@@ -1,4 +1,4 @@
-import json,httpx,os,subprocess,zipfile,py7zr
+import json,httpx,os,subprocess,zipfile
 from shutil import copyfile,rmtree
 
 def gtmp(suf=''): return os.getenv('TEMP').strip('\\') + '\\tmp' + os.urandom(8).hex() + suf
@@ -25,16 +25,16 @@ class DLDB:
         if exe.lower().endswith('.exe'): exe = exe[:-4]
         if exe in self.db:
             if not os.path.exists('bin/' + self.db[exe]['p']):
+                print('Downloading',exe)
                 for e in self.db[exe]['fs']:
-                    ex = e.get('ex','.' + e['u'].split('?').split('.')[-1]).lower()
-                    p = e.get('p',gtmp(ex))
+                    if 'p' in e: p = 'bin/' + e['p']
+                    else:
+                        ex = e.get('ex','.' + e['u'].split('?')[0].split('.')[-1]).lower()
+                        p = gtmp(ex)
                     self.dl(e['u'],p)
                     if 'x' in e:
                         if ex == '.zip':
                             with zipfile.ZipFile(p,'r') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
-                        elif ex == '.7z':
-                            with py7zr.SevenZipFile(p,'r') as z:
                                 for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
                         elif ex == '.msi':
                             td = gtmp()
@@ -48,4 +48,5 @@ class DLDB:
         return exei
     def dl(self,url:str,out:str):
         with xopen(out,'wb') as f:
-            for c in self.c.get(url,stream=True).iter_bytes(4096): f.write(c)
+            with self.c.stream("GET",url) as r:
+                for c in r.iter_bytes(4096): f.write(c)

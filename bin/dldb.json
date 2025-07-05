@@ -1,6 +1,6 @@
 {
     "trid":{
-        "p":"bin/trid/trid.exe",
+        "p":"trid/trid.exe",
         "fs":[
             {
                 "u":"https://mark0.net/download/trid_w32.zip",
@@ -13,7 +13,7 @@
         ]
     },
     "7z":{
-        "p":"bin/7z/7z.exe",
+        "p":"7z/7z.exe",
         "fs":[
             {
                 "u":"https://www.7-zip.org/a/7z2500-x64.msi",
