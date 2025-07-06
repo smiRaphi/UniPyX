@@ -1,4 +1,4 @@
-import json,httpx,os,subprocess,zipfile,tarfile
+import json,httpx,os,subprocess,shlex,zipfile,tarfile
 from shutil import copyfile,rmtree
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,9 +24,9 @@ class DLDB:
 
     def run(self,cmd:list,stdin:bytes|str=None,text=True) -> tuple[int,str|bytes,str|bytes]:
         if self.print_try: print('Trying with',cmd[0])
-        cmd[0] = self.get(cmd[0])
+        if type(cmd) == list: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
-        p = subprocess.Popen([str(x) for x in cmd],text=text,stdout=-1,stderr=-1,stdin=-1 if stdin != None else None)
+        p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,stdout=-1,stderr=-1,stdin=-1 if stdin != None else None)
         if stdin != None: o,e = p.communicate(input=stdin)
         else:
             p.wait()

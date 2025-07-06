@@ -1,6 +1,15 @@
 {
+    "7z":[
+        ".7z archive"
+    ],
+
+    "VISE Installer":[
+        "vise mindvision wizard module"
+    ],
+
     "InstallShield Setup":[
-        "installshield setup"
+        "installshield setup",
+        "installshield 3.x custom"
     ],
     "Stirling Compressed":[
         "stirling technologies installshield compressed"

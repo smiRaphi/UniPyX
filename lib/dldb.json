@@ -11,6 +11,15 @@
             }
         ]
     },
+    "exeinfope":{
+        "p":"ExeinfoPe/exeinfope.exe",
+        "fs":[{
+            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.0/Exeinfo_0090.zip",
+            "x":{"ExeinfoPe/exeinfope.exe":"ExeinfoPe/exeinfope.exe",
+            "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll",
+            "ExeinfoPe/userdb.txt":"ExeinfoPe/userdb.txt"}
+        }]
+    },
 
     "7z":{
         "p":"7z/7z.exe",
@@ -28,15 +37,24 @@
     },
     "quickbms":{
         "p":"quickbms.exe",
-        "fs":[{
-            "u":"https://aluigi.altervista.org/papers/quickbms.zip",
-            "x":{"quickbms.exe":"quickbms.exe"}
-        }]
+        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/quickbms.exe"]
     },
     "instexpl":{
-        "p":"InstExpl.wcx",
-        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/InstExpl.wcx",
-              "https://update.bioruebe.com/uniextract/nightly/bin/InstExpl.dll"]
+        "p":"InstExpl/InstExpl.wcx",
+        "fs":[["https://update.bioruebe.com/uniextract/nightly/bin/InstExpl.wcx","InstExpl/InstExpl.wcx"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/InstExpl.dll","InstExpl/InstExpl.dll"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/Bzip2_1.unp","InstExpl/Unp/Bzip2_1.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/Bzip2_2.unp","InstExpl/Unp/Bzip2_2.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/Bzip2_3.unp","InstExpl/Unp/Bzip2_3.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/Eschalon.unp","InstExpl/Unp/Eschalon.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/Gentee.unp","InstExpl/Unp/Gentee.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/inflate1.unp","InstExpl/Unp/inflate1.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/inflate2.unp","InstExpl/Unp/inflate2.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/inflate3.unp","InstExpl/Unp/inflate3.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/lzma.unp","InstExpl/Unp/lzma.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/pkware.unp","InstExpl/Unp/pkware.unp"],
+              ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/vise.unp","InstExpl/Unp/vise.unp"]
+        ]
     },
 
     "isx":{

@@ -69,6 +69,13 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
     i = inp
     o = out
     match t:
+        case '7z'|'zip'|'rar':
+            run(['7z','x',i,'-o' + o])
+            if os.listdir(o): return
+
+        case 'VISE Installer':
+            run(['quickbms',db.get('instexpl'),i,o])[2]
+            if os.listdir(o): return
         case 'InstallShield Setup':
             tf = TmpFile(extname(i))
             tf.link(i)
@@ -84,7 +91,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 raise NotImplementedError("isxunpack returned:\n" + po)
             tf.destroy()
 
-            run(['quickbms',db.get('instexpl'),i,o])
+            db.run_cmd(['quickbms',db.get('instexpl'),i,o])
             fs = os.listdir(o)
             if fs:
                 if not 'SETUP.EXE' in fs: return
