@@ -1,5 +1,4 @@
 __pycache__
 
-/bin/*
-!/bin/dldb.json
+/bin
 /dev
