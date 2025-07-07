@@ -28,15 +28,13 @@ class DLDB:
         if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
         p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,stdout=-1,stderr=-1,stdin=-1 if stdin != None else None)
-        if stdin != None: o,e = p.communicate(input=stdin)
-        else:
-            if timeout:
-                for _ in range(timeout*10):
-                    if p.poll() != None: break
-                    sleep(0.1)
-                else: p.kill()
-            else: p.wait()
+        if timeout:
+            for _ in range(timeout*10):
+                if p.poll() != None: break
+                sleep(0.1)
+            else: p.kill()
             o,e = p.stdout.read(),p.stderr.read()
+        else: o,e = p.communicate(input=stdin)
         return p.returncode,o,e
     def get(self,exei:str):
         cd = os.getcwd()
