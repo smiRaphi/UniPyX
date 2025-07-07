@@ -108,6 +108,57 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return
         case 'InstallShield Setup':
+            f = open(i,'rb')
+            f.seek(943)
+            if f.read(42) == b'InstallShield Self-Extracting Stub Program':
+                print('Trying with custom extractor')
+                ofs = []
+                while True:
+                    x = f.read(1)
+                    if not x: break
+                    if x == b'\x50':
+                        if f.read(3) == b'\x4B\3\4':
+                            of = open(o + f'\\FILE{len(ofs)+1}.zip','wb')
+                            of.write(b'PK\3\4')
+                            of.write(f.read(14))
+                            cs = f.read(4)
+                            of.write(cs)
+                            cs = int.from_bytes(cs,'little')
+                            of.write(f.read(4))
+                            fnl = f.read(2)
+                            of.write(fnl)
+                            fnl = int.from_bytes(fnl,'little')
+                            of.write(f.read(2))
+                            fn = f.read(fnl)
+                            of.write(fn)
+                            ofs.append((of.name,fn.decode()))
+                            of.write(f.read(cs))
+
+                            chhd = f.read(4)
+                            assert chhd == b'PK\1\2'
+                            of.write(chhd)
+                            of.write(f.read(42+fnl))
+
+                            chhd = f.read(4)
+                            assert chhd == b'PK\5\6'
+                            of.write(chhd)
+                            of.write(f.read(12))
+                            of.write((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
+                            of.write(b'\0\0')
+                            of.close()
+                            
+                        else: f.seek(-3,1)
+                if ofs:
+                    f.close()
+                    import zipfile
+                    for x in ofs:
+                        with zipfile.ZipFile(x[0]) as z: xopen(o + '/' + x[1],'wb').write(z.read(x[1]))
+                        remove(x[0])
+                    if os.path.exists(o + '/_INST32I.EX_'):
+                        if fix_isinstext(o,db): return
+                    else: return
+            f.close()
+
             run(['isx',i,o])
             if exists(o + '/' + tbasename(i) + '_ext.bin'):
                 remove(o)
@@ -125,7 +176,6 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if 'All Files are Successfuly Extracted!' in po and len(os.listdir(td.p)) == 1:
                 copydir(td + '/' + os.listdir(td.p)[0],o,True)
                 if os.path.exists(o + '/_inst32i.ex_'):
-                    for x in os.listdir(o): rename(o + '/' + x,o + '/' + x.upper())
                     if fix_isinstext(o,db): return
                 else: return
 
@@ -146,7 +196,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             osj = OSJump()
             osj.jump(td)
             symlink(i,'archive.z')
-            run(['icomp','archive.z','*.*','-d','-i'])
+            run(['icomp','archive.z','*.*','-d','-i'],timeout=2)
             remove('archive.z')
             osj.back()
             if not os.listdir(td.p): td.destroy()
@@ -205,7 +255,7 @@ def fix_isinstext(o:str,db:DLDB):
 
     for x in fs:
         x = x.upper()
-        if x == '_SETUP.LIB' or (x.startswith('_SETUP.') and x.endswith(('0','1','2','3','4','5','6','7','8','9'))):
+        if x in ['_SETUP.LIB','DATA.Z'] or (x.startswith('_SETUP.') and x.endswith(('0','1','2','3','4','5','6','7','8','9'))):
             mkdir(o + '/' + x.replace('.','_'))
             r = not extract(o + '\\' + x,o + '\\' + x.replace('.','_'),'InstallShield Z',db)
             if not r: print("Could not extract",x)

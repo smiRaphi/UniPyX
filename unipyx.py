@@ -48,8 +48,7 @@ def analyze(inp:str):
             if m: ts.append(m[1].strip())
 
     nts = checktdb(ts)
-    if not nts: print(ts)
-    else: nts = list(set(nts))
+    nts = list(set(nts))
     for x in DDB:
         if 'rq' in x and x['rq'] not in nts: continue
         if 'rqr' in x and x['rqr'] not in ts: continue
@@ -75,6 +74,7 @@ def analyze(inp:str):
                 if f.read(len(cv)) == cv:
                     if x.get('s'): nts = [x['rs']]
                     else: nts.append(x['rs'])
+    if not nts: print(ts)
 
     return nts
 def extract(inp:str,out:str,ts:list[str]=None):
