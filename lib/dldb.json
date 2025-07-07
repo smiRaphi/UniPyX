@@ -81,11 +81,8 @@
         "fs":["http://www.compdigitec.com/labs/files/isxunpack.exe"]
     },
     "unshield":{
-        "p":"unshield/unshield.exe",
-        "fs":[{
-            "u":"https://raw.githubusercontent.com/ScoopInstaller/Binary/master/unshield/unshield-1.5.1.7z",
-            "x":{"unshield.exe":"unshield/unshield.exe","zlib.dll":"unshield/zlib.dll"}
-        }]
+        "p":"unshield.exe",
+        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/unshield.exe"]
     },
     "icomp":{
         "p":"ICOMP.EXE",

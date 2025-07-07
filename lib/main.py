@@ -112,7 +112,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if exists(o + '/' + tbasename(i) + '_ext.bin'):
                 remove(o)
                 mkdir(o)
-            else: return
+            elif os.listdir(o): return
 
             td = TmpDir()
             tf = td + '\\' + basename(i)

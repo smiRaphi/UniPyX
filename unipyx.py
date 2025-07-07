@@ -15,6 +15,12 @@ DDB:list[dict] = json.load(xopen('lib/ddb.json'))
 TDBF = set(sum(TDB.values(),[]))
 db = DLDB()
 
+def cleanp(i:str):
+    i = i.replace('/','\\').rstrip('\\')
+    while i.endswith('\\.'): i = i[:-1].rstrip('\\')
+    while i.startswith('.\\'): i = i[1:].lstrip('\\')
+    i = i.replace('\\.\\','\\')
+    return os.path.abspath(i)
 def checktdb(i:list):
     o = []
     for x in i:
@@ -23,45 +29,58 @@ def checktdb(i:list):
             if x.lower() in TDB[t]: o.append(t)
     return o
 def analyze(inp:str):
+    inp = cleanp(inp)
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
 
     if os.path.isfile(inp) and open(inp,'rb').read(2) == b'MZ':
         log = gtmp('.log')
         db.run(['exeinfope',inp + '*','/s','/log:' + log])
-        for _ in range(50):
+        for _ in range(15):
             if os.path.exists(log) and os.path.getsize(log): break
             sleep(0.1)
-        else: raise Exception('exeinfope timed out')
-        lg = open(log,encoding='utf-8').read()
-        os.remove(log)
-        m = EIPER1.search(lg)
-        if m: ts.append(m[1])
-        m = EIPER2.search(lg)
-        if m: ts.append(m[1].strip())
+        if os.path.exists(log):
+            lg = open(log,encoding='utf-8').read()
+            os.remove(log)
+            m = EIPER1.search(lg)
+            if m: ts.append(m[1])
+            m = EIPER2.search(lg)
+            if m: ts.append(m[1].strip())
 
     nts = checktdb(ts)
     if not nts: print(ts)
     else: nts = list(set(nts))
     for x in DDB:
         if 'rq' in x and x['rq'] not in nts: continue
-        if x['d']['c'] == 'contain' and os.path.isfile(inp):
-            cv = x['d']['v'].encode()
-            f = open(inp,'rb')
-            sp = x['d']['r'][0]
-            if sp < 0: sp = f.seek(0,2) + sp
-            if sp < 0: sp = 0
-            f.seek(sp)
-            if cv in f.read(x['d']['r'][1]):
-                if x.get('s'): nts = [x['rs']]
-                else: nts.append(x['rs'])
-            f.close()
-                    
+        if 'rqr' in x and x['rqr'] not in ts: continue
+        if os.path.isfile(inp):
+            if x['d']['c'] == 'contain':
+                cv = x['d']['v'].encode()
+                f = open(inp,'rb')
+                sp = x['d']['r'][0]
+                if sp < 0: sp = f.seek(0,2) + sp
+                if sp < 0: sp = 0
+                f.seek(sp)
+                if cv in f.read(x['d']['r'][1]):
+                    if x.get('s'): nts = [x['rs']]
+                    else: nts.append(x['rs'])
+                f.close()
+            elif x['d']['c'] == 'isat':
+                cv = x['d']['v'].encode()
+                f = open(inp,'rb')
+                sp = x['d']['o']
+                if sp < 0: sp = f.seek(0,2) + sp
+                if sp < 0: sp = 0
+                f.seek(sp)
+                if f.read(len(cv)) == cv:
+                    if x.get('s'): nts = [x['rs']]
+                    else: nts.append(x['rs'])
+
     return nts
 def extract(inp:str,out:str,ts:list[str]=None):
-    out = os.path.abspath(out).replace('/','\\')
+    out = cleanp(out)
     assert not os.path.exists(out),'Output directory already exists'
-    inp = os.path.abspath(inp).replace('/','\\')
+    inp = cleanp(inp)
     if ts == None: ts = analyze(inp)
     assert ts,'Unknown file type'
 

@@ -4,5 +4,11 @@
         "d":{"c":"contain","v":"MSIEng.isc","r":[-5000000,null]},
         "rs":"InstallShield MSI",
         "s":1
+    },
+    {
+        "rqr":"Win16 NE executable (generic)",
+        "d":{"c":"isat","v":"InstallShield Self-Extracting Stub Program","o":943},
+        "rs":"InstallShield Setup",
+        "s":1
     }
 ]
