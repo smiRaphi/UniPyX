@@ -60,7 +60,13 @@ def analyze(inp:str):
     for x in DDB:
         if 'rq' in x and x['rq'] not in nts: continue
         if 'rqr' in x and x['rqr'] not in ts: continue
-        if os.path.isfile(inp):
+        if x['d'] == 'py':
+            lc = {}
+            exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
+            if lc['check'](inp):
+                if x.get('s'): nts = [x['rs']]
+                else: nts.append(x['rs'])
+        elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
                 cv = x['d']['v'].encode()
                 f = open(inp,'rb')

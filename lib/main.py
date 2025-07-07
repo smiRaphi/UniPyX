@@ -102,6 +102,17 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     for x in tm: mv(x,o + '/$INSFILES')
                 if exists(o + '/$INSTDIR'): copydir(o + '/$INSTDIR',o,True)
                 return
+        case 'Wise Installer':
+            run(['e_wise',i,o])
+            if os.path.exists(o + '/00000000.BAT'):
+                osj = OSJump()
+                osj.jump(o)
+                e,_,r = run(['00000000.BAT'],getexe=False)
+                osj.back()
+                if e: print('BAT returned',e,r)
+                else: remove(o + '/00000000.BAT')
+                return
+            if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'MSI':
             run(['msiexec','/a',i,'/qb','TARGETDIR=' + o],getexe=False)
             if os.listdir(o): return

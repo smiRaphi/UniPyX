@@ -26,6 +26,7 @@
     "NSIS Installer":[
         "nsis - nullsoft scriptable install system"
     ],
+    "Wise Installer":[],
     "MSI":[
         "microsoft windows installer",
         "windows sdk setup transformer script"

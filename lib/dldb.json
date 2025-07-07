@@ -69,6 +69,13 @@
         "fs":["https://update.bioruebe.com/uniextract/nightly/bin/x64/UnRAR.exe"]
     },
 
+    "e_wise":{
+        "p":"E_WISE_W.EXE",
+        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/E_WISE_W.EXE",
+              "https://update.bioruebe.com/uniextract/nightly/bin/E_WISE.INI"
+        ]
+    },
+
     "isx":{
         "p":"ISx.exe",
         "fs":[{
