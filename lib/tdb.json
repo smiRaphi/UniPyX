@@ -2,19 +2,47 @@
     "7z":[
         ".7z archive"
     ],
+    "ZIP":[
+        "zip compressed archive"
+    ],
+    "LHARC":[
+        "lharc/lzark compressed archive (generic)"
+    ],
+    "RAR":[
+        "winrar self extracting archive (4.x-5.x)",
+        "rar archive"
+    ],
+    "MSCAB":[
+        "cab installer",
+        "win32 ms cabinet self-extractor (wextract stub)"
+    ],
+    "StuffIt":[
+        "stuffit compressed archive (var.2)"
+    ],
 
     "VISE Installer":[
         "vise mindvision wizard module"
+    ],
+    "NSIS Installer":[
+        "nsis - nullsoft scriptable install system"
+    ],
+    "MSI":[
+        "microsoft windows installer",
+        "windows sdk setup transformer script"
     ],
 
     "InstallShield Setup":[
         "installshield setup",
         "installshield 3.x custom"
     ],
-    "Stirling Compressed":[
-        "stirling technologies installshield compressed"
-    ],
+    "InstallShield MSI":[],
     "InstallShield Z":[
         "installshield z archive"
+    ],
+    "InstallShield Archive":[
+        "installshield compressed archive (generic)"
+    ],
+    "Stirling Compressed":[
+        "stirling technologies installshield compressed"
     ]
 }

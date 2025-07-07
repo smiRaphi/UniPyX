@@ -25,7 +25,14 @@
         "p":"7z/7z.exe",
         "fs":[{
             "u":"https://github.com/ip7z/7zip/releases/download/25.00/7z2500-x64.msi",
-            "x":{"7-Zip/7z.exe":"7z/7z.exe","7-Zip/7z.dll":"7z/7z.dll"}
+            "x":{"Files/7-Zip/7z.exe":"7z/7z.exe","Files/7-Zip/7z.dll":"7z/7z.dll"}
+        }]
+    },
+    "unar":{
+        "p":"Unarchiver/unar.exe",
+        "fs":[{
+            "u":"https://cdn.theunarchiver.com/downloads/unarWindows.zip",
+            "x":{"unar.exe":"Unarchiver/unar.exe","Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"}
         }]
     },
     "deark":{
@@ -57,10 +64,15 @@
         ]
     },
 
+    "unrar":{
+        "p":"UnRAR.exe",
+        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/x64/UnRAR.exe"]
+    },
+
     "isx":{
         "p":"ISx.exe",
         "fs":[{
-            "u":"https://github.com/lifenjoiner/ISx/releases/download/v0.3.10/ISx-v0.3.10.7z",
+            "u":"https://github.com/lifenjoiner/ISx/releases/download/v0.3.11/ISx-v0.3.11.7z",
             "x":{"ISx.exe":"ISx.exe"}
         }]
     },
@@ -80,6 +92,28 @@
         "fs":[{
             "u":"https://www.sac.sk/download/pack/icomp95.zip",
             "x":{"ICOMP.EXE":"ICOMP.EXE"}
+        }]
+    },
+    "i5comp":{
+        "p":"i5comp/I5comp.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/i5comp21.rar",
+            "x":{
+                "I5comp.exe" :"i5comp/I5comp.exe",
+                "ZD51145.DLL":"i5comp/ZD51145.DLL",
+                "ZD50149.DLL":"i5comp/ZD50149.DLL"
+            }
+        }]
+    },
+    "i6comp":{
+        "p":"i6comp.exe",
+        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/i6comp.exe"]
+    },
+    "iscab":{
+        "p":"ISCAB/ISCAB.exe",
+        "fs":[{
+            "u":"https://dl.dropboxusercontent.com/s/juxy8fc79ccfqra/InstallShield_Cabinet_File_Viewer.zip",
+            "x":{"InstallShield_Cabinet_File_Viewer/ISCAB.exe":"ISCAB/ISCAB.exe","InstallShield_Cabinet_File_Viewer/ISTools.dll":"ISCAB/ISTools.dll"}
         }]
     }
 }

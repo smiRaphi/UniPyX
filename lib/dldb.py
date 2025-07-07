@@ -1,4 +1,4 @@
-import json,httpx,os,subprocess,shlex,zipfile,tarfile
+import json,httpx,os,subprocess,zipfile,tarfile
 from shutil import copyfile,rmtree
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,9 +22,9 @@ class DLDB:
             pass
         self.db = json.load(xopen(self.dbp))
 
-    def run(self,cmd:list,stdin:bytes|str=None,text=True) -> tuple[int,str|bytes,str|bytes]:
+    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True) -> tuple[int,str|bytes,str|bytes]:
         if self.print_try: print('Trying with',cmd[0])
-        if type(cmd) == list: cmd[0] = self.get(cmd[0])
+        if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
         p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,stdout=-1,stderr=-1,stdin=-1 if stdin != None else None)
         if stdin != None: o,e = p.communicate(input=stdin)
@@ -63,11 +63,16 @@ class DLDB:
                             self.run(['7z','x','-y','-o' + td,p])
                             for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
                             rmtree(td)
+                        elif ex == '.rar':
+                            td = gtmp()
+                            self.run(['unrar','x','-or','-op' + td,p])
+                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
+                            rmtree(td)
                         elif ex == '.msi':
                             td = gtmp()
                             os.makedirs(td,exist_ok=True)
-                            subprocess.run(['msiexec','/a',p,'/qb','TARGETDIR=' + td],stdout=-1,stderr=-1)
-                            for tx in e['x']: copy(td + '/Files/' + tx,'bin/' + e['x'][tx])
+                            self.run(['msiexec','/a',p,'/qb','TARGETDIR=' + td],getexe=False)
+                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
                             rmtree(td)
                         else: raise NotImplementedError(p + f' [{ex}]')
                         os.remove(p)
@@ -76,5 +81,9 @@ class DLDB:
         return exei
     def dl(self,url:str,out:str):
         with xopen(out,'wb') as f:
-            with self.c.stream("GET",url,follow_redirects=True) as r:
-                for c in r.iter_bytes(4096): f.write(c)
+            while True:
+                try:
+                    with self.c.stream("GET",url,follow_redirects=True) as r:
+                        for c in r.iter_bytes(4096): f.write(c)
+                    break
+                except httpx.ConnectError: pass

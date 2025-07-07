@@ -1,0 +1,8 @@
+[
+    {
+        "rq":"InstallShield Setup",
+        "d":{"c":"contain","v":"MSIEng.isc","r":[-5000000,null]},
+        "rs":"InstallShield MSI",
+        "s":1
+    }
+]
