@@ -8,7 +8,7 @@ from lib.dldb import DLDB,xopen,gtmp
 from lib.main import extract as _extract
 TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
 EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
-EIPER2 = re.compile(r'^.+? - .+? - ([^\(!\n:,\]\[]]+)')
+EIPER2 = re.compile(r'^.+? - .+? - ([^\(!\n:,\]\[]+)')
 
 TDB:dict = json.load(xopen('lib/tdb.json'))
 DDB:list[dict] = json.load(xopen('lib/ddb.json'))
@@ -33,19 +33,27 @@ def analyze(inp:str):
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
 
-    if os.path.isfile(inp) and open(inp,'rb').read(2) == b'MZ':
-        log = gtmp('.log')
-        db.run(['exeinfope',inp + '*','/s','/log:' + log])
-        for _ in range(15):
-            if os.path.exists(log) and os.path.getsize(log): break
-            sleep(0.1)
-        if os.path.exists(log):
-            lg = open(log,encoding='utf-8').read()
-            os.remove(log)
-            m = EIPER1.search(lg)
-            if m: ts.append(m[1])
-            m = EIPER2.search(lg)
-            if m: ts.append(m[1].strip())
+    if os.path.isfile(inp):
+        f = open(inp,'rb')
+        if f.read(2) == b'MZ':
+            f.seek(0x3C)
+            f.seek(int.from_bytes(f.read(4),'little'))
+            if f.read(4) == b'PE\0\0':
+                f.close()
+                log = gtmp('.log')
+                db.run(['exeinfope',inp + '*','/s','/log:' + log])
+                for _ in range(15):
+                    if os.path.exists(log) and os.path.getsize(log): break
+                    sleep(0.1)
+                if os.path.exists(log):
+                    lg = open(log,encoding='utf-8').read()
+                    os.remove(log)
+                    m = EIPER1.search(lg)
+                    if m: ts.append(m[1])
+                    m = EIPER2.search(lg)
+                    if m: ts.append(m[1].strip())
+            else: f.close()
+        else: f.close()
 
     nts = checktdb(ts)
     nts = list(set(nts))
