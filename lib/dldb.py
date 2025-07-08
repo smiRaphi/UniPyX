@@ -56,6 +56,8 @@ class DLDB:
                         p = gtmp(ex)
                     self.dl(e['u'],p)
                     if 'x' in e:
+                        bk = self.print_try
+                        self.print_try = False
                         if ex == '.zip':
                             with zipfile.ZipFile(p,'r') as z:
                                 for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
@@ -79,6 +81,7 @@ class DLDB:
                             for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
                             rmtree(td)
                         else: raise NotImplementedError(p + f' [{ex}]')
+                        self.print_try = bk
                         os.remove(p)
             exei = os.path.abspath('bin/' + self.db[exe]['p'])
         os.chdir(cd)

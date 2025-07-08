@@ -1,11 +1,10 @@
 import os
 from lib.dldb import DLDB
-from shutil import move,rmtree,copytree,copyfile
+from shutil import rmtree,copytree,copyfile
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext = os.path.basename,os.path.dirname,os.path.splitext
 symlink,rename = os.symlink,os.rename
-mv = move
 def tbasename(i:str): return splitext(basename(str(i)))[0]
 def extname(i:str): return splitext(str(i))[1]
 def noext(i:str): return splitext(str(i))[0]
@@ -26,6 +25,10 @@ def copy(i:str,o:str):
             copytree(i,o + basename(i),dirs_exist_ok=True)
         else: copytree(i,o,dirs_exist_ok=True)
 cp = copy
+def move(i:str,o:str):
+    copy(i,o)
+    remove(i)
+mv = move
 def copydir(i:str,o:str,delete=False):
     mkdir(o)
     for x in os.listdir(str(i)): cp(i + '/' + x,o + '/' + x)
@@ -73,9 +76,26 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
     i = inp
     o = out
     match t:
-        case '7z'|'ZIP'|'LHARC'|'MSCAB':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex':
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
+        case 'ZIP'|'InstallShield Setup ForTheWeb':
+            if open(i,'rb').read(2) == b'MZ':
+                run(['7z','x',i,'-o' + o,'-aoa'])
+                if os.path.exists(o + '/_INST32I.EX_'):
+                    if fix_isinstext(o,db): return
+                elif os.listdir(o): return
+            else:
+                run(['unzip','-q','-o',i,'-d',o])
+                if os.listdir(o): return
+                run(['7z','x',i,'-o' + o,'-aoa'])
+                if os.listdir(o): return
+                import zipfile
+                try:
+                    with zipfile.ZipFile(i,'r') as z: z.extractall(o)
+                except: pass
+                else: return
+
         case 'RAR':
             run(['unrar','x','-or','-op' + o,i])
             if os.listdir(o): return
@@ -84,6 +104,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'StuffIt':
            e,_,_ = run(['unar','-f','-o',o,i])
            if not e: return
+        case 'UPX':
+            run(['upx','-d','-o',o + '/' + basename(i),i])
+            if exists(o + '/' + basename(i)): return
 
         case 'VISE Installer':
             run(['quickbms',db.get('instexpl'),i,o])[2]
@@ -113,6 +136,13 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 else: remove(o + '/00000000.BAT')
                 return
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
+        case 'Inno Installer':
+            run(['innounp','-x','-d' + o,'-y',i])
+            if exists(o + '/{app}'):
+                for x in os.listdir(o):
+                    if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
+                copydir(o + '/{app}',o,True)
+                return
         case 'MSI':
             run(['msiexec','/a',i,'/qb','TARGETDIR=' + o],getexe=False)
             if os.listdir(o): return
@@ -217,9 +247,8 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 return
         case 'InstallShield Archive':
             td = TmpDir()
-            osj = OSJump()
             osj.jump(td)
-            e,_,_ = run(['i6comp','x','-rof',i])
+            e,_,_ = run(['i5comp','x','-rof',i])
             osj.back()
             if not e and os.listdir(td.p):
                 copydir(td,o)
@@ -228,8 +257,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             td.destroy()
 
             td = TmpDir()
+            osj = OSJump()
             osj.jump(td)
-            e,_,_ = run(['i5comp','x','-rof',i])
+            e,_,_ = run(['i6comp','x','-rof',i])
             osj.back()
             if not e and os.listdir(td.p):
                 copydir(td,o)
@@ -255,6 +285,13 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 if x.startswith('output.') and len(x.rsplit('.',1)[0]) > 10: move(o + '/' + x,o + '/' + x.split('.',2)[2])
             if fs: return
 
+        case 'Windows Help File':
+            run(['7z','x',i,'-o' + o,'-aou'])
+            if os.listdir(o):
+                for x in os.listdir(o):
+                    xp = o + '/' + x
+                    if x[0] in '$#': remove(xp)
+                return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

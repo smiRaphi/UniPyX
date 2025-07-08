@@ -26,6 +26,9 @@
         "fs":[{
             "u":"https://github.com/ip7z/7zip/releases/download/25.00/7z2500-x64.msi",
             "x":{"Files/7-Zip/7z.exe":"7z/7z.exe","Files/7-Zip/7z.dll":"7z/7z.dll"}
+        },{
+            "u":"https://www.tc4shell.com/binary/eDecoder.zip",
+            "x":{"eDecoder.64.dll":"7z/Formats/eDecoder.64.dll"}
         }]
     },
     "unar":{
@@ -64,9 +67,20 @@
         ]
     },
 
+    "unzip":{
+        "p":"unzip.exe",
+        "fs":["https://update.bioruebe.com/uniextract/nightly/bin/unzip.exe"]
+    },
     "unrar":{
         "p":"UnRAR.exe",
         "fs":["https://update.bioruebe.com/uniextract/nightly/bin/x64/UnRAR.exe"]
+    },
+    "upx":{
+        "p":"upx.exe",
+        "fs":[{
+            "u":"https://github.com/upx/upx/releases/download/v5.0.1/upx-5.0.1-win64.zip",
+            "x":{"upx-5.0.1-win64/upx.exe":"upx.exe"}
+        }]
     },
 
     "e_wise":{
@@ -74,6 +88,13 @@
         "fs":["https://update.bioruebe.com/uniextract/nightly/bin/E_WISE_W.EXE",
               "https://update.bioruebe.com/uniextract/nightly/bin/E_WISE.INI"
         ]
+    },
+    "innounp":{
+        "p":"innounp.exe",
+        "fs":[{
+            "u":"https://netcologne.dl.sourceforge.net/project/innounp/innounp/innounp%200.50/innounp050.rar?viasf=1",
+            "x":{"innounp.exe":"innounp.exe"}
+        }]
     },
 
     "isx":{
