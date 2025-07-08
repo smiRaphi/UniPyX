@@ -8,7 +8,6 @@ from lib.dldb import DLDB,xopen,gtmp
 from lib.main import extract as _extract
 TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
 EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
-EIPER2 = re.compile(r'^.+? - .+? - ([^\(!\n:,\]\[]+)')
 
 TDB:dict = json.load(xopen('lib/tdb.json'))
 DDB:list[dict] = json.load(xopen('lib/ddb.json'))
@@ -46,12 +45,11 @@ def analyze(inp:str):
                     if os.path.exists(log) and os.path.getsize(log): break
                     sleep(0.1)
                 if os.path.exists(log):
-                    lg = open(log,encoding='utf-8').read()
+                    lg = open(log,encoding='utf-8').read().strip()
                     os.remove(log)
                     m = EIPER1.search(lg)
                     if m: ts.append(m[1])
-                    m = EIPER2.search(lg)
-                    if m: ts.append(m[1].strip())
+                    for x in lg.split('\n')[0].split(' - ')[1:]: ts.append(x.split('(')[0].split('[')[0].strip(' ,!:;'))
             else: f.close()
         else: f.close()
 
