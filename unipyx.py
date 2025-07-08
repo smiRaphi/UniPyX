@@ -1,7 +1,7 @@
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-import re,json
+import re,json,ast
 from time import sleep
 from shutil import rmtree
 from lib.dldb import DLDB,xopen,gtmp
@@ -56,36 +56,37 @@ def analyze(inp:str):
     nts = checktdb(ts)
     nts = list(set(nts))
     for x in DDB:
-        if 'rq' in x and x['rq'] not in nts: continue
-        if 'rqr' in x and x['rqr'] not in ts: continue
+        if 'rq'  in x and not (x['rq']  in nts or (x['rq'] == None and not nts)): continue
+        if 'rqr' in x and not (x['rqr'] in ts or (x['rqr'] == None and not ts )): continue
         if x['d'] == 'py':
             lc = {}
             exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
             if lc['check'](inp):
                 if x.get('s'): nts = [x['rs']]
                 else: nts.append(x['rs'])
+        elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
         elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
-                cv = x['d']['v'].encode()
+                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode()
                 f = open(inp,'rb')
                 sp = x['d']['r'][0]
                 if sp < 0: sp = f.seek(0,2) + sp
                 if sp < 0: sp = 0
                 f.seek(sp)
-                if cv in f.read(x['d']['r'][1]):
-                    if x.get('s'): nts = [x['rs']]
-                    else: nts.append(x['rs'])
+                ret = cv in f.read(x['d']['r'][1])
                 f.close()
             elif x['d']['c'] == 'isat':
-                cv = x['d']['v'].encode()
+                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode()
                 f = open(inp,'rb')
                 sp = x['d']['o']
                 if sp < 0: sp = f.seek(0,2) + sp
                 if sp < 0: sp = 0
                 f.seek(sp)
-                if f.read(len(cv)) == cv:
-                    if x.get('s'): nts = [x['rs']]
-                    else: nts.append(x['rs'])
+                ret = f.read(len(cv)) == cv
+                f.close()
+        if ret:
+            if x.get('s'): nts = [x['rs']]
+            else: nts.append(x['rs'])
     if not nts: print(ts)
 
     return nts

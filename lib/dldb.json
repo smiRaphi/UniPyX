@@ -82,6 +82,72 @@
             "x":{"upx-5.0.1-win64/upx.exe":"upx.exe"}
         }]
     },
+    "dolphintool":{
+        "p":"DolphinTool.exe",
+        "fs":[{
+            "u":"https://dl.dolphin-emu.org/builds/e0/6c/dolphin-master-2506-189-x64.7z",
+            "x":{"Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"}
+        }]
+    },
+    "wit":{
+        "p":"WIT/wit.exe",
+        "fs":[{
+            "u":"https://wit.wiimm.de/download/wit-v3.05a-r8638-cygwin64.zip",
+            "x":{
+                "wit-v3.05a-r8638-cygwin64/bin/wit.exe":"WIT/wit.exe",
+                "wit-v3.05a-r8638-cygwin64/bin/cygcrypto-1.1.dll":"WIT/cygcrypto-1.1.dll",
+                "wit-v3.05a-r8638-cygwin64/bin/cygncursesw-10.dll":"WIT/cygncursesw-10.dll",
+                "wit-v3.05a-r8638-cygwin64/bin/cygwin1.dll":"WIT/cygwin1.dll",
+                "wit-v3.05a-r8638-cygwin64/bin/cygz.dll":"WIT/cygz.dll"
+            }
+        }]
+    },
+    "wszst":{
+        "p":"WSZST/wszst.exe",
+        "fs":[{
+            "u":"https://szs.wiimm.de/download/szs-v2.42a-r8989-cygwin64.zip",
+            "x":{
+                "szs-v2.42a-r8989-cygwin64/bin/wszst.exe":"WSZST/wszst.exe",
+                "szs-v2.42a-r8989-cygwin64/bin/cygcrypto-1.1.dll":"WSZST/cygcrypto-1.1.dll",
+                "szs-v2.42a-r8989-cygwin64/bin/cygwin1.dll":"WSZST/cygwin1.dll",
+                "szs-v2.42a-r8989-cygwin64/bin/cygpng16-16.dll":"WSZST/cygpng16-16.dll",
+                "szs-v2.42a-r8989-cygwin64/bin/cygncursesw-10.dll":"WSZST/cygncursesw-10.dll",
+                "szs-v2.42a-r8989-cygwin64/bin/cygz.dll":"WSZST/cygz.dll"
+            }
+        }]
+    },
+    "gbalzss":{
+        "p":"gbalzss.exe",
+        "fs":[{
+            "u":"https://static.wiidatabase.de/U8Tool.zip",
+            "x":{"gbalzss.exe":"gbalzss.exe"}
+        }]
+    },
+    "gxpand":{
+        "p":"gxpand.exe",
+        "fs":[{
+            "u":"https://files.gamebanana.com/tools/gxpand.rar",
+            "x":{"gxpand.exe":"gxpand.exe"}
+        }]
+    },
+    "bnrtool":{
+        "p":"bnrtool/bnrtool.exe",
+        "fs":[{
+            "u":"https://github.com/xchellx/bnrtool/releases/download/v1.1.0/bnrtool_v1.1.0_msys2-clang64_net9.0_win-x64.7z",
+            "x":{
+                "bnrtool/bnrtool.exe":"bnrtool/bnrtool.exe",
+                "bnrtool/libgxtexture.dll":"bnrtool/libgxtexture.dll",
+                "bnrtool/libc++.dll":"bnrtool/libc++.dll"
+            }
+        }]
+    },
+    "gcfsysd":{
+        "p":"gcfsysd.exe",
+        "fs":[{
+            "u":"https://www.hcs64.com/files/gcfsysd01.zip",
+            "x":{"gcfsysd.exe":"gcfsysd.exe"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

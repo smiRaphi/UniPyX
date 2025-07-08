@@ -23,19 +23,24 @@ class DLDB:
             pass
         self.db = json.load(xopen(self.dbp))
 
-    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0) -> tuple[int,str|bytes,str|bytes]:
+    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False) -> tuple[int,str|bytes,str|bytes]:
         if self.print_try: print('Trying with',cmd[0])
         if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
-        p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,stdout=-1,stderr=-1,stdin=-1 if stdin != None else None)
-        if timeout:
-            for _ in range(timeout*10):
-                if p.poll() != None: break
-                sleep(0.1)
-            else: p.kill()
-            o,e = p.stdout.read(),p.stderr.read()
-        else: o,e = p.communicate(input=stdin)
-        return p.returncode,o,e
+        if useos:
+            r = os.system((subprocess.list2cmdline(cmd) if type(cmd) == list else cmd) + ' >NUL')
+            o = e = None
+        else:
+            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=-1,stderr=-1,stdin=-1 if stdin != None else None)
+            if timeout:
+                for _ in range(timeout*10):
+                    if p.poll() != None: break
+                    sleep(0.1)
+                else: p.kill()
+                o,e = p.stdout.read(),p.stderr.read()
+            else: o,e = p.communicate(input=stdin)
+            r = p.returncode
+        return r,o,e
     def get(self,exei:str):
         cd = os.getcwd()
         os.chdir(BDIR)

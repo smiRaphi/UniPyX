@@ -27,6 +27,21 @@
     "BinHex":[
         "binhex 4.0 encoded"
     ],
+    "RVZ":[
+        "nintendo compressed disk image"
+    ],
+    "U8":[
+        "wii u8 archive"
+    ],
+    "RARC":[
+        "nintendo rarc archive"
+    ],
+    "Yaz0":[
+        "nintendo yaz0 compressed data"
+    ],
+    "LZSS":[
+        "microids lzs compressed game data (generic)"
+    ],
 
     "VISE Installer":[
         "vise mindvision wizard module"
@@ -63,5 +78,8 @@
 
     "Windows Help File":[
         "windows help file"
-    ]
+    ],
+
+    "F-Zero G/AX .lz":[],
+    "Pokemon FSYS":[]
 }

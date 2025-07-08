@@ -95,7 +95,6 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
                 except: pass
                 else: return
-
         case 'RAR':
             run(['unrar','x','-or','-op' + o,i])
             if os.listdir(o): return
@@ -107,6 +106,37 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'UPX':
             run(['upx','-d','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return
+        case 'RVZ':
+            run(['dolphintool','extract','-i',i,'-o',o,'-q'])
+            if os.listdir(o):
+                rename(o + '/sys',o + '/$SYS')
+                copydir(o + '/files',o,True)
+                return
+            tf = TmpFile('.iso')
+            run(['dolphintool','convert','-u',gtmp('user'),'-i',i,'-o',tf,'-f','iso'])
+            if exists(tf.p):
+                run(['wit','-q','X',tf,'-p','-o','-E$','-d',o])
+                tf.destroy()
+                fs = os.listdir(o)
+                if len(fs) == 1:
+                    try:
+                        mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
+                        copydir(o + '/' + fs[0] + '/files',o,True)
+                        remove(o + '/' + fs[0])
+                    except:pass
+                    else:return
+            tf.destroy()
+        case 'U8'|'RARC':
+            run(['wszst','X',i,'-o','-R','-E$','-d',o])
+            if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
+                if exists(o + '/wszst-setup.txt'): remove(o + '/wszst-setup.txt')
+                return
+        case 'Yaz0':
+            run(['wszst','DEC',i,'-o','-E$','-d',o + '\\' + tbasename(i)])
+            if exists(o + '\\' + tbasename(i)): return
+        case 'LZSS':
+            run(['gbalzss','d',i,o + '\\' + tbasename(i)])
+            if exists(o + '\\' + tbasename(i)): return
 
         case 'VISE Installer':
             run(['quickbms',db.get('instexpl'),i,o])[2]
@@ -292,6 +322,41 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     xp = o + '/' + x
                     if x[0] in '$#': remove(xp)
                 return
+
+        case 'F-Zero G/AX .lz':
+            td = TmpDir()
+            tf = td + '/file.lz'
+            symlink(i,tf)
+            run(['gxpand','unpack',td,o])
+            if os.path.exists(o + '/file,lz'):
+                td.destroy()
+                rename(o + '/file,lz',o + '/' + tbasename(i))
+                return
+            remove(tf)
+            ouf = open(tf,'wb')
+            inf = open(i,'rb')
+            ouf.write((inf.read(1)[0] - 8).to_bytes(1,'little'))
+            ouf.write(inf.read())
+            ouf.close()
+            inf.close()
+            run(['gxpand','unpack',td,o])
+            td.destroy()
+            if os.path.exists(o + '/file,lz'):
+                rename(o + '/file,lz',o + '/' + tbasename(i))
+                return
+        case 'GC opening.bnr':
+            run(['bnrtool','decode','--bnr',i,'--image',o + '/' + tbasename(i) + '.png','--info',o + '/' + tbasename(i) + '.yaml','-f','-s'],useos=True)
+            if os.path.exists(o + '/' + tbasename(i) + '.png') and os.path.exists(o + '/' + tbasename(i) + '.yaml'): return
+        case 'Pokemon FSYS':
+            td = TmpDir()
+            osj = OSJump()
+            osj.jump(td)
+            run(['gcfsysd',i])
+            osj.back()
+            if os.listdir(td.p):
+                copydir(td,o,True)
+                return
+            td.destroy()
     return 1
 
 def fix_isinstext(o:str,db:DLDB):
