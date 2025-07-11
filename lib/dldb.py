@@ -54,10 +54,11 @@ class DLDB:
                     elif type(e) == list: e = {'u':e[0],'p':e[1]}
                     if 'p' in e: p = 'bin/' + e['p']
                     else:
-                        sux = e['u'].split('?')[0].split('/')[-1].lower()
-                        if sux.split('.')[-2] == 'tar': sux = '.tar.' + sux.split('.')[-1]
-                        else: sux = '.' + sux.split('.')[-1]
-                        ex = e.get('ex',sux)
+                        if e.get('ex'): ex = e['ex']
+                        else:
+                            ex = e['u'].split('?')[0].split('/')[-1].lower()
+                            if ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
+                            else: ex = '.' + ex.split('.')[-1]
                         p = gtmp(ex)
                     self.dl(e['u'],p)
                     if 'x' in e:

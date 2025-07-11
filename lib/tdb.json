@@ -30,6 +30,8 @@
     "RVZ":[
         "nintendo compressed disk image"
     ],
+    "GameCube ISO":[],
+    "Wii ISO":[],
     "U8":[
         "wii u8 archive"
     ],
@@ -41,6 +43,10 @@
     ],
     "LZSS":[
         "microids lzs compressed game data (generic)"
+    ],
+    "VirtualBox Disk Image":[
+        "virtualbox disk image (oracle)",
+        "virtualbox disk image (generic)"
     ],
 
     "VISE Installer":[
@@ -81,5 +87,6 @@
     ],
 
     "F-Zero G/AX .lz":[],
-    "Pokemon FSYS":[]
+    "Pokemon FSYS":[],
+    "RetroStudio PAK":[]
 }

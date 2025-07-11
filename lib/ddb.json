@@ -1,5 +1,15 @@
 [
     {
+        "rqr":null,
+        "d":{"c":"isat","v":"\\x5D\\x1C\\x9E\\xA3","o":24},
+        "rs":"Wii ISO","s":1
+    },
+    {
+        "rqr":null,
+        "d":{"c":"isat","v":"\\xC2\\x33\\x9F\\x3D","o":28},
+        "rs":"GameCube ISO","s":1
+    },
+    {
         "rq":"InstallShield Setup",
         "d":{"c":"contain","v":"MSIEng.isc","r":[-5000000,null]},
         "rs":"InstallShield MSI",
@@ -37,5 +47,10 @@
         "rqr":null,
         "d":{"c":"ext","v":".lz"},
         "rs":"F-Zero G/AX .lz"
+    },
+    {
+        "d":{"c":"isat","v":"\\0\\3\\0\\5\\0\\0\\0\\0","o":0},
+        "rs":"RetroStudio PAK",
+        "s":1
     }
 ]

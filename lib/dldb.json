@@ -148,6 +148,14 @@
             "x":{"gcfsysd.exe":"gcfsysd.exe"}
         }]
     },
+    "paktool":{
+        "p":"PakTool/PakTool.exe",
+        "fs":[{
+            "u":"https://www.dropbox.com/scl/fi/exp8xazcfiqlmf7zk7s9g/PakTool.rar?rlkey=w23jpu9a66j6ws13d95jkjc3a&e=1&dl=1",
+            "ex":".rar",
+            "x":{"PakTool.exe":"PakTool/PakTool.exe","zlib1.dll":"PakTool/zlib1.dll"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

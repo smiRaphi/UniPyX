@@ -95,6 +95,14 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
                 except: pass
                 else: return
+        case 'VirtualBox Disk Image':
+            td = TmpDir()
+            run(['7z','x',i,'-o' + td,'-aoa'])
+            if os.path.exists(td + '/1.img'):
+                run(['7z','x',td + '/1.img','-o' + o,'-aoa'])
+                td.destroy()
+                if os.listdir(o): return
+            td.destroy()
         case 'RAR':
             run(['unrar','x','-or','-op' + o,i])
             if os.listdir(o): return
@@ -126,6 +134,27 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     except:pass
                     else:return
             tf.destroy()
+        case 'GameCube ISO':
+            run(['dolphintool','extract','-i',i,'-o',o,'-q'])
+            if os.listdir(o):
+                rename(o + '/sys',o + '/$SYS')
+                copydir(o + '/files',o,True)
+                return
+        case 'Wii ISO':
+            run(['dolphintool','extract','-i',i,'-o',o,'-q'])
+            if os.listdir(o):
+                rename(o + '/sys',o + '/$SYS')
+                copydir(o + '/files',o,True)
+                return
+            run(['wit','-q','X',i,'-p','-o','-E$','-d',o])
+            fs = os.listdir(o)
+            if len(fs) == 1:
+                try:
+                    mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
+                    copydir(o + '/' + fs[0] + '/files',o,True)
+                    remove(o + '/' + fs[0])
+                except:pass
+                else:return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
@@ -357,6 +386,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 copydir(td,o,True)
                 return
             td.destroy()
+        case 'RetroStudio PAK':
+            run(['paktool','-x',i,'-o',o])
+            if os.listdir(o): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):
