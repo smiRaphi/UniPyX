@@ -56,8 +56,8 @@ def analyze(inp:str):
     nts = checktdb(ts)
     nts = list(set(nts))
     for x in DDB:
-        if 'rq'  in x and not (x['rq']  in nts or (x['rq'] == None and not nts)): continue
-        if 'rqr' in x and not (x['rqr'] in ts or (x['rqr'] == None and not ts )): continue
+        if 'rq'  in x and not (x['rq']  in nts or (x['rq']  == None and not nts)): continue
+        if 'rqr' in x and not (x['rqr'] in ts  or (x['rqr'] == None and not ts )): continue
         if x['d'] == 'py':
             lc = {}
             exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
@@ -67,7 +67,7 @@ def analyze(inp:str):
         elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
         elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
-                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode()
+                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode('latin1')
                 f = open(inp,'rb')
                 sp = x['d']['r'][0]
                 if sp < 0: sp = f.seek(0,2) + sp
@@ -76,7 +76,7 @@ def analyze(inp:str):
                 ret = cv in f.read(x['d']['r'][1])
                 f.close()
             elif x['d']['c'] == 'isat':
-                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode()
+                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode('latin1')
                 f = open(inp,'rb')
                 sp = x['d']['o']
                 if sp < 0: sp = f.seek(0,2) + sp
