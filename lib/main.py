@@ -436,6 +436,12 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'RetroStudio PAK':
             run(['paktool','-x',i,'-o',o])
             if os.listdir(o): return
+        case 'CPK':
+            run(['cpkextract',i,o])
+            if os.listdir(o): return
+        case 'Sonic AMB':
+            run(['quickbms',db.get('sonic4'),i,o])
+            if os.listdir(o): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

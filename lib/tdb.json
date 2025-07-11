@@ -47,6 +47,9 @@
     "AFS":[
         "afs game data archive"
     ],
+    "CPK":[
+        "xfbin cpk game data container"
+    ],
     "VirtualBox Disk Image":[
         "virtualbox disk image (oracle)",
         "virtualbox disk image (generic)"
@@ -98,5 +101,8 @@
 
     "F-Zero G/AX .lz":[],
     "Pokemon FSYS":[],
-    "RetroStudio PAK":[]
+    "RetroStudio PAK":[],
+    "GD-ROM CUE+BIN":[],
+    "NCSD":[],
+    "CDI":[]
 }

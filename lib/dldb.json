@@ -184,6 +184,17 @@
             "x":{"3dstool.exe":"3dstool/3dstool.exe","ext_key.txt":"3dstool/ext_key.txt","ignore_3dstool.txt":"3dstool/ignore_3dstool.txt"}
         }]
     },
+    "cpkextract":{
+        "p":"CpkExtract.exe",
+        "fs":["https://github.com/1330-Studios/CPK-Extract/releases/download/1.0.1/CpkExtract.exe"]
+    },
+    "ambextract":{
+        "p":"AMBextract.exe",
+        "fs":[{
+            "u":"http://projects.sappharad.com/tools/ambextract-windows.zip",
+            "x":{"AMBextract-windows/AMBextract.exe":"AMBextract.exe"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",
@@ -242,5 +253,10 @@
             "u":"https://dl.dropboxusercontent.com/s/juxy8fc79ccfqra/InstallShield_Cabinet_File_Viewer.zip",
             "x":{"InstallShield_Cabinet_File_Viewer/ISCAB.exe":"ISCAB/ISCAB.exe","InstallShield_Cabinet_File_Viewer/ISTools.dll":"ISCAB/ISTools.dll"}
         }]
+    },
+
+    "sonic4":{
+        "p":"BMS/sonic4.bms",
+        "fs":[["https://aluigi.altervista.org/bms/sonic4.bms","BMS/sonic4.bms"]]
     }
 }
