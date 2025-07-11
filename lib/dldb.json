@@ -177,6 +177,13 @@
             "x":{"AFSPacker.exe":"AFSPacker.exe"}
         }]
     },
+    "3dstool":{
+        "p":"3dstool/3dstool.exe",
+        "fs":[{
+            "u":"https://github.com/dnasdw/3dstool/releases/download/v1.2.6/3dstool.zip",
+            "x":{"3dstool.exe":"3dstool/3dstool.exe","ext_key.txt":"3dstool/ext_key.txt","ignore_3dstool.txt":"3dstool/ignore_3dstool.txt"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

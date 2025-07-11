@@ -63,5 +63,9 @@
         "d":"py",
         "py":"import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',open(inp,encoding='utf-8').read())\nreturn f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'",
         "rs":"GD-ROM CUE+BIN","s":1
+    },
+    {
+        "d":{"c":"isat","v":"NCSD\\0\\0","o":256},
+        "rs":"NCSD","s":1
     }
 ]
