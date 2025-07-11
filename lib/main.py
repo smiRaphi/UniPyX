@@ -76,9 +76,17 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
     i = inp
     o = out
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'ISO':
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
+        case 'CDI':
+            run(['7z','x',i,'-o' + o,'-aoa'])
+            if os.listdir(o):
+                for x in os.listdir(o):
+                    if x.endswith('.iso'):
+                        e,_,_ = run(['7z','x',o + '/' + x,'-o' + o + '/' + x.split('.')[-2],'-aoa'])
+                        if not e: remove(o + '/' + x)
+                return
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
                 run(['7z','x',i,'-o' + o,'-aoa'])
@@ -95,6 +103,14 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
                 except: pass
                 else: return
+        case 'CUE+BIN':
+            mkdir(o)
+            run(['bin2iso',i,o,'-a'])
+            for x in os.listdir(o):
+                if x.endswith('.iso'):
+                    e,_,_ = run(['7z','x',o + '/' + x,'-o' + o + '/' + x.split('-')[-1][:-4],'-aoa'])
+                    if not e: remove(o + '/' + x)
+            if os.listdir(o): return
         case 'VirtualBox Disk Image':
             td = TmpDir()
             run(['7z','x',i,'-o' + td,'-aoa'])
@@ -166,6 +182,13 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'LZSS':
             run(['gbalzss','d',i,o + '\\' + tbasename(i)])
             if exists(o + '\\' + tbasename(i)): return
+        case 'AFS':
+            run(['afspacker','-e',i,o])
+            if os.path.exists(noext(i) + '.json'): remove(noext(i) + '.json')
+            if os.listdir(o): return
+        case 'GD-ROM CUE+BIN':
+            run(['buildgdi','-extract','-cue',i,'-output',o,'-ip',o + '/IP.BIN'])
+            if os.listdir(o): return
 
         case 'VISE Installer':
             run(['quickbms',db.get('instexpl'),i,o])[2]

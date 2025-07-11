@@ -44,9 +44,18 @@
     "LZSS":[
         "microids lzs compressed game data (generic)"
     ],
+    "AFS":[
+        "afs game data archive"
+    ],
     "VirtualBox Disk Image":[
         "virtualbox disk image (oracle)",
         "virtualbox disk image (generic)"
+    ],
+    "ISO":[
+        "iso 9660 cd image"
+    ],
+    "CUE+BIN":[
+        "iso cdimage cue/description - data (with remark)"
     ],
 
     "VISE Installer":[

@@ -44,13 +44,24 @@
         "s":1
     },
     {
+        "d":{"c":"isat","v":"\\0\\3\\0\\5\\0\\0\\0\\0","o":0},
+        "rs":"RetroStudio PAK",
+        "s":1
+    },
+    {
         "rqr":null,
         "d":{"c":"ext","v":".lz"},
         "rs":"F-Zero G/AX .lz"
     },
     {
-        "d":{"c":"isat","v":"\\0\\3\\0\\5\\0\\0\\0\\0","o":0},
-        "rs":"RetroStudio PAK",
-        "s":1
+        "rqr":"null bytes",
+        "d":{"c":"ext","v":".cdi"},
+        "rs":"CDI"
+    },
+    {
+        "rq":"CUE+BIN",
+        "d":"py",
+        "py":"import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',open(inp,encoding='utf-8').read())\nreturn f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'",
+        "rs":"GD-ROM CUE+BIN","s":1
     }
 ]

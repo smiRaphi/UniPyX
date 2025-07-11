@@ -29,6 +29,9 @@
         },{
             "u":"https://www.tc4shell.com/binary/eDecoder.zip",
             "x":{"eDecoder.64.dll":"7z/Formats/eDecoder.64.dll"}
+        },{
+            "u":"https://www.tc4shell.com/binary/Iso7z.zip",
+            "x":{"Iso7z.64.dll":"7z/Formats/Iso7z.64.dll"}
         }]
     },
     "unar":{
@@ -65,6 +68,17 @@
               ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/pkware.unp","InstExpl/Unp/pkware.unp"],
               ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/vise.unp","InstExpl/Unp/vise.unp"]
         ]
+    },
+    "bin2iso":{
+        "p":"bin2iso.exe",
+        "fs":["https://mooncore.eu/filus/bin2iso.exe"]
+    },
+    "buildgdi":{
+        "p":"buildgdi.exe",
+        "fs":[{
+            "u":"https://github.com/Sappharad/GDIbuilder/releases/download/v2.1.1/gdibuilder211_cmd_win_x64.zip",
+            "x":{"buildgdi.exe":"buildgdi.exe"}
+        }]
     },
 
     "unzip":{
@@ -154,6 +168,13 @@
             "u":"https://www.dropbox.com/scl/fi/exp8xazcfiqlmf7zk7s9g/PakTool.rar?rlkey=w23jpu9a66j6ws13d95jkjc3a&e=1&dl=1",
             "ex":".rar",
             "x":{"PakTool.exe":"PakTool/PakTool.exe","zlib1.dll":"PakTool/zlib1.dll"}
+        }]
+    },
+    "afspacker":{
+        "p":"AFSPacker.exe",
+        "fs":[{
+            "u":"https://github.com/MaikelChan/AFSPacker/releases/download/v2.1.2/AFSPacker-v2.1.2-win-x64.7z",
+            "x":{"AFSPacker.exe":"AFSPacker.exe"}
         }]
     },
 
