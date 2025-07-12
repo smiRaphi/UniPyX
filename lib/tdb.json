@@ -50,6 +50,9 @@
     "CPK":[
         "xfbin cpk game data container"
     ],
+    "CRI CPK":[
+        "criware cpk game data container"
+    ],
     "VirtualBox Disk Image":[
         "virtualbox disk image (oracle)",
         "virtualbox disk image (generic)"

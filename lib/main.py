@@ -84,9 +84,12 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             osj = OSJump()
             osj.jump(dirname(i))
             run(['aaru','filesystem','extract',i,td])
+            td = os.path.abspath(td)
             osj.back()
             if os.listdir(td):
-                copydir(td,o,True)
+                td1 = td + '/' + os.listdir(td)[0]
+                copydir(td1 + '/' + os.listdir(td1)[0],o)
+                remove(td)
                 return
             remove(td)
         case 'ZIP'|'InstallShield Setup ForTheWeb':
@@ -435,6 +438,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if os.listdir(o): return
         case 'CPK':
             run(['cpkextract',i,o])
+            if os.listdir(o): return
+        case 'CRI CPK':
+            run(['quickbms',db.get('cpk'),i,o])
             if os.listdir(o): return
         case 'Sonic AMB':
             run(['quickbms',db.get('sonic4'),i,o])

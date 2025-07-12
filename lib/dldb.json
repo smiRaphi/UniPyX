@@ -272,5 +272,9 @@
     "sonic4":{
         "p":"BMS/sonic4.bms",
         "fs":[["https://aluigi.altervista.org/bms/sonic4.bms","BMS/sonic4.bms"]]
+    },
+    "cpk":{
+        "p":"BMS/cpk.bms",
+        "fs":[["https://aluigi.altervista.org/bms/cpk.bms","BMS/cpk.bms"]]
     }
 }
