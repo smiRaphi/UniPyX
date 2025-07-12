@@ -195,6 +195,10 @@
             "x":{"AMBextract-windows/AMBextract.exe":"AMBextract.exe"}
         }]
     },
+    "3ds-xfsatool":{
+        "p":"3ds-xfsatool.exe",
+        "fs":["https://raw.githubusercontent.com/MeltyPlayer/FinModelUtility/refs/heads/main/cli/tools/3ds-xfsatool/3ds-xfsatool.exe"]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

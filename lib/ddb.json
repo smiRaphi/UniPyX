@@ -71,5 +71,13 @@
     {
         "d":{"c":"isat","v":"#AMB \\0\\0\\0","o":0},
         "rs":"Sonic AMB","s":1
+    },
+    {
+        "d":{"c":"isat","v":"XPCK","o":0},
+        "rs":"Level5 XPCK","s":1
+    },
+    {
+        "d":{"c":"isat","v":"ARC0","o":0},
+        "rs":"Level5 ARC","s":1
     }
 ]

@@ -293,7 +293,6 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                             of.write((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
                             of.write(b'\0\0')
                             of.close()
-                            
                         else: f.seek(-3,1)
                 if ofs:
                     f.close()
@@ -441,6 +440,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if os.listdir(o): return
         case 'Sonic AMB':
             run(['quickbms',db.get('sonic4'),i,o])
+            if os.listdir(o): return
+        case 'Level5 ARC'|'Level5 XPCK':
+            run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if os.listdir(o): return
     return 1
 
