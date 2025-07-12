@@ -55,8 +55,22 @@
     },
     {
         "rqr":"null bytes",
+        "d":{"c":"isat","v":"\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\x00\\x50\\x53\\x50\\x20\\x47\\x41\\x4D\\x45","o":32768},
+        "rs":"ISO","s":1
+    },
+    {
+        "d":{"c":"isat","v":"\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\x00\\x50\\x4C\\x41\\x59\\x53\\x54\\x41\\x54\\x49\\x4F\\x4E","o":32768},
+        "rs":"ISO","s":1
+    },
+    {
+        "rqr":"null bytes",
         "d":{"c":"ext","v":".cdi"},
         "rs":"CDI"
+    },
+    {
+        "rq":"CUE+BIN",
+        "d":{"c":"contain","v":"  TRACK 01 CDI/2352","r":[0,null]},
+        "rs":"CDI CUE+BIN","s":1
     },
     {
         "rq":"CUE+BIN",

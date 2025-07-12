@@ -59,7 +59,8 @@
     ],
     "CUE+BIN":[
         "iso cdimage cue/description - data (with remark)",
-        "iso cdimage cue/description - data"
+        "iso cdimage cue/description - data",
+        "iso cdimage cue/description - data (with catalog)"
     ],
 
     "VISE Installer":[

@@ -76,17 +76,19 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
     i = inp
     o = out
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'ISO':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex':
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
-        case 'CDI':
-            run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o):
-                for x in os.listdir(o):
-                    if x.endswith('.iso'):
-                        e,_,_ = run(['7z','x',o + '/' + x,'-o' + o + '/' + x.split('.')[-2],'-aoa'])
-                        if not e: remove(o + '/' + x)
+        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN':
+            td = 'tmp' + os.urandom(8).hex()
+            osj = OSJump()
+            osj.jump(dirname(i))
+            run(['aaru','filesystem','extract',i,td])
+            osj.back()
+            if os.listdir(td):
+                copydir(td,o,True)
                 return
+            remove(td)
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
                 run(['7z','x',i,'-o' + o,'-aoa'])
@@ -103,14 +105,6 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
                 except: pass
                 else: return
-        case 'CUE+BIN':
-            mkdir(o)
-            run(['bin2iso',i,o,'-a'])
-            for x in os.listdir(o):
-                if x.endswith('.iso'):
-                    e,_,_ = run(['7z','x',o + '/' + x,'-o' + o + '/' + x.split('-')[-1][:-4],'-aoa'])
-                    if not e: remove(o + '/' + x)
-            if os.listdir(o): return
         case 'VirtualBox Disk Image':
             td = TmpDir()
             run(['7z','x',i,'-o' + td,'-aoa'])
@@ -243,6 +237,10 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 return
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
+            run(['innoextract','-e','-q','-m','-g','--no-gog-galaxy','-d',o,i])
+            if exists(o + '/app'):
+                copydir(o + '/app',o,True)
+                return
             run(['innounp','-x','-d' + o,'-y',i])
             if exists(o + '/{app}'):
                 for x in os.listdir(o):
