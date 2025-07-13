@@ -195,6 +195,17 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'NSP':
             run(['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys'),'--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS',i])
             if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
+        case 'PS4 PKG':
+            td = TmpDir()
+            rtd = TmpDir()
+            run(['ps4pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,td])
+            rtd.destroy()
+            if os.path.exists(td + '/Image0') and os.listdir(td + '/Image0'):
+                copydir(td + '/Image0',o)
+                mv(td + '/Sc0',o + '/sce_sys')
+                td.destroy()
+                return
+            td.destroy()
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):

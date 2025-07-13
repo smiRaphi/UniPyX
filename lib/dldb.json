@@ -110,6 +110,14 @@
             "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
         }]
     },
+    "ps4pkg":{
+        "p":"ps4pkg/orbis-pub-cmd.exe",
+        "fs":[
+            ["https://raw.githubusercontent.com/CyB1K/PS4-Fake-PKG-Tools-3.87/refs/heads/main/orbis-pub-cmd.exe","ps4pkg/orbis-pub-cmd.exe"],
+            ["https://raw.githubusercontent.com/CyB1K/PS4-Fake-PKG-Tools-3.87/refs/heads/main/ext/di.exe","ps4pkg/ext/di.exe"],
+            ["https://raw.githubusercontent.com/CyB1K/PS4-Fake-PKG-Tools-3.87/refs/heads/main/ext/sc.exe","ps4pkg/ext/sc.exe"]
+        ]
+    },
 
     "unzip":{
         "p":"unzip.exe",
