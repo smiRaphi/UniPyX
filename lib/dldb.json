@@ -34,6 +34,16 @@
             "x":{"Iso7z.64.dll":"7z/Formats/Iso7z.64.dll"}
         }]
     },
+    "hxcfe":{
+        "p":"hxcfe/hxcfe.exe",
+        "fs":[{
+            "u":"https://github.com/jfdelnero/HxCFloppyEmulator/releases/download/HxCFloppyEmulator_V2_16_13_1/HxCFloppyEmulator_soft.zip",
+            "x":{"HxCFloppyEmulator_soft/hxcfe.exe":"hxcfe/hxcfe.exe",
+                 "HxCFloppyEmulator_soft/libhxcfe.dll":"hxcfe/libhxcfe.dll",
+                 "HxCFloppyEmulator_soft/libusbhxfce.dll":"hxcfe/libusbhxfce.dll"
+            }
+        }]
+    },
     "unar":{
         "p":"Unarchiver/unar.exe",
         "fs":[{
@@ -81,6 +91,23 @@
         "fs":[{
             "u":"https://github.com/Sappharad/GDIbuilder/releases/download/v2.1.1/gdibuilder211_cmd_win_x64.zip",
             "x":{"buildgdi.exe":"buildgdi.exe"}
+        }]
+    },
+    "hac2l":{
+        "p":"hac2l.exe"
+    },
+    "prodkeys":{
+        "p":"prodkeys/prod.keys",
+        "fs":[{
+            "u":"https://files.prodkeys.net/ProdKeys.net-v20.0.1.zip",
+            "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
+        }]
+    },
+    "titlekeys":{
+        "p":"prodkeys/title.keys",
+        "fs":[{
+            "u":"https://files.prodkeys.net/ProdKeys.net-v20.0.1.zip",
+            "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
         }]
     },
 

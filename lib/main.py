@@ -1,4 +1,4 @@
-import os
+import os,re
 from lib.dldb import DLDB
 from shutil import rmtree,copytree,copyfile
 
@@ -192,6 +192,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             for x in os.listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
+        case 'NSP':
+            run(['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys'),'--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS',i])
+            if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
