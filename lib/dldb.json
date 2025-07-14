@@ -148,6 +148,20 @@
             "x":{"gcfsysd.exe":"gcfsysd.exe"}
         }]
     },
+    "mrst":{
+        "p":"mrst.exe",
+        "fs":[{
+            "u":"https://github.com/em-eight/mrst/releases/download/v1.2-rc6/mrst-Windows.zip",
+            "x":{"bin/mrst.exe":"mrst.exe"}
+        }]
+    },
+    "cvm_tool":{
+        "p":"cvm_tool.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/mchubby/RE-games-attic/refs/heads/master/sega-nextech/cvm_tool%20%5Broxfan%5D/cvm_tool_02.zip",
+            "x":{"cvm_tool.exe":"cvm_tool.exe"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

@@ -33,7 +33,9 @@ def copydir(i:str,o:str,delete=False):
     mkdir(o)
     for x in os.listdir(str(i)): cp(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
-def remove(i:str): os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i)
+def remove(i:list[str]|str):
+    if type(i) != list: i = [i]
+    for f in i: os.remove(f) if isfile(f) or os.path.islink(f) else rmdir(f)
 def xopen(f:str,m='r',encoding='utf-8'):
     f = os.path.abspath(str(f))
     mkdir(dirname(f))
@@ -109,8 +111,18 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
             if os.listdir(o):
-                rename(o + '/sys',o + '/$SYS')
-                copydir(o + '/files',o,True)
+                if exists(o + '/DATA'):
+                    for sd in os.listdir(o):
+                        rename(o + '/' + sd + '/sys',o + '/' + sd + '/$SYS')
+                        for sf in os.listdir(o + '/' + sd):
+                            if sf in ['$SYS','files']: continue
+                            remove(o + '/' + sd + '/' + sf)
+                        copydir(o + '/' + sd + '/files',o + '/' + sd,True)
+                        if sd == 'DATA': copydir(o + '/DATA',o,True)
+                        else: rename(o + '/' + sd,o + '/$' + sd)
+                else:
+                    rename(o + '/sys',o + '/$SYS')
+                    copydir(o + '/files',o,True)
                 return
             tf = TmpFile('.iso')
             run(['dolphintool','convert','-u',gtmp('user'),'-i',i,'-o',tf,'-f','iso'])
@@ -357,6 +369,15 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 copydir(td,o,True)
                 return
             td.destroy()
+        case 'BRSAR':
+            run(['mrst','extract','-o',o,i])
+            if os.listdir(o): return
+        case 'ROFS Volume':
+            tf = TmpFile('.iso')
+            run(['cvm_tool','split',i,tf])
+            run(['7z','x',tf,'-o' + o,'-aoa'])
+            tf.destroy()
+            if os.listdir(o): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

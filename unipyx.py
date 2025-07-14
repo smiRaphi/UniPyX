@@ -76,13 +76,15 @@ def analyze(inp:str):
                 ret = cv in f.read(x['d']['r'][1])
                 f.close()
             elif x['d']['c'] == 'isat':
-                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode()
                 f = open(inp,'rb')
-                sp = x['d']['o']
-                if sp < 0: sp = f.seek(0,2) + sp
-                if sp < 0: sp = 0
-                f.seek(sp)
-                ret = f.read(len(cv)) == cv
+                ret = True
+                for ix in range(len(x['d']['v'])//2):
+                    cv = ast.literal_eval('"' + x['d']['v'][ix*2] + '"').encode()
+                    sp = x['d']['v'][ix*2 + 1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    ret = ret and f.read(len(cv)) == cv
                 f.close()
         if ret:
             if x.get('s'): nts = [x['rs']]
