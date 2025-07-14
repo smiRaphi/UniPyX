@@ -30,6 +30,11 @@
     "RVZ":[
         "nintendo compressed disk image"
     ],
+    "NSP":[
+        "nintendo switch submission package"
+    ],
+    "GameCube ISO":[],
+    "Wii ISO":[],
     "U8":[
         "wii u8 archive"
     ],
@@ -41,6 +46,27 @@
     ],
     "LZSS":[
         "microids lzs compressed game data (generic)"
+    ],
+    "AFS":[
+        "afs game data archive"
+    ],
+    "CPK":[
+        "xfbin cpk game data container"
+    ],
+    "CRI CPK":[
+        "criware cpk game data container"
+    ],
+    "VirtualBox Disk Image":[
+        "virtualbox disk image (oracle)",
+        "virtualbox disk image (generic)"
+    ],
+    "ISO":[
+        "iso 9660 cd image"
+    ],
+    "CUE+BIN":[
+        "iso cdimage cue/description - data (with remark)",
+        "iso cdimage cue/description - data",
+        "iso cdimage cue/description - data (with catalog)"
     ],
 
     "VISE Installer":[
@@ -82,5 +108,11 @@
 
     "F-Zero G/AX .lz":[],
     "Pokemon FSYS":[],
-    "BRSAR":[]
+    "BRSAR":[],
+    "RetroStudio PAK":[],
+    "GD-ROM CUE+BIN":[],
+    "NCSD":[],
+    "CDI":[],
+    "Sonic AMB":[],
+    "Level5 ARC":[]
 }

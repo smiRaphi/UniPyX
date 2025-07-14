@@ -1,5 +1,15 @@
 [
     {
+        "rqr":null,
+        "d":{"c":"isat","v":["\\x5D\\x1C\\x9E\\xA3",24]},
+        "rs":"Wii ISO","s":1
+    },
+    {
+        "rqr":null,
+        "d":{"c":"isat","v":["\\xC2\\x33\\x9F\\x3D",28]},
+        "rs":"GameCube ISO","s":1
+    },
+    {
         "rq":"InstallShield Setup",
         "d":{"c":"contain","v":"MSIEng.isc","r":[-5000000,null]},
         "rs":"InstallShield MSI","s":1
@@ -37,8 +47,64 @@
         "s":1
     },
     {
+        "d":{"c":"isat","v":["\\0\\3\\0\\5\\0\\0\\0\\0",0]},
+        "rs":"RetroStudio PAK",
+        "s":1
+    },
+    {
         "rqr":null,
         "d":{"c":"ext","v":".lz"},
         "rs":"F-Zero G/AX .lz"
+    },
+    {
+        "rqr":"null bytes",
+        "d":{"c":"isat","v":["\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\x00\\x50\\x53\\x50\\x20\\x47\\x41\\x4D\\x45",32768]},
+        "rs":"ISO","s":1
+    },
+    {
+        "d":{"c":"isat","v":["\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\x00\\x50\\x4C\\x41\\x59\\x53\\x54\\x41\\x54\\x49\\x4F\\x4E",32768]},
+        "rs":"ISO","s":1
+    },
+    {
+        "rqr":"null bytes",
+        "d":{"c":"ext","v":".cdi"},
+        "rs":"CDI"
+    },
+    {
+        "rq":"CUE+BIN",
+        "d":{"c":"contain","v":"  TRACK 01 CDI/2352","r":[0,null]},
+        "rs":"CDI CUE+BIN","s":1
+    },
+    {
+        "rq":"CUE+BIN",
+        "d":"py",
+        "py":"import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',open(inp,encoding='utf-8').read())\nreturn f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'",
+        "rs":"GD-ROM CUE+BIN","s":1
+    },
+    {
+        "d":{"c":"isat","v":["NCSD\\0\\0",256]},
+        "rs":"NCSD","s":1
+    },
+    {
+        "rqr":null,
+        "d":{"c":"isat","v":["\\x7F\\x43\\x4E\\x54\\0\\0\\0\\1",0]},
+        "rs":"PS4 PKG","s":1
+    },
+    {
+        "rqr":null,
+        "d":{"c":"isat","v":["\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0]},
+        "rs":"PS4 PKG","s":1
+    },
+    {
+        "d":{"c":"isat","v":["#AMB \\0\\0\\0",0]},
+        "rs":"Sonic AMB","s":1
+    },
+    {
+        "d":{"c":"isat","v":["XPCK",0]},
+        "rs":"Level5 XPCK","s":1
+    },
+    {
+        "d":{"c":"isat","v":["ARC0",0]},
+        "rs":"Level5 ARC","s":1
     }
 ]

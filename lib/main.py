@@ -1,4 +1,4 @@
-import os
+import os,re
 from lib.dldb import DLDB
 from shutil import rmtree,copytree,copyfile
 
@@ -33,9 +33,7 @@ def copydir(i:str,o:str,delete=False):
     mkdir(o)
     for x in os.listdir(str(i)): cp(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
-def remove(i:list[str]|str):
-    if type(i) != list: i = [i]
-    for f in i: os.remove(f) if isfile(f) or os.path.islink(f) else rmdir(f)
+def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
 def xopen(f:str,m='r',encoding='utf-8'):
     f = os.path.abspath(str(f))
     mkdir(dirname(f))
@@ -81,6 +79,19 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case '7z'|'LHARC'|'MSCAB'|'BinHex':
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
+        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN':
+            td = 'tmp' + os.urandom(8).hex()
+            osj = OSJump()
+            osj.jump(dirname(i))
+            run(['aaru','filesystem','extract',i,td])
+            td = os.path.abspath(td)
+            osj.back()
+            if os.listdir(td):
+                td1 = td + '/' + os.listdir(td)[0]
+                copydir(td1 + '/' + os.listdir(td1)[0],o)
+                remove(td)
+                return
+            remove(td)
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
                 run(['7z','x',i,'-o' + o,'-aoa'])
@@ -97,6 +108,14 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
                 except: pass
                 else: return
+        case 'VirtualBox Disk Image':
+            td = TmpDir()
+            run(['7z','x',i,'-o' + td,'-aoa'])
+            if os.path.exists(td + '/1.img'):
+                run(['7z','x',td + '/1.img','-o' + o,'-aoa'])
+                td.destroy()
+                if os.listdir(o): return
+            td.destroy()
         case 'RAR':
             run(['unrar','x','-or','-op' + o,i])
             if os.listdir(o): return
@@ -138,6 +157,65 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     except:pass
                     else:return
             tf.destroy()
+        case 'GameCube ISO':
+            run(['dolphintool','extract','-i',i,'-o',o,'-q'])
+            if os.listdir(o):
+                rename(o + '/sys',o + '/$SYS')
+                copydir(o + '/files',o,True)
+                return
+        case 'Wii ISO':
+            run(['dolphintool','extract','-i',i,'-o',o,'-q'])
+            if os.listdir(o):
+                rename(o + '/sys',o + '/$SYS')
+                copydir(o + '/files',o,True)
+                return
+            run(['wit','-q','X',i,'-p','-o','-E$','-d',o])
+            fs = os.listdir(o)
+            if len(fs) == 1:
+                try:
+                    mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
+                    copydir(o + '/' + fs[0] + '/files',o,True)
+                    remove(o + '/' + fs[0])
+                except:pass
+                else:return
+        case 'NCSD':
+            e,_,_ = run(['3dstool','-xt01267f','cci',o + '\\DP0.bin',o + '\\DP1.bin',o + '\\DP2.bin',o + '\\DP6.bin',o + '\\DP7.bin',i,'--header',o + '\\HNCSD.bin'])
+            if e: return 1
+
+            e,_,_ = run(['3dstool','-xtf','cxi',o + '\\DP0.bin','--header',o + '\\HNCCH0.bin','--exh',o + '\\DecExH.bin','--exh-auto-key','--exefs',o + '\\DExeFS.bin','--exefs-auto-key','--exefs-top-auto-key','--romfs',o + '\\DRomFS.bin','--romfs-auto-key','--logo',o + '\\LogoLZ.bin','--plain',o + '\\PlainRGN.bin'])
+            if e: return 1
+            run(['3dstool','-xtf','cfa',o + '\\DP1.bin','--header',o + '\\HNCCH1.bin','--romfs',o + '\\DecManual.bin','--romfs-auto-key'])
+            run(['3dstool','-xtf','cfa',o + '\\DP2.bin','--header',o + '\\HNCCH2.bin','--romfs',o + '\\DecDLPlay.bin','--romfs-auto-key'])
+            run(['3dstool','-xtf','cfa',o + '\\DP6.bin','--header',o + '\\HNCCH6.bin','--romfs',o + '\\DecN3DSU.bin','--romfs-auto-key'])
+            run(['3dstool','-xtf','cfa',o + '\\DP7.bin','--header',o + '\\HNCCH7.bin','--romfs',o + '\\DecO3DSU.bin','--romfs-auto-key'])
+
+            remove(o + '\\DP0.bin',o + '\\DP1.bin',o + '\\DP2.bin',o + '\\DP6.bin',o + '\\DP7.bin')
+            e,_,_ = run(['3dstool','-xtfu','exefs',o + '\\DExeFS.bin','--header',o + '\\HExeFS.bin','--exefs-dir',o + '\\ExeFS'])
+            if e: return 1
+            e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
+            if e: return 1
+            run(['3dstool','-xtf','romfs',o + '\\DecManual.bin','--romfs-dir',o + '\\Manual'])
+            run(['3dstool','-xtf','romfs',o + '\\DecDLPlay.bin','--romfs-dir',o + '\\DownloadPlay'])
+            run(['3dstool','-xtf','romfs',o + '\\DecN3DSU.bin','--romfs-dir',o + '\\N3DSUpdate'])
+            run(['3dstool','-xtf','romfs',o + '\\DecO3DSU.bin','--romfs-dir',o + '\\O3DSUpdate'])
+
+            for x in os.listdir(o):
+                if x.endswith('.bin'): remove(o + '/' + x)
+            return
+        case 'NSP':
+            run(['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys'),'--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS',i])
+            if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
+        case 'PS4 PKG':
+            td = TmpDir()
+            rtd = TmpDir()
+            run(['ps4pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,td])
+            rtd.destroy()
+            if os.path.exists(td + '/Image0') and os.listdir(td + '/Image0'):
+                copydir(td + '/Image0',o)
+                mv(td + '/Sc0',o + '/sce_sys')
+                td.destroy()
+                return
+            td.destroy()
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
@@ -149,6 +227,13 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'LZSS':
             run(['gbalzss','d',i,o + '\\' + tbasename(i)])
             if exists(o + '\\' + tbasename(i)): return
+        case 'AFS':
+            run(['afspacker','-e',i,o])
+            if os.path.exists(noext(i) + '.json'): remove(noext(i) + '.json')
+            if os.listdir(o): return
+        case 'GD-ROM CUE+BIN':
+            run(['buildgdi','-extract','-cue',i,'-output',o,'-ip',o + '/IP.BIN'])
+            if os.listdir(o): return
 
         case 'VISE Installer':
             run(['quickbms',db.get('instexpl'),i,o])[2]
@@ -179,6 +264,10 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 return
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
+            run(['innoextract','-e','-q','-m','-g','--no-gog-galaxy','-d',o,i])
+            if exists(o + '/app'):
+                copydir(o + '/app',o,True)
+                return
             run(['innounp','-x','-d' + o,'-y',i])
             if exists(o + '/{app}'):
                 for x in os.listdir(o):
@@ -229,7 +318,6 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                             of.write((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
                             of.write(b'\0\0')
                             of.close()
-                            
                         else: f.seek(-3,1)
                 if ofs:
                     f.close()
@@ -377,6 +465,20 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             run(['cvm_tool','split',i,tf])
             run(['7z','x',tf,'-o' + o,'-aoa'])
             tf.destroy()
+        case 'RetroStudio PAK':
+            run(['paktool','-x',i,'-o',o])
+            if os.listdir(o): return
+        case 'CPK':
+            run(['cpkextract',i,o])
+            if os.listdir(o): return
+        case 'CRI CPK':
+            run(['quickbms',db.get('cpk'),i,o])
+            if os.listdir(o): return
+        case 'Sonic AMB':
+            run(['quickbms',db.get('sonic4'),i,o])
+            if os.listdir(o): return
+        case 'Level5 ARC'|'Level5 XPCK':
+            run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if os.listdir(o): return
     return 1
 
