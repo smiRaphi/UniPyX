@@ -259,6 +259,14 @@
             "x":{"chdman.exe":"chdman.exe"}
         }]
     },
+    "mdnds":{
+        "p":"mdnds.exe",
+        "fs":["https://raw.githubusercontent.com/Roughsketch/mdnds/refs/heads/master/bin/mdnds.exe"]
+    },
+    "ndssndext":{
+        "p":"ndssndext.exe",
+        "fs":[["https://files.catbox.moe/k4141a.bin","ndssndext.exe"]]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

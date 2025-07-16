@@ -35,6 +35,12 @@
     ],
     "GameCube ISO":[],
     "Wii ISO":[],
+    "NDS":[
+        "nintendo ds rom"
+    ],
+    "NDS Sound Data":[
+        "nintendo ds sound data"
+    ],
     "U8":[
         "wii u8 archive"
     ],

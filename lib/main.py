@@ -223,6 +223,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'NSP':
             run(['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys'),'--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS',i])
             if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
+        case 'NDS':
+            run(['mdnds','e',i,o])
+            if os.listdir(o): return
         case 'PS4 PKG':
             td = TmpDir()
             rtd = TmpDir()
@@ -252,6 +255,17 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o,'-ip',o + '/IP.BIN'])
             if os.listdir(o): return
+        case 'NDS Sound Data':
+            td = TmpDir()
+            tf = td + '\\' + 'tmp' + os.urandom(8).hex() + '.sdat'
+            symlink(i,tf)
+            run(['ndssndext','-x',tf])
+            remove(tf)
+            if os.listdir(td.p):
+                copydir(td + '/' + os.listdir(td.p)[0],o)
+                td.destroy()
+                return
+            td.destroy()
 
         case 'VISE Installer':
             run(['quickbms',db.get('instexpl'),i,o])[2]

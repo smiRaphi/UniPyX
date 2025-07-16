@@ -102,7 +102,11 @@ def extract(inp:str,out:str,ts:list[str]=None):
     for x in ts:
         print('Trying format',x)
         os.makedirs(out,exist_ok=True)
-        if not _extract(inp,out,x,db):break
+        try:
+            if not _extract(inp,out,x,db):break
+        except:
+            if not os.listdir(out): os.rmdir(out)
+            raise
         rmtree(out)
     else: raise Exception("Could not extract")
     print('Extracted successfully to',out)

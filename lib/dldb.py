@@ -94,11 +94,17 @@ class DLDB:
         return exei
     def dl(self,url:str,out:str):
         start = 0
-        with xopen(out,'wb') as f:
-            while True:
-                try:
-                    with self.c.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True) as r:
-                        for c in r.iter_bytes(4096): f.write(c)
-                    break
-                except httpx.ConnectError: pass
-                except httpx.ReadTimeout: start = f.tell()
+        try:
+            with xopen(out,'wb') as f:
+                for _ in range(10):
+                    try:
+                        with self.c.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True) as r:
+                            if r.headers.get('Content-Length') and not int(r.headers['Content-Length']): continue
+                            for c in r.iter_bytes(4096): f.write(c)
+                        break
+                    except httpx.ConnectError: pass
+                    except httpx.ReadTimeout: start = f.tell()
+                else: f.write(self.c.get(url,follow_redirects=True).content)
+        except:
+            os.remove(out)
+            raise
