@@ -68,6 +68,9 @@
         "iso cdimage cue/description - data",
         "iso cdimage cue/description - data (with catalog)"
     ],
+    "CHD":[
+        "mame compressed hunk of data"
+    ],
 
     "VISE Installer":[
         "vise mindvision wizard module"

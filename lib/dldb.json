@@ -251,6 +251,14 @@
         "p":"3ds-xfsatool.exe",
         "fs":["https://raw.githubusercontent.com/MeltyPlayer/FinModelUtility/refs/heads/main/cli/tools/3ds-xfsatool/3ds-xfsatool.exe"]
     },
+    "chdman":{
+        "p":"chdman.exe",
+        "fs":[{
+            "u":"https://github.com/mamedev/mame/releases/download/mame0278/mame0278b_64bit.exe",
+            "ex":".7z",
+            "x":{"chdman.exe":"chdman.exe"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",
