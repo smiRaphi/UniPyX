@@ -271,6 +271,13 @@
         "p":"ps3dec.exe",
         "fs":["https://github.com/Redrrx/ps3dec/releases/download/0.2.0/ps3dec.exe"]
     },
+    "ctpktool":{
+        "p":"ctpktool/ctpktool.exe",
+        "fs":[{
+            "u":"https://github.com/dnasdw/ctpktool/releases/download/v1.1.2/ctpktool.zip",
+            "x":{"ctpktool.exe":"ctpktool/ctpktool.exe","PVRTexLib.dll":"ctpktool/PVRTexLib.dll"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

@@ -550,6 +550,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'NUB2':
             run(['quickbms',db.get('nus3_nub2'),i,o])
             if os.listdir(o): return
+        case 'CTPK':
+            run(['ctpktool','-efd',i,o])
+            if os.listdir(o): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

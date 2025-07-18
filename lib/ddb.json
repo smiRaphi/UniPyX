@@ -113,6 +113,11 @@
         "rs":"NDS","s":1
     },
     {
+        "rqr":null,
+        "d":{"c":"isat","v":["CTPK",0]},
+        "rs":"CTPK","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":{"c":"contain","v":"<FILE type=\"VFSM\" hash=\"0\" providerCert=\"","r":[35,250]},
         "rs":"Iron Sky GPK","s":1
