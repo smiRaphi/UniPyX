@@ -79,7 +79,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case '7z'|'LHARC'|'MSCAB'|'BinHex':
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
-        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN':
+        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN'|'UDF':
             td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
             osj.jump(dirname(i))

@@ -69,6 +69,9 @@
     "ISO":[
         "iso 9660 cd image"
     ],
+    "UDF":[
+        "udf disc image"
+    ],
     "CUE+BIN":[
         "iso cdimage cue/description - data (with remark)",
         "iso cdimage cue/description - data",
