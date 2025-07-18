@@ -512,6 +512,8 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'Level5 ARC'|'Level5 XPCK':
             run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if os.listdir(o): return
+        case 'NDS SWAR':
+            pass
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

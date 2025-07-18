@@ -123,5 +123,8 @@
     "NCSD":[],
     "CDI":[],
     "Sonic AMB":[],
-    "Level5 ARC":[]
+    "Level5 ARC":[],
+    "NDS SWAR":[
+        "nintendo ds sound wave archive"
+    ]
 }
