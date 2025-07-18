@@ -267,6 +267,10 @@
         "p":"ndssndext.exe",
         "fs":[["https://files.catbox.moe/k4141a.bin","ndssndext.exe"]]
     },
+    "ps3dec":{
+        "p":"ps3dec.exe",
+        "fs":["https://github.com/Redrrx/ps3dec/releases/download/0.2.0/ps3dec.exe"]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

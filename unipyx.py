@@ -67,7 +67,7 @@ def analyze(inp:str):
         elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
         elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
-                cv = ast.literal_eval('"' + x['d']['v'] + '"').encode('latin1')
+                cv = ast.literal_eval('"' + x['d']['v'].replace('"','\\"') + '"').encode('latin1')
                 f = open(inp,'rb')
                 sp = x['d']['r'][0]
                 if sp < 0: sp = f.seek(0,2) + sp
@@ -79,7 +79,7 @@ def analyze(inp:str):
                 f = open(inp,'rb')
                 ret = True
                 for ix in range(len(x['d']['v'])//2):
-                    cv = ast.literal_eval('"' + x['d']['v'][ix*2] + '"').encode('latin1')
+                    cv = ast.literal_eval('"' + x['d']['v'][ix*2].replace('"','\\"') + '"').encode('latin1')
                     sp = x['d']['v'][ix*2 + 1]
                     if sp < 0: sp = f.seek(0,2) + sp
                     if sp < 0: sp = 0

@@ -237,6 +237,19 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 td.destroy()
                 return
             td.destroy()
+        case 'PS3 ISO':
+            from bin.ps3key import PS3Keys
+            k = PS3Keys().get(i)
+            tf = TmpFile('.iso')
+            tf.link(i)
+            run(['ps3dec','--iso',tf,'--dk',k,'--tc','16','--skip'])
+            tf.destroy()
+            if os.path.exists(tf.p + '_decrypted.iso'):
+                if not extract(tf.p + '_decrypted.iso',o,'ISO',db):
+                    remove(tf.p + '_decrypted.iso')
+                    return
+                remove(tf.p + '_decrypted.iso')
+                return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
@@ -514,6 +527,25 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if os.listdir(o): return
         case 'NDS SWAR':
             pass
+        case 'Iron Sky GPK':
+            fs = []
+            for x in re.findall(r'<File((?: \w+="\w{3}: [^"]*")+)\s*/>',open(i,encoding='utf-8').read()):
+                tfs = {}
+                for y in re.findall(r'(\w+)="(\w{3}): ([^"]*)"',x):
+                    if y[1] in ['U16','U32','U64']: tfs[y[0]] = int(y[2])
+                    elif y[1] == 'BOL': tfs[y[0]] = bool(int(y[2]))
+                    else: tfs[y[0]] = y[2]
+                fs.append(tfs)
+            ofl = {}
+            bid = dirname(i) + '/'
+            for x in fs:
+                if not x['source'] in ofl: ofl[x['source']] = open(bid + x['source'],'rb')
+                ofl[x['source']].seek(x['offset'])
+                xopen(o + '/' + x['alias'],'wb').write(ofl[x['source']].read(x['size']))
+                if x['compression'] != 'CM_STORE' or x['size'] != x['originalSize']: print('Unknown compression',x)
+            for x in ofl: ofl[x].close()
+            return
+            
     return 1
 
 def fix_isinstext(o:str,db:DLDB):
