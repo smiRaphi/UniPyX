@@ -243,13 +243,15 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             tf = TmpFile('.iso')
             tf.link(i)
             run(['ps3dec','--iso',tf,'--dk',k,'--tc','16','--skip'])
+            rmdir('log')
             tf.destroy()
             if os.path.exists(tf.p + '_decrypted.iso'):
                 if not extract(tf.p + '_decrypted.iso',o,'ISO',db):
                     remove(tf.p + '_decrypted.iso')
                     return
                 remove(tf.p + '_decrypted.iso')
-                return
+            if not extract(i,o,'ISO',db): return
+            
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
@@ -545,7 +547,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 if x['compression'] != 'CM_STORE' or x['size'] != x['originalSize']: print('Unknown compression',x)
             for x in ofl: ofl[x].close()
             return
-            
+        case 'NUB2':
+            run(['quickbms',db.get('nus3_nub2'),i,o])
+            if os.listdir(o): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

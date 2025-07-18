@@ -345,5 +345,9 @@
     "cpk":{
         "p":"BMS/cpk.bms",
         "fs":[["https://aluigi.altervista.org/bms/cpk.bms","BMS/cpk.bms"]]
+    },
+    "nus3_nub2":{
+        "p":"BMS/nus3_nub2.bms",
+        "fs":[["http://aluigi.org/papers/bms/others/nus3_nub2.bms","BMS/nus3_nub2.bms"]]
     }
 }

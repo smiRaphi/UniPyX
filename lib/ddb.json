@@ -57,11 +57,6 @@
         "s":1
     },
     {
-        "rqr":null,
-        "d":{"c":"ext","v":".lz"},
-        "rs":"F-Zero G/AX .lz"
-    },
-    {
         "rqr":"null bytes",
         "d":{"c":"isat","v":["\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\x00\\x50\\x53\\x50\\x20\\x47\\x41\\x4D\\x45",32768]},
         "rs":"ISO","s":1
@@ -121,5 +116,15 @@
         "rqr":"Generic XML (ASCII)",
         "d":{"c":"contain","v":"<FILE type=\"VFSM\" hash=\"0\" providerCert=\"","r":[35,250]},
         "rs":"Iron Sky GPK","s":1
+    },
+    {
+        "rqr":null,
+        "d":{"c":"ext","v":".lz"},
+        "rs":"F-Zero G/AX .lz"
+    },
+    {
+        "rqr":null,
+        "d":{"c":"ext","v":".nub2"},
+        "rs":"NUB2"
     }
 ]
