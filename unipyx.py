@@ -60,10 +60,14 @@ def analyze(inp:str):
         if 'rqr' in x and not (x['rqr'] in ts  or (x['rqr'] == None and not ts )): continue
         if x['d'] == 'py':
             lc = {}
-            exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
-            if lc['check'](inp):
-                if x.get('s'): nts = [x['rs']]
-                else: nts.append(x['rs'])
+            try:
+                exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
+                if lc['check'](inp):
+                    if x.get('s'): nts = [x['rs']]
+                    else: nts.append(x['rs'])
+            except:
+                print(x)
+                raise
         elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
         elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
