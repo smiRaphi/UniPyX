@@ -272,6 +272,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                         copydir(o + '/' + x,o,True)
                     except PermissionError: pass
                 return
+        case 'XISO':
+            run(['xdvdfs','unpack',i,o])
+            if os.listdir(o): return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):

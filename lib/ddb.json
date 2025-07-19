@@ -11,6 +11,11 @@
     },
     {
         "rqr":null,
+        "d":{"c":"isat","v":["MICROSOFT*XBOX*MEDIA",65536]},
+        "rs":"XISO","s":1
+    },
+    {
+        "rqr":null,
         "d":{"c":"isat","v":["\\xC2\\x33\\x9F\\x3D",28]},
         "rs":"GameCube ISO","s":1
     },

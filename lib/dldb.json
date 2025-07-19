@@ -294,6 +294,13 @@
         "p":"JWUDTool.jar",
         "fs":[["https://github.com/Maschell/JWUDTool/releases/download/0.4/JWUDTool-0.4.jar","JWUDTool.jar"]]
     },
+    "xdvdfs":{
+        "p":"xdvdfs.exe",
+        "fs":[{
+            "u":"https://github.com/antangelo/xdvdfs/releases/download/v0.8.3/xdvdfs-windows-1cc850bf1b3487fad7ec7c9eed01d83e8fc75ba4.zip",
+            "x":{"xdvdfs.exe":"xdvdfs.exe"}
+        }]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",
