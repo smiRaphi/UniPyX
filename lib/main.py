@@ -588,6 +588,9 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'CTPK':
             run(['ctpktool','-efd',i,o])
             if os.listdir(o): return
+        case 'Rob Northen Compression':
+            run(['ancient','decompress',i,o + '/' + basename(i)])
+            if os.path.exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

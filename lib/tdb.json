@@ -129,5 +129,9 @@
     "Level5 ARC":[],
     "NDS SWAR":[
         "nintendo ds sound wave archive"
+    ],
+    "Rob Northen Compression":[
+        "rob northen compression (type 1)",
+        "rob northen compression (type 2)"
     ]
 }
