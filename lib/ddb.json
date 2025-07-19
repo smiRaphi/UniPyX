@@ -10,7 +10,7 @@
         "rs":"Wii ISO","s":1
     },
     {
-        "rqr":null,
+        "rqr":"null bytes",
         "d":{"c":"isat","v":["MICROSOFT*XBOX*MEDIA",65536]},
         "rs":"XISO","s":1
     },
