@@ -124,6 +124,11 @@
         "rs":"CTPK","s":1
     },
     {
+        "rqr":null,
+        "d":{"c":"isat","v":["WUX0",0]},
+        "rs":"WUX","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":{"c":"contain","v":"<FILE type=\"VFSM\" hash=\"0\" providerCert=\"","r":[35,250]},
         "rs":"Iron Sky GPK","s":1

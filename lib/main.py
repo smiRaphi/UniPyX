@@ -76,7 +76,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
     i = inp
     o = out
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File':
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
         case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN'|'UDF':
@@ -253,7 +253,25 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     return
                 remove(tf.p + '_decrypted.iso')
             if not extract(i,o,'ISO',db): return
-            
+        case 'WUX':
+            from bin.wiiudk import DKeys
+            cmd = ['java','-jar',db.get('jwudtool'),'-commonkey','d7b00402659ba2abd2cb0db27fa2b656','-decrypt','-in',i,'-out',o]
+            k = DKeys().get(i)
+            if not k: cmd.append('-dev')
+            else: cmd += ['-titleKey',k]
+            op = db.print_try
+            db.print_try = False
+            if op: print('Trying with jwudtool')
+            run(cmd)
+            db.print_try = op
+            if os.listdir(o):
+                for x in os.listdir(o):
+                    try:
+                        if not x.startswith('GM'): remove(o + '/' + x);continue
+                        if not exists(o + '/' + x + '/content'): remove(o + '/' + x);continue
+                        copydir(o + '/' + x,o,True)
+                    except PermissionError: pass
+                return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
@@ -485,14 +503,6 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     mkdir(o + f'/{ix}')
                     if extract(o + f'/{ix}.exe',o + f'/{ix}','ZIP',db) and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
                     else: remove(o + f'/{ix}.exe')
-                return
-
-        case 'Windows Help File':
-            run(['7z','x',i,'-o' + o,'-aou'])
-            if os.listdir(o):
-                for x in os.listdir(o):
-                    xp = o + '/' + x
-                    if x[0] in '$#': remove(xp)
                 return
 
         case 'F-Zero G/AX .lz':

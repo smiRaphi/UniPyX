@@ -282,6 +282,10 @@
             "x":{"ctpktool.exe":"ctpktool/ctpktool.exe","PVRTexLib.dll":"ctpktool/PVRTexLib.dll"}
         }]
     },
+    "jwudtool":{
+        "p":"JWUDTool.jar",
+        "fs":[["https://github.com/Maschell/JWUDTool/releases/download/0.4/JWUDTool-0.4.jar","JWUDTool.jar"]]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

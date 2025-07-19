@@ -1,5 +1,12 @@
 __pycache__
 
-/bin
+/bin/*
 /dev
 *.exe
+
+!/bin/hac2l.exe
+!/bin/ndssndext.exe
+!/bin/ps3key.py
+!/bin/ps3keys.bdb
+!/bin/wiiudk.py
+!/bin/wiiudk.bdb
