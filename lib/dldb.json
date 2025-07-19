@@ -34,6 +34,10 @@
             "x":{"Iso7z.64.dll":"7z/Formats/Iso7z.64.dll"}
         }]
     },
+    "garbro":{
+        "p":"GARbro/GARbro.Console.exe",
+        "fs":[["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/ArcFormats.dll","GARbro/ArcFormats.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/ArcFormats.dll.config","GARbro/ArcFormats.dll.config"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GameData","GARbro/GameData"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GameRes.dll","GARbro/GameRes.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GameRes.dll.config","GARbro/GameRes.dll.config"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GARbro.Console.exe","GARbro/GARbro.Console.exe"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GARbro.Console.exe.config","GARbro/GARbro.Console.exe.config"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/ICSharpCode.SharpZipLib.dll","GARbro/ICSharpCode.SharpZipLib.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/Microsoft.WindowsAPICodePack.dll","GARbro/Microsoft.WindowsAPICodePack.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/Microsoft.WindowsAPICodePack.Shell.dll","GARbro/Microsoft.WindowsAPICodePack.Shell.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/NAudio.dll","GARbro/NAudio.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/Net20.dll","GARbro/Net20.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/NVorbis.dll","GARbro/NVorbis.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/System.IO.FileSystem.dll","GARbro/System.IO.FileSystem.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/System.Security.Cryptography.Algorithms.dll","GARbro/System.Security.Cryptography.Algorithms.dll"],["https://update.bioruebe.com/uniextract/nightly/bin/GARbro/System.Security.Cryptography.Primitives.dll","GARbro/System.Security.Cryptography.Primitives.dll"]]
+    },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
         "fs":[{

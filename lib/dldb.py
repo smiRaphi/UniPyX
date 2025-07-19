@@ -106,5 +106,5 @@ class DLDB:
                     except httpx.ReadTimeout: start = f.tell()
                 else: f.write(self.c.get(url,follow_redirects=True).content)
         except:
-            os.remove(out)
+            if os.path.exists(out): os.remove(out)
             raise

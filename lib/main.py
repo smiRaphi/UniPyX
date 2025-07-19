@@ -116,6 +116,8 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 if os.path.exists(o + '/_INST32I.EX_'):
                     if fix_isinstext(o,db): return
                 elif os.listdir(o): return
+                run(['garbro','x','-o',o,i])
+                if os.listdir(o): return
             else:
                 run(['unzip','-q','-o',i,'-d',o])
                 if os.listdir(o): return
@@ -461,6 +463,29 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             for x in fs:
                 if x.startswith('output.') and len(x.rsplit('.',1)[0]) > 10: move(o + '/' + x,o + '/' + x.split('.',2)[2])
             if fs: return
+        case 'Big EXE':
+            ts = os.path.getsize(i)
+            f = open(i,'rb')
+            f.seek(64)
+            c = 0
+            while True:
+                b = f.read(16)
+                if not b: break
+                if b == b'\x4D\x5A\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xFF\xFF\x00\x00':
+                    sp = f.tell()-16
+                    f.seek(48 + 24 + 56,1)
+                    siz = int.from_bytes(f.read(4),'little')
+                    f.seek(sp)
+                    open(o + '/' + str(c) + '.exe','wb').write(f.read(siz))
+                    f.seek(-f.tell() % 16,1)
+                    if f.tell() >= ts: f.seek(sp + 64)
+                    c += 1
+            if c:
+                for ix in range(c):
+                    mkdir(o + f'/{ix}')
+                    if extract(o + f'/{ix}.exe',o + f'/{ix}','ZIP',db) and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
+                    else: remove(o + f'/{ix}.exe')
+                return
 
         case 'Windows Help File':
             run(['7z','x',i,'-o' + o,'-aou'])
