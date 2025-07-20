@@ -379,5 +379,12 @@
     "nus3_nub2":{
         "p":"BMS/nus3_nub2.bms",
         "fs":[["http://aluigi.org/papers/bms/others/nus3_nub2.bms","BMS/nus3_nub2.bms"]]
+    },
+    "bea":{
+        "p":"BMS/vroom_scne.bms",
+        "fs":[["http://aluigi.org/bms/vroom_scne.bms","BMS/vroom_scne.bms"]]
+    },
+    "xbp":{
+        "p":"BMS/xbp.bms"
     }
 }

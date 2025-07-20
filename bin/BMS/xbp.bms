@@ -1,0 +1,42 @@
+get BaseFileName basename
+
+get Checksum uint32
+get Mult uint32
+get Unknown_0 uint32
+get ResourceCount uint32
+get ResourceTableOffset uint32
+get Unknown_1_Offset uint32
+get Unknown_2 uint32
+get Unknown_3 uint32
+get Unknown_4_Offset uint32
+get Unknown_5 uint32
+get ResourceStrTableOffset uint32
+get ResourceStrTableSize uint32
+get ResourceTableSize uint32
+get Unknown_9 uint32
+get Unknown_10 uint32
+get Unknown_11 uint32
+
+math ResourceTableOffset * Mult
+math ResourceStrTableOffset * Mult
+
+goto ResourceTableOffset
+
+for i = 0 < ResourceCount
+	get ResourceOffset uint32
+    get Unknown_0 uint32
+    get ResourceSize uint32
+    get ResourceNameOffset uint32
+    get Unknown_1 uint32
+    get Unknown_2 uint32
+    get Unknown_3 uint32
+    get Unknown_4 uint32
+	savepos cPos
+	math ResourceOffset * Mult
+	math ResourceNameOffset + ResourceStrTableOffset
+	goto ResourceNameOffset
+	get ResourceName string
+	goto cPos
+	string Name p "%s/%s" BaseFileName ResourceName
+	log Name ResourceOffset ResourceSize
+next i

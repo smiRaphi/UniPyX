@@ -594,6 +594,12 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
         case 'Rob Northen Compression':
             run(['ancient','decompress',i,o + '/' + basename(i)])
             if os.path.exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
+        case 'XBP':
+            run(['quickbms',db.get('xbp'),i,o])
+            if os.listdir(o): return
+        case 'Bezel Archive':
+            run(['quickbms',db.get('bea'),i,o])
+            if os.listdir(o): return
     return 1
 
 def fix_isinstext(o:str,db:DLDB):

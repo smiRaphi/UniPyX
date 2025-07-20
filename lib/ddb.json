@@ -147,5 +147,9 @@
         "rqr":null,
         "d":{"c":"ext","v":".nub2"},
         "rs":"NUB2"
+    },
+    {
+        "d":{"c":"ext","v":".xbp"},
+        "rs":"XBP"
     }
 ]

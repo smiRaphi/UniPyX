@@ -1,4 +1,5 @@
-import os
+import os,sys
+sys.argv = [sys.argv[0]] + [os.path.abspath(x) for x in sys.argv[1:]]
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import re,json,ast
