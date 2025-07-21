@@ -1,6 +1,10 @@
-import os,re
-from lib.dldb import DLDB
+import re,json,ast,os
+from time import sleep
 from shutil import rmtree,copytree,copyfile
+from lib.dldb import DLDB
+
+TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
+EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext = os.path.basename,os.path.dirname,os.path.splitext
@@ -70,7 +74,95 @@ class OSJump:
     def jump(self,i): os.chdir(str(i))
     def back(self): os.chdir(self.p)
 
-def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
+TDB:dict = json.load(xopen('lib/tdb.json'))
+DDB:list[dict] = json.load(xopen('lib/ddb.json'))
+TDBF = set(sum(TDB.values(),[]))
+db = DLDB()
+
+def cleanp(i:str):
+    i = i.replace('/','\\').rstrip('\\')
+    while i.endswith('\\.'): i = i[:-1].rstrip('\\')
+    while i.startswith('.\\'): i = i[1:].lstrip('\\')
+    i = i.replace('\\.\\','\\')
+    return os.path.abspath(i)
+def checktdb(i:list):
+    o = []
+    for x in i:
+        if not x.lower() in TDBF: continue
+        for t in TDB:
+            if x.lower() in TDB[t]: o.append(t)
+    return o
+def analyze(inp:str):
+    inp = cleanp(inp)
+    _,o,_ = db.run(['trid','-n:5',inp])
+    ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
+
+    if os.path.isfile(inp):
+        f = open(inp,'rb')
+        if f.read(2) == b'MZ':
+            f.seek(0x3C)
+            f.seek(int.from_bytes(f.read(4),'little'))
+            if f.read(4) == b'PE\0\0':
+                f.close()
+                log = gtmp('.log')
+                db.run(['exeinfope',inp + '*','/s','/log:' + log])
+                for _ in range(15):
+                    if os.path.exists(log) and os.path.getsize(log): break
+                    sleep(0.1)
+                if os.path.exists(log):
+                    lg = open(log,encoding='utf-8').read().strip()
+                    os.remove(log)
+                    m = EIPER1.search(lg)
+                    if m: ts.append(m[1])
+                    for x in lg.split('\n')[0].split(' - ')[1:]: ts.append(x.split('(')[0].split('[')[0].strip(' ,!:;'))
+            else: f.close()
+        else: f.close()
+
+    nts = checktdb(ts)
+    nts = list(set(nts))
+    for x in DDB:
+        if 'rq'  in x and not (x['rq']  in nts or (x['rq']  == None and not nts)): continue
+        if 'rqr' in x and not (x['rqr'] in ts  or (x['rqr'] == None and not ts )): continue
+        if x['d'] == 'py':
+            lc = {}
+            try:
+                exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
+                if lc['check'](inp):
+                    if x.get('s'): nts = [x['rs']]
+                    else: nts.append(x['rs'])
+            except:
+                print(x)
+                raise
+        elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
+        elif os.path.isfile(inp):
+            if x['d']['c'] == 'contain':
+                cv = ast.literal_eval('"' + x['d']['v'].replace('"','\\"') + '"').encode('latin1')
+                f = open(inp,'rb')
+                sp = x['d']['r'][0]
+                if sp < 0: sp = f.seek(0,2) + sp
+                if sp < 0: sp = 0
+                f.seek(sp)
+                ret = cv in f.read(x['d']['r'][1])
+                f.close()
+            elif x['d']['c'] == 'isat':
+                f = open(inp,'rb')
+                ret = True
+                for ix in range(len(x['d']['v'])//2):
+                    cv = ast.literal_eval('"' + x['d']['v'][ix*2].replace('"','\\"') + '"').encode('latin1')
+                    sp = x['d']['v'][ix*2 + 1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    ret = ret and f.read(len(cv)) == cv
+                f.close()
+        if ret:
+            if x.get('s'): nts = [x['rs']]
+            else: nts.append(x['rs'])
+    if not nts: print(ts)
+
+    return nts
+
+def extract(inp:str,out:str,t:str) -> bool:
     db.print_try = True
     run = db.run
     i = inp
@@ -114,7 +206,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if open(i,'rb').read(2) == b'MZ':
                 run(['7z','x',i,'-o' + o,'-aoa'])
                 if os.path.exists(o + '/_INST32I.EX_'):
-                    if fix_isinstext(o,db): return
+                    if fix_isinstext(o): return
                 elif os.listdir(o): return
                 run(['garbro','x','-o',o,i])
                 if os.listdir(o): return
@@ -248,11 +340,11 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             rmdir('log')
             tf.destroy()
             if os.path.exists(tf.p + '_decrypted.iso'):
-                if not extract(tf.p + '_decrypted.iso',o,'ISO',db):
+                if not extract(tf.p + '_decrypted.iso',o,'ISO'):
                     remove(tf.p + '_decrypted.iso')
                     return
                 remove(tf.p + '_decrypted.iso')
-            if not extract(i,o,'ISO',db): return
+            if not extract(i,o,'ISO'): return
         case 'WUX':
             from bin.wiiudk import DKeys
             cmd = ['java','-jar',db.get('jwudtool'),'-commonkey','d7b00402659ba2abd2cb0db27fa2b656','-decrypt','-in',i,'-out',o]
@@ -305,6 +397,15 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                 return
             td.destroy()
 
+        case 'MSCAB SFX':
+            bk = os.environ.get('__COMPAT_LAYER')
+            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
+            run([i,'/X:' + o,'/Q','/C'])
+            if bk != None: os.environ['__COMPAT_LAYER'] = bk
+            else: del os.environ['__COMPAT_LAYER']
+            for _ in range(50):
+                if os.listdir(o): return
+                sleep(0.1)
         case 'VISE Installer':
             run(['quickbms',db.get('instexpl'),i,o])[2]
             if os.listdir(o): return
@@ -396,7 +497,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                         with zipfile.ZipFile(x[0]) as z: xopen(o + '/' + x[1],'wb').write(z.read(x[1]))
                         remove(x[0])
                     if os.path.exists(o + '/_INST32I.EX_'):
-                        if fix_isinstext(o,db): return
+                        if fix_isinstext(o): return
                     else: return
             f.close()
 
@@ -417,7 +518,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if 'All Files are Successfuly Extracted!' in po and len(os.listdir(td.p)) == 1:
                 copydir(td + '/' + os.listdir(td.p)[0],o,True)
                 if os.path.exists(o + '/_inst32i.ex_'):
-                    if fix_isinstext(o,db): return
+                    if fix_isinstext(o): return
                 else: return
 
             db.run(['quickbms',db.get('instexpl'),i,o])
@@ -428,10 +529,10 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
                     ret = False
                     for x in fs:
                         if not x.lower().endswith('.msi'): continue
-                        r = extract(o + '/' + x,o + '/' + noext(x),'MSI',db)
+                        r = extract(o + '/' + x,o + '/' + noext(x),'MSI')
                         if x[0] != '{' and not '}.' in x: ret = ret or r
                     if not ret: return
-                elif fix_isinstext(o,db): return
+                elif fix_isinstext(o): return
         case 'InstallShield Z':
             td = TmpDir()
             osj = OSJump()
@@ -504,7 +605,7 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             if c:
                 for ix in range(c):
                     mkdir(o + f'/{ix}')
-                    if extract(o + f'/{ix}.exe',o + f'/{ix}','ZIP',db) and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
+                    if main_extract(o + f'/{ix}.exe',o + f'/{ix}') and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
                     else: remove(o + f'/{ix}.exe')
                 return
 
@@ -601,24 +702,23 @@ def extract(inp:str,out:str,t:str,db:DLDB) -> bool:
             run(['quickbms',db.get('bea'),i,o])
             if os.listdir(o): return
     return 1
-
-def fix_isinstext(o:str,db:DLDB):
+def fix_isinstext(o:str):
     ret = True
     fs = os.listdir(o)
     if exists(o + '/_INST32I.EX_'):
         mkdir(o + '/_INST32I_EX_')
-        extract(o + '/_INST32I.EX_',o + '/_INST32I_EX_','Stirling Compressed',db)
+        extract(o + '/_INST32I.EX_',o + '/_INST32I_EX_','Stirling Compressed')
 
     for x in fs:
         x = x.upper()
         if x in ['_SETUP.LIB','DATA.Z'] or (x.startswith('_SETUP.') and x.endswith(('0','1','2','3','4','5','6','7','8','9'))):
             mkdir(o + '/' + x.replace('.','_'))
-            r = not extract(o + '\\' + x,o + '\\' + x.replace('.','_'),'InstallShield Z',db)
+            r = not extract(o + '\\' + x,o + '\\' + x.replace('.','_'),'InstallShield Z')
             if not r: print("Could not extract",x)
             ret = ret and r
         elif x.startswith(('_SYS','_USER','DATA')) and x.endswith('.CAB'):
             mkdir(o + '/' + tbasename(x))
-            r = not extract(o + '\\' + x,o + '\\' + tbasename(x),'InstallShield Archive',db)
+            r = not extract(o + '\\' + x,o + '\\' + tbasename(x),'InstallShield Archive')
             if not r: print("Could not extract",x)
             ret = ret and r
 
@@ -630,3 +730,23 @@ def fix_isinstext(o:str,db:DLDB):
                 try: copydir(o + '/' + x,o,True);break
                 except PermissionError: pass
     return ret
+
+def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True):
+    out = cleanp(out)
+    assert not exists(out),'Output directory already exists'
+    inp = cleanp(inp)
+    if ts == None: ts = analyze(inp)
+    assert ts,'Unknown file type'
+
+    for x in ts:
+        if not quiet: print('Trying format',x)
+        mkdir(out)
+        try:
+            if not extract(inp,out,x):break
+        except:
+            if not os.listdir(out): os.rmdir(out)
+            raise
+        rmtree(out)
+    else: raise Exception("Could not extract")
+    if not quiet: print('Extracted successfully to',out)
+

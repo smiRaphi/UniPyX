@@ -301,6 +301,10 @@
             "x":{"xdvdfs.exe":"xdvdfs.exe"}
         }]
     },
+    "psarc":{
+        "p":"psarc.exe",
+        "fs":[["https://ia801801.us.archive.org/view_archive.php?archive=/3/items/ps3_sdks/PS3%204.50%20SDK-YLoD%20%5B450_001%5D.7z&file=4.50%20SDK-YLoD%20%5B450_001%5D%2Fps3_sdk_450_001-ylod%2FPS3_SDK_450_001-YLoD%2Fcell%2Fhost-win32%2Fbin%2Fpsarc.exe","psarc.exe"]]
+    },
 
     "e_wise":{
         "p":"E_WISE_W.EXE",

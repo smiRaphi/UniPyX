@@ -17,6 +17,10 @@
         "cab installer",
         "win32 ms cabinet self-extractor (wextract stub)"
     ],
+    "MSCAB SFX":[
+        "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
+        "microsoft sfx cab archive  v6.1.22.4"
+    ],
     "StuffIt":[
         "stuffit compressed archive (var.2)",
         "stuffit compressed archive"
@@ -136,5 +140,8 @@
     ],
     "Bezel Archive":[
         "bezel archive game data"
+    ],
+    "PlayStation Archive":[
+        "playstation archive (zlib)"
     ]
 }
