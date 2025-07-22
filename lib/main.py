@@ -159,7 +159,9 @@ def analyze(inp:str):
                     ret = ret and f.read(len(cv)) == cv
                 f.close()
         if ret:
-            if x.get('s'): nts = [x['rs']]
+            if x.get('s'):
+                nts = [x['rs']]
+                break
             else: nts.append(x['rs'])
     if not nts: print(ts)
 
@@ -173,7 +175,15 @@ def extract(inp:str,out:str,t:str) -> bool:
     o = out
     match t:
         case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File':
-            run(['7z','x',i,'-o' + o,'-aou'])
+            _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
+            if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
+                rmtree(o,True)
+                mkdir(o)
+                opt = db.print_try
+                db.print_try = False
+                if opt: print('Trying with input')
+                run([i,'x','-o' + o,'-y'])
+                db.print_try = opt
             if os.listdir(o): return
         case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN'|'UDF':
             td = 'tmp' + os.urandom(8).hex()
