@@ -1,5 +1,5 @@
 import os,sys
-sys.argv = [sys.argv[0]] + [os.path.abspath(x) for x in sys.argv[1:]]
+sys.argv = [sys.argv[0]] + [os.path.realpath(x) for x in sys.argv[1:]]
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from lib.main import main_extract as extract

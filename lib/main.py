@@ -39,7 +39,7 @@ def copydir(i:str,o:str,delete=False):
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
 def xopen(f:str,m='r',encoding='utf-8'):
-    f = os.path.abspath(str(f))
+    f = os.path.realpath(str(f))
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding)
@@ -84,7 +84,7 @@ def cleanp(i:str):
     while i.endswith('\\.'): i = i[:-1].rstrip('\\')
     while i.startswith('.\\'): i = i[1:].lstrip('\\')
     i = i.replace('\\.\\','\\')
-    return os.path.abspath(i)
+    return os.path.realpath(i)
 def checktdb(i:list):
     o = []
     for x in i:
@@ -180,7 +180,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             osj = OSJump()
             osj.jump(dirname(i))
             run(['aaru','filesystem','extract',i,td])
-            td = os.path.abspath(td)
+            td = os.path.realpath(td)
             osj.back()
             if os.listdir(td):
                 td1 = td + '/' + os.listdir(td)[0]
@@ -198,7 +198,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             osj.jump(dirname(tf.p))
             run(['aaru','filesystem','extract',tf,td])
             tf.destroy()
-            td = os.path.abspath(td)
+            td = os.path.realpath(td)
             osj.back()
             if os.listdir(td):
                 td1 = td + '/' + os.listdir(td)[0]
@@ -470,7 +470,10 @@ def extract(inp:str,out:str,t:str) -> bool:
                 copydir(o + '/{app}',o,True)
                 return
         case 'MSI':
-            run(['msiexec','/a',i,'/qb','TARGETDIR=' + o],getexe=False)
+            td = TmpDir()
+            run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
+            copydir(td,o)
+            td.destroy()
             if os.listdir(o): return
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return
