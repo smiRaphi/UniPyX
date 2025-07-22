@@ -728,7 +728,8 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['quickbms',db.get('bea'),i,o])
             if os.listdir(o): return
         case 'PlayStation Archive':
-            raise NotImplementedError
+            run(['psarc','extract','--input='+i,'--to='+o])
+            if os.listdir(o): return
         case 'Unity Bundle':
             opt = db.print_try
             db.print_try = False
