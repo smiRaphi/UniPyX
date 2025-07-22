@@ -6,7 +6,7 @@ __pycache__
 /bin/BMS/*
 !/bin/AssetRipper
 /bin/AssetRipper/*
-/dev
+/out
 *.exe
 
 !/bin/hac2l.exe
