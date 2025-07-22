@@ -1,4 +1,4 @@
-import re,json,ast,os
+import re,json,ast,os,sys
 from time import sleep
 from shutil import rmtree,copytree,copyfile
 from lib.dldb import DLDB
@@ -689,7 +689,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if os.listdir(o): return
         case 'NDS SWAR':
-            pass
+            raise NotImplementedError
         case 'Iron Sky GPK':
             fs = []
             for x in re.findall(r'<File((?: \w+="\w{3}: [^"]*")+)\s*/>',open(i,encoding='utf-8').read()):
@@ -722,6 +722,15 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Bezel Archive':
             run(['quickbms',db.get('bea'),i,o])
+            if os.listdir(o): return
+        case 'PlayStation Archive':
+            raise NotImplementedError
+        case 'Unity Bundle':
+            opt = db.print_try
+            db.print_try = False
+            if opt: print('Trying with assetripper')
+            run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o])
+            db.print_try = opt
             if os.listdir(o): return
     return 1
 def fix_isinstext(o:str):

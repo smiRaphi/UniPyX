@@ -4,6 +4,8 @@ __pycache__
 /bin/*
 !/bin/BMS
 /bin/BMS/*
+!/bin/AssetRipper
+/bin/AssetRipper/*
 /dev
 *.exe
 
@@ -14,3 +16,4 @@ __pycache__
 !/bin/wiiudk.py
 !/bin/wiiudk.bdb
 !/bin/BMS/xbp.bms
+!/bin/AssetRipper/client.py

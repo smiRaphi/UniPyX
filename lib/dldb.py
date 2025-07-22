@@ -19,8 +19,6 @@ class DLDB:
         self.dbp = 'lib/dldb.json'
         self.c = httpx.Client()
         self.print_try = False
-        if not os.path.exists(self.dbp):
-            pass
         self.db = json.load(xopen(self.dbp))
 
     def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False) -> tuple[int,str|bytes,str|bytes]:
