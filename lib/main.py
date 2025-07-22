@@ -93,6 +93,8 @@ def checktdb(i:list):
             if x.lower() in TDB[t]: o.append(t)
     return o
 def analyze(inp:str):
+    opt = db.print_try
+    db.print_try = False
     inp = cleanp(inp)
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
@@ -160,6 +162,7 @@ def analyze(inp:str):
             else: nts.append(x['rs'])
     if not nts: print(ts)
 
+    db.print_try = opt
     return nts
 
 def extract(inp:str,out:str,t:str) -> bool:
@@ -398,9 +401,29 @@ def extract(inp:str,out:str,t:str) -> bool:
             td.destroy()
 
         case 'MSCAB SFX':
+            run(['7z','x',i,'-o' + o,'-aoa'])
+            if os.listdir(o): return
+
             bk = os.environ.get('__COMPAT_LAYER')
             os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
+            opt = db.print_try
+            db.print_try = False
+            if opt: print('Trying with input (/X)')
             run([i,'/X:' + o,'/Q','/C'])
+            db.print_try = opt
+            if bk != None: os.environ['__COMPAT_LAYER'] = bk
+            else: del os.environ['__COMPAT_LAYER']
+            for _ in range(50):
+                if os.listdir(o): return
+                sleep(0.1)
+
+            bk = os.environ.get('__COMPAT_LAYER')
+            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
+            opt = db.print_try
+            db.print_try = False
+            if opt: print('Trying with input (/T)')
+            run([i,'/T:' + o,'/Q'])
+            db.print_try = opt
             if bk != None: os.environ['__COMPAT_LAYER'] = bk
             else: del os.environ['__COMPAT_LAYER']
             for _ in range(50):
@@ -604,7 +627,6 @@ def extract(inp:str,out:str,t:str) -> bool:
                     c += 1
             if c:
                 for ix in range(c):
-                    mkdir(o + f'/{ix}')
                     if main_extract(o + f'/{ix}.exe',o + f'/{ix}') and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
                     else: remove(o + f'/{ix}.exe')
                 return
@@ -731,7 +753,7 @@ def fix_isinstext(o:str):
                 except PermissionError: pass
     return ret
 
-def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True):
+def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False):
     out = cleanp(out)
     assert not exists(out),'Output directory already exists'
     inp = cleanp(inp)
@@ -747,6 +769,8 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True):
             if not os.listdir(out): os.rmdir(out)
             raise
         rmtree(out)
-    else: raise Exception("Could not extract")
+    else:
+        if rs: raise Exception("Could not extract")
+        return
     if not quiet: print('Extracted successfully to',out)
 

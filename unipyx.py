@@ -14,4 +14,4 @@ if __name__ == '__main__':
         out = os.path.splitext(inp)[0]
         c = 1
         while os.path.exists(out): out = os.path.splitext(inp)[0] + '_' + str(c);c += 1
-    extract(inp,out,quiet=False)
+    extract(inp,out,quiet=False,rs=True)
