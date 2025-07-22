@@ -125,6 +125,7 @@ def analyze(inp:str):
     for x in DDB:
         if 'rq'  in x and not (x['rq']  in nts or (x['rq']  == None and not nts)): continue
         if 'rqr' in x and not (x['rqr'] in ts  or (x['rqr'] == None and not ts )): continue
+        ret = False
         if x['d'] == 'py':
             lc = {}
             try:
@@ -782,4 +783,3 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False):
         if rs: raise Exception("Could not extract")
         return
     if not quiet: print('Extracted successfully to',out)
-
