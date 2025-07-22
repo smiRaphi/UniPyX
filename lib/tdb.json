@@ -2,7 +2,8 @@
     "7z":[
         ".7z archive",
         "7-zip compressed archive (v0.4)",
-        "7-zip compressed archive (gen)"
+        "7-zip compressed archive (gen)",
+        "no sec. cab.7z.zip"
     ],
     "ZIP":[
         "zip compressed archive",
