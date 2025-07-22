@@ -42,9 +42,9 @@
         "p":"hxcfe/hxcfe.exe",
         "fs":[{
             "u":"https://github.com/jfdelnero/HxCFloppyEmulator/releases/download/HxCFloppyEmulator_V2_16_13_1/HxCFloppyEmulator_soft.zip",
-            "x":{"HxCFloppyEmulator_soft/hxcfe.exe":"hxcfe/hxcfe.exe",
-                 "HxCFloppyEmulator_soft/libhxcfe.dll":"hxcfe/libhxcfe.dll",
-                 "HxCFloppyEmulator_soft/libusbhxfce.dll":"hxcfe/libusbhxfce.dll"
+            "x":{"HxCFloppyEmulator_soft/HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
+                 "HxCFloppyEmulator_soft/HxCFloppyEmulator_Software/Windows_x64/libhxcfe.dll":"hxcfe/libhxcfe.dll",
+                 "HxCFloppyEmulator_soft/HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
             }
         }]
     },

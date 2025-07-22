@@ -185,7 +185,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
             if os.listdir(o): return
-        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN'|'UDF':
+        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN'|'UDF'|'Apple Disk Image':
             td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
             osj.jump(dirname(i))
@@ -198,6 +198,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 remove(td)
                 return
             remove(td)
+
+            run(['7z','x',i,'-o' + o,'-aou'])
+            if os.listdir(o): return
         case 'CHD':
             tf = TmpFile('.img')
             run(['chdman','extracthd','-o',tf,'-f','-i',i])

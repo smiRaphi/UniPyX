@@ -79,6 +79,9 @@
     "ISO":[
         "iso 9660 cd image"
     ],
+    "Apple Disk Image":[
+        "disk image"
+    ],
     "UDF":[
         "udf disc image"
     ],
