@@ -20,6 +20,11 @@
         "rs":"GameCube ISO","s":1
     },
     {
+        "rqr":"ISO 9660 CD image",
+        "d":{"c":"isat","v":["CVMH\\0\\0",0,"ROFSROFSBLD ",52]},
+        "rs":"ROFS Volume","s":1
+    },
+    {
         "rq":"InstallShield Setup",
         "d":{"c":"contain","v":"MSIEng.isc","r":[-5000000,null]},
         "rs":"InstallShield MSI","s":1
@@ -40,11 +45,6 @@
         "d":"py",
         "py":"f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little') >= 8000000\n\telse:f.seek(32,1)",
         "rs":"Big EXE"
-    },
-    {
-        "rqr":"ISO 9660 CD image",
-        "d":{"c":"isat","v":["CVMH\\0\\0",0,"ROFSROFSBLD ",52]},
-        "rs":"ROFS Volume","s":1
     },
     {
         "d":{"c":"isat","v":["RSAR\\xFE\\xFF",0]},
@@ -137,6 +137,10 @@
         "rqr":"Generic XML (ASCII)",
         "d":{"c":"contain","v":"<FILE type=\"VFSM\" hash=\"0\" providerCert=\"","r":[35,250]},
         "rs":"Iron Sky GPK","s":1
+    },
+    {
+        "d":{"c":"isat","v":["\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x16\\0\\0\\0\\0",0,"\\0\\0\\0\\0\\0\\0\\0\\x0020",40]},
+        "rs":"Unity Assets","s":1
     },
     {
         "rqr":null,

@@ -62,14 +62,18 @@ class Client:
     def LoadFile(self,path:str):
         path = os.path.realpath(path)
         assert os.path.exists(path) and os.path.isfile(path)
-        self.post('LoadFile',path=path)
+        try: self.post('LoadFile',path=path)
+        except httpx.ReadTimeout: pass
     def Reset(self): self.post('Reset')
     def SettingsUpdate(self,settings:dict): self.post('Settings/Update',**settings)
     def ExportPrimaryContent(self,path:str,create_subfolder=False):
         path = os.path.realpath(path)
         try: self.post('Export/PrimaryContent',Path=path,CreateSubfolder=create_subfolder)
         except httpx.ReadTimeout: pass
-        assert os.listdir(path)
+        if not os.listdir(path):
+            self.end()
+            if self.p: print(self.p.stderr.read().decode() + '\n========\n' + self.p.stdout.read().decode())
+            raise Exception('Failed to export')
 def extract(i,o,base=None):
     c = Client(base)
     if not base: c.start()

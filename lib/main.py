@@ -737,6 +737,20 @@ def extract(inp:str,out:str,t:str) -> bool:
             run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o])
             db.print_try = opt
             if os.listdir(o): return
+        case 'Unity Assets':
+            b = basename(i).lower()
+            if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
+                bn = b.rstrip('0123456789')
+                fs = []
+                for x in os.listdir(dirname(i)):
+                    if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
+                tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
+                with open(tf,'wb') as f:
+                    for x in sorted(fs,key=lambda x:x[1]): f.write(open(x[0],'rb').read())
+                r = extract(tf,o,'Unity Bundle')
+                remove(tf)
+            else: r = extract(i,o,'Unity Bundle')
+            if not r: return
     return 1
 def fix_isinstext(o:str):
     ret = True

@@ -7,7 +7,8 @@
     "ZIP":[
         "zip compressed archive",
         "zip archive",
-		"android package"
+		"android package",
+        "apkmirror bundle"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)"
