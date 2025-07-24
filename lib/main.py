@@ -180,7 +180,7 @@ def extract(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)

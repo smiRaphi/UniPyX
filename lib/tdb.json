@@ -21,6 +21,10 @@
     "MSCAB":[
         "microsoft cabinet archive"
     ],
+    "ARJ":[
+        "arj compressed archive (standard)",
+        "arj compressed archive"
+    ],
     "MSCAB SFX":[
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
         "microsoft sfx cab archive  v6.1.22.4",
