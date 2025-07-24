@@ -21,6 +21,9 @@
     "MSCAB":[
         "microsoft cabinet archive"
     ],
+    "PDF":[
+        "adobe portable document format"
+    ],
     "ARJ":[
         "arj compressed archive (standard)",
         "arj compressed archive"

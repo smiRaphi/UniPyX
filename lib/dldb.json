@@ -340,6 +340,32 @@
         }]
     },
 
+    "pdfimages":{
+        "p":"xpdf-tools/pdfimages.exe",
+        "fs":[{
+            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip",
+            "x":{"xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
+                 "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
+                 "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"}
+        }]
+    },"pdfdetach":{
+        "p":"xpdf-tools/pdfdetach.exe",
+        "fs":[{
+            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip",
+            "x":{"xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
+                 "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
+                 "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"}
+        }]
+    },"pdftohtml":{
+        "p":"xpdf-tools/pdftohtml.exe",
+        "fs":[{
+            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip",
+            "x":{"xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
+                 "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
+                 "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"}
+        }]
+    },
+
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

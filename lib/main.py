@@ -191,6 +191,12 @@ def extract(inp:str,out:str,t:str) -> bool:
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
             if os.listdir(o): return
+        case 'PDF':
+            run(['pdfdetach','-saveall','-o',o + '\\out',i])
+            run(['pdfimages','-j',i,o + '\\img'])
+            run(['pdftohtml','-embedbackground','-meta','-overwrite','-q',i,o + '\\html'])
+            if os.listdir(o + '/html'): return
+            remove(o + '/html')
         case 'ISO'|'CDI CUE+BIN'|'CDI'|'UDF':
             td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
@@ -305,7 +311,6 @@ def extract(inp:str,out:str,t:str) -> bool:
             t.join()
             qo.shutdown(True)
             td.destroy()
-
         case 'CHD':
             tf = TmpFile('.img')
             run(['chdman','extracthd','-o',tf,'-f','-i',i])
