@@ -83,6 +83,10 @@
               ["https://update.bioruebe.com/uniextract/nightly/bin/Unp/vise.unp","InstExpl/Unp/vise.unp"]
         ]
     },
+    "bin2iso":{
+        "p":"bin2iso.exe",
+        "fs":["https://mooncore.eu/filus/bin2iso.exe"]
+    },
     "aaru":{
         "p":"Aaru/aaru.exe",
         "fs":[{
@@ -320,7 +324,29 @@
                 "capstone.dll":"AssetRipper/capstone.dll"
         }}]
     },
+    "hfsexplorer":{
+        "p":"hfsexplorer/hfsx.jar",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/catacombae/HFSExplorer/0.23.1/hfsexplorer-0.23.1-bin.zip?viasf=1",
+            "x":{
+                "lib/apache-ant-1.7.0-bzip2.jar":"hfsexplorer/apache-ant-1.7.0-bzip2.jar",
+                "lib/csframework.jar":"hfsexplorer/csframework.jar",
+                "lib/hfsx.jar":"hfsexplorer/hfsx.jar",
+                "lib/hfsx_dmglib.jar":"hfsexplorer/hfsx_dmglib.jar",
+                "lib/iharder-base64.jar":"hfsexplorer/iharder-base64.jar",
+                "lib/llio_amd64.dll":"hfsexplorer/llio_amd64.dll",
+                "lib/swing-layout-1.0.4.jar":"hfsexplorer/swing-layout-1.0.4.jar"
+            }
+        }]
+    },
 
+    "unarc-cpp":{
+        "p":"unarc-cpp.exe",
+        "fs":[{
+            "u":"https://github.com/user-attachments/files/18629018/unarc-cpp.zip",
+            "x":{"unarc_32bit.exe":"unarc-cpp.exe"}
+        }]
+    },
     "e_wise":{
         "p":"E_WISE_W.EXE",
         "fs":["https://update.bioruebe.com/uniextract/nightly/bin/E_WISE_W.EXE",

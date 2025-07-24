@@ -185,7 +185,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
             if os.listdir(o): return
-        case 'ISO'|'CDI CUE+BIN'|'CDI'|'CUE+BIN'|'UDF'|'Apple Disk Image':
+        case 'ISO'|'CDI CUE+BIN'|'CDI'|'UDF':
             td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
             osj.jump(dirname(i))
@@ -201,6 +201,106 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
+        case 'CUE+BIN':
+            if not extract(i,o,'ISO'): return
+            tf = TmpFile('.iso')
+            run(['bin2iso',i,tf,'-a'])
+            if exists(tf.p):
+                main_extract(i,o)
+                tf.destroy()
+                if os.listdir(o): return
+        case 'Apple Disk Image':
+            import subprocess
+            from threading import Thread
+            from queue import Queue,Empty
+
+            def readl(out,queue):
+                for l in iter(out.readline,b''): queue.put(l)
+                out.close()
+
+            if db.print_try: print('Trying with hfsexplorer')
+            ce = os.environ.copy()
+            ce['PATH'] += ';' + dirname(db.get('hfsexplorer'))
+            td = TmpDir()
+            p = subprocess.Popen(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.HFSExplorer','-apm','browse',i],cwd=td.p,env=ce,stdout=-1,stderr=-3,stdin=-1,bufsize=1,close_fds=False)
+            qo = Queue()
+            t = Thread(target=readl,args=(p.stdout,qo))
+            t.daemon = True
+            t.start()
+            def sin(i:bytes):
+                p.stdin.write(i)
+                try: p.stdin.flush()
+                except OSError: pass
+
+            ps = []
+            while p.poll() is None:
+                for _ in range(3):
+                    try: l = qo.get_nowait().decode().rstrip();break
+                    except Empty:sleep(0.1)
+                else:break
+                print(l)
+                if l.startswith('Partition ') and 'HFS' in l: ps.append((int(l.split()[1][:-1]),l.split('"')[1]))
+                elif ps: break
+
+            for sp in ps:
+                def xfold():
+                    fs = []
+                    while p.poll() is None:
+                        for _ in range(3):
+                            try: l = qo.get_nowait().decode().rstrip();break
+                            except Empty:sleep(0.1)
+                        else:break
+                        print(l)
+                        if l.startswith('  [org.catacombae.'): fs.append((int(l.split('@')[1].split(']')[0],16),l[-2] == '/'))
+                        elif l.startswith('  [Folder Thread: '): base = str(int(l.split('@')[1].split(']')[0],16)).encode()
+                        elif l.startswith('Listing files in "'): basen = l.split('"')[1].strip('/\\')
+                        elif fs: break
+                    while p.poll() is None:
+                        for f in fs:
+                            while p.poll() is None:
+                                try:l = qo.get_nowait()
+                                except Empty:break
+                                print(l)
+                            if f[1]:
+                                sin(b'cdn ' + str(f[0]).encode() + b'\r\n')
+                                xfold()
+                                while p.poll() is None:
+                                    try:l = qo.get_nowait()
+                                    except Empty:break
+                                    print(l)
+                                sin(b'cdn ' + base + b'\r\n')
+                            else:
+                                sin(b'info ' + str(f[0]).encode() + b'\r\n')
+                                while p.poll() is None:
+                                    try:l = qo.get_nowait()
+                                    except Empty:break
+                                    print(l)
+                                sin(b'extract ' + str(f[0]).encode() + b'\r\n')
+                                while p.poll() is None:
+                                    try:l = qo.get_nowait()
+                                    except Empty:break
+                                    print(l)
+                                while not os.listdir(td.p): sleep(0.1)
+                                move(td.p + '/' + os.listdir(td.p)[0],o + '/' + sp[1] + '/' + basen + '/')
+
+                while p.poll() is None:
+                    try:l = qo.get_nowait()
+                    except Empty:break
+                    print(l)
+                sin(str(sp[0]).encode() + b'\r\n')
+                xfold()
+                while p.poll() is None:
+                    try:l = qo.get_nowait()
+                    except Empty:break
+                    print(l)
+                sin(b'q\r\n')
+
+            p.kill()
+            p.stdin.close()
+            t.join()
+            qo.shutdown(True)
+            td.destroy()
+
         case 'CHD':
             tf = TmpFile('.img')
             run(['chdman','extracthd','-o',tf,'-f','-i',i])
