@@ -347,6 +347,13 @@
             "x":{"unarc_32bit.exe":"unarc-cpp.exe"}
         }]
     },
+    "cls-srep":{
+        "p":"cls-srep/cls-srep.dll",
+        "fs":[{
+            "u":"https://files.catbox.moe/e9ac5w.7z",
+            "x":{"cls-srep.dll":"cls-srep/cls-srep.dll","cls-srep_x64.exe":"cls-srep/cls-srep_x64.exe","cls-srep_x86.exe":"cls-srep/cls-srep_x86.exe"}
+        }]
+    },
     "e_wise":{
         "p":"E_WISE_W.EXE",
         "fs":["https://update.bioruebe.com/uniextract/nightly/bin/E_WISE_W.EXE",

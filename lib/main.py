@@ -1,4 +1,4 @@
-import re,json,ast,os,sys
+import re,json,ast,os,sys,subprocess
 from time import sleep
 from shutil import rmtree,copytree,copyfile
 from lib.dldb import DLDB
@@ -136,6 +136,12 @@ def analyze(inp:str):
             except:
                 print(x)
                 raise
+        elif x['d'] == 'ps':
+            env = os.environ.copy()
+            env['input'] = inp
+            p = subprocess.Popen(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',x['ps']],env=env,stdout=-1)
+            p.wait()
+            ret = p.stdout.read().decode().strip() == 'True'
         elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
         elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
@@ -210,7 +216,6 @@ def extract(inp:str,out:str,t:str) -> bool:
                 tf.destroy()
                 if os.listdir(o): return
         case 'Apple Disk Image':
-            import subprocess
             from threading import Thread
             from queue import Queue,Empty
 
@@ -517,12 +522,11 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Qt IFW':
             from signal import SIGTERM
             from winpty import PtyProcess
-            from subprocess import list2cmdline
             bk = os.environ.get('__COMPAT_LAYER')
             os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
             if db.print_try: print('Trying with input')
 
-            p = PtyProcess.spawn(list2cmdline([db.get('winpty'),i,'--nf','--ns','--am','--al','--lang','en','--cp',o + '\\$CACHE','-t',o,'-g','ifw.installer.installlog=true','in']))
+            p = PtyProcess.spawn(subprocess.list2cmdline([db.get('winpty'),i,'--nf','--ns','--am','--al','--lang','en','--cp',o + '\\$CACHE','-t',o,'-g','ifw.installer.installlog=true','in']))
             p.write('Yes\r\n')
             while p.isalive():
                 try: l = p.readline()
@@ -608,6 +612,28 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
                 copydir(o + '/{app}',o,True)
                 return
+        case 'FitGirl Installer':
+            for x in os.listdir(dirname(i)):
+                if x.startswith('fg-') and x.endswith('.bin'):
+                    try: n = int(x[3:-4])
+                    except: n = None
+                    if n == 1: mf = x;break
+            else: return 1
+
+            td = TmpDir()
+            run(['innoextract','-e','-q','-d',td,i])
+            remove(td + '/tmp/cls-srep.dll',td + '/tmp/cls-srep_x64.exe',td + '/tmp/cls-srep_x86.exe')
+            copydir(dirname(db.get('cls-srep')),td + '/tmp')
+            run(['unarc-cpp','unarc.dll','x','-o+','-dp' + o,'-w' + td + '\\tmp','-cfgarc.ini',dirname(i) + '\\' + mf],cwd=td.p + '\\tmp')
+            td.destroy()
+
+            def find_file(o):
+                for x in os.listdir(o):
+                    x = o + '/' + x
+                    if isfile(x) or find_file(x): return 1
+            if find_file(o): return
+            remove(o)
+            mkdir(o)
         case 'MSI':
             td = TmpDir()
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
