@@ -396,13 +396,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     except:pass
                     else:return
             tf.destroy()
-        case 'GameCube ISO':
-            run(['dolphintool','extract','-i',i,'-o',o,'-q'])
-            if os.listdir(o):
-                rename(o + '/sys',o + '/$SYS')
-                copydir(o + '/files',o,True)
-                return
-        case 'Wii ISO':
+        case 'Wii ISO'|'GameCube ISO':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
             if os.listdir(o):
                 rename(o + '/sys',o + '/$SYS')
@@ -442,7 +436,20 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
         case 'NSP':
-            run(['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys'),'--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS',i])
+            bcd = ['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys')]
+            _,e,_ = run(bcd + [i])
+            bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
+            if ' MetaType=Patch ' in e:
+                pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
+                pid,pv = pinf[1],int(pinf[2],16)
+                for x in os.listdir(dirname(i)):
+                    if pid in x and x.endswith('.nsp'):
+                        try: v = int(re.search(r'v(\d+)(?:\b|_)(?!\.)',x)[1])
+                        except: v = 0
+                        if v < pv: bf = dirname(i) + '\\' + x;break
+                else: return 1
+                bcd += ['--basepfs',bf]
+            run(bcd + [i])
             if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
         case 'NDS':
             run(['mdnds','e',i,o])
