@@ -170,6 +170,11 @@
         "rs":"Rayman DCZ"
     },
     {
+        "rqr":null,
+        "d":{"c":"name","v":"RRV1_A"},
+        "rs":"Ridge Racer V A"
+    },
+    {
         "d":{"c":"ext","v":".xbp"},
         "rs":"XBP"
     }

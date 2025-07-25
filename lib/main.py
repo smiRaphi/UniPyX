@@ -143,6 +143,7 @@ def analyze(inp:str):
             p.wait()
             ret = p.stdout.read().decode().strip() == 'True'
         elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
+        elif x['d']['c'] == 'name': ret = basename(inp) == x['d']['v']
         elif os.path.isfile(inp):
             if x['d']['c'] == 'contain':
                 cv = ast.literal_eval('"' + x['d']['v'].replace('"','\\"') + '"').encode('latin1')
@@ -485,11 +486,8 @@ def extract(inp:str,out:str,t:str) -> bool:
             k = DKeys().get(i)
             if not k: cmd.append('-dev')
             else: cmd += ['-titleKey',k]
-            op = db.print_try
-            db.print_try = False
-            if op: print('Trying with jwudtool')
-            run(cmd)
-            db.print_try = op
+            if db.print_try: print('Trying with jwudtool')
+            run(cmd,print_try=False)
             if os.listdir(o):
                 for x in os.listdir(o):
                     try:
@@ -562,11 +560,8 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             bk = os.environ.get('__COMPAT_LAYER')
             os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
-            opt = db.print_try
-            db.print_try = False
-            if opt: print('Trying with input (/X)')
-            run([i,'/X:' + o,'/Q','/C'])
-            db.print_try = opt
+            if db.print_try: print('Trying with input (/X)')
+            run([i,'/X:' + o,'/Q','/C'],print_try=False)
             if bk != None: os.environ['__COMPAT_LAYER'] = bk
             else: del os.environ['__COMPAT_LAYER']
             for _ in range(50):
@@ -575,11 +570,8 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             bk = os.environ.get('__COMPAT_LAYER')
             os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
-            opt = db.print_try
-            db.print_try = False
-            if opt: print('Trying with input (/T)')
-            run([i,'/T:' + o,'/Q'])
-            db.print_try = opt
+            if db.print_try: print('Trying with input (/T)')
+            run([i,'/T:' + o,'/Q'],print_try=False)
             if bk != None: os.environ['__COMPAT_LAYER'] = bk
             else: del os.environ['__COMPAT_LAYER']
             for _ in range(50):
@@ -658,7 +650,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             f = open(i,'rb')
             f.seek(943)
             if f.read(42) == b'InstallShield Self-Extracting Stub Program':
-                print('Trying with custom extractor')
+                if db.print_try: print('Trying with custom extractor')
                 ofs = []
                 while True:
                     x = f.read(1)
@@ -852,7 +844,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ROFS Volume':
             tf = TmpFile('.iso')
             run(['cvm_tool','split',i,tf])
-            run(['7z','x',tf,'-o' + o,'-aoa'])
+            extract(tf,o,'ISO')
             tf.destroy()
         case 'RetroStudio PAK':
             run(['paktool','-x',i,'-o',o])
@@ -908,11 +900,8 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['psarc','extract','--input='+i,'--to='+o])
             if os.listdir(o): return
         case 'Unity Bundle':
-            opt = db.print_try
-            db.print_try = False
-            if opt: print('Trying with assetripper')
-            run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o])
-            db.print_try = opt
+            if db.print_try: print('Trying with assetripper')
+            run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o],print_try=False)
             if os.listdir(o): return
         case 'Unity Assets':
             b = basename(i).lower()
@@ -931,6 +920,31 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Rayman DCZ':
             run(['quickbms',db.get('rayman_dcz'),i,o])
             if os.listdir(o): return
+
+        case 'Ridge Racer V A':
+            tf = dirname(i) + '\\rrv3vera.ic002'
+            if os.path.exists(tf): remove(tf)
+            symlink(db.get('rrv3va'),tf)
+
+            cfp = dirname(db.get('rrvatool')) + '/RidgeRacerVArchiveTool.exe.config'
+            d = open(cfp).read().replace('<value>True</value>','<value>False</value>')
+            open(cfp,'w').write(d.replace('<setting name="ACV3Achecked" serializeAs="String">\n                <value>False</value>','<setting name="ACV3Achecked" serializeAs="String">\n                <value>True</value>'))
+            if db.print_try: print('Trying with rrvatool')
+            p = subprocess.Popen([db.get('rrvatool'),i],stdout=-1,stderr=-1)
+            sleep(1)
+            
+            while not os.listdir(i + '_extract'): sleep(0.1)
+            while True:
+                try:copydir(i + '_extract',o,True)
+                except:sleep(0.1)
+                else:break
+            p.kill()
+            remove(tf)
+
+            for x in os.listdir(o):
+                if not os.path.getsize(o + '/' + x): remove(o + '/' + x)
+
+            return
     return 1
 def fix_isinstext(o:str):
     ret = True

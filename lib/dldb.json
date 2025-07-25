@@ -112,20 +112,6 @@
     "hac2l":{
         "p":"hac2l.exe"
     },
-    "prodkeys":{
-        "p":"prodkeys/prod.keys",
-        "fs":[{
-            "u":"https://files.prodkeys.net/ProdKeys.net-v20.0.1.zip",
-            "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
-        }]
-    },
-    "titlekeys":{
-        "p":"prodkeys/title.keys",
-        "fs":[{
-            "u":"https://files.prodkeys.net/ProdKeys.net-v20.0.1.zip",
-            "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
-        }]
-    },
     "ps4pkg":{
         "p":"ps4pkg/orbis-pub-cmd.exe",
         "fs":[
@@ -324,6 +310,13 @@
                 "capstone.dll":"AssetRipper/capstone.dll"
         }}]
     },
+    "rrvatool":{
+        "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
+        "fs":[{
+            "u":"https://github.com/ch-mcl/PS2_RidgeRacerV_ArchiveTool/releases/download/v1.0.0/v1.0.0.zip",
+            "x":{"RidgeRacerVArchiveTool.exe":"RRVArcTool/RidgeRacerVArchiveTool.exe","RidgeRacerVArchiveTool.exe.config":"RRVArcTool/RidgeRacerVArchiveTool.exe.config"}
+        }]
+    },
     "hfsexplorer":{
         "p":"hfsexplorer/hfsx.jar",
         "fs":[{
@@ -468,5 +461,26 @@
     },
     "xbp":{
         "p":"BMS/xbp.bms"
+    },
+
+    "prodkeys":{
+        "p":"prodkeys/prod.keys",
+        "fs":[{
+            "u":"https://files.prodkeys.net/ProdKeys.net-v20.0.1.zip",
+            "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
+        }]
+    },"titlekeys":{
+        "p":"prodkeys/title.keys",
+        "fs":[{
+            "u":"https://files.prodkeys.net/ProdKeys.net-v20.0.1.zip",
+            "x":{"prod.keys":"prodkeys/prod.keys","title.keys":"prodkeys/title.keys"}
+        }]
+    },
+    "rrv3va":{
+        "p":"RRVArcTool/rrv3vera.ic002",
+        "fs":[{
+            "u":"https://archive.org/download/Namco2x6Games/rrvac.zip",
+            "x":{"rrv3vera.ic002":"RRVArcTool/rrv3vera.ic002"}
+        }]
     }
 }

@@ -21,8 +21,8 @@ class DLDB:
         self.print_try = False
         self.db = json.load(xopen(self.dbp))
 
-    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,**kwargs) -> tuple[int,str|bytes,str|bytes]:
-        if self.print_try: print('Trying with',cmd[0])
+    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,**kwargs) -> tuple[int,str|bytes,str|bytes]:
+        if print_try and self.print_try: print('Trying with',cmd[0])
         if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
         if useos:
