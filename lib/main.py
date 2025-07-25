@@ -180,7 +180,7 @@ def extract(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -921,6 +921,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 remove(tf)
             else: r = extract(i,o,'Unity Bundle')
             if not r: return
+        case 'Rayman DCZ':
+            run(['quickbms',db.get('rayman_dcz'),i,o])
+            if os.listdir(o): return
     return 1
 def fix_isinstext(o:str):
     ret = True

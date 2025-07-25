@@ -28,6 +28,9 @@
         "arj compressed archive (standard)",
         "arj compressed archive"
     ],
+    "ZSTD":[
+        "zstandard compressed data"
+    ],
     "MSCAB SFX":[
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
         "microsoft sfx cab archive  v6.1.22.4",

@@ -456,11 +456,15 @@
     },
     "nus3_nub2":{
         "p":"BMS/nus3_nub2.bms",
-        "fs":[["http://aluigi.org/papers/bms/others/nus3_nub2.bms","BMS/nus3_nub2.bms"]]
+        "fs":[["https://aluigi.altervista.org/bms/nus3_nub2.bms","BMS/nus3_nub2.bms"]]
     },
     "bea":{
         "p":"BMS/vroom_scne.bms",
-        "fs":[["http://aluigi.org/bms/vroom_scne.bms","BMS/vroom_scne.bms"]]
+        "fs":[["https://aluigi.altervista.org/bms/vroom_scne.bms","BMS/vroom_scne.bms"]]
+    },
+    "rayman_dcz":{
+        "p":"BMS/rayman_dcz.bms",
+        "fs":[["https://aluigi.altervista.org/bms/rayman_dcz.bms","BMS/rayman_dcz.bms"]]
     },
     "xbp":{
         "p":"BMS/xbp.bms"
