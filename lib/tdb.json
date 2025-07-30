@@ -89,6 +89,9 @@
     "ISO":[
         "iso 9660 cd image"
     ],
+    "IMG":[
+        "generic pc disk image (ntfs)"
+    ],
     "Apple Disk Image":[
         "disk image"
     ],

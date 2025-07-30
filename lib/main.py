@@ -198,7 +198,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['pdftohtml','-embedbackground','-meta','-overwrite','-q',i,o + '\\html'])
             if os.listdir(o + '/html'): return
             remove(o + '/html')
-        case 'ISO'|'CDI CUE+BIN'|'CDI'|'UDF':
+        case 'ISO'|'IMG'|'CDI CUE+BIN'|'CDI'|'UDF':
             td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
             osj.jump(dirname(i))
@@ -317,19 +317,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['chdman','extracthd','-o',tf,'-f','-i',i])
             if not exists(tf.p): return 1
 
-            td = 'tmp' + os.urandom(8).hex()
-            osj = OSJump()
-            osj.jump(dirname(tf.p))
-            run(['aaru','filesystem','extract',tf,td])
+            r = extract(tf.p,o,'IMG')
             tf.destroy()
-            td = os.path.realpath(td)
-            osj.back()
-            if os.listdir(td):
-                td1 = td + '/' + os.listdir(td)[0]
-                copydir(td1 + '/' + os.listdir(td1)[0],o)
-                remove(td)
-                return
-            remove(td)
+            return r
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
                 run(['7z','x',i,'-o' + o,'-aoa'])
@@ -500,7 +490,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['xdvdfs','unpack',i,o])
             if os.listdir(o): return
         case 'U8'|'RARC':
-            run(['wszst','X',i,'-o','-R','-E$','-d',o])
+            run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
                 if exists(o + '/wszst-setup.txt'): remove(o + '/wszst-setup.txt')
                 return
@@ -919,6 +909,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             if not r: return
         case 'Rayman DCZ':
             run(['quickbms',db.get('rayman_dcz'),i,o])
+            if os.listdir(o): return
+        case 'iQiyi PAK':
+            run(['iqipack',i,o])
             if os.listdir(o): return
 
         case 'Ridge Racer V A':

@@ -332,6 +332,10 @@
             }
         }]
     },
+    "iqipack":{
+        "p":"iQiPack.exe",
+        "fs":["https://github.com/simontime/iQiPack/releases/download/v2.0/iQiPack.exe"]
+    },
 
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
