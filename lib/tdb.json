@@ -123,7 +123,9 @@
         "microsoft windows installer",
         "windows sdk setup transformer script"
     ],
-
+    "Setup Factory Installer":[
+        "setup factory 6.0"
+    ],
     "InstallShield Setup":[
         "installshield setup",
         "installshield 3.x custom"

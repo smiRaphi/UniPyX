@@ -640,6 +640,15 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return
+        case 'Setup Factory Installer':
+            if not quickbms('totalobserver'):
+                if os.listdir(o + '/%AppDir%'):
+                    for x in os.listdir(o):
+                        if isfile(o + '/' + x): remove(o + '/' + x)
+                    copydir(o + '/%AppDir%',o,True)
+                if exists(o + '/%SysDir%'): mv(o + '/%SysDir%',o + '/$SYS')
+                return
+            quickbms('instexpl')
         case 'InstallShield Setup':
             f = open(i,'rb')
             f.seek(943)
