@@ -734,6 +734,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 return
         case 'InstallShield Archive':
             td = TmpDir()
+            osj = OSJump()
             osj.jump(td)
             e,_,_ = run(['i5comp','x','-rof',i])
             osj.back()
@@ -912,6 +913,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'iQiyi PAK':
             run(['iqipack',i,o])
+            if os.listdir(o): return
+        case 'LEGO JAM':
+            run(['quickbms',db.get('legoracer_jam'),i,o])
             if os.listdir(o): return
 
         case 'Ridge Racer V A':

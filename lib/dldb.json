@@ -466,6 +466,10 @@
     "xbp":{
         "p":"BMS/xbp.bms"
     },
+    "legoracer_jam":{
+        "p":"BMS/legoracer_jam.bms",
+        "fs":[["https://aluigi.altervista.org/bms/legoracer_jam.bms","BMS/legoracer_jam.bms"]]
+    },
 
     "prodkeys":{
         "p":"prodkeys/prod.keys",
