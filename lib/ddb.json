@@ -157,11 +157,6 @@
     },
     {
         "rqr":null,
-        "d":{"c":"ext","v":".lz"},
-        "rs":"F-Zero G/AX .lz"
-    },
-    {
-        "rqr":null,
         "d":{"c":"ext","v":".nub2"},
         "rs":"NUB2"
     },
@@ -169,6 +164,16 @@
         "rqr":null,
         "d":{"c":"ext","v":".dcz"},
         "rs":"Rayman DCZ"
+    },
+    {
+        "rqr":null,
+        "d":{"c":"ext","v":".pkg"},
+        "rs":"Metroid Samus Returns PKG"
+    },
+    {
+        "rqr":null,
+        "d":{"c":"ext","v":".lz"},
+        "rs":"F-Zero G/AX .lz"
     },
     {
         "rqr":null,

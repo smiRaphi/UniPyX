@@ -470,6 +470,10 @@
         "p":"BMS/legoracer_jam.bms",
         "fs":[["https://aluigi.altervista.org/bms/legoracer_jam.bms","BMS/legoracer_jam.bms"]]
     },
+    "metroid_sr_3ds":{
+        "p":"BMS/metroid_sr_3ds.bms",
+        "fs":[["https://aluigi.altervista.org/bms/metroid_sr_3ds.bms","BMS/metroid_sr_3ds.bms"]]
+    },
 
     "prodkeys":{
         "p":"prodkeys/prod.keys",

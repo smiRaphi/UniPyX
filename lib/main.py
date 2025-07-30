@@ -180,6 +180,13 @@ def extract(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
     o = out
+
+    def quickbms(scr):
+        if db.print_try: print('Trying with',scr)
+        run(['quickbms',db.get(scr),i,o],print_try=False)
+        if os.listdir(o): return
+        return 1
+
     match t:
         case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
@@ -317,9 +324,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['chdman','extracthd','-o',tf,'-f','-i',i])
             if not exists(tf.p): return 1
 
-            r = extract(tf.p,o,'IMG')
+            if extract(tf.p,o,'IMG'): mv(tf.p,o + '/' + basename(o) + '.img')
             tf.destroy()
-            return r
+            return
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
                 run(['7z','x',i,'-o' + o,'-aoa'])
@@ -567,15 +574,12 @@ def extract(inp:str,out:str,t:str) -> bool:
             for _ in range(50):
                 if os.listdir(o): return
                 sleep(0.1)
-        case 'VISE Installer':
-            run(['quickbms',db.get('instexpl'),i,o])[2]
-            if os.listdir(o): return
+        case 'VISE Installer': return quickbms('instexpl')
         case 'NSIS Installer':
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return
 
-            run(['quickbms',db.get('instexpl'),i,o])[2]
-            if os.listdir(o):
+            if quickbms('instexpl'):
                 tm = []
                 for x in os.listdir(o):
                     if isfile(o + '/' + x): tm.append(o + '/' + x)
@@ -707,7 +711,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if fix_isinstext(o): return
                 else: return
 
-            db.run(['quickbms',db.get('instexpl'),i,o])
+            quickbms('instexpl')
             fs = os.listdir(o)
             if fs:
                 if not 'SETUP.EXE' in fs and not 'Setup.ini' in fs and not 'MSIEng.isc' in fs: return
@@ -843,12 +847,8 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'CPK':
             run(['cpkextract',i,o])
             if os.listdir(o): return
-        case 'CRI CPK':
-            run(['quickbms',db.get('cpk'),i,o])
-            if os.listdir(o): return
-        case 'Sonic AMB':
-            run(['quickbms',db.get('sonic4'),i,o])
-            if os.listdir(o): return
+        case 'CRI CPK': return quickbms('cpk')
+        case 'Sonic AMB': return quickbms('sonic4')
         case 'Level5 ARC'|'Level5 XPCK':
             run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if os.listdir(o): return
@@ -872,21 +872,15 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if x['compression'] != 'CM_STORE' or x['size'] != x['originalSize']: print('Unknown compression',x)
             for x in ofl: ofl[x].close()
             return
-        case 'NUB2':
-            run(['quickbms',db.get('nus3_nub2'),i,o])
-            if os.listdir(o): return
+        case 'NUB2': return quickbms('nus3_nub2')
         case 'CTPK':
             run(['ctpktool','-efd',i,o])
             if os.listdir(o): return
         case 'Rob Northen Compression':
             run(['ancient','decompress',i,o + '/' + basename(i)])
             if os.path.exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
-        case 'XBP':
-            run(['quickbms',db.get('xbp'),i,o])
-            if os.listdir(o): return
-        case 'Bezel Archive':
-            run(['quickbms',db.get('bea'),i,o])
-            if os.listdir(o): return
+        case 'XBP': return quickbms('xbp')
+        case 'Bezel Archive': return quickbms('bea')
         case 'PlayStation Archive':
             run(['psarc','extract','--input='+i,'--to='+o])
             if os.listdir(o): return
@@ -908,15 +902,12 @@ def extract(inp:str,out:str,t:str) -> bool:
                 remove(tf)
             else: r = extract(i,o,'Unity Bundle')
             if not r: return
-        case 'Rayman DCZ':
-            run(['quickbms',db.get('rayman_dcz'),i,o])
-            if os.listdir(o): return
+        case 'Rayman DCZ': return quickbms('rayman_dcz')
         case 'iQiyi PAK':
             run(['iqipack',i,o])
             if os.listdir(o): return
-        case 'LEGO JAM':
-            run(['quickbms',db.get('legoracer_jam'),i,o])
-            if os.listdir(o): return
+        case 'LEGO JAM': return quickbms('legoracer_jam')
+        case 'Metroid Samus Returns PKG': return quickbms('metroid_sr_3ds')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
