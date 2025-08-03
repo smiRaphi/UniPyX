@@ -59,7 +59,7 @@ class TmpDir:
     def __radd__(self,i): return i + self.p
     def __del__(self): self.destroy()
 class TmpFile:
-    def __init__(self,suf=''): self.p = gtmp(suf)
+    def __init__(self,suf='',name=''): self.p = TMP + (name or (os.urandom(8).hex() + suf))
     def link(self,i): symlink(i,self.p)
     def copy(self,i): cp(i,self.p)
     def destroy(self):
@@ -129,7 +129,7 @@ def analyze(inp:str):
         if x['d'] == 'py':
             lc = {}
             try:
-                exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={},locals=lc)
+                exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename},locals=lc)
                 if lc['check'](inp):
                     if x.get('s'): nts = [x['rs']]
                     else: nts.append(x['rs'])
@@ -181,9 +181,10 @@ def extract(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
-    def quickbms(scr):
+    def quickbms(scr,inp=None):
+        inf = inp or i
         if db.print_try: print('Trying with',scr)
-        run(['quickbms',db.get(scr),i,o],print_try=False)
+        run(['quickbms',db.get(scr),inf,o],print_try=False)
         if os.listdir(o): return
         return 1
 
@@ -917,6 +918,24 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'LEGO JAM': return quickbms('legoracer_jam')
         case 'Metroid Samus Returns PKG': return quickbms('metroid_sr_3ds')
+        case 'DDR DAT':
+            MODS = ['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']
+
+            for x in os.listdir(dirname(i)):
+                if x.upper() in MODS: ex = dirname(i) + '\\' + x;break
+            else:
+                for x in os.listdir(dirname(dirname(i))):
+                    if x.upper() in MODS: ex = dirname(dirname(i)) + '\\' + x;break
+                else: return 1
+
+            osj = OSJump()
+            tf1,tf2 = TmpFile(name=basename(i).upper()),TmpFile(name=basename(ex).upper())
+            tf1.link(i),tf2.link(ex)
+            osj.jump(TMP)
+            r = quickbms('ddr_dat',tf2)
+            osj.back()
+            tf1.destroy(),tf2.destroy()
+            return r
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

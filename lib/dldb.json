@@ -481,6 +481,10 @@
         "p":"BMS/metroid_sr_3ds.bms",
         "fs":[["https://aluigi.altervista.org/bms/metroid_sr_3ds.bms","BMS/metroid_sr_3ds.bms"]]
     },
+    "ddr_dat":{
+        "p":"BMS/ddr_dat.bms",
+        "fs":[["https://raw.githubusercontent.com/bnnm/vgm-tools/96e0f8de47b85cfce33582ae0182800adba5297a/bms/archives/kces_ddr_dat.bms","BMS/ddr_dat.bms"]]
+    },
 
     "prodkeys":{
         "p":"prodkeys/prod.keys",

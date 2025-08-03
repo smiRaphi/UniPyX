@@ -165,6 +165,11 @@
         "rs":"NUB2"
     },
     {
+        "d":"py",
+        "py":"m=['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']\nreturn ((basename(inp).lower().startswith('mdb_') and inp.lower().endswith('.dat')) or basename(inp).lower() == 'sound.dat') and ([x for x in os.listdir(dirname(inp)) if x.upper() in m] or [x for x in os.listdir(dirname(dirname(inp))) if x.upper() in m])",
+        "rs":"DDR DAT"
+    },
+    {
         "rqr":null,
         "d":{"c":"ext","v":".dcz"},
         "rs":"Rayman DCZ"
