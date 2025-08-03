@@ -206,7 +206,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['pdftohtml','-embedbackground','-meta','-overwrite','-q',i,o + '\\html'])
             if os.listdir(o + '/html'): return
             remove(o + '/html')
-        case 'ISO'|'IMG'|'CDI CUE+BIN'|'CDI'|'UDF':
+        case 'ISO'|'IMG'|'Floppy Image'|'CDI CUE+BIN'|'CDI'|'UDF':
             td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
             osj.jump(dirname(i))
