@@ -7,7 +7,8 @@ TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
 EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
-basename,dirname,splitext = os.path.basename,os.path.dirname,os.path.splitext
+basename,dirname,splitext,realpath = os.path.basename,os.path.dirname,os.path.splitext,os.path.realpath
+abspath = realpath
 symlink,rename = os.symlink,os.rename
 def tbasename(i:str): return splitext(basename(str(i)))[0]
 def extname(i:str): return splitext(str(i))[1]
@@ -436,7 +437,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             return
         case 'NSP':
             bcd = ['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys')]
-            _,e,_ = run(bcd + [i])
+            _,e,_ = run(bcd + [i],print_try=False)
             bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
             if ' MetaType=Patch ' in e:
                 pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
@@ -478,6 +479,29 @@ def extract(inp:str,out:str,t:str) -> bool:
                     return
                 remove(tf.p + '_decrypted.iso')
             if not extract(i,o,'ISO'): return
+        case 'PSVita PKG':
+            import zlib,base64
+            if exists(dirname(i) + '/work.bin'):
+                ZRIF_DICT = zlib.decompress(base64.b64decode(b"eNpjYBgFo2AU0AsYAIElGt8MRJiDCAsw3xhEmIAIU4N4AwNdRxcXZ3+/EJCAkW6Ac7C7ARwYgviuQAaIdoPSzlDaBUo7QmknIM3ACIZM78+u7kx3VWYEAGJ9HV0="))
+                rif = open(dirname(i) + '/work.bin','rb').read()
+                c = zlib.compressobj(level=9,wbits=10,memLevel=8,zdict=ZRIF_DICT)
+                bn = c.compress(rif)
+                bn += c.flush()
+                if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
+                zrif = base64.b64encode(bn).decode()
+            else: return 1
+
+            osj = OSJump()
+            osj.jump(o)
+            run(['pkg2zip','-x',i,zrif])
+            if exists('app') and os.listdir('app') and os.listdir('app/' + os.listdir('app')[0]):
+                td = o + '/app/' + os.listdir('app')[0]
+                osj.back()
+
+                run(['psvpfsparser','-i',td,'-o',o,'-z',zrif])
+                rmtree(o + '/app')
+
+                if os.listdir(o): return
         case 'WUX':
             from bin.wiiudk import DKeys
             cmd = ['java','-jar',db.get('jwudtool'),'-commonkey','d7b00402659ba2abd2cb0db27fa2b656','-decrypt','-in',i,'-out',o]
@@ -505,7 +529,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Yaz0':
             run(['wszst','DEC',i,'-o','-E$','-d',o + '\\' + tbasename(i)])
             if exists(o + '\\' + tbasename(i)): return
-        case 'LZSS':
+        case 'LZSS'|'LZ77':
             run(['gbalzss','d',i,o + '\\' + tbasename(i)])
             if exists(o + '\\' + tbasename(i)): return
         case 'AFS':
@@ -960,7 +984,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             for x in os.listdir(o):
                 if not os.path.getsize(o + '/' + x): remove(o + '/' + x)
 
-            return
+            if os.listdir(o): return
     return 1
 def fix_isinstext(o:str):
     ret = True

@@ -150,6 +150,11 @@
         "rs":"WUX","s":1
     },
     {
+        "rqr":null,
+        "d":{"c":"isat","v":["PFS0",0]},
+        "rs":"NSP","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":{"c":"contain","v":"<FILE type=\"VFSM\" hash=\"0\" providerCert=\"","r":[35,250]},
         "rs":"Iron Sky GPK","s":1
@@ -177,6 +182,11 @@
         "rqr":null,
         "d":{"c":"ext","v":".pkg"},
         "rs":"Metroid Samus Returns PKG"
+    },
+    {
+        "rqr":null,
+        "d":{"c":"ext","v":".lz77"},
+        "rs":"LZ77"
     },
     {
         "rqr":null,

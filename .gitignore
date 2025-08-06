@@ -15,3 +15,5 @@ __pycache__
 !/bin/wiiudk.py
 !/bin/BMS/xbp.bms
 !/bin/AssetRipper/client.py
+!/bin/psvpfsparser/
+!/bin/psvpfsparser/psvpfsparser.exe

@@ -119,6 +119,9 @@
     "hac2l":{
         "p":"hac2l.exe"
     },
+    "psvpfsparser":{
+        "p":"psvpfsparser/psvpfsparser.exe"
+    },
     "ps4pkg":{
         "p":"ps4pkg/orbis-pub-cmd.exe",
         "fs":[
@@ -367,6 +370,13 @@
             "x":{"xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
                  "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
                  "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"}
+        }]
+    },
+    "pkg2zip":{
+        "p":"pkg2zip.exe",
+        "fs":[{
+            "u":"https://github.com/mmozeiko/pkg2zip/releases/download/v1.8/pkg2zip_64bit.zip",
+            "x":{"pkg2zip.exe":"pkg2zip.exe"}
         }]
     },
 
