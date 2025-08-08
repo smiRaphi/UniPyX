@@ -108,6 +108,13 @@
             "x":{"ancient_2.0.0/ancient.exe":"ancient.exe"}
         }]
     },
+    "unarc":{
+        "p":"unarc.exe",
+        "fs":[{
+            "u":"https://altushost-swe.dl.sourceforge.net/project/freearc/FreeArc/FreeArc%200.51/FreeArc-portable-0.51-win32.zip?viasf=1",
+            "x":{"bin/unarc.exe":"unarc.exe"}
+        }]
+    },
     "buildgdi":{
         "p":"buildgdi.exe",
         "fs":[{

@@ -142,7 +142,7 @@ def analyze(inp:str):
             env['input'] = inp
             p = subprocess.Popen(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',x['ps']],env=env,stdout=-1)
             p.wait()
-            ret = p.stdout.read().decode().strip() == 'True'
+            ret = p.stdout.read().decode(errors='ignore').strip() == 'True'
         elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
         elif x['d']['c'] == 'name': ret = basename(inp) == x['d']['v']
         elif os.path.isfile(inp):
@@ -356,7 +356,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if os.listdir(o): return
             td.destroy()
         case 'RAR':
-            run(['unrar','x','-or','-op' + o,i])
+            cmd = ['unrar','x','-or','-op' + o]
+            if i.lower().endswith('-m4ckd0ge_repack.rar'): cmd += ['-pM4CKD0GE']
+            run(cmd + [i])
             if os.listdir(o): return
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
@@ -625,9 +627,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 return
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
-            run(['innoextract','-e','-q','-m','-g','--no-gog-galaxy','-d',o,i])
-            if exists(o + '/app'):
-                copydir(o + '/app',o,True)
+            run(['innoextract','-e','-q','--iss-file','-g','-d',o,i])
+            if os.listdir(o):
+                for x in os.listdir(o):
+                    if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
+                if exists(o + '/app'): copydir(o + '/app',o,True)
                 return
             run(['innounp','-x','-d' + o,'-y',i])
             if exists(o + '/{app}'):
@@ -647,7 +651,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['innoextract','-e','-q','-d',td,i])
             remove(td + '/tmp/cls-srep.dll',td + '/tmp/cls-srep_x64.exe',td + '/tmp/cls-srep_x86.exe')
             copydir(dirname(db.get('cls-srep')),td + '/tmp')
-            run(['unarc-cpp','unarc.dll','x','-o+','-dp' + o,'-w' + td + '\\tmp','-cfgarc.ini',dirname(i) + '\\' + mf],cwd=td.p + '\\tmp')
+            run(['unarc-cpp',td + '\\tmp\\unarc.dll','x','-o+','-dp' + o,'-w' + td + '\\tmp','-cfgarc.ini',dirname(i) + '\\' + mf],cwd=td.p + '\\tmp')
             td.destroy()
 
             def find_file(o):
@@ -810,6 +814,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             for x in fs:
                 if x.startswith('output.') and len(x.rsplit('.',1)[0]) > 10: move(o + '/' + x,o + '/' + x.split('.',2)[2])
             if fs: return
+        case 'FreeArc':
+            run(['unarc','x','-o+','-dp' + o,i])
+            if os.listdir(o): return
         case 'Big EXE':
             ts = os.path.getsize(i)
             f = open(i,'rb')

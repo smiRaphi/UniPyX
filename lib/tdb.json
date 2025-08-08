@@ -16,7 +16,9 @@
     ],
     "RAR":[
         "winrar self extracting archive (4.x-5.x)",
-        "rar archive"
+        "rar archive",
+        "rar compressed archive (v5.0)",
+        "rar compressed archive (gen)"
     ],
     "MSCAB":[
         "microsoft cabinet archive"
@@ -149,6 +151,9 @@
     ],
     "Stirling Compressed":[
         "stirling technologies installshield compressed"
+    ],
+    "FreeArc":[
+        "freearc compressed archive"
     ],
 
     "Windows Help File":[
