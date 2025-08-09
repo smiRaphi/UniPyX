@@ -7,6 +7,7 @@
     ],
     "ZIP":[
         "zip compressed archive",
+        "zip archive data",
         "zip archive",
 		"android package",
         "apkmirror bundle"
@@ -16,6 +17,7 @@
     ],
     "RAR":[
         "winrar self extracting archive (4.x-5.x)",
+        "dos rar sfx executable",
         "rar archive",
         "rar compressed archive (v5.0)",
         "rar compressed archive (gen)"
@@ -129,7 +131,8 @@
     "NSIS Installer":[
         "nsis - nullsoft scriptable install system",
         "nullsoft sfx v2.46.2-5 setup unicode installer",
-        "http://nsis.sourceforge.net"
+        "http://nsis.sourceforge.net",
+        "generic : installer nullsoft pimp stub"
     ],
     "Wise Installer":[],
     "Inno Installer":[

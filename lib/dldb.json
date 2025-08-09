@@ -125,6 +125,20 @@
             "x":{"bin/unarc.exe":"unarc.exe"}
         }]
     },
+    "gameextractor":{
+        "p":"GameExtractor/GameExtractor.jar",
+        "fs":[{
+            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0001/extract.zip",
+            "x":{"GameExtractor.jar":"GameExtractor/GameExtractor.jar",
+                 "settings/default.xml":"GameExtractor/settings/default.xml",
+                 "settings/plugins.xml":"GameExtractor/settings/plugins.xml",
+                 "language/English.xml":"GameExtractor/language/English.xml",
+                 "interface/default.xml":"GameExtractor/interface/default.xml",
+                 "interface/SidePanel_DirectoryList.xml":"GameExtractor/interface/SidePanel_DirectoryList.xml",
+                 "interface/SidePanel_DirectoryList_ReadPanel.xml":"GameExtractor/interface/SidePanel_DirectoryList_ReadPanel.xml"}
+        }]
+    },
+
     "buildgdi":{
         "p":"buildgdi.exe",
         "fs":[{
@@ -132,7 +146,6 @@
             "x":{"buildgdi.exe":"buildgdi.exe"}
         }]
     },
-
     "hac2l":{
         "p":"hac2l.exe"
     },

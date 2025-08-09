@@ -973,6 +973,12 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Allegro DAT':
             run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
             if os.listdir(o): return
+        case 'SAD SAUD':
+            if db.print_try: print('Trying with gameextractor')
+            run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
+            log = dirname(db.get('gameextractor')) + '/logs'
+            if exists(log): rmtree(log)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
