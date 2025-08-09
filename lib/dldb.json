@@ -353,6 +353,13 @@
         "p":"iQiPack.exe",
         "fs":["https://github.com/simontime/iQiPack/releases/download/v2.0/iQiPack.exe"]
     },
+    "allegro_dat":{
+        "p":"allegro/dat.exe",
+        "fs":[{
+            "u":"http://cdn.allegro.cc/file/library/allegro/4.4.2/allegro-4.4.2-extra.zip",
+            "x":{"allegro-4.4.2-extra/tools/dat.exe":"allegro/dat.exe","allegro-4.4.2-extra/allegro-4.4.2-monolith-md.dll":"allegro/allegro-4.4.2-monolith-md.dll","allegro-4.4.2-extra/libgcc_s_dw2-1.dll":"allegro/libgcc_s_dw2-1.dll"}
+        }]
+    },
 
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",

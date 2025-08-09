@@ -231,7 +231,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 main_extract(i,o)
                 tf.destroy()
                 if os.listdir(o): return
-        case 'Apple Disk Image':
+        case 'Apple Disk Image'|'Mac HFS Image':
             from threading import Thread
             from queue import Queue,Empty
 
@@ -967,6 +967,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             osj.back()
             tf1.destroy(),tf2.destroy()
             return r
+        case 'Allegro DAT':
+            run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
