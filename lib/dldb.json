@@ -11,6 +11,16 @@
             }
         ]
     },
+    "file":{
+        "p":"file/file.exe",
+        "fs":[{
+            "u":"https://github.com/julian-r/file-windows/releases/download/v5.44/file_5.44-build104-vs2022-x64.zip",
+            "x":{"file.exe":"file/file.exe","libmagic.dll":"file/libmagic.dll"}
+        },{
+            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.45-3build1_amd64.deb",
+            "x":{"usr/share/file/magic.mgc":"file/magic.mgc"}
+        }]
+    },
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
         "fs":[{

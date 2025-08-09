@@ -84,6 +84,13 @@ class DLDB:
                             self.run(['msiexec','/a',p,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
                             for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
                             rmtree(td)
+                        elif ex == '.deb':
+                            td = gtmp()
+                            os.makedirs(td,exist_ok=True)
+                            self.run(['7z','x','-y','-o' + td,p])
+                            with tarfile.open(td + '/data.tar','r') as z:
+                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile('./' + tx).read())
+                            rmtree(td)
                         else: raise NotImplementedError(p + f' [{ex}]')
                         self.print_try = bk
                         os.remove(p)

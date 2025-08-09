@@ -93,12 +93,14 @@ def checktdb(i:list):
         for t in TDB:
             if x.lower() in TDB[t]: o.append(t)
     return o
-def analyze(inp:str):
+def analyze(inp:str,raw=False):
     opt = db.print_try
     db.print_try = False
     inp = cleanp(inp)
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
+    _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
+    ts += [x.split(',')[0].strip() for x in o.strip().split('\n') if x.strip() not in ['data']]
 
     if os.path.isfile(inp):
         f = open(inp,'rb')
@@ -171,9 +173,10 @@ def analyze(inp:str):
                 nts = [x['rs']]
                 break
             else: nts.append(x['rs'])
-    if not nts: print(ts)
+    if not raw and not nts: print(ts)
 
     db.print_try = opt
+    if raw: return nts,ts
     return nts
 
 def extract(inp:str,out:str,t:str) -> bool:
