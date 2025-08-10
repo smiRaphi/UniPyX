@@ -110,6 +110,11 @@
         "rs":"GD-ROM CUE+BIN","s":1
     },
     {
+        "rqr":"data",
+        "d":{"c":"contain","v":"\\0name=KryoFlux DiskSystem","r":[0,208]},
+        "rs":"KryoFlux","s":1
+    },
+    {
         "d":{"c":"isat","v":["NCSD\\0\\0",256]},
         "rs":"NCSD","s":1
     },

@@ -100,7 +100,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
     _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
-    ts += [x.split(',')[0].split(' created: ')[0].strip() for x in o.strip().split('\n') if x.strip() not in ['data']]
+    ts += [x.split(',')[0].split(' created: ')[0].strip() for x in o.strip().split('\n')]
 
     if os.path.isfile(inp):
         f = open(inp,'rb')
@@ -371,6 +371,18 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'UPX':
             run(['upx','-d','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return
+        case 'KryoFlux':
+            tf = TmpFile('.script')
+            xopen(tf,'w').write('set FLUXSTREAM_PLL_INITIAL_BITRATE 250000\n')
+            _,o,_ = run(['hxcfe','-finput:' + i,'-script:' + tf,'-list'])
+            tf.destroy()
+
+            if '------- Disk Tree --------' in o:
+                o = o.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
+                if not 'ERROR -> Sector not found' in o:
+                    print(o)
+                    raise NotImplementedError()
+
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
             if os.listdir(o):
@@ -526,6 +538,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'XISO':
             run(['xdvdfs','unpack',i,o])
             if os.listdir(o): return
+
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
