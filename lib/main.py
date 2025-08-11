@@ -986,12 +986,17 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Allegro DAT':
             run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
             if os.listdir(o): return
-        case 'SAD SAUD':
-            if db.print_try: print('Trying with gameextractor')
-            run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
-            log = dirname(db.get('gameextractor')) + '/logs'
-            if exists(log): rmtree(log)
-            if os.listdir(o): return
+        case 'Doom WAD':
+            osj = OSJump()
+            osj.jump(o)
+            run(['wadext',i,'-nogfxconvert','-nosndconvert'])
+            osj.back()
+            if os.listdir(o) and os.listdir(o + '/' + os.listdir(o)[0]):
+                td = o + '/' + os.listdir(o)[0]
+                while exists(td):
+                    try: copydir(td,o,True)
+                    except PermissionError:pass
+                return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

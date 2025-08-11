@@ -383,6 +383,20 @@
             "x":{"allegro-4.4.2-extra/tools/dat.exe":"allegro/dat.exe","allegro-4.4.2-extra/allegro-4.4.2-monolith-md.dll":"allegro/allegro-4.4.2-monolith-md.dll","allegro-4.4.2-extra/libgcc_s_dw2-1.dll":"allegro/libgcc_s_dw2-1.dll"}
         }]
     },
+    "pkg2zip":{
+        "p":"pkg2zip.exe",
+        "fs":[{
+            "u":"https://github.com/mmozeiko/pkg2zip/releases/download/v1.8/pkg2zip_64bit.zip",
+            "x":{"pkg2zip.exe":"pkg2zip.exe"}
+        }]
+    },
+    "wadext":{
+        "p":"wadext.exe",
+        "fs":[{
+            "u":"https://github.com/ZDoom/wadext/releases/download/2.1/wadext_win32_2.1.zip",
+            "x":{"wadext.exe":"wadext.exe"}
+        }]
+    },
 
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
@@ -407,13 +421,6 @@
             "x":{"xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
                  "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
                  "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"}
-        }]
-    },
-    "pkg2zip":{
-        "p":"pkg2zip.exe",
-        "fs":[{
-            "u":"https://github.com/mmozeiko/pkg2zip/releases/download/v1.8/pkg2zip_64bit.zip",
-            "x":{"pkg2zip.exe":"pkg2zip.exe"}
         }]
     },
 
