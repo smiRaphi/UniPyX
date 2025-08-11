@@ -397,6 +397,20 @@
             "x":{"wadext.exe":"wadext.exe"}
         }]
     },
+    "rpkg":{
+        "p":"rpkg/rpkg-cli.exe",
+        "fs":[{
+            "u":"https://github.com/glacier-modding/RPKG-Tool/releases/download/v2.33.0/rpkg_v2.33.0-cli.zip",
+            "x":{"ResourceLib_HM3.dll":"rpkg/ResourceLib_HM3.dll",
+                 "rpkg-cli.exe":"rpkg/rpkg-cli.exe",
+                 "quickentity_ffi.dll":"rpkg/quickentity_ffi.dll",
+                 "hash_list.txt":"rpkg/hash_list.txt",
+                 "ResourceLib_HM2016.dll":"rpkg/ResourceLib_HM2016.dll",
+                 "ResourceLib_HM2.dll":"rpkg/ResourceLib_HM2.dll",
+                 "assimp.dll":"rpkg/assimp.dll",
+                 "hash_list.hmla":"rpkg/hash_list.hmla"}
+        }]
+    },
 
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",

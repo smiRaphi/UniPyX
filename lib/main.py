@@ -1,4 +1,4 @@
-import re,json,ast,os,sys,subprocess
+import re,json,ast,os,sys,subprocess,hashlib
 from time import sleep
 from shutil import rmtree,copytree,copyfile
 from lib.dldb import DLDB
@@ -100,7 +100,19 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
     _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
-    ts += [x.split(',')[0].split(' created: ')[0].strip() for x in o.strip().split('\n')]
+    ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.strip().split('\n')]
+
+    if isdir(inp): typ = 'directory'
+    else:
+        idt = open(inp,'rb').read(0x4000)
+        try: idt = idt.decode('utf-8')
+        except: typ = 'binary'
+        else: typ = 'text'
+        if 'null data' in ts and typ == 'binary': typ = 'null'
+
+    if 'data' in ts: ts.remove('data')
+    if 'null data' in ts: ts.remove('null data')
+    if 'directory' in ts: ts.remove('directory')
 
     if os.path.isfile(inp):
         f = open(inp,'rb')
@@ -125,54 +137,82 @@ def analyze(inp:str,raw=False):
 
     nts = checktdb(ts)
     nts = list(set(nts))
-    for x in DDB:
-        if 'rq'  in x and not (x['rq']  in nts or (x['rq']  == None and not nts)): continue
-        if 'rqr' in x and not (x['rqr'] in ts  or (x['rqr'] == None and not ts )): continue
-        ret = False
-        if x['d'] == 'py':
-            lc = {}
-            try:
-                exec('def check(inp):\n\t' + x['py'].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename},locals=lc)
-                if lc['check'](inp):
-                    if x.get('s'): nts = [x['rs']]
-                    else: nts.append(x['rs'])
-            except:
-                print(x)
-                raise
-        elif x['d'] == 'ps':
-            env = os.environ.copy()
-            env['input'] = inp
-            p = subprocess.Popen(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',x['ps']],env=env,stdout=-1)
-            p.wait()
-            ret = p.stdout.read().decode(errors='ignore').strip() == 'True'
-        elif x['d']['c'] == 'ext': ret = inp.lower().endswith(x['d']['v'])
-        elif x['d']['c'] == 'name': ret = basename(inp) == x['d']['v']
-        elif os.path.isfile(inp):
-            if x['d']['c'] == 'contain':
-                cv = ast.literal_eval('"' + x['d']['v'].replace('"','\\"') + '"').encode('latin1')
-                f = open(inp,'rb')
-                sp = x['d']['r'][0]
-                if sp < 0: sp = f.seek(0,2) + sp
-                if sp < 0: sp = 0
-                f.seek(sp)
-                ret = cv in f.read(x['d']['r'][1])
-                f.close()
-            elif x['d']['c'] == 'isat':
-                f = open(inp,'rb')
-                ret = True
-                for ix in range(len(x['d']['v'])//2):
-                    cv = ast.literal_eval('"' + x['d']['v'][ix*2].replace('"','\\"') + '"').encode('latin1')
-                    sp = x['d']['v'][ix*2 + 1]
+    for xv in DDB:
+        if 't' in xv and xv['t'] != typ: continue
+        if 'rq' in xv:
+            if xv['rq'] == None and not nts: continue
+            rq = xv['rq'] if type(xv['rq']) == list else [xv['rq']]
+            if not any(y in nts for y in rq): continue
+        if 'rqr' in xv:
+            if xv['rqr'] == None and not ts: continue
+            rqr = xv['rqr'] if type(xv['rqr']) == list else [xv['rqr']]
+            if not any(y in ts for y in rqr): continue
+
+        tret = False
+        dl = xv['d']
+        if type(dl[0]) != list: dl = [dl]
+        for x in dl:
+            if x[0] == 'py':
+                lc = {}
+                try:
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename},locals=lc)
+                    ret = lc['check'](inp)
+                except:
+                    print(x[1])
+                    raise
+            elif x[0] == 'ps':
+                env = os.environ.copy()
+                env['input'] = inp
+                p = subprocess.Popen(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',x[1]],env=env,stdout=-1)
+                p.wait()
+                ret = p.stdout.read().decode(errors='ignore').strip() == 'True'
+            elif x[0] == 'ext': ret = inp.lower().endswith(x[1])
+            elif x[0] == 'name': ret = basename(inp) == x[1]
+            elif os.path.isfile(inp):
+                if x[0] == 'contain':
+                    cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
+                    f = open(inp,'rb')
+                    sp = x[2][0]
                     if sp < 0: sp = f.seek(0,2) + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
-                    ret = ret and f.read(len(cv)) == cv
-                f.close()
-        if ret:
-            if x.get('s'):
-                nts = [x['rs']]
+                    ret = cv in f.read(x[2][1])
+                    f.close()
+                elif x[0] == 'isat':
+                    f = open(inp,'rb')
+                    cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
+                    sp = x[2]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    ret = f.read(len(cv)) == cv
+                    f.close()
+                elif x[0] == 'size':
+                    sz = os.path.getsize(inp)
+                    if type(x[1]) == int: ret = sz == x[1]
+                    else: ret = (x[1][0] == None or sz >= x[1][0]) and (x[1][1] == None or sz <= x[1][1])
+                elif x[0] == 'hash':
+                    hs = x[1].lower()
+                    if len(hs) == 40: h = hashlib.sha1
+                    elif len(hs) == 32: h = hashlib.md5
+                    elif len(hs) == 64: h = hashlib.sha256
+                    h = h()
+
+                    f = open(inp,'rb')
+                    while True:
+                        cv = f.read(0x1000)
+                        if not cv: break
+                        h.update(cv)
+                    f.close()
+                    ret = h.hexdigest() == hs
+            if type(x[-1]) == bool and x[-1]: tret = tret or ret
+            else: tret = tret and ret
+            if not xv.get('noq') and not tret: break
+        if tret:
+            if xv.get('s'):
+                nts = [xv['rs']]
                 break
-            else: nts.append(x['rs'])
+            else: nts.append(xv['rs'])
     if not raw and not nts: print(ts)
 
     db.print_try = opt
@@ -997,6 +1037,17 @@ def extract(inp:str,out:str,t:str) -> bool:
                     try: copydir(td,o,True)
                     except PermissionError:pass
                 return
+        case 'Glacier RPKG':
+            run(['rpkg','-extract_from_rpkg',i,'-output_path',o])
+            if os.listdir(o) and os.listdir(o + '/' + os.listdir(o)[0]):
+                td = o + '/' + os.listdir(o)[0]
+                while exists(td):
+                    try: copydir(td,o,True)
+                    except PermissionError:pass
+                return
+        case 'Glacier PKG Def':
+            run(['rpkg','-decrypt_packagedefinition_thumbs',i,'-output_path',o])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

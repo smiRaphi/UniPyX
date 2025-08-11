@@ -1,210 +1,210 @@
 [
     {
         "rq":"ISO",
-        "d":{"c":"isat","v":["\\x50\\x6C\\x61\\x79\\x53\\x74\\x61\\x74\\x69\\x6F\\x6E\\x33\\0\\0\\0\\0",2048]},
+        "d":["isat","\\x50\\x6C\\x61\\x79\\x53\\x74\\x61\\x74\\x69\\x6F\\x6E\\x33\\0\\0\\0\\0",2048],
         "rs":"PS3 ISO","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["\\x5D\\x1C\\x9E\\xA3",24]},
+        "d":["isat","\\x5D\\x1C\\x9E\\xA3",24],
         "rs":"Wii ISO","s":1
     },
     {
-        "rqr":"null bytes",
-        "d":{"c":"isat","v":["MICROSOFT*XBOX*MEDIA",65536]},
+        "t":"null",
+        "d":["isat","MICROSOFT*XBOX*MEDIA",65536],
         "rs":"XISO","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["\\xC2\\x33\\x9F\\x3D",28]},
+        "d":["isat","\\xC2\\x33\\x9F\\x3D",28],
         "rs":"GameCube ISO","s":1
     },
     {
         "rqr":"ISO 9660 CD image",
-        "d":{"c":"isat","v":["CVMH\\0\\0",0,"ROFSROFSBLD ",52]},
+        "d":[["isat","CVMH\\0\\0",0],
+             ["isat","ROFSROFSBLD ",52]],
         "rs":"ROFS Volume","s":1
     },
     {
         "rq":"InstallShield Setup",
-        "d":{"c":"contain","v":"MSIEng.isc","r":[-5000000,null]},
+        "d":["contain","MSIEng.isc",[-5000000,null]],
         "rs":"InstallShield MSI","s":1
     },
     {
         "rq":"Inno Installer",
-        "d":"ps",
-        "ps":"Write-Output ((Get-Item -Path $env:input).VersionInfo.LegalCopyright.Trim() -eq 'FitGirl')",
+        "d":["ps","Write-Output ((Get-Item -Path $env:input).VersionInfo.LegalCopyright.Trim() -eq 'FitGirl')"],
         "rs":"FitGirl Installer","s":1
     },
     {
         "rqr":"Win16 NE executable (generic)",
-        "d":{"c":"isat","v":["InstallShield Self-Extracting Stub Program",943]},
+        "d":["isat","InstallShield Self-Extracting Stub Program",943],
         "rs":"InstallShield Setup","s":1
     },
     {
         "rqr":"Win32 Executable MS Visual C++ (generic)",
-        "d":"py",
-        "py":"f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.data\\0\\0\\0':f.seek(8,1);sz,of = int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');break\n\tf.seek(32,1)\nelse: return\nf.seek(of)\nd = f.read(sz)\nf.close()\nreturn b'\\0WiseMain\\0' in d and b'\\0GLBSInstall\\0' in d",
+        "d":["py","f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.data\\0\\0\\0':f.seek(8,1);sz,of = int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');break\n\tf.seek(32,1)\nelse: return\nf.seek(of)\nd = f.read(sz)\nf.close()\nreturn b'\\0WiseMain\\0' in d and b'\\0GLBSInstall\\0' in d"],
         "rs":"Wise Installer","s":1
     },
     {
         "rqr":"Win64 Executable (generic)",
-        "d":"py",
-        "py":"f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.qtmimed':return True\n\telse:f.seek(32,1)",
+        "d":["py","f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.qtmimed':return True\n\telse:f.seek(32,1)"],
         "rs":"Qt IFW","s":1
     },
     {
         "rqr":"Win64 Executable (generic)",
-        "d":"py",
-        "py":"f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little') >= 8000000\n\telse:f.seek(32,1)",
+        "d":["py","f = open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little') >= 8000000\n\telse:f.seek(32,1)"],
         "rs":"Big EXE"
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["KCAP\\x67\\0\\0\\0",0]},
+        "d":["isat","KCAP\\x67\\0\\0\\0",0],
         "rs":"iQiyi PAK","s":1
     },
     {
-        "d":{"c":"isat","v":["RSAR\\xFE\\xFF",0]},
+        "d":["isat","RSAR\\xFE\\xFF",0],
         "rs":"BRSAR","s":1
     },
     {
-        "d":{"c":"isat","v":["BNR1\\0\\0\\0\\0\\0",0]},
-        "rs":"GC opening.bnr","s":1
-    },{
-        "d":{"c":"isat","v":["BNR2\\0\\0\\0\\0\\0",0]},
+        "d":[["isat","BNR1\\0\\0\\0\\0\\0",0,true],
+             ["isat","BNR2\\0\\0\\0\\0\\0",0,true]],"noq":true,
         "rs":"GC opening.bnr","s":1
     },
     {
-        "d":{"c":"isat","v":["FSYS\\0",0]},
-        "rs":"Pokemon FSYS",
-        "s":1
+        "d":["isat","FSYS\\0",0],
+        "rs":"Pokemon FSYS","s":1
     },
     {
-        "d":{"c":"isat","v":["\\0\\3\\0\\5\\0\\0\\0\\0",0]},
-        "rs":"RetroStudio PAK",
-        "s":1
+        "d":["isat","\\0\\3\\0\\5\\0\\0\\0\\0",0],
+        "rs":"RetroStudio PAK","s":1
     },
     {
-        "rqr":"null bytes",
-        "d":{"c":"isat","v":["\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\0",32752]},
+        "d":[["isat","2KPR\\1\\0\\0\\0",0,true],
+             ["isat","GKPR\\1\\0\\0\\0",0,true]],"noq":true,
+        "rs":"Glacier RPKG","s":1
+    },
+    {
+        "d":[["size",88236],["hash","95397288029c149040af17fc6d7522a3b39c943b"]],
+        "rs":"Glacier PKG Def","s":1
+    },
+    {
+        "t":"null",
+        "d":["isat","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\0",32752],
+        "rs":"ISO","s":1},
+        {"rqr":null,
+        "d":["isat","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\0",32752],
         "rs":"ISO","s":1
-    },{
-        "rqr":null,
-        "d":{"c":"isat","v":["\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x01\\x43\\x44\\x30\\x30\\x31\\x01\\0",32752]},
-        "rs":"ISO","s":1
     },
     {
-        "rqr":"null bytes",
-        "d":{"c":"ext","v":".cdi"},
+        "t":"null",
+        "d":["ext",".cdi"],
         "rs":"CDI"
     },
     {
         "rq":"CUE+BIN",
-        "d":{"c":"contain","v":"  TRACK 01 CDI/2352","r":[0,null]},
+        "d":["contain","  TRACK 01 CDI/2352",[0,null]],
         "rs":"CDI CUE+BIN","s":1
     },
     {
         "rq":"CUE+BIN",
-        "d":"py",
-        "py":"import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',open(inp,encoding='utf-8').read())\nreturn len(f) == 3 and f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'",
+        "d":["py","import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',open(inp,encoding='utf-8').read())\nreturn len(f) == 3 and f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'"],
         "rs":"GD-ROM CUE+BIN","s":1
     },
     {
-        "rqr":"data",
-        "d":{"c":"contain","v":"\\0name=KryoFlux DiskSystem","r":[0,208]},
+        "t":"binary",
+        "d":["contain","\\0name=KryoFlux DiskSystem",[0,208]],
         "rs":"KryoFlux","s":1
     },
     {
-        "d":{"c":"isat","v":["NCSD\\0\\0",256]},
+        "d":["isat","NCSD\\0\\0",256],
         "rs":"NCSD","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["\\x7F\\x43\\x4E\\x54\\0\\0\\0\\1",0]},
+        "d":["isat","\\x7F\\x43\\x4E\\x54\\0\\0\\0\\1",0],
         "rs":"PS4 PKG","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0]},
+        "d":["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],
         "rs":"PS4 PKG","s":1
     },
     {
-        "d":{"c":"isat","v":["#AMB \\0\\0\\0",0]},
+        "d":["isat","#AMB \\0\\0\\0",0],
         "rs":"Sonic AMB","s":1
     },
     {
-        "d":{"c":"isat","v":["XPCK",0]},
+        "d":["isat","XPCK",0],
         "rs":"Level5 XPCK","s":1
     },
     {
-        "d":{"c":"isat","v":["ARC0",0]},
+        "d":["isat","ARC0",0],
         "rs":"Level5 ARC","s":1
     },
     {
-        "d":{"c":"isat","v":["\\x24\\xFF\\xAE\\x51\\x69\\x9A\\xA2\\x21\\x3D\\x84\\x82\\x0A\\x84\\xE4\\x09\\xAD\\x11\\x24\\x8B\\x98\\xC0\\x81\\x7F\\x21\\xA3\\x52\\xBE\\x19\\x93\\x09\\xCE\\x20\\x10\\x46\\x4A\\x4A\\xF8\\x27\\x31\\xEC\\x58\\xC7\\xE8\\x33\\x82\\xE3\\xCE\\xBF\\x85\\xF4\\xDF\\x94\\xCE\\x4B\\x09\\xC1\\x94\\x56\\x8A\\xC0\\x13\\x72\\xA7\\xFC\\x9F\\x84\\x4D\\x73\\xA3\\xCA\\x9A\\x61\\x58\\x97\\xA3\\x27\\xFC\\x03\\x98\\x76\\x23\\x1D\\xC7\\x61\\x03\\x04\\xAE\\x56\\xBF\\x38\\x84\\x00\\x40\\xA7\\x0E\\xFD\\xFF\\x52\\xFE\\x03\\x6F\\x95\\x30\\xF1\\x97\\xFB\\xC0\\x85\\x60\\xD6\\x80\\x25\\xA9\\x63\\xBE\\x03\\x01\\x4E\\x38\\xE2\\xF9\\xA2\\x34\\xFF\\xBB\\x3E\\x03\\x44\\x78\\x00\\x90\\xCB\\x88\\x11\\x3A\\x94\\x65\\xC0\\x7C\\x63\\x87\\xF0\\x3C\\xAF\\xD6\\x25\\xE4\\x8B\\x38\\x0A\\xAC\\x72\\x21\\xD4\\xF8\\x07\\x56\\xCF",192]},
+        "d":["isat","\\x24\\xFF\\xAE\\x51\\x69\\x9A\\xA2\\x21\\x3D\\x84\\x82\\x0A\\x84\\xE4\\x09\\xAD\\x11\\x24\\x8B\\x98\\xC0\\x81\\x7F\\x21\\xA3\\x52\\xBE\\x19\\x93\\x09\\xCE\\x20\\x10\\x46\\x4A\\x4A\\xF8\\x27\\x31\\xEC\\x58\\xC7\\xE8\\x33\\x82\\xE3\\xCE\\xBF\\x85\\xF4\\xDF\\x94\\xCE\\x4B\\x09\\xC1\\x94\\x56\\x8A\\xC0\\x13\\x72\\xA7\\xFC\\x9F\\x84\\x4D\\x73\\xA3\\xCA\\x9A\\x61\\x58\\x97\\xA3\\x27\\xFC\\x03\\x98\\x76\\x23\\x1D\\xC7\\x61\\x03\\x04\\xAE\\x56\\xBF\\x38\\x84\\x00\\x40\\xA7\\x0E\\xFD\\xFF\\x52\\xFE\\x03\\x6F\\x95\\x30\\xF1\\x97\\xFB\\xC0\\x85\\x60\\xD6\\x80\\x25\\xA9\\x63\\xBE\\x03\\x01\\x4E\\x38\\xE2\\xF9\\xA2\\x34\\xFF\\xBB\\x3E\\x03\\x44\\x78\\x00\\x90\\xCB\\x88\\x11\\x3A\\x94\\x65\\xC0\\x7C\\x63\\x87\\xF0\\x3C\\xAF\\xD6\\x25\\xE4\\x8B\\x38\\x0A\\xAC\\x72\\x21\\xD4\\xF8\\x07\\x56\\xCF",192],
         "rs":"NDS","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["CTPK",0]},
+        "d":["isat","CTPK",0],
         "rs":"CTPK","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["WUX0",0]},
+        "d":["isat","WUX0",0],
         "rs":"WUX","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"isat","v":["PFS0",0]},
+        "d":["isat","PFS0",0],
         "rs":"NSP","s":1
     },
     {
         "rqr":"Generic XML (ASCII)",
-        "d":{"c":"contain","v":"<FILE type=\"VFSM\" hash=\"0\" providerCert=\"","r":[35,250]},
+        "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1
     },
     {
-        "d":{"c":"isat","v":["\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x16\\0\\0\\0\\0",0,"\\0\\0\\0\\0\\0\\0\\0\\x0020",40]},
+        "d":[["isat","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x16\\0\\0\\0\\0",0],
+             ["isat","\\0\\0\\0\\0\\0\\0\\0\\x0020",40]],
         "rs":"Unity Assets","s":1
     },
     {
         "rqr":null,
-        "d":{"c":"ext","v":".nub2"},
+        "d":["ext",".nub2"],
         "rs":"NUB2"
     },
     {
-        "d":"py",
-        "py":"m=['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']\nreturn ((basename(inp).lower().startswith('mdb_') and inp.lower().endswith('.dat')) or basename(inp).lower() == 'sound.dat') and ([x for x in os.listdir(dirname(inp)) if x.upper() in m] or [x for x in os.listdir(dirname(dirname(inp))) if x.upper() in m])",
+        "d":["py","m=['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']\nreturn ((basename(inp).lower().startswith('mdb_') and inp.lower().endswith('.dat')) or basename(inp).lower() == 'sound.dat') and ([x for x in os.listdir(dirname(inp)) if x.upper() in m] or [x for x in os.listdir(dirname(dirname(inp))) if x.upper() in m])"],
         "rs":"DDR DAT"
     },
     {
         "rqr":null,
-        "d":{"c":"ext","v":".dcz"},
+        "d":["ext",".dcz"],
         "rs":"Rayman DCZ"
     },
     {
         "rqr":null,
-        "d":{"c":"ext","v":".pkg"},
+        "d":["ext",".pkg"],
         "rs":"Metroid Samus Returns PKG"
     },
     {
         "rqr":null,
-        "d":{"c":"ext","v":".lz77"},
+        "d":["ext",".lz77"],
         "rs":"LZ77"
     },
     {
         "rqr":null,
-        "d":{"c":"ext","v":".lz"},
+        "d":["ext",".lz"],
         "rs":"F-Zero G/AX .lz"
     },
     {
         "rqr":null,
-        "d":{"c":"name","v":"RRV1_A"},
+        "d":["name","RRV1_A"],
         "rs":"Ridge Racer V A"
     },
     {
-        "d":{"c":"ext","v":".xbp"},
+        "d":["ext",".xbp"],
         "rs":"XBP"
     }
 ]
