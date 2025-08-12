@@ -140,15 +140,19 @@ def analyze(inp:str,raw=False):
     for xv in DDB:
         if 't' in xv and xv['t'] != typ: continue
         if 'rq' in xv:
-            if xv['rq'] == None and not nts: continue
-            rq = xv['rq'] if type(xv['rq']) == list else [xv['rq']]
-            if not any(y in nts for y in rq): continue
+            if xv['rq'] == None:
+                if nts: continue
+            else:
+                rq = xv['rq'] if type(xv['rq']) == list else [xv['rq']]
+                if not any(y in nts for y in rq): continue
         if 'rqr' in xv:
-            if xv['rqr'] == None and not ts: continue
-            rqr = xv['rqr'] if type(xv['rqr']) == list else [xv['rqr']]
-            if not any(y in ts for y in rqr): continue
+            if xv['rqr'] == None:
+                if ts: continue
+            else:
+                rqr = xv['rqr'] if type(xv['rqr']) == list else [xv['rqr']]
+                if not any(y in ts for y in rqr): continue
 
-        tret = 1
+        tret = 0
         dl = xv['d']
         if type(dl[0]) != list: dl = [dl]
         for x in dl:
@@ -206,9 +210,9 @@ def analyze(inp:str,raw=False):
                     f.close()
                     ret = h.hexdigest() == hs
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
-            else: tret = tret and ret
+            else: tret = (tret or type(tret) != bool) and ret
             if not xv.get('noq') and not tret: break
-        if type(tret) == bool and tret:
+        if tret:
             if xv.get('s'):
                 nts = [xv['rs']]
                 break
