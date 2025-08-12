@@ -61,6 +61,12 @@
         "rs":"iQiyi PAK","s":1
     },
     {
+        "rqr":null,
+        "d":[["isat","PAK2\\0\\0\\0\\1",0,true],
+             ["isat","2KAP\\1\\0\\0\\0",0,true]],"noq":true,
+        "rs":"Blur PAK","s":1
+    },
+    {
         "d":["isat","RSAR\\xFE\\xFF",0],
         "rs":"BRSAR","s":1
     },

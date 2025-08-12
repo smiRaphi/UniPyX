@@ -553,6 +553,10 @@
         "p":"BMS/ddr_dat.bms",
         "fs":[["https://raw.githubusercontent.com/bnnm/vgm-tools/96e0f8de47b85cfce33582ae0182800adba5297a/bms/archives/kces_ddr_dat.bms","BMS/ddr_dat.bms"]]
     },
+    "blur":{
+        "p":"BMS/blur.bms",
+        "fs":[["https://aluigi.altervista.org/bms/blur.bms","BMS/blur.bms"]]
+    },
 
     "prodkeys":{
         "p":"prodkeys/prod.keys",

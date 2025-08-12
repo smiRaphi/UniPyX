@@ -1052,6 +1052,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Glacier PKG Def':
             run(['rpkg','-decrypt_packagedefinition_thumbs',i,'-output_path',o])
             if os.listdir(o): return
+        case 'Blur PAK': return quickbms('blur')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
