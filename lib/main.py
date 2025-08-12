@@ -148,7 +148,7 @@ def analyze(inp:str,raw=False):
             rqr = xv['rqr'] if type(xv['rqr']) == list else [xv['rqr']]
             if not any(y in ts for y in rqr): continue
 
-        tret = False
+        tret = 1
         dl = xv['d']
         if type(dl[0]) != list: dl = [dl]
         for x in dl:
@@ -208,7 +208,7 @@ def analyze(inp:str,raw=False):
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = tret and ret
             if not xv.get('noq') and not tret: break
-        if tret:
+        if type(tret) == bool and tret:
             if xv.get('s'):
                 nts = [xv['rs']]
                 break
