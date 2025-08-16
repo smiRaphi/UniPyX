@@ -411,6 +411,10 @@
                  "hash_list.hmla":"rpkg/hash_list.hmla"}
         }]
     },
+    "sarc":{
+        "p":"sarc.py",
+        "fs":["https://raw.githubusercontent.com/zeldamods/sarc/refs/heads/master/sarc/sarc.py"]
+    },
 
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",

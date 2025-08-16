@@ -598,6 +598,38 @@ def extract(inp:str,out:str,t:str) -> bool:
             if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
                 if exists(o + '/wszst-setup.txt'): remove(o + '/wszst-setup.txt')
                 return
+        case 'SARC':
+            class Stub:
+                def __init__(self,*args,**kwargs):pass
+                def __call__(self,*args,**kwargs): return Stub()
+                def __getattribute__(self,name): return Stub()
+            class OsStub:
+                def __init__(self):pass
+                def __add__(self,v): return os.devnull
+
+            if db.print_try: print('Trying with sarc')
+            db.get('sarc')
+            sys.modules['oead'] = Stub()
+            sys.modules['rstb'] = Stub()
+            sys.modules['json'] = Stub()
+            os.path.dirname = lambda x: OsStub() if x.endswith('\\sarc.py') else dirname(x)
+            sys.modules['os'] = os
+
+            try:
+                from bin.sarc import SARC # type: ignore
+                sarc = SARC(open(i,'rb').read())
+                sarc.extract_to_dir(o)
+                del sarc
+            except ImportError: raise
+            except: pass
+
+            sys.modules.pop('oead')
+            sys.modules.pop('rstb')
+            sys.modules.pop('json')
+            sys.modules.pop('os')
+            os.path.dirname = dirname
+
+            if os.listdir(o): return
         case 'Yaz0':
             run(['wszst','DEC',i,'-o','-E$','-d',o + '\\' + tbasename(i)])
             if exists(o + '\\' + tbasename(i)): return
