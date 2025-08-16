@@ -1,5 +1,10 @@
 [
     {
+        "rqr":["DLL file with 0000 Entry Point","Resources Only",true],
+        "rs":"Resource DLL","s":1
+    },
+
+    {
         "rq":"ISO",
         "d":["isat","\\x50\\x6C\\x61\\x79\\x53\\x74\\x61\\x74\\x69\\x6F\\x6E\\x33\\0\\0\\0\\0",2048],
         "rs":"PS3 ISO","s":1

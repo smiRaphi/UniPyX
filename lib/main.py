@@ -131,7 +131,11 @@ def analyze(inp:str,raw=False):
                     os.remove(log)
                     m = EIPER1.search(lg)
                     if m: ts.append(m[1])
-                    for x in lg.split('\n')[0].split(' - ')[1:]: ts.append(x.split('(')[0].split('[')[0].strip(' ,!:;'))
+                    for x in lg.split('\n')[0].split(' - ')[1:]:
+                        if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
+                        else:
+                            x = x.split('(')[0].split('[')[0].strip(' ,!:;')
+                            if x: ts.append(x)
             else: f.close()
         else: f.close()
 
@@ -144,17 +148,23 @@ def analyze(inp:str,raw=False):
                 if nts: continue
             else:
                 rq = xv['rq'] if type(xv['rq']) == list else [xv['rq']]
-                if not any(y in nts for y in rq): continue
+                chf = all if type(rq[-1]) == bool and rq[-1] else any
+                if not chf(y in nts for y in rq if type(y) == str): continue
         if 'rqr' in xv:
             if xv['rqr'] == None:
                 if ts: continue
             else:
                 rqr = xv['rqr'] if type(xv['rqr']) == list else [xv['rqr']]
-                if not any(y in ts for y in rqr): continue
+                chf = all if type(rqr[-1]) == bool and rqr[-1] else any
+                if not chf(y in ts for y in rqr if type(y) == str): continue
 
         tret = 0
-        dl = xv['d']
-        if type(dl[0]) != list: dl = [dl]
+        if not 'd' in xv or not xv['d']:
+            dl = []
+            tret = True
+        else:
+            dl = xv['d']
+            if type(dl[0]) != list: dl = [dl]
         for x in dl:
             if x[0] == 'py':
                 lc = {}
@@ -620,7 +630,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
             if db.print_try: print('Trying with input')
 
-            p = PtyProcess.spawn(subprocess.list2cmdline([db.get('winpty'),i,'--nf','--ns','--am','--al','--lang','en','--cp',o + '\\$CACHE','-t',o,'-g','ifw.installer.installlog=true','in']))
+            p = PtyProcess.spawn(subprocess.list2cmdline([i,'--nf','--ns','--am','--al','--lang','en','--cp',o + '\\$CACHE','-t',o,'-g','ifw.installer.installlog=true','in']))
             p.write('Yes\r\n')
             while p.isalive():
                 try: l = p.readline()
@@ -898,6 +908,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 for ix in range(c):
                     if main_extract(o + f'/{ix}.exe',o + f'/{ix}') and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
                     else: remove(o + f'/{ix}.exe')
+                return
+        case 'Resource DLL':
+            run(['7z','x',i,'-o' + o,'-aou'])
+            if exists(o + '/.rsrc'):
+                copydir(o + '/.rsrc',o,True)
                 return
 
         case 'F-Zero G/AX .lz':
