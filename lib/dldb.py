@@ -1,6 +1,6 @@
 import json,httpx,os,subprocess,zipfile,tarfile
 from shutil import copyfile,rmtree
-from time import sleep
+from time import sleep,time
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -17,9 +17,12 @@ def copy(i:str,o:str):
 class DLDB:
     def __init__(self):
         self.dbp = 'lib/dldb.json'
+        self.udbp = 'bin/updb.json'
         self.c = httpx.Client()
         self.print_try = False
         self.db = json.load(xopen(self.dbp))
+        if os.path.exists(self.udbp): self.udb = json.load(xopen(self.udbp))
+        else: self.udb = {}
 
     def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,**kwargs) -> tuple[int,str|bytes,str|bytes]:
         if print_try and self.print_try: print('Trying with',cmd[0])
@@ -45,9 +48,12 @@ class DLDB:
         exe = exei.lower()
         if exe.endswith('.exe'): exe = exe[:-4]
         if exe in self.db:
-            if not os.path.exists('bin/' + self.db[exe]['p']):
+            exi = self.db[exe]
+            t = int(time())
+            if self.udb[exe] < exi.get('ts',0): os.remove('bin/' + exi['p'])
+            if not os.path.exists('bin/' + exi['p']):
                 print('Downloading',exe)
-                for e in self.db[exe]['fs']:
+                for e in exi['fs']:
                     if type(e) == str: e = {'u':e,'p':e.split('?')[0].split('/')[-1]}
                     elif type(e) == list: e = {'u':e[0],'p':e[1]}
                     if 'p' in e: p = 'bin/' + e['p']
@@ -58,6 +64,7 @@ class DLDB:
                             if ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
                             else: ex = '.' + ex.split('.')[-1]
                         p = gtmp(ex)
+
                     self.dl(e['u'],p)
                     if 'x' in e:
                         bk = self.print_try
@@ -94,7 +101,8 @@ class DLDB:
                         else: raise NotImplementedError(p + f' [{ex}]')
                         self.print_try = bk
                         os.remove(p)
-            exei = os.path.abspath('bin/' + self.db[exe]['p'])
+            exei = os.path.abspath('bin/' + exi['p'])
+            self.udb[exe] = t
         os.chdir(cd)
         return exei
     def dl(self,url:str,out:str):
@@ -113,3 +121,8 @@ class DLDB:
         except:
             if os.path.exists(out): os.remove(out)
             raise
+
+    def __del__(self):
+        open(BDIR + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False))
+
+from io import open
