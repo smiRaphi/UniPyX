@@ -50,7 +50,7 @@ class DLDB:
         if exe in self.db:
             exi = self.db[exe]
             t = int(time())
-            if self.udb[exe] < exi.get('ts',0): os.remove('bin/' + exi['p'])
+            if exe in self.udb and self.udb[exe] < exi.get('ts',0): os.remove('bin/' + exi['p'])
             if not os.path.exists('bin/' + exi['p']):
                 print('Downloading',exe)
                 for e in exi['fs']:
