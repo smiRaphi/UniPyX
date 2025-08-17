@@ -114,6 +114,7 @@ def update():
                     if nu != u: u = nu
 
             if ts > ots:
+                print(k,'->',u)
                 tts = max(tts,ts)
                 if type(f) == str: nfs.append(u)
                 elif type(f) == list: nfs.append([u,p])
