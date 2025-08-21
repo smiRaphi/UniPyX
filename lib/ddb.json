@@ -219,6 +219,11 @@
         "rs":"Ridge Racer V A"
     },
     {
+        "rq":null,
+        "d":["ext",".toast"],
+        "rs":"Roxio Toast IMG"
+    },
+    {
         "d":["ext",".xbp"],
         "rs":"XBP"
     }

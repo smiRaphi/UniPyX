@@ -103,6 +103,7 @@ class DLDB:
                         os.remove(p)
             exei = os.path.abspath('bin/' + exi['p'])
             self.udb[exe] = t
+            self.save()
         os.chdir(cd)
         return exei
     def dl(self,url:str,out:str):
@@ -122,7 +123,7 @@ class DLDB:
             if os.path.exists(out): os.remove(out)
             raise
 
-    def __del__(self):
-        open(BDIR + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False))
+    def save(self):
+        open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False))
 
 from io import open

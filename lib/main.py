@@ -288,96 +288,18 @@ def extract(inp:str,out:str,t:str) -> bool:
                 main_extract(i,o)
                 tf.destroy()
                 if os.listdir(o): return
-        case 'Apple Disk Image'|'Mac HFS Image':
-            from threading import Thread
-            from queue import Queue,Empty
+        case 'Apple Disk Image'|'Mac HFS Image'|'Roxio Toast IMG':
+            _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
+            try: ps = int(re.search(r'(\d+) partitions found\.',e)[1])
+            except: ps = 1
 
-            def readl(out,queue):
-                for l in iter(out.readline,b''): queue.put(l)
-                out.close()
-
-            if db.print_try: print('Trying with hfsexplorer')
             ce = os.environ.copy()
             ce['PATH'] += ';' + dirname(db.get('hfsexplorer'))
-            td = TmpDir()
-            p = subprocess.Popen(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.HFSExplorer','-apm','browse',i],cwd=td.p,env=ce,stdout=-1,stderr=-3,stdin=-1,bufsize=1,close_fds=False)
-            qo = Queue()
-            t = Thread(target=readl,args=(p.stdout,qo))
-            t.daemon = True
-            t.start()
-            def sin(i:bytes):
-                p.stdin.write(i)
-                try: p.stdin.flush()
-                except OSError: pass
-
-            ps = []
-            while p.poll() is None:
-                for _ in range(3):
-                    try: l = qo.get_nowait().decode().rstrip();break
-                    except Empty:sleep(0.1)
-                else:break
-                print(l)
-                if l.startswith('Partition ') and 'HFS' in l: ps.append((int(l.split()[1][:-1]),l.split('"')[1]))
-                elif ps: break
-
-            for sp in ps:
-                def xfold():
-                    fs = []
-                    while p.poll() is None:
-                        for _ in range(3):
-                            try: l = qo.get_nowait().decode().rstrip();break
-                            except Empty:sleep(0.1)
-                        else:break
-                        print(l)
-                        if l.startswith('  [org.catacombae.'): fs.append((int(l.split('@')[1].split(']')[0],16),l[-2] == '/'))
-                        elif l.startswith('  [Folder Thread: '): base = str(int(l.split('@')[1].split(']')[0],16)).encode()
-                        elif l.startswith('Listing files in "'): basen = l.split('"')[1].strip('/\\')
-                        elif fs: break
-                    while p.poll() is None:
-                        for f in fs:
-                            while p.poll() is None:
-                                try:l = qo.get_nowait()
-                                except Empty:break
-                                print(l)
-                            if f[1]:
-                                sin(b'cdn ' + str(f[0]).encode() + b'\r\n')
-                                xfold()
-                                while p.poll() is None:
-                                    try:l = qo.get_nowait()
-                                    except Empty:break
-                                    print(l)
-                                sin(b'cdn ' + base + b'\r\n')
-                            else:
-                                sin(b'info ' + str(f[0]).encode() + b'\r\n')
-                                while p.poll() is None:
-                                    try:l = qo.get_nowait()
-                                    except Empty:break
-                                    print(l)
-                                sin(b'extract ' + str(f[0]).encode() + b'\r\n')
-                                while p.poll() is None:
-                                    try:l = qo.get_nowait()
-                                    except Empty:break
-                                    print(l)
-                                while not os.listdir(td.p): sleep(0.1)
-                                move(td.p + '/' + os.listdir(td.p)[0],o + '/' + sp[1] + '/' + basen + '/')
-
-                while p.poll() is None:
-                    try:l = qo.get_nowait()
-                    except Empty:break
-                    print(l)
-                sin(str(sp[0]).encode() + b'\r\n')
-                xfold()
-                while p.poll() is None:
-                    try:l = qo.get_nowait()
-                    except Empty:break
-                    print(l)
-                sin(b'q\r\n')
-
-            p.kill()
-            p.stdin.close()
-            t.join()
-            qo.shutdown(True)
-            td.destroy()
+            for p in range(ps):
+                if db.print_try: print('Trying with hfsexplorer/unhfs')
+                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',o + (f'\\{p}' if ps > 1 else ''),'-resforks','NONE','-partition',p,'--',i],print_try=False,env=ce)
+                if 'Failed to create directory ' in e: return 1
+            if os.listdir(o): return
         case 'CHD':
             tf = TmpFile('.img')
             run(['chdman','extracthd','-o',tf,'-f','-i',i])
