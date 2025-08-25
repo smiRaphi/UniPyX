@@ -100,18 +100,22 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['trid','-n:5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
     _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
-    ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.strip().split('\n')]
+    ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.split('\n') if x.strip()]
 
     if isdir(inp): typ = 'directory'
     else:
         idt = open(inp,'rb').read(0x4000)
+        isz = sum(idt) != 0
         try: idt = idt.decode('utf-8')
         except: typ = 'binary'
-        else: typ = 'text'
-        if 'null data' in ts and typ == 'binary': typ = 'null'
+        else:
+            if isz: typ = 'text'
+            else: typ = 'binary'
+        if ('null data' in ts or 'null bytes' in ts) and typ == 'binary' and not isz: typ = 'null'
 
     if 'data' in ts: ts.remove('data')
     if 'null data' in ts: ts.remove('null data')
+    if 'null bytes' in ts: ts.remove('null bytes')
     if 'directory' in ts: ts.remove('directory')
 
     if os.path.isfile(inp):

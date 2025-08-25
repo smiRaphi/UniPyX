@@ -132,7 +132,9 @@
         "nsis - nullsoft scriptable install system",
         "nullsoft sfx v2.46.2-5 setup unicode installer",
         "http://nsis.sourceforge.net",
-        "generic : installer nullsoft pimp stub"
+        "generic : installer nullsoft pimp stub",
+        "installer nullsoft pimp stub",
+        "nullsoft pimp install system"
     ],
     "Wise Installer":[],
     "Inno Installer":[
@@ -148,8 +150,7 @@
     "InstallShield Setup":[
         "installshield setup",
         "installshield 3.x custom",
-        "installshield custom",
-        "installshield custom additional"
+        "installshield custom"
     ],
     "InstallShield Setup ForTheWeb":[
         "installshield packagefortheweb setup module"
