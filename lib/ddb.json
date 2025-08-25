@@ -93,6 +93,10 @@
         "rs":"RetroStudio PAK","s":1
     },
     {
+        "d":["isat","DP2\\x1A0001",0],
+        "rs":"Konami DPG","s":1
+    },
+    {
         "d":[["isat","2KPR\\1\\0\\0\\0",0,true],
              ["isat","GKPR\\1\\0\\0\\0",0,true]],"noq":true,
         "rs":"Glacier RPKG","s":1

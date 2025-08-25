@@ -1032,6 +1032,38 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['rpkg','-decrypt_packagedefinition_thumbs',i,'-output_path',o])
             if os.listdir(o): return
         case 'Blur PAK': return quickbms('blur')
+        case 'Konami DPG':
+            if db.print_try: print('Trying with custom extractor')
+
+            inf = open(i,'rb')
+            def readstr():
+                t = b''
+                while True:
+                    b = inf.read(1)
+                    if b == b'\x00': break
+                    t += b
+                return t.decode()
+            assert inf.read(8) == b'DP2\x1A0001'
+            inf.seek(4,1)
+            nfs = int.from_bytes(inf.read(4),byteorder='little')
+            offs = [int.from_bytes(inf.read(4),byteorder='little') for _ in range(nfs+1)]
+            fnms = [readstr() for _ in range(nfs)]
+
+            for idx in range(nfs):
+                tof = open(o + '/' + fnms[idx],'wb')
+                inf.seek(offs[idx])
+                print(hex(inf.tell()),fnms[idx])
+                siz = int.from_bytes(inf.read(4),byteorder='little') - 5
+                skp = 4
+
+                inf.seek(skp + siz,1)
+                while inf.read(1) != b'\x11':
+                    skp += 1
+
+                inf.seek(offs[idx] + 4 + skp)
+                tof.write(inf.read(siz))
+                tof.close()
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
@@ -1089,7 +1121,7 @@ def fix_isinstext(o:str):
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False):
     out = cleanp(out)
-    assert not exists(out),'Output directory already exists'
+    #assert not exists(out),'Output directory already exists'
     inp = cleanp(inp)
     if ts == None: ts = analyze(inp)
     assert ts,'Unknown file type'
