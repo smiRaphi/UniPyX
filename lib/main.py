@@ -311,8 +311,11 @@ def extract(inp:str,out:str,t:str) -> bool:
             ce['PATH'] += ';' + dirname(db.get('hfsexplorer'))
             for p in range(ps):
                 if db.print_try: print('Trying with hfsexplorer/unhfs')
-                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',o + (f'\\{p}' if ps > 1 else ''),'-resforks','NONE','-partition',p,'--',i],print_try=False,env=ce)
+                cop = o + (f'\\{p}' if ps > 1 else '')
+                mkdir(cop)
+                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','NONE','-partition',p,'--',i],print_try=False,env=ce)
                 if 'Failed to create directory ' in e: return 1
+                if not os.listdir(cop): rmdir(cop)
             if os.listdir(o): return
         case 'CHD':
             tf = TmpFile('.img')
