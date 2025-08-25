@@ -42,16 +42,19 @@ class DLDB:
             else: o,e = p.communicate(input=stdin)
             r = p.returncode
         return r,o,e
-    def get(self,exei:str):
-        cd = os.getcwd()
-        os.chdir(BDIR)
+    def get(self,exei:str): return self.update(exei)[0]
+    def update(self,exei:str):
         exe = exei.lower()
+        up = False
         if exe.endswith('.exe'): exe = exe[:-4]
         if exe in self.db:
+            cd = os.getcwd()
+            os.chdir(BDIR)
             exi = self.db[exe]
             t = int(time())
             if exe in self.udb and self.udb[exe] < exi.get('ts',0): os.remove('bin/' + exi['p'])
             if not os.path.exists('bin/' + exi['p']):
+                up = True
                 print('Downloading',exe)
                 for e in exi['fs']:
                     if type(e) == str: e = {'u':e,'p':e.split('?')[0].split('/')[-1]}
@@ -104,8 +107,8 @@ class DLDB:
             exei = os.path.abspath('bin/' + exi['p'])
             self.udb[exe] = t
             self.save()
-        os.chdir(cd)
-        return exei
+            os.chdir(cd)
+        return exei,up
     def dl(self,url:str,out:str):
         start = 0
         try:

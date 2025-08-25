@@ -136,8 +136,18 @@ def analyze(inp:str,raw=False):
                         else:
                             x = x.split('(')[0].split('[')[0].strip(' ,!:;')
                             if x: ts.append(x)
+
+                yrep = db.update('yara')
+                yp = os.path.dirname(yrep[0])
+                if yrep[1]:
+                    db.run([yp + '/yarac.exe','-w',yp + '/packers_peid.yar',yp + '/packers_peid.yarc'])
+                    remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
+                err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
+                if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
             else: f.close()
         else: f.close()
+
+    ts = [x.strip() for x in ts if x.strip()]
 
     nts = checktdb(ts)
     nts = list(set(nts))

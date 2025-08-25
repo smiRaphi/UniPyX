@@ -147,7 +147,9 @@
     ],
     "InstallShield Setup":[
         "installshield setup",
-        "installshield 3.x custom"
+        "installshield 3.x custom",
+        "installshield custom",
+        "installshield custom additional"
     ],
     "InstallShield Setup ForTheWeb":[
         "installshield packagefortheweb setup module"

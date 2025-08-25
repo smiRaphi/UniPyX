@@ -39,11 +39,22 @@
             "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.0/Exeinfo_0090.zip",
             "x":{
                 "ExeinfoPe/exeinfope.exe":"ExeinfoPe/exeinfope.exe",
-                "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll",
-                "ExeinfoPe/userdb.txt":"ExeinfoPe/userdb.txt"
+                "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll"
             }
         }],
         "ts":0
+    },
+    "yara":{
+        "p":"yara/yara.exe",
+        "fs":[{
+            "u":"https://github.com/VirusTotal/yara/releases/download/v4.5.4/yara-master-v4.5.4-win64.zip",
+            "x":{
+                "yara64.exe":"yara/yara.exe",
+                "yarac64.exe":"yara/yarac.exe"
+            }
+        },[
+            "https://raw.githubusercontent.com/Yara-Rules/rules/refs/heads/master/packers/peid.yar","yara/packers_peid.yar"
+        ]]
     },
     "7z":{
         "p":"7z/7z.exe",
