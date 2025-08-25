@@ -674,7 +674,8 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
                 if exists(o + '/app'): copydir(o + '/app',o,True)
                 return
-            run(['innounp','-x','-d' + o,'-y',i])
+            run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y',i])
+            if not exists(o + '/{app}'): run(['innounp','-x','-m','-d' + o,'-y',i])
             if exists(o + '/{app}'):
                 for x in os.listdir(o):
                     if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')

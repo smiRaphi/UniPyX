@@ -114,6 +114,10 @@
         "rs":"ISO","s":1
     },
     {
+        "d":["isat","koly\\0\\0\\0\\4\\0\\0\\2\\0",-512],
+        "rs":"Apple Disk Image","s":1
+    },
+    {
         "t":"null",
         "d":["ext",".cdi"],
         "rs":"CDI"

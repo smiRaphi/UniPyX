@@ -821,6 +821,15 @@
         }],
         "ts":0
     },
+    "innounp-2":{
+        "p":"innounp-2.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/jrathlev/InnoUnpacker-Windows-GUI/refs/heads/master/innounp-2/bin/innounp-2.zip",
+            "x":{
+                "innounp.exe":"innounp-2.exe"
+            }
+        }]
+    },
     "innoextract":{
         "p":"innoextract/innoextract.exe",
         "fs":[{
