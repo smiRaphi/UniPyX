@@ -891,6 +891,14 @@ def extract(inp:str,out:str,t:str) -> bool:
             if exists(o + '/.rsrc'):
                 copydir(o + '/.rsrc',o,True)
                 return
+        case 'Netopsystems FEAD':
+            bk = os.environ.get('__COMPAT_LAYER')
+            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
+            if db.print_try: print('Trying with input (/nos_ne)')
+            run([i,'/s','/nos_ne','/nos_o' + o],print_try=False)
+            if bk != None: os.environ['__COMPAT_LAYER'] = bk
+            else: del os.environ['__COMPAT_LAYER']
+            if os.listdir(o): return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
