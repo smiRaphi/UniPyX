@@ -138,7 +138,7 @@ def analyze(inp:str,raw=False):
                     for x in lg.split('\n')[0].split(' - ')[1:]:
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
                         else:
-                            x = x.split('(')[0].split('[')[0].strip(' ,!:;')
+                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].strip(' ,!:;')
                             if x: ts.append(x)
 
                 yrep = db.update('yara')
@@ -704,6 +704,11 @@ def extract(inp:str,out:str,t:str) -> bool:
             remove(o)
             mkdir(o)
         case 'MSI':
+            run(['lessmsi','x',i,o + '\\'])
+            if exists(o + '/SourceDir') and os.listdir(o + '/SourceDir'):
+                copydir(o + '/SourceDir',o,True)
+                return
+
             td = TmpDir()
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
             copydir(td,o)

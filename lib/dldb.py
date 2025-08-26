@@ -91,8 +91,8 @@ class DLDB:
                         elif ex == '.msi':
                             td = gtmp()
                             os.makedirs(td,exist_ok=True)
-                            self.run(['msiexec','/a',p,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
-                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
+                            self.run(['lessmsi','x',p,td + '\\'],getexe=False)
+                            for tx in e['x']: copy(td + '/SourceDir/' + tx,'bin/' + e['x'][tx])
                             rmtree(td)
                         elif ex == '.deb':
                             td = gtmp()

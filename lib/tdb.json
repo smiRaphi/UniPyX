@@ -46,7 +46,10 @@
         "stuffit compressed archive"
     ],
     "UPX":[
-        "upx compressed win32 executable"
+        "upx compressed win32 executable",
+        "upx wwwupxsourceforgenet",
+        "packerupx compresorgratuito wwwupxsourceforgenet",
+        "upx 290 lzma"
     ],
     "BinHex":[
         "binhex 4.0 encoded"
@@ -167,6 +170,12 @@
     ],
     "Stirling Compressed":[
         "stirling technologies installshield compressed"
+    ],
+    "Netopsystems FEAD":[
+        "netopsystems ag installer fead",
+        "netopsystems fead optimizer 1",
+        "netopsystems fead optimizer",
+        "www.netopsystems.com"
     ],
     "FreeArc":[
         "freearc compressed archive"

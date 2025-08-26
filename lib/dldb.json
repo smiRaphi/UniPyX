@@ -909,6 +909,21 @@
         }],
         "ts":0
     },
+    "lessmsi":{
+        "p":"lessmsi/lessmsi.exe",
+        "fs":[{
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.7.3/lessmsi-v2.7.3.zip",
+            "x":{
+                "lessmsi.exe":"lessmsi/lessmsi.exe",
+                "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
+                "LessIO.dll":"lessmsi/LessIO.dll",
+                "libmspackn.dll":"lessmsi/libmspackn.dll",
+                "mspack.dll":"lessmsi/mspack.dll",
+                "wix.dll":"lessmsi/wix.dll"
+            }
+        }]
+    },
+
     "sonic4":{
         "p":"BMS/sonic4.bms",
         "fs":[[
