@@ -140,6 +140,9 @@
     "Inno Installer":[
         "inno setup installer"
     ],
+    "Inno Archive":[
+        "inno setup archive"
+    ],
     "MSI":[
         "microsoft windows installer",
         "windows sdk setup transformer script"

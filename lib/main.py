@@ -642,7 +642,6 @@ def extract(inp:str,out:str,t:str) -> bool:
             for _ in range(50):
                 if os.listdir(o): return
                 sleep(0.1)
-        case 'VISE Installer': return quickbms('instexpl')
         case 'NSIS Installer':
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return
@@ -681,6 +680,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
                 copydir(o + '/{app}',o,True)
                 return
+        case 'VISE Installer'|'Inno Archive': return quickbms('instexpl')
         case 'FitGirl Installer':
             for x in os.listdir(dirname(i)):
                 if x.startswith('fg-') and x.endswith('.bin'):
