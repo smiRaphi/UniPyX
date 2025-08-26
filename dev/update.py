@@ -1,4 +1,4 @@
-import os
+import os,locale
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import json,httpx,time,re
@@ -22,10 +22,15 @@ GFMTS = {
     'ch-mcl/PS2_RidgeRacerV_ArchiveTool':lambda tag:f'{tag}.zip',
     'ZDoom/wadext':lambda tag:f'wadext_win32_{tag}.zip',
     'glacier-modding/RPKG-Tool':lambda tag:f'rpkg_{tag}-cli.zip',
-    'lifenjoiner/ISx':lambda tag:f'ISx-{tag}.7z'
+    'lifenjoiner/ISx':lambda tag:f'ISx-{tag}.7z',
+    'activescott/lessmsi':lambda tag:f'lessmsi-{tag}.zip',
 }
 
-def ft(i:str,f:str): return int(time.mktime(time.strptime(i,f)))
+def ft(i:str,f:str,loc='en_US'):
+    locale.setlocale(locale.LC_TIME,loc)
+    r = int(time.mktime(time.strptime(i,f)))
+    locale.setlocale(locale.LC_TIME,'')
+    return r
 def t(): return int(time.time())
 
 class Cache:
@@ -112,6 +117,13 @@ def update():
                 if ts > ots:
                     nu = re.search(r'href="(https://files\.prodkeys\.net/ProdKeys\.net-v\d+\.\d+\.\d+\.zip)"',s)[1]
                     if nu != u: u = nu
+            elif dom == 'dl.xpdfreader.com':
+                s = c.get('https://www.xpdfreader.com/download.html')
+                ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')
+                if ts > ots:
+                    nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
+                    if nu != u: u = nu
+                    else: ts = 0
 
             if ts > ots:
                 print(k,'->',u)
