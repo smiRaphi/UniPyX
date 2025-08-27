@@ -35,7 +35,7 @@ def t(): return int(time.time())
 
 class Cache:
     def __init__(self):
-        self.c = httpx.Client()
+        self.c = httpx.Client(timeout=10)
         self._s = {}
     def get(self,u) -> str:
         if u in self._s: return self._s[u]
@@ -94,6 +94,7 @@ def update():
                 if ts > ots:
                     nu = bu + ms[0]
                     if u != nu: u = nu
+                    else: ts = 0
             elif dom == 'entropymine.com':
                 bu = os.path.dirname(u) + '/'
                 s = c.get(bu)
@@ -105,18 +106,21 @@ def update():
                 m = re.search(r'href="/download/dev/[^"]+">[^<]+</a></td>\s*<td class="reldate" title="([^"Z\.]+)[^"]*">[^<]*</td>\s*.+\s*</tr>\s*<tr class="download">\s*.+\s*<td class="download-links".*>\s*<a href="(https://[^"]+-x64\.7z)"',s)
                 ts = ft(m[1],'%Y-%m-%dT%H:%M:%S')
                 if m[2] != u: u = m[2]
+                else: ts = 0
             elif dom.endswith('.wiimm.de'):
                 s = c.get(f'https://{dom}/download.html')
                 m = re.search(r'<a href="(/download/[^"]+-cygwin64\.zip)">[^<\n]*</a>[^,\n]+, (\d{4}-\d\d-\d\d)',s)
                 ts = ft(m[2],'%Y-%m-%d')
                 nu = f'https://{dom}{m[1]}'
                 if nu != u: u = nu
+                else: ts = 0
             elif dom == 'files.prodkeys.net':
                 s = c.get(c.srch(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"','https://prodkeys.net/'))
                 ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1].split('+')[0],'%Y-%m-%dT%H:%M:%S')
                 if ts > ots:
                     nu = re.search(r'href="(https://files\.prodkeys\.net/ProdKeys\.net-v\d+\.\d+\.\d+\.zip)"',s)[1]
                     if nu != u: u = nu
+                    else: ts = 0
             elif dom == 'dl.xpdfreader.com':
                 s = c.get('https://www.xpdfreader.com/download.html')
                 ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')

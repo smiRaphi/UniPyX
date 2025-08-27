@@ -12,9 +12,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1755986400
+            "ts":1756245600
         }],
-        "ts":1755986400
+        "ts":1756245600
     },
     "file":{
         "p":"file/file.exe",
@@ -1099,9 +1099,10 @@
     },
     "tmd_wii":{
         "p":"tmd_wii/cetk",
-        "fs":[
-        ["http://nus.cdn.shop.wii.com/ccs/download/000000010000003A/cetk","tmd_wii/cetk"]
-        ],
+        "fs":[[
+            "http://nus.cdn.shop.wii.com/ccs/download/000000010000003A/cetk",
+            "tmd_wii/cetk"
+        ]],
         "ts":0
     }
 }
