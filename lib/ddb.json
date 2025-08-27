@@ -168,6 +168,11 @@
         "rs":"NDS","s":1
     },
     {
+        "d":[["isat","\\0\\1\\0\\1",0],
+             ["isat","Root-CA000000",320]],
+        "rs":"Wii TMD","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","CTPK",0],
         "rs":"CTPK","s":1

@@ -17,3 +17,4 @@ __pycache__
 !/bin/AssetRipper/client.py
 !/bin/psvpfsparser/
 !/bin/psvpfsparser/psvpfsparser.exe
+!/bin/tmd.py

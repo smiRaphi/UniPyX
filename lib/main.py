@@ -531,6 +531,50 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'XISO':
             run(['xdvdfs','unpack',i,o])
             if os.listdir(o): return
+        case 'Xbox LIVE ROM': raise NotImplementedError()
+        case 'Wii TMD':
+            ckey = dirname(db.get('tmd_wii')) + '/'
+
+            if not exists(ckey + 'common.key'):
+                s = db.c.get('https://wiki.wiidatabase.de/wiki/Common-Key').text
+                for r,k in [('Normal','common'),
+                            ('Korea' ,'korea' ),
+                            ('Debug' ,'debug' )]:
+                    open(ckey + k + '.key','wb').write(bytes.fromhex(re.search(f'<b>{r}:</b> *<code>([^<]+)</code>',s)[1]))
+
+            if db.print_try: print('Trying with tmd_wii')
+            from bin.tmd import TMD,derive_key,check_sha1,decrypt_content
+
+            dr = dirname(i)
+            dls = [x for x in os.listdir(dr) if os.path.isfile(dr + '/' + x)]
+            if 'tmd' in dls: tmd = 'tmd'
+            else: tmd = max([x for x in dls if x.startswith('tmd.')],key=lambda x:int(x.split('.')[-1]))
+            tmd = TMD(dr + '/' + tmd)
+
+            for c in tmd.contents:
+                fn = hex(c.cid)[2:].zfill(8)
+                odr = o + '/' + fn
+                ifl = dr + '/' + fn
+
+                if not check_sha1(ifl,c.sha1):
+                    tf = TmpFile()
+                    decrypt_content(ifl,tf,derive_key(tmd.titleid,1),c)
+                    assert check_sha1(tf, c.sha1)
+                    ifl = str(tf)
+
+                if c.type == 2: copy(ifl,o + '/CAFEDEAD.bin')
+                elif c.type == 0x8001:
+                    if extract(ifl,o + '/$SHARED','U8'): copy(ifl,o + '/$SHARED/' + fn + '.bin')
+                elif c.index == 0 and tmd.titleid == b'\0\0\0\1\0\0\0\2': copy(ifl,o + '/build_tag.bin')
+                elif c.index == 0: copy(ifl,o + '/banner.bnr')
+                elif c.index == 1:
+                    copy(ifl,o + '/launch.dol')
+                elif tmd.bootindex == c.index: copy(ifl,o + '/boot.dol')
+                else:
+                    if open(ifl,'rb').read(4) == b'U\xAA8\x2D':
+                        if extract(ifl,odr,'U8'): copy(ifl,odr + '.bin')
+                    else: copy(ifl,odr + '.bin')
+            return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
@@ -953,8 +997,6 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Level5 ARC'|'Level5 XPCK':
             run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if os.listdir(o): return
-        case 'NDS SWAR':
-            raise NotImplementedError
         case 'Iron Sky GPK':
             fs = []
             for x in re.findall(r'<File((?: \w+="\w{3}: [^"]*")+)\s*/>',open(i,encoding='utf-8').read()):
