@@ -138,7 +138,7 @@ def analyze(inp:str,raw=False):
                     for x in lg.split('\n')[0].split(' - ')[1:]:
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
                         else:
-                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].strip(' ,!:;')
+                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;')
                             if x: ts.append(x)
 
                 yrep = db.update('yara')
@@ -567,8 +567,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if extract(ifl,o + '/$SHARED','U8'): copy(ifl,o + '/$SHARED/' + fn + '.bin')
                 elif c.index == 0 and tmd.titleid == b'\0\0\0\1\0\0\0\2': copy(ifl,o + '/build_tag.bin')
                 elif c.index == 0: copy(ifl,o + '/banner.bnr')
-                elif c.index == 1:
-                    copy(ifl,o + '/launch.dol')
+                elif c.index == 1: copy(ifl,o + '/launch.dol')
                 elif tmd.bootindex == c.index: copy(ifl,o + '/boot.dol')
                 else:
                     if open(ifl,'rb').read(4) == b'U\xAA8\x2D':
@@ -757,6 +756,11 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
             copydir(td,o)
             td.destroy()
+            if os.listdir(o): return
+            run(['7z','x',i,'-o' + o,'-aoa'])
+            if os.listdir(o): return
+        case 'MSP':
+            run(['msix',i,'/out',o,'/ext'])
             if os.listdir(o): return
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return

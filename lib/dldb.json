@@ -988,6 +988,16 @@
         }],
         "ts":0
     },
+    "msix":{
+        "p":"MsiX.exe",
+        "fs":[{
+            "u":"http://www.windowswiki.info/wp-content/uploads/2009/07/msix.zip",
+            "x":{
+                "Release/MsiX.exe":"MsiX.exe"
+            }
+        }],
+        "ts":0
+    },
     "sonic4":{
         "p":"BMS/sonic4.bms",
         "fs":[[

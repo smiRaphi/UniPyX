@@ -23,7 +23,10 @@
         "rar compressed archive (gen)"
     ],
     "MSCAB":[
-        "microsoft cabinet archive"
+        "microsoft cabinet archive",
+        ".cab archive",
+        "ms cab file",
+        "mode : mszip"
     ],
     "PDF":[
         "adobe portable document format"
@@ -151,7 +154,11 @@
     ],
     "MSI":[
         "microsoft windows installer",
-        "windows sdk setup transformer script"
+        "windows sdk setup transformer script",
+        "windows sdk setup transform script"
+    ],
+    "MSP":[
+        "windows installer patch"
     ],
     "Setup Factory Installer":[
         "setup factory 6.0"
