@@ -330,6 +330,8 @@ def extract(inp:str,out:str,t:str) -> bool:
                 run(['7z','x',i,'-o' + o,'-aoa'])
                 if os.path.exists(o + '/_INST32I.EX_'):
                     if fix_isinstext(o): return
+                elif os.path.exists(o + '/Disk1/ikernel.ex_'):
+                    if fix_isinstext(o,o + '/Disk1'): return
                 elif os.listdir(o): return
                 run(['garbro','x','-o',o,i])
                 if os.listdir(o): return
@@ -873,7 +875,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             td = TmpDir()
             osj = OSJump()
             osj.jump(td)
-            e,_,_ = run(['i5comp','x','-rof',i])
+            e,_,_ = run(['i6comp','x','-rof',i])
             osj.back()
             if not e and os.listdir(td.p):
                 copydir(td,o)
@@ -884,7 +886,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             td = TmpDir()
             osj = OSJump()
             osj.jump(td)
-            e,_,_ = run(['i6comp','x','-rof',i])
+            e,_,_ = run(['i5comp','x','-rof',i])
             osj.back()
             if not e and os.listdir(td.p):
                 copydir(td,o)
@@ -1157,28 +1159,31 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             if os.listdir(o): return
     return 1
-def fix_isinstext(o:str):
+def fix_isinstext(o:str,oi:str=None):
     ret = True
-    fs = os.listdir(o)
-    if exists(o + '/_INST32I.EX_'):
+    oi = oi or o
+    fs = os.listdir(oi)
+    if exists(oi + '/_INST32I.EX_'):
         mkdir(o + '/_INST32I_EX_')
-        extract(o + '/_INST32I.EX_',o + '/_INST32I_EX_','Stirling Compressed')
+        extract(oi + '/_INST32I.EX_',o + '/_INST32I_EX_','Stirling Compressed')
 
     for x in fs:
         x = x.upper()
         if x in ['_SETUP.LIB','DATA.Z'] or (x.startswith('_SETUP.') and x.endswith(('0','1','2','3','4','5','6','7','8','9'))):
             mkdir(o + '/' + x.replace('.','_'))
-            r = not extract(o + '\\' + x,o + '\\' + x.replace('.','_'),'InstallShield Z')
+            r = not extract(oi + '\\' + x,o + '\\' + x.replace('.','_'),'InstallShield Z')
             if not r: print("Could not extract",x)
             ret = ret and r
         elif x.startswith(('_SYS','_USER','DATA')) and x.endswith('.CAB'):
             mkdir(o + '/' + tbasename(x))
-            r = not extract(o + '\\' + x,o + '\\' + tbasename(x),'InstallShield Archive')
+            r = not extract(oi + '\\' + x,o + '\\' + tbasename(x),'InstallShield Archive')
             if not r: print("Could not extract",x)
             ret = ret and r
 
     if ret:
-        for x in fs: remove(o + '/' + x)
+        if oi == o:
+            for x in fs: remove(oi + '/' + x)
+        else: remove(oi)
         for x in os.listdir(o):
             if not isdir(o + '/' + x) or x.upper() == '_INST32I_EX_': continue
             while True:
