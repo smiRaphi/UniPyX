@@ -534,6 +534,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['xdvdfs','unpack',i,o])
             if os.listdir(o): return
         case 'Xbox LIVE ROM': raise NotImplementedError()
+        case 'GD-ROM CUE+BIN':
+            run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
+            if os.listdir(o): return
         case 'Wii TMD':
             ckey = dirname(db.get('tmd_wii')) + '/'
 
@@ -623,9 +626,6 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'AFS':
             run(['afspacker','-e',i,o])
             if os.path.exists(noext(i) + '.json'): remove(noext(i) + '.json')
-            if os.listdir(o): return
-        case 'GD-ROM CUE+BIN':
-            run(['buildgdi','-extract','-cue',i,'-output',o,'-ip',o + '/IP.BIN'])
             if os.listdir(o): return
         case 'NDS Sound Data':
             td = TmpDir()
