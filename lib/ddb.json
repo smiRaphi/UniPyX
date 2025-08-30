@@ -248,5 +248,9 @@
     {
         "d":["ext",".xbp"],
         "rs":"XBP"
+    },
+    {
+        "d":["ext",".tde"],
+        "rs":"Teardown Encrypted File"
     }
 ]

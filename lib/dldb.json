@@ -805,6 +805,9 @@
         ],
         "ts":0
     },
+    "tdedecrypt":{
+        "p":"TDEDecrypt.exe"
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

@@ -641,7 +641,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
         case 'Qt IFW':
             from signal import SIGTERM
-            from winpty import PtyProcess
+            from winpty import PtyProcess # type: ignore
             bk = os.environ.get('__COMPAT_LAYER')
             os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
             if db.print_try: print('Trying with input')
@@ -1133,6 +1133,10 @@ def extract(inp:str,out:str,t:str) -> bool:
                 tof.write(inf.read(siz))
                 tof.close()
             if os.listdir(o): return
+        case 'Teardown Encrypted File':
+            of = o + '\\' + basename(o) + '_'
+            run(['tdedecrypt',i + '_',of])
+            if exists(of[:-1]) and (os.path.getsize(of[:-1]) or not os.path.getsize(i)): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
