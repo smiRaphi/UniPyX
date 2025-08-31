@@ -1137,6 +1137,12 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + basename(o) + '_'
             run(['tdedecrypt',i + '_',of])
             if exists(of[:-1]) and (os.path.getsize(of[:-1]) or not os.path.getsize(i)): return
+        case 'Unreal Engine Package':
+            if 0:
+                key = ['-a']
+            else: key = []
+            run(['repak'] + key + ['unpack','-o',o,'-q','-f',i])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

@@ -207,6 +207,10 @@
         "rs":"Unity Assets","s":1
     },
     {
+        "d":["contain","\\xE1\\x12\\x6F\\x5A",[-269,null]],
+        "rs":"Unreal Engine Package","s":1
+    },
+    {
         "rqr":null,
         "d":["ext",".nub2"],
         "rs":"NUB2"

@@ -808,6 +808,15 @@
     "tdedecrypt":{
         "p":"TDEDecrypt.exe"
     },
+    "repak":{
+        "p":"repak.exe",
+        "fs":[{
+            "u":"https://github.com/trumank/repak/releases/download/v0.2.2/repak_cli-x86_64-pc-windows-msvc.zip",
+            "x":{
+                "repak.exe":"repak.exe"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
