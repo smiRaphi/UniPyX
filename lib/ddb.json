@@ -197,6 +197,11 @@
         "rs":"NSP","s":1
     },
     {
+        "rqr":null,
+        "d":["isat","AGAR\\1\\0\\0\\0\\1\\0\\0\\0",0],
+        "rs":"Danganronpa WAD","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1

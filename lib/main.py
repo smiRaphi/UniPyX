@@ -1143,6 +1143,16 @@ def extract(inp:str,out:str,t:str) -> bool:
             else: key = []
             run(['repak'] + key + ['unpack','-o',o,'-q','-f',i])
             if os.listdir(o): return
+        case 'Danganronpa WAD':
+            if db.print_try: print('Trying with wad_archiver')
+            db.get('wad_archiver')
+            from bin.wad_archiver import Commands # type: ignore
+            class Args:
+                input = i
+                output = o
+                silent = True
+            Commands.extract_files(Args)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

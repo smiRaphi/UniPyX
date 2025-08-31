@@ -817,6 +817,13 @@
             }
         }]
     },
+    "wad_archiver":{
+        "p":"wad_archiver.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/vn-tools/danganronpa-tools/refs/heads/master/wad_archiver/wad_archiver",
+            "wad_archiver.py"
+        ]]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
