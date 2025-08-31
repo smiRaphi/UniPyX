@@ -824,6 +824,15 @@
             "wad_archiver.py"
         ]]
     },
+    "vpkedit":{
+        "p":"vpkeditcli.exe",
+        "fs":[{
+            "u":"https://github.com/craftablescience/VPKEdit/releases/download/v5.0.0.1/VPKEdit-Windows-Standalone-msvc-Release.zip",
+            "x":{
+                "vpkeditcli.exe":"vpkeditcli.exe"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

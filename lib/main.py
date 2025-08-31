@@ -1153,6 +1153,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 silent = True
             Commands.extract_files(Args)
             if os.listdir(o): return
+        case 'Valve Package':
+            run(['vpkedit','-o',o,'--no-progress','-e','/',i])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

@@ -227,5 +227,9 @@
     ],
     "SARC":[
         "mii maker data archive"
+    ],
+    "Valve Package":[
+        "valve package (v1)",
+        "valve package (v2)"
     ]
 }
