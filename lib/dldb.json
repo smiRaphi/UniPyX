@@ -833,6 +833,25 @@
             }
         }]
     },
+    "unpsarc":{
+        "p":"UnPSARC/UnPSARC.exe",
+        "fs":[{
+            "u":"https://github.com/rm-NoobInCoding/UnPSARC/releases/download/v2.7/UnPSARC_v2.7.zip",
+            "x":{
+                "Gibbed.IO.dll":"UnPSARC/Gibbed.IO.dll",
+                "ICSharpCode.SharpZipLib.dll":"UnPSARC/ICSharpCode.SharpZipLib.dll",
+                "K4os.Compression.LZ4.dll":"UnPSARC/K4os.Compression.LZ4.dll",
+                "System.Buffers.dll":"UnPSARC/System.Buffers.dll",
+                "System.Memory.dll":"UnPSARC/System.Memory.dll",
+                "System.Numerics.Vectors.dll":"UnPSARC/System.Numerics.Vectors.dll",
+                "System.Runtime.CompilerServices.Unsafe.dll":"UnPSARC/System.Runtime.CompilerServices.Unsafe.dll",
+                "System.Threading.Tasks.Extensions.dll":"UnPSARC/System.Threading.Tasks.Extensions.dll",
+                "UnPSARC.exe":"UnPSARC/UnPSARC.exe"
+            }
+        },
+        "https://github.com/new-world-tools/go-oodle/releases/download/v0.2.3-files/oo2core_9_win64.dll"
+        ]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

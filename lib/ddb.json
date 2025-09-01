@@ -188,6 +188,11 @@
     },
     {
         "rqr":null,
+        "d":["isat","DSAR",0],
+        "rs":"Direct Storage Archive","s":1
+    },
+    {
+        "rqr":null,
         "d":["isat","WUX0",0],
         "rs":"WUX","s":1
     },

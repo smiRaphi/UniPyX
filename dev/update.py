@@ -24,6 +24,7 @@ GFMTS = {
     'glacier-modding/RPKG-Tool':lambda tag:f'rpkg_{tag}-cli.zip',
     'lifenjoiner/ISx':lambda tag:f'ISx-{tag}.7z',
     'activescott/lessmsi':lambda tag:f'lessmsi-{tag}.zip',
+    'rm-NoobInCoding/UnPSARC':lambda tag:f'UnPSARC_{tag}.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):

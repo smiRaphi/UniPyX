@@ -1033,6 +1033,8 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'PlayStation Archive':
             run(['psarc','extract','--input='+i,'--to='+o])
             if os.listdir(o): return
+            run(['unpsarc',i,o])
+            if os.listdir(o): return
         case 'Unity Bundle':
             if db.print_try: print('Trying with assetripper')
             run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o],print_try=False)
@@ -1155,6 +1157,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Valve Package':
             run(['vpkedit','-o',o,'--no-progress','-e','/',i])
+            if os.listdir(o): return
+        case 'Direct Storage Archive':
+            run(['unpsarc',i,o])
             if os.listdir(o): return
 
         case 'Ridge Racer V A':
