@@ -821,7 +821,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     for x in ofs:
                         with zipfile.ZipFile(x[0]) as z: xopen(o + '/' + x[1],'wb').write(z.read(x[1]))
                         remove(x[0])
-                    if os.path.exists(o + '/_INST32I.EX_'):
+                    if os.path.exists(o + '/_INST32I.EX_') or os.path.exists(o + '/_inst16.ex_'):
                         if fix_isinstext(o): return
                     else: return
             f.close()
@@ -1194,10 +1194,13 @@ def fix_isinstext(o:str,oi:str=None):
     if exists(oi + '/_INST32I.EX_'):
         mkdir(o + '/_INST32I_EX_')
         extract(oi + '/_INST32I.EX_',o + '/_INST32I_EX_','Stirling Compressed')
+    elif exists(oi + '/_inst16.ex_'):
+        mkdir(o + '/_inst16_ex_')
+        extract(oi + '/_inst16.ex_',o + '/_inst16_ex_','Stirling Compressed')
 
     for x in fs:
         x = x.upper()
-        if x in ['_SETUP.LIB','DATA.Z'] or (x.startswith('_SETUP.') and x.endswith(('0','1','2','3','4','5','6','7','8','9'))):
+        if x in ['_SETUP.LIB'] or (x.startswith('_SETUP.') and x.endswith(('0','1','2','3','4','5','6','7','8','9'))) or x.endswith('.Z'):
             mkdir(o + '/' + x.replace('.','_'))
             r = not extract(oi + '\\' + x,o + '\\' + x.replace('.','_'),'InstallShield Z')
             if not r: print("Could not extract",x)
@@ -1213,7 +1216,7 @@ def fix_isinstext(o:str,oi:str=None):
             for x in fs: remove(oi + '/' + x)
         else: remove(oi)
         for x in os.listdir(o):
-            if not isdir(o + '/' + x) or x.upper() == '_INST32I_EX_': continue
+            if not isdir(o + '/' + x) or x.upper() in ['_INST32I_EX_','_INST16_EX_']: continue
             while True:
                 try: copydir(o + '/' + x,o,True);break
                 except PermissionError: pass
