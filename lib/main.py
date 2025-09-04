@@ -271,7 +271,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if opt: print('Trying with input')
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
-            if os.listdir(o): return
+            if os.listdir(o) and not exists(o + '/.rsrc'): return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
             run(['pdfimages','-j',i,o + '\\img'])
@@ -676,27 +676,48 @@ def extract(inp:str,out:str,t:str) -> bool:
                 mkdir(o)
         case 'MSCAB SFX':
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o): return
+            if os.listdir(o) and not exists(o + '/.rsrc'): return
+            remove(o)
+            mkdir(o)
 
-            bk = os.environ.get('__COMPAT_LAYER')
-            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
+            env = os.environ.copy()
+            env['__COMPAT_LAYER'] = 'RUNASINVOKER'
+
             if db.print_try: print('Trying with input (/X)')
-            run([i,'/X:' + o,'/Q','/C'],print_try=False)
-            if bk != None: os.environ['__COMPAT_LAYER'] = bk
-            else: del os.environ['__COMPAT_LAYER']
-            for _ in range(50):
-                if os.listdir(o): return
+            prc = subprocess.Popen([i,'/X:' + o,'/Q','/C'],stdout=-1,stderr=-1,env=env)
+            for _ in range(20):
+                if prc.poll() != None:
+                    for _ in range(50):
+                        if os.listdir(o): return
+                        sleep(0.1)
+                    break
                 sleep(0.1)
+            else: prc.kill()
 
-            bk = os.environ.get('__COMPAT_LAYER')
-            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
             if db.print_try: print('Trying with input (/T)')
-            run([i,'/T:' + o,'/Q'],print_try=False)
-            if bk != None: os.environ['__COMPAT_LAYER'] = bk
-            else: del os.environ['__COMPAT_LAYER']
-            for _ in range(50):
-                if os.listdir(o): return
+            prc = subprocess.Popen([i,'/T:' + o,'/Q'],stdout=-1,stderr=-1,env=env)
+            for _ in range(10):
+                if prc.poll() != None:
+                    for _ in range(50):
+                        if os.listdir(o): return
+                        sleep(0.1)
+                    break
                 sleep(0.1)
+            else: prc.kill()
+
+            if db.print_try: print('Trying with input (-extract)')
+            prc = subprocess.Popen([i,'-silent','-extract'],stdout=-1,stderr=-1,env=env,cwd=o)
+            for _ in range(10):
+                if prc.poll() != None:
+                    for _ in range(50):
+                        if os.listdir(o):
+                            for f in os.listdir(o):
+                                if f.endswith('.msi'): extract(o + '/' + f,o,'MSI')
+                            return
+                        sleep(0.1)
+                    break
+                sleep(0.1)
+            else: prc.kill()
         case 'NSIS Installer':
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return
@@ -935,8 +956,10 @@ def extract(inp:str,out:str,t:str) -> bool:
                     c += 1
             if c:
                 for ix in range(c):
-                    if main_extract(o + f'/{ix}.exe',o + f'/{ix}') and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
-                    else: remove(o + f'/{ix}.exe')
+                    try: xr = main_extract(o + f'/{ix}.exe',o + f'/{ix}')
+                    except AssertionError: xr = False
+                    if exists(o + f'/{ix}') and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
+                    elif xr: remove(o + f'/{ix}.exe')
                 return
         case 'Resource DLL':
             run(['7z','x',i,'-o' + o,'-aou'])
@@ -1224,12 +1247,14 @@ def fix_isinstext(o:str,oi:str=None):
                 except PermissionError: pass
     return ret
 
-def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False):
+def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     out = cleanp(out)
     #assert not exists(out),'Output directory already exists'
     inp = cleanp(inp)
     if ts == None: ts = analyze(inp)
-    assert ts,'Unknown file type'
+    if not ts:
+        if rs: assert ts,'Unknown file type'
+        return
 
     for x in ts:
         if not quiet: print('Trying format',x)
@@ -1241,6 +1266,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False):
             raise
         rmtree(out)
     else:
-        if rs: raise Exception("Could not extract")
+        if rs: assert not rs,"Could not extract"
         return
     if not quiet: print('Extracted successfully to',out)
+    return True

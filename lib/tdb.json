@@ -41,7 +41,8 @@
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
         "microsoft sfx cab archive  v6.1.22.4",
         "win32 ms cabinet self-extractor (wextract stub)",
-        "cab installer"
+        "cab installer",
+        "microsoft sfx cab archive"
     ],
     "StuffIt":[
         "stuffit compressed archive (var.2)",
