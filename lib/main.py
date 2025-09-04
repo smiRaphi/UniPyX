@@ -712,42 +712,34 @@ def extract(inp:str,out:str,t:str) -> bool:
                 return
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
+            run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y',i])
+            if not exists(o + '/{app}'): run(['innounp','-x','-m','-d' + o,'-y',i])
+            if exists(o + '/{app}'):
+                for x in os.listdir(o):
+                    if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
+                while True:
+                    try:copydir(o + '/{app}',o,True)
+                    except:pass
+                    else:break
+                if exists(o + '/$INSFILES/unarc.dll'):
+                    td = TmpDir()
+                    copydir(o + '/$INSFILES',td.p)
+                    remove(td + '/cls-srep.dll',td + '/cls-srep_x64.exe',td + '/cls-srep_x86.exe')
+                    copydir(dirname(db.get('cls-srep')),td.p)
+                    bcmd = ['unarc-cpp',td + '\\unarc.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
+                    for f in os.listdir(dirname(i)):
+                        f = dirname(i) + '\\' + f
+                        if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
+                        print(run(bcmd + [f],cwd=td.p))
+                        td.destroy()
+                return
             run(['innoextract','-e','-q','--iss-file','-g','-d',o,i])
             if os.listdir(o):
                 for x in os.listdir(o):
                     if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
                 if exists(o + '/app'): copydir(o + '/app',o,True)
                 return
-            run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y',i])
-            if not exists(o + '/{app}'): run(['innounp','-x','-m','-d' + o,'-y',i])
-            if exists(o + '/{app}'):
-                for x in os.listdir(o):
-                    if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
-                copydir(o + '/{app}',o,True)
-                return
         case 'VISE Installer'|'Inno Archive': return quickbms('instexpl')
-        case 'FitGirl Installer':
-            for x in os.listdir(dirname(i)):
-                if x.startswith('fg-') and x.endswith('.bin'):
-                    try: n = int(x[3:-4])
-                    except: n = None
-                    if n == 1: mf = x;break
-            else: return 1
-
-            td = TmpDir()
-            run(['innoextract','-e','-q','-d',td,i])
-            remove(td + '/tmp/cls-srep.dll',td + '/tmp/cls-srep_x64.exe',td + '/tmp/cls-srep_x86.exe')
-            copydir(dirname(db.get('cls-srep')),td + '/tmp')
-            run(['unarc-cpp',td + '\\tmp\\unarc.dll','x','-o+','-dp' + o,'-w' + td + '\\tmp','-cfgarc.ini',dirname(i) + '\\' + mf],cwd=td.p + '\\tmp')
-            td.destroy()
-
-            def find_file(o):
-                for x in os.listdir(o):
-                    x = o + '/' + x
-                    if isfile(x) or find_file(x): return 1
-            if find_file(o): return
-            remove(o)
-            mkdir(o)
         case 'MSI':
             run(['lessmsi','x',i,o + '\\'])
             if exists(o + '/SourceDir') and os.listdir(o + '/SourceDir'):

@@ -44,11 +44,6 @@
         "rs":"InstallShield MSI","s":1
     },
     {
-        "rq":"Inno Installer",
-        "d":["ps","Write-Output ((Get-Item -Path $env:input).VersionInfo.LegalCopyright.Trim() -eq 'FitGirl')"],
-        "rs":"FitGirl Installer","s":1
-    },
-    {
         "rqr":"Win16 NE executable (generic)",
         "d":["isat","InstallShield Self-Extracting Stub Program",943],
         "rs":"InstallShield Setup","s":1

@@ -19,3 +19,5 @@ __pycache__
 !/bin/psvpfsparser/psvpfsparser.exe
 !/bin/tmd.py
 !/bin/TDEDecrypt.exe
+!/bin/cls-srep/
+!/bin/cls-srep/*

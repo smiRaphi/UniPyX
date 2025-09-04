@@ -146,7 +146,9 @@
     ],
     "Wise Installer":[],
     "Inno Installer":[
-        "inno setup installer"
+        "inno setup installer",
+        "inno setup v.6.4.0.1 installer",
+        "www.innosetup.com"
     ],
     "Inno Archive":[
         "inno setup archive"
