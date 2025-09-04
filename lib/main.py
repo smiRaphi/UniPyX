@@ -345,6 +345,12 @@ def extract(inp:str,out:str,t:str) -> bool:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
                 except: pass
                 else: return
+        case 'ZLIB':
+            if db.print_try: print('Trying with zlib')
+            import zlib
+            try:open(o + '/' + tbasename(i),'wb').write(zlib.decompress(open(i,'rb').read()))
+            except:pass
+            else:return
         case 'VirtualBox Disk Image':
             td = TmpDir()
             run(['7z','x',i,'-o' + td,'-aoa'])
@@ -1186,6 +1192,28 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Direct Storage Archive':
             run(['unpsarc',i,o])
             if os.listdir(o): return
+        case 'NSMBW Coin World ARC':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+            f.skip(6)
+
+            fc = f.readu16()
+            fs = []
+            for _ in range(fc):
+                fm = [f.read(0x40).strip(b'\0').decode()]
+                f.skip(4)
+                fm.append(f.readu32())
+                f.skip(4)
+                fm.append(f.readu32())
+                fs.append(fm)
+            for of in fs:
+                tof = xopen(o + '/' + of[0],'wb')
+                f.seek(of[2])
+                tof.write(f.read(of[1]))
+                tof.close()
+            f.close()
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

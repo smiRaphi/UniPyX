@@ -37,6 +37,9 @@
     "ZSTD":[
         "zstandard compressed data"
     ],
+    "ZLIB":[
+        "zlib compressed data (default comp.)"
+    ],
     "MSCAB SFX":[
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
         "microsoft sfx cab archive  v6.1.22.4",

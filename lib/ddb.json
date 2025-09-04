@@ -178,6 +178,10 @@
         "rs":"Wii TMD","s":1
     },
     {
+        "d":["isat","ARC\\0\\7\\0",0],
+        "rs":"NSMBW Coin World ARC","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","CTPK",0],
         "rs":"CTPK","s":1
