@@ -1214,6 +1214,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 tof.close()
             f.close()
             if fs: return
+        case 'Arc System Works PAC': return quickbms('arcsys')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

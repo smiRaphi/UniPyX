@@ -1129,6 +1129,13 @@
         ]],
         "ts":0
     },
+    "arcsys":{
+        "p":"BMS/arcsys.bms",
+        "fs":[[
+            "http://aluigi.org/bms/arcsys.bms",
+            "BMS/arcsys.bms"
+        ]]
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
