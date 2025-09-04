@@ -467,16 +467,26 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['mdnds','e',i,o])
             if os.listdir(o): return
         case 'PS4 PKG':
-            td = TmpDir()
             rtd = TmpDir()
-            run(['ps4pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,td])
+            run(['ps4pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,o])
             rtd.destroy()
-            if os.path.exists(td + '/Image0') and os.listdir(td + '/Image0'):
-                copydir(td + '/Image0',o)
-                mv(td + '/Sc0',o + '/sce_sys')
-                td.destroy()
+            if os.path.exists(o + '/Image0') and os.listdir(o + '/Image0'):
+                fs = os.listdir(o)
+                copydir(o + '/Image0',o)
+                mv(o + '/Sc0',o + '/sce_sys')
+                for x in fs: remove(o + '/' + x)
                 return
-            td.destroy()
+        case 'PS5 PKG':
+            rtd = TmpDir()
+            run(['ps5pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,o])
+            rtd.destroy()
+            if os.listdir(o): raise NotImplementedError()
+            if os.path.exists(o + '/Image0') and os.listdir(o + '/Image0'):
+                fs = os.listdir(o)
+                copydir(o + '/Image0',o)
+                mv(o + '/Sc0',o + '/sce_sys')
+                for x in fs: remove(o + '/' + x)
+                return
         case 'PS3 ISO':
             from bin.ps3key import PS3Keys
             k = PS3Keys().get(i)

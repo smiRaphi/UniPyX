@@ -852,6 +852,15 @@
         "https://github.com/new-world-tools/go-oodle/releases/download/v0.2.3-files/oo2core_9_win64.dll"
         ]
     },
+    "ps5pkg":{
+        "p":"ps5pkg/prospero-pub-cmd.exe",
+        "fs":[
+            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/prospero-pub-cmd.exe", "ps5pkg/prospero-pub-cmd.exe"],
+            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/p2d.exe", "ps5pkg/ext/p2d.exe"],
+            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/sc2.exe", "ps5pkg/ext/sc2.exe"],
+            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/ric.exe", "ps5pkg/ext/ric.exe"]
+        ]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
