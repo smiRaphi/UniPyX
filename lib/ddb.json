@@ -221,13 +221,18 @@
         "rs":"Unreal Engine Package","s":1
     },
     {
-        "rqr":null,
-        "d":["ext",".nub2"],
-        "rs":"NUB2"
+        "d":[["isat","\\0\\0\\0\\0",256],
+             ["str0",0,256,2]],
+        "rs":"BBC Micro SSD"
     },
     {
         "d":["py","m=['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']\nreturn ((basename(inp).lower().startswith('mdb_') and inp.lower().endswith('.dat')) or basename(inp).lower() == 'sound.dat') and ([x for x in os.listdir(dirname(inp)) if x.upper() in m] or [x for x in os.listdir(dirname(dirname(inp))) if x.upper() in m])"],
         "rs":"DDR DAT"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".nub2"],
+        "rs":"NUB2"
     },
     {
         "rqr":null,

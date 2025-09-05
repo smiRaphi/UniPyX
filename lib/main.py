@@ -233,6 +233,18 @@ def analyze(inp:str,raw=False):
                         h.update(cv)
                     f.close()
                     ret = h.hexdigest() == hs
+                elif x[0] == 'str0':
+                    f = open(inp,'rb')
+                    f.seek(x[1])
+                    scnt = 0
+                    b = b''
+                    for _ in range(x[2]):
+                        b = f.read(1)
+                        if not b: ret = False;break
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=': scnt += 1
+                        elif b != b'\0': ret = False;break
+                    else: ret = scnt >= x[3]
+                    f.close()
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = (tret or type(tret) != bool) and ret
             if not xv.get('noq') and not tret: break
@@ -383,6 +395,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if not 'ERROR -> Sector not found' in o:
                     print(o)
                     raise NotImplementedError()
+        case 'BBC Micro SSD':
+            run(['bbccp','-i',i,'.',o + '\\'])
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -509,15 +524,17 @@ def extract(inp:str,out:str,t:str) -> bool:
             if not extract(i,o,'ISO'): return
         case 'PSVita PKG':
             import zlib,base64
-            if exists(dirname(i) + '/work.bin'):
-                ZRIF_DICT = zlib.decompress(base64.b64decode(b"eNpjYBgFo2AU0AsYAIElGt8MRJiDCAsw3xhEmIAIU4N4AwNdRxcXZ3+/EJCAkW6Ac7C7ARwYgviuQAaIdoPSzlDaBUo7QmknIM3ACIZM78+u7kx3VWYEAGJ9HV0="))
-                rif = open(dirname(i) + '/work.bin','rb').read()
-                c = zlib.compressobj(level=9,wbits=10,memLevel=8,zdict=ZRIF_DICT)
-                bn = c.compress(rif)
-                bn += c.flush()
-                if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
-                zrif = base64.b64encode(bn).decode()
+            if exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
+            elif exists(noext(i) + '.work.bin'): work = noext(i) + '.work.bin'
             else: return 1
+
+            ZRIF_DICT = zlib.decompress(base64.b64decode(b"eNpjYBgFo2AU0AsYAIElGt8MRJiDCAsw3xhEmIAIU4N4AwNdRxcXZ3+/EJCAkW6Ac7C7ARwYgviuQAaIdoPSzlDaBUo7QmknIM3ACIZM78+u7kx3VWYEAGJ9HV0="))
+            rif = open(work,'rb').read()
+            c = zlib.compressobj(level=9,wbits=10,memLevel=8,zdict=ZRIF_DICT)
+            bn = c.compress(rif)
+            bn += c.flush()
+            if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
+            zrif = base64.b64encode(bn).decode()
 
             osj = OSJump()
             osj.jump(o)

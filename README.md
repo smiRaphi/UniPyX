@@ -13,6 +13,7 @@ You need to provide disc keys to extract Wii U WUD/WUX files, you can do so by m
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
 * self compiled [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt)
+* self compiled [bbccp](https://github.com/ethandicks/bbc-disk-tools) without glob
 * [ndssndext](https://gbatemp.net/download/nds-sound-extractor.28818/) because it's packed twice
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
 * tmd.py for Nintendo TMD files and key generation
