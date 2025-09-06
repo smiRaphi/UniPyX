@@ -12,9 +12,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1756245600
+            "ts":1756936800
         }],
-        "ts":1756245600
+        "ts":1756936800
     },
     "file":{
         "p":"file/file.exe",
@@ -25,13 +25,13 @@
                 "libmagic.dll":"file/libmagic.dll"
             }
         },{
-            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5_i386.deb",
+            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5build1_i386.deb",
             "x":{
                 "usr/share/file/magic.mgc":"file/magic.mgc"
             },
-            "ts":1746109560
+            "ts":1756929540
         }],
-        "ts":1746109560
+        "ts":1756929540
     },
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
@@ -467,13 +467,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/4b/51/dolphin-master-2506-406-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/df/3e/dolphin-master-2506-424-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1756007433
+            "ts":1756879579
         }],
-        "ts":1756007433
+        "ts":1756879579
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -630,14 +630,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0279/mame0279b_64bit.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0280/mame0280b_64bit.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1754035789
+            "ts":1756582295
         }],
-        "ts":1754035789
+        "ts":1756582295
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -815,14 +815,16 @@
             "x":{
                 "repak.exe":"repak.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "wad_archiver":{
         "p":"wad_archiver.py",
         "fs":[[
             "https://raw.githubusercontent.com/vn-tools/danganronpa-tools/refs/heads/master/wad_archiver/wad_archiver",
             "wad_archiver.py"
-        ]]
+        ]],
+        "ts":0
     },
     "vpkedit":{
         "p":"vpkeditcli.exe",
@@ -831,7 +833,8 @@
             "x":{
                 "vpkeditcli.exe":"vpkeditcli.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "unpsarc":{
         "p":"UnPSARC/UnPSARC.exe",
@@ -850,16 +853,25 @@
             }
         },
         "https://github.com/new-world-tools/go-oodle/releases/download/v0.2.3-files/oo2core_9_win64.dll"
-        ]
+        ],
+        "ts":0
     },
     "ps5pkg":{
         "p":"ps5pkg/prospero-pub-cmd.exe",
-        "fs":[
-            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/prospero-pub-cmd.exe", "ps5pkg/prospero-pub-cmd.exe"],
-            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/p2d.exe", "ps5pkg/ext/p2d.exe"],
-            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/sc2.exe", "ps5pkg/ext/sc2.exe"],
-            ["https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/ric.exe", "ps5pkg/ext/ric.exe"]
-        ]
+        "fs":[[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/prospero-pub-cmd.exe",
+            "ps5pkg/prospero-pub-cmd.exe"
+        ],[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/p2d.exe",
+            "ps5pkg/ext/p2d.exe"
+        ],[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/sc2.exe",
+            "ps5pkg/ext/sc2.exe"
+        ],[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/ric.exe",
+            "ps5pkg/ext/ric.exe"
+        ]],
+        "ts":0
     },
     "bbccp":{
         "p":"bbccp.exe"
@@ -1035,7 +1047,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.7.3/lessmsi-v2.7.3.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.8.1/lessmsi-v2.8.1.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -1043,9 +1055,10 @@
                 "libmspackn.dll":"lessmsi/libmspackn.dll",
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
-            }
+            },
+            "ts":1756754139
         }],
-        "ts":0
+        "ts":1756754139
     },
     "msix":{
         "p":"MsiX.exe",
@@ -1137,7 +1150,8 @@
         "fs":[[
             "http://aluigi.org/bms/arcsys.bms",
             "BMS/arcsys.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
