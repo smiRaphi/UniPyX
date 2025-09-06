@@ -330,12 +330,25 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if not os.listdir(cop): rmdir(cop)
             if os.listdir(o): return
         case 'CHD':
-            tf = TmpFile('.img')
-            run(['chdman','extracthd','-o',tf,'-f','-i',i])
-            if not exists(tf.p): return 1
+            _,inf,_ = run(['chdman','info','-i',i],print_try=False)
 
-            if extract(tf.p,o,'IMG'): mv(tf.p,o + '/' + basename(o) + '.img')
-            tf.destroy()
+            if "Tag='CHGD'" in inf:
+                td = TmpDir()
+                run(['chdman','extractcd','-o',td + '/tmp.cue','-f','-i',i])
+                if not exists(td + '/tmp.cue'):
+                    td.destroy()
+                    return 1
+
+                if extract(td + '/tmp.cue',o,'GD-ROM CUE+BIN'):
+                    for f in os.listdir(td.p): mv(td + '/' + f,o + '/' + tbasename(i) + extname(f))
+                td.destroy()
+            else:
+                tf = TmpFile('.img')
+                run(['chdman','extracthd','-o',tf,'-f','-i',i])
+                if not exists(tf.p): return 1
+
+                if extract(tf.p,o,'IMG'): mv(tf.p,o + '/' + basename(o) + '.img')
+                tf.destroy()
             return
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
