@@ -791,14 +791,25 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if exists(o + '/$INSFILES/unarc.dll'):
                     td = TmpDir()
                     copydir(o + '/$INSFILES',td.p)
-                    remove(td + '/cls-srep.dll',td + '/cls-srep_x64.exe',td + '/cls-srep_x86.exe')
-                    copydir(dirname(db.get('cls-srep')),td.p)
+
+                    wfd64 = dirname(db.get('wfrrx64'))
+                    wfd86 = dirname(db.get('wfrrx86'))
+                    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd64 + '/V_FS.json','w'),separators=(',',':'))
+                    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd86 + '/V_FS.json','w'),separators=(',',':'))
+                    prcs = []
+                    for f in os.listdir(td.p):
+                        if f.startswith('cls-') and f.endswith('_x64.exe'): prcs.append(subprocess.Popen([db.get('wfrrx64'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
+                        elif f.startswith('cls-') and f.endswith('_x86.exe'): prcs.append(subprocess.Popen([db.get('wfrrx86'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
+
                     bcmd = ['unarc-cpp',td + '\\unarc.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
                     for f in os.listdir(dirname(i)):
                         f = dirname(i) + '\\' + f
                         if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
-                        print(run(bcmd + [f],cwd=td.p))
-                        td.destroy()
+                        run(bcmd + [f],cwd=td.p)
+                    td.destroy()
+
+                    for p in prcs: p.kill()
+                    remove(wfd64 + '/WFRR.log',wfd64 + '/V_FS.json',wfd86 + '/WFRR.log',wfd86 + '/V_FS.json')
                 return
             run(['innoextract','-e','-q','--iss-file','-g','-d',o,i])
             if os.listdir(o):

@@ -451,7 +451,7 @@
         "fs":[
         "https://update.bioruebe.com/uniextract/nightly/bin/x64/UnRAR.exe"
         ],
-        "ts":0
+        "ts":1757254045798
     },
     "upx":{
         "p":"upx.exe",
@@ -925,17 +925,41 @@
         }],
         "ts":0
     },
-    "cls-srep":{
-        "p":"cls-srep/cls-srep.dll",
+    "wfrrx64":{
+        "p":"WFRRx64/WFRR.exe",
         "fs":[{
-            "u":"https://files.catbox.moe/e9ac5w.7z",
+            "u":"https://github.com/peitaosu/WFRR/releases/download/v1.0.0/WFRR_v1.0.0.0_x64_release.zip",
             "x":{
-                "cls-srep.dll":"cls-srep/cls-srep.dll",
-                "cls-srep_x64.exe":"cls-srep/cls-srep_x64.exe",
-                "cls-srep_x86.exe":"cls-srep/cls-srep_x86.exe"
+                "WFRR.exe":"WFRRx64/WFRR.exe",
+                "FSHook.dll":"WFRRx64/FSHook.dll",
+                "RegHook.dll":"WFRRx64/RegHook.dll",
+                "WFRR.exe.config":"WFRRx64/WFRR.exe.config",
+                "EasyHook.dll":"WFRRx64/EasyHook.dll",
+                "EasyHook64.dll":"WFRRx64/EasyHook64.dll",
+                "EasyHook64Svc.exe":"WFRRx64/EasyHook64Svc.exe",
+                "EasyLoad64.dll":"WFRRx64/EasyLoad64.dll",
+                "Newtonsoft.Json.dll":"WFRRx64/Newtonsoft.Json.dll",
+                "log4net.dll":"WFRRx64/log4net.dll"
             }
-        }],
-        "ts":0
+        }]
+    },
+    "wfrrx86":{
+        "p":"WFRRx86/WFRR.exe",
+        "fs":[{
+            "u":"https://github.com/peitaosu/WFRR/releases/download/v1.0.0/WFRR_v1.0.0.0_x86_release.zip",
+            "x":{
+                "WFRR.exe":"WFRRx86/WFRR.exe",
+                "FSHook.dll":"WFRRx86/FSHook.dll",
+                "RegHook.dll":"WFRRx86/RegHook.dll",
+                "WFRR.exe.config":"WFRRx86/WFRR.exe.config",
+                "EasyHook.dll":"WFRRx86/EasyHook.dll",
+                "EasyHook32.dll":"WFRRx86/EasyHook32.dll",
+                "EasyHook32Svc.exe":"WFRRx86/EasyHook32Svc.exe",
+                "EasyLoad32.dll":"WFRRx86/EasyLoad32.dll",
+                "Newtonsoft.Json.dll":"WFRRx86/Newtonsoft.Json.dll",
+                "log4net.dll":"WFRRx86/log4net.dll"
+            }
+        }]
     },
     "e_wise":{
         "p":"E_WISE_W.EXE",
