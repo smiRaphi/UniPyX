@@ -240,5 +240,11 @@
     ],
     "Arc System Works PAC":[
         "arc system works game data package"
+    ],
+    "JFD IMG":[
+        "jfd disk image (unzipped)"
+    ],
+    "GZIP":[
+        "gzipped data"
     ]
 }

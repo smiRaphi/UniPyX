@@ -273,7 +273,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -374,6 +374,12 @@ def extract(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with zlib')
             import zlib
             try:open(o + '/' + tbasename(i),'wb').write(zlib.decompress(open(i,'rb').read()))
+            except:pass
+            else:return
+        case 'GZIP':
+            if db.print_try: print('Trying with gzip')
+            import gzip
+            try:open(o + '/' + tbasename(i),'wb').write(gzip.decompress(open(i,'rb').read()))
             except:pass
             else:return
         case 'VirtualBox Disk Image':
