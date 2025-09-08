@@ -786,37 +786,17 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
             run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y',i])
-            if not exists(o + '/{app}'): run(['innounp','-x','-m','-d' + o,'-y',i])
+            if not os.listdir(o): run(['innounp','-x','-m','-d' + o,'-y',i])
+            for x in os.listdir(o):
+                if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
             if exists(o + '/{app}'):
-                for x in os.listdir(o):
-                    if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
                 while True:
                     try:copydir(o + '/{app}',o,True)
                     except:pass
                     else:break
-                if exists(o + '/$INSFILES/unarc.dll'):
-                    td = TmpDir()
-                    copydir(o + '/$INSFILES',td.p)
-
-                    wfd64 = dirname(db.get('wfrrx64'))
-                    wfd86 = dirname(db.get('wfrrx86'))
-                    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd64 + '/V_FS.json','w'),separators=(',',':'))
-                    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd86 + '/V_FS.json','w'),separators=(',',':'))
-                    prcs = []
-                    for f in os.listdir(td.p):
-                        if f.startswith('cls-') and f.endswith('_x64.exe'): prcs.append(subprocess.Popen([db.get('wfrrx64'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
-                        elif f.startswith('cls-') and f.endswith('_x86.exe'): prcs.append(subprocess.Popen([db.get('wfrrx86'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
-
-                    bcmd = ['unarc-cpp',td + '\\unarc.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
-                    for f in os.listdir(dirname(i)):
-                        f = dirname(i) + '\\' + f
-                        if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
-                        run(bcmd + [f],cwd=td.p)
-                    td.destroy()
-
-                    for p in prcs: p.kill()
-                    remove(wfd64 + '/WFRR.log',wfd64 + '/V_FS.json',wfd86 + '/WFRR.log',wfd86 + '/V_FS.json')
+                fix_innoinstext(o,i)
                 return
+            if fix_innoinstext(o,i): return
             run(['innoextract','-e','-q','--iss-file','-g','-d',o,i])
             if os.listdir(o):
                 for x in os.listdir(o):
@@ -1322,6 +1302,35 @@ def fix_isinstext(o:str,oi:str=None):
                 try: copydir(o + '/' + x,o,True);break
                 except PermissionError: pass
     return ret
+def fix_innoinstext(o:str,i:str):
+    if not exists(o + '/$INSFILES'): return False
+    if exists(o + '/$INSFILES/unarc.dll'): uad = o + '\\$INSFILES'
+    elif exists(o + '/$INSFILES/tmp/unarc.dll'): uad = o + '\\$INSFILES\\tmp'
+    elif exists(o + '/$INSFILES/{tmp}/unarc.dll'): uad = o + '\\$INSFILES\\{tmp}'
+    else: return False
+
+    td = TmpDir()
+    copydir(uad,td.p)
+
+    wfd64 = dirname(db.get('wfrrx64'))
+    wfd86 = dirname(db.get('wfrrx86'))
+    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd64 + '/V_FS.json','w'),separators=(',',':'))
+    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd86 + '/V_FS.json','w'),separators=(',',':'))
+    prcs = []
+    for f in os.listdir(td.p):
+        if f.startswith('cls-') and f.endswith('_x64.exe'): prcs.append(subprocess.Popen([db.get('wfrrx64'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
+        elif f.startswith('cls-') and f.endswith('_x86.exe'): prcs.append(subprocess.Popen([db.get('wfrrx86'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
+
+    bcmd = ['unarc-cpp',td + '\\unarc.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
+    for f in os.listdir(dirname(i)):
+        f = dirname(i) + '\\' + f
+        if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
+        db.run(bcmd + [f],cwd=td.p)
+    td.destroy()
+
+    for p in prcs: p.kill()
+    remove(wfd64 + '/WFRR.log',wfd64 + '/V_FS.json',wfd86 + '/WFRR.log',wfd86 + '/V_FS.json')
+    return True
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     out = cleanp(out)
