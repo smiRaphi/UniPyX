@@ -876,6 +876,10 @@
     "bbccp":{
         "p":"bbccp.exe"
     },
+    "chrome-pak":{
+        "p":"chrome-pak.exe",
+        "fs":[["https://github.com/myfreeer/chrome-pak-customizer/releases/download/2.0/pak_mingw64.exe","chrome-pak.exe"]]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

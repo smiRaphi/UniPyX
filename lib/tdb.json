@@ -247,5 +247,8 @@
     ],
     "GZIP":[
         "gzipped data"
+    ],
+    "Chrome PAK":[
+        "chromium pack resource archive (v5, utf-8)"
     ]
 }

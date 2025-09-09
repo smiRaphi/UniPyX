@@ -1242,6 +1242,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
         case 'Arc System Works PAC': return quickbms('arcsys')
+        case 'Chrome PAK':
+            run(['chrome-pak','-u',i,o])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
