@@ -12,9 +12,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1756936800
+            "ts":1757196000
         }],
-        "ts":1756936800
+        "ts":1757196000
     },
     "file":{
         "p":"file/file.exe",
@@ -467,13 +467,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/df/3e/dolphin-master-2506-424-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/55/8e/dolphin-master-2506-431-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1756879579
+            "ts":1757372489
         }],
-        "ts":1756879579
+        "ts":1757372489
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -703,7 +703,7 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.2/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.3/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "Texture2DDecoderNative.dll":"AssetRipper/Texture2DDecoderNative.dll",
@@ -711,9 +711,9 @@
                 "crunch.dll":"AssetRipper/crunch.dll",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1754808194
+            "ts":1757428782
         }],
-        "ts":1754808194
+        "ts":1757428782
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -878,7 +878,11 @@
     },
     "chrome-pak":{
         "p":"chrome-pak.exe",
-        "fs":[["https://github.com/myfreeer/chrome-pak-customizer/releases/download/2.0/pak_mingw64.exe","chrome-pak.exe"]]
+        "fs":[[
+            "https://github.com/myfreeer/chrome-pak-customizer/releases/download/2.0/pak_mingw64.exe",
+            "chrome-pak.exe"
+        ]],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
@@ -945,7 +949,8 @@
                 "Newtonsoft.Json.dll":"WFRRx64/Newtonsoft.Json.dll",
                 "log4net.dll":"WFRRx64/log4net.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "wfrrx86":{
         "p":"WFRRx86/WFRR.exe",
@@ -963,7 +968,8 @@
                 "Newtonsoft.Json.dll":"WFRRx86/Newtonsoft.Json.dll",
                 "log4net.dll":"WFRRx86/log4net.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "e_wise":{
         "p":"E_WISE_W.EXE",

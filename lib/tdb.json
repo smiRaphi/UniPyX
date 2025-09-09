@@ -250,5 +250,9 @@
     ],
     "Chrome PAK":[
         "chromium pack resource archive (v5, utf-8)"
+    ],
+    "TAR":[
+        "tar - tape archive (gnu)",
+        "tar - tape archive (file)"
     ]
 }

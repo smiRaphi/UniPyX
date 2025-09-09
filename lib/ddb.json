@@ -182,6 +182,16 @@
         "rs":"NSMBW Coin World ARC","s":1
     },
     {
+        "d":["isat","SCEUF\\0\\0",0],
+        "rs":"PS3/PSV PUP","s":1
+    },
+    {
+        "rq":null,
+        "d":[["isat","ustar\\0",257,true],
+             ["isat","ustar ",  257,true]],"noq":true,
+        "rs":"TAR","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","CTPK",0],
         "rs":"CTPK","s":1

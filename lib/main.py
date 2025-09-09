@@ -273,7 +273,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -1245,6 +1245,105 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Chrome PAK':
             run(['chrome-pak','-u',i,o])
             if os.listdir(o): return
+        case 'PS3/PSV PUP':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            PUPMAP = {
+            1:{
+                0x100: 'version.txt',
+                0x101: 'license.xml',
+                0x102: 'promo_flags.txt',
+                0x103: 'update_flags.txt',
+                0x104: 'patch_build.txt',
+
+                0x200: 'ps3swu.self',
+                0x201: 'vsh.tar',
+                0x202: 'dots.txt',
+                0x203: 'patch_data.pkg',
+
+                0x501: 'spkg_hdr.tar',
+
+                0x601: 'ps3swu2.self',
+            },
+            2:{
+                0x100: 'version.txt',
+                0x101: 'license.xml',
+
+                0x200: 'psp2swu.self',
+                0x204: 'cui_setupper.self',
+                0x221: 'vs0_patch_tar_info.txt',
+                0x231: 'vs0_patch_tar_2_info.txt',
+
+                0x300: 'update_files.tar',
+                0x302: 'SLB2',
+                0x303: 'os0',
+                0x304: 'vs0',
+                0x305: 'unk_305',
+                0x306: 'unk_306',
+                0x307: 'unk_307',
+                0x308: 'unk_308',
+                0x309: 'unk_309',
+                0x30A: 'unk_30A',
+                0x30B: 'unk_30B',
+                0x30C: 'unk_30C',
+                0x30D: 'unk_30D',
+                0x30E: 'unk_30E',
+                0x30F: 'unk_30F',
+                0x310: 'unk_310',
+                0x311: 'vs0_patch_tar',
+                0x312: 'vs0_patch_tar_2',
+                0x313: 'sysscon_type_0',
+                0x314: 'sysscon_type_1',
+                0x315: 'sysscon_type_2',
+                0x316: 'sysscon_type_3',
+                0x317: 'sysscon_type_4',
+                0x318: 'sysscon_type_5',
+                0x319: 'sysscon_type_6',
+                0x31A: 'sysscon_type_7',
+                0x31B: 'sysscon_type_8',
+                0x31C: 'sysscon_type_9',
+
+                0x400: 'package_scewm.wm',
+                0x401: 'package_sceas.as',
+
+                0x2005: 'cp_es1_fw',
+                0x2006: 'cp_es2_fw',
+            }}
+
+            f = File(i,endian='<')
+            assert f.read(7) == b'SCEUF\0\0'
+            f.skip(1)
+            fv = f.readu64()
+            if fv > 0xFFFFFFFFFFF:
+                f.skip(-8)
+                f._end = '>'
+                fv = f.readu64()
+
+            assert fv in (1,2) # PS3,PSV
+
+            if fv in (1,2): f.skip(8)
+            segs = f.readu64()
+            assert 0xFFFFFFFFFFF >= segs
+            if fv == 1: f.skip(16)
+            elif fv == 2: f.skip(96)
+
+            fs = []
+            for _ in range(segs):
+                fs.append((f.readu64(),f.readu64(),f.readu64()))
+                f.skip(8)
+            for of in fs:
+                f.seek(of[1])
+                if of[0] == 0x101:
+                    xml = f.read(5)
+                    f.skip(-5)
+                    if xml in (b'<xml ',b'<?xml'): n = 'license.xml'
+                    else: n = 'resource.txt'
+                else: n = PUPMAP[fv].get(of[0],hex(of[0]))
+                tof = xopen(o + '/' + n,'wb')
+                tof.write(f.read(of[2]))
+                tof.close()
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
