@@ -884,6 +884,13 @@
         ]],
         "ts":0
     },
+    "rpgmakerdecrypter":{
+        "p":"RPGMakerDecrypter-cli.exe",
+        "fs":[
+        "https://github.com/uuksu/RPGMakerDecrypter/releases/download/v3.0.4/RPGMakerDecrypter-cli.exe"
+        ],
+        "ts":0
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

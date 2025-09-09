@@ -1344,6 +1344,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 tof.write(f.read(of[2]))
                 tof.close()
             if fs: return
+        case 'RPG Maker Archive (XP/VX/VX Ace)':
+            run(['rpgmakerdecrypter',i,'-w','-o',o])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

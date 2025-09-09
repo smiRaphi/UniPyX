@@ -254,5 +254,9 @@
     "TAR":[
         "tar - tape archive (gnu)",
         "tar - tape archive (file)"
+    ],
+    "RPG Maker Archive (XP/VX/VX Ace)":[
+        "rpg maker vx encrypted archive (v2)",
+        "rpg maker vx encrypted archive (generic)"
     ]
 }
