@@ -568,8 +568,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if os.listdir(o): return
         case 'WUX':
             from bin.wiiudk import DKeys
-            cmd = ['java','-jar',db.get('jwudtool'),'-commonkey','d7b00402659ba2abd2cb0db27fa2b656','-decrypt','-in',i,'-out',o]
-            k = DKeys().get(i)
+            kys = DKeys()
+            cmd = ['java','-jar',db.get('jwudtool'),'-commonkey',kys.get('common'),'-decrypt','-in',i,'-out',o]
+            k = kys.get(i)
             if not k: cmd.append('-dev')
             else: cmd += ['-titleKey',k]
             if db.print_try: print('Trying with jwudtool')
@@ -634,9 +635,8 @@ def extract(inp:str,out:str,t:str) -> bool:
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
-            if len(os.listdir(o)) > 1 or (os.listdir(o) and not exists(o + '/wszst-setup.txt')):
-                if exists(o + '/wszst-setup.txt'): remove(o + '/wszst-setup.txt')
-                return
+            remove(o + '/wszst-setup.txt')
+            if os.listdir(o): return
         case 'SARC':
             class Stub:
                 def __init__(self,*args,**kwargs):pass
@@ -1202,13 +1202,19 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['tdedecrypt',i + '_',of])
             if exists(of[:-1]) and (os.path.getsize(of[:-1]) or not os.path.getsize(i)): return
         case 'Unreal Engine Package':
+            if '/Content/' in i.split()[-1].replace('\\','/'): prgf = dirname(i.replace('\\','/').rsplit('/Content/',1)[0]) + '/Engine/Programs'
+            else: prgf = None
             run(['unrealpak',i,'-Extract',o])
+            if prgf and exists(prgf): remove(prgf)
             if os.listdir(o): return
 
             run(['repak','unpack','-o',o,'-q','-f',i])
             if os.listdir(o): return
         case 'Unreal ZenLoader':
+            if '/Content/' in i.split()[-1].replace('\\','/'): prgf = dirname(i.replace('\\','/').rsplit('/Content/',1)[0]) + '/Engine/Programs'
+            else: prgf = None
             run(['unrealpak',i,'-Extract',o])
+            if prgf and exists(prgf): remove(prgf)
             if os.listdir(o): return
 
             run(['zentools','ExtractPackages',dirname(i),o,'-PackageFilter=' + i])[1]
