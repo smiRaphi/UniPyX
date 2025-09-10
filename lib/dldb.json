@@ -954,6 +954,21 @@
             }
         }]
     },
+    "cethleann":{
+        "p":"Cethleann/Cethleann.DataExporter.exe",
+        "fs":[{
+            "u":"https://github.com/yretenai/Cethleann/releases/download/1.2.1/cethleann-net7-win-x86-64-rel.zip",
+            "x":{
+                "Cethleann.dll":"Cethleann/Cethleann.dll",
+                "Cethleann.DataExporter.dll":"Cethleann/Cethleann.DataExporter.dll",
+                "Cethleann.DataExporter.exe":"Cethleann/Cethleann.DataExporter.exe",
+                "Cethleann.DataExporter.runtimeconfig.json":"Cethleann/Cethleann.DataExporter.runtimeconfig.json",
+                "Cethleann.Structure.dll":"Cethleann/Cethleann.Structure.dll",
+                "Cethleann.Unbundler.dll":"Cethleann/Cethleann.Unbundler.dll",
+                "DragonLib.dll":"Cethleann/DragonLib.dll"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

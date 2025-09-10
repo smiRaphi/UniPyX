@@ -131,7 +131,7 @@ def analyze(inp:str,raw=False):
                     if os.path.exists(log) and os.path.getsize(log): break
                     sleep(0.1)
                 if os.path.exists(log):
-                    lg = open(log,encoding='utf-8').read().strip()
+                    lg = open(log,encoding='utf-8',errors='ignore').read().strip()
                     os.remove(log)
                     m = EIPER1.search(lg)
                     if m: ts.append(m[1])
@@ -1396,6 +1396,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'RPG Maker Archive (XP/VX/VX Ace)':
             run(['rpgmakerdecrypter',i,'-w','-o',o])
+            if os.listdir(o): return
+        case 'RDB':
+            run(['cethleann','--rdb','-k','-p','-y','-z',o,dirname(i),'--filelist',basename(i)])
             if os.listdir(o): return
 
         case 'Ridge Racer V A':

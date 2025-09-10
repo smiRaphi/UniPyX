@@ -10,7 +10,8 @@
         "zip archive data",
         "zip archive",
 		"android package",
-        "apkmirror bundle"
+        "apkmirror bundle",
+        "zip sfx archive"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)"

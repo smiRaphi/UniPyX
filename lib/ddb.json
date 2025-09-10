@@ -146,6 +146,10 @@
         "rs":"NCSD","s":1
     },
     {
+        "d":["isat","DRK0000",1],
+        "rs":"RDB","s":1
+    },
+    {
         "d":[["isat","NCCH",256],
              ["isat","\\0\\0\\0\\0\\0",520],
              ["isat","\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF",1376]],
