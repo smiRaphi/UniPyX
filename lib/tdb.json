@@ -258,5 +258,14 @@
     "RPG Maker Archive (XP/VX/VX Ace)":[
         "rpg maker vx encrypted archive (v2)",
         "rpg maker vx encrypted archive (generic)"
+    ],
+    "ZPAQ":[
+        "zpaq compressed archive"
+    ],
+    "yEnc":[
+        "yenc encoded"
+    ],
+    "xz":[
+        "xz compressed container"
     ]
 }

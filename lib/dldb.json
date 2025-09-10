@@ -939,6 +939,12 @@
         }],
         "ts":0
     },
+    "zpaq":{
+        "p":"zpaq.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/zpaq.exe"
+        ]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

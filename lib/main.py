@@ -273,7 +273,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -381,7 +381,13 @@ def extract(inp:str,out:str,t:str) -> bool:
             import gzip
             try:open(o + '/' + tbasename(i),'wb').write(gzip.decompress(open(i,'rb').read()))
             except:pass
-            else:return
+            else:return fix_tar(o)
+
+            run(['7z','x',i,'-o' + o,'-aoa'])
+            if os.listdir(o): return fix_tar(o)
+        case 'ZPAQ':
+            run(['zpaq','x',i,'-f','-to',o])
+            if os.listdir(o): return
         case 'VirtualBox Disk Image':
             td = TmpDir()
             run(['7z','x',i,'-o' + td,'-aoa'])
