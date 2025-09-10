@@ -86,7 +86,7 @@ def cleanp(i:str):
     while i.startswith('.\\'): i = i[1:].lstrip('\\')
     i = i.replace('\\.\\','\\')
     return os.path.realpath(i)
-def checktdb(i:list):
+def checktdb(i:list[str]) -> list[str]:
     o = []
     for x in i:
         if not x.lower() in TDBF: continue
@@ -283,7 +283,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if opt: print('Trying with input')
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
-            if os.listdir(o) and not exists(o + '/.rsrc'): return
+            if os.listdir(o) and not exists(o + '/.rsrc'): return fix_tar(o)
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
             run(['pdfimages','-j',i,o + '\\img'])
@@ -1453,6 +1453,18 @@ def fix_innoinstext(o:str,i:str):
     for p in prcs: p.kill()
     remove(wfd64 + '/WFRR.log',wfd64 + '/V_FS.json',wfd86 + '/WFRR.log',wfd86 + '/V_FS.json')
     return True
+def fix_tar(o:str,rem=True):
+    if len(os.listdir(o)) == 1:
+        f = o + '/' + os.listdir(o)[0]
+        rf = open(f,'rb')
+        rf.seek(0x101)
+        r = rf.read(6) in (b'ustar\0',b'ustar ')
+        if r:
+            r = extract(f,o,'TAR')
+            if not r and rem:
+                try:remove(f)
+                except PermissionError:pass
+            return r
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     out = cleanp(out)
