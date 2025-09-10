@@ -227,6 +227,13 @@
         "rs":"Unity Assets","s":1
     },
     {
+        "d":[["isat","-==--==--==--==-",0 ],
+             ["isat","\\x0C\\0\\0\\0"  ,32],
+             ["isat","\\x20\\0\\0\\0"  ,40],
+             ["isat","\\0\\0\\1\\0"    ,44]],
+        "rs":"Unreal ZenLoader","s":1
+    },
+    {
         "d":["contain","\\xE1\\x12\\x6F\\x5A",[-269,null]],
         "rs":"Unreal Engine Package","s":1
     },
@@ -268,6 +275,11 @@
         "rqr":null,
         "d":["name","RRV1_A"],
         "rs":"Ridge Racer V A"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".ucas"],
+        "rs":"Unreal ZenLoader"
     },
     {
         "rq":null,

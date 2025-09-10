@@ -1,4 +1,4 @@
-import re,json,ast,os,sys,subprocess,hashlib
+import re,json,ast,os,sys,subprocess,hashlib,shutil
 from time import sleep
 from shutil import rmtree,copytree,copyfile
 from lib.dldb import DLDB
@@ -807,7 +807,11 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'MSI':
             run(['lessmsi','x',i,o + '\\'])
             if exists(o + '/SourceDir') and os.listdir(o + '/SourceDir'):
-                copydir(o + '/SourceDir',o,True)
+                for _ in range(10):
+                    try:copydir(o + '/SourceDir',o,True)
+                    except PermissionError:pass
+                    except shutil.Error:pass
+                    else:break
                 return
 
             td = TmpDir()
@@ -1198,10 +1202,17 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['tdedecrypt',i + '_',of])
             if exists(of[:-1]) and (os.path.getsize(of[:-1]) or not os.path.getsize(i)): return
         case 'Unreal Engine Package':
-            if 0:
-                key = ['-a']
-            else: key = []
-            run(['repak'] + key + ['unpack','-o',o,'-q','-f',i])
+            run(['unrealpak',i,'-Extract',o])
+            if os.listdir(o): return
+
+            run(['repak','unpack','-o',o,'-q','-f',i])
+            if os.listdir(o): return
+        case 'Unreal ZenLoader':
+            run(['unrealpak',i,'-Extract',o])
+            if os.listdir(o): return
+
+            run(['zentools','ExtractPackages',dirname(i),o,'-PackageFilter=' + i])[1]
+            remove(o + '/PackageStoreManifest.json')
             if os.listdir(o): return
         case 'Danganronpa WAD':
             if db.print_try: print('Trying with wad_archiver')

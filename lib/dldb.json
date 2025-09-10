@@ -851,9 +851,10 @@
                 "System.Threading.Tasks.Extensions.dll":"UnPSARC/System.Threading.Tasks.Extensions.dll",
                 "UnPSARC.exe":"UnPSARC/UnPSARC.exe"
             }
-        },
-        "https://github.com/new-world-tools/go-oodle/releases/download/v0.2.3-files/oo2core_9_win64.dll"
-        ],
+        },[
+            "https://github.com/new-world-tools/go-oodle/releases/download/v0.2.3-files/oo2core_9_win64.dll",
+            "UnPSARC/oo2core_9_win64.dll"
+        ]],
         "ts":0
     },
     "ps5pkg":{
@@ -889,6 +890,53 @@
         "fs":[
         "https://github.com/uuksu/RPGMakerDecrypter/releases/download/v3.0.4/RPGMakerDecrypter-cli.exe"
         ],
+        "ts":0
+    },
+    "zentools":{
+        "p":"ZenTools.exe",
+        "fs":[
+        "https://github.com/WistfulHopes/ZenTools-UE4/releases/download/ue4-1.0.3/ZenTools.exe"
+        ],
+        "ts":0
+    },
+    "unrealpak":{
+        "p":"UnrealPak/UnrealPak.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/ZOAZ-Uzumaki/Rust-Rides-game.-Unreal-engine-UnrealPaks-conventor/refs/heads/main/AddonUnrealPack_Tools.rar",
+            "x":{
+                "AddonUnrealPack_Tools/UnrealPak-ApplicationCore.dll":"UnrealPak/UnrealPak-ApplicationCore.dll",
+                "AddonUnrealPack_Tools/UnrealPak-AssetRegistry.dll":"UnrealPak/UnrealPak-AssetRegistry.dll",
+                "AddonUnrealPack_Tools/UnrealPak-AutoRTFM.dll":"UnrealPak/UnrealPak-AutoRTFM.dll",
+                "AddonUnrealPack_Tools/UnrealPak-BuildSettings.dll":"UnrealPak/UnrealPak-BuildSettings.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Cbor.dll":"UnrealPak/UnrealPak-Cbor.dll",
+                "AddonUnrealPack_Tools/UnrealPak-CookMetadata.dll":"UnrealPak/UnrealPak-CookMetadata.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Core.dll":"UnrealPak/UnrealPak-Core.dll",
+                "AddonUnrealPack_Tools/UnrealPak-CorePreciseFP.dll":"UnrealPak/UnrealPak-CorePreciseFP.dll",
+                "AddonUnrealPack_Tools/UnrealPak-CoreUObject.dll":"UnrealPak/UnrealPak-CoreUObject.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DerivedDataCache.dll":"UnrealPak/UnrealPak-DerivedDataCache.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DesktopPlatform.dll":"UnrealPak/UnrealPak-DesktopPlatform.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DeveloperSettings.dll":"UnrealPak/UnrealPak-DeveloperSettings.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DeveloperToolSettings.dll":"UnrealPak/UnrealPak-DeveloperToolSettings.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DevHttp.dll":"UnrealPak/UnrealPak-DevHttp.dll",
+                "AddonUnrealPack_Tools/UnrealPak-IoStoreUtilities.dll":"UnrealPak/UnrealPak-IoStoreUtilities.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Json.dll":"UnrealPak/UnrealPak-Json.dll",
+                "AddonUnrealPack_Tools/UnrealPak-PakFile.dll":"UnrealPak/UnrealPak-PakFile.dll",
+                "AddonUnrealPack_Tools/UnrealPak-PakFileUtilities.dll":"UnrealPak/UnrealPak-PakFileUtilities.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Projects.dll":"UnrealPak/UnrealPak-Projects.dll",
+                "AddonUnrealPack_Tools/UnrealPak-RenderCore.dll":"UnrealPak/UnrealPak-RenderCore.dll",
+                "AddonUnrealPack_Tools/UnrealPak-RHI.dll":"UnrealPak/UnrealPak-RHI.dll",
+                "AddonUnrealPack_Tools/UnrealPak-RSA.dll":"UnrealPak/UnrealPak-RSA.dll",
+                "AddonUnrealPack_Tools/UnrealPak-SandboxFile.dll":"UnrealPak/UnrealPak-SandboxFile.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Sockets.dll":"UnrealPak/UnrealPak-Sockets.dll",
+                "AddonUnrealPack_Tools/UnrealPak-SSL.dll":"UnrealPak/UnrealPak-SSL.dll",
+                "AddonUnrealPack_Tools/UnrealPak-TelemetryUtils.dll":"UnrealPak/UnrealPak-TelemetryUtils.dll",
+                "AddonUnrealPack_Tools/UnrealPak-TraceLog.dll":"UnrealPak/UnrealPak-TraceLog.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Zen.dll":"UnrealPak/UnrealPak-Zen.dll",
+                "AddonUnrealPack_Tools/UnrealPak.exe":"UnrealPak/UnrealPak.exe",
+                "AddonUnrealPack_Tools/UnrealPak.modules":"UnrealPak/UnrealPak.modules",
+                "AddonUnrealPack_Tools/tbbmalloc.dll":"UnrealPak/tbbmalloc.dll"
+            }
+        }],
         "ts":0
     },
     "pdfimages":{
