@@ -945,6 +945,15 @@
         "https://mattmahoney.net/dc/zpaq.exe"
         ]
     },
+    "bzip":{
+        "p":"bzip.exe",
+        "fs":[{
+            "u":"https://sourceware.org/pub/bzip2/bzip-0.21.tar.gz",
+            "x":{
+                "bzip-0.21/bzip.exe":"bzip.exe"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

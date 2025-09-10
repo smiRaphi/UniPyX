@@ -2,7 +2,9 @@ import struct,io,os
 from hashlib import pbkdf2_hmac,md5,sha1
 
 try: from Cryptodome.Cipher import AES # type: ignore
-except: from Crypto.Cipher import AES # type: ignore
+except ImportError:
+    try: from Crypto.Cipher import AES # type: ignore
+    except ImportError: AES = None
 
 BASED = os.path.dirname(os.path.abspath(__file__)) + '/tmd_'
 
@@ -110,6 +112,7 @@ def derive_key(tid:str|bytes,pwd:str|bytes|int):
 
     return pbkdf2_hmac('sha1',get_pwd(pwd),md5(SECRET + tid).digest(),20,16)
 def encrypt_key(tid:str|bytes,key:bytes,ckey:bytes) -> bytes:
+    assert AES
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.rjust(16,b'\0')
 
