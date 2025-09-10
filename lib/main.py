@@ -498,6 +498,28 @@ def extract(inp:str,out:str,t:str) -> bool:
             for x in os.listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
+        case 'NCCH CXI':
+            e,_,_ = run(['3dstool','-xtf','cxi',i,'--header',o + '\\HNCCH.bin','--exh',o + '\\DecExH.bin','--exh-auto-key','--exefs',o + '\\DExeFS.bin','--exefs-auto-key','--exefs-top-auto-key','--romfs',o + '\\DRomFS.bin','--romfs-auto-key','--logo',o + '\\LogoLZ.bin','--plain',o + '\\PlainRGN.bin'])
+            if e: return 1
+            e,_,_ = run(['3dstool','-xtf','exefs',o + '\\DExeFS.bin','--header',o + '\\HExeFS.bin','--exefs-dir',o + '\\ExeFS'])
+            if e: return 1
+            e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
+            if e: return 1
+
+            for x in os.listdir(o):
+                if x.endswith('.bin'): remove(o + '/' + x)
+            return
+        case 'NCCH CFA':
+            e,_,_ = run(['3dstool','-xtf','cfa',i,'--header',o + '\\HNCCH.bin','--exefs',o + '\\DExeFS.bin','--exefs-auto-key','--exefs-top-auto-key','--romfs',o + '\\DRomFS.bin','--romfs-auto-key'])
+            if e: return 1
+            e,_,_ = run(['3dstool','-xtf','exefs',o + '\\DExeFS.bin','--header',o + '\\HExeFS.bin','--exefs-dir',o + '\\ExeFS'])
+            if e: return 1
+            e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
+            if e: return 1
+
+            for x in os.listdir(o):
+                if x.endswith('.bin'): remove(o + '/' + x)
+            return
         case 'NSP':
             bcd = ['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys')]
             _,e,_ = run(bcd + [i],print_try=False)

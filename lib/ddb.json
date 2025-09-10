@@ -146,6 +146,16 @@
         "rs":"NCSD","s":1
     },
     {
+        "d":[["isat","NCCH",256],
+             ["isat","\\0\\0\\0\\0\\0",520],
+             ["isat","\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF",1376]],
+        "rs":"NCCH CXI","s":1
+    },
+    {
+        "d":[["isat","NCCH",256]],
+        "rs":"NCCH CFA","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0,true],
              ["isat","\\x7F\\x43\\x4E\\x54\\0\\0\\0\\1"  ,0,true]],"noq":true,
