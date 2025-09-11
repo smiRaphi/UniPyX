@@ -12,9 +12,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1757196000
+            "ts":1757541600
         }],
-        "ts":1757196000
+        "ts":1757541600
     },
     "file":{
         "p":"file/file.exe",
@@ -943,7 +943,8 @@
         "p":"zpaq.exe",
         "fs":[
         "https://mattmahoney.net/dc/zpaq.exe"
-        ]
+        ],
+        "ts":0
     },
     "bzip":{
         "p":"bzip.exe",
@@ -952,7 +953,8 @@
             "x":{
                 "bzip-0.21/bzip.exe":"bzip.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "cethleann":{
         "p":"Cethleann/Cethleann.DataExporter.exe",
@@ -967,7 +969,15 @@
                 "Cethleann.Unbundler.dll":"Cethleann/Cethleann.Unbundler.dll",
                 "DragonLib.dll":"Cethleann/DragonLib.dll"
             }
-        }]
+        }],
+        "ts":0
+    },
+    "ddrutil":{
+        "p":"ddrutil.py",
+        "fs":[
+        "https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py"
+        ],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",

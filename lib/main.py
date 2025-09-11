@@ -215,6 +215,15 @@ def analyze(inp:str,raw=False):
                     f.seek(sp)
                     ret = f.read(len(cv)) == cv
                     f.close()
+                elif x[0] == 'isatS':
+                    f = open(inp,'rb')
+                    cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
+                    sp = x[3]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    ret = f.read(x[2]*len(cv)) == (cv*x[2])
+                    f.close()
                 elif x[0] == 'size':
                     sz = os.path.getsize(inp)
                     if type(x[1]) == int: ret = sz == x[1]
@@ -1408,6 +1417,24 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'RDB':
             run(['cethleann','--rdb','-k','-p','-y','-z',o,dirname(i),'--filelist',basename(i)])
+            if os.listdir(o): return
+        case 'Konami GAME.DAT':
+            db.get('ddrutil')
+            from bin.ddrutil import FileTable,FILE_TABLE_OFFSET,decompress # type: ignore
+
+            f = open(i,'rb')
+            f.seek(FILE_TABLE_OFFSET)
+            ft = FileTable(f)
+            d = b''
+            for fe in ft.entries:
+                if not fe.is_valid(): continue
+                of = open(o + '/' + hex(fe.filename_hash),'wb')
+                f.seek(fe.offset)
+                d = f.read(fe.length)
+                if fe.is_compressed(): d = decompress(d)
+                of.write(d)
+                of.close()
+            f.close()
             if os.listdir(o): return
 
         case 'Ridge Racer V A':
