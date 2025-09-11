@@ -291,29 +291,38 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o + '/html'): return
             remove(o + '/html')
         case 'ISO'|'IMG'|'Floppy Image'|'CDI CUE+BIN'|'CDI'|'UDF':
-            td = 'tmp' + os.urandom(8).hex()
             osj = OSJump()
             osj.jump(dirname(i))
-            run(['aaru','filesystem','extract',i,td])
-            td = os.path.realpath(td)
+            run(['aaru','filesystem','extract',i,o])
             osj.back()
-            if os.listdir(td):
-                td1 = td + '/' + os.listdir(td)[0]
+            if os.listdir(o):
+                td1 = o + '/' + os.listdir(o)[0]
                 copydir(td1 + '/' + os.listdir(td1)[0],o)
-                remove(td)
                 return
-            remove(td)
+            remove(o)
+            mkdir(o)
 
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
         case 'CUE+BIN':
-            if not extract(i,o,'ISO'): return
-            tf = TmpFile('.iso')
-            run(['bin2iso',i,tf,'-a'])
-            if exists(tf.p):
-                main_extract(i,o)
-                tf.destroy()
-                if os.listdir(o): return
+            osj = OSJump()
+            osj.jump(dirname(i))
+            run(['aaru','filesystem','extract',i,o])
+            osj.back()
+            if os.listdir(o):
+                td1 = o + '/' + os.listdir(o)[0]
+                copydir(td1 + '/' + os.listdir(td1)[0],o)
+                return
+            remove(o)
+            mkdir(o)
+
+            run(['bin2iso',i,o,'-a'])[1]
+            if os.listdir(o):
+                for f in os.listdir(o):
+                    if f.endswith('.iso'):
+                        f = o + '\\' + f
+                        if not extract(f,o,'ISO'): remove(f)
+                return
         case 'Apple Disk Image'|'Mac HFS Image'|'Roxio Toast IMG':
             _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
             try: ps = int(re.search(r'(\d+) partitions found\.',e)[1])
