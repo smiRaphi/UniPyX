@@ -293,14 +293,14 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ISO'|'IMG'|'Floppy Image'|'CDI CUE+BIN'|'CDI'|'UDF':
             osj = OSJump()
             osj.jump(dirname(i))
+            ol = os.listdir(o)
             run(['aaru','filesystem','extract',i,o])
             osj.back()
-            if os.listdir(o):
-                td1 = o + '/' + os.listdir(o)[0]
+            ol = [x for x in os.listdir(o) if x not in ol]
+            if ol:
+                td1 = o + '/' + ol[0]
                 copydir(td1 + '/' + os.listdir(td1)[0],o)
                 return
-            remove(o)
-            mkdir(o)
 
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
