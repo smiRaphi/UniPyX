@@ -836,8 +836,17 @@ def extract(inp:str,out:str,t:str) -> bool:
                 return
             if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
-            run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y',i])
-            if not os.listdir(o): run(['innounp','-x','-m','-d' + o,'-y',i])
+            _,e,_ = run(['innounp-2','-o','-q',i],print_try=False)
+            e = e.replace('\r','').replace(' ','').replace('\t','')
+            if 'Encrytedfiles:' in e and not 'Encrytedfiles:0\n' in e:
+                _,e,_ = run(['innoextract','--crack','-q',i])
+                e = e.replace('\r','').lstrip().rstrip('\n')
+                if not e.startswith('Password found:'): return 1
+                pwd = ['-p' + e.split(': ',1)[1]]
+            else: pwd = []
+
+            run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y'] + pwd + [i])
+            if not os.listdir(o): run(['innounp','-x','-m','-d' + o,'-y'] + pwd + [i])
             for x in os.listdir(o):
                 if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
             if exists(o + '/{app}'):
@@ -848,7 +857,8 @@ def extract(inp:str,out:str,t:str) -> bool:
                 fix_innoinstext(o,i)
                 return
             if fix_innoinstext(o,i): return
-            run(['innoextract','-e','-q','--iss-file','-g','-d',o,i])
+            if pwd: pwd = ['-P',pwd[2:]]
+            run(['innoextract','-e','-q','--iss-file','-g'] + pwd + ['-d',o,i])
             if os.listdir(o):
                 for x in os.listdir(o):
                     if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
