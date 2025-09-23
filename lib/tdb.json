@@ -274,5 +274,8 @@
     ],
     "BZIP2":[
         "bzip2 compressed archive"
+    ],
+    "Hollow Knight Save":[
+        "hollow knight save game"
     ]
 }

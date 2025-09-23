@@ -2,19 +2,19 @@
     "trid":{
         "p":"trid/trid.exe",
         "fs":[{
-            "u":"https://mark0.net/download/trid_w32.zip",
+            "u":"https://mark0.net/download/trid_win64.zip",
             "x":{
                 "trid.exe":"trid/trid.exe"
             },
-            "ts":1459602900
+            "ts":1758628368
         },{
             "u":"https://mark0.net/download/triddefs.zip",
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1757541600
+            "ts":1758492000
         }],
-        "ts":1757541600
+        "ts":1758628368
     },
     "file":{
         "p":"file/file.exe",
@@ -467,13 +467,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/55/8e/dolphin-master-2506-431-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/00/7c/dolphin-master-2509-49-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1757372489
+            "ts":1758313144
         }],
-        "ts":1757372489
+        "ts":1758313144
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -703,7 +703,7 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.3/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.4/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "Texture2DDecoderNative.dll":"AssetRipper/Texture2DDecoderNative.dll",
@@ -711,9 +711,9 @@
                 "crunch.dll":"AssetRipper/crunch.dll",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1757428782
+            "ts":1758514164
         }],
-        "ts":1757428782
+        "ts":1758514164
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
