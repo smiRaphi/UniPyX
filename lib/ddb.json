@@ -106,6 +106,10 @@
         "rs":"Glacier RPKG","s":1
     },
     {
+        "d":["isat","\\0\\1\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\1\\0\\0\\0\\0\\0\\0\\0\\x06\\1\\0\\0\\0",0],
+        "rs":"Hollow Knight Save","s":1
+    },
+    {
         "d":[["size",88236],["hash","95397288029c149040af17fc6d7522a3b39c943b"]],
         "rs":"Glacier PKG Def","s":1
     },

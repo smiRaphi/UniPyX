@@ -1430,6 +1430,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Konami GAME.DAT':
             db.get('ddrutil')
+            if db.print_try: print('Trying with ddrutil')
             from bin.ddrutil import FileTable,FILE_TABLE_OFFSET,decompress # type: ignore
 
             f = open(i,'rb')
@@ -1446,6 +1447,20 @@ def extract(inp:str,out:str,t:str) -> bool:
                 of.close()
             f.close()
             if os.listdir(o): return
+        case 'Hollow Knight Save':
+            if db.print_try: print('Trying with custom extractor')
+            try: from Cryptodome.Cipher import AES # type: ignore
+            except ImportError: from Crypto.Cipher import AES # type: ignore
+            from base64 import b64decode
+
+            f = open(i,'rb')
+            f.seek(0x19)
+            dat = f.read().split(b'=')[0]
+            f.close()
+            dat = AES.new(b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l',AES.MODE_ECB).decrypt(b64decode(dat + b'===='))
+
+            open(o + '/' + tbasename(i) + '.json','wb').write(dat[:-dat[-1]])
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
