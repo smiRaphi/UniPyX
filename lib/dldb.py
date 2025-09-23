@@ -74,7 +74,11 @@ class DLDB:
                         self.print_try = False
                         if ex == '.zip':
                             with zipfile.ZipFile(p,'r') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
+                                for tx in e['x']:
+                                    if tx == '*':
+                                        os.makedirs('bin/' + e['x'][tx],exist_ok=True)
+                                        z.extractall('bin/' + e['x'][tx])
+                                    else: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
                         elif ex in ['.tgz','.tar.gz']:
                             with tarfile.open(p,'r:gz') as z:
                                 for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())

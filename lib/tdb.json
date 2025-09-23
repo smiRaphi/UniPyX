@@ -26,7 +26,8 @@
     "MSCAB":[
         "microsoft cabinet archive",
         "ms cab file",
-        "mode : mszip"
+        "mode : mszip",
+        "microsoft cabinet file"
     ],
     "PDF":[
         "adobe portable document format"
@@ -39,7 +40,8 @@
         "zstandard compressed data"
     ],
     "ZLIB":[
-        "zlib compressed data (default comp.)"
+        "zlib compressed data (default comp.)",
+        "zlib compressed data (best comp.)"
     ],
     "MSCAB SFX":[
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
@@ -281,5 +283,17 @@
     "Advanced Installer":[
         "advanced installer",
         "www.caphyon.com"
+    ],
+    "CExe":[
+        "cexe compressed win32 executable",
+        "cexe executable compressor v1.0b copyright 1999, tinyware, inc.",
+        "www.tinyware.com by scott ludwig",
+        "cexe v10a",
+        "cexe v10a tinyware inc",
+        "cexe v10a additional",
+        "cexe 10a"
+    ],
+    "SZDD":[
+        "microsoft szdd compressed (haruhiko okumura's lzss)"
     ]
 }

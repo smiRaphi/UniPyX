@@ -5,6 +5,7 @@ from lib.dldb import DLDB
 
 TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
 EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
+DIER = re.compile(r'    Archive: (.+)\[.+\]')
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext,realpath = os.path.basename,os.path.dirname,os.path.splitext,os.path.realpath
@@ -101,6 +102,8 @@ def analyze(inp:str,raw=False):
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
     _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.split('\n') if x.strip()]
+    _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
+    ts += [x.split('(')[0].strip() for x in DIER.findall(o)]
 
     if isdir(inp): typ = 'directory'
     else:
@@ -282,7 +285,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2'|'SZDD':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -292,7 +295,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if opt: print('Trying with input')
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
-            if os.listdir(o) and not exists(o + '/.rsrc'): return fix_tar(o)
+            if os.listdir(o) and not exists(o + '/.rsrc'):
+                if t == 'MSCAB': fix_cab(o);return
+                else: return fix_tar(o)
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
             run(['pdfimages','-j',i,o + '\\img'])
@@ -1088,6 +1093,30 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if not f.endswith('.msi') or extract(bp + '\\' + f,o,'MSI'): mv(bp + '\\' + f,o + '\\$INSFILES\\' + f)
                 td.destroy()
                 if os.listdir(o): return
+        case 'CExe':
+            err,e,_ = run(['resourceextractor','list',i])
+            if err: return 1
+            for x in e.strip().replace('\r','').split('\n'):
+                if x.split('/')[0] == '99':
+                    tf = TmpFile()
+                    run(['resourceextractor','extract',i,x.split()[0],tf.p],print_try=False)
+                    ar,_ = analyze(tf.p,True)
+
+                    td = TmpDir()
+                    if ('SZDD' in ar and not extract(tf.p,td.p,'SZDD')) or ('ZLIB' in ar and not extract(tf.p,td.p,'ZLIB')):
+                        otf = td.p + '\\' + os.listdir(td.p)[0]
+                        if open(otf,'rb').read(8) == b'MZ\x90\0\3\0\0\0': mv(otf,o + '/' + x.split('/')[1] + '.exe')
+                        else: mv(otf,o + '/' + x.split('/')[1])
+                    else: mv(tf.p,o + '/' + x.split('/')[1])
+                    tf.destroy()
+                    td.destroy()
+
+            for f in os.listdir(o):
+                f = o + '\\' + f
+                if not f.endswith('.exe') or os.path.getsize(f) < 16384:continue
+                main_extract(f,f[:-4])
+
+            if os.listdir(o): return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
@@ -1578,6 +1607,35 @@ def fix_tar(o:str,rem=True):
                 try:remove(f)
                 except PermissionError:pass
             return r
+def fix_cab(o:str,rem=True):
+    ids = {}
+    for x in os.listdir(o):
+        if len(extname(x)) != 4 or not extname(x)[1:].isdigit(): return
+        id = int(extname(x)[1:])
+        if id in ids: return
+        ids[id] = x
+
+    if not 0 in ids: return
+    from bin.tmd import File
+    i = File(o + '/' + ids[0],endian='<')
+    if i.read(4) != b'MSCE': return
+    i.skip(0x30)
+
+    fc = i.readu16()
+    i.skip(14)
+    fso = i.readu32()
+
+    err = False
+    i.seek(fso)
+    for _ in range(fc):
+        id = i.readu16()
+        i.skip(8)
+        n = i.read(i.readu16())[:-1].decode('ascii')
+        if id not in ids: err = True
+        else: os.rename(o + '/' + ids[id],o + '/' + n)
+    i.close()
+
+    if not err and rem: remove(o + '/' + ids[0])
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     out = cleanp(out)

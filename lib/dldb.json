@@ -58,6 +58,22 @@
         ]],
         "ts":0
     },
+    "die":{
+        "p":"DiE/diec.exe",
+        "fs":[{
+            "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/die_win64_portable_3.10_x64.zip",
+            "x":{
+                "diec.exe":"DiE/diec.exe",
+                "Qt5Core.dll":"DiE/Qt5Core.dll",
+                "Qt5Script.dll":"DiE/Qt5Script.dll"
+            }
+        },{
+            "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip",
+            "x":{
+                "*":"DiE"
+            }
+        }]
+    },
     "7z":{
         "p":"7z/7z.exe",
         "fs":[{
@@ -1198,6 +1214,12 @@
             }
         }],
         "ts":0
+    },
+    "resourceextractor":{
+        "p":"ResourceExtractor.exe",
+        "fs":[
+        "https://github.com/rgl/ResourceExtractor/releases/download/v1.0.1/ResourceExtractor.exe"
+        ]
     },
     "sonic4":{
         "p":"BMS/sonic4.bms",
