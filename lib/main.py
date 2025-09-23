@@ -936,8 +936,8 @@ def extract(inp:str,out:str,t:str) -> bool:
                             of.write(b'\0\0')
                             of.close()
                         else: f.seek(-3,1)
+                f.close()
                 if ofs:
-                    f.close()
                     import zipfile
                     for x in ofs:
                         with zipfile.ZipFile(x[0]) as z: xopen(o + '/' + x[1],'wb').write(z.read(x[1]))
@@ -945,7 +945,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     if os.path.exists(o + '/_INST32I.EX_') or os.path.exists(o + '/_inst16.ex_'):
                         if fix_isinstext(o): return
                     else: return
-            f.close()
+            else: f.close()
 
             run(['isx',i,o])
             if exists(o + '/' + tbasename(i) + '_ext.bin'):
@@ -1072,6 +1072,22 @@ def extract(inp:str,out:str,t:str) -> bool:
             if bk != None: os.environ['__COMPAT_LAYER'] = bk
             else: del os.environ['__COMPAT_LAYER']
             if os.listdir(o): return
+        case 'Advanced Installer':
+            if db.print_try: print('Trying with input (/extract)')
+            td = TmpDir()
+
+            p = subprocess.Popen([i,'/extract',td.p],stdout=-1,stderr=-1)
+            for _ in range(25):
+                if p.poll() != None: break
+                sleep(0.1)
+            else: p.kill()
+
+            if os.listdir(td.p):
+                bp = td.p + '\\' + os.listdir(td.p)[0]
+                for f in os.listdir(bp):
+                    if not f.endswith('.msi') or extract(bp + '\\' + f,o,'MSI'): mv(bp + '\\' + f,o + '\\$INSFILES\\' + f)
+                td.destroy()
+                if os.listdir(o): return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
