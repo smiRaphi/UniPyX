@@ -295,5 +295,10 @@
     ],
     "SZDD":[
         "microsoft szdd compressed (haruhiko okumura's lzss)"
+    ],
+    "ACE":[
+        "ace",
+        "ace compressed archive",
+        "winace / sfx factory v2.x 32-bit"
     ]
 }

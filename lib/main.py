@@ -451,6 +451,15 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'BBC Micro SSD':
             run(['bbccp','-i',i,'.',o + '\\'])
             if os.listdir(o): return
+        case 'ACE':
+            db.get('acefile')
+            if db.print_try: print('Trying with acefile')
+            from bin.acefile import open as aceopen # type: ignore
+
+            try:
+                with aceopen(i) as f: f.extractall(path=o)
+            except: pass
+            else: return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

@@ -995,6 +995,12 @@
         ],
         "ts":0
     },
+    "acefile":{
+        "p":"acefile.py",
+        "fs":[
+        "https://raw.githubusercontent.com/droe/acefile/refs/heads/master/acefile.py"
+        ]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
