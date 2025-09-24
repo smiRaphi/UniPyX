@@ -77,6 +77,8 @@ def update():
                 ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
             elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
                 ts = ft(str(time.gmtime().tm_year),'%Y')
+            elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
+                ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%d/%m/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
 
             elif dom == 'github.com' and '/releases/download/' in u:
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]

@@ -460,6 +460,25 @@ def extract(inp:str,out:str,t:str) -> bool:
                 with aceopen(i) as f: f.extractall(path=o)
             except: pass
             else: return
+        case 'AIN':
+            if db.print_try: print('Trying with ain')
+            p = subprocess.Popen([db.get('msdos'),'-sc',db.get('ain'),'x',i],cwd=o,stdin=-1)
+
+            for t,v in ((2,b'\n'),(1,b'AIN\n'),(1,b'q')):
+                if p.poll() != None: break
+                sleep(t)
+                try: p.stdin.write(v)
+                except: pass
+
+            for _ in range(25):
+                if os.listdir(o): break
+                sleep(0.1)
+            else: p.kill()
+            while p.poll() == None: sleep(0.05)
+            try:del p
+            except:pass
+
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

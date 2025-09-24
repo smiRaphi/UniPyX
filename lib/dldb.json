@@ -1,4 +1,15 @@
 {
+    "msdos":{
+        "p":"msdos.exe",
+        "fs":[{
+            "u":"http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z",
+            "x":{
+                "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
+            },
+            "ts":1744149600
+        }],
+        "ts":1744149600
+    },
     "trid":{
         "p":"trid/trid.exe",
         "fs":[{
@@ -72,7 +83,8 @@
             "x":{
                 "*":"DiE"
             }
-        }]
+        }],
+        "ts":0
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -999,7 +1011,16 @@
         "p":"acefile.py",
         "fs":[
         "https://raw.githubusercontent.com/droe/acefile/refs/heads/master/acefile.py"
-        ]
+        ],
+        "ts":0
+    },
+    "ain":{
+        "p":"AIN.EXE",
+        "fs":[[
+            "https://www.sac.sk/download/pack/ain232.exe",
+            "AIN.EXE"
+        ]],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
@@ -1198,7 +1219,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.8.1/lessmsi-v2.8.1.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.9.0/lessmsi-v2.9.0.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -1207,9 +1228,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1756754139
+            "ts":1758645610
         }],
-        "ts":1756754139
+        "ts":1758645610
     },
     "msix":{
         "p":"MsiX.exe",
@@ -1225,7 +1246,8 @@
         "p":"ResourceExtractor.exe",
         "fs":[
         "https://github.com/rgl/ResourceExtractor/releases/download/v1.0.1/ResourceExtractor.exe"
-        ]
+        ],
+        "ts":0
     },
     "sonic4":{
         "p":"BMS/sonic4.bms",

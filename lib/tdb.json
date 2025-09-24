@@ -300,5 +300,9 @@
         "ace",
         "ace compressed archive",
         "winace / sfx factory v2.x 32-bit"
+    ],
+    "AIN":[
+        "ain compressed archive",
+        "ainexe compressed 16bit dos executable"
     ]
 }

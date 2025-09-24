@@ -34,7 +34,7 @@ class DLDB:
         else:
             p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=-1,stderr=-1,stdin=-1 if stdin != None else None,**kwargs)
             if timeout:
-                for _ in range(timeout*10):
+                for _ in range(int(timeout*10)):
                     if p.poll() != None: break
                     sleep(0.1)
                 else: p.kill()
