@@ -186,7 +186,7 @@ def analyze(inp:str,raw=False):
             if x[0] == 'py':
                 lc = {}
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename},locals=lc)
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'exists':exists},locals=lc)
                     ret = lc['check'](inp)
                 except:
                     print(x[1])
@@ -231,6 +231,7 @@ def analyze(inp:str,raw=False):
                     sz = os.path.getsize(inp)
                     if type(x[1]) == int: ret = sz == x[1]
                     else: ret = (x[1][0] == None or sz >= x[1][0]) and (x[1][1] == None or sz <= x[1][1])
+                elif x[0] == 's%': ret = os.path.getsize(inp) % x[1] == 0
                 elif x[0] == 'hash':
                     hs = x[1].lower()
                     if len(hs) == 40: h = hashlib.sha1
@@ -1264,23 +1265,117 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'LEGO JAM': return quickbms('legoracer_jam')
         case 'Metroid Samus Returns PKG': return quickbms('metroid_sr_3ds')
         case 'DDR DAT':
-            MODS = ['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']
+            if db.print_try: print('Trying with custom extractor')
 
-            for x in os.listdir(dirname(i)):
-                if x.upper() in MODS: ex = dirname(i) + '\\' + x;break
-            else:
-                for x in os.listdir(dirname(dirname(i))):
-                    if x.upper() in MODS: ex = dirname(dirname(i)) + '\\' + x;break
-                else: return 1
+            d = dirname(i)
+            for _ in range(3):
+                if exists(d + '/SYSTEM.CNF'): break
+                d = dirname(d)
+            else: return 1
+            mf = d + '/' + re.search(r'cdrom0:\\(.+);\d+\n',open(d + '/SYSTEM.CNF').read())[1]
+            if not exists(mf): return 1
 
-            osj = OSJump()
-            tf1,tf2 = TmpFile(name=basename(i).upper()),TmpFile(name=basename(ex).upper())
-            tf1.link(i),tf2.link(ex)
-            osj.jump(TMP)
-            r = quickbms('ddr_dat',tf2)
-            osj.back()
-            tf1.destroy(),tf2.destroy()
-            return r
+            f = open(mf,'rb')
+            size = f.seek(0,2)
+            f.seek(0)
+            if f.read(4) != b'\x7FELF': return 1
+
+            def read32(): return int.from_bytes(f.read(4),'little')
+            def skip(n): f.seek(n,1)
+            def cs(): return size-f.tell()
+            def reads(max=0xFF):
+                t = b''
+                for _ in range(max):
+                    t += f.read(1)
+                    if t[-1] == 0: break
+                return t
+            def testb():
+                b = f.read(1)
+                if b: f.seek(-1,1)
+                return bool(b)
+
+            f.seek(0x38)
+            hsize = read32()
+            load = read32()
+            f.seek(load)
+
+            ENTRY_SIZE = 4 * 11
+            def read_table(ver=0) -> float:
+                fs = read32()
+                if fs == 0 or (fs*(ENTRY_SIZE + (4 if ver == 0 else 0))) > cs(): return -1
+
+                tab = []
+                for i in range(fs):
+                    if read32() != i: return -2 # ID
+                    t = read32()
+                    if t > 0xFF: return -3
+                    if t > 0x10: return -3.1 # type
+                    if i == 0 and t != 1: return -3.2
+                    if ver == 1: skip(4)
+
+                    s = read32()
+                    if s == 0: return -4 # size
+                    o = read32() * 0x800
+
+                    no = read32()
+                    if no == 0: return -6.1 # name offset
+                    no = no - load + hsize
+                    if no < 0 or no > size: return -6 # name offset
+
+                    skip(4) # hash
+                    if read32() not in (0x7D6,0x7D5): return -8 # ?
+                    for _ in range(4):
+                        if read32() > 0xFF: return -9 # small values
+
+                    pos = f.tell()
+                    f.seek(no)
+                    n = reads()
+                    if n[-1] != 0: return -10
+                    try: n = n[:-1].decode('ascii')
+                    except: return -10
+                    f.seek(pos)
+
+                    tab.append({
+                        'o':o,
+                        's':s,
+                        'n':n or f'0x{i:x}.bin'
+                    })
+
+                return tab
+
+            tabs = []
+            while testb():
+                cp = f.tell()
+                r = read_table()
+                if type(r) == list:
+                    #print(f'Found table at 0x{cp:X} to 0x{f.tell():X}')
+                    tabs.append(r)
+                else:
+                    #if r <= -8: print(f'0x{cp:X} 0x{f.tell()-4:X}',r)
+                    f.seek(cp+4)
+
+            f.seek(load)
+            while testb():
+                cp = f.tell()
+                r = read_table(1)
+                if type(r) == list:
+                    #print(f'Found v1 table at 0x{cp:X} to 0x{f.tell():X}')
+                    tabs.append(r)
+                else:
+                    #if r <= -8: print('v1',f'0x{cp:X}',f'0x{f.tell()-4:X}',r)
+                    f.seek(cp+4)
+
+            ds = os.path.getsize(i)
+            for t in tabs:
+                lt = max([x['o'] + x['s'] for x in t])
+                if lt == ds:
+                    for xf in t:
+                        f.seek(xf['o'])
+                        os.makedirs(o + '/' + os.path.dirname(xf['n']),exist_ok=True)
+                        open(o + '/' + xf['n'],'wb').write(f.read(xf['s']))
+                    f.close()
+                    return
+            f.close()
         case 'Allegro DAT':
             run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
             if os.listdir(o): return
