@@ -1022,6 +1022,15 @@
         ]],
         "ts":0
     },
+    "ha":{
+        "p":"HA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/ha0999.zip",
+            "x":{
+                "HA.EXE":"HA.EXE"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

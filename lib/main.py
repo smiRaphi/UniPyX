@@ -480,6 +480,10 @@ def extract(inp:str,out:str,t:str) -> bool:
             except:pass
 
             if os.listdir(o): return
+        case 'HA':
+            if db.print_try: print('Trying with ha')
+            run(['msdos',db.get('ha'),'xqy',i],print_try=False,cwd=o)
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
