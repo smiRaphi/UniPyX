@@ -6,9 +6,9 @@
             "x":{
                 "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
             },
-            "ts":1744149600
+            "ts":1758837600
         }],
-        "ts":1744149600
+        "ts":1758837600
     },
     "trid":{
         "p":"trid/trid.exe",
@@ -23,9 +23,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1758492000
+            "ts":1758751200
         }],
-        "ts":1758628368
+        "ts":1758751200
     },
     "file":{
         "p":"file/file.exe",
@@ -335,71 +335,15 @@
         "ts":0
     },
     "aaru":{
-        "p":"Aaru/aaru.exe",
+        "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v5.4.1/aaru-5.4.1_windows_x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.11/aaru-6.0.0-alpha.11_windows-x64.zip",
             "x":{
-                "Aaru.Checksums.dll":"Aaru/Aaru.Checksums.dll",
-                "Aaru.CommonTypes.dll":"Aaru/Aaru.CommonTypes.dll",
-                "Aaru.Compression.dll":"Aaru/Aaru.Compression.dll",
-                "Aaru.Console.dll":"Aaru/Aaru.Console.dll",
-                "Aaru.Core.dll":"Aaru/Aaru.Core.dll",
-                "Aaru.Database.dll":"Aaru/Aaru.Database.dll",
-                "Aaru.Decoders.dll":"Aaru/Aaru.Decoders.dll",
-                "Aaru.Decryption.dll":"Aaru/Aaru.Decryption.dll",
-                "aaru.deps.json":"Aaru/aaru.deps.json",
-                "Aaru.Devices.dll":"Aaru/Aaru.Devices.dll",
-                "aaru.dll":"Aaru/aaru.dll",
-                "Aaru.Dto.dll":"Aaru/Aaru.Dto.dll",
-                "aaru.exe":"Aaru/aaru.exe",
-                "Aaru.Filesystems.dll":"Aaru/Aaru.Filesystems.dll",
-                "Aaru.Filters.dll":"Aaru/Aaru.Filters.dll",
-                "Aaru.Helpers.dll":"Aaru/Aaru.Helpers.dll",
-                "Aaru.Images.dll":"Aaru/Aaru.Images.dll",
-                "Aaru.Partitions.dll":"Aaru/Aaru.Partitions.dll",
-                "aaru.runtimeconfig.json":"Aaru/aaru.runtimeconfig.json",
-                "Aaru.Settings.dll":"Aaru/Aaru.Settings.dll",
-                "Castle.Core.dll":"Aaru/Castle.Core.dll",
-                "Claunia.Encoding.dll":"Aaru/Claunia.Encoding.dll",
-                "Claunia.RsrcFork.dll":"Aaru/Claunia.RsrcFork.dll",
-                "DotNetZip.dll":"Aaru/DotNetZip.dll",
-                "e_sqlite3.dll":"Aaru/e_sqlite3.dll",
-                "JetBrains.Annotations.dll":"Aaru/JetBrains.Annotations.dll",
-                "Microsoft.Data.Sqlite.dll":"Aaru/Microsoft.Data.Sqlite.dll",
-                "Microsoft.EntityFrameworkCore.Abstractions.dll":"Aaru/Microsoft.EntityFrameworkCore.Abstractions.dll",
-                "Microsoft.EntityFrameworkCore.dll":"Aaru/Microsoft.EntityFrameworkCore.dll",
-                "Microsoft.EntityFrameworkCore.Proxies.dll":"Aaru/Microsoft.EntityFrameworkCore.Proxies.dll",
-                "Microsoft.EntityFrameworkCore.Relational.Design.dll":"Aaru/Microsoft.EntityFrameworkCore.Relational.Design.dll",
-                "Microsoft.EntityFrameworkCore.Relational.dll":"Aaru/Microsoft.EntityFrameworkCore.Relational.dll",
-                "Microsoft.EntityFrameworkCore.Sqlite.Design.dll":"Aaru/Microsoft.EntityFrameworkCore.Sqlite.Design.dll",
-                "Microsoft.EntityFrameworkCore.Sqlite.dll":"Aaru/Microsoft.EntityFrameworkCore.Sqlite.dll",
-                "Microsoft.Extensions.Caching.Abstractions.dll":"Aaru/Microsoft.Extensions.Caching.Abstractions.dll",
-                "Microsoft.Extensions.Caching.Memory.dll":"Aaru/Microsoft.Extensions.Caching.Memory.dll",
-                "Microsoft.Extensions.Configuration.Abstractions.dll":"Aaru/Microsoft.Extensions.Configuration.Abstractions.dll",
-                "Microsoft.Extensions.DependencyInjection.Abstractions.dll":"Aaru/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-                "Microsoft.Extensions.DependencyInjection.dll":"Aaru/Microsoft.Extensions.DependencyInjection.dll",
-                "Microsoft.Extensions.DependencyModel.dll":"Aaru/Microsoft.Extensions.DependencyModel.dll",
-                "Microsoft.Extensions.Logging.Abstractions.dll":"Aaru/Microsoft.Extensions.Logging.Abstractions.dll",
-                "Microsoft.Extensions.Logging.dll":"Aaru/Microsoft.Extensions.Logging.dll",
-                "Microsoft.Extensions.Options.dll":"Aaru/Microsoft.Extensions.Options.dll",
-                "Microsoft.Extensions.Primitives.dll":"Aaru/Microsoft.Extensions.Primitives.dll",
-                "Newtonsoft.Json.dll":"Aaru/Newtonsoft.Json.dll",
-                "plist-cil.dll":"Aaru/plist-cil.dll",
-                "SharpCompress.dll":"Aaru/SharpCompress.dll",
-                "SQLitePCLRaw.batteries_v2.dll":"Aaru/SQLitePCLRaw.batteries_v2.dll",
-                "SQLitePCLRaw.core.dll":"Aaru/SQLitePCLRaw.core.dll",
-                "SQLitePCLRaw.provider.e_sqlite3.dll":"Aaru/SQLitePCLRaw.provider.e_sqlite3.dll",
-                "System.CodeDom.dll":"Aaru/System.CodeDom.dll",
-                "System.CommandLine.dll":"Aaru/System.CommandLine.dll",
-                "System.Diagnostics.EventLog.dll":"Aaru/System.Diagnostics.EventLog.dll",
-                "System.Diagnostics.EventLog.Messages.dll":"Aaru/System.Diagnostics.EventLog.Messages.dll",
-                "System.Management.dll":"Aaru/System.Management.dll",
-                "System.Resources.Extensions.dll":"Aaru/System.Resources.Extensions.dll",
-                "System.Security.Permissions.dll":"Aaru/System.Security.Permissions.dll"
+                "aaru.exe":"aaru.exe"
             },
-            "ts":1755162013
+            "ts":1755817825
         }],
-        "ts":1755162013
+        "ts":1755817825
     },
     "ancient":{
         "p":"ancient.exe",
@@ -424,7 +368,7 @@
     "gameextractor":{
         "p":"GameExtractor/GameExtractor.jar",
         "fs":[{
-            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0001/extract.zip",
+            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0002/extract.zip",
             "x":{
                 "GameExtractor.jar":"GameExtractor/GameExtractor.jar",
                 "settings/default.xml":"GameExtractor/settings/default.xml",
@@ -433,9 +377,10 @@
                 "interface/default.xml":"GameExtractor/interface/default.xml",
                 "interface/SidePanel_DirectoryList.xml":"GameExtractor/interface/SidePanel_DirectoryList.xml",
                 "interface/SidePanel_DirectoryList_ReadPanel.xml":"GameExtractor/interface/SidePanel_DirectoryList_ReadPanel.xml"
-            }
+            },
+            "ts":1758799912
         }],
-        "ts":0
+        "ts":1758799912
     },
     "buildgdi":{
         "p":"buildgdi.exe",
@@ -1029,7 +974,8 @@
             "x":{
                 "HA.EXE":"HA.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
@@ -1228,7 +1174,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.9.0/lessmsi-v2.9.0.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.0/lessmsi-v2.10.0.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -1237,9 +1183,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1758645610
+            "ts":1758735297
         }],
-        "ts":1758645610
+        "ts":1758735297
     },
     "msix":{
         "p":"MsiX.exe",

@@ -308,27 +308,32 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ISO'|'IMG'|'Floppy Image'|'CDI CUE+BIN'|'CDI'|'UDF':
             osj = OSJump()
             osj.jump(dirname(i))
-            ol = os.listdir(o)
-            run(['aaru','filesystem','extract',i,o])
+            td = 'tmp' + os.urandom(8).hex()
+            run(['aaru','filesystem','extract',i,td])
             osj.back()
-            ol = [x for x in os.listdir(o) if x not in ol]
-            if ol:
-                td1 = o + '/' + ol[0]
+            td = dirname(i) + '\\' + td
+            if os.listdir(td):
+                td1 = td + '/' + os.listdir(td)[0]
                 copydir(td1 + '/' + os.listdir(td1)[0],o)
+                remove(td)
                 return
+            remove(td)
 
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
         case 'CUE+BIN':
             osj = OSJump()
             osj.jump(dirname(i))
-            run(['aaru','filesystem','extract',i,o])
+            td = 'tmp' + os.urandom(8).hex()
+            run(['aaru','filesystem','extract',i,td])
             osj.back()
-            if os.listdir(o):
-                td1 = o + '/' + os.listdir(o)[0]
+            td = dirname(i) + '\\' + td
+            if os.listdir(td):
+                td1 = td + '/' + os.listdir(td)[0]
                 copydir(td1 + '/' + os.listdir(td1)[0],o)
+                remove(td)
                 return
-            remove(o)
+            remove(o,td)
             mkdir(o)
 
             run(['bin2iso',i,o,'-a'])[1]

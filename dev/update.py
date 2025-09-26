@@ -11,7 +11,7 @@ GFMTS = {
     'ip7z/7zip':lambda tag:f'7z{tag.replace(".","")}-x64.msi',
     'julian-r/file-windows':lambda tag:f'file_{tag[1:]}-build104-vs2022-x64.zip',
     'ExeinfoASL/ASL':lambda tag:f'Exeinfo_{tag[1:].replace(".","")}.zip',
-    'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows_x64.zip',
+    'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows-x64.zip',
     'temisu/ancient':lambda tag:f'ancient_{tag[1:]}.zip',
     'Sappharad/GDIbuilder':lambda tag:f'gdibuilder{tag[1:].replace(".","")}_cmd_win_x64.zip',
     'upx/upx':lambda tag:f'upx-{tag[1:]}-win64.zip',
@@ -78,11 +78,13 @@ def update():
             elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
                 ts = ft(str(time.gmtime().tm_year),'%Y')
             elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
-                ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%d/%m/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
+                ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
 
             elif dom == 'github.com' and '/releases/download/' in u:
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]
-                s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
+
+                if repo in ('aaru-dps/Aaru',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
                 tag = GRELTG.search(s)[1]
                 if ts > ots:
