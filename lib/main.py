@@ -1209,6 +1209,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 main_extract(f,f[:-4])
 
             if os.listdir(o): return
+        case 'PyInstaller':
+            run(['pyinstxtractor-ng',i],cwd=o)
+            if exists(o + '/' + basename(i) + '_extracted'):
+                copydir(o + '/' + basename(i) + '_extracted',o,True)
+                return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()

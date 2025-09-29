@@ -23,9 +23,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1758924000
+            "ts":1759096800
         }],
-        "ts":1758924000
+        "ts":1759096800
     },
     "file":{
         "p":"file/file.exe",
@@ -1022,20 +1022,30 @@
         "p":"DSKInfoV3.py",
         "fs":[
         "https://raw.githubusercontent.com/muckypaws/AmstradDSKExplorer/refs/heads/master/DSKInfoV3.py"
-        ]
+        ],
+        "ts":0
     },
     "cadius":{
         "p":"cadius.exe",
         "fs":[
         "https://github.com/mach-kernel/cadius/releases/download/1.4.5/cadius.exe"
-        ]
+        ],
+        "ts":0
     },
     "acx":{
         "p":"acx.jar",
         "fs":[[
             "https://github.com/AppleCommander/AppleCommander/releases/download/12.0/AppleCommander-acx-12.0.jar",
             "acx.jar"
-        ]]
+        ]],
+        "ts":0
+    },
+    "pyinstxtractor-ng":{
+        "p":"pyinstxtractor-ng.exe",
+        "fs":[
+        "https://github.com/pyinstxtractor/pyinstxtractor-ng/releases/download/2025.01.05/pyinstxtractor-ng.exe"
+        ],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
