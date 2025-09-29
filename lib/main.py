@@ -312,7 +312,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['aaru','filesystem','extract',i,td])
             osj.back()
             td = dirname(i) + '\\' + td
-            if os.listdir(td):
+            if exists(td) and os.listdir(td):
                 td1 = td + '/' + os.listdir(td)[0]
                 copydir(td1 + '/' + os.listdir(td1)[0],o)
                 remove(td)
@@ -320,7 +320,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             remove(td)
 
             run(['7z','x',i,'-o' + o,'-aou'])
-            if os.listdir(o): return
+            if exists(o) and os.listdir(o): return
         case 'CUE+BIN':
             osj = OSJump()
             osj.jump(dirname(i))
@@ -328,7 +328,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['aaru','filesystem','extract',i,td])
             osj.back()
             td = dirname(i) + '\\' + td
-            if os.listdir(td):
+            if exists(td) and os.listdir(td):
                 td1 = td + '/' + os.listdir(td)[0]
                 copydir(td1 + '/' + os.listdir(td1)[0],o)
                 remove(td)
@@ -356,8 +356,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 mkdir(cop)
                 _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','NONE','-partition',p,'--',i],print_try=False,env=ce)
                 if 'Failed to create directory ' in e: return 1
-                if not os.listdir(cop): rmdir(cop)
+                if exists(cop) and not os.listdir(cop): rmdir(cop)
+            if not exists(o): mkdir(o)
             if os.listdir(o): return
+
+            return extract(i,o,'ISO')
         case 'CHD':
             _,inf,_ = run(['chdman','info','-i',i],print_try=False)
 
@@ -726,6 +729,14 @@ def extract(inp:str,out:str,t:str) -> bool:
                         if extract(ifl,odr,'U8'): copy(ifl,odr + '.bin')
                     else: copy(ifl,odr + '.bin')
             return
+        case '3DO IMG':
+            run(['3dt','unpack','-o',o,i])
+            if os.listdir(o) and os.listdir(o + '/' + basename(i) + '.unpacked'):
+                copydir(o + '/' + basename(i) + '.unpacked',o,True)
+                return
+        case 'Amiga IMG':
+            run(['uaeunp','-x',i,'**'],cwd=o)
+            if os.listdir(o): return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
@@ -1646,6 +1657,9 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             open(o + '/' + tbasename(i) + '.json','wb').write(dat[:-dat[-1]])
             return
+        case 'Initial D XAF':
+            run(['assamunpack',i],cwd=o)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

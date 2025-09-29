@@ -977,6 +977,25 @@
         }],
         "ts":0
     },
+    "3dt":{
+        "p":"3dt.exe",
+        "fs":[[
+            "https://github.com/trapexit/3dt/releases/download/1.1.1/3dt_win64.exe",
+            "3dt.exe"
+        ]]
+    },
+    "assamunpack":{
+        "p":"assamUnpack.exe"
+    },
+    "uaeunp":{
+        "p":"uaeunp.exe",
+        "fs":[{
+            "u":"https://download.abime.net/winuae/stuff/uaeunp-0.8.zip",
+            "x":{
+                "uaeunp.exe":"uaeunp.exe"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

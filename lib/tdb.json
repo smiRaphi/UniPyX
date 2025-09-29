@@ -307,5 +307,11 @@
     ],
     "HA":[
         "ha compressed archive"
+    ],
+    "Amiga IMG":[
+        "amiga disk image file (ofs)",
+        "amiga disk image file (generic)",
+        "ext2 extended amiga disk image file",
+        "disk masher system compressed disk image"
     ]
 }
