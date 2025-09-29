@@ -86,9 +86,11 @@ def update():
 
                 if repo in ('aaru-dps/Aaru',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
+
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
                 tag = GRELTG.search(s)[1]
-                if ts > ots:
+
+                if (repo != 'mach-kernel/cadius' or tag != '1.4.3') and ts > ots:
                     if repo in GFMTS:
                         if repo == 'peitaosu/WFRR': of = GFMTS[repo](tag,u.split('_')[-2])
                         else: of = GFMTS[repo](tag)

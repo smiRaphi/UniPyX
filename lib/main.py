@@ -45,6 +45,15 @@ def xopen(f:str,m='r',encoding='utf-8'):
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding)
+def rldir(i:str,files=True):
+    o = []
+    for x in os.listdir(str(i)):
+        x = str(i) + '\\' + x
+        if isfile(x): o.append(x)
+        else:
+            if not files: o.append(x)
+            o += rldir(x)
+    return o
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'
 def gtmp(suf=''): return TMP + 'tmp' + os.urandom(8).hex() + suf
@@ -504,9 +513,16 @@ def extract(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with amstradcpcexplorer')
             run([sys.executable,db.get('amstradcpcexplorer'),i,'-dir','-ex'],print_try=False,cwd=o)
             if os.listdir(o): return
-        case '2MG':
-            run(['cadius','EXTRACTVOLUME',i,o])
-            if os.listdir(o): return
+        case '2MG'|'Apple DOS IMG':
+            td = 'tmp' + os.urandom(8).hex()
+            run(['cadius','EXTRACTVOLUME',i,td])
+            if os.listdir(td):
+                copydir(td,o,True)
+                for f in rldir(o):
+                    if f.endswith('\\_FileInformation.txt'): remove(f)
+                    else: rename(f,f[:-7])
+                return
+            remove(td)
 
             if db.print_try: print('Trying with acx')
             run(['java','-jar',db.get('acx'),'x','--suggested','-d',i,'-o',o],print_try=False)

@@ -328,5 +328,8 @@
     ],
     "2MG":[
         "2img universal format disk image (apple ii)"
+    ],
+    "Apple DOS IMG":[
+        "apple ii prodos disk image"
     ]
 }
