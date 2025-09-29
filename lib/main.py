@@ -1700,6 +1700,15 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Initial D XAF':
             run(['assamunpack',i],cwd=o)
             if os.listdir(o): return
+        case 'Safari WebArchive':
+            db.get('pywebarchive')
+            if db.print_try: print('Trying with pywebarchive')
+            import bin.webarchive # type: ignore
+
+            try:
+                with bin.webarchive.open(i) as f: f.extract(o + '/' + tbasename(i) + '.html',False)
+            except bin.webarchive.WebArchiveError: pass
+            else: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

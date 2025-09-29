@@ -1047,6 +1047,21 @@
         ],
         "ts":0
     },
+    "pywebarchive":{
+        "p":"webarchive/webarchive.py",
+        "fs":[{
+            "u":"https://github.com/bmjcode/pywebarchive/archive/refs/heads/master.zip",
+            "x":{
+                "pywebarchive-master/webarchive/webarchive.py":"webarchive/webarchive.py",
+                "pywebarchive-master/webarchive/__init__.py":"webarchive/__init__.py",
+                "pywebarchive-master/webarchive/exceptions.py":"webarchive/exceptions.py",
+                "pywebarchive-master/webarchive/webresource.py":"webarchive/webresource.py",
+                "pywebarchive-master/webarchive/util.py":"webarchive/util.py"
+            },
+            "ts":0
+        }],
+        "ts":0
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
