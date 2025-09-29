@@ -325,5 +325,8 @@
     ],
     "CPC IMG":[
         "cpcemu disk image format"
+    ],
+    "2MG":[
+        "2img universal format disk image (apple ii)"
     ]
 }

@@ -504,6 +504,13 @@ def extract(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with amstradcpcexplorer')
             run([sys.executable,db.get('amstradcpcexplorer'),i,'-dir','-ex'],print_try=False,cwd=o)
             if os.listdir(o): return
+        case '2MG':
+            run(['cadius','EXTRACTVOLUME',i,o])
+            if os.listdir(o): return
+
+            if db.print_try: print('Trying with acx')
+            run(['java','-jar',db.get('acx'),'x','--suggested','-d',i,'-o',o],print_try=False)
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
