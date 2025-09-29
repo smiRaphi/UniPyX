@@ -344,5 +344,10 @@
     ],
     "Atari ATR":[
         "atari atr disk image"
+    ],
+    "WIM":[
+        "windows imaging format (wim)",
+        "windows imaging format (generic)",
+        "windows imaging format"
     ]
 }

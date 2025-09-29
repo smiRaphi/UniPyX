@@ -1107,10 +1107,22 @@
         "p":"ARQ.EXE",
         "fs":[
         "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/ARQ.EXE"
-        ]
+        ],
+        "ts":0
     },
     "atr":{
         "p":"atr.exe"
+    },
+    "wimlib":{
+        "p":"wimlib/wimlib-imagex.exe",
+        "fs":[{
+            "u":"https://wimlib.net/downloads/wimlib-1.14.4-windows-x86_64-bin.zip",
+            "x":{
+                "wimlib-imagex.exe":"wimlib/wimlib-imagex.exe",
+                "libwim-15.dll":"wimlib/libwim-15.dll"
+            }
+        }],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",

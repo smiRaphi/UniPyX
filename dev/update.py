@@ -140,6 +140,14 @@ def update():
                     nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
                     if nu != u: u = nu
                     else: ts = 0
+            elif dom == 'wimlib.net':
+                s = c.get('https://wimlib.net/')
+                m = re.search(r'Current release: (wimlib\-\d+\.\d+\.\d+) \(released (\w+ \d{1,2}, \d{4})\)',s)
+                ts = ft(m[2],'%B %d, %Y')
+                if ts > ots:
+                    nu = f'https://wimlib.net/downloads/{m[1]}-windows-x86_64-bin.zip'
+                    if nu != u: u = nu
+                    else: ts = 0
 
             if ts > ots:
                 print(k,'->',u)

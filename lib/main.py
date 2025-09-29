@@ -1719,6 +1719,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 with bin.webarchive.open(i) as f: f.extract(o + '/' + tbasename(i) + '.html',False)
             except bin.webarchive.WebArchiveError: pass
             else: return
+        case 'WIM':
+            run(['wimlib','apply',i,o])
+            if os.listdir(o): return
+
+            return extract(i,o,'7z')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
