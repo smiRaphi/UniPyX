@@ -1047,6 +1047,47 @@
         ],
         "ts":0
     },
+    "ar":{
+        "p":"binutils/ar.exe",
+        "fs":[{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-binutils-2.45-2-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/ar.exe":"binutils/ar.exe"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gettext-runtime-0.26-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libintl-8.dll":"binutils/libintl-8.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r179.g8181947cc-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libwinpthread-1.dll":"binutils/libwinpthread-1.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.18-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libiconv-2.dll":"binutils/libiconv-2.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.3.1-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/zlib1.dll":"binutils/zlib1.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zstd-1.5.7-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libzstd.dll":"binutils/libzstd.dll"
+            },
+            "ts":0
+        }],
+        "ts":0
+    },
     "pywebarchive":{
         "p":"webarchive/webarchive.py",
         "fs":[{
@@ -1061,6 +1102,12 @@
             "ts":0
         }],
         "ts":0
+    },
+    "arq":{
+        "p":"ARQ.EXE",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/ARQ.EXE"
+        ]
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",

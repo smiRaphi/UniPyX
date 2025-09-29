@@ -334,5 +334,12 @@
     ],
     "Safari WebArchive":[
         "apple safari webarchive"
+    ],
+    "AR":[
+        "library",
+        "ar archive"
+    ],
+    "ARQ":[
+        "arq archive"
     ]
 }

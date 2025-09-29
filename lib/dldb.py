@@ -82,6 +82,15 @@ class DLDB:
                         elif ex in ['.tgz','.tar.gz']:
                             with tarfile.open(p,'r:gz') as z:
                                 for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
+                        elif ex in ['.txz','.tar.xz']:
+                            with tarfile.open(p,'r:xz') as z:
+                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
+                        elif ex in ['.tzt','.tar.zst']:
+                            td = gtmp()
+                            self.run(['7z','x','-y','-o' + td,p])
+                            with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
+                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
+                            rmtree(td)
                         elif ex == '.7z':
                             td = gtmp()
                             self.run(['7z','x','-y','-o' + td,p])
