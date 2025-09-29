@@ -779,6 +779,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Amiga IMG':
             run(['uaeunp','-x',i,'**'],cwd=o)
             if os.listdir(o): return
+        case 'Atari ATR':
+            run(['atr',i,'x','-a'],cwd=o)
+            if os.listdir(o): return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])

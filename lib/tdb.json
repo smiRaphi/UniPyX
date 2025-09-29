@@ -341,5 +341,8 @@
     ],
     "ARQ":[
         "arq archive"
+    ],
+    "Atari ATR":[
+        "atari atr disk image"
     ]
 }

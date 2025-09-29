@@ -1109,6 +1109,9 @@
         "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/ARQ.EXE"
         ]
     },
+    "atr":{
+        "p":"atr.exe"
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
