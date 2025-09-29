@@ -316,5 +316,8 @@
     ],
     "AKT":[
         "akt compressed archive (generic)"
+    ],
+    "AMGC":[
+        "amgc compressed archive"
     ]
 }

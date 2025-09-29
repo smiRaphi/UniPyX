@@ -23,9 +23,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1758751200
+            "ts":1758924000
         }],
-        "ts":1758751200
+        "ts":1758924000
     },
     "file":{
         "p":"file/file.exe",
@@ -337,13 +337,13 @@
     "aaru":{
         "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.11/aaru-6.0.0-alpha.11_windows-x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.12/aaru-6.0.0-alpha.12_windows-x64.zip",
             "x":{
                 "aaru.exe":"aaru.exe"
             },
-            "ts":1755817825
+            "ts":1759022555
         }],
-        "ts":1755817825
+        "ts":1759022555
     },
     "ancient":{
         "p":"ancient.exe",
@@ -440,13 +440,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/00/7c/dolphin-master-2509-49-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/80/63/dolphin-master-2509-96-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1758313144
+            "ts":1759098552
         }],
-        "ts":1758313144
+        "ts":1759098552
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -982,7 +982,8 @@
         "fs":[[
             "https://github.com/trapexit/3dt/releases/download/1.1.1/3dt_win64.exe",
             "3dt.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "assamunpack":{
         "p":"assamUnpack.exe"
@@ -994,7 +995,8 @@
             "x":{
                 "uaeunp.exe":"uaeunp.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "akt":{
         "p":"AKT.EXE",
@@ -1003,7 +1005,18 @@
             "x":{
                 "akt.exe":"AKT.EXE"
             }
-        }]
+        }],
+        "ts":0
+    },
+    "amgc":{
+        "p":"AMGC.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/amgc22.zip",
+            "x":{
+                "AMGC.EXE":"AMGC.EXE"
+            }
+        }],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
