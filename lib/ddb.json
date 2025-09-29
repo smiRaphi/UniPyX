@@ -256,6 +256,10 @@
         "rs":"Unreal Engine Package","s":1
     },
     {
+        "d":["isat","AMPK\\x04\\0\\0",0],
+        "rs":"AMPK","s":1
+    },
+    {
         "d":[["isat","xaf0\\2",0],["isat","(c) SEGA CORPORATION",112]],
         "rs":"Initial D XAF","s":1
     },

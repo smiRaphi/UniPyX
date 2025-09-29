@@ -440,7 +440,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
-        case 'StuffIt':
+        case 'StuffIt'|'AMPK':
            e,_,_ = run(['unar','-f','-o',o,i])
            if not e: return
         case 'UPX':
@@ -1258,7 +1258,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'CTPK':
             run(['ctpktool','-efd',i,o])
             if os.listdir(o): return
-        case 'Rob Northen Compression':
+        case 'Rob Northen Compression'|'Amiga XPK':
             run(['ancient','decompress',i,o + '/' + basename(i)])
             if os.path.exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
         case 'XBP': return quickbms('xbp')
