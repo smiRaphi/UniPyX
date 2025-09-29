@@ -1018,6 +1018,12 @@
         }],
         "ts":0
     },
+    "amstradcpcexplorer":{
+        "p":"DSKInfoV3.py",
+        "fs":[
+        "https://raw.githubusercontent.com/muckypaws/AmstradDSKExplorer/refs/heads/master/DSKInfoV3.py"
+        ]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{

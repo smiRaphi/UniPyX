@@ -500,6 +500,10 @@ def extract(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with amgc')
             run(['msdos',db.get('amgc'),'x',i],print_try=False,cwd=o)
             if os.listdir(o): return
+        case 'CPC IMG':
+            if db.print_try: print('Trying with amstradcpcexplorer')
+            run([sys.executable,db.get('amstradcpcexplorer'),i,'-dir','-ex'],print_try=False,cwd=o)
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
