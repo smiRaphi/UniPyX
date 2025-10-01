@@ -1124,6 +1124,24 @@
         }],
         "ts":0
     },
+    "steamless":{
+        "p":"Steamless/Steamless.CLI.exe",
+        "fs":[{
+            "u":"https://github.com/atom0s/Steamless/releases/download/v3.1.0.5/Steamless.v3.1.0.5.-.by.atom0s.zip",
+            "x":{
+                "Steamless.CLI.exe":"Steamless/Steamless.CLI.exe",
+                "Plugins/SharpDisasm.dll":"Steamless/Plugins/SharpDisasm.dll",
+                "Plugins/Steamless.API.dll":"Steamless/Plugins/Steamless.API.dll",
+                "Plugins/Steamless.Unpacker.Variant10.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant10.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant20.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant20.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant21.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant21.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant30.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x64.dll",
+                "Plugins/Steamless.Unpacker.Variant30.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant31.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x64.dll",
+                "Plugins/Steamless.Unpacker.Variant31.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x86.dll"
+            }
+        }]
+    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
@@ -1162,6 +1180,12 @@
             "ts":1707346800
         }],
         "ts":1707346800
+    },
+    "wpack":{
+        "p":"WPACK.EXE",
+        "fs":[
+        "https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE"
+        ]
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",

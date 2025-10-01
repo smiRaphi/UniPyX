@@ -3,7 +3,9 @@
         ".7z archive",
         "7-zip compressed archive (v0.4)",
         "7-zip compressed archive (gen)",
-        "no sec. cab.7z.zip"
+        "7z-installaware.com",
+        "7-zip sfx stub",
+        "7-zip"
     ],
     "ZIP":[
         "zip compressed archive",
@@ -11,7 +13,9 @@
         "zip archive",
 		"android package",
         "apkmirror bundle",
-        "zip sfx archive"
+        "zip sfx archive",
+        "minecraft resource package",
+        "zip"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)"
@@ -21,7 +25,9 @@
         "dos rar sfx executable",
         "rar archive",
         "rar compressed archive (v5.0)",
-        "rar compressed archive (gen)"
+        "rar compressed archive (v-4.x)",
+        "rar compressed archive (gen)",
+        "rar"
     ],
     "MSCAB":[
         "microsoft cabinet archive",
@@ -144,7 +150,7 @@
         "vise mindvision wizard module"
     ],
     "NSIS Installer":[
-        "nsis - nullsoft scriptable install system",
+        "nullsoft scriptable install system",
         "nullsoft sfx v2.46.2-5 setup unicode installer",
         "http://nsis.sourceforge.net",
         "generic : installer nullsoft pimp stub",
@@ -349,5 +355,15 @@
         "windows imaging format (wim)",
         "windows imaging format (generic)",
         "windows imaging format"
+    ],
+    "Steam DRM":[
+        "steam",
+        "steam vlv on mz-head"
+    ],
+    "Denuvo DRM":[
+        "denuvo"
+    ],
+    "WATCOM Archive":[
+        "wpk"
     ]
 }

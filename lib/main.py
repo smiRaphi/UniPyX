@@ -5,7 +5,7 @@ from lib.dldb import DLDB
 
 TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
 EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
-DIER = re.compile(r'    Archive: (.+)\[.+\]')
+DIER = re.compile(r'    [A-Za-z]{4,12}: (.+)\n')
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext,realpath = os.path.basename,os.path.dirname,os.path.splitext,os.path.realpath
@@ -85,6 +85,11 @@ class OSJump:
     def jump(self,i): os.chdir(str(i))
     def back(self): os.chdir(self.p)
 
+def msplit(i:str|list[str],seps:list[str]) -> list[str]:
+    out = i if type(i) == list else [i]
+    for s in seps: out = sum([x.split(s) for x in out],[])
+    return out
+
 TDB:dict = json.load(xopen('lib/tdb.json'))
 DDB:list[dict] = json.load(xopen('lib/ddb.json'))
 TDBF = set(sum(TDB.values(),[]))
@@ -112,7 +117,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.split('\n') if x.strip()]
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
-    ts += [x.split('(')[0].strip() for x in DIER.findall(o)]
+    ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
     if isdir(inp): typ = 'directory'
     else:
@@ -147,11 +152,11 @@ def analyze(inp:str,raw=False):
                     os.remove(log)
                     m = EIPER1.search(lg)
                     if m: ts.append(m[1])
-                    for x in lg.split('\n')[0].split(' - ')[1:]:
+                    for x in msplit(' - ' + lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' ]   ',' stub : ',' Ovl like : ',' - ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
-                        else:
+                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','EP Token : ','File is corrupted ')):
                             x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;')
-                            if x: ts.append(x)
+                            if x and x.lower() not in ('genuine','unknown') and not (len(x) == 4 and x.isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
                 yp = os.path.dirname(yrep[0])
@@ -725,7 +730,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'XISO':
             run(['xdvdfs','unpack',i,o])
             if os.listdir(o): return
-        case 'Xbox LIVE ROM': raise NotImplementedError()
+        case 'Xbox LIVE ROM': raise NotImplementedError
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
             if os.listdir(o): return
@@ -1224,6 +1229,16 @@ def extract(inp:str,out:str,t:str) -> bool:
             if exists(o + '/' + basename(i) + '_extracted'):
                 copydir(o + '/' + basename(i) + '_extracted',o,True)
                 return
+        case 'Steam DRM':
+            tf = o + '\\' + basename(i)
+            symlink(i,tf)
+            run(['steamless','--quiet','--dumppayload','--dumpdrmp','--realign','--recalcchecksum','--exp',tf])
+            remove(tf)
+            if os.listdir(o) and exists(tf + '.unpacked.exe'):
+                rename(tf + '.unpacked.exe',tf)
+                return
+        case 'Denuvo': raise NotImplementedError
+        case 'Crinkler': raise NotImplementedError
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
@@ -1724,6 +1739,10 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
 
             return extract(i,o,'7z')
+        case 'WATCOM Archive':
+            if db.print_try: print('Trying with wpack')
+            run(['msdos',db.get('wpack'),i],print_try=False,cwd=o)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

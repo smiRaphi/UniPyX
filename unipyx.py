@@ -25,7 +25,7 @@ if __name__ == '__main__':
         for x in ts: print(x)
         print()
         print('Raw:')
-        for x in rts: print(x)
+        for x in sorted(set(rts)): print(x)
     else:
         from lib.main import main_extract as extract
         extract(inp,out,quiet=False,rs=True)
