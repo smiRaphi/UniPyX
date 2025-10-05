@@ -24,7 +24,7 @@ class File:
         self._size = self.tell()
         self.seek(0)
 
-    def read(self,n:int) -> bytes: return self._f.read(n)
+    def read(self,n:int=None) -> bytes: return self._f.read(n)
     def write(self,data:bytes) -> int: return self._f.write(data)
     def seek(self,n:int,whence=0) -> int: return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
     def tell(self) -> int: return self._f.tell() - self._start_pos

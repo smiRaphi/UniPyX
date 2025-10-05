@@ -254,10 +254,21 @@ def analyze(inp:str,raw=False):
                     h = h()
 
                     f = open(inp,'rb')
-                    while True:
-                        cv = f.read(0x1000)
+                    if len(x) > 3: mn,mx = x[2],x[3]
+                    elif len(x) > 2: mn,mx = 0,x[2]
+                    else:
+                        mn = 0
+                        mx = f.seek(0,2)
+                        f.seek(0)
+
+                    f.seek(mn)
+                    c = mx - mn
+                    cv = b''
+                    while c > 0:
+                        cv = f.read((c % 0x1000) or 0x1000)
                         if not cv: break
                         h.update(cv)
+                        c -= len(cv)
                     f.close()
                     ret = h.hexdigest() == hs
                 elif x[0] == 'str0':
@@ -1743,6 +1754,23 @@ def extract(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with wpack')
             run(['msdos',db.get('wpack'),i],print_try=False,cwd=o)
             if os.listdir(o): return
+        case 'RPACK':
+            if db.print_try: print('Trying with custom extractor') # https://github.com/Qivex/rpack-extract/blob/main/rpack-extract.lua
+            raise NotImplementedError
+            from bin.tmd import File
+
+            f = File(i,endian='<')
+            assert f.read(4) == b'RP6L','Invalid RPACK file'
+            if f.readu32() == 4: offm = 16
+            else: assert False,"Unknown offset multiplier"
+
+            cmp = f.readu32()
+            assert cmp in (0,),'Unknown compression method'
+
+            pc,sc,fc,fncl,fnc,bs = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            secis = {}
+            for _ in range(sc):
+                s = {'type':f.readu8()}
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
@@ -1768,6 +1796,31 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if not os.path.getsize(o + '/' + x): remove(o + '/' + x)
 
             if os.listdir(o): return
+        case 'Donkey Kong Banana Kingdom':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i,endian='<')
+            f.seek(0x14)
+            c = f.readu32()
+            f.seek(0x20)
+            fs = []
+            for _ in range(c):
+                fs.append((f.read(0x10).rstrip(b'\0').decode(),f.readu32(),f.readu32() * 0x200))
+                f.skip(8)
+            for fe in fs:
+                f.seek(fe[2])
+                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+
+            lo = max(fe[2] + fe[1] for fe in fs)
+            xo = lo + (-lo % 0x200)
+            if not xo >= f._size:
+                f.seek(xo)
+                open(o + '/_extra.bin','wb').write(f.read(f._size - xo - 0x200 - 0xB8B200 - 0x14C))
+
+            f.close()
+            if fs: return
+
     return 1
 def fix_isinstext(o:str,oi:str=None):
     ret = True
