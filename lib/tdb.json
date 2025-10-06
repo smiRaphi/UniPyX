@@ -518,5 +518,12 @@
     ],
     "XPACK/LZCOM":[
         "xpack/lzcom"
+    ],
+    "XX34":[
+        "xx34 encoded data"
+    ],
+    "ZOO":[
+        "16bit dos exe sez sfx zoo archive (v2.3)",
+        "zoo archive"
     ]
 }

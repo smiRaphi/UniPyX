@@ -1185,6 +1185,21 @@
         ],
         "ts":0
     },
+    "xx34":{
+        "p":"XX34.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/utilfile/xx3402.zip",
+            "x":{
+                "XX3402.EXE":"XX34.EXE"
+            }
+        }]
+    },
+    "unzoo":{
+        "p":"unzoo.exe",
+        "fs":[
+        "https://update.bioruebe.com/uniextract/nightly/bin/unzoo/unzoo.exe"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

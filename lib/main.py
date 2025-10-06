@@ -314,17 +314,14 @@ def extract(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
-    def quickbms(scr,inp=None):
-        inf = inp or i
+    def quickbms(scr,inp=i):
         if db.print_try: print('Trying with',scr)
         run(['quickbms',db.get(scr),inf,o],print_try=False)
         if os.listdir(o): return
         return 1
-    def dosbox(cmd:list,inf=None,ouf=None,print_try=True,nowin=True,max=True):
+    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True):
         scr = cmd[0]
         s = db.get(scr)
-        inf = inf or i
-        oup = ouf or o
 
         mkdir(oup)
         symlink(s,oup + '/' + basename(s))
@@ -358,6 +355,19 @@ def extract(inp:str,out:str,t:str) -> bool:
         p.kill()
 
         return r
+    def msdos(cmd,mscmd=[],tmpi=False,inf=i,**kwargs):
+        if tmpi:
+            mkdir(o)
+            tf = o + '/' + 'TMP' + extname(inf)
+            symlink(inf,tf)
+
+        if db.print_try: print('Trying with',cmd[0])
+        run(['msdos'] + mscmd + [db.get(cmd[0])] + [(('TMP' + extname(inf)) if tmpi and x == inf else x) for x in cmd[1:]],print_try=False,**kwargs)
+
+        if tmpi: remove(tf)
+
+        if os.listdir(o): return
+        return 1
 
     match t:
         case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2'|'SZDD':
@@ -562,18 +572,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             except:pass
 
             if os.listdir(o): return
-        case 'HA':
-            if db.print_try: print('Trying with ha')
-            run(['msdos',db.get('ha'),'xqy',i],print_try=False,cwd=o)
-            if os.listdir(o): return
-        case 'AKT':
-            if db.print_try: print('Trying with akt')
-            run(['msdos',db.get('akt'),'x',i],print_try=False,cwd=o)
-            if os.listdir(o): return
-        case 'AMGC':
-            if db.print_try: print('Trying with amgc')
-            run(['msdos',db.get('amgc'),'x',i],print_try=False,cwd=o)
-            if os.listdir(o): return
+        case 'HA': return msdos(['ha','xqy',i],cwd=o)
+        case 'AKT': return msdos(['akt','x',i],cwd=o)
+        case 'AMGC': return msdos(['amgc','x',i],cwd=o)
         case 'CPC IMG':
             if db.print_try: print('Trying with amstradcpcexplorer')
             run([sys.executable,db.get('amstradcpcexplorer'),i,'-dir','-ex'],print_try=False,cwd=o)
@@ -595,9 +596,33 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'AR':
             run(['ar','x',i],cwd=o)
             if os.listdir(o): return
-        case 'ARQ':
-            if db.print_try: print('Trying with arq')
-            run(['msdos',db.get('arq'),'-x',i,'*',o],print_try=False)
+        case 'ARQ': return msdos(['arq','-x',i,'*',o])
+        case 'XX34': return msdos(['xx34','D',i],tmpi=True,cwd=o)
+        case 'Stirling Compressed':
+            od = rldir(o)
+            run(["deark","-od",o,i])
+            for x in rldir(o):
+                if x in od: continue
+                xb = basename(x)
+                if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in (3,4,5) and xb.split('.')[1].isdigit(): move(x,dirname(x) + '\\' + xb.split('.',2)[2])
+            if os.listdir(o): return
+        case 'ZOO':
+            if open(i,'rb').read(2) == b'MZ':
+                run(['deark','-od',o,i])
+                tf = o + '\\output.000.zoo'
+                if not exists(tf): return 1
+                r = extract(tf,o,'ZOO')
+                if r: mv(tf,o + '\\' + tbasename(i) + '.zoo')
+                else: remove(tf)
+                return r
+
+            r = extract(i,o,'Stirling Compressed') # deark
+            if r:
+                remove(o)
+                mkdir(o)
+            else: return
+
+            run(['unzoo','-x','-o','-j',o + '\\',i])
             if os.listdir(o): return
 
         case 'RVZ':
@@ -1198,12 +1223,6 @@ def extract(inp:str,out:str,t:str) -> bool:
                 ti.destroy()
                 raise NotImplementedError("iscab returned:\n" + e)
             ti.destroy()
-        case 'Stirling Compressed':
-            run(["deark","-od",o,i])
-            fs = os.listdir(o)
-            for x in fs:
-                if x.startswith('output.') and len(x.rsplit('.',1)[0]) > 10: move(o + '/' + x,o + '/' + x.split('.',2)[2])
-            if fs: return
         case 'FreeArc':
             run(['unarc','x','-o+','-dp' + o,i])
             if os.listdir(o): return
