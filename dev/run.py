@@ -8,7 +8,7 @@ db = DLDB()
 if sys.argv[1] == 'hfsexplorer':
     ce = os.environ.copy()
     ce['PATH'] += ';' + os.path.dirname(db.get('hfsexplorer'))
-    c,o,e = db.run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS'] + sys.argv[2:],env=ce)
+    c,o,e = db.run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.' + sys.argv[2]] + sys.argv[3:],env=ce)
 else: c,o,e = db.run(sys.argv[1:])
 
 print(c)

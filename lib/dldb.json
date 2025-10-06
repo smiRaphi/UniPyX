@@ -23,9 +23,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1759096800
+            "ts":1759615200
         }],
-        "ts":1759096800
+        "ts":1759615200
     },
     "file":{
         "p":"file/file.exe",
@@ -346,11 +346,11 @@
         "ts":1759022555
     },
     "ancient":{
-        "p":"ancient.exe",
+        "p":"Ancient.exe",
         "fs":[{
-            "u":"https://github.com/temisu/ancient/releases/download/v2.0.0/ancient_2.0.0.zip",
+            "u":"https://github.com/temisu/ancient/releases/download/v2.3.0/windows_binaries_Release.zip",
             "x":{
-                "ancient_2.0.0/ancient.exe":"ancient.exe"
+                "Ancient64.exe":"Ancient.exe"
             }
         }],
         "ts":0
@@ -440,13 +440,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/80/63/dolphin-master-2509-96-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/58/8b/dolphin-master-2509-138-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1759098552
+            "ts":1759705099
         }],
-        "ts":1759098552
+        "ts":1759705099
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -524,13 +524,13 @@
     "mrst":{
         "p":"mrst.exe",
         "fs":[{
-            "u":"https://github.com/em-eight/mrst/releases/download/v1.2-rc8/mrst-Windows.zip",
+            "u":"https://github.com/em-eight/mrst/releases/download/v1.2-rc9/mrst-Windows.zip",
             "x":{
                 "bin/mrst.exe":"mrst.exe"
             },
-            "ts":1754502477
+            "ts":1759240568
         }],
-        "ts":1754502477
+        "ts":1759240568
     },
     "cvm_tool":{
         "p":"cvm_tool.exe",
@@ -603,7 +603,7 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0280/mame0280b_64bit.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0281/mame0281b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
@@ -628,9 +628,9 @@
         "ts":0
     },
     "ps3dec":{
-        "p":"ps3dec.exe",
+        "p":"ps3decrs.exe",
         "fs":[
-        "https://github.com/Redrrx/ps3dec/releases/download/0.2.0/ps3dec.exe"
+        "https://github.com/Redrrx/ps3dec/releases/download/2.0.0/ps3decrs.exe"
         ],
         "ts":0
     },
@@ -702,15 +702,14 @@
     "hfsexplorer":{
         "p":"hfsexplorer/hfsx.jar",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/catacombae/HFSExplorer/0.23.1/hfsexplorer-0.23.1-bin.zip?viasf=1",
+            "u":"https://github.com/unsound/hfsexplorer/releases/download/hfsexplorer-2021.10.9/hfsexplorer-2021.10.9-bin.zip",
             "x":{
                 "lib/apache-ant-1.7.0-bzip2.jar":"hfsexplorer/apache-ant-1.7.0-bzip2.jar",
                 "lib/csframework.jar":"hfsexplorer/csframework.jar",
                 "lib/hfsx.jar":"hfsexplorer/hfsx.jar",
                 "lib/hfsx_dmglib.jar":"hfsexplorer/hfsx_dmglib.jar",
                 "lib/iharder-base64.jar":"hfsexplorer/iharder-base64.jar",
-                "lib/llio_amd64.dll":"hfsexplorer/llio_amd64.dll",
-                "lib/swing-layout-1.0.4.jar":"hfsexplorer/swing-layout-1.0.4.jar"
+                "lib/llio_amd64.dll":"hfsexplorer/llio_amd64.dll"
             }
         }],
         "ts":0
@@ -757,7 +756,7 @@
     "rpkg":{
         "p":"rpkg/rpkg-cli.exe",
         "fs":[{
-            "u":"https://github.com/glacier-modding/RPKG-Tool/releases/download/v2.33.0/rpkg_v2.33.0-cli.zip",
+            "u":"https://github.com/glacier-modding/RPKG-Tool/releases/download/v2.33.2/rpkg_v2.33.2-cli.zip",
             "x":{
                 "ResourceLib_HM3.dll":"rpkg/ResourceLib_HM3.dll",
                 "rpkg-cli.exe":"rpkg/rpkg-cli.exe",
@@ -767,9 +766,10 @@
                 "ResourceLib_HM2.dll":"rpkg/ResourceLib_HM2.dll",
                 "assimp.dll":"rpkg/assimp.dll",
                 "hash_list.hmla":"rpkg/hash_list.hmla"
-            }
+            },
+            "ts":1759277359
         }],
-        "ts":0
+        "ts":1759277359
     },
     "sarc":{
         "p":"sarc.py",
@@ -802,12 +802,13 @@
     "vpkedit":{
         "p":"vpkeditcli.exe",
         "fs":[{
-            "u":"https://github.com/craftablescience/VPKEdit/releases/download/v5.0.0.1/VPKEdit-Windows-Standalone-msvc-Release.zip",
+            "u":"https://github.com/craftablescience/VPKEdit/releases/download/v5.0.0.3/VPKEdit-Windows-Standalone-msvc-Release.zip",
             "x":{
                 "vpkeditcli.exe":"vpkeditcli.exe"
-            }
+            },
+            "ts":1759388231
         }],
-        "ts":0
+        "ts":1759388231
     },
     "unpsarc":{
         "p":"UnPSARC/UnPSARC.exe",
@@ -1140,7 +1141,8 @@
                 "Plugins/Steamless.Unpacker.Variant31.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x64.dll",
                 "Plugins/Steamless.Unpacker.Variant31.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x86.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
@@ -1185,7 +1187,8 @@
         "p":"WPACK.EXE",
         "fs":[
         "https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE"
-        ]
+        ],
+        "ts":0
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
@@ -1345,7 +1348,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.0/lessmsi-v2.10.0.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.2/lessmsi-v2.10.2.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -1354,9 +1357,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1758735297
+            "ts":1759501899
         }],
-        "ts":1758735297
+        "ts":1759501899
     },
     "msix":{
         "p":"MsiX.exe",

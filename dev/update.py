@@ -12,12 +12,11 @@ GFMTS = {
     'julian-r/file-windows':lambda tag:f'file_{tag[1:]}-build104-vs2022-x64.zip',
     'ExeinfoASL/ASL':lambda tag:f'Exeinfo_{tag[1:].replace(".","")}.zip',
     'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows-x64.zip',
-    'temisu/ancient':lambda tag:f'ancient_{tag[1:]}.zip',
     'Sappharad/GDIbuilder':lambda tag:f'gdibuilder{tag[1:].replace(".","")}_cmd_win_x64.zip',
     'upx/upx':lambda tag:f'upx-{tag[1:]}-win64.zip',
     'xchellx/bnrtool':lambda tag:f'bnrtool_{tag}_msys2-clang64_net9.0_win-x64.7z',
     'MaikelChan/AFSPacker':lambda tag:f'AFSPacker-{tag}-win-x64.7z',
-    'mamedev/mame':lambda tag:f'{tag}b_64bit.exe',
+    'mamedev/mame':lambda tag:f'{tag}b_x64.exe',
     'Maschell/JWUDTool':lambda tag:f'JWUDTool-{tag}.jar',
     'ch-mcl/PS2_RidgeRacerV_ArchiveTool':lambda tag:f'{tag}.zip',
     'ZDoom/wadext':lambda tag:f'wadext_win32_{tag}.zip',
@@ -27,6 +26,7 @@ GFMTS = {
     'rm-NoobInCoding/UnPSARC':lambda tag:f'UnPSARC_{tag}.zip',
     'peitaosu/WFRR':lambda tag,arch:f'WFRR_{tag}.0_{arch}_release.zip',
     'AppleCommander/AppleCommander':lambda tag:f'AppleCommander-acx-{tag}.jar',
+    'unsound/hfsexplorer':lambda tag: f'{tag}-bin.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):
@@ -85,6 +85,7 @@ def update():
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
                 if repo in ('aaru-dps/Aaru',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                elif repo in ('horsicq/Detect-It-Easy',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
@@ -96,8 +97,12 @@ def update():
                         else: of = GFMTS[repo](tag)
                         nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
                     else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
-                    if u != nu and c.c.head(nu).status_code == 302: u = nu
-                    else: ts = 0
+                    if u != nu:
+                        if c.c.head(nu).status_code == 302: u = nu
+                        else:
+                            print('[!] 404:',u,'!->',nu)
+                            ts = ots
+                    else: ts = ots
             elif dom == 'archive.ubuntu.com':
                 bu = os.path.dirname(u) + '/'
                 s = c.get(bu)

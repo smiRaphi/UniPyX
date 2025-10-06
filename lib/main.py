@@ -379,7 +379,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if db.print_try: print('Trying with hfsexplorer/unhfs')
                 cop = o + (f'\\{p}' if ps > 1 else '')
                 mkdir(cop)
-                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','APPLEDOUBLE','-partition',p,'--',i],print_try=False,env=ce)
+                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','APPLEDOUBLE','-sfm-substitutions','-partition',p,'--',i],print_try=False,env=ce)
                 if 'Failed to create directory ' in e: return 1
                 if exists(cop) and not os.listdir(cop): rmdir(cop)
             if not exists(o): mkdir(o)
