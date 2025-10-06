@@ -368,7 +368,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                         f = o + '\\' + f
                         if not extract(f,o,'ISO'): remove(f)
                 return
-        case 'Apple Disk Image'|'Mac HFS Image'|'Roxio Toast IMG':
+        case 'Apple Disk Image'|'Roxio Toast IMG':
             _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
             try: ps = int(re.search(r'(\d+) partitions found\.',e)[1])
             except: ps = 1
@@ -379,7 +379,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if db.print_try: print('Trying with hfsexplorer/unhfs')
                 cop = o + (f'\\{p}' if ps > 1 else '')
                 mkdir(cop)
-                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','NONE','-partition',p,'--',i],print_try=False,env=ce)
+                _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','APPLEDOUBLE','-partition',p,'--',i],print_try=False,env=ce)
                 if 'Failed to create directory ' in e: return 1
                 if exists(cop) and not os.listdir(cop): rmdir(cop)
             if not exists(o): mkdir(o)
@@ -1291,8 +1291,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ROFS Volume':
             tf = TmpFile('.iso')
             run(['cvm_tool','split',i,tf])
-            extract(tf,o,'ISO')
+            r = extract(tf,o,'ISO')
             tf.destroy()
+            return r
         case 'RetroStudio PAK':
             run(['paktool','-x',i,'-o',o])
             if os.listdir(o): return

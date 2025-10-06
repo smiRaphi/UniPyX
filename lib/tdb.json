@@ -125,9 +125,7 @@
         "anex86 pc98 floppy image (generic)"
     ],
     "Apple Disk Image":[
-        "disk image"
-    ],
-    "Mac HFS Image":[
+        "disk image",
         "bootable mac hfs volume/disk image"
     ],
     "UDF":[

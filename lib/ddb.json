@@ -214,6 +214,11 @@
         "rs":"TAR","s":1
     },
     {
+        "rq":null,
+        "d":[["isatS","\\0",1024,0],["isat","BD\\xC7M",1024]],
+        "rs":"Apple Disk Image"
+    },
+    {
         "rqr":null,
         "d":["isat","CTPK",0],
         "rs":"CTPK","s":1
