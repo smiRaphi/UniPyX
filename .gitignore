@@ -16,7 +16,7 @@ __pycache__
 !/bin/BMS/xbp.bms
 !/bin/AssetRipper/client.py
 !/bin/psvpfsparser/
-!/bin/psvpfsparser/psvpfsparser.exe
+!/bin/psvpfsparser/*
 !/bin/tmd.py
 !/bin/TDEDecrypt.exe
 !/bin/cls-srep/
