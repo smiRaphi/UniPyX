@@ -307,6 +307,7 @@
     ],
     "AIN":[
         "ain compressed archive",
+        "ainexe",
         "ainexe compressed 16bit dos executable"
     ],
     "HA":[
@@ -366,5 +367,15 @@
     ],
     "RPACK":[
         "dying light game data archive"
+    ],
+    "Aaru":[
+        "aaru disk image"
+    ],
+    "com2txt":[
+        "com2txt 16bit dos executable (new-default)"
+    ],
+    "bytepress":[
+        ".net exe bytepress v1.0.0.2 by adam roach",
+        "http://github.com/roachadam/bytepress"
     ]
 }

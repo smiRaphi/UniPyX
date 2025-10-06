@@ -6,6 +6,17 @@ from lib.dldb import DLDB
 TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
 EIPER1 = re.compile(r'Overlay : +(.+) > Offset : [\da-f]+h')
 DIER = re.compile(r'    [A-Za-z]{4,12}: (.+)\n')
+MSPCR = re.compile(r' +')
+DOSMAX = {
+    "waitonerror":"false",
+    "priority":"normal,normal",
+    "autolock":"false",
+    "memsize":"63",
+    "scaler":"none",
+    "cycles":"max 100% limit 9999999999999999999999999999999999999999999999999999999999",
+    "core":"dynamic",
+    "ipx":"false"
+}
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext,realpath = os.path.basename,os.path.dirname,os.path.splitext,os.path.realpath
@@ -155,7 +166,7 @@ def analyze(inp:str,raw=False):
                     for x in msplit(' - ' + lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' ]   ',' stub : ',' Ovl like : ',' - ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
                         elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','EP Token : ','File is corrupted ')):
-                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;')
+                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;-')
                             if x and x.lower() not in ('genuine','unknown') and not (len(x) == 4 and x.isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
@@ -168,7 +179,7 @@ def analyze(inp:str,raw=False):
             else: f.close()
         else: f.close()
 
-    ts = [x.strip() for x in ts if x.strip()]
+    ts = [MSPCR.sub(' ',x.strip()) for x in ts if x.strip()]
 
     nts = checktdb(ts)
     nts = list(set(nts))
@@ -309,6 +320,44 @@ def extract(inp:str,out:str,t:str) -> bool:
         run(['quickbms',db.get(scr),inf,o],print_try=False)
         if os.listdir(o): return
         return 1
+    def dosbox(cmd:list,inf=None,ouf=None,print_try=True,nowin=True,max=True):
+        scr = cmd[0]
+        s = db.get(scr)
+        inf = inf or i
+        oup = ouf or o
+
+        mkdir(oup)
+        symlink(s,oup + '/' + basename(s))
+        symlink(inf,oup + '/' + basename(inf))
+
+        if print_try and db.print_try: print('Trying with',scr)
+        p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','-defaultconf','NUL','-fastlaunch','-nogui',('-silent' if nowin else '-exit'),
+             '-c','MOUNT C "' + oup.replace('\\','\\\\') + '"','-c','C:',
+             '-c',subprocess.list2cmdline([basename(s)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + ' > _OUT.TXT'] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
+
+        while not exists(oup + '/_OUT.TXT'): sleep(0.1)
+        while True:
+            try: open(oup + '/_OUT.TXT','ab').close()
+            except PermissionError: sleep(0.1)
+            else: break
+
+        for _ in range(10):
+            if os.path.getsize(oup + '/_OUT.TXT') > 0: break
+            sleep(0.1)
+
+        while True:
+            r = open(oup + '/_OUT.TXT','rb').read()
+            if len(r) == os.path.getsize(oup + '/_OUT.TXT'):
+                r = r.decode('utf-8')
+                break
+            sleep(0.1)
+        while True:
+            try: remove(oup + '/_OUT.TXT',oup + '/' + basename(s),oup + '/' + basename(inf))
+            except PermissionError: sleep(0.1)
+            else: break
+        p.kill()
+
+        return r
 
     match t:
         case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2'|'SZDD':
@@ -330,7 +379,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['pdftohtml','-embedbackground','-meta','-overwrite','-q',i,o + '\\html'])
             if os.listdir(o + '/html'): return
             remove(o + '/html')
-        case 'ISO'|'IMG'|'Floppy Image'|'CDI CUE+BIN'|'CDI'|'UDF':
+        case 'ISO'|'IMG'|'Floppy Image'|'CDI'|'UDF'|'Aaru':
             osj = OSJump()
             osj.jump(dirname(i))
             td = 'tmp' + os.urandom(8).hex()
@@ -346,7 +395,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             run(['7z','x',i,'-o' + o,'-aou'])
             if exists(o) and os.listdir(o): return
-        case 'CUE+BIN':
+        case 'CUE+BIN'|'CDI CUE+BIN':
             osj = OSJump()
             osj.jump(dirname(i))
             td = 'tmp' + os.urandom(8).hex()
@@ -1245,11 +1294,22 @@ def extract(inp:str,out:str,t:str) -> bool:
             symlink(i,tf)
             run(['steamless','--quiet','--dumppayload','--dumpdrmp','--realign','--recalcchecksum','--exp',tf])
             remove(tf)
-            if os.listdir(o) and exists(tf + '.unpacked.exe'):
+            if exists(tf + '.unpacked.exe'):
                 rename(tf + '.unpacked.exe',tf)
                 return
         case 'Denuvo': raise NotImplementedError
         case 'Crinkler': raise NotImplementedError
+        case 'com2txt':
+            dosbox(['com2txt','-r',i,'OUT.COM'])
+            if exists(o + '/OUT.COM'):
+                mv(o + '/OUT.COM',o + '/' + tbasename(i) + ('.com' if i[-3:].islower() else '.COM'))
+                return
+        case 'bytepress':
+            run(['bytepressdecompressor',i],stdin='No\n\n',cwd=o)
+            of = o + '/' + tbasename(i) + '-decompressed.exe'
+            if exists(of):
+                mv(of,o + '/' + basename(i))
+                return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()

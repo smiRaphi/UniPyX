@@ -1125,25 +1125,6 @@
         }],
         "ts":0
     },
-    "steamless":{
-        "p":"Steamless/Steamless.CLI.exe",
-        "fs":[{
-            "u":"https://github.com/atom0s/Steamless/releases/download/v3.1.0.5/Steamless.v3.1.0.5.-.by.atom0s.zip",
-            "x":{
-                "Steamless.CLI.exe":"Steamless/Steamless.CLI.exe",
-                "Plugins/SharpDisasm.dll":"Steamless/Plugins/SharpDisasm.dll",
-                "Plugins/Steamless.API.dll":"Steamless/Plugins/Steamless.API.dll",
-                "Plugins/Steamless.Unpacker.Variant10.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant10.x86.dll",
-                "Plugins/Steamless.Unpacker.Variant20.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant20.x86.dll",
-                "Plugins/Steamless.Unpacker.Variant21.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant21.x86.dll",
-                "Plugins/Steamless.Unpacker.Variant30.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x64.dll",
-                "Plugins/Steamless.Unpacker.Variant30.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x86.dll",
-                "Plugins/Steamless.Unpacker.Variant31.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x64.dll",
-                "Plugins/Steamless.Unpacker.Variant31.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x86.dll"
-            }
-        }],
-        "ts":0
-    },
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
@@ -1234,6 +1215,32 @@
                 "EasyLoad32.dll":"WFRRx86/EasyLoad32.dll",
                 "Newtonsoft.Json.dll":"WFRRx86/Newtonsoft.Json.dll",
                 "log4net.dll":"WFRRx86/log4net.dll"
+            }
+        }],
+        "ts":0
+    },
+    "resourceextractor":{
+        "p":"ResourceExtractor.exe",
+        "fs":[
+        "https://github.com/rgl/ResourceExtractor/releases/download/v1.0.1/ResourceExtractor.exe"
+        ],
+        "ts":0
+    },
+    "steamless":{
+        "p":"Steamless/Steamless.CLI.exe",
+        "fs":[{
+            "u":"https://github.com/atom0s/Steamless/releases/download/v3.1.0.5/Steamless.v3.1.0.5.-.by.atom0s.zip",
+            "x":{
+                "Steamless.CLI.exe":"Steamless/Steamless.CLI.exe",
+                "Plugins/SharpDisasm.dll":"Steamless/Plugins/SharpDisasm.dll",
+                "Plugins/Steamless.API.dll":"Steamless/Plugins/Steamless.API.dll",
+                "Plugins/Steamless.Unpacker.Variant10.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant10.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant20.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant20.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant21.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant21.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant30.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x64.dll",
+                "Plugins/Steamless.Unpacker.Variant30.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant31.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x64.dll",
+                "Plugins/Steamless.Unpacker.Variant31.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x86.dll"
             }
         }],
         "ts":0
@@ -1371,11 +1378,27 @@
         }],
         "ts":0
     },
-    "resourceextractor":{
-        "p":"ResourceExtractor.exe",
-        "fs":[
-        "https://github.com/rgl/ResourceExtractor/releases/download/v1.0.1/ResourceExtractor.exe"
-        ],
+    "com2txt":{
+        "p":"COM2TXT.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/utilprog/com2t111.rar",
+            "x":{
+                "COM2TXT.EXE":"COM2TXT.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "bytepressdecompressor":{
+        "p":"BytePressDecompressor/BytePressDecompressor.exe",
+        "fs":[[
+            "https://web.archive.org/web/20201001175539if_/https://github.com/ribthegreat99OrN0P/BytePressDecompressor/releases/download/1/BytePressDecompressor.exe",
+            "BytePressDecompressor/BytePressDecompressor.exe"
+        ],{
+            "u":"https://github.com/roachadam/bytepress/releases/download/v1.0.0.2/bytepress.v1.0.0.2.zip",
+            "x":{
+                "bytepress.lib.dll":"BytePressDecompressor/bytepress.lib.dll"
+            }
+        }],
         "ts":0
     },
     "sonic4":{
