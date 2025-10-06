@@ -1218,6 +1218,33 @@
             }
         }]
     },
+    "777":{
+        "p":"777.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20040403052028if_/http://www.7-zip.org/dl/ufa/777004b1.zip",
+            "x":{
+                "777.exe":"777.exe"
+            }
+        }]
+    },
+    "bix":{
+        "p":"bix.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20040828100613if_/http://www.7-zip.org/dl/ufa/bix100b7.zip",
+            "x":{
+                "bix.exe":"bix.exe"
+            }
+        }]
+    },
+    "ufa":{
+        "p":"ufa.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20040818235228if_/http://www.7-zip.org/dl/ufa/ufa004b1.zip",
+            "x":{
+                "ufa.exe":"ufa.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
