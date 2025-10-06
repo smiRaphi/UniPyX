@@ -1310,6 +1310,70 @@ def extract(inp:str,out:str,t:str) -> bool:
             if exists(of):
                 mv(of,o + '/' + basename(i))
                 return
+        case 'Bat2Exe':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i,endian='<')
+            f.seek(0x178)
+            assert f.read(8) == b'.text\0\0\0'
+            f.skip(8)
+            s,of = f.readu32(),f.readu32()
+            eo = of + s - 8
+
+            f.seek(of + 8)
+            tmpl = 0
+            src = b'@echo off && title '
+            while f.tell() < eo:
+                t = f.readu16()
+                if t == src[tmpl]:
+                    tmpl += 1
+                    if tmpl == len(src): break
+                else: tmpl = 0
+            else: assert tmpl == len(src)
+
+            f.skip(-39)
+            sl = f.readu8()
+            f.skip(38)
+            fn = f.read(sl-38)[:-1].decode('utf-16le')
+            fn += f.read(f.readu8())[:-1].decode('utf-16le')
+
+            assert f.readu8() == 0x7D
+            f.skip(0x7D)
+
+            bs = f.readu8()
+            if   bs & (0b100 << 5) == (0b000 << 5): bs =  bs & 0x7F
+            elif bs & (0b110 << 5) == (0b100 << 5): bs = (bs & 0x3F) << 8 | f.readu8()
+            elif bs & (0b111 << 5) == (0b110 << 5): bs = (bs & 0x1F) << 24 | (f.readu8() << 16) | (f.readu8() << 8) | f.readu8()
+            bs -= 1
+            assert bs > 0
+
+            bat = f.read(bs)
+            assert f.readu8() in (0,1)
+            f.close()
+
+            if len(bat.replace(b'\r',b'')) > 3519 and bat.startswith(b'set '):
+                st = re.search(rb'^set [a-z]{10}=s\r?\n%[a-z]{10}%et [a-z]{10}=e\r?\n%[a-z]{10}%%[a-z]{10}%t [a-z]{10}=t\r?\n',bat)
+                if st:
+                    cr = st.end() > 87
+                    assert st.end() == (87 + (3 if cr else 0))
+                    bat = bat[87 + (3 if cr else 0):]
+
+                    mp = re.findall(rb'(?:%[a-z]{10}%){3} ([a-z]{10})=([a-z])\r?\ngoto [A-Z]{10}\r?\n(?:%[a-z]{10}%){3} [a-z]{10}=[a-z]\r?\n:[A-Z]{10}\r?\n',
+                                    bat[:3432 + (104 if cr else 0)])
+                    assert len(mp) == 26
+                    bat = bat[3432 + (104 if cr else 0):]
+                    for x in mp:
+                        bat = bat.replace(b'%' + x[0] + b'%',x[1])
+                        if bat.strip().endswith(b'%' + x[0]): bat = bat.replace(b'%' + x[0],x[1])
+            else:
+                sub10 = re.compile(rb'%[a-z]{10}%')
+
+                nrp = [sub10.sub(b'',x) for x in re.findall(rb'(%[a-z]{10}%|^)?[sS]%[a-z]{10}%[eE]%a[a-z]{10}%[tT]%[a-z]{10}%(?:[ \t]%[a-z]{10}%){1,} ((?:[a-z]%[a-z]{10}%){10})[ \t=][a-z]{10}',bat)] # find all real variables with a length of 10
+                bat = sub10.sub(lambda m: m[0] if m[0] in nrp else b'',bat)
+            open(o + '/' + fn,'wb').write(bat)
+
+            return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()

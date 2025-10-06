@@ -377,5 +377,9 @@
     "bytepress":[
         ".net exe bytepress v1.0.0.2 by adam roach",
         "http://github.com/roachadam/bytepress"
+    ],
+    "Bat2Exe":[
+        ".net bat2exe v2.1",
+        "http://github.com/dehoisted"
     ]
 }
