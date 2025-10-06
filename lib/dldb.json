@@ -1209,6 +1209,15 @@
             }
         }]
     },
+    "yzdec":{
+        "p":"yzdec.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/win32/yz1/deepf106.zip",
+            "x":{
+                "yzdec.exe":"yzdec.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

@@ -525,5 +525,11 @@
     "ZOO":[
         "16bit dos exe sez sfx zoo archive (v2.3)",
         "zoo archive"
+    ],
+    "YAC":[
+        "yac compressed archive"
+    ],
+    "Yamazaki Zipper":[
+        "yamazaki zipper compressed archive"
     ]
 }

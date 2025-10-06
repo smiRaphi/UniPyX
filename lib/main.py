@@ -165,7 +165,7 @@ def analyze(inp:str,raw=False):
                     if m: ts.append(m[1])
                     for x in msplit(' - ' + lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' ]   ',' stub : ',' Ovl like : ',' - ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
-                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','EP Token : ','File is corrupted ')):
+                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','*Unknown exe ','EP Token : ','File is corrupted ')):
                             x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;-')
                             if x and x.lower() not in ('genuine','unknown') and not (len(x) == 4 and x.isdigit()): ts.append(x)
 
@@ -293,6 +293,16 @@ def analyze(inp:str,raw=False):
                         if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=': scnt += 1
                         elif b != b'\0': ret = False;break
                     else: ret = scnt >= x[3]
+                    f.close()
+                elif x[0] == 'str':
+                    f = open(inp,'rb')
+                    f.seek(x[1])
+                    b = b''
+                    for _ in range(x[2]):
+                        b = f.read(1)
+                        if not b: ret = False;break
+                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=': ret = False;break
+                    else: ret = True
                     f.close()
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = (tret or type(tret) != bool) and ret
@@ -623,6 +633,10 @@ def extract(inp:str,out:str,t:str) -> bool:
             else: return
 
             run(['unzoo','-x','-o','-j',o + '\\',i])
+            if os.listdir(o): return
+        case 'YAC': return msdos(['yac','x',i],cwd=o)
+        case 'Yamazaki Zipper':
+            run(['yzdec','-d' + o,'-y',i])
             if os.listdir(o): return
 
         case 'RVZ':

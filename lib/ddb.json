@@ -289,10 +289,15 @@
         "rs":"Konami GAME.DAT"
     },
     {
+        "rqr":"Win32 Executable (generic)",
+        "d":[["size",[42000,null]],["isat","MZ",0],["isat","yz",41984],["str",41986,6]],
+        "rs":"Yamazaki Zipper","s":1
+    },
+    {
         "rq":null,
         "rqr":"Win32 Executable (generic)",
         "d":[["size",[200,1048576]],
-             ["py","f=open(inp,'rb')\nf.seek(60);o=int.from_bytes(f.read(4),'little');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n\tf.seek(2);av,iv=f.read(1)[0],f.read(1)[0]\n\tf.seek(12)\n\tif f.read(1)[0] not in (124,102,185,106,127,15,191,90,141,75,232,190):return\nelif o==12: f.seek(38);av,iv=f.read(1)[0],f.read(1)[0]\nif av not in (48,49,50) or iv<48 or iv>57 or (av==48 and iv>54) or (av==49 and iv>52) or (av==50 and iv>51):return\nreturn True"]],
+             ["py","f=open(inp,'rb')\nf.seek(60);o=int.from_bytes(f.read(4),'little');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n\tf.seek(2);av,iv=f.read(1)[0],f.read(1)[0]\n\tf.seek(12)\n\tif f.read(1)[0] not in (124,102,185,106,127,15,191,90,141,75,232,190):return\nelif o==12: f.seek(38);av,iv=f.read(1)[0],f.read(1)[0]\nelse:return\nif av not in (48,49,50) or iv<48 or iv>57 or (av==48 and iv>54) or (av==49 and iv>52) or (av==50 and iv>51):return\nreturn True"]],
         "rs":"Crinkler"
     },
     {
