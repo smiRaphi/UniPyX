@@ -381,5 +381,142 @@
     "Bat2Exe":[
         ".net bat2exe v2.1",
         "http://github.com/dehoisted"
+    ],
+    "624":[
+        "six-2-four"
+    ],
+    "4kZIP":[
+        "4kzip"
+    ],
+    "Amisetup":[
+        "amisetup loader"
+    ],
+    "aPACK":[
+        "apack",
+        "16bit dos exe apack compressed"
+    ],
+    "AVPACK":[
+        "avpack"
+    ],
+    "AXE":[
+        "sea-axe",
+        "16bit dos axe compressed executable"
+    ],
+    "CEBE":[
+        "cebe compress expand compressed dos executable (v1.0)"
+    ],
+    "Cheat Packer":[
+        "cheat packer"
+    ],
+    "COM RLE Packer":[
+        "com rle packer"
+    ],
+    "COMPACK":[
+        "compack"
+    ],
+    "Compress-EXE":[
+        "compress-exe"
+    ],
+    "Cruncher":[
+        "cruncher",
+        "cruncher compressed dos executable"
+    ],
+    "DexEXE":[
+        "dexexe"
+    ],
+    "Diet Packed":[
+        "diet"
+    ],
+    "Dn.COM Cruncher":[
+        "dn.com cruncher"
+    ],
+    "Envelope":[
+        "envelope"
+    ],
+    "EXECUTRIX-COMPRESSOR":[
+        "executrix-compressor",
+        "executrix compressed dos executable"
+    ],
+    "ExeLITE":[
+        "exelite"
+    ],
+    "ICE":[
+        "ice",
+        "ice compressed/scrambled dos command"
+    ],
+    "JAM":[
+        "jam",
+        "jam compressed 16bit dos executable"
+    ],
+    "LGLZ":[
+        "lglz",
+        "16bit dos exe lglz compressed"
+    ],
+    "LM-T2E":[
+        "16bit dos lm-t2e executable (v2.0)"
+    ],
+    "Neobook Executable":[
+        "neobook compiled book executable"
+    ],
+    "Optlink":[
+        "optlink"
+    ],
+    "Pack Packed":[
+        "pack"
+    ],
+    "PACKWIN":[
+        "16bit dos exe packwin compressed",
+        "packwin"
+    ],
+    "PGMPAK":[
+        "pgmpak"
+    ],
+    "PMWLite":[
+        "pmwlite"
+    ],
+    "Pro-Pack":[
+        "pro-pack",
+        "16bit dos exe rmc / pro-pack compressed (v2.08)"
+    ],
+    "RDT Compressor":[
+        "rtd_compressor 2"
+    ],
+    "RJCrush":[
+        "rjcrush",
+        "rjcrush compressed 16bit dos executable"
+    ],
+    "SCRNCH":[
+        "scrnch"
+    ],
+    "Shrinker Packed":[
+        "16bit dos shrinker compressed executable (v2.1)"
+    ],
+    "SpaceMaker":[
+        "16bit dos exe spacemaker compressed"
+    ],
+    "T-PACK":[
+        "tpack",
+        "16bit dos com t-pack compressed (v0.5)"
+    ],
+    "Tenth Planet Soft":[
+        "tenth planet soft packer"
+    ],
+    "TinyProg":[
+        "tinyprog",
+        "16bit dos exe tinyprog compressed"
+    ],
+    "TSCRUNCH":[
+        "tscrunch"
+    ],
+    "UCEXE":[
+        "ucexe",
+        "ucexe compressed 16bit dos executable"
+    ],
+    "WWPACK":[
+        "wwpack",
+        "16bit dos exe wwpack compressed"
+    ],
+    "XPACK/LZCOM":[
+        "xpack/lzcom"
     ]
 }

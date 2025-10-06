@@ -31,4 +31,4 @@ if __name__ == '__main__':
         extract(inp,out,quiet=False,rs=True)
 else:
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    from lib.main import main_extract as extract
+    from lib.main import analyze,main_extract as extract,extract as sub_extract

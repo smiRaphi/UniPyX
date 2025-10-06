@@ -1374,6 +1374,35 @@ def extract(inp:str,out:str,t:str) -> bool:
             open(o + '/' + fn,'wb').write(bat)
 
             return
+        case '624'|'4kZIP'|'Amisetup'|'aPACK'|'AVPACK'|'COM RLE Packer'|'Cruncher'|'DexEXE'|'Dn.COM Cruncher'|'Envelope'|'ExeLITE'|'JAM'|'LGLZ'|'Pack Packed'|\
+             'PMWLite'|'RDT Compressor'|'RJCrush'|'Shrinker Packed'|'SpaceMaker'|'T-PACK'|'Tenth Planet Soft'|'TSCRUNCH'|'XPACK/LZCOM':
+            dosbox(['cup386',i,'OUT.BIN','/1h' + ('x' if open(i,'rb').read(2) == b'MZ' else '')])
+            chks = os.path.getsize(i)-768
+            if chks < 0x10: chks = 0x10
+            if exists(o + '/OUT.BIN') and os.path.getsize(o + '/OUT.BIN') >= chks:
+                on = basename(i)
+                if on.lower().endswith('.exe') and open(o + '/OUT.BIN','rb').read(2) != b'MZ': on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
+                elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
+                mv(o + '/OUT.BIN',o + '/' + on)
+                return
+        case 'COMPACK'|'Compress-EXE'|'ICE'|'Optlink'|'PGMPAK'|'TinyProg':
+            dosbox(['unp','e',i,'OUT.BIN'])
+            chks = os.path.getsize(i)-768
+            if chks < 0x10: chks = 0x10
+            if exists(o + '/OUT.BIN') and os.path.getsize(o + '/OUT.BIN') >= chks:
+                on = basename(i)
+                if on.lower().endswith('.exe') and open(o + '/OUT.BIN','rb').read(2) != b'MZ': on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
+                elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
+                mv(o + '/OUT.BIN',o + '/' + on)
+                return
+        case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK':
+            r = extract(i,o,'624')
+            if not r: return r
+            remove(o)
+            mkdir(i)
+
+            r = extract(i,o,'COMPACK')
+            if not r: return r
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()

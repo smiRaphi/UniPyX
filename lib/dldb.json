@@ -10,6 +10,18 @@
         }],
         "ts":1758837600
     },
+    "dosbox":{
+        "p":"DOSBox-X/dosbox-x.exe",
+        "fs":[{
+            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.05.03/dosbox-x-vsbuild-win64-20250503164337.zip",
+            "x":{
+                "bin/x64/Release SDL2/dosbox-x.exe":"DOSBox-X/dosbox-x.exe",
+                "bin/x64/Release SDL2/inpoutx64.dll":"DOSBox-X/inpoutx64.dll"
+            },
+            "ts":0
+        }],
+        "ts":0
+    },
     "trid":{
         "p":"trid/trid.exe",
         "fs":[{
@@ -77,14 +89,16 @@
                 "diec.exe":"DiE/diec.exe",
                 "Qt5Core.dll":"DiE/Qt5Core.dll",
                 "Qt5Script.dll":"DiE/Qt5Script.dll"
-            }
+            },
+            "ts":1735686000
         },{
             "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip",
             "x":{
                 "*":"DiE"
-            }
+            },
+            "ts":1759700000
         }],
-        "ts":0
+        "ts":1759700000
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -440,13 +454,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/58/8b/dolphin-master-2509-138-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/2f/c4/dolphin-master-2509-140-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1759705099
+            "ts":1759773960
         }],
-        "ts":1759705099
+        "ts":1759773960
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -1399,6 +1413,20 @@
                 "bytepress.lib.dll":"BytePressDecompressor/bytepress.lib.dll"
             }
         }],
+        "ts":0
+    },
+    "cup386":{
+        "p":"CUP386.COM",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/8f3d56b9830b496f248ce98216935b5ff47c87bd/dos/CUP386/CUP386.COM"
+        ],
+        "ts":0
+    },
+    "unp":{
+        "p":"UNP.EXE",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/8f3d56b9830b496f248ce98216935b5ff47c87bd/dos/UNP.EXE"
+        ],
         "ts":0
     },
     "sonic4":{

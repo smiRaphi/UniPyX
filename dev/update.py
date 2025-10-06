@@ -80,12 +80,17 @@ def update():
                 ts = ft(str(time.gmtime().tm_year),'%Y')
             elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
                 ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
+            elif u.startswith('https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/'):
+                ts = ft(str(time.gmtime().tm_year),'%Y')
+            elif u == "https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip":
+                ct = time.gmtime()
+                ts = ft(f'{ct.tm_year}.{ct.tm_mon:02d}.{ct.tm_mday:02d}','%Y.%m.%d')
 
             elif dom == 'github.com' and '/releases/download/' in u:
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
                 if repo in ('aaru-dps/Aaru',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
-                elif repo in ('horsicq/Detect-It-Easy',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
+                elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
