@@ -351,6 +351,11 @@
         "rs":"Roxio Toast IMG"
     },
     {
+        "rq":null,
+        "d":["ext",".qbp"],
+        "sr":"qbp"
+    },
+    {
         "d":["ext",".xbp"],
         "rs":"XBP"
     },

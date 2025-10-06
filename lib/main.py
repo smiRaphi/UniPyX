@@ -641,6 +641,10 @@ def extract(inp:str,out:str,t:str) -> bool:
         case '777'|'BIX'|'UFA': # merge 7z predecessors
             run([t.lower(),'x','-y','-o' + o,i])
             if os.listdir(o): return
+        case 'qbp':
+            of = o + '/' + tbasename(i)
+            run(['qbp','d',i,of])
+            if exists(of) and os.path.getsize(of): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
