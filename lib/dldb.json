@@ -1200,6 +1200,15 @@
         "https://update.bioruebe.com/uniextract/nightly/bin/unzoo/unzoo.exe"
         ]
     },
+    "yac":{
+        "p":"YAC.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/yac102.zip",
+            "x":{
+                "YAC.EXE":"YAC.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
