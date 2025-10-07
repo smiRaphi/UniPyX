@@ -2133,6 +2133,14 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['lizard','-d','-f','-q',i,of])
             if exists(of) and os.path.getsize(of): return
+        case 'Zhuff':
+            of = o + '/' + tbasename(i)
+            run(['zhuff','-d','-s',i,of])
+            if exists(of) and os.path.getsize(of): return
+        case 'BriefLZ':
+            of = o + '/' + tbasename(i)
+            run(['blzpack','-d',i,of])
+            if exists(of) and os.path.getsize(of): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

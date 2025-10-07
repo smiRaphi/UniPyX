@@ -415,6 +415,11 @@
         "rs":"LZPXJ"
     },
     {
+        "rqr":null,
+        "d":[["ext",".zh",true],["ext",".zhuff",true]],"noq":true,
+        "rs":"Zhuff"
+    },
+    {
         "rq":null,
         "d":["ext",".toast"],
         "rs":"Roxio Toast IMG"

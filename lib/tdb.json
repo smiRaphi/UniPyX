@@ -615,5 +615,8 @@
     ],
     "Lizard":[
         "lizard compressed data"
+    ],
+    "BriefLZ":[
+        "brieflz compressed data"
     ]
 }

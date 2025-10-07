@@ -1548,6 +1548,18 @@
     "lizard":{
         "p":"lizard.exe"
     },
+    "zhuff":{
+        "p":"Zhuff.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20161227114805if_/https://dl.dropboxusercontent.com/u/59565338/Zhuff/Zhuffv099beta.zip",
+            "x":{
+                "Zhuff_beta.exe":"Zhuff.exe"
+            }
+        }]
+    },
+    "blzpack":{
+        "p":"blzpack.exe"
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
