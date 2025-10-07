@@ -239,6 +239,11 @@
         "rs":"NSP","s":1
     },
     {
+        "rq":null,
+        "d":["isat","BCM2",0],
+        "rs":"BCM","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","AGAR\\1\\0\\0\\0\\1\\0\\0\\0",0],
         "rs":"Danganronpa WAD","s":1
@@ -294,6 +299,22 @@
         "rs":"Yamazaki Zipper","s":1
     },
     {
+        "rqr":null,
+        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],
+             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
+        "rs":"ZCM"
+    },
+    {
+        "rq":"UPX",
+        "d":[["size",[69136,null]],["isat","RK",-2],["isat","R\\x00K\\x00 \\x00S\\x00e\\x00l\\x00f\\x00-\\x00E\\x00x\\x00t\\x00r\\x00a\\x00c\\x00t\\x00i\\x00n\\x00g\\x00 \\x00A\\x00r\\x00c\\x00h\\x00i\\x00v\\x00e\\x00",68508]],
+        "rs":"RK","s":1
+    },
+    {
+        "rq":null,
+        "d":[["size",[32,null]],["isat","RK",-2],["isat","\\0\\0\\0\\0",-12]],
+        "rs":"RK"
+    },
+    {
         "rq":null,
         "rqr":"Win32 Executable (generic)",
         "d":[["size",[200,1048576]],
@@ -346,6 +367,11 @@
         "rs":"Unreal ZenLoader"
     },
     {
+        "rqr":null,
+        "d":["ext",".nlzm"],
+        "rs":"NLZM"
+    },
+    {
         "rq":null,
         "d":["ext",".toast"],
         "rs":"Roxio Toast IMG"
@@ -353,7 +379,17 @@
     {
         "rq":null,
         "d":["ext",".qbp"],
-        "sr":"qbp"
+        "rs":"qbp"
+    },
+    {
+        "rq":null,
+        "d":["ext",".tangelo"],
+        "rs":"TANGELO"
+    },
+    {
+        "rq":null,
+        "d":["ext",".csc"],
+        "rs":"CSC"
     },
     {
         "d":["ext",".xbp"],

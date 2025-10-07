@@ -72,49 +72,9 @@ class DLDB:
                     if 'x' in e:
                         bk = self.print_try
                         self.print_try = False
-                        if ex == '.zip':
-                            with zipfile.ZipFile(p,'r') as z:
-                                for tx in e['x']:
-                                    if tx == '*':
-                                        os.makedirs('bin/' + e['x'][tx],exist_ok=True)
-                                        z.extractall('bin/' + e['x'][tx])
-                                    else: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
-                        elif ex in ['.tgz','.tar.gz']:
-                            with tarfile.open(p,'r:gz') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
-                        elif ex in ['.txz','.tar.xz']:
-                            with tarfile.open(p,'r:xz') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
-                        elif ex in ['.tzt','.tar.zst']:
-                            td = gtmp()
-                            self.run(['7z','x','-y','-o' + td,p])
-                            with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
-                            rmtree(td)
-                        elif ex == '.7z':
-                            td = gtmp()
-                            self.run(['7z','x','-y','-o' + td,p])
-                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
-                            rmtree(td)
-                        elif ex == '.rar':
-                            td = gtmp()
-                            self.run(['unrar','x','-or','-op' + td,p])
-                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
-                            rmtree(td)
-                        elif ex == '.msi':
-                            td = gtmp()
-                            os.makedirs(td,exist_ok=True)
-                            self.run(['lessmsi','x',p,td + '\\'])
-                            for tx in e['x']: copy(td + '/SourceDir/' + tx,'bin/' + e['x'][tx])
-                            rmtree(td)
-                        elif ex == '.deb':
-                            td = gtmp()
-                            os.makedirs(td,exist_ok=True)
-                            self.run(['7z','x','-y','-o' + td,p])
-                            with tarfile.open(td + '/data.tar','r') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile('./' + tx).read())
-                            rmtree(td)
-                        else: raise NotImplementedError(p + f' [{ex}]')
+
+                        self.ext(p,ex,e['x'])
+
                         self.print_try = bk
                         os.remove(p)
             exei = os.path.abspath('bin/' + exi['p'])
@@ -122,6 +82,55 @@ class DLDB:
             self.save()
             os.chdir(cd)
         return exei,up
+    def ext(self,p:str,ex:str,xl:dict):
+        if ex == '.zip':
+            with zipfile.ZipFile(p,'r') as z:
+                for tx in xl:
+                    if tx == '*':
+                        os.makedirs('bin/' + xl[tx],exist_ok=True)
+                        z.extractall('bin/' + xl[tx])
+                    elif type(xl[tx]) == dict:
+                        tf = gtmp(ex)
+                        xopen(tf,'wb').write(z.read(tx))
+                        self.ext(tf,ex,xl[tx])
+                        os.remove(tf)
+                    else: xopen('bin/' + xl[tx],'wb').write(z.read(tx))
+        elif ex in ['.tgz','.tar.gz']:
+            with tarfile.open(p,'r:gz') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+        elif ex in ['.txz','.tar.xz']:
+            with tarfile.open(p,'r:xz') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+        elif ex in ['.tzt','.tar.zst']:
+            td = gtmp()
+            self.run(['7z','x','-y','-o' + td,p])
+            with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+            rmtree(td)
+        elif ex == '.7z':
+            td = gtmp()
+            self.run(['7z','x','-y','-o' + td,p])
+            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == '.rar':
+            td = gtmp()
+            self.run(['unrar','x','-or','-op' + td,p])
+            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == '.msi':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run(['lessmsi','x',p,td + '\\'])
+            for tx in xl: copy(td + '/SourceDir/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == '.deb':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run(['7z','x','-y','-o' + td,p])
+            with tarfile.open(td + '/data.tar','r') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile('./' + tx).read())
+            rmtree(td)
+        else: raise NotImplementedError(p + f' [{ex}]')
     def dl(self,url:str,out:str):
         start = 0
         try:

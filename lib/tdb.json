@@ -63,8 +63,8 @@
     "UPX":[
         "upx compressed win32 executable",
         "upx wwwupxsourceforgenet",
-        "packerupx compresorgratuito wwwupxsourceforgenet",
-        "upx 290 lzma"
+        "upx 290 lzma",
+        "upx"
     ],
     "BinHex":[
         "binhex 4.0 encoded"
@@ -260,7 +260,8 @@
     ],
     "TAR":[
         "tar - tape archive (gnu)",
-        "tar - tape archive (file)"
+        "tar - tape archive (file)",
+        "tar - tape archive (directory)"
     ],
     "RPG Maker Archive (XP/VX/VX Ace)":[
         "rpg maker vx encrypted archive (v2)",
@@ -540,5 +541,36 @@
     ],
     "BIX":[
         "bix archiver compressed archive"
+    ],
+    "RAZOR":[
+        "razor"
+    ],
+    "NanoZip":[
+        "nanozip",
+        "nanozip compressed archive"
+    ],
+    "bsc":[
+        "bsc compressed data"
+    ],
+    "LZIP":[
+        "lzip compressed archive"
+    ],
+    "LZHAM":[
+        "lzham compressed data"
+    ],
+    "YBS":[
+        "ybs compressed archive"
+    ],
+    "CSArc":[
+        "csarc compressed archive"
+    ],
+    "UHARC":[
+        "uharc compressed archive"
+    ],
+    "GRZip":[
+        "grzip compressed archive"
+    ],
+    "GRZipII":[
+        "grzipii compressed archive"
     ]
 }

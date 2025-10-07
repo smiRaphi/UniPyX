@@ -26,7 +26,8 @@ GFMTS = {
     'rm-NoobInCoding/UnPSARC':lambda tag:f'UnPSARC_{tag}.zip',
     'peitaosu/WFRR':lambda tag,arch:f'WFRR_{tag}.0_{arch}_release.zip',
     'AppleCommander/AppleCommander':lambda tag:f'AppleCommander-acx-{tag}.jar',
-    'unsound/hfsexplorer':lambda tag: f'{tag}-bin.zip',
+    'unsound/hfsexplorer':lambda tag:f'{tag}-bin.zip',
+    'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):

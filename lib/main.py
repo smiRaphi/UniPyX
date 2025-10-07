@@ -380,7 +380,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2'|'SZDD':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2'|'SZDD'|'LZIP':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -392,7 +392,8 @@ def extract(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if os.listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                else: return fix_tar(o)
+                elif t in ('ZSTD','BZIP2','LZIP'): return fix_tar(o)
+                else: return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
             run(['pdfimages','-j',i,o + '\\img'])
@@ -608,6 +609,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'ARQ': return msdos(['arq','-x',i,'*',o])
         case 'XX34': return msdos(['xx34','D',i],tmpi=True,cwd=o)
+        case 'UHARC':
+            dosbox(['uharcd','x',i])
+            if os.listdir(o): return
         case 'Stirling Compressed':
             od = rldir(o)
             run(["deark","-od",o,i])
@@ -638,13 +642,10 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Yamazaki Zipper':
             run(['yzdec','-d' + o,'-y',i])
             if os.listdir(o): return
-        case '777'|'BIX'|'UFA': # merge 7z predecessors
+        case '777'|'BIX'|'UFA':
+            # merge 7z predecessors
             run([t.lower(),'x','-y','-o' + o,i])
             if os.listdir(o): return
-        case 'qbp':
-            of = o + '/' + tbasename(i)
-            run(['qbp','d',i,of])
-            if exists(of) and os.path.getsize(of): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -2015,6 +2016,52 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
 
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII':
+            # merge some small compressors
+            of = o + '/' + tbasename(i)
+            run([t.lower(),'d',i,of])
+            if exists(of) and os.path.getsize(of): return
+        case 'ZCM':
+            run(['zcm','x','-t0',i,o],timeout=300)
+            if exists('master.tmp'): remove('master.tmp')
+            if os.listdir(o): return
+        case 'BCM':
+            of = o + '/' + tbasename(i)
+            run(['bcm','-d','-f',i,of])
+            if exists(of) and os.path.getsize(of): return
+        case 'RAZOR':
+            run(['rz','-y','-o',o,'x',i,'*'])
+            if os.listdir(o): return
+        case 'NanoZip':
+            run(['nz','x','-o' + o,i,'*'])
+            if os.listdir(o): return
+        case 'bsc':
+            of = o + '/' + tbasename(i)
+            run(['bsc','d',i,of])
+            if exists(of) and os.path.getsize(of): return
+        case 'LZHAM':
+            of = o + '/' + tbasename(i)
+            run(['lzham','-c','-u','d',i,of])
+            if exists(of) and os.path.getsize(of): return
+        case 'YBS':
+            YBSR = re.compile(r': Error opening ([^\n]+)')
+            if db.print_try: print('Trying with ybs')
+            while True:
+                _,_,r = run(['ybs','-d','-y',i],print_try=False,cwd=o)
+                fs = YBSR.findall(r)
+                if not fs: break
+                for f in fs: mkdir(o + '/' + dirname(f))
+            if os.listdir(o): return
+        case 'CSArc':
+            run(['csarc','x','-t8','-o',o,i])
+            if os.listdir(o): return
+        case 'RK':
+            run(['rk','-x','-y','-O','-D' + o,i])
+            if os.listdir(o): return
+        case 'GRZip':
+            run(['grzip','e',i],cwd=o)
+            if os.listdir(o): return
+
     return 1
 def fix_isinstext(o:str,oi:str=None):
     ret = True
@@ -2082,10 +2129,8 @@ def fix_innoinstext(o:str,i:str):
 def fix_tar(o:str,rem=True):
     if len(os.listdir(o)) == 1:
         f = o + '/' + os.listdir(o)[0]
-        rf = open(f,'rb')
-        rf.seek(0x101)
-        r = rf.read(6) in (b'ustar\0',b'ustar ')
-        if r:
+        nts,_ = analyze(f,True)
+        if nts == ['TAR']:
             r = extract(f,o,'TAR')
             if not r and rem:
                 try:remove(f)

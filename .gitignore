@@ -10,7 +10,6 @@ __pycache__
 *.exe
 
 !/bin/hac2l.exe
-!/bin/ndssndext.exe
 !/bin/ps3key.py
 !/bin/wiiudk.py
 !/bin/BMS/xbp.bms
@@ -24,3 +23,5 @@ __pycache__
 !/bin/bbccp.exe
 !/bin/assamUnpack.exe
 !/bin/atr.exe
+!/bin/csc.exe
+!/bin/csarc.exe

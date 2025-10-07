@@ -11,7 +11,8 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * self compiled [bbccp](https://github.com/ethandicks/bbc-disk-tools) without glob
 * self compiled [assamUnpack](https://github.com/refint/assamUnpack) without input request
 * self compiled [atr](https://github.com/jhallen/atari-tools)
-* [ndssndext](https://gbatemp.net/download/nds-sound-extractor.28818/) because it's packed twice
+* self compiled [CSC/CSArc](https://github.com/fusiyuan2010/CSC)
+* self compiled [NLZM](https://github.com/nauful/NLZM)
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
 * tmd.py for Nintendo TMD files and key generation
 

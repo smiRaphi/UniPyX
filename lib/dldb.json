@@ -96,9 +96,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1759700000
+            "ts":1759788000
         }],
-        "ts":1759700000
+        "ts":1759788000
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -118,6 +118,11 @@
             "u":"https://www.tc4shell.com/binary/Iso7z.zip",
             "x":{
                 "Iso7z.64.dll":"7z/Formats/Iso7z.64.dll"
+            }
+        },{
+            "u":"https://www.tc4shell.com/binary/Lzip.zip",
+            "x":{
+                "Lzip.64.dll":"7z/Formats/Lzip.64.dll"
             }
         }],
         "ts":1754212738
@@ -635,10 +640,14 @@
     },
     "ndssndext":{
         "p":"ndssndext.exe",
-        "fs":[[
-            "https://files.catbox.moe/k4141a.bin",
-            "ndssndext.exe"
-        ]],
+        "fs":[{
+            "u":"https://filetrip.net/files/f/28818-ndssndext_v04.zip",
+            "x":{
+                "ndssndext_v04.zip":{
+                    "ndssndext.exe":"ndssndext.exe"
+                }
+            }
+        }],
         "ts":0
     },
     "ps3dec":{
@@ -1192,13 +1201,15 @@
             "x":{
                 "XX3402.EXE":"XX34.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "unzoo":{
         "p":"unzoo.exe",
         "fs":[
         "https://update.bioruebe.com/uniextract/nightly/bin/unzoo/unzoo.exe"
-        ]
+        ],
+        "ts":0
     },
     "yac":{
         "p":"YAC.EXE",
@@ -1207,7 +1218,8 @@
             "x":{
                 "YAC.EXE":"YAC.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "yzdec":{
         "p":"yzdec.exe",
@@ -1216,7 +1228,8 @@
             "x":{
                 "yzdec.exe":"yzdec.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "777":{
         "p":"777.exe",
@@ -1225,7 +1238,8 @@
             "x":{
                 "777.exe":"777.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "bix":{
         "p":"bix.exe",
@@ -1234,7 +1248,8 @@
             "x":{
                 "bix.exe":"bix.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "ufa":{
         "p":"ufa.exe",
@@ -1243,14 +1258,150 @@
             "x":{
                 "ufa.exe":"ufa.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "qbp":{
         "p":"qbp.exe",
         "fs":[[
             "https://raw.githubusercontent.com/asimba/qbp/refs/heads/master/bin/windows-x86_64/qbp-rs.exe",
             "qbp.exe"
-        ]]
+        ]],
+        "ts":0
+    },
+    "tangelo":{
+        "p":"tangelo.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=2355&d=1371488428",
+            "ex":".zip",
+            "x":{
+                "tangelo.exe":"tangelo.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zcm":{
+        "p":"zcm.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20250219173903if_/http://heartofcomp.altervista.org/zcm093.zip",
+            "x":{
+                "zcmx64.exe":"zcm.exe"
+            }
+        }],
+        "ts":0
+    },
+    "bcm":{
+        "p":"bcm.exe",
+        "fs":[{
+            "u":"https://compressme.net/bcm203.zip",
+            "x":{
+                "bcm.exe":"bcm.exe"
+            }
+        }],
+        "ts":0
+    },
+    "rz":{
+        "p":"rz.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=5854&d=1521756803",
+            "ex":".zip",
+            "x":{
+                "rz.exe":"rz.exe"
+            }
+        }],
+        "ts":0
+    },
+    "nz":{
+        "p":"nz.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20160304180916if_/http://nanozip.net/nanozip-0.09a.win64.zip",
+            "x":{
+                "nz.exe":"nz.exe"
+            }
+        }],
+        "ts":0
+    },
+    "bsc":{
+        "p":"bsc.exe",
+        "fs":[{
+            "u":"https://github.com/IlyaGrebnov/libbsc/releases/download/v3.3.12/bsc-3.3.12-x64.zip",
+            "x":{
+                "bsc.exe":"bsc.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lzham":{
+        "p":"lzham/lzham.exe",
+        "fs":[{
+            "u":"https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/lzham/lzham_alpha7_r1.7z",
+            "x":{
+                "bin/lzhamtest_x64.exe":"lzham/lzham.exe",
+                "bin/lzham_x64.dll":"lzham/lzham_x64.dll"
+            }
+        }],
+        "ts":0
+    },
+    "ybs":{
+        "p":"ybs.exe",
+        "fs":[{
+            "u":"https://compression.ru/compression.ru/ybs/ybs003fw.zip",
+            "x":{
+                "YBS.EXE":"ybs.exe"
+            }
+        }],
+        "ts":0
+    },
+    "csc":{
+        "p":"csc.exe"
+    },
+    "csarc":{
+        "p":"csarc.exe"
+    },
+    "nlzm":{
+        "p":"nlzm.exe"
+    },
+    "uharcd":{
+        "p":"UHARCD.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/uharc06b.zip",
+            "x":{
+                "UHARCD.EXE":"UHARCD.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "rk":{
+        "p":"rk.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/win32/rk/rk104a1e.zip",
+            "x":{
+                "rk.exe":"rk.exe"
+            }
+        }],
+        "ts":0
+    },
+    "grzip":{
+        "p":"GRZip.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/grzip.zip",
+            "x":{
+                "GRZipWin.zip":{
+                    "GRZip.exe":"GRZip.exe"
+                }
+            }
+        }],
+        "ts":0
+    },
+    "grzipii":{
+        "p":"GRZipII.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/grzipiiw.zip",
+            "x":{
+                "GRZipII.exe":"GRZipII.exe"
+            }
+        }],
+        "ts":0
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
