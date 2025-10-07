@@ -602,5 +602,18 @@
         "squeez sqx archive selfextractor v.5.63",
         "www.speedproject.de/enu/support/updates.html",
         "sqx compressed archive"
+    ],
+    "IMP":[
+        "imp compressed archive"
+    ],
+    "ARHANGEL":[
+        "arhangel compressed archive"
+    ],
+    "JAR":[
+        "jar compressed archive",
+        "jar compressed archive (with secruity envelope)"
+    ],
+    "Lizard":[
+        "lizard compressed data"
     ]
 }

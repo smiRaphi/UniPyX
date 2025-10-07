@@ -2020,7 +2020,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
 
-        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ':
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH'|'LZPX'|'LZPXJ':
             # merge some small compressors
             of = o + '/' + tbasename(i)
             run([t.lower(),'d',i,of])
@@ -2120,6 +2120,19 @@ def extract(inp:str,out:str,t:str) -> bool:
             run([tf],print_try=False)
             remove(tf)
             if os.listdir(o): return
+        case 'IMP':
+            run(['imp','e','-o' + o,'-y',i])
+            if os.listdir(o): return
+        case 'ARHANGEL':
+            dosbox(['arhangel','x','-oq-',i])
+            if os.listdir(o): return
+        case 'JAR':
+            run(['jar','x','-y',i],cwd=o)
+            if os.listdir(o): return
+        case 'Lizard':
+            of = o + '/' + tbasename(i)
+            run(['lizard','-d','-f','-q',i,of])
+            if exists(of) and os.path.getsize(of): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
