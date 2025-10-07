@@ -572,5 +572,10 @@
     ],
     "GRZipII":[
         "grzipii compressed archive"
+    ],
+    "CPIO":[
+        "cpio archive (portable)",
+        "cpio archive (portable old)",
+        "cpio archive (portable new)"
     ]
 }
