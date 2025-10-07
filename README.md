@@ -13,6 +13,7 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * self compiled [atr](https://github.com/jhallen/atari-tools)
 * self compiled [CSC/CSArc](https://github.com/fusiyuan2010/CSC)
 * self compiled [NLZM](https://github.com/nauful/NLZM)
+* [flashzip](https://web.archive.org/web/20250503183329/https://heartofcomp.altervista.org/Flashzip.htm) because it's packed in an inno installer in a zip
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
 * tmd.py for Nintendo TMD files and key generation
 

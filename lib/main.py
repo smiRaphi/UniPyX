@@ -338,7 +338,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         symlink(inf,oup + '/' + basename(inf))
 
         if print_try and db.print_try: print('Trying with',scr)
-        p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','-defaultconf','NUL','-fastlaunch','-nogui',('-silent' if nowin else '-exit'),
+        p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else '-exit'),
              '-c','MOUNT C "' + oup.replace('\\','\\\\') + '"','-c','C:',
              '-c',subprocess.list2cmdline([basename(s)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + ' > _OUT.TXT'] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
 
@@ -392,7 +392,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if os.listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in ('ZSTD','BZIP2','LZIP'): return fix_tar(o)
+                elif t in ('ZSTD','xz','BZIP2','LZIP'): return fix_tar(o)
                 else: return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
@@ -2060,6 +2060,12 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'GRZip':
             run(['grzip','e',i],cwd=o)
+            if os.listdir(o): return
+        case 'BOA Constrictor':
+            dosbox(['boa','-x',i])
+            if os.listdir(o): return
+        case 'Flashzip':
+            run(['flashzip','x','-t0',i,o])
             if os.listdir(o): return
 
     return 1

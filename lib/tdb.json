@@ -274,7 +274,8 @@
         "yenc encoded"
     ],
     "xz":[
-        "xz compressed container"
+        "xz compressed container",
+        "xz"
     ],
     "BZIP":[
         "bzip compressed archive"
@@ -577,5 +578,8 @@
         "cpio archive (portable)",
         "cpio archive (portable old)",
         "cpio archive (portable new)"
+    ],
+    "BOA Constrictor":[
+        "boa constrictor archiver compressed archive"
     ]
 }

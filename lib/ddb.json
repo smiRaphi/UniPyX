@@ -299,10 +299,18 @@
         "rs":"Yamazaki Zipper","s":1
     },
     {
+        "rq":null,
         "rqr":null,
         "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],
              ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
         "rs":"ZCM"
+    },
+    {
+        "rq":null,
+        "rqr":null,
+        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",8,48],
+             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif dn and dn[-1:]!=b'/':return\nif f.read(2) == b'R5' and not sum(f.read(7)) and f.read(2) == b'R5' and not sum(f.read(7)):return True"]],
+        "rs":"Flashzip"
     },
     {
         "rq":"UPX",

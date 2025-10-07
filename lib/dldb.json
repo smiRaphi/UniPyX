@@ -1403,6 +1403,19 @@
         }],
         "ts":0
     },
+    "boa":{
+        "p":"BOA/BOA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/boa058.zip",
+            "x":{
+                "BOA.EXE":"BOA/BOA.EXE",
+                "CWSDPMI.EXE":"BOA/CWSDPMI.EXE"
+            }
+        }]
+    },
+    "flashzip":{
+        "p":"flashzip.exe"
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
