@@ -62,6 +62,7 @@
     ],
     "UPX":[
         "upx compressed win32 executable",
+        "upx compressed win64 executable",
         "upx wwwupxsourceforgenet",
         "upx 290 lzma",
         "upx"
@@ -581,5 +582,25 @@
     ],
     "BOA Constrictor":[
         "boa constrictor archiver compressed archive"
+    ],
+    "Dark":[
+        "dark compressed data"
+    ],
+    "SBC":[
+        "sbc compressed archive"
+    ],
+    "SZIP":[
+        "szip compressed data"
+    ],
+    "BALZ":[
+        "balz compressed data"
+    ],
+    "Zzip":[
+        "zzip compressed archive"
+    ],
+    "Squeez":[
+        "squeez sqx archive selfextractor v.5.63",
+        "www.speedproject.de/enu/support/updates.html",
+        "sqx compressed archive"
     ]
 }

@@ -1416,6 +1416,63 @@
     "flashzip":{
         "p":"flashzip.exe"
     },
+    "dark":{
+        "p":"dark.exe",
+        "fs":[{
+            "u":"https://darchiver.narod.ru/dark/dark-0.51-win.zip",
+            "x":{
+                "dark.exe":"dark.exe"
+            }
+        }]
+    },
+    "brotli":{
+        "p":"brotli.exe",
+        "fs":[{
+            "u":"https://github.com/google/brotli/releases/download/v1.1.0/brotli-x64-windows-static.zip",
+            "x":{
+                "brotli.exe":"brotli.exe"
+            }
+        }]
+    },
+    "sbc":{
+        "p":"sbc.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20201010022623if_/https://86c32373-a-62cb3a1a-s-sites.googlegroups.com/site/sbcarchiver/sbc-0.970r3.win.amd64.zip?attachauth=ANoY7cqBXzoR2QXAJqnmfjR0L8J430qTD7_NyzuoW-rplsemNXQt_900VMd9u5ebzPp4j2yh0cywTd1VviVjoRnpahwAlm6EreGyZm5kn6BRuaYI-OHc1o9DEfV5YnFiVAhUjfwnn-Qp0FDKVlH2gf8ggU-xKExbaOlwMYQcCzLw-FPRXHggh7e02RS3QadkNsOPatl0nR457MSp6zwdCv5_aLoX7ct-d70UtiId54_KA2tLXAZpd6c%3D&attredirects=0",
+            "x":{
+                "sbc.exe":"sbc.exe"
+            }
+        }]
+    },
+    "szip":{
+        "p":"szip.exe",
+        "fs":[{
+            "u":"http://www.compressconsult.com/szip/szip_112a_win32.zip",
+            "x":{
+                "szip.exe":"szip.exe"
+            }
+        }]
+    },
+    "balz":{
+        "p":"balz.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/balz/BALZ/1.50/balz150_win32.zip?viasf=1",
+            "x":{
+                "balz.exe":"balz.exe"
+            }
+        }]
+    },
+    "zzip":{
+        "p":"zzip.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20160530091207if_/http://archives.damiendebin.net/zzip/files/zzip-win32.zip",
+            "x":{
+                "zzip-win32/zzip.exe":"zzip.exe"
+            }
+        }]
+    },
+    "sqx":{
+        "p":"sqx_std64.sfx"
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

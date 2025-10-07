@@ -646,6 +646,10 @@ def extract(inp:str,out:str,t:str) -> bool:
             # merge 7z predecessors
             run([t.lower(),'x','-y','-o' + o,i])
             if os.listdir(o): return
+        case 'Brotli':
+            of = o + '/' + tbasename(i)
+            run(['brotli','-d','-o',of,i])
+            if exists(of) and os.path.getsize(of): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -2016,7 +2020,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
 
-        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII':
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ':
             # merge some small compressors
             of = o + '/' + tbasename(i)
             run([t.lower(),'d',i,of])
@@ -2066,6 +2070,55 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Flashzip':
             run(['flashzip','x','-t0',i,o])
+            if os.listdir(o): return
+        case 'Dark':
+            run(['dark','u',i],cwd=o)
+            if os.listdir(o): return
+        case 'SBC':
+            run(['sbc','x','-hn','-y','-t' + o,i])
+            if os.listdir(o): return
+        case 'SZIP':
+            of = o + '/' + tbasename(i)
+            run(['szip','-d',i,of])
+            if exists(of) and os.path.getsize(of): return
+        case 'Zzip':
+            run(['zzip','x','-q',i],cwd=o)
+            if os.listdir(o): return
+        case 'Squeez':
+            import zlib,base64
+
+            tf = o + '/tmp' + os.urandom(8).hex() + '.exe'
+            t = open(tf,'wb')
+
+            t.write(open(db.get('sqx'),'rb').read())
+            # SCSFX
+            t.write(zlib.decompress(base64.b85decode('c-oy-&2Aev5LVDjp+ff_nE;X!G?uMDOHTR&N0u9-i5+;;ra;sKwM$8?cgZcum7=~;Z@u?WpfAuz=_~Xb?yj_U5}>F7+uWJq@SB-$h72ab`H!`~f4^7zv{tLlKdaUL`Qy(<{cR*{Xk_Z7RzEfBjrtM$icQrrmUcy-ZzJybPH}b9sCV)IQa9>7{GV_YinvklV|^{sn1_P#7=i%=tw6XeZPbUfp1yO2hptgS#@9tlEi~hEok1`n^>Y!!a*SoC(`nRCD!v=_r-9=t;wEAU0RRX|>uN2`#z-gFLdL?fjdUycW2w;zqESm264W;<p;)AqU?PVA6>FJHv3Aq8VMK8>?Gx6FGw<r5eRR0caU={@<t7mwI$`k-;JOs;B$nX~)9_M6)@DwZ)|7(+)&g*tTS+@p+=MH+7G&pEg4tArav?>;^3%xk;Qx4Lh2su8-6=N`%emOYCm-!|e^9$KQ?F@Xe(ugTG=h_*Trla7GPqIN!G*N0<LhuHd90TfK&hq^trpTGW#J*E+EzXD7%rnN3$=1wDj@annBob}X*auV3YrM;MrU!vwmM_6yzwbA1)V5W9s<>kc4G(egzBA#kJ^3%A#tYJzaQOa&$g)5OvT(fmgp!?a<luGHG81#(a!F>XCE~p=DhMuLM(>8;?{1oiJ<BE7<1OK2Tl8c0YX~niG5B`zB}wyEVu=B<&X)ABGkq}w=+iUy?)^>lBCjR%k;t<mt<*L@-I|qw&{O!>j76??0nOK#IQ;<RL4uPVQ13bppd_0uq8QFvN#EK69#-Bi)MyT7MTJW4$5(Grr;#yZbfH|_M5GU2^+yF*|ri!+`?y9zW7zPk{2p+kZ(UHPD6B3@~hms;aJB&fZAb1REah>`i44RE~Vo!vvR4p%Z#``Q&*`_hedM{)w$Yk_!b=M9~I@OWWVBa&0`t8@3Hefrm~gL#c;tL{he?98YszvI;%jQ_ZFKPqYa|$6Za<9lLIe+vQLyd4MSlqi-eMXN58-8H6r4!TdfcYwGXmc0xrh`Hc|C2l+6|k8A_CnB_hd*(I4K;?JjVsiokIbkmd1R%MUjIEQtu`u};%1QN=Te0B3Pb+VO74BU8vuX8jQC`{C~?K>?MM8k&K>n<y*nVKaL~RBYNJd*2Er45yo?>tjR{B%CfaNO~n;TptIgA1ITbB|$1gG|@?d5&_6e%~Zt=mGZU)g~Hcd#(a(fpvJUg=2p(7_Q~PlX0z#7+JKDwjEr<bog9+MM5kLLmn-+zZ>)QA(m&`Op$&sKQx>d2*lX#)ikYHW?#(PlAu_Y}DIHMRTlpM+g3rNw!BQRb+jKyMx`P=RU<b$=v{an4g3Ce4Wyq;47deqE`jqG03nIWU&U3LU2s{@6ypRfS1ra@FTj7wl={xE2!F+4auE|iXmqKMY>BPt4NBZ!n@<^Dui8JvRQ;542F>4_wg)Ughh4U7@+(P0dG4#oqMt(imkB`c}Q)q@2O`sD|s9r)v8EajrH4VJn#3yy=-zYywvB8@1(|W<pQm_m32vRxpfdmQN&4uXL$MXW$7S=w9Gl6c3NkxbQjT2h)Ej~TyOWcT9`)AYZZAxqZYzpMBv_8(ytXx$PdQhj%89C1!&BtR8?V9q94-X2JPeC6`8%9UIv06!j&c|nWPbGZy_Rp}9hx8n&N%<1Tj|O>K$~W5wNaf2);pRyi`Fq93H1aI;VT=fI9^Htb-U(<#h^z68bHMuu#ss;DZ`{k3c`##wT*fjcyiLpxybcpQ;vgB`mK67r_j&B!f9&D@AiM?rCV!8Sh<!P=Ay38EG+9GGvWlliilIXsL2HgFr0>;@(i>GgRPfNQeS+W5hqaIX+$(;oKmP(&ql(S')))
+
+            f = open(i,'rb')
+            if f.read(2) == b'MZ':
+                for of in (0x19600,0x1ce00,0x55c00,0x1c400,0x20200,0x65a00,0x19400,0x1ca00,0x55000):
+                    f.seek(of)
+                    if f.read(5) == b'SCSFX':break
+                else:
+                    f.close()
+                    t.close()
+                    tf.destroy()
+                    return 1
+
+                f.seek(9,1)
+                f.seek(int.from_bytes(f.read(4),'little'),1)
+                f.seek(0x2C,1)
+                for _ in range(3): f.seek(int.from_bytes(f.read(4),'little')*2,1)
+                f.seek(7,1)
+                assert f.read(5) == b'-sqx-'
+                f.seek(-12,1)
+            else: f.seek(-2,1)
+            t.write(f.read())
+            f.close()
+            t.close()
+            if db.print_try: print('Trying with sqx sfx')
+            run([tf],print_try=False)
+            remove(tf)
             if os.listdir(o): return
 
     return 1

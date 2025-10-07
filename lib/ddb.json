@@ -323,6 +323,13 @@
         "rs":"RK"
     },
     {
+        "rq":"UPX",
+        "d":[["size",[103434,null]],
+             ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true]],
+             "noq":true,
+        "rs":"Squeez","s":1
+    },
+    {
         "rq":null,
         "rqr":"Win32 Executable (generic)",
         "d":[["size",[200,1048576]],
@@ -378,6 +385,11 @@
         "rqr":null,
         "d":["ext",".nlzm"],
         "rs":"NLZM"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".br"],
+        "rs":"Brotli"
     },
     {
         "rq":null,

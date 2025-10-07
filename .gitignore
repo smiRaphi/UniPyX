@@ -26,3 +26,4 @@ __pycache__
 !/bin/csc.exe
 !/bin/csarc.exe
 !/bin/flashzip.exe
+!/bin/sqx_std64.sfx
