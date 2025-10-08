@@ -209,7 +209,7 @@
         "fs":[{
             "u":"https://entropymine.com/deark/releases/deark-1.7.1.tar.gz",
             "x":{
-                "deark-1.7.0/x64/deark.exe":"deark.exe"
+                "deark-1.7.1/x64/deark.exe":"deark.exe"
             },
             "ts":1755919440
         }],
@@ -1559,6 +1559,67 @@
     },
     "blzpack":{
         "p":"blzpack.exe"
+    },
+    "thor":{
+        "p":"THOR.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20140115050229if_/http://www.maximumcompression.com/thor_096.zip",
+            "x":{
+                "THOR.exe":"THOR.exe"
+            }
+        }]
+    },
+    "lzfse":{
+        "p":"lzfse.exe",
+        "fs":[
+        "https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe"
+        ]
+    },
+    "limit":{
+        "p":"LIMIT.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/nightowl/nopv13/014A/LIMIT12.ZIP",
+            "X":{
+                "LIMIT.EXE":"LIMIT.EXE"
+            }
+        }]
+    },
+    "sqz":{
+        "p":"SQZ.EXE",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/dos/sqz/sqz1084.zip",
+            "x":{
+                "SQZ.EXE":"SQZ.EXE"
+            }
+        }]
+    },
+    "quark":{
+        "p":"QUARK.EXE",
+        "fs":[{
+            "u":"http://old-dos.ru/dl.php?id=488",
+            "ex":".zip",
+            "x":{
+                "quarkr.exe":"QUARK.EXE"
+            }
+        }]
+    },
+    "ulz":{
+        "p":"ulz.exe",
+        "fs":[{
+            "u":"https://compressme.net/ulz102BETA.zip",
+            "x":{
+                "ulz.exe":"ulz.exe"
+            }
+        }]
+    },
+    "lzop":{
+        "p":"lzop.exe",
+        "fs":[{
+            "u":"https://www.lzop.org/download/lzop103w.zip",
+            "x":{
+                "lzop103w/lzop.exe":"lzop.exe"
+            }
+        }]
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",

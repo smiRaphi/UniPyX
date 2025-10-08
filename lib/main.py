@@ -324,23 +324,26 @@ def extract(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
-    def quickbms(scr,inp=i):
+    def quickbms(scr,inf=i,ouf=o):
         if db.print_try: print('Trying with',scr)
-        run(['quickbms',db.get(scr),inf,o],print_try=False)
-        if os.listdir(o): return
+        run(['quickbms',db.get(scr),inf,ouf],print_try=False)
+        if os.listdir(ouf): return
         return 1
-    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True):
+    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,tmps=False):
         scr = cmd[0]
         s = db.get(scr)
 
         mkdir(oup)
-        symlink(s,oup + '/' + basename(s))
+        ts = oup + '/'
+        if tmps: ts += 'TMP' + os.urandom(2).hex() + extname(s)
+        else: ts += basename(s)
+        symlink(s,ts)
         symlink(inf,oup + '/' + basename(inf))
 
         if print_try and db.print_try: print('Trying with',scr)
         p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else '-exit'),
              '-c','MOUNT C "' + oup.replace('\\','\\\\') + '"','-c','C:',
-             '-c',subprocess.list2cmdline([basename(s)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + ' > _OUT.TXT'] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
+             '-c',subprocess.list2cmdline([basename(ts)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + ' > _OUT.TXT'] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
 
         while not exists(oup + '/_OUT.TXT'): sleep(0.1)
         while True:
@@ -359,7 +362,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 break
             sleep(0.1)
         while True:
-            try: remove(oup + '/_OUT.TXT',oup + '/' + basename(s),oup + '/' + basename(inf))
+            try: remove(oup + '/_OUT.TXT',ts,oup + '/' + basename(inf))
             except PermissionError: sleep(0.1)
             else: break
         p.kill()
@@ -1440,7 +1443,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
                 mv(o + '/OUT.BIN',o + '/' + on)
                 return
-        case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK':
+        case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK'|'PKTINY':
             r = extract(i,o,'624')
             if not r: return r
             remove(o)
@@ -1448,6 +1451,13 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             r = extract(i,o,'COMPACK')
             if not r: return r
+        case 'PKLITE':
+            od = rldir(o)
+            run(["deark","-opt","execomp","-od",o,i])
+            for x in rldir(o):
+                if not x in od:
+                    mv(x,o + '/' + basename(i))
+                    return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
@@ -2020,7 +2030,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
 
-        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH'|'LZPX'|'LZPXJ':
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH'|'LZPX'|'LZPXJ'|'THOR'|'ULZ':
             # merge some small compressors
             of = o + '/' + tbasename(i)
             run([t.lower(),'d',i,of])
@@ -2141,6 +2151,19 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['blzpack','-d',i,of])
             if exists(of) and os.path.getsize(of): return
+        case 'UltraCompressor 2': raise NotImplementedError
+        case 'LZFSE':
+            of = o + '/' + tbasename(i)
+            run(['lzfse','-decode','-i',i,'-o',of])
+            if exists(of) and os.path.getsize(of): return
+        case 'LIMIT':
+            dosbox(['limit','e','-y','-p',i],tmps=True)
+            if os.listdir(o): return
+        case 'Squeeze It': return msdos(['sqz','x',i],cwd=o)
+        case 'QuARK': return msdos(['quark','x','/y',i],cwd=o,text=False)
+        case 'LZOP':
+            run(['lzop','-x','-qf',i],cwd=o)
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

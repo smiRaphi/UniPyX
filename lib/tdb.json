@@ -618,5 +618,31 @@
     ],
     "BriefLZ":[
         "brieflz compressed data"
+    ],
+    "UltraCompressor 2":[
+        "ultracompressor 2 archive"
+    ],
+    "THOR":[
+        "thor compressed data"
+    ],
+    "LZFSE":[
+        "lzfse compressed data (compressed tables)"
+    ],
+    "LIMIT":[
+        "limit compressed archive"
+    ],
+    "Squeeze It":[
+        "squeeze it compressed archive"
+    ],
+    "PKTINY":[
+        "16bit dos exe pktiny compressed"
+    ],
+    "PKLITE":[
+        "16bit dos exe pklite compressed",
+        "pklite"
+    ],
+    "LZOP":[
+        "lzop compressed data",
+        "lzop compressed"
     ]
 }
