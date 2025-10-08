@@ -901,6 +901,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Atari ATR':
             run(['atr',i,'x','-a'],cwd=o)
             if os.listdir(o): return
+        case 'ZArchive':
+            run(['zarchive',i,o])
+            if os.listdir(o): return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
@@ -2030,7 +2033,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
 
-        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH'|'LZPX'|'LZPXJ'|'THOR'|'ULZ':
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
             # merge some small compressors
             of = o + '/' + tbasename(i)
             run([t.lower(),'d',i,of])
@@ -2147,9 +2150,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['zhuff','-d','-s',i,of])
             if exists(of) and os.path.getsize(of): return
-        case 'BriefLZ':
+        case 'BriefLZ'|'QUAD':
             of = o + '/' + tbasename(i)
-            run(['blzpack','-d',i,of])
+            run([t.lower(),'-d',i,of])
             if exists(of) and os.path.getsize(of): return
         case 'UltraCompressor 2': raise NotImplementedError
         case 'LZFSE':

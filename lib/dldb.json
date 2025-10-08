@@ -1621,6 +1621,30 @@
             }
         }]
     },
+    "quad":{
+        "p":"quad.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/quad/QUAD/1.12/quad112.zip?viasf=1",
+            "x":{
+                "quad.exe":"quad.exe"
+            }
+        }]
+    },
+    "lzpm":{
+        "p":"lzpm.exe",
+        "fs":[{
+            "u":"https://compressme.net/lzpm018.zip",
+            "x":{
+                "lzpm.exe":"lzpm.exe"
+            }
+        }]
+    },
+    "zarchive":{
+        "p":"zarchive.exe",
+        "fs":[
+        "https://github.com/Exzap/ZArchive/releases/download/v0.1.2/zarchive.exe"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

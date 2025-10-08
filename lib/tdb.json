@@ -43,7 +43,8 @@
         "arj compressed archive"
     ],
     "ZSTD":[
-        "zstandard compressed data"
+        "zstandard compressed data",
+        "facebook zstandard/zstd compressed data"
     ],
     "ZLIB":[
         "zlib compressed data (default comp.)",
