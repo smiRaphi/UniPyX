@@ -180,6 +180,9 @@ def analyze(inp:str,raw=False):
         else: f.close()
 
     ts = [MSPCR.sub(' ',x.strip()) for x in ts if x.strip()]
+    if any(x in ts for x in ('Commodore 64 BASIC V2 program',)):
+        _,o,_ = db.run(['unp64','-i',inp])
+        ts.append(o.strip().split(' : ',1)[1].split(', unpacker=')[0])
 
     nts = checktdb(ts)
     nts = list(set(nts))
@@ -914,6 +917,16 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ZArchive':
             run(['zarchive',i,o])
             if os.listdir(o): return
+        case 'C64 Tape'|'C64 LiBRary':
+            run(['dirmaster','/e',i],cwd=o)
+            if os.listdir(o): return
+        case 'C64 TBC MultiCompactor'|'C64 CruelCrunch'|'C64 Time Cruncher'|'C64 Super Compressor'|'C64 MegaByte Cruncher'|'C64 1001 CardCruncher'|\
+             'C64 ECA Compactor':
+            tf = o + '\\' + basename(i)
+            symlink(i,tf)
+            run(['unp64',tf])
+            remove(tf)
+            if os.listdir(o): return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
@@ -1456,7 +1469,8 @@ def extract(inp:str,out:str,t:str) -> bool:
                 elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
                 mv(o + '/OUT.BIN',o + '/' + on)
                 return
-        case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK'|'PKTINY':
+        case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK'|\
+             'PKTINY':
             r = extract(i,o,'624')
             if not r: return r
             remove(o)

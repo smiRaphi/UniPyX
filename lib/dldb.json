@@ -1697,6 +1697,28 @@
             }
         }]
     },
+    "dirmaster":{
+        "p":"DirMaster.exe",
+        "fs":[{
+            "u":"https://style64.org/file/DirMaster_v3.1.5-STYLE.zip",
+            "x":{
+                "DirMaster_v3.1.5-STYLE/DirMasterSetup.exe":{
+                    "?ex":"inno",
+                    "DirMaster.exe":"DirMaster.exe"
+                }
+            }
+        }]
+    },
+    "unp64":{
+        "p":"unp64.exe",
+        "fs":[{
+            "u":"https://iancoog.altervista.org/C/unp64_241.7z",
+            "v":false,
+            "x":{
+                "unp64_241/unp64.exe":"unp64.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

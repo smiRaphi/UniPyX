@@ -162,6 +162,7 @@
         "inno setup installer",
         "inno setup v.6.4.0.1 installer",
         "www.innosetup.com",
+        "inno setup module",
         "inno setup module 5 sfx"
     ],
     "Inno Archive":[
@@ -648,5 +649,34 @@
     ],
     "BZip3":[
         "bzip3 compressed archive"
+    ],
+    "C64 Tape":[
+        "c64 tape image format (v1-updated)",
+        "commodore 64 tape container"
+    ],
+    "C64 LiBRary":[
+        "c64 library container"
+    ],
+    "C64 CruelCrunch":[
+        "cruelcrunch",
+        "cruelcrunch / header"
+    ],
+    "C64 TBC MultiCompactor":[
+        "tbc multicompactor"
+    ],
+    "C64 Time Cruncher":[
+        "time cruncher v3.1"
+    ],
+    "C64 Super Compressor":[
+        "super compressor / equal sequences"
+    ],
+    "C64 MegaByte Cruncher":[
+        "megabyte cruncher v2.x"
+    ],
+    "C64 1001 CardCruncher":[
+        "1001 cardcruncher new packer"
+    ],
+    "C64 ECA Compactor":[
+        "eca compactor/linker"
     ]
 }

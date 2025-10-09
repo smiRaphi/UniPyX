@@ -68,7 +68,7 @@ class DLDB:
                             else: ex = '.' + ex.split('.')[-1]
                         p = gtmp(ex)
 
-                    self.dl(e['u'],p)
+                    self.dl(e['u'],p,verify=e.get('v',True))
                     if 'x' in e:
                         bk = self.print_try
                         self.print_try = False
@@ -139,19 +139,24 @@ class DLDB:
             for tx in xl: copy(td + '/{app}/' + tx,'bin/' + xl[tx])
             rmtree(td)
         else: raise NotImplementedError(p + f' [{ex}]')
-    def dl(self,url:str,out:str):
+    def dl(self,url:str,out:str,verify=True):
         start = 0
+        kwargs = {}
+        if not verify:
+            cl = httpx
+            kwargs['verify'] = False
+        else: cl = self.c
         try:
             with xopen(out,'wb') as f:
                 for _ in range(10):
                     try:
-                        with self.c.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True) as r:
+                        with cl.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True,**kwargs) as r:
                             if r.headers.get('Content-Length') and not int(r.headers['Content-Length']): continue
                             for c in r.iter_bytes(4096): f.write(c)
                         break
                     except httpx.ConnectError: pass
                     except httpx.ReadTimeout: start = f.tell()
-                else: f.write(self.c.get(url,follow_redirects=True).content)
+                else: f.write(cl.get(url,follow_redirects=True,**kwargs).content)
         except:
             if os.path.exists(out): os.remove(out)
             raise
