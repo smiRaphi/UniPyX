@@ -13,7 +13,7 @@
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
         "fs":[{
-            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.05.03/dosbox-x-vsbuild-win64-20250503164337.zip",
+            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.10.07/dosbox-x-vsbuild-win64-20251007154914.zip",
             "x":{
                 "bin/x64/Release SDL2/dosbox-x.exe":"DOSBox-X/dosbox-x.exe",
                 "bin/x64/Release SDL2/inpoutx64.dll":"DOSBox-X/inpoutx64.dll"
@@ -96,9 +96,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1759788000
+            "ts":1759960800
         }],
-        "ts":1759788000
+        "ts":1759960800
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -387,7 +387,7 @@
     "gameextractor":{
         "p":"GameExtractor/GameExtractor.jar",
         "fs":[{
-            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0002/extract.zip",
+            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0003/extract.zip",
             "x":{
                 "GameExtractor.jar":"GameExtractor/GameExtractor.jar",
                 "settings/default.xml":"GameExtractor/settings/default.xml",
@@ -397,9 +397,9 @@
                 "interface/SidePanel_DirectoryList.xml":"GameExtractor/interface/SidePanel_DirectoryList.xml",
                 "interface/SidePanel_DirectoryList_ReadPanel.xml":"GameExtractor/interface/SidePanel_DirectoryList_ReadPanel.xml"
             },
-            "ts":1758799912
+            "ts":1759875616
         }],
-        "ts":1758799912
+        "ts":1759875616
     },
     "buildgdi":{
         "p":"buildgdi.exe",
@@ -459,13 +459,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/2f/c4/dolphin-master-2509-140-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/23/74/dolphin-master-2509-143-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1759773960
+            "ts":1759958482
         }],
-        "ts":1759773960
+        "ts":1759958482
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -1411,7 +1411,8 @@
                 "BOA.EXE":"BOA/BOA.EXE",
                 "CWSDPMI.EXE":"BOA/CWSDPMI.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "flashzip":{
         "p":"flashzip.exe"
@@ -1423,7 +1424,8 @@
             "x":{
                 "dark.exe":"dark.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "brotli":{
         "p":"brotli.exe",
@@ -1432,7 +1434,8 @@
             "x":{
                 "brotli.exe":"brotli.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "sbc":{
         "p":"sbc.exe",
@@ -1441,7 +1444,8 @@
             "x":{
                 "sbc.exe":"sbc.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "szip":{
         "p":"szip.exe",
@@ -1450,7 +1454,8 @@
             "x":{
                 "szip.exe":"szip.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "balz":{
         "p":"balz.exe",
@@ -1459,7 +1464,8 @@
             "x":{
                 "balz.exe":"balz.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "zzip":{
         "p":"zzip.exe",
@@ -1468,7 +1474,8 @@
             "x":{
                 "zzip-win32/zzip.exe":"zzip.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "sqx":{
         "p":"sqx_std64.sfx"
@@ -1480,7 +1487,8 @@
             "x":{
                 "sr3a.exe":"sr3.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "imp":{
         "p":"imp.exe",
@@ -1489,7 +1497,8 @@
             "x":{
                 "imp.exe":"imp.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "squid":{
         "p":"squid.exe",
@@ -1498,7 +1507,8 @@
             "x":{
                 "squid.exe":"squid.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "crush":{
         "p":"crush.exe",
@@ -1507,7 +1517,8 @@
             "x":{
                 "crush.exe":"crush.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "arhangel":{
         "p":"ARHANGEL.EXE",
@@ -1516,7 +1527,8 @@
             "x":{
                 "ARHANGEL.EXE":"ARHANGEL.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "lzpx":{
         "p":"lzpx.exe",
@@ -1525,7 +1537,8 @@
             "x":{
                 "lzpx-1.5b/lzpx.exe":"lzpx.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "lzpxj":{
         "p":"lzpxj.exe",
@@ -1534,7 +1547,8 @@
             "x":{
                 "lzpxj-1.2h/lzpxj.exe":"lzpxj.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "jar":{
         "p":"jar.exe",
@@ -1543,7 +1557,8 @@
             "x":{
                 "JAR32.EXE":"jar.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "lizard":{
         "p":"lizard.exe"
@@ -1555,7 +1570,8 @@
             "x":{
                 "Zhuff_beta.exe":"Zhuff.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "blzpack":{
         "p":"blzpack.exe"
@@ -1567,13 +1583,15 @@
             "x":{
                 "THOR.exe":"THOR.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "lzfse":{
         "p":"lzfse.exe",
         "fs":[
         "https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe"
-        ]
+        ],
+        "ts":0
     },
     "limit":{
         "p":"LIMIT.EXE",
@@ -1582,7 +1600,8 @@
             "X":{
                 "LIMIT.EXE":"LIMIT.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "sqz":{
         "p":"SQZ.EXE",
@@ -1591,7 +1610,8 @@
             "x":{
                 "SQZ.EXE":"SQZ.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "quark":{
         "p":"QUARK.EXE",
@@ -1601,7 +1621,8 @@
             "x":{
                 "quarkr.exe":"QUARK.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "ulz":{
         "p":"ulz.exe",
@@ -1610,7 +1631,8 @@
             "x":{
                 "ulz.exe":"ulz.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "lzop":{
         "p":"lzop.exe",
@@ -1619,7 +1641,8 @@
             "x":{
                 "lzop103w/lzop.exe":"lzop.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "quad":{
         "p":"quad.exe",
@@ -1628,7 +1651,8 @@
             "x":{
                 "quad.exe":"quad.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "lzpm":{
         "p":"lzpm.exe",
@@ -1637,13 +1661,32 @@
             "x":{
                 "lzpm.exe":"lzpm.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "zarchive":{
         "p":"zarchive.exe",
         "fs":[
         "https://github.com/Exzap/ZArchive/releases/download/v0.1.2/zarchive.exe"
-        ]
+        ],
+        "ts":0
+    },
+    "bzip3":{
+        "p":"bzip3.exe",
+        "fs":[[
+            "https://github.com/iczelia/bzip3/releases/download/1.5.3/bzip3-x86_64.exe",
+            "bzip3.exe"
+        ]],
+        "ts":0
+    },
+    "turborc":{
+        "p":"turborc.exe",
+        "fs":[{
+            "u":"https://github.com/powturbo/Turbo-Range-Coder/releases/download/2023.06/TurboRC_amd64_win64.zip",
+            "x":{
+                "turborc.exe":"turborc.exe"
+            }
+        }]
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",

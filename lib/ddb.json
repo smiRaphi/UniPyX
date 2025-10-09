@@ -376,6 +376,11 @@
     },
     {
         "rqr":null,
+        "d":[["isat","\\x54",0],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0]&15==1"]],
+        "rs":"Turbo Range Coder"
+    },
+    {
+        "rqr":null,
         "d":["ext",".nub2"],
         "rs":"NUB2"
     },

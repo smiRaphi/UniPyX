@@ -383,7 +383,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZIP2'|'SZDD'|'LZIP'|'CPIO':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -395,7 +395,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if os.listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in ('ZSTD','xz','BZIP2','LZIP'): return fix_tar(o)
+                elif t in ('ZSTD','xz','BZip2','LZIP'): return fix_tar(o)
                 else: return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
@@ -652,6 +652,16 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Brotli':
             of = o + '/' + tbasename(i)
             run(['brotli','-d','-o',of,i])
+            if exists(of) and os.path.getsize(of): return fix_tar(o)
+        case 'BZip3':
+            tf = o + '/' + basename(i)
+            symlink(i,tf)
+            run(['bzip3','-d','-f','-k',tf])
+            remove(tf)
+            if os.listdir(o): return fix_tar(o)
+        case 'Turbo Range Coder':
+            of = o + '/' + tbasename(i)
+            run(['turborc','-d',i,of])
             if exists(of) and os.path.getsize(of): return
 
         case 'RVZ':
@@ -2235,6 +2245,7 @@ def fix_innoinstext(o:str,i:str):
 def fix_tar(o:str,rem=True):
     if len(os.listdir(o)) == 1:
         f = o + '/' + os.listdir(o)[0]
+        if open(f,'rb').read(2) == b'MZ': return
         nts,_ = analyze(f,True)
         if nts == ['TAR']:
             r = extract(f,o,'TAR')

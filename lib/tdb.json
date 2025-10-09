@@ -282,7 +282,7 @@
     "BZIP":[
         "bzip compressed archive"
     ],
-    "BZIP2":[
+    "BZip2":[
         "bzip2 compressed archive"
     ],
     "Hollow Knight Save":[
@@ -645,5 +645,8 @@
     "LZOP":[
         "lzop compressed data",
         "lzop compressed"
+    ],
+    "BZip3":[
+        "bzip3 compressed archive"
     ]
 }
