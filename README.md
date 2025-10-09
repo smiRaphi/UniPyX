@@ -15,7 +15,6 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * self compiled [NLZM](https://github.com/nauful/NLZM)
 * self compiled [Lizard](https://github.com/inikep/lizard)
 * self compiled [blzpack](https://github.com/jibsen/brieflz)
-* [flashzip](https://web.archive.org/web/20250503183329/https://heartofcomp.altervista.org/Flashzip.htm) because it's packed in an inno installer in a zip
 * sqx SFX from [SpeedCommander 22](https://www.speedproject.com/) because it's packed in a sqc SFX
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
 * tmd.py for Nintendo TMD files and key generation

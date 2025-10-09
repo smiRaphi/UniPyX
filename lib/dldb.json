@@ -1415,7 +1415,16 @@
         "ts":0
     },
     "flashzip":{
-        "p":"flashzip.exe"
+        "p":"flashzip.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20250505230415if_/http://heartofcomp.altervista.org/flashzip.zip",
+            "x":{
+                "WFlashzip.exe":{
+                    "?ex":"inno",
+                    "flashzip.exe":"flashzip.exe"
+                }
+            }
+        }]
     },
     "dark":{
         "p":"dark.exe",

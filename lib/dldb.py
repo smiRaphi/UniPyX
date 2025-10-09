@@ -90,6 +90,8 @@ class DLDB:
                         os.makedirs('bin/' + xl[tx],exist_ok=True)
                         z.extractall('bin/' + xl[tx])
                     elif type(xl[tx]) == dict:
+                        if '?ex' in xl[tx]: ex = xl[tx].pop('?ex')
+                        else: ex = os.path.splitext(tx)[1].lower()
                         tf = gtmp(ex)
                         xopen(tf,'wb').write(z.read(tx))
                         self.ext(tf,ex,xl[tx])
@@ -129,6 +131,12 @@ class DLDB:
             self.run(['7z','x','-y','-o' + td,p])
             with tarfile.open(td + '/data.tar','r') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile('./' + tx).read())
+            rmtree(td)
+        elif ex == 'inno':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run(['innounp-2','-x','-b','-m','-d' + td,'-u','-h','-o','-y',p])
+            for tx in xl: copy(td + '/{app}/' + tx,'bin/' + xl[tx])
             rmtree(td)
         else: raise NotImplementedError(p + f' [{ex}]')
     def dl(self,url:str,out:str):
