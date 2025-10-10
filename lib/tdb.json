@@ -83,8 +83,6 @@
     "PSVita PKG":[
         "sony psp/psvita package (finalized/retail)"
     ],
-    "GameCube ISO":[],
-    "Wii ISO":[],
     "NDS":[
         "nintendo ds rom"
     ],
@@ -145,7 +143,6 @@
         "allegro packfile (uncompressed)",
         "allegro data (generic)"
     ],
-
     "VISE Installer":[
         "vise mindvision wizard module"
     ],
@@ -157,7 +154,6 @@
         "installer nullsoft pimp stub",
         "nullsoft pimp install system"
     ],
-    "Wise Installer":[],
     "Inno Installer":[
         "inno setup installer",
         "inno setup v.6.4.0.1 installer",
@@ -182,12 +178,12 @@
     "InstallShield Setup":[
         "installshield setup",
         "installshield 3.x custom",
-        "installshield custom"
+        "installshield custom",
+        "installshield"
     ],
     "InstallShield Setup ForTheWeb":[
         "installshield packagefortheweb setup module"
     ],
-    "InstallShield MSI":[],
     "InstallShield Z":[
         "installshield z archive"
     ],
@@ -206,22 +202,8 @@
     "FreeArc":[
         "freearc compressed archive"
     ],
-
     "Windows Help File":[
         "windows help file"
-    ],
-
-    "F-Zero G/AX .lz":[],
-    "Pokemon FSYS":[],
-    "BRSAR":[],
-    "RetroStudio PAK":[],
-    "GD-ROM CUE+BIN":[],
-    "NCSD":[],
-    "CDI":[],
-    "Sonic AMB":[],
-    "Level5 ARC":[],
-    "NDS SWAR":[
-        "nintendo ds sound wave archive"
     ],
     "Rob Northen Compression":[
         "rob northen compression (type 1)",
@@ -603,7 +585,8 @@
     "Squeez":[
         "squeez sqx archive selfextractor v.5.63",
         "www.speedproject.de/enu/support/updates.html",
-        "sqx compressed archive"
+        "sqx compressed archive",
+        "sqx archive installer 2002"
     ],
     "IMP":[
         "imp compressed archive"
