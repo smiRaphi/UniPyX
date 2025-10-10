@@ -365,6 +365,11 @@
         "rs":"QuARK","s":1
     },
     {
+        "rq":null,
+        "d":[["isat","GC",5],["py","f=open(inp,'rb');return sum(f.read(4))>3 and f.read(1)[0]&3==3"]],
+        "rs":"Konami LZSS"
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0",256],
              ["str0",0,256,2]],
         "rs":"BBC Micro SSD"

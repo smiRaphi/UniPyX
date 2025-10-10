@@ -2011,6 +2011,46 @@ def extract(inp:str,out:str,t:str) -> bool:
             secis = {}
             for _ in range(sc):
                 s = {'type':f.readu8()}
+        case 'Konami LZSS':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i,endian='<')
+            l = f.readu32()
+            if not l: return 1
+            of = open(o + '/' + basename(i)[:(-1 if i[-1] in 'zZ' else None)],'wb')
+
+            ring = [b'\0'] * 0x1000
+            rpos = 0x0FEE
+            ctrlw = 1
+
+            c1 = c2 = co = cl = 0
+            b = b''
+            while l > 0:
+                if ctrlw == 1: ctrlw = 0x100 | f.readu8()
+
+                if ctrlw & 1:
+                    b = f.read(1)
+                    of.write(b)
+                    ring[rpos] = b
+                    rpos = (rpos + 1) % 0x1000
+                    l -= 1
+                else:
+                    c1,c2 = f.readu8(),f.readu8()
+                    cl = (c2 & 0x0F) + 3
+                    co = ((c2 & 0xF0) << 4) | c1
+
+                    for _ in range(cl):
+                        of.write(ring[co])
+                        ring[rpos] = ring[co]
+                        co = (co + 1) % 0x1000
+                        rpos = (rpos + 1) % 0x1000
+                        l -= 1
+
+                ctrlw >>= 1
+
+            of.close()
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
