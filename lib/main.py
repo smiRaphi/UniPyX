@@ -860,7 +860,10 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Xbox LIVE ROM': raise NotImplementedError
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
-            if os.listdir(o): return
+            if os.listdir(o):
+                from bin.chkey import CHKeys
+                if exists(o + '/IP.BIN') and CHKeys().get(o): return extract(o + '\\IP.BIN',o,'Chihiro Extracted GD-ROM')
+                return
         case 'Wii TMD':
             ckey = dirname(db.get('tmd_wii')) + '/'
 
@@ -927,6 +930,40 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['unp64',tf])
             remove(tf)
             if os.listdir(o): return
+        case 'Chihiro Extracted GD-ROM':
+            from bin.chkey import CHKeys
+
+            id = dirname(i)
+            key = CHKeys().get(i)
+            if not key: return 1
+
+            fats = []
+            for f in os.listdir(id):
+                if len(f) != 7: continue
+                ld = id + '\\' + f
+                if isdir(ld) or os.path.getsize(ld) != 0x100: continue
+
+                lf = open(ld,'rb')
+                if sum(lf.read(8)) == 0 and sum(lf.read(8)) != 0 and sum(lf.read(3)) == 0 and lf.read(1)[0] == 0xFF and sum(lf.read(0x8C)) == 0:
+                    lf.seek(0xC0)
+                    fatx = lf.read(0x20).strip(b'\0')
+                    if fatx:
+                        try:fatx = id + '\\' + fatx.decode()
+                        except:pass
+                        else:
+                            if exists(fatx): fats.append(fatx)
+                lf.close()
+
+            if not fats: return 1
+
+            for f in fats:
+                tf = f + '.dec'
+                run(['chdecrypt',f,tf,key.hex().upper()])
+                assert exists(tf) and open(tf,'rb').read(4) == b'FATX',basename(tf)
+                od = f + '_ext'
+                run(['chextract-fatx',tf,od])
+                if exists(od) and not os.listdir(od): rmdir(od)
+            return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])

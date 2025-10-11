@@ -1719,6 +1719,12 @@
             }
         }]
     },
+    "chdecrypt":{
+        "p":"chdecrypt.exe"
+    },
+    "chextract-fatx":{
+        "p":"chextract-fatx.exe"
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

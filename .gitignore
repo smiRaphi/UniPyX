@@ -28,3 +28,6 @@ __pycache__
 !/bin/sqx_std64.sfx
 !/bin/lizard.exe
 !/bin/blzpack.exe
+!/bin/chkey.py
+!/bin/chdecrypt.exe
+!/bin/chextract-fatx.exe
