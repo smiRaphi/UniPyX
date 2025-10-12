@@ -165,9 +165,9 @@ def analyze(inp:str,raw=False):
                     if m: ts.append(m[1])
                     for x in msplit(' - ' + lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' ]   ',' stub : ',' Ovl like : ',' - ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
-                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','*Unknown exe ','EP Token : ','File is corrupted ')):
+                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','*Unknown exe ','Stub : *Unknown exe ','EP Token : ','File is corrupted ')):
                             x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;-')
-                            if x and x.lower() not in ('genuine','unknown') and not (len(x) == 4 and x.isdigit()): ts.append(x)
+                            if x and x.lower() not in ('genuine','unknown','more than necessary )') and not (len(x) == 4 and x.isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
                 yp = os.path.dirname(yrep[0])
@@ -386,7 +386,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -759,21 +759,24 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
         case 'NSP':
-            bcd = ['hac2l','-t','pfs','--disablekeywarns','-k',db.get('prodkeys'),'--titlekeys=' + db.get('titlekeys')]
-            _,e,_ = run(bcd + [i],print_try=False)
-            bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
-            if ' MetaType=Patch ' in e:
-                pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
-                pid,pv = pinf[1],int(pinf[2],16)
-                for x in os.listdir(dirname(i)):
-                    if pid in x and x.endswith('.nsp'):
-                        try: v = int(re.search(r'v(\d+)(?:\b|_)(?!\.)',x)[1])
-                        except: v = 0
-                        if v < pv: bf = dirname(i) + '\\' + x;break
-                else: return 1
-                bcd += ['--basepfs',bf]
-            run(bcd + [i])
-            if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
+            for k in ('prod','dev'):
+                bcd = ['hac2l','-t','pfs','--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + db.get('titlekeys')]
+                _,e,_ = run(bcd + [i],print_try=False)
+                bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
+                if ' MetaType=Patch ' in e:
+                    pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
+                    pid,pv = pinf[1],int(pinf[2],16)
+                    for x in os.listdir(dirname(i)):
+                        if pid in x and x.endswith('.nsp'):
+                            try: v = int(re.search(r'v(\d+)(?:\b|_)(?!\.)',x)[1])
+                            except: v = 0
+                            if v < pv: bf = dirname(i) + '\\' + x;break
+                    else: return 1
+                    bcd += ['--basepfs',bf]
+                run(bcd + [i])
+                if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
+                rmdir(o)
+                mkdir(o)
         case 'NDS':
             run(['mdnds','e',i,o])
             if os.listdir(o): return
@@ -2088,6 +2091,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             of.close()
             return
+        case 'Minecraft PCK': return quickbms('minecraft_pck')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

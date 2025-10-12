@@ -9,25 +9,10 @@ __pycache__
 /out
 *.exe
 
-!/bin/hac2l.exe
+!/bin/bin.7z
 !/bin/ps3key.py
 !/bin/wiiudk.py
 !/bin/BMS/xbp.bms
 !/bin/AssetRipper/client.py
-!/bin/psvpfsparser/
-!/bin/psvpfsparser/*
 !/bin/tmd.py
-!/bin/TDEDecrypt.exe
-!/bin/cls-srep/
-!/bin/cls-srep/*
-!/bin/bbccp.exe
-!/bin/assamUnpack.exe
-!/bin/atr.exe
-!/bin/csc.exe
-!/bin/csarc.exe
-!/bin/sqx_std64.sfx
-!/bin/lizard.exe
-!/bin/blzpack.exe
 !/bin/chkey.py
-!/bin/chdecrypt.exe
-!/bin/chextract-fatx.exe

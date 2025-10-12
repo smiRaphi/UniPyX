@@ -124,6 +124,11 @@
             "x":{
                 "Lzip.64.dll":"7z/Formats/Lzip.64.dll"
             }
+        },{
+            "u":"https://www.tc4shell.com/binary/Asar.zip",
+            "x":{
+                "Asar.64.dll":"7z/Formats/Asar.64.dll"
+            }
         }],
         "ts":1754212738
     },
@@ -412,10 +417,27 @@
         "ts":0
     },
     "hac2l":{
-        "p":"hac2l.exe"
+        "p":"hac2l.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "hac2l.exe":"hac2l.exe"
+            }
+        }]
     },
     "psvpfsparser":{
-        "p":"psvpfsparser/psvpfsparser.exe"
+        "p":"psvpfsparser/psvpfsparser.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "psvpfsparser/psvpfsparser.exe":"psvpfsparser/psvpfsparser.exe",
+                "psvpfsparser/libgcc_s_seh-1.dll":"psvpfsparser/libgcc_s_seh-1.dll",
+                "psvpfsparser/libgmp-10.dll":"psvpfsparser/libgmp-10.dll",
+                "psvpfsparser/libtomcrypt-1.dll":"psvpfsparser/libtomcrypt-1.dll",
+                "psvpfsparser/libtommath-1.dll":"psvpfsparser/libtommath-1.dll",
+                "psvpfsparser/libwinpthread-1.dll":"psvpfsparser/libwinpthread-1.dll"
+            }
+        }]
     },
     "ps4pkg":{
         "p":"ps4pkg/orbis-pub-cmd.exe",
@@ -802,7 +824,13 @@
         "ts":0
     },
     "tdedecrypt":{
-        "p":"TDEDecrypt.exe"
+        "p":"TDEDecrypt.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "TDEDecrypt.exe":"TDEDecrypt.exe"
+            }
+        }]
     },
     "repak":{
         "p":"repak.exe",
@@ -872,7 +900,13 @@
         "ts":0
     },
     "bbccp":{
-        "p":"bbccp.exe"
+        "p":"bbccp.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "bbccp.exe":"bbccp.exe"
+            }
+        }]
     },
     "chrome-pak":{
         "p":"chrome-pak.exe",
@@ -1010,7 +1044,13 @@
         "ts":0
     },
     "assamunpack":{
-        "p":"assamUnpack.exe"
+        "p":"assamUnpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "assamUnpack.exe":"assamUnpack.exe"
+            }
+        }]
     },
     "uaeunp":{
         "p":"uaeunp.exe",
@@ -1135,7 +1175,13 @@
         "ts":0
     },
     "atr":{
-        "p":"atr.exe"
+        "p":"atr.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "atr.exe":"atr.exe"
+            }
+        }]
     },
     "wimlib":{
         "p":"wimlib/wimlib-imagex.exe",
@@ -1353,13 +1399,31 @@
         "ts":0
     },
     "csc":{
-        "p":"csc.exe"
+        "p":"csc.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "csc.exe":"csc.exe"
+            }
+        }]
     },
     "csarc":{
-        "p":"csarc.exe"
+        "p":"csarc.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "csarc.exe":"csarc.exe"
+            }
+        }]
     },
     "nlzm":{
-        "p":"nlzm.exe"
+        "p":"nlzm.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "nlzm.exe":"nlzm.exe"
+            }
+        }]
     },
     "uharcd":{
         "p":"UHARCD.EXE",
@@ -1487,7 +1551,13 @@
         "ts":0
     },
     "sqx":{
-        "p":"sqx_std64.sfx"
+        "p":"sqx_std64.sfx",
+        "fs":[{
+            "u":".",
+            "x":{
+                "sqx_std64.sfx":"sqx_std64.sfx"
+            }
+        }]
     },
     "sr3":{
         "p":"sr3.exe",
@@ -1570,7 +1640,13 @@
         "ts":0
     },
     "lizard":{
-        "p":"lizard.exe"
+        "p":"lizard.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "lizard.exe":"lizard.exe"
+            }
+        }]
     },
     "zhuff":{
         "p":"Zhuff.exe",
@@ -1583,7 +1659,13 @@
         "ts":0
     },
     "blzpack":{
-        "p":"blzpack.exe"
+        "p":"blzpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "blzpack.exe":"blzpack.exe"
+            }
+        }]
     },
     "thor":{
         "p":"THOR.exe",
@@ -1720,10 +1802,22 @@
         }]
     },
     "chdecrypt":{
-        "p":"chdecrypt.exe"
+        "p":"chdecrypt.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "chdecrypt.exe":"chdecrypt.exe"
+            }
+        }]
     },
     "chextract-fatx":{
-        "p":"chextract-fatx.exe"
+        "p":"chextract-fatx.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "chextract-fatx.exe":"chextract-fatx.exe"
+            }
+        }]
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
@@ -2039,18 +2133,25 @@
     "arcsys":{
         "p":"BMS/arcsys.bms",
         "fs":[[
-            "http://aluigi.org/bms/arcsys.bms",
+            "https://aluigi.org/bms/arcsys.bms",
             "BMS/arcsys.bms"
         ]],
         "ts":0
+    },
+    "minecraft_pck":{
+        "p":"BMS/minecraft_pck.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/minecraft_x360_pck.bms",
+            "BMS/minecraft_pck.bms"
+        ]]
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
             "u":"https://files.prodkeys.net/ProdKeys.net-v20.3.0.zip",
             "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
+                "ProdKeys.net-v20.3.0/prod.keys":"prodkeys/prod.keys",
+                "ProdKeys.net-v20.3.0/title.keys":"prodkeys/title.keys"
             },
             "ts":1754702838
         }],
@@ -2061,12 +2162,15 @@
         "fs":[{
             "u":"https://files.prodkeys.net/ProdKeys.net-v20.3.0.zip",
             "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
+                "ProdKeys.net-v20.3.0/prod.keys":"prodkeys/prod.keys",
+                "ProdKeys.net-v20.3.0/title.keys":"prodkeys/title.keys"
             },
             "ts":1754702838
         }],
         "ts":1754702838
+    },
+    "devkeys":{
+        "p":"prodkeys/dev.keys"
     },
     "rrv3va":{
         "p":"RRVArcTool/rrv3vera.ic002",

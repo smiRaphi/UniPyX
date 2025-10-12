@@ -385,6 +385,11 @@
         "rs":"Turbo Range Coder"
     },
     {
+        "rq":null,
+        "d":[["isat","\\x03\\0\\0\\0",0]],
+        "rs":"Minecraft PCK"
+    },
+    {
         "rqr":null,
         "d":["ext",".nub2"],
         "rs":"NUB2"

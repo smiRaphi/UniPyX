@@ -15,7 +15,11 @@
         "apkmirror bundle",
         "zip sfx archive",
         "minecraft resource package",
-        "zip"
+        "zip",
+        "nuget package",
+        "open packaging conventions container",
+        "zip installer",
+        "squirrel setup"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)"
@@ -661,5 +665,9 @@
     ],
     "C64 ECA Compactor":[
         "eca compactor/linker"
+    ],
+    "Asar":[
+        "asar archive",
+        "asar electron archive"
     ]
 }

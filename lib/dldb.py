@@ -68,7 +68,8 @@ class DLDB:
                             else: ex = '.' + ex.split('.')[-1]
                         p = gtmp(ex)
 
-                    self.dl(e['u'],p,verify=e.get('v',True))
+                    if e['u'] == '.': p,ex = 'bin/bin.7z','.7z'
+                    else: self.dl(e['u'],p,verify=e.get('v',True))
                     if 'x' in e:
                         bk = self.print_try
                         self.print_try = False
@@ -76,7 +77,7 @@ class DLDB:
                         self.ext(p,ex,e['x'])
 
                         self.print_try = bk
-                        os.remove(p)
+                        if e['u'] != '.': os.remove(p)
             exei = os.path.abspath('bin/' + exi['p'])
             self.udb[exe] = t
             self.save()
