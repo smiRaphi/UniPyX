@@ -2098,6 +2098,25 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Mo\'PaQ':
             run(['mpqextractor','-e','*','-o',o,i])
             if os.listdir(o): return
+        case 'IPS Patch'|'IPS32 Patch':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i)
+            i32 = f.read(5) == b'IPS32'
+
+            rof = f.readu32 if i32 else f.readu24
+            eof = int.from_bytes(b'EEOF' if i32 else b'EOF')
+            off = s = 0
+            d = b''
+            while True:
+                off = rof()
+                if off == eof:break
+                s = f.readu16()
+                if s == 0: d = f.readu16()*f.read(1)
+                else: d = f.read(s)
+                open(o + '/' + hex(off)[2:].upper().zfill(8 if i32 else 6) + '.bin','wb').write(d)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

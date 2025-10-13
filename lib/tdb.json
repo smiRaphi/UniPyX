@@ -677,5 +677,11 @@
     "SWF":[
         "macromedia flash player compressed movie",
         "small web format"
+    ],
+    "IPS32 Patch":[
+        "ips32 patch"
+    ],
+    "IPS Patch":[
+        "international patching system binary patch"
     ]
 }

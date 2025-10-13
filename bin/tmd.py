@@ -35,6 +35,11 @@ class File:
 
     def readu8 (self) -> int: return struct.unpack(self._end+'B',self.read(1))[0]
     def readu16(self) -> int: return struct.unpack(self._end+'H',self.read(2))[0]
+    def readu24(self) -> int:
+        d = self.read(3)
+        if self._end == '<': d = d + b'\0'
+        else: d = b'\0' + d
+        return struct.unpack(self._end+'I',d)[0]
     def readu32(self) -> int: return struct.unpack(self._end+'I',self.read(4))[0]
     def readu64(self) -> int: return struct.unpack(self._end+'Q',self.read(8))[0]
     def reads8 (self) -> int: return struct.unpack(self._end+'b',self.read(1))[0]
