@@ -1828,6 +1828,16 @@
             }
         }]
     },
+    "zli":{
+        "p":"zli.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "zli.exe":"zli.exe"
+            }
+        }],
+        "ts":0
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

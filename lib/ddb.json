@@ -396,6 +396,11 @@
     },
     {
         "rqr":null,
+        "d":["ext",".zl"],
+        "rs":"OpenZL"
+    },
+    {
+        "rqr":null,
         "d":["ext",".nca"],
         "rs":"Switch NCA"
     },

@@ -17,6 +17,7 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * self compiled [blzpack](https://github.com/jibsen/brieflz)
 * self compiled [Chihiro decrypt & extract-fatx](https://github.com/JayFoxRox/Chihiro-Tools)
 * self compiled [MPQExtractor](https://github.com/Kanma/MPQExtractor)
+* self compiled [ZLI](https://github.com/facebook/openzl)
 * sqx SFX from [SpeedCommander 22](https://www.speedproject.com/) because it's packed in a sqc SFX
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
 * chkey.py for managing Chihiro keys

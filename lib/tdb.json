@@ -673,5 +673,9 @@
     "Mo'PaQ":[
         "mpq",
         "mpq archive - blizzard game data"
+    ],
+    "SWF":[
+        "macromedia flash player compressed movie",
+        "small web format"
     ]
 }

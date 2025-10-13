@@ -386,7 +386,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -1265,6 +1265,9 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             quickbms('instexpl')
             fs = os.listdir(o)
+            if fs == ['install.exe','uninst.exe'] and (os.path.getsize(o + '/install.exe') + os.path.getsize(o + '/uninst.exe')) == 0:
+                remove(o + '/install.exe',o + '/uninst.exe')
+                fs = []
             if fs:
                 if not 'SETUP.EXE' in fs and not 'Setup.ini' in fs and not 'MSIEng.isc' in fs: return
                 if 'MSIEng.isc' in fs:
@@ -2277,6 +2280,10 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'LZOP':
             run(['lzop','-x','-qf',i],cwd=o)
             if os.listdir(o): return
+        case 'OpenZL':
+            of = o + '/' + tbasename(i)
+            run(['zli','d','-o',of,'-f',i])
+            if exists(of) and os.path.getsize(of): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
