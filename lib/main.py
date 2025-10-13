@@ -758,9 +758,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             for x in os.listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
-        case 'NSP':
+        case 'Switch NSP'|'Switch NCA'|'Switch XCI':
             for k in ('prod','dev'):
-                bcd = ['hac2l','-t','pfs','--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + db.get('titlekeys')]
+                bcd = ['hac2l','-t',{'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t],'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + db.get('titlekeys')]
                 _,e,_ = run(bcd + [i],print_try=False)
                 bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
                 if ' MetaType=Patch ' in e:
@@ -2092,6 +2092,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             of.close()
             return
         case 'Minecraft PCK': return quickbms('minecraft_pck')
+        case 'Mo\'PaQ':
+            run(['mpqextractor','-e','*','-o',o,i])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

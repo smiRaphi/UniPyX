@@ -360,6 +360,11 @@
         "rs":"Crinkler"
     },
     {
+        "rqr":null,
+        "d":[["isat","HEAD",256],["py","f=open(inp,'rb');f.seek(0x130);f.seek(int.from_bytes(f.read(8),'little'));return f.read(4)==b'HFS0'"]],
+        "rs":"Switch XCI","s":1
+    },
+    {
         "rq":null,
         "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f=open(inp,'rb');f.seek(11);sl=f.read(1)[0]\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
         "rs":"QuARK","s":1
@@ -388,6 +393,11 @@
         "rq":null,
         "d":[["isat","\\x03\\0\\0\\0",0]],
         "rs":"Minecraft PCK"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".nca"],
+        "rs":"Switch NCA"
     },
     {
         "rqr":null,

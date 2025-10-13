@@ -1819,6 +1819,15 @@
             }
         }]
     },
+    "mpqextractor":{
+        "p":"MPQExtractor.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "MPQExtractor.exe":"MPQExtractor.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

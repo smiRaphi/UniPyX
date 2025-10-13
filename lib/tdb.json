@@ -78,7 +78,7 @@
     "RVZ":[
         "nintendo compressed disk image"
     ],
-    "NSP":[
+    "Switch NSP":[
         "nintendo switch submission package"
     ],
     "Xbox LIVE ROM":[
@@ -669,5 +669,9 @@
     "Asar":[
         "asar archive",
         "asar electron archive"
+    ],
+    "Mo'PaQ":[
+        "mpq",
+        "mpq archive - blizzard game data"
     ]
 }
