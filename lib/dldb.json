@@ -1865,6 +1865,21 @@
             }
         }]
     },
+    "gamearch":{
+        "p":"camoto/gamearch.exe",
+        "fs":[{
+            "u":"http://files.shikadi.net/camoto/desktop/camoto-install-20150221.exe",
+            "ex":"nsis",
+            "x":{
+                "gamearch.exe":"camoto/gamearch.exe",
+                "libgamecommon.dll":"camoto/libgamecommon.dll",
+                "boost_program_options-vc120-mt-1_57.dll":"camoto/boost_program_options-vc120-mt-1_57.dll",
+                "libgamearchive.dll":"camoto/libgamearchive.dll",
+                "boost_filesystem-vc120-mt-1_57.dll":"camoto/boost_filesystem-vc120-mt-1_57.dll",
+                "boost_system-vc120-mt-1_57.dll":"camoto/boost_system-vc120-mt-1_57.dll"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

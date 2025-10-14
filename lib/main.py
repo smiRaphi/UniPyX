@@ -2138,6 +2138,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
             if os.listdir(o): return
+        case 'Build Engine Group':
+            run(['gamearch',i,'-X'],cwd=o)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

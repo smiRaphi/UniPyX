@@ -110,9 +110,9 @@ class DLDB:
             with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
             rmtree(td)
-        elif ex == '.7z':
+        elif ex in ('.7z','nsis'):
             td = gtmp()
-            self.run(['7z','x','-y','-o' + td,p])
+            self.run(['7z','x','-y','-o' + td,'-aoa',p])
             for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
             rmtree(td)
         elif ex == '.rar':
