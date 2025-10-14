@@ -683,6 +683,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             for f in r.split('\n'): mkdir(o + '/' + dirname(f.rsplit(None,3)[0].replace(':','\\')))
 
             return msdos(['ar7','x',i],cwd=o)
+        case 'ARG': return msdos(['arg','e',i],cwd=o)
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

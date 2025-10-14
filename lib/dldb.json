@@ -1933,6 +1933,15 @@
             }
         }]
     },
+    "arg":{
+        "p":"ARG.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/arg.zip",
+            "x":{
+                "arg.exe":"ARG.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

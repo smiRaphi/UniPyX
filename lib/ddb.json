@@ -406,6 +406,11 @@
     },
     {
         "rqr":null,
+        "d":[["ext",".arg"],["isat","\\0",0],["isat","\\1",-1],["str0",1,2,1]],
+        "rs":"ARG"
+    },
+    {
+        "rqr":null,
         "d":[["ext",".car"],["str0",0,2,1]],
         "rs":"CarComp"
     },
