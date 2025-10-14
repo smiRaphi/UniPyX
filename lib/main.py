@@ -2133,6 +2133,11 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
 
             if fs: return
+        case 'The Sims FAR':
+            if db.print_try: print('Trying with gameextractor')
+            run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
+            remove(dirname(db.get('gameextractor')) + '/logs')
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
