@@ -307,6 +307,11 @@ def analyze(inp:str,raw=False):
                         if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=': ret = False;break
                     else: ret = True
                     f.close()
+                elif x[0] == 'n0':
+                    f = open(inp,'rb')
+                    f.seek(x[2])
+                    ret = sum(f.read(x[1])) != 0
+                    f.close()
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = (tret or type(tret) != bool) and ret
             if not xv.get('noq') and not tret: break
@@ -2343,6 +2348,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['zli','d','-o',of,'-f',i])
             if exists(of) and os.path.getsize(of): return
         case 'Flash': return msdos(['flash','-E',i,'*.*'],cwd=o)
+        case 'Ai':
+            run(['ai','e',i],cwd=o)
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

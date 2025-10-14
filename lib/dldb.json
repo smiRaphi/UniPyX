@@ -1895,6 +1895,15 @@
             }
         }]
     },
+    "ai":{
+        "p":"ai.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/ai11.zip",
+            "x":{
+                "ai.exe":"ai.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
