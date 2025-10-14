@@ -68,10 +68,12 @@ def update():
             elif type(f) == dict:
                 u = f['u']
                 if 'ts' in f: ots = f['ts'] or tts
-            dom = u.split('://')[1].split('/')[0]
+            if u == '.': dom = None
+            else: dom = u.split('://')[1].split('/')[0]
 
             ts = ots
-            if u in ['https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip']:
+            if u == '.': tts = -1
+            elif u in ['https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip']:
                 ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
                 ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
                 u = 'https://mark0.net/download/trid_win64.zip'
@@ -172,7 +174,7 @@ def update():
             else: nfs.append(f)
 
         inf['fs'] = nfs
-        inf['ts'] = tts
+        if tts >= 0: inf['ts'] = tts
 
     out = json.dumps(DLDB,ensure_ascii=False,separators=(',',':'),indent=4).replace(
                     '\n            {',           '{').replace(

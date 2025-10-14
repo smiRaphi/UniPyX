@@ -6,9 +6,9 @@
             "x":{
                 "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
             },
-            "ts":1758837600
+            "ts":1760220000
         }],
-        "ts":1758837600
+        "ts":1760220000
     },
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
@@ -35,9 +35,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1759615200
+            "ts":1760306400
         }],
-        "ts":1759615200
+        "ts":1760306400
     },
     "file":{
         "p":"file/file.exe",
@@ -96,9 +96,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1759960800
+            "ts":1760392800
         }],
-        "ts":1759960800
+        "ts":1760392800
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -481,13 +481,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/23/74/dolphin-master-2509-143-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/b2/98/dolphin-master-2509-182-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1759958482
+            "ts":1760404929
         }],
-        "ts":1759958482
+        "ts":1760404929
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -721,7 +721,7 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.4/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.5/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "Texture2DDecoderNative.dll":"AssetRipper/Texture2DDecoderNative.dll",
@@ -729,9 +729,9 @@
                 "crunch.dll":"AssetRipper/crunch.dll",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1758514164
+            "ts":1760326925
         }],
-        "ts":1758514164
+        "ts":1760326925
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -1099,10 +1099,10 @@
     "acx":{
         "p":"acx.jar",
         "fs":[[
-            "https://github.com/AppleCommander/AppleCommander/releases/download/12.0/AppleCommander-acx-12.0.jar",
+            "https://github.com/AppleCommander/AppleCommander/releases/download/13.0/AppleCommander-acx-13.0.jar",
             "acx.jar"
         ]],
-        "ts":0
+        "ts":1760048587
     },
     "pyinstxtractor-ng":{
         "p":"pyinstxtractor-ng.exe",
@@ -1488,7 +1488,8 @@
                     "flashzip.exe":"flashzip.exe"
                 }
             }
-        }]
+        }],
+        "ts":0
     },
     "dark":{
         "p":"dark.exe",
@@ -1777,7 +1778,8 @@
             "x":{
                 "turborc.exe":"turborc.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "dirmaster":{
         "p":"DirMaster.exe",
@@ -1789,7 +1791,8 @@
                     "DirMaster.exe":"DirMaster.exe"
                 }
             }
-        }]
+        }],
+        "ts":0
     },
     "unp64":{
         "p":"unp64.exe",
@@ -1799,7 +1802,8 @@
             "x":{
                 "unp64_241/unp64.exe":"unp64.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "chdecrypt":{
         "p":"chdecrypt.exe",
@@ -1845,7 +1849,8 @@
             "x":{
                 "DABE.EXE":"DABE.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "car":{
         "p":"CAR.EXE",
@@ -1854,7 +1859,8 @@
             "x":{
                 "CAR.EXE":"CAR.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "flash":{
         "p":"FLASH.EXE",
@@ -1863,7 +1869,8 @@
             "x":{
                 "FLASH.EXE":"FLASH.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "gamearch":{
         "p":"camoto/gamearch.exe",
@@ -1878,13 +1885,15 @@
                 "boost_filesystem-vc120-mt-1_57.dll":"camoto/boost_filesystem-vc120-mt-1_57.dll",
                 "boost_system-vc120-mt-1_57.dll":"camoto/boost_system-vc120-mt-1_57.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "hmmunpack":{
         "p":"hmmunpack.py",
         "fs":[
         "https://raw.githubusercontent.com/ross-spencer/hmmunpack/refs/heads/main/hmmunpack.py"
-        ]
+        ],
+        "ts":0
     },
     "acb":{
         "p":"ACB.EXE",
@@ -1893,7 +1902,8 @@
             "x":{
                 "ACB.EXE":"ACB.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "ai":{
         "p":"ai.exe",
@@ -1902,7 +1912,8 @@
             "x":{
                 "ai.exe":"ai.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "alzipcon":{
         "p":"ALZip/ALZipCon.exe",
@@ -1922,7 +1933,8 @@
                 "Formats/Alz.dll":"ALZip/Formats/Alz.dll",
                 "Formats/Egg.dll":"ALZip/Formats/Egg.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "ar7":{
         "p":"AR7.EXE",
@@ -1931,7 +1943,8 @@
             "x":{
                 "AR7.EXE":"AR7.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "arg":{
         "p":"ARG.EXE",
@@ -1940,14 +1953,16 @@
             "x":{
                 "arg.exe":"ARG.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "ari":{
         "p":"ARI.EXE",
         "fs":[[
             "http://cd.textfiles.com/simtel/simtel0101/simtel/arcers/ari22.exe",
             "ARI.EXE"
-        ]]
+        ]],
+        "ts":0
     },
     "resource_dasm":{
         "p":"resource_dasm/resource_dasm.exe",
@@ -1967,7 +1982,8 @@
                 "mingw64/bin/libgcc_s_seh-1.dll":"resource_dasm/libgcc_s_seh-1.dll",
                 "mingw64/bin/libstdc++-6.dll":"resource_dasm/libstdc++-6.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "asd":{
         "p":"asd.exe",
@@ -2162,7 +2178,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.2/lessmsi-v2.10.2.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.3/lessmsi-v2.10.3.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -2171,9 +2187,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1759501899
+            "ts":1760119873
         }],
-        "ts":1759501899
+        "ts":1760119873
     },
     "msix":{
         "p":"MsiX.exe",
@@ -2302,7 +2318,8 @@
         "fs":[[
             "https://aluigi.altervista.org/bms/minecraft_x360_pck.bms",
             "BMS/minecraft_pck.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
