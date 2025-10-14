@@ -137,7 +137,7 @@ class DLDB:
             td = gtmp()
             os.makedirs(td,exist_ok=True)
             self.run(['innounp-2','-x','-b','-m','-d' + td,'-u','-h','-o','-y',p])
-            for tx in xl: copy(td + '/{app}/' + tx,'bin/' + xl[tx])
+            for tx in xl: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,'bin/' + xl[tx])
             rmtree(td)
         else: raise NotImplementedError(p + f' [{ex}]')
     def dl(self,url:str,out:str,verify=True):

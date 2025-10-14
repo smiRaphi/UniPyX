@@ -706,5 +706,11 @@
     ],
     "Ai":[
         "ai archivator compressed archive"
+    ],
+    "ALZip":[
+        "alzip compressed archive"
+    ],
+    "EGG":[
+        "egg compressed archive"
     ]
 }

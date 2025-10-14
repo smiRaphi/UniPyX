@@ -674,6 +674,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ACB':
             dosbox(['acb','r',i],tmps=True)
             if os.listdir(o): return
+        case 'ALZip'|'EGG':
+            run(['alzipcon','-x','-oa',i,o])
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

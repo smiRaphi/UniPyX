@@ -1904,6 +1904,26 @@
             }
         }]
     },
+    "alzipcon":{
+        "p":"ALZip/ALZipCon.exe",
+        "fs":[{
+            "u":"https://aldn.altools.co.kr/setup/ALZip1232.exe",
+            "ex":"inno",
+            "x":{
+                "{tmp}/ALZipCon.exe":"ALZip/ALZipCon.exe",
+                "Coders/AZO.dll":"ALZip/Coders/AZO.dll",
+                "Coders/BZ2.dll":"ALZip/Coders/BZ2.dll",
+                "Coders/Coder7z.dll":"ALZip/Coders/Coder7z.dll",
+                "Coders/Deflate.dll":"ALZip/Coders/Deflate.dll",
+                "Coders/Implode.dll":"ALZip/Coders/Implode.dll",
+                "Coders/LZH.dll":"ALZip/Coders/LZH.dll",
+                "Coders/LZMA.dll":"ALZip/Coders/LZMA.dll",
+                "Coders/PPMD.dll":"ALZip/Coders/PPMD.dll",
+                "Formats/Alz.dll":"ALZip/Formats/Alz.dll",
+                "Formats/Egg.dll":"ALZip/Formats/Egg.dll"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
