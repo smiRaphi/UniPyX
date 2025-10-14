@@ -346,7 +346,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         if print_try and db.print_try: print('Trying with',scr)
         p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else '-exit'),
              '-c','MOUNT C "' + oup.replace('\\','\\\\') + '"','-c','C:',
-             '-c',subprocess.list2cmdline([basename(ts)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + ' > _OUT.TXT'] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
+             '-c',subprocess.list2cmdline([basename(ts)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + (' > _OUT.TXT' if nowin else '')] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
 
         while not exists(oup + '/_OUT.TXT'): sleep(0.1)
         while True:
@@ -666,6 +666,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['turborc','-d',i,of])
             if exists(of) and os.path.getsize(of): return
+        case 'ACB':
+            dosbox(['acb','r',i],tmps=True)
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

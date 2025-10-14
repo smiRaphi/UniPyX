@@ -1886,6 +1886,15 @@
         "https://raw.githubusercontent.com/ross-spencer/hmmunpack/refs/heads/main/hmmunpack.py"
         ]
     },
+    "acb":{
+        "p":"ACB.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/acb_200c.zip",
+            "x":{
+                "ACB.EXE":"ACB.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

@@ -336,6 +336,11 @@
         "rs":"Flashzip"
     },
     {
+        "rq":"aPACK",
+        "d":["isat","Rar\\x21\\x1A\\x07\\0",8221],
+        "rs":"RAR","s":1
+    },
+    {
         "rq":"UPX",
         "d":[["size",[69136,null]],["isat","RK",-2],["isat","R\\x00K\\x00 \\x00S\\x00e\\x00l\\x00f\\x00-\\x00E\\x00x\\x00t\\x00r\\x00a\\x00c\\x00t\\x00i\\x00n\\x00g\\x00 \\x00A\\x00r\\x00c\\x00h\\x00i\\x00v\\x00e\\x00",68508]],
         "rs":"RK","s":1
@@ -388,6 +393,11 @@
         "rqr":null,
         "d":[["isat","\\x54",0],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0]&15==1"]],
         "rs":"Turbo Range Coder"
+    },
+    {
+        "rq":null,
+        "d":[["isat","\\0",3],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0] in (0x80,0x81,0x82,0x83,0x84)"]],
+        "rs":"ACB"
     },
     {
         "rq":null,
