@@ -712,5 +712,8 @@
     ],
     "EGG":[
         "egg compressed archive"
+    ],
+    "AR7":[
+        "ar7 compressed archive"
     ]
 }

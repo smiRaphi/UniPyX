@@ -1924,6 +1924,15 @@
             }
         }]
     },
+    "ar7":{
+        "p":"AR7.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/640swstudio/COMPRESS/AR712.ZIP",
+            "x":{
+                "AR7.EXE":"AR7.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

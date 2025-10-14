@@ -677,6 +677,12 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ALZip'|'EGG':
             run(['alzipcon','-x','-oa',i,o])
             if os.listdir(o): return
+        case 'AR7':
+            _,_,r = run(['msdos',db.get('ar7'),'l',i])
+            r = re.sub('\n+','\n',r.replace('\r','')).split('----------- ------------- ---- ------\n')[-1].strip().rsplit('\n',1)[0].replace('\n ',' ')
+            for f in r.split('\n'): mkdir(o + '/' + dirname(f.rsplit(None,3)[0].replace(':','\\')))
+
+            return msdos(['ar7','x',i],cwd=o)
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
