@@ -1126,7 +1126,7 @@
             },
             "ts":0
         },{
-            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r179.g8181947cc-1-any.pkg.tar.zst",
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r223.gf82613935-1-any.pkg.tar.zst",
             "x":{
                 "mingw64/bin/libwinpthread-1.dll":"binutils/libwinpthread-1.dll"
             },
@@ -1939,6 +1939,42 @@
             "u":"https://www.sac.sk/download/pack/arg.zip",
             "x":{
                 "arg.exe":"ARG.EXE"
+            }
+        }]
+    },
+    "ari":{
+        "p":"ARI.EXE",
+        "fs":[[
+            "http://cd.textfiles.com/simtel/simtel0101/simtel/arcers/ari22.exe",
+            "ARI.EXE"
+        ]]
+    },
+    "resource_dasm":{
+        "p":"resource_dasm/resource_dasm.exe",
+        "fs":[{
+            "u":"https://github.com/fuzziqersoftware/resource_dasm/releases/download/v2025-05-26/release-windows.zip",
+            "x":{
+                "release-windows/resource_dasm.exe":"resource_dasm/resource_dasm.exe"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r223.gf82613935-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libwinpthread-1.dll":"resource_dasm/libwinpthread-1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-15.2.0-8-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libgcc_s_seh-1.dll":"resource_dasm/libgcc_s_seh-1.dll",
+                "mingw64/bin/libstdc++-6.dll":"resource_dasm/libstdc++-6.dll"
+            }
+        }]
+    },
+    "asd":{
+        "p":"asd.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "asd.exe":"asd.exe"
             }
         }]
     },

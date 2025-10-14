@@ -7,6 +7,10 @@
         "rq":"MSP",
         "rs":"MSP","s":1
     },
+    {
+        "rq":["ARJZ","ARJ"],
+        "rs":"ARJZ","s":1
+    },
 
     {
         "rq":"ISO",
@@ -352,10 +356,15 @@
     },
     {
         "rq":"UPX",
-        "d":[["size",[103434,null]],
-             ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true]],
-             "noq":true,
+        "d":[["size",[103434,null],false],
+             ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true],[false]],
+             "qq":true,
         "rs":"Squeez","s":1
+    },
+    {
+        "rq":"UPX",
+        "d":[["size",[36874,null]],["isat","ASD02",36864]],
+        "rs":"ASD","s":1
     },
     {
         "rq":null,

@@ -45,7 +45,8 @@
     ],
     "ARJ":[
         "arj compressed archive (standard)",
-        "arj compressed archive"
+        "arj compressed archive",
+        "arj"
     ],
     "ZSTD":[
         "zstandard compressed data",
@@ -71,7 +72,8 @@
         "upx compressed win64 executable",
         "upx wwwupxsourceforgenet",
         "upx 290 lzma",
-        "upx"
+        "upx",
+        "packerupx compresorgratuito wwwupxsourceforgenet"
     ],
     "BinHex":[
         "binhex 4.0 encoded"
@@ -715,5 +717,12 @@
     ],
     "AR7":[
         "ar7 compressed archive"
+    ],
+    "ARJZ":[
+        "arjz compressed archive"
+    ],
+    "ASD":[
+        "asd archiever compressed archive",
+        "asd archiver compressed archive"
     ]
 }

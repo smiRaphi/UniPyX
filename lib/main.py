@@ -312,9 +312,11 @@ def analyze(inp:str,raw=False):
                     f.seek(x[2])
                     ret = sum(f.read(x[1])) != 0
                     f.close()
+                elif type(x[0]) == bool and x[0] == False: tret = ret = False
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = (tret or type(tret) != bool) and ret
-            if not xv.get('noq') and not tret: break
+            if xv.get('qq') and (type(x[-1]) != bool or x[-1]) and ret: break
+            if not (xv.get('noq') and (type(x[-1]) != bool or x[-1])) and not tret: break
         if tret:
             if xv.get('s'):
                 nts = [xv['rs']]
@@ -391,7 +393,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF':
+        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -684,6 +686,17 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             return msdos(['ar7','x',i],cwd=o)
         case 'ARG': return msdos(['arg','e',i],cwd=o)
+        case 'ASD':
+            tf = i
+            f = open(i,'rb')
+            if f.read(2) == b'MZ':
+                tf = TmpFile('.asd')
+                f.seek(0x9000)
+                open(tf.p,'wb').write(f.read())
+                f.close()
+            run(['asd','x','-y',tf],cwd=o)
+            if hasattr(tf,'destroy'): tf.destroy()
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

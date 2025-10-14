@@ -29,8 +29,23 @@ class DLDB:
         if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
         if useos:
-            r = os.system((subprocess.list2cmdline(cmd) if type(cmd) == list else cmd) + ' >NUL')
-            o = e = None
+            if stdin:
+                tfi = gtmp('.i')
+                if type(stdin) == str: stdin = stdin.encode()
+                open(tfi,'wb').write(stdin)
+            tfo,tfe = gtmp('.o'),gtmp('.e')
+
+            if 'cwd' in kwargs:
+                cd = os.getcwd()
+                os.chdir(kwargs['cwd'])
+            r = os.system((subprocess.list2cmdline(cmd) if type(cmd) == list else cmd) + (f' <{tfi}' if stdin else '') + f' >{tfo} 2>{tfe}')
+            if 'cwd' in kwargs: os.chdir(cd)
+
+            o,e = open(tfo,'rb').read(),open(tfe,'rb').read()
+            os.remove(tfo)
+            os.remove(tfe)
+            if stdin: os.remove(tfi)
+            if text: o,e = o.decode('cp437'),e.decode('cp437')
         else:
             p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=-1,stderr=-1,stdin=-1 if stdin != None else None,**kwargs)
             if timeout:
@@ -66,7 +81,7 @@ class DLDB:
                             ex = e['u'].split('?')[0].split('/')[-1].lower()
                             if ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
                             else: ex = '.' + ex.split('.')[-1]
-                        p = gtmp(ex)
+                        p = gtmp('.exe' if ex in ('run','inno','nsis') else ex)
 
                     if e['u'] == '.': p,ex = 'bin/bin.7z','.7z'
                     else: self.dl(e['u'],p,verify=e.get('v',True))
@@ -138,6 +153,12 @@ class DLDB:
             os.makedirs(td,exist_ok=True)
             self.run(['innounp-2','-x','-b','-m','-d' + td,'-u','-h','-o','-y',p])
             for tx in xl: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == 'run':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run([p,'-y'],stdin='\n',getexe=False,cwd=td)
+            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
             rmtree(td)
         else: raise NotImplementedError(p + f' [{ex}]')
     def dl(self,url:str,out:str,verify=True):
