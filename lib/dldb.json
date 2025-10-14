@@ -1847,6 +1847,15 @@
             }
         }]
     },
+    "car":{
+        "p":"CAR.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/carcom11.zip",
+            "x":{
+                "CAR.EXE":"CAR.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

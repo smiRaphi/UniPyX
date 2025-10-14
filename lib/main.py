@@ -2118,6 +2118,21 @@ def extract(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + hex(off)[2:].upper().zfill(8 if i32 else 6) + '.bin','wb').write(d)
             if os.listdir(o): return
         case 'ABE': return msdos(['dabe','-v','+i',i],cwd=o)
+        case 'CarComp': return msdos(['car','x',i],cwd=o)
+        case 'Bunny Pro. Das2 DPK':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i,endian='<')
+            assert f.read(2) == b'PA'
+            fc = f.readu16()
+            assert fc > 0 and f.readu32() > 0
+            fs = [(f.read(0x10).rstrip(b'\0').decode('ascii'),f.readu32()) for _ in range(fc)]
+
+            for n,s in fs: open(o + '/' + n,'wb').write(f.read(s))
+            f.close()
+
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

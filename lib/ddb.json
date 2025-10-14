@@ -396,6 +396,11 @@
     },
     {
         "rqr":null,
+        "d":[["ext",".car"],["str0",0,2,1]],
+        "rs":"CarComp"
+    },
+    {
+        "rqr":null,
         "d":["ext",".zl"],
         "rs":"OpenZL"
     },
