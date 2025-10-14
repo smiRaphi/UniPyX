@@ -1856,6 +1856,15 @@
             }
         }]
     },
+    "flash":{
+        "p":"FLASH.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/flash100.zip",
+            "x":{
+                "FLASH.EXE":"FLASH.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

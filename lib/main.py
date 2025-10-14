@@ -2324,6 +2324,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['zli','d','-o',of,'-f',i])
             if exists(of) and os.path.getsize(of): return
+        case 'Flash': return msdos(['flash','-E',i,'*.*'],cwd=o)
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
