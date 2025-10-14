@@ -19,7 +19,8 @@
         "nuget package",
         "open packaging conventions container",
         "zip installer",
-        "squirrel setup"
+        "squirrel setup",
+        "ios application"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)"
@@ -270,7 +271,8 @@
         "bzip compressed archive"
     ],
     "BZip2":[
-        "bzip2 compressed archive"
+        "bzip2 compressed archive",
+        "bzip2 compressed data"
     ],
     "Hollow Knight Save":[
         "hollow knight save game"
@@ -683,5 +685,8 @@
     ],
     "IPS Patch":[
         "international patching system binary patch"
+    ],
+    "ABE":[
+        "abe encoded data (original)"
     ]
 }

@@ -2117,6 +2117,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 else: d = f.read(s)
                 open(o + '/' + hex(off)[2:].upper().zfill(8 if i32 else 6) + '.bin','wb').write(d)
             if os.listdir(o): return
+        case 'ABE': return msdos(['dabe','-v','+i',i],cwd=o)
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

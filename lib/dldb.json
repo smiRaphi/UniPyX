@@ -1838,6 +1838,15 @@
         }],
         "ts":0
     },
+    "dabe":{
+        "p":"DABE.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/simtel/simtel9510/disk2/DISC2/DECODE/ABE.ZIP",
+            "x":{
+                "DABE.EXE":"DABE.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
