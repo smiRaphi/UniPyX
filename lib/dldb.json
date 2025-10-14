@@ -1880,6 +1880,12 @@
             }
         }]
     },
+    "hmmunpack":{
+        "p":"hmmunpack.py",
+        "fs":[
+        "https://raw.githubusercontent.com/ross-spencer/hmmunpack/refs/heads/main/hmmunpack.py"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

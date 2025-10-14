@@ -2141,6 +2141,18 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Build Engine Group':
             run(['gamearch',i,'-X'],cwd=o)
             if os.listdir(o): return
+        case 'HMM Packfile':
+            if db.print_try: print('Trying with hmmunpack')
+            db.get('hmmunpack')
+            import bin.hmmunpack as hmmunpack # type: ignore
+
+            hmmunpack.print = lambda *_,file=None:None
+            hmmunpack.__Path = hmmunpack.Path
+            hmmunpack.Path = lambda *args,**kwargs:hmmunpack.__Path(*((o,) if args == (f'output-{i}',) else args),**kwargs)
+            hmmunpack.open = lambda *args,**kwargs:open('NUL' if args[0] == f'extract-report-{i.replace("\\","-").replace("/","-")}.txt' else args[0],*args[1:],**kwargs)
+
+            hmmunpack.extract(i)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
