@@ -2029,6 +2029,15 @@
             }
         }]
     },
+    "btspk":{
+        "p":"BTSPK.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/btspk.arj",
+            "x":{
+                "BTSPK.EXE":"BTSPK.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

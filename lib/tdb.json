@@ -736,5 +736,8 @@
     ],
     "BSArc":[
         "bsarc compressed archive"
+    ],
+    "LZEXE":[
+        "lzexe"
     ]
 }

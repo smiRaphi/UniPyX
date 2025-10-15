@@ -1559,7 +1559,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             r = extract(i,o,'COMPACK')
             if not r: return r
-        case 'PKLITE':
+        case 'PKLITE'|'LZEXE':
             od = rldir(o)
             run(["deark","-opt","execomp","-od",o,i])
             for x in rldir(o):
@@ -2386,6 +2386,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'BSArc':
             dosbox(['bsa','x','-y','-S',i])
+            if os.listdir(o): return
+        case 'BTSPK':
+            dosbox(['btspk','x','-y','-e',i])
             if os.listdir(o): return
 
     return 1

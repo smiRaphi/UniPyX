@@ -113,19 +113,19 @@ class DLDB:
                         self.ext(tf,ex,xl[tx])
                         os.remove(tf)
                     else: xopen('bin/' + xl[tx],'wb').write(z.read(tx))
-        elif ex in ['.tgz','.tar.gz']:
+        elif ex in ('.tgz','.tar.gz'):
             with tarfile.open(p,'r:gz') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
         elif ex in ['.txz','.tar.xz']:
             with tarfile.open(p,'r:xz') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
-        elif ex in ['.tzt','.tar.zst']:
+        elif ex in ('.tzt','.tar.zst'):
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,p])
             with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
             rmtree(td)
-        elif ex in ('.7z','nsis'):
+        elif ex in ('.7z','.arj','nsis'):
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,'-aoa',p])
             for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
