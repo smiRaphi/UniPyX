@@ -724,5 +724,8 @@
     "ASD":[
         "asd archiever compressed archive",
         "asd archiver compressed archive"
+    ],
+    "B1":[
+        "b1 compressed archive"
     ]
 }

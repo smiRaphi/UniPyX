@@ -1994,6 +1994,13 @@
             }
         }]
     },
+    "b1-pack":{
+        "p":"b1-pack-tool.jar",
+        "fs":[[
+            "http://dev.b1.org/snapshots/org/b1/pack/b1-pack-tool/0.9.3-SNAPSHOT/b1-pack-tool-0.9.3-20130524.124731-1.jar",
+            "b1-pack-tool.jar"
+        ]]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

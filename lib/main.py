@@ -2374,6 +2374,10 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Ai':
             run(['ai','e',i],cwd=o)
             if os.listdir(o): return
+        case 'B1':
+            if db.print_try: print('Trying with b1-pack')
+            run(['java','-jar',db.get('b1-pack'),'x','-o',o,i],print_try=False)
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
