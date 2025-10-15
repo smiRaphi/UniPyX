@@ -2001,6 +2001,16 @@
             "b1-pack-tool.jar"
         ]]
     },
+    "izarccl":{
+        "p":"IZARCE.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20241119051656if_/https://www.izarc.org/download/IZArcCL.exe",
+            "ex":"inno",
+            "x":{
+                "IZARCE.exe":"IZARCE.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

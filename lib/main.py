@@ -697,6 +697,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['asd','x','-y',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
             if os.listdir(o): return
+        case 'BlakHole':
+            run(['izarccl','-e','-o','-p' + o,i])
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])

@@ -727,5 +727,8 @@
     ],
     "B1":[
         "b1 compressed archive"
+    ],
+    "BlakHole":[
+        "blackhole compressed archive"
     ]
 }
