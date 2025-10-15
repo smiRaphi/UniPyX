@@ -2011,6 +2011,15 @@
             }
         }]
     },
+    "blink":{
+        "p":"blink.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/blink.zip",
+            "x":{
+                "blinkw.exe":"blink.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

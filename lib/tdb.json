@@ -730,5 +730,8 @@
     ],
     "BlakHole":[
         "blackhole compressed archive"
+    ],
+    "BLINK":[
+        "blink compressed archive"
     ]
 }

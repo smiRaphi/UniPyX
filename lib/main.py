@@ -1375,7 +1375,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                     f.seek(48 + 24 + 56,1)
                     siz = int.from_bytes(f.read(4),'little')
                     f.seek(sp)
-                    open(o + '/' + str(c) + '.exe','wb').write(f.read(siz))
+                    open(o + f'/{c}.exe','wb').write(f.read(siz))
                     f.seek(-f.tell() % 16,1)
                     if f.tell() >= ts: f.seek(sp + 64)
                     c += 1
@@ -2380,6 +2380,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'B1':
             if db.print_try: print('Trying with b1-pack')
             run(['java','-jar',db.get('b1-pack'),'x','-o',o,i],print_try=False)
+            if os.listdir(o): return
+        case 'BLINK':
+            run(['blink','X',i,'*'],cwd=o)
             if os.listdir(o): return
 
     return 1
