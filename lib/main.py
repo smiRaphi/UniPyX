@@ -2384,6 +2384,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'BLINK':
             run(['blink','X',i,'*'],cwd=o)
             if os.listdir(o): return
+        case 'BSArc':
+            dosbox(['bsa','x','-y','-S',i])
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

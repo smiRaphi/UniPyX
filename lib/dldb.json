@@ -2020,6 +2020,15 @@
             }
         }]
     },
+    "bsa":{
+        "p":"BSA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/bsa.zip",
+            "x":{
+                "BSA.EXE":"BSA.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

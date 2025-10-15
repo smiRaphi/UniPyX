@@ -733,5 +733,8 @@
     ],
     "BLINK":[
         "blink compressed archive"
+    ],
+    "BSArc":[
+        "bsarc compressed archive"
     ]
 }
