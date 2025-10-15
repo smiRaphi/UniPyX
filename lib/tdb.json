@@ -746,5 +746,11 @@
     ],
     "ChArc":[
         "charc compressed archive"
+    ],
+    "ChiefLZArchive":[
+        "lza compressed archive"
+    ],
+    "ChiefLZZ":[
+        "lza compressed data"
     ]
 }

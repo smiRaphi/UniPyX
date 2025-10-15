@@ -2394,6 +2394,13 @@ def extract(inp:str,out:str,t:str) -> bool:
             dosbox(['btspk','x','-y','-e',i])
             if os.listdir(o): return
         case 'ChArc': return msdos(['charc','-E',i],cwd=o)
+        case 'ChiefLZArchive':
+            run(['lza',i,o,'/X'])
+            if os.listdir(o): return
+        case 'ChiefLZZ':
+            of = o + '/' + tbasename(i)
+            run(['lza',i,of,'/U'])
+            if exists(of) and os.path.getsize(of): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

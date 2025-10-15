@@ -2056,6 +2056,15 @@
             }
         }]
     },
+    "lza":{
+        "p":"LZA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/lza101.zip",
+            "x":{
+                "LZA32.EXE":"LZA.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
