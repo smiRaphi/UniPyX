@@ -19,6 +19,7 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * self compiled [MPQExtractor](https://github.com/Kanma/MPQExtractor)
 * self compiled [ZLI](https://github.com/facebook/openzl)
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
+* [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * sqx SFX from [SpeedCommander 22](https://www.speedproject.com/) because it's packed in a sqc SFX
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
 * chkey.py for managing Chihiro keys

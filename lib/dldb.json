@@ -2047,6 +2047,15 @@
             }
         }]
     },
+    "charc":{
+        "p":"CHARC.EXE",
+        "fs":[{
+            "u":".",
+            "x":{
+                "CHARC.EXE":"CHARC.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

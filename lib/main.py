@@ -2393,6 +2393,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'BTSPK':
             dosbox(['btspk','x','-y','-e',i])
             if os.listdir(o): return
+        case 'ChArc': return msdos(['charc','-E',i],cwd=o)
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
