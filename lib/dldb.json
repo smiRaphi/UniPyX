@@ -2038,6 +2038,15 @@
             }
         }]
     },
+    "uncfl":{
+        "p":"uncfl.exe",
+        "fs":[{
+            "u":"https://solhsa.com/zip/cfl3r3.zip",
+            "x":{
+                "bin/uncfl.exe":"uncfl.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

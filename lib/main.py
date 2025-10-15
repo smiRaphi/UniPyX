@@ -2187,6 +2187,9 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             hmmunpack.extract(i)
             if os.listdir(o): return
+        case 'Compressed File Library':
+            run(['uncfl',i],cwd=o)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
