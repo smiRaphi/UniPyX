@@ -130,6 +130,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
+    if 'plain text' in ts: ts.remove('plain text')
     if isdir(inp): typ = 'directory'
     else:
         idt = open(inp,'rb').read(0x4000)
@@ -165,8 +166,8 @@ def analyze(inp:str,raw=False):
                     if m: ts.append(m[1])
                     for x in msplit(' - ' + lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' ]   ',' stub : ',' Ovl like : ',' - ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
-                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown exe ','*Unknown exe ','Stub : *Unknown exe ','EP Token : ','File is corrupted ')):
-                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].strip(' ,!:;-')
+                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown ','*Unknown ','Stub : *Unknown ','EP Token : ','File is corrupted ')):
+                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].split('Warning : ')[0].strip(' ,!:;-')
                             if x and x.lower() not in ('genuine','unknown','more than necessary )') and not (len(x) == 4 and x.isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
@@ -2417,6 +2418,12 @@ def extract(inp:str,out:str,t:str) -> bool:
             if exists(of) and os.path.getsize(of): return
         case 'CMZ':
             run(['uncmz','-d',o,'-e',i])
+            if os.listdir(o): return
+        case 'Compressia':
+            if db.print_try: print('Trying with compressia')
+            prc = subprocess.Popen([db.get('compressia'),'e',i,o],stdout=-1,stderr=-1)
+            run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',"(New-Object -ComObject WScript.Shell).SendKeys('{ENTER}')"],print_try=False,getexe=False)
+            prc.wait()
             if os.listdir(o): return
 
     return 1

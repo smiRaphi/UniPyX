@@ -2088,6 +2088,12 @@
             }
         }]
     },
+    "compressia":{
+        "p":"compcl.exe",
+        "fs":[
+        "https://web.archive.org/web/20021210174357if_/http://www.compressia.com:80/compcl.exe"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
