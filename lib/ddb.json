@@ -414,13 +414,18 @@
     },
     {
         "rq":null,
-        "d":[["isat","\\0",3],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0] in (0x80,0x81,0x82,0x83,0x84)"]],
+        "d":[["isin",["\\x80","\\x81","\\x82","\\x83","\\x84"],1],["isat","\\0",3]],
         "rs":"ACB"
     },
     {
         "rq":null,
         "d":[["isat","\\x03\\0\\0\\0",0]],
         "rs":"Minecraft PCK"
+    },
+    {
+        "rqr":null,
+        "d":[["isat","\\1",0],["str",1,11],["isin",["\\0","\\xFF"],13],["isat","\\1",14],["isin",["\\0","\\1"],18]],
+        "rs":"The Compressor"
     },
     {
         "rqr":null,

@@ -256,6 +256,15 @@ def analyze(inp:str,raw=False):
                     f.seek(sp)
                     ret = f.read(x[2]*len(cv)) == (cv*x[2])
                     f.close()
+                elif x[0] == 'isin':
+                    f = open(inp,'rb')
+                    cvs = [ast.literal_eval('"' + cv.replace('"','\\"') + '"').encode('latin1') for cv in x[1]]
+                    sp = x[2]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    ret = f.read(len(cvs[0])) in cvs
+                    f.close()
                 elif x[0] == 'size':
                     sz = os.path.getsize(inp)
                     if type(x[1]) == int: ret = sz == x[1]
@@ -631,7 +640,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed':
+        case 'Stirling Compressed'|'The Compressor':
             od = rldir(o)
             run(["deark","-od",o,i])
             for x in rldir(o):
