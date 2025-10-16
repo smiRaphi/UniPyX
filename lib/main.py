@@ -394,7 +394,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'LHARC'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ':
+        case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -408,6 +408,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if t == 'MSCAB': fix_cab(o);return
                 elif t in ('ZSTD','xz','BZip2','LZIP'): return fix_tar(o)
                 else: return
+        case 'LHARC':
+            run(['lha','xf','--extract-broken-archive','-w=' + o,i])
+            if os.listdir(o): return
+            run(['7z','x',i,'-o' + o,'-aou'])
+            if os.listdir(o): return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
             run(['pdfimages','-j',i,o + '\\img'])
