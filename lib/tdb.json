@@ -752,5 +752,8 @@
     ],
     "ChiefLZZ":[
         "lza compressed data"
+    ],
+    "CMZ":[
+        "cmz compressed archive"
     ]
 }

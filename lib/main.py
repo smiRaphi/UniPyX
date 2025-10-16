@@ -2401,6 +2401,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['lza',i,of,'/U'])
             if exists(of) and os.path.getsize(of): return
+        case 'CMZ':
+            run(['uncmz','-d',o,'-e',i])
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

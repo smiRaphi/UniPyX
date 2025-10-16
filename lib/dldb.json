@@ -2065,6 +2065,15 @@
             }
         }]
     },
+    "uncmz":{
+        "p":"uncmz.exe",
+        "fs":[{
+            "u":"https://github.com/sourcekris/uncmz/releases/download/v1.0.0/uncmz-windows-amd64.zip",
+            "x":{
+                "uncmz.exe":"uncmz.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
