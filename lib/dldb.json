@@ -203,6 +203,20 @@
             "u":"https://cdn.theunarchiver.com/downloads/unarWindows.zip",
             "x":{
                 "unar.exe":"Unarchiver/unar.exe",
+                "lsar.exe":"Unarchiver/lsar.exe",
+                "Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"
+            },
+            "ts":1735686000
+        }],
+        "ts":1735686000
+    },
+    "lsar":{
+        "p":"Unarchiver/lsar.exe",
+        "fs":[{
+            "u":"https://cdn.theunarchiver.com/downloads/unarWindows.zip",
+            "x":{
+                "unar.exe":"Unarchiver/unar.exe",
+                "lsar.exe":"Unarchiver/lsar.exe",
                 "Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"
             },
             "ts":1735686000

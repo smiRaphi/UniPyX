@@ -8,11 +8,12 @@ import lib.main
 
 url = sys.argv[1].strip('/') + '/'
 assert '://sembiance.com/' in url and url.startswith(('https://','http://'))
+div = int(sys.argv[2]) if len(sys.argv) > 2 else 3
 
 fs = re.findall(r'(?m)^<a href="([^"]+)">',httpx.get(url).text)
 assert len(fs)
 
-f = fs[(len(fs)-1)//3]
+f = fs[(len(fs)-1)//div]
 fn = os.path.abspath(unquote(f))
 ur = url + f
 print(os.path.basename(fn),ur)

@@ -755,5 +755,15 @@
     ],
     "CMZ":[
         "cmz compressed archive"
+    ],
+    "MacBinary":[
+        "macbinary",
+        "macbinary 2",
+        "macintosh application (macbinary)"
+    ],
+    "Compact Pro":[
+        "compact pro compressed archive",
+        "mac compact pro archive",
+        "mac compact pro compressed archive (macbinary)"
     ]
 }

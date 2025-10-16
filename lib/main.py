@@ -700,6 +700,20 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'BlakHole':
             run(['izarccl','-e','-o','-p' + o,i])
             if os.listdir(o): return
+        case 'Compact Pro'|'MacBinary':
+            cmd = ['unar','-f','-D','-k','visible']
+            try: i.encode('ascii')
+            except UnicodeEncodeError:
+                try: i.encode('x-mac-japanese')
+                except UnicodeEncodeError: pass
+                else:
+                    try: inf = json.loads(run(['lsar','-json',i])[1].replace('\t',' ').replace('}\n  "lsarInnerFormatName"','},"lsarInnerFormatName"'))
+                    except json.JSONDecodeError: pass
+                    else:
+                        if inf['lsarEncoding'] not in ('macintosh','UTF-8'): cmd += ['-e','x-mac-japanese']
+
+            run(cmd + ['-o',o,i])
+            if os.listdir(o): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
