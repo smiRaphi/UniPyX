@@ -28,6 +28,7 @@ GFMTS = {
     'AppleCommander/AppleCommander':lambda tag:f'AppleCommander-acx-{tag}.jar',
     'unsound/hfsexplorer':lambda tag:f'{tag}-bin.zip',
     'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
+    'GDRETools/gdsdecomp':lambda tag:f'GDRE_tools-{tag}-windows.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):
@@ -92,7 +93,7 @@ def update():
             elif dom == 'github.com' and '/releases/download/' in u:
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-                if repo in ('aaru-dps/Aaru',): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                 elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 

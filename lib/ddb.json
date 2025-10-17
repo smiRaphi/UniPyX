@@ -37,6 +37,11 @@
         "rs":"GameCube ISO","s":1
     },
     {
+        "rq":null,
+        "d":[["isat","GDPC",0],["n0",1,4],["isat","\\0\\0\\0",5]],
+        "rs":"Godot Pack","s":1
+    },
+    {
         "rqr":"ISO 9660 CD image",
         "d":[["isat","CVMH\\0\\0",0],
              ["isat","ROFSROFSBLD ",52]],
@@ -61,6 +66,11 @@
         "rqr":"Win64 Executable (generic)",
         "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.qtmimed':return True\n\telse:f.seek(32,1)"],
         "rs":"Qt IFW","s":1
+    },
+    {
+        "rqr":"Generic Win/DOS Executable",
+        "d":[["isat","GDPC",-4],["contain","pck\\0\\0\\0\\0\\0",[384,911]]],
+        "rs":"Godot Game","s":1
     },
     {
         "rq":"MSCAB",

@@ -1595,6 +1595,10 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if not x in od:
                     mv(x,o + '/' + basename(i))
                     return
+        case 'Godot Game'|'Godot Pack':
+            run(['gdre_tools','--headless','--extract=' + i,'--output=' + o,'--ignore-checksum-errors'])
+            if exists(o): remove(o + '/gdre_export.log')
+            if os.listdir(o): return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()

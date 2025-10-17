@@ -2103,6 +2103,17 @@
             }
         }]
     },
+    "gdre_tools":{
+        "p":"GDRETools/gdre_tools.exe",
+        "fs":[{
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.0.0-beta.8/GDRE_tools-v2.0.0-beta.8-windows.zip",
+            "x":{
+                "gdre_tools.exe":"GDRETools/gdre_tools.exe",
+                "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
+                "gdre_tools.pck":"GDRETools/gdre_tools.pck"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
