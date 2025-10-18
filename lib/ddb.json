@@ -350,6 +350,11 @@
         "rs":"Squeeze It","s":1
     },
     {
+        "rqr":"Microsoft Visual C/C++",
+        "d":["isat","DGCA",222528],
+        "rs":"DGCA","s":1
+    },
+    {
         "rq":null,
         "rqr":null,
         "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],

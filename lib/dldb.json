@@ -2171,6 +2171,26 @@
             }
         }]
     },
+    "dgcac":{
+        "p":"dgcac.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20190306080212if_/http://www.emit.jp/dgca/dgca_v110.zip",
+            "x":{
+                "DGCA/dgcac.exe":"dgcac.exe"
+            }
+        }]
+    },
+    "dietdisk":{
+        "p":"DIETDISC/DIETDISK.COM",
+        "fs":[{
+            "u":"http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP",
+            "ex":".zipx",
+            "x":{
+                "FATTEN.EXE":"DIETDISC/FATTEN.EXE",
+                "DIETDISK.COM":"DIETDISC/DIETDISK.COM"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

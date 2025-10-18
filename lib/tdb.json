@@ -773,5 +773,20 @@
     ],
     "DAR":[
         "dar archive"
+    ],
+    "DGCA":[
+        "dgca digital g codec archiver"
+    ],
+    "DIET":[
+        "diet compressed data (generic)"
+    ],
+    "Disk Doubler":[
+        "diskdoubler compressed data"
+    ],
+    "DiskDupe IMG":[
+        "diskdupe disk image (newer/generic)"
+    ],
+    "DietDisk":[
+        "lzdiet compressed data"
     ]
 }

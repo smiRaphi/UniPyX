@@ -349,21 +349,22 @@ def extract(inp:str,out:str,t:str) -> bool:
         run(['quickbms',db.get(scr),inf,ouf],print_try=False)
         if os.listdir(ouf): return
         return 1
-    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,tmps=False):
+    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
         scr = cmd[0]
         s = db.get(scr)
+        if not exists(s): s = custs
 
         mkdir(oup)
-        ts = oup + '/'
-        if tmps: ts += 'TMP' + os.urandom(2).hex() + extname(s)
-        else: ts += basename(s)
-        symlink(s,ts)
-        symlink(inf,oup + '/' + basename(inf))
+        oinf = inf
+        if tmpi:
+            td = TmpDir()
+            inf = td + '\\TMP' + extname(inf)
+            symlink(oinf,inf)
 
         if print_try and db.print_try: print('Trying with',scr)
-        p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else '-exit'),
-             '-c','MOUNT C "' + oup.replace('\\','\\\\') + '"','-c','C:',
-             '-c',subprocess.list2cmdline([basename(ts)] + [(basename(x) if x == i else x) for x in cmd[1:]]) + (' > _OUT.TXT' if nowin else '')] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
+        p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else ''),
+             '-c','MOUNT I "' + dirname(inf).replace('\\','\\\\') + '"','-c','MOUNT C "' + dirname(custs or s).replace('\\','\\\\') + '"','-c','MOUNT O "' + oup.replace('\\','\\\\') + '"','-c','O:'] + xcmds + [
+             '-c',subprocess.list2cmdline(['C:\\' + basename(s)] + [('I:\\' + basename(inf) if x == oinf else x) for x in cmd[1:]]) + (' > _OUT.TXT' if nowin else '')] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
 
         while not exists(oup + '/_OUT.TXT'): sleep(0.1)
         while True:
@@ -382,10 +383,11 @@ def extract(inp:str,out:str,t:str) -> bool:
                 break
             sleep(0.1)
         while True:
-            try: remove(oup + '/_OUT.TXT',ts,oup + '/' + basename(inf))
+            try: remove(oup + '/_OUT.TXT')
             except PermissionError: sleep(0.1)
             else: break
         p.kill()
+        if tmpi: td.destroy()
 
         return r
     def msdos(cmd,mscmd=[],tmpi=False,inf=i,**kwargs):
@@ -403,7 +405,8 @@ def extract(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ':
+        case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
+             'DiskDupe IMG':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -640,7 +643,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor'|'CP Shrink':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET':
             od = rldir(o)
             run(["deark","-od",o,i])
             for x in rldir(o):
@@ -689,7 +692,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['turborc','-d',i,of])
             if exists(of) and os.path.getsize(of): return
         case 'ACB':
-            dosbox(['acb','r',i],tmps=True)
+            dosbox(['acb','r',i])
             if os.listdir(o): return
         case 'ALZip'|'EGG':
             run(['alzipcon','-x','-oa',i,o])
@@ -708,14 +711,14 @@ def extract(inp:str,out:str,t:str) -> bool:
                 tf = TmpFile('.asd')
                 f.seek(0x9000)
                 open(tf.p,'wb').write(f.read())
-                f.close()
+            f.close()
             run(['asd','x','-y',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
             if os.listdir(o): return
         case 'BlakHole':
             run(['izarccl','-e','-o','-p' + o,i])
             if os.listdir(o): return
-        case 'Compact Pro'|'MacBinary':
+        case 'Compact Pro'|'MacBinary'|'Disk Doubler':
             cmd = ['unar','-f','-D','-k','visible']
             try: i.encode('ascii')
             except UnicodeEncodeError:
@@ -732,6 +735,13 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'DAR':
             run(['dar','-x','/cygdrive/' + i.replace('\\','/').replace(':',''),'-q','-qcrypto','-R','/cygdrive/' + o.replace('\\','/').replace(':','')])
             if os.listdir(o): return
+        case 'DietDisk':
+            ins = os.path.getsize(i)
+            copy(i,o + '/TMP.EXT')
+            dosbox(['fatten','O:\\TMP.EXT'],custs=dirname(db.get('dietdisk')) + '\\FATTEN.EXE',tmpi=False,xcmds=['-c','C:','-c','DIETDISK.COM','-c','O:'])
+            if os.path.getsize(o + '/TMP.EXT') != ins:
+                mv(o + '/TMP.EXT',o + '/' + basename(i))
+                return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -2401,7 +2411,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['lzfse','-decode','-i',i,'-o',of])
             if exists(of) and os.path.getsize(of): return
         case 'LIMIT':
-            dosbox(['limit','e','-y','-p',i],tmps=True)
+            dosbox(['limit','e','-y','-p',i])
             if os.listdir(o): return
         case 'Squeeze It': return msdos(['sqz','x',i],cwd=o)
         case 'QuARK': return msdos(['quark','x','/y',i],cwd=o,text=False)
@@ -2447,6 +2457,17 @@ def extract(inp:str,out:str,t:str) -> bool:
             prc.wait()
             if os.listdir(o): return
         case 'CRUSH': return msdos(['uncrush','-qo',i],cwd=o)
+        case 'DGCA':
+            tf = i
+            f = open(i,'rb')
+            if f.read(2) == b'MZ':
+                tf = TmpFile('.dgc')
+                f.seek(0x36540)
+                open(tf.p,'wb').write(f.read())
+            f.close()
+            run(['dgcac','e',tf,o])
+            if hasattr(tf,'destroy'): tf.destroy()
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
