@@ -2491,6 +2491,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Dzip':
             run(['dzip','-x',i,'-f'],cwd=o)
             if os.listdir(o): return
+        case 'ESP':
+            dosbox(['unesp','xys',i])
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

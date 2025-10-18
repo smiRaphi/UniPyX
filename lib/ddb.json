@@ -284,6 +284,11 @@
         "rs":"Dzip","s":1
     },
     {
+        "rq":"WWPACK",
+        "d":[["isat","ESP>",5086]],
+        "rs":"ESP","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1

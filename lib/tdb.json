@@ -792,5 +792,8 @@
     ],
     "DWC":[
         "dos dwc sfx executable"
+    ],
+    "ESP":[
+        "esp - extension sort packer compressed archive"
     ]
 }
