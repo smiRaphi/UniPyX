@@ -20,7 +20,8 @@
         "open packaging conventions container",
         "zip installer",
         "squirrel setup",
-        "ios application"
+        "ios application",
+        "mozilla firefox browser extension"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)"
@@ -788,5 +789,8 @@
     ],
     "DietDisk":[
         "lzdiet compressed data"
+    ],
+    "DWC":[
+        "dos dwc sfx executable"
     ]
 }

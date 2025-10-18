@@ -2191,6 +2191,15 @@
             }
         }]
     },
+    "dwc":{
+        "p":"DWC.EXE",
+        "fs":[{
+            "u":".",
+            "x":{
+                "DWC.EXE":"DWC.EXE"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

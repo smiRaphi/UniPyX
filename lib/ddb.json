@@ -273,6 +273,11 @@
         "rs":"Danganronpa WAD","s":1
     },
     {
+        "rqr":null,
+        "d":[["isat","DWC",-3],["isat","\\x1B\\x00\\x22",-27],["str0",-24,13,0]],
+        "rs":"DWC","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1

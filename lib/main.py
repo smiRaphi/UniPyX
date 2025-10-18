@@ -297,7 +297,10 @@ def analyze(inp:str,raw=False):
                     ret = h.hexdigest() == hs
                 elif x[0] == 'str0':
                     f = open(inp,'rb')
-                    f.seek(x[1])
+                    sp = x[1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
                     scnt = 0
                     b = b''
                     for _ in range(x[2]):
@@ -309,7 +312,10 @@ def analyze(inp:str,raw=False):
                     f.close()
                 elif x[0] == 'str':
                     f = open(inp,'rb')
-                    f.seek(x[1])
+                    sp = x[1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
                     b = b''
                     for _ in range(x[2]):
                         b = f.read(1)
@@ -742,6 +748,20 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.path.getsize(o + '/TMP.EXT') != ins:
                 mv(o + '/TMP.EXT',o + '/' + basename(i))
                 return
+        case 'DWC':
+            tf = i
+            f = open(i,'rb')
+            if f.read(2) == b'MZ':
+                siz = f.seek(0,2)
+                f.seek(0)
+                tf = TmpFile('.dwc')
+                d = f.read(siz-0x10)
+                open(tf.p,'wb').write(d + f.read(0x10).rsplit(b'DWC')[0] + b'DWC')
+                del d
+            f.close()
+            r = msdos(['dwc','x',tf],cwd=o)
+            if hasattr(tf,'destroy'): tf.destroy()
+            return r
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
