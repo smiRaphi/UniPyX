@@ -2488,6 +2488,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['dgcac','e',tf,o])
             if hasattr(tf,'destroy'): tf.destroy()
             if os.listdir(o): return
+        case 'Dzip':
+            run(['dzip','-x',i,'-f'],cwd=o)
+            if os.listdir(o): return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):

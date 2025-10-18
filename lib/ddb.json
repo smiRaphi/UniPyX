@@ -278,6 +278,12 @@
         "rs":"DWC","s":1
     },
     {
+        "rqr":null,
+        "d":[["isat","DZ",0],["isin",["\\0","\\1","\\2","\\3"],2],["isin",["\\0","\\1","\\2","\\x21","\\3","\\4","\\5","\\x51","\\x55","\\6","\\7","\\8","\\x81","\\x82","\\x83","\\x84","\\9"],3],["n0",4,4],
+             ["py","f=open(inp,'rb');siz=f.seek(0,2);f.seek(4);o=int.from_bytes(f.read(4),'little');return (o+0x42)<=siz"]],
+        "rs":"Dzip","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1

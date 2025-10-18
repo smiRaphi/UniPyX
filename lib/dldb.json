@@ -2200,6 +2200,16 @@
             }
         }]
     },
+    "dzip":{
+        "p":"dzip.exe",
+        "fs":[{
+            "u":"https://quake.speeddemosarchive.com/quake/downloads/dzip31.zip",
+            "x":{
+                "dzip.exe":"dzip.exe"
+            }
+        }],
+        "ts":0
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
