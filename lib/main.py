@@ -412,7 +412,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
     match t:
         case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
-             'DiskDupe IMG':
+             'DiskDupe IMG'|'XAR':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -762,6 +762,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             r = msdos(['dwc','x',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
             return r
+        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder':
+            run(['ancient','decompress',i,o + '/' + basename(i)])
+            if exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
 
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -1621,7 +1624,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             r = extract(i,o,'COMPACK')
             if not r: return r
-        case 'PKLITE'|'LZEXE':
+        case 'PKLITE'|'LZEXE'|'EXEPACK':
             od = rldir(o)
             run(["deark","-opt","execomp","-od",o,i])
             for x in rldir(o):
@@ -1709,9 +1712,6 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'CTPK':
             run(['ctpktool','-efd',i,o])
             if os.listdir(o): return
-        case 'Rob Northen Compression'|'Amiga XPK':
-            run(['ancient','decompress',i,o + '/' + basename(i)])
-            if os.path.exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
         case 'XBP': return quickbms('xbp')
         case 'Bezel Archive': return quickbms('bea')
         case 'PlayStation Archive':

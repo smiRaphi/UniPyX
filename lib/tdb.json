@@ -795,5 +795,17 @@
     ],
     "ESP":[
         "esp - extension sort packer compressed archive"
+    ],
+    "File Imploder":[
+        "file imploder by peter struijk",
+        "file imploder compressed data (clone 7)"
+    ],
+    "EXEPACK":[
+        "exepack",
+        "exepack compressed dos executable"
+    ],
+    "XAR":[
+        "xar",
+        "xar archive"
     ]
 }
