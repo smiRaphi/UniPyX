@@ -89,6 +89,11 @@
     },
     {
         "rqr":null,
+        "d":[["n0",4,0],["n0",4,4],["str0",12,15,1],["isin",["\\0","\\1","\\2"],27],["py","from zlib import crc32;f=open(inp,'rb');m=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');return crc32(f.read(m*32))==c"]],
+        "rs":"CP Shrink","s":1
+    },
+    {
+        "rqr":null,
         "d":["isat","KCAP\\x67\\0\\0\\0",0],
         "rs":"iQiyi PAK","s":1
     },
@@ -505,7 +510,7 @@
     {
         "rqr":null,
         "d":["ext",".crush"],
-        "rs":"CRUSH"
+        "rs":"CRUSH (I.M.)"
     },
     {
         "rqr":null,

@@ -2114,6 +2114,63 @@
             }
         }]
     },
+    "uncrush":{
+        "p":"UNCRUSH.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/pdos9606/ARCHIVER/TOOLS/CRUSH18.ZIP",
+            "x":{
+                "UNCRUSH.EXE":"UNCRUSH.EXE"
+            }
+        }]
+    },
+    "dar":{
+        "p":"DAR/dar.exe",
+        "fs":[{
+            "u":"https://cyfuture.dl.sourceforge.net/project/dar/dar/2.8.1/dar64-2.8.1-win64.zip?viasf=1",
+            "x":{
+                "dar64-2.8.1-win64/bin/dar.exe":"DAR/dar.exe",
+                "dar64-2.8.1-win64/bin/cygbz2-1.dll":"DAR/cygbz2-1.dll",
+                "dar64-2.8.1-win64/bin/cygargon2-1.dll":"DAR/cygargon2-1.dll",
+                "dar64-2.8.1-win64/bin/cygcurl-4.dll":"DAR/cygcurl-4.dll",
+                "dar64-2.8.1-win64/bin/cygwin1.dll":"DAR/cygwin1.dll",
+                "dar64-2.8.1-win64/bin/cyggcrypt-20.dll":"DAR/cyggcrypt-20.dll",
+                "dar64-2.8.1-win64/bin/cygintl-8.dll":"DAR/cygintl-8.dll",
+                "dar64-2.8.1-win64/bin/cyglz4-1.dll":"DAR/cyglz4-1.dll",
+                "dar64-2.8.1-win64/bin/cyglzma-5.dll":"DAR/cyglzma-5.dll",
+                "dar64-2.8.1-win64/bin/cygrhash-0.dll":"DAR/cygrhash-0.dll",
+                "dar64-2.8.1-win64/bin/cygrsync-2.dll":"DAR/cygrsync-2.dll",
+                "dar64-2.8.1-win64/bin/cyglzo2-2.dll":"DAR/cyglzo2-2.dll",
+                "dar64-2.8.1-win64/bin/cygssh-4.dll":"DAR/cygssh-4.dll",
+                "dar64-2.8.1-win64/bin/cygstdc++-6.dll":"DAR/cygstdc++-6.dll",
+                "dar64-2.8.1-win64/bin/cyggcc_s-seh-1.dll":"DAR/cyggcc_s-seh-1.dll",
+                "dar64-2.8.1-win64/bin/cygzstd-1.dll":"DAR/cygzstd-1.dll",
+                "dar64-2.8.1-win64/bin/cygz.dll":"DAR/cygz.dll",
+                "dar64-2.8.1-win64/bin/cyggsasl-18.dll":"DAR/cyggsasl-18.dll",
+                "dar64-2.8.1-win64/bin/cyggssapi_krb5-2.dll":"DAR/cyggssapi_krb5-2.dll",
+                "dar64-2.8.1-win64/bin/cygbrotlidec-1.dll":"DAR/cygbrotlidec-1.dll",
+                "dar64-2.8.1-win64/bin/cygcrypto-3.dll":"DAR/cygcrypto-3.dll",
+                "dar64-2.8.1-win64/bin/cygldap-2.dll":"DAR/cygldap-2.dll",
+                "dar64-2.8.1-win64/bin/cygnghttp2-14.dll":"DAR/cygnghttp2-14.dll",
+                "dar64-2.8.1-win64/bin/cygidn2-0.dll":"DAR/cygidn2-0.dll",
+                "dar64-2.8.1-win64/bin/cyglber-2.dll":"DAR/cyglber-2.dll",
+                "dar64-2.8.1-win64/bin/cygssh2-1.dll":"DAR/cygssh2-1.dll",
+                "dar64-2.8.1-win64/bin/cyggpg-error-0.dll":"DAR/cyggpg-error-0.dll",
+                "dar64-2.8.1-win64/bin/cygssl-3.dll":"DAR/cygssl-3.dll",
+                "dar64-2.8.1-win64/bin/cygpsl-5.dll":"DAR/cygpsl-5.dll",
+                "dar64-2.8.1-win64/bin/cygiconv-2.dll":"DAR/cygiconv-2.dll",
+                "dar64-2.8.1-win64/bin/cygbrotlicommon-1.dll":"DAR/cygbrotlicommon-1.dll",
+                "dar64-2.8.1-win64/bin/cygidn-12.dll":"DAR/cygidn-12.dll",
+                "dar64-2.8.1-win64/bin/cygkrb5support-0.dll":"DAR/cygkrb5support-0.dll",
+                "dar64-2.8.1-win64/bin/cygkrb5-3.dll":"DAR/cygkrb5-3.dll",
+                "dar64-2.8.1-win64/bin/cygntlm-0.dll":"DAR/cygntlm-0.dll",
+                "dar64-2.8.1-win64/bin/cygk5crypto-3.dll":"DAR/cygk5crypto-3.dll",
+                "dar64-2.8.1-win64/bin/cygsasl2-3.dll":"DAR/cygsasl2-3.dll",
+                "dar64-2.8.1-win64/bin/cygunistring-5.dll":"DAR/cygunistring-5.dll",
+                "dar64-2.8.1-win64/bin/cygcom_err-2.dll":"DAR/cygcom_err-2.dll",
+                "dar64-2.8.1-win64/bin/cygcrypto-1.1.dll":"DAR/cygcrypto-1.1.dll"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

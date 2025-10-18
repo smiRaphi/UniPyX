@@ -767,5 +767,11 @@
     ],
     "Compressia":[
         "compressia archive"
+    ],
+    "CRUSH":[
+        "crush archive"
+    ],
+    "DAR":[
+        "dar archive"
     ]
 }

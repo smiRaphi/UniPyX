@@ -640,7 +640,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink':
             od = rldir(o)
             run(["deark","-od",o,i])
             for x in rldir(o):
@@ -728,6 +728,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                         if inf['lsarEncoding'] not in ('macintosh','UTF-8'): cmd += ['-e','x-mac-japanese']
 
             run(cmd + ['-o',o,i])
+            if os.listdir(o): return
+        case 'DAR':
+            run(['dar','-x','/cygdrive/' + i.replace('\\','/').replace(':',''),'-q','-qcrypto','-R','/cygdrive/' + o.replace('\\','/').replace(':','')])
             if os.listdir(o): return
 
         case 'RVZ':
@@ -2273,10 +2276,10 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             if fs: return
 
-        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH (I.M.)'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
             # merge some small compressors
             of = o + '/' + tbasename(i)
-            run([t.lower(),'d',i,of])
+            run([t.split('(')[0].strip().lower(),'d',i,of])
             if exists(of) and os.path.getsize(of): return
         case 'ZCM':
             run(['zcm','x','-t0',i,o],timeout=300)
@@ -2443,6 +2446,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',"(New-Object -ComObject WScript.Shell).SendKeys('{ENTER}')"],print_try=False,getexe=False)
             prc.wait()
             if os.listdir(o): return
+        case 'CRUSH': return msdos(['uncrush','-qo',i],cwd=o)
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
