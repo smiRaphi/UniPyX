@@ -807,5 +807,11 @@
     "XAR":[
         "xar",
         "xar archive"
+    ],
+    "Acorn Spark":[
+        "acorn spark archive"
+    ],
+    "ActiveMime":[
+        "activemime object"
     ]
 }

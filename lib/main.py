@@ -649,7 +649,7 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark':
             od = rldir(o)
             run(["deark","-od",o,i])
             for x in rldir(o):
@@ -2256,6 +2256,35 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'Compressed File Library':
             run(['uncfl',i],cwd=o)
             if os.listdir(o): return
+        case 'ActiveMime':
+            afp = db.get('amime')
+
+            af = open(afp).read()
+            if 'def main():' in af: open(afp,'w').write(af.split('def main():')[0])
+
+            if db.print_try: print('Trying with amime')
+            import bin.amime as amime # type: ignore
+
+            class CDat(bytes):
+                def encode(self,enc:str):
+                    assert enc == 'hex'
+                    return self.hex()
+                def startswith(self,prefix,start=None,end=None):
+                    if isinstance(prefix,str): prefix = prefix.encode('latin-1')
+                    return super().startswith(prefix, start, end)
+                def __getitem__(self,i):
+                    if type(i) == slice: return self.__class__(super().__getitem__(i))
+                    return super().__getitem__(i)
+            amime.__zlib_decompress = amime.zlib.decompress
+            amime.zlib.decompress = lambda *args,**kwargs:CDat(amime.__zlib_decompress(*args,**kwargs))
+
+            dat = CDat(open(i,'rb').read())
+            if amime.ActiveMimeDocument.is_activemime(dat[:14]): amd = amime.ActiveMimeDocument(dat,amime.ActiveMimeDocument.is_base64(dat[:14]))
+            else: amd = amime.ActimeMimeParser().process(dat) # typo in amime.py
+            assert amd
+            open(o + '/' + hashlib.sha256(amd.data).hexdigest(),'wb').write(amd.data)
+            del amd
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

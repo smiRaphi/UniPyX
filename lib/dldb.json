@@ -2219,6 +2219,12 @@
             }
         }]
     },
+    "amime":{
+        "p":"amime.py",
+        "fs":[
+        "https://raw.githubusercontent.com/idiom/activemime-format/refs/heads/master/amime.py"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
