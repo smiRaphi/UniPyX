@@ -475,6 +475,29 @@ def extract(inp:str,out:str,t:str) -> bool:
                         f = o + '\\' + f
                         if not extract(f,o,'ISO'): remove(f)
                 return
+        case 'Apple Partition Map':
+            _,e,_ = run(['7z','l','-tAPM',i],print_try=False)
+            if 'ERRORS:\nUnexpected end of archive' in e and '0.Apple_partition_map' in e:
+                run(['7z','x','-tAPM',i,'-o' + o,'-aou'])
+                fs = os.listdir(o)
+                if len(fs) > 1:
+                    for f in fs:
+                        f = o + '\\' + f.lower()
+                        od = noext(f)
+                        if f.endswith('.iso'):
+                            mkdir(od)
+                            if not extract(f,od,'ISO'):
+                                remove(f,od)
+                                assert not exists(od)
+                        elif f.endswith('.hfs'):
+                            mkdir(od)
+                            if not extract(f,od,'Apple Disk Image'):
+                                remove(f,od)
+                                assert not exists(od)
+                    if os.listdir(o) != fs: return
+                remove(o)
+                mkdir(o)
+            return extract(i,o,'Apple Disk Image')
         case 'Apple Disk Image'|'Roxio Toast IMG':
             _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
             try: ps = int(re.search(r'(\d+) partitions found\.',e)[1])

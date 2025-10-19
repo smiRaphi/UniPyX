@@ -15,6 +15,8 @@ elif sys.argv[1] == 'dosbox':
                     "-c","MOUNT C .","-c","C:"])
 else: c,o,e = db.run(sys.argv[1:])
 
-print(c)
+print('Errorcode:',c)
+print('stdout:')
 print(o)
+print('stderr:')
 print(e)
