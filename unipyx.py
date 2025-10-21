@@ -25,10 +25,10 @@ if __name__ == '__main__':
     scan = '-os' in argv
     if scan: argv.remove('-os')
 
-    inp = os.path.realpath(argv[1])
+    inp = os.path.abspath(argv[1])
     assert os.path.exists(inp),'Input file does not exist'
 
-    if len(argv) > 2: out = os.path.realpath(argv[2])
+    if len(argv) > 2: out = os.path.abspath(argv[2])
     else:
         out = os.path.splitext(inp)[0]
         c = 1
