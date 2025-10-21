@@ -3,14 +3,25 @@
         ".7z archive",
         "7-zip compressed archive (v0.4)",
         "7-zip compressed archive (gen)",
-        "no sec. cab.7z.zip"
+        "7z-installaware.com",
+        "7-zip sfx stub",
+        "7-zip"
     ],
     "ZIP":[
         "zip compressed archive",
         "zip archive data",
         "zip archive",
 		"android package",
-        "apkmirror bundle"
+        "apkmirror bundle",
+        "zip sfx archive",
+        "minecraft resource package",
+        "zip",
+        "nuget package",
+        "open packaging conventions container",
+        "zip installer",
+        "squirrel setup",
+        "ios application",
+        "mozilla firefox browser extension"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
@@ -21,28 +32,38 @@
         "dos rar sfx executable",
         "rar archive",
         "rar compressed archive (v5.0)",
-        "rar compressed archive (gen)"
+        "rar compressed archive (v-4.x)",
+        "rar compressed archive (gen)",
+        "rar"
     ],
     "MSCAB":[
         "microsoft cabinet archive",
         "ms cab file",
-        "mode : mszip"
+        "mode : mszip",
+        "microsoft cabinet file"
     ],
     "PDF":[
         "adobe portable document format"
     ],
     "ARJ":[
         "arj compressed archive (standard)",
-        "arj compressed archive"
+        "arj compressed archive",
+        "arj"
     ],
     "ZSTD":[
-        "zstandard compressed data"
+        "zstandard compressed data",
+        "facebook zstandard/zstd compressed data"
+    ],
+    "ZLIB":[
+        "zlib compressed data (default comp.)",
+        "zlib compressed data (best comp.)"
     ],
     "MSCAB SFX":[
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",
         "microsoft sfx cab archive  v6.1.22.4",
         "win32 ms cabinet self-extractor (wextract stub)",
-        "cab installer"
+        "cab installer",
+        "microsoft sfx cab archive"
     ],
     "StuffIt":[
         "stuffit compressed archive (var.2)",
@@ -50,9 +71,11 @@
     ],
     "UPX":[
         "upx compressed win32 executable",
+        "upx compressed win64 executable",
         "upx wwwupxsourceforgenet",
-        "packerupx compresorgratuito wwwupxsourceforgenet",
-        "upx 290 lzma"
+        "upx 290 lzma",
+        "upx",
+        "packerupx compresorgratuito wwwupxsourceforgenet"
     ],
     "BinHex":[
         "binhex 4.0 encoded"
@@ -60,7 +83,7 @@
     "RVZ":[
         "nintendo compressed disk image"
     ],
-    "NSP":[
+    "Switch NSP":[
         "nintendo switch submission package"
     ],
     "Xbox LIVE ROM":[
@@ -69,8 +92,6 @@
     "PSVita PKG":[
         "sony psp/psvita package (finalized/retail)"
     ],
-    "GameCube ISO":[],
-    "Wii ISO":[],
     "NDS":[
         "nintendo ds rom"
     ],
@@ -113,9 +134,7 @@
         "anex86 pc98 floppy image (generic)"
     ],
     "Apple Disk Image":[
-        "disk image"
-    ],
-    "Mac HFS Image":[
+        "disk image",
         "bootable mac hfs volume/disk image"
     ],
     "UDF":[
@@ -133,21 +152,23 @@
         "allegro packfile (uncompressed)",
         "allegro data (generic)"
     ],
-
     "VISE Installer":[
         "vise mindvision wizard module"
     ],
     "NSIS Installer":[
-        "nsis - nullsoft scriptable install system",
+        "nullsoft scriptable install system",
         "nullsoft sfx v2.46.2-5 setup unicode installer",
         "http://nsis.sourceforge.net",
         "generic : installer nullsoft pimp stub",
         "installer nullsoft pimp stub",
         "nullsoft pimp install system"
     ],
-    "Wise Installer":[],
     "Inno Installer":[
-        "inno setup installer"
+        "inno setup installer",
+        "inno setup v.6.4.0.1 installer",
+        "www.innosetup.com",
+        "inno setup module",
+        "inno setup module 5 sfx"
     ],
     "Inno Archive":[
         "inno setup archive"
@@ -166,12 +187,12 @@
     "InstallShield Setup":[
         "installshield setup",
         "installshield 3.x custom",
-        "installshield custom"
+        "installshield custom",
+        "installshield"
     ],
     "InstallShield Setup ForTheWeb":[
         "installshield packagefortheweb setup module"
     ],
-    "InstallShield MSI":[],
     "InstallShield Z":[
         "installshield z archive"
     ],
@@ -183,29 +204,14 @@
     ],
     "Netopsystems FEAD":[
         "netopsystems ag installer fead",
-        "netopsystems fead optimizer 1",
         "netopsystems fead optimizer",
         "www.netopsystems.com"
     ],
     "FreeArc":[
         "freearc compressed archive"
     ],
-
     "Windows Help File":[
         "windows help file"
-    ],
-
-    "F-Zero G/AX .lz":[],
-    "Pokemon FSYS":[],
-    "BRSAR":[],
-    "RetroStudio PAK":[],
-    "GD-ROM CUE+BIN":[],
-    "NCSD":[],
-    "CDI":[],
-    "Sonic AMB":[],
-    "Level5 ARC":[],
-    "NDS SWAR":[
-        "nintendo ds sound wave archive"
     ],
     "Rob Northen Compression":[
         "rob northen compression (type 1)",
@@ -228,5 +234,585 @@
     ],
     "SARC":[
         "mii maker data archive"
+    ],
+    "Valve Package":[
+        "valve package (v1)",
+        "valve package (v2)"
+    ],
+    "Arc System Works PAC":[
+        "arc system works game data package"
+    ],
+    "JFD IMG":[
+        "jfd disk image (unzipped)"
+    ],
+    "GZIP":[
+        "gzipped data"
+    ],
+    "Chrome PAK":[
+        "chromium pack resource archive (v5, utf-8)"
+    ],
+    "TAR":[
+        "tar - tape archive (gnu)",
+        "tar - tape archive (file)",
+        "tar - tape archive (directory)"
+    ],
+    "RPG Maker Archive (XP/VX/VX Ace)":[
+        "rpg maker vx encrypted archive (v2)",
+        "rpg maker vx encrypted archive (generic)"
+    ],
+    "ZPAQ":[
+        "zpaq compressed archive"
+    ],
+    "yEnc":[
+        "yenc encoded"
+    ],
+    "xz":[
+        "xz compressed container",
+        "xz"
+    ],
+    "BZIP":[
+        "bzip compressed archive"
+    ],
+    "BZip2":[
+        "bzip2 compressed archive",
+        "bzip2 compressed data"
+    ],
+    "Hollow Knight Save":[
+        "hollow knight save game"
+    ],
+    "Advanced Installer":[
+        "advanced installer",
+        "www.caphyon.com"
+    ],
+    "CExe":[
+        "cexe compressed win32 executable",
+        "cexe executable compressor v1.0b copyright 1999, tinyware, inc.",
+        "www.tinyware.com by scott ludwig",
+        "cexe v10a",
+        "cexe v10a tinyware inc",
+        "cexe v10a additional",
+        "cexe 10a"
+    ],
+    "SZDD":[
+        "microsoft szdd compressed (haruhiko okumura's lzss)"
+    ],
+    "ACE":[
+        "ace",
+        "ace compressed archive",
+        "winace / sfx factory v2.x 32-bit"
+    ],
+    "AIN":[
+        "ain compressed archive",
+        "ainexe",
+        "ainexe compressed 16bit dos executable"
+    ],
+    "HA":[
+        "ha compressed archive"
+    ],
+    "Amiga IMG":[
+        "amiga disk image file (ofs)",
+        "amiga disk image file (generic)",
+        "ext2 extended amiga disk image file",
+        "disk masher system compressed disk image"
+    ],
+    "AKT":[
+        "akt compressed archive (generic)"
+    ],
+    "AMGC":[
+        "amgc compressed archive"
+    ],
+    "Amiga XPK":[
+        "xpk compressed data"
+    ],
+    "CPC IMG":[
+        "cpcemu disk image format"
+    ],
+    "2MG":[
+        "2img universal format disk image (apple ii)"
+    ],
+    "Apple DOS IMG":[
+        "apple ii prodos disk image"
+    ],
+    "Safari WebArchive":[
+        "apple safari webarchive"
+    ],
+    "AR":[
+        "library",
+        "ar archive"
+    ],
+    "ARQ":[
+        "arq archive"
+    ],
+    "Atari ATR":[
+        "atari atr disk image"
+    ],
+    "WIM":[
+        "windows imaging format (wim)",
+        "windows imaging format (generic)",
+        "windows imaging format"
+    ],
+    "Steam DRM":[
+        "steam",
+        "steam vlv on mz-head"
+    ],
+    "Denuvo DRM":[
+        "denuvo"
+    ],
+    "WATCOM Archive":[
+        "wpk"
+    ],
+    "RPACK":[
+        "dying light game data archive"
+    ],
+    "Aaru":[
+        "aaru disk image"
+    ],
+    "com2txt":[
+        "com2txt 16bit dos executable (new-default)"
+    ],
+    "bytepress":[
+        ".net exe bytepress v1.0.0.2 by adam roach",
+        "http://github.com/roachadam/bytepress"
+    ],
+    "Bat2Exe":[
+        ".net bat2exe v2.1",
+        "http://github.com/dehoisted"
+    ],
+    "624":[
+        "six-2-four"
+    ],
+    "4kZIP":[
+        "4kzip"
+    ],
+    "Amisetup":[
+        "amisetup loader"
+    ],
+    "aPACK":[
+        "apack",
+        "16bit dos exe apack compressed"
+    ],
+    "AVPACK":[
+        "avpack"
+    ],
+    "AXE":[
+        "sea-axe",
+        "16bit dos axe compressed executable"
+    ],
+    "CEBE":[
+        "cebe compress expand compressed dos executable (v1.0)"
+    ],
+    "Cheat Packer":[
+        "cheat packer"
+    ],
+    "COM RLE Packer":[
+        "com rle packer"
+    ],
+    "COMPACK":[
+        "compack"
+    ],
+    "Compress-EXE":[
+        "compress-exe"
+    ],
+    "Cruncher":[
+        "cruncher",
+        "cruncher compressed dos executable"
+    ],
+    "DexEXE":[
+        "dexexe"
+    ],
+    "Diet Packed":[
+        "diet"
+    ],
+    "Dn.COM Cruncher":[
+        "dn.com cruncher"
+    ],
+    "Envelope":[
+        "envelope"
+    ],
+    "EXECUTRIX-COMPRESSOR":[
+        "executrix-compressor",
+        "executrix compressed dos executable"
+    ],
+    "ExeLITE":[
+        "exelite"
+    ],
+    "ICE":[
+        "ice",
+        "ice compressed/scrambled dos command"
+    ],
+    "JAM":[
+        "jam",
+        "jam compressed 16bit dos executable"
+    ],
+    "LGLZ":[
+        "lglz",
+        "16bit dos exe lglz compressed"
+    ],
+    "LM-T2E":[
+        "16bit dos lm-t2e executable (v2.0)"
+    ],
+    "Neobook Executable":[
+        "neobook compiled book executable"
+    ],
+    "Optlink":[
+        "optlink"
+    ],
+    "Pack Packed":[
+        "pack"
+    ],
+    "PACKWIN":[
+        "16bit dos exe packwin compressed",
+        "packwin"
+    ],
+    "PGMPAK":[
+        "pgmpak"
+    ],
+    "PMWLite":[
+        "pmwlite"
+    ],
+    "Pro-Pack":[
+        "pro-pack",
+        "16bit dos exe rmc / pro-pack compressed (v2.08)"
+    ],
+    "RDT Compressor":[
+        "rtd_compressor 2"
+    ],
+    "RJCrush":[
+        "rjcrush",
+        "rjcrush compressed 16bit dos executable"
+    ],
+    "SCRNCH":[
+        "scrnch"
+    ],
+    "Shrinker Packed":[
+        "16bit dos shrinker compressed executable (v2.1)"
+    ],
+    "SpaceMaker":[
+        "16bit dos exe spacemaker compressed"
+    ],
+    "T-PACK":[
+        "tpack",
+        "16bit dos com t-pack compressed (v0.5)"
+    ],
+    "Tenth Planet Soft":[
+        "tenth planet soft packer"
+    ],
+    "TinyProg":[
+        "tinyprog",
+        "16bit dos exe tinyprog compressed"
+    ],
+    "TSCRUNCH":[
+        "tscrunch"
+    ],
+    "UCEXE":[
+        "ucexe",
+        "ucexe compressed 16bit dos executable"
+    ],
+    "WWPACK":[
+        "wwpack",
+        "16bit dos exe wwpack compressed"
+    ],
+    "XPACK/LZCOM":[
+        "xpack/lzcom"
+    ],
+    "XX34":[
+        "xx34 encoded data"
+    ],
+    "ZOO":[
+        "16bit dos exe sez sfx zoo archive (v2.3)",
+        "zoo archive"
+    ],
+    "YAC":[
+        "yac compressed archive"
+    ],
+    "Yamazaki Zipper":[
+        "yamazaki zipper compressed archive"
+    ],
+    "777":[
+        "777 compressed archive"
+    ],
+    "UFA":[
+        "ufa compressed archive"
+    ],
+    "BIX":[
+        "bix archiver compressed archive"
+    ],
+    "RAZOR":[
+        "razor"
+    ],
+    "NanoZip":[
+        "nanozip",
+        "nanozip compressed archive"
+    ],
+    "bsc":[
+        "bsc compressed data"
+    ],
+    "LZIP":[
+        "lzip compressed archive"
+    ],
+    "LZHAM":[
+        "lzham compressed data"
+    ],
+    "YBS":[
+        "ybs compressed archive"
+    ],
+    "CSArc":[
+        "csarc compressed archive"
+    ],
+    "UHARC":[
+        "uharc compressed archive"
+    ],
+    "GRZip":[
+        "grzip compressed archive"
+    ],
+    "GRZipII":[
+        "grzipii compressed archive"
+    ],
+    "CPIO":[
+        "cpio archive (portable)",
+        "cpio archive (portable old)",
+        "cpio archive (portable new)"
+    ],
+    "BOA Constrictor":[
+        "boa constrictor archiver compressed archive"
+    ],
+    "Dark":[
+        "dark compressed data"
+    ],
+    "SBC":[
+        "sbc compressed archive"
+    ],
+    "SZIP":[
+        "szip compressed data"
+    ],
+    "BALZ":[
+        "balz compressed data"
+    ],
+    "Zzip":[
+        "zzip compressed archive"
+    ],
+    "Squeez":[
+        "squeez sqx archive selfextractor v.5.63",
+        "www.speedproject.de/enu/support/updates.html",
+        "sqx compressed archive",
+        "sqx archive installer 2002"
+    ],
+    "IMP":[
+        "imp compressed archive"
+    ],
+    "ARHANGEL":[
+        "arhangel compressed archive"
+    ],
+    "JAR":[
+        "jar compressed archive",
+        "jar compressed archive (with secruity envelope)"
+    ],
+    "Lizard":[
+        "lizard compressed data"
+    ],
+    "BriefLZ":[
+        "brieflz compressed data"
+    ],
+    "UltraCompressor 2":[
+        "ultracompressor 2 archive"
+    ],
+    "THOR":[
+        "thor compressed data"
+    ],
+    "LZFSE":[
+        "lzfse compressed data (compressed tables)"
+    ],
+    "LIMIT":[
+        "limit compressed archive"
+    ],
+    "Squeeze It":[
+        "squeeze it compressed archive"
+    ],
+    "PKTINY":[
+        "16bit dos exe pktiny compressed"
+    ],
+    "PKLITE":[
+        "16bit dos exe pklite compressed",
+        "pklite"
+    ],
+    "LZOP":[
+        "lzop compressed data",
+        "lzop compressed"
+    ],
+    "BZip3":[
+        "bzip3 compressed archive"
+    ],
+    "C64 Tape":[
+        "c64 tape image format (v1-updated)",
+        "commodore 64 tape container"
+    ],
+    "C64 LiBRary":[
+        "c64 library container"
+    ],
+    "C64 CruelCrunch":[
+        "cruelcrunch",
+        "cruelcrunch / header"
+    ],
+    "C64 TBC MultiCompactor":[
+        "tbc multicompactor"
+    ],
+    "C64 Time Cruncher":[
+        "time cruncher v3.1"
+    ],
+    "C64 Super Compressor":[
+        "super compressor / equal sequences"
+    ],
+    "C64 MegaByte Cruncher":[
+        "megabyte cruncher v2.x"
+    ],
+    "C64 1001 CardCruncher":[
+        "1001 cardcruncher new packer"
+    ],
+    "C64 ECA Compactor":[
+        "eca compactor/linker"
+    ],
+    "Asar":[
+        "asar archive",
+        "asar electron archive"
+    ],
+    "Mo'PaQ":[
+        "mpq",
+        "mpq archive - blizzard game data"
+    ],
+    "SWF":[
+        "macromedia flash player compressed movie",
+        "small web format"
+    ],
+    "IPS32 Patch":[
+        "ips32 patch"
+    ],
+    "IPS Patch":[
+        "international patching system binary patch"
+    ],
+    "ABE":[
+        "abe encoded data (original)"
+    ],
+    "Bunny Pro. Das2 DPK":[
+        "studio folio corsage game data archive"
+    ],
+    "The Sims FAR":[
+        "the sims archive"
+    ],
+    "Flash":[
+        "flash: fast library utility archive"
+    ],
+    "Build Engine Group":[
+        "build engine grp container"
+    ],
+    "HMM Packfile":[
+        "rising kingdoms game data archive"
+    ],
+    "Ai":[
+        "ai archivator compressed archive"
+    ],
+    "ALZip":[
+        "alzip compressed archive"
+    ],
+    "EGG":[
+        "egg compressed archive"
+    ],
+    "AR7":[
+        "ar7 compressed archive"
+    ],
+    "ARJZ":[
+        "arjz compressed archive"
+    ],
+    "ASD":[
+        "asd archiever compressed archive",
+        "asd archiver compressed archive"
+    ],
+    "B1":[
+        "b1 compressed archive"
+    ],
+    "BlakHole":[
+        "blackhole compressed archive"
+    ],
+    "BLINK":[
+        "blink compressed archive"
+    ],
+    "BSArc":[
+        "bsarc compressed archive"
+    ],
+    "LZEXE":[
+        "lzexe"
+    ],
+    "Compressed File Library":[
+        "compressed file library 3 compressed data",
+        "jari comppa's compressed file library 3 file"
+    ],
+    "ChArc":[
+        "charc compressed archive"
+    ],
+    "ChiefLZArchive":[
+        "lza compressed archive"
+    ],
+    "ChiefLZZ":[
+        "lza compressed data"
+    ],
+    "CMZ":[
+        "cmz compressed archive"
+    ],
+    "MacBinary":[
+        "macbinary",
+        "macbinary 2",
+        "macintosh application (macbinary)"
+    ],
+    "Compact Pro":[
+        "compact pro compressed archive",
+        "mac compact pro archive",
+        "mac compact pro compressed archive (macbinary)"
+    ],
+    "Compressia":[
+        "compressia archive"
+    ],
+    "CRUSH":[
+        "crush archive"
+    ],
+    "DAR":[
+        "dar archive"
+    ],
+    "DGCA":[
+        "dgca digital g codec archiver"
+    ],
+    "DIET":[
+        "diet compressed data (generic)"
+    ],
+    "Disk Doubler":[
+        "diskdoubler compressed data"
+    ],
+    "DiskDupe IMG":[
+        "diskdupe disk image (newer/generic)"
+    ],
+    "DietDisk":[
+        "lzdiet compressed data"
+    ],
+    "DWC":[
+        "dos dwc sfx executable"
+    ],
+    "ESP":[
+        "esp - extension sort packer compressed archive"
+    ],
+    "File Imploder":[
+        "file imploder by peter struijk",
+        "file imploder compressed data (clone 7)"
+    ],
+    "EXEPACK":[
+        "exepack",
+        "exepack compressed dos executable"
+    ],
+    "XAR":[
+        "xar",
+        "xar archive"
+    ],
+    "Acorn Spark":[
+        "acorn spark archive"
+    ],
+    "ActiveMime":[
+        "activemime object"
     ]
 }

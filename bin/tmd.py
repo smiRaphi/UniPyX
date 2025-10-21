@@ -2,7 +2,9 @@ import struct,io,os
 from hashlib import pbkdf2_hmac,md5,sha1
 
 try: from Cryptodome.Cipher import AES # type: ignore
-except: from Crypto.Cipher import AES # type: ignore
+except ImportError:
+    try: from Crypto.Cipher import AES # type: ignore
+    except ImportError: AES = None
 
 BASED = os.path.dirname(os.path.abspath(__file__)) + '/tmd_'
 
@@ -12,16 +14,17 @@ def clamp(n:int,max:int):
     return n
 
 class File:
-    def __init__(self,f,mode='r'):
+    def __init__(self,f,mode='r',endian='>'):
         if type(f) == str: f = open(f,mode + 'b')
         self._f = f
+        self._end = endian
 
         self._start_pos = self._f.tell()
         self.seek(0,2)
         self._size = self.tell()
         self.seek(0)
 
-    def read(self,n:int) -> bytes: return self._f.read(n)
+    def read(self,n:int=None) -> bytes: return self._f.read(n)
     def write(self,data:bytes) -> int: return self._f.write(data)
     def seek(self,n:int,whence=0) -> int: return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
     def tell(self) -> int: return self._f.tell() - self._start_pos
@@ -30,23 +33,28 @@ class File:
     def skip(self,n:int): self.seek(n,1)
     def reads(self): return self.read(1)
 
-    def readu8 (self) -> int: return struct.unpack( 'B',self.read(1))[0]
-    def readu16(self) -> int: return struct.unpack('>H',self.read(2))[0]
-    def readu32(self) -> int: return struct.unpack('>I',self.read(4))[0]
-    def readu64(self) -> int: return struct.unpack('>Q',self.read(8))[0]
-    def reads8 (self) -> int: return struct.unpack( 'b',self.read(1))[0]
-    def reads16(self) -> int: return struct.unpack('>h',self.read(2))[0]
-    def reads32(self) -> int: return struct.unpack('>i',self.read(4))[0]
-    def reads64(self) -> int: return struct.unpack('>q',self.read(8))[0]
+    def readu8 (self) -> int: return struct.unpack(self._end+'B',self.read(1))[0]
+    def readu16(self) -> int: return struct.unpack(self._end+'H',self.read(2))[0]
+    def readu24(self) -> int:
+        d = self.read(3)
+        if self._end == '<': d = d + b'\0'
+        else: d = b'\0' + d
+        return struct.unpack(self._end+'I',d)[0]
+    def readu32(self) -> int: return struct.unpack(self._end+'I',self.read(4))[0]
+    def readu64(self) -> int: return struct.unpack(self._end+'Q',self.read(8))[0]
+    def reads8 (self) -> int: return struct.unpack(self._end+'b',self.read(1))[0]
+    def reads16(self) -> int: return struct.unpack(self._end+'h',self.read(2))[0]
+    def reads32(self) -> int: return struct.unpack(self._end+'i',self.read(4))[0]
+    def reads64(self) -> int: return struct.unpack(self._end+'q',self.read(8))[0]
 
-    def writeu8 (self,data:int): return self.write(struct.pack( 'B',data))
-    def writeu16(self,data:int): return self.write(struct.pack('>H',data))
-    def writeu32(self,data:int): return self.write(struct.pack('>I',data))
-    def writeu64(self,data:int): return self.write(struct.pack('>Q',data))
-    def writes8 (self,data:int): return self.write(struct.pack( 'b',data))
-    def writes16(self,data:int): return self.write(struct.pack('>h',data))
-    def writes32(self,data:int): return self.write(struct.pack('>i',data))
-    def writes64(self,data:int): return self.write(struct.pack('>q',data))
+    def writeu8 (self,data:int): return self.write(struct.pack(self._end+'B',data))
+    def writeu16(self,data:int): return self.write(struct.pack(self._end+'H',data))
+    def writeu32(self,data:int): return self.write(struct.pack(self._end+'I',data))
+    def writeu64(self,data:int): return self.write(struct.pack(self._end+'Q',data))
+    def writes8 (self,data:int): return self.write(struct.pack(self._end+'b',data))
+    def writes16(self,data:int): return self.write(struct.pack(self._end+'h',data))
+    def writes32(self,data:int): return self.write(struct.pack(self._end+'i',data))
+    def writes64(self,data:int): return self.write(struct.pack(self._end+'q',data))
 
     def align(self,blocksize:int): return self.write(b'\0' * align(self.tell(),blocksize))
 
@@ -109,6 +117,7 @@ def derive_key(tid:str|bytes,pwd:str|bytes|int):
 
     return pbkdf2_hmac('sha1',get_pwd(pwd),md5(SECRET + tid).digest(),20,16)
 def encrypt_key(tid:str|bytes,key:bytes,ckey:bytes) -> bytes:
+    assert AES
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.rjust(16,b'\0')
 

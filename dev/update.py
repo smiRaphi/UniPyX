@@ -11,19 +11,24 @@ GFMTS = {
     'ip7z/7zip':lambda tag:f'7z{tag.replace(".","")}-x64.msi',
     'julian-r/file-windows':lambda tag:f'file_{tag[1:]}-build104-vs2022-x64.zip',
     'ExeinfoASL/ASL':lambda tag:f'Exeinfo_{tag[1:].replace(".","")}.zip',
-    'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows_x64.zip',
-    'temisu/ancient':lambda tag:f'ancient_{tag[1:]}.zip',
+    'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows-x64.zip',
     'Sappharad/GDIbuilder':lambda tag:f'gdibuilder{tag[1:].replace(".","")}_cmd_win_x64.zip',
     'upx/upx':lambda tag:f'upx-{tag[1:]}-win64.zip',
     'xchellx/bnrtool':lambda tag:f'bnrtool_{tag}_msys2-clang64_net9.0_win-x64.7z',
     'MaikelChan/AFSPacker':lambda tag:f'AFSPacker-{tag}-win-x64.7z',
-    'mamedev/mame':lambda tag:f'{tag}b_64bit.exe',
+    'mamedev/mame':lambda tag:f'{tag}b_x64.exe',
     'Maschell/JWUDTool':lambda tag:f'JWUDTool-{tag}.jar',
     'ch-mcl/PS2_RidgeRacerV_ArchiveTool':lambda tag:f'{tag}.zip',
     'ZDoom/wadext':lambda tag:f'wadext_win32_{tag}.zip',
     'glacier-modding/RPKG-Tool':lambda tag:f'rpkg_{tag}-cli.zip',
     'lifenjoiner/ISx':lambda tag:f'ISx-{tag}.7z',
     'activescott/lessmsi':lambda tag:f'lessmsi-{tag}.zip',
+    'rm-NoobInCoding/UnPSARC':lambda tag:f'UnPSARC_{tag}.zip',
+    'peitaosu/WFRR':lambda tag,arch:f'WFRR_{tag}.0_{arch}_release.zip',
+    'AppleCommander/AppleCommander':lambda tag:f'AppleCommander-acx-{tag}.jar',
+    'unsound/hfsexplorer':lambda tag:f'{tag}-bin.zip',
+    'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
+    'GDRETools/gdsdecomp':lambda tag:f'GDRE_tools-{tag}-windows.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):
@@ -64,28 +69,49 @@ def update():
             elif type(f) == dict:
                 u = f['u']
                 if 'ts' in f: ots = f['ts'] or tts
-            dom = u.split('://')[1].split('/')[0]
+            if u == '.': dom = None
+            else: dom = u.split('://')[1].split('/')[0]
 
             ts = ots
-            if u == 'https://mark0.net/download/trid_w32.zip':
-                v = c.srch(r'TrID v(\d{1,3}\.\d{1,3}),','https://mark0.net/soft-trid-e.html')
-                if v != '2.24': ts = t()
-                else: ts = 1459602900
+            if u == '.': tts = -1
+            elif u in ['https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip']:
+                ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
+                ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
+                u = 'https://mark0.net/download/trid_win64.zip'
             elif u == 'https://mark0.net/download/triddefs.zip':
                 ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
             elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
                 ts = ft(str(time.gmtime().tm_year),'%Y')
+            elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
+                ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
+            elif u.startswith('https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/'):
+                ts = ft(str(time.gmtime().tm_year),'%Y')
+            elif u == "https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip":
+                ct = time.gmtime()
+                ts = ft(f'{ct.tm_year}.{ct.tm_mon:02d}.{ct.tm_mday:02d}','%Y.%m.%d')
 
             elif dom == 'github.com' and '/releases/download/' in u:
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]
-                s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
+
+                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
+                else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
+
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
                 tag = GRELTG.search(s)[1]
+
                 if ts > ots:
-                    if repo in GFMTS: nu = f'https://github.com/{repo}/releases/download/{tag}/{GFMTS[repo](tag)}'
+                    if repo in GFMTS:
+                        if repo == 'peitaosu/WFRR': of = GFMTS[repo](tag,u.split('_')[-2])
+                        else: of = GFMTS[repo](tag)
+                        nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
                     else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
-                    if u != nu and c.c.head(nu).status_code == 302: u = nu
-                    else: ts = 0
+                    if u != nu:
+                        if c.c.head(nu).status_code == 302: u = nu
+                        else:
+                            print('[!] 404:',u,'!->',nu)
+                            ts = ots
+                    else: ts = ots
             elif dom == 'archive.ubuntu.com':
                 bu = os.path.dirname(u) + '/'
                 s = c.get(bu)
@@ -128,6 +154,14 @@ def update():
                     nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
                     if nu != u: u = nu
                     else: ts = 0
+            elif dom == 'wimlib.net':
+                s = c.get('https://wimlib.net/')
+                m = re.search(r'Current release: (wimlib\-\d+\.\d+\.\d+) \(released (\w+ \d{1,2}, \d{4})\)',s)
+                ts = ft(m[2],'%B %d, %Y')
+                if ts > ots:
+                    nu = f'https://wimlib.net/downloads/{m[1]}-windows-x86_64-bin.zip'
+                    if nu != u: u = nu
+                    else: ts = 0
 
             if ts > ots:
                 print(k,'->',u)
@@ -141,7 +175,7 @@ def update():
             else: nfs.append(f)
 
         inf['fs'] = nfs
-        inf['ts'] = tts
+        if tts >= 0: inf['ts'] = tts
 
     out = json.dumps(DLDB,ensure_ascii=False,separators=(',',':'),indent=4).replace(
                     '\n            {',           '{').replace(

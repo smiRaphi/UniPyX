@@ -3,17 +3,30 @@
 ---
 Usage: `python unipyx.py <input> [<output dir>]`
 
-### ps3key.py
-You need to provide the disc keys to extract PS3 ISOs, you can do so by making a folder called `ps3keys` in `bin/` containing `<game name>.dkey` files and afterwards running `ps3key.py` from the `bin/` folder.
-### wiiudk.py
-You need to provide disc keys to extract Wii U WUD/WUX files, you can do so by making a `keys.txt` file in `bin/` with one key per line formatted like this: `<key> # <game name>` and afterwards running `wiiudk.py` from the `bin/` folder.
-
 ## Included tools
 * xbp.bms by [h3x3r](https://reshax.com/profile/183-h3x3r/) taken from https://reshax.com/topic/18058-ripping-sounds-from-fuzion-frenzy-xbox/
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
-* [ndssndext](https://gbatemp.net/download/nds-sound-extractor.28818/) because of httpcore weirdness with [catbox.moe](https://catbox.moe/)
+* self compiled [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt)
+* self compiled [bbccp](https://github.com/ethandicks/bbc-disk-tools) without glob
+* self compiled [assamUnpack](https://github.com/refint/assamUnpack) without input request
+* self compiled [atr](https://github.com/jhallen/atari-tools)
+* self compiled [CSC/CSArc](https://github.com/fusiyuan2010/CSC)
+* self compiled [NLZM](https://github.com/nauful/NLZM)
+* self compiled [Lizard](https://github.com/inikep/lizard)
+* self compiled [blzpack](https://github.com/jibsen/brieflz)
+* self compiled [Chihiro decrypt & extract-fatx](https://github.com/JayFoxRox/Chihiro-Tools)
+* self compiled [MPQExtractor](https://github.com/Kanma/MPQExtractor)
+* self compiled [ZLI](https://github.com/facebook/openzl)
+* self compiled [lha](https://github.com/jca02266/lha)
+* [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
+* [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
+* [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX
+* [UNESP v1.92](http://fileformats.archiveteam.org/wiki/ESP_(compressed_archive)) because it's packed in a ESP SFX
+* sqx SFX from [SpeedCommander 22](https://www.speedproject.com/) because it's packed in a sqc SFX
 * ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
+* chkey.py for managing Chihiro keys
+* tmd.py for Nintendo TMD files and key generation
 
 ## Notes
-* Extracting Wii U WUD/WUX files requires java to be installed.
+* Extracting Wii U WUD/WUX files and Apple Disk Images (at least properly) requires java to be installed.

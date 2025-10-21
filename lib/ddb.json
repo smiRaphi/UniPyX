@@ -7,6 +7,10 @@
         "rq":"MSP",
         "rs":"MSP","s":1
     },
+    {
+        "rq":["ARJZ","ARJ"],
+        "rs":"ARJZ","s":1
+    },
 
     {
         "rq":"ISO",
@@ -33,6 +37,11 @@
         "rs":"GameCube ISO","s":1
     },
     {
+        "rq":null,
+        "d":[["isat","GDPC",0],["n0",1,4],["isat","\\0\\0\\0",5]],
+        "rs":"Godot Pack","s":1
+    },
+    {
         "rqr":"ISO 9660 CD image",
         "d":[["isat","CVMH\\0\\0",0],
              ["isat","ROFSROFSBLD ",52]],
@@ -42,11 +51,6 @@
         "rq":"InstallShield Setup",
         "d":["contain","MSIEng.isc",[-5000000,null]],
         "rs":"InstallShield MSI","s":1
-    },
-    {
-        "rq":"Inno Installer",
-        "d":["ps","Write-Output ((Get-Item -Path $env:input).VersionInfo.LegalCopyright.Trim() -eq 'FitGirl')"],
-        "rs":"FitGirl Installer","s":1
     },
     {
         "rqr":"Win16 NE executable (generic)",
@@ -64,6 +68,11 @@
         "rs":"Qt IFW","s":1
     },
     {
+        "rqr":"Generic Win/DOS Executable",
+        "d":[["isat","GDPC",-4],["contain","pck\\0\\0\\0\\0\\0",[384,911]]],
+        "rs":"Godot Game","s":1
+    },
+    {
         "rq":"MSCAB",
         "d":["isat","MZ",0],
         "rs":"MSCAB SFX"
@@ -72,6 +81,16 @@
         "rqr":"Win64 Executable (generic)",
         "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little') >= 8000000\n\telse:f.seek(32,1)"],
         "rs":"Big EXE"
+    },
+    {
+        "rqr":"DOS Executable Generic",
+        "d":["isat","SChF",1850],
+        "rs":"ChArc","s":1
+    },
+    {
+        "rqr":null,
+        "d":[["n0",4,0],["n0",4,4],["str0",12,15,1],["isin",["\\0","\\1","\\2"],27],["py","from zlib import crc32;f=open(inp,'rb');m=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');return crc32(f.read(m*32))==c"]],
+        "rs":"CP Shrink","s":1
     },
     {
         "rqr":null,
@@ -111,8 +130,16 @@
         "rs":"Glacier RPKG","s":1
     },
     {
+        "d":["isat","\\0\\1\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\1\\0\\0\\0\\0\\0\\0\\0\\x06\\1\\0\\0\\0",0],
+        "rs":"Hollow Knight Save","s":1
+    },
+    {
         "d":[["size",88236],["hash","95397288029c149040af17fc6d7522a3b39c943b"]],
         "rs":"Glacier PKG Def","s":1
+    },
+    {
+        "d":[["size",512483328],["hash","016ff307a32d228865257c5f450fe9d98a13ea15",4096]],
+        "rs":"Donkey Kong Banana Kingdom","s":1
     },
     {
         "t":"null",
@@ -151,14 +178,29 @@
         "rs":"NCSD","s":1
     },
     {
+        "d":["isat","DRK0000",1],
+        "rs":"RDB","s":1
+    },
+    {
+        "d":[["isat","NCCH",256],
+             ["isat","\\0\\0\\0\\0\\0",520],
+             ["isat","\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF",1376]],
+        "rs":"NCCH CXI","s":1
+    },
+    {
+        "d":[["isat","NCCH",256]],
+        "rs":"NCCH CFA","s":1
+    },
+    {
         "rqr":null,
-        "d":["isat","\\x7F\\x43\\x4E\\x54\\0\\0\\0\\1",0],
+        "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0,true],
+             ["isat","\\x7F\\x43\\x4E\\x54\\x00\\0\\0\\1",0,true]],"noq":true,
         "rs":"PS4 PKG","s":1
     },
     {
         "rqr":null,
-        "d":["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],
-        "rs":"PS4 PKG","s":1
+        "d":[["isat","\\x7F\\x46\\x49\\x48\\x01\\x80\\x03\\0",0,true]],"noq":true,
+        "rs":"PS5 PKG","s":1
     },
     {
         "d":["isat","#AMB \\0\\0\\0",0],
@@ -182,9 +224,33 @@
         "rs":"Wii TMD","s":1
     },
     {
+        "d":["isat","ARC\\0\\7\\0",0],
+        "rs":"NSMBW Coin World ARC","s":1
+    },
+    {
+        "d":["isat","SCEUF\\0\\0",0],
+        "rs":"PS3/PSV PUP","s":1
+    },
+    {
+        "rq":null,
+        "d":[["isat","ustar\\0",257,true],
+             ["isat","ustar ",  257,true]],"noq":true,
+        "rs":"TAR","s":1
+    },
+    {
+        "rq":null,
+        "d":[["isatS","\\0",1024,0],["isat","BD\\xC7M",1024]],
+        "rs":"Apple Disk Image"
+    },
+    {
         "rqr":null,
         "d":["isat","CTPK",0],
         "rs":"CTPK","s":1
+    },
+    {
+        "rqr":null,
+        "d":["isat","DSAR",0],
+        "rs":"Direct Storage Archive","s":1
     },
     {
         "rqr":null,
@@ -197,6 +263,32 @@
         "rs":"NSP","s":1
     },
     {
+        "rq":null,
+        "d":["isat","BCM2",0],
+        "rs":"BCM","s":1
+    },
+    {
+        "rqr":null,
+        "d":["isat","AGAR\\1\\0\\0\\0\\1\\0\\0\\0",0],
+        "rs":"Danganronpa WAD","s":1
+    },
+    {
+        "rqr":null,
+        "d":[["isat","DWC",-3],["isat","\\x1B\\x00\\x22",-27],["str0",-24,13,0]],
+        "rs":"DWC","s":1
+    },
+    {
+        "rqr":null,
+        "d":[["isat","DZ",0],["isin",["\\0","\\1","\\2","\\3"],2],["isin",["\\0","\\1","\\2","\\x21","\\3","\\4","\\5","\\x51","\\x55","\\6","\\7","\\8","\\x81","\\x82","\\x83","\\x84","\\9"],3],["n0",4,4],
+             ["py","f=open(inp,'rb');siz=f.seek(0,2);f.seek(4);o=int.from_bytes(f.read(4),'little');return (o+0x42)<=siz"]],
+        "rs":"Dzip","s":1
+    },
+    {
+        "rq":"WWPACK",
+        "d":[["isat","ESP>",5086]],
+        "rs":"ESP","s":1
+    },
+    {
         "rqr":"Generic XML (ASCII)",
         "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1
@@ -207,13 +299,202 @@
         "rs":"Unity Assets","s":1
     },
     {
+        "d":[["isat","-==--==--==--==-",0 ],
+             ["isat","\\x0C\\0\\0\\0"  ,32],
+             ["isat","\\x20\\0\\0\\0"  ,40],
+             ["isat","\\0\\0\\1\\0"    ,44]],
+        "rs":"Unreal ZenLoader","s":1
+    },
+    {
+        "d":[["isat","ER",16],["isat","PM",528],["isat","Apple_partition_map",576]],
+        "rs":"Apple Partition Map","s":1
+    },
+    {
+        "d":[["isat","ER",0],["isat","PM",512],["isat","Apple_partition_map",560]],
+        "rs":"Apple Partition Map","s":1
+    },
+    {
+        "d":["contain","\\xE1\\x12\\x6F\\x5A",[-269,null]],
+        "rs":"Unreal Engine Package","s":1
+    },
+    {
+        "d":["isat","AMPK\\x04\\0\\0",0],
+        "rs":"AMPK","s":1
+    },
+    {
+        "d":[["isat","xaf0\\2",0],["isat","(c) SEGA CORPORATION",112]],
+        "rs":"Initial D XAF","s":1
+    },
+    {
+        "d":[["isat","\\x1B\\x03MASTR\\xFFEND!!!!\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x00\\x1A\\0",-31]],
+        "rs":"BTSPK","s":1
+    },
+    {
+        "d":[["s%",2048],
+             ["isat","\\1ZZZZZ\\1",0],["isatS","\\0",32,8],["str0",40,8,1]],
+        "rs":"3DO IMG","s":1
+    },
+    {
+        "d":[["isat","MZ",0],
+             ["isat","MEI\\x0C\\x0B\\x0A\\x0B\\x0E",-88]],
+        "rs":"PyInstaller","s":1
+    },
+    {
+        "d":[["isat","SQD\\3",0],["isat","\\0\\0\\0\\0",8]],
+        "rs":"SQUID","s":1
+    },
+    {
+        "d":[["isat","sR\\3",0,true],["isat","sR3",0,true],["isat","sR\\2",0,true]],"noq":true,
+        "rs":"SR3"
+    },
+    {
+        "rq":"ZSTD",
+        "d":["isat","\\x61\\xBF\\x3A\\x01\\x16\\x9F\\x52\\xD6",-8],
+        "rs":"ZArchive","s":1
+    },
+    {
+        "d":[["size",16777216],
+             ["isatS","\\xFF",7168,16655360],
+             ["isat","\\0\\0\\0",16662537],["isat","\\0\\0\\0",16662553],["isat","\\0\\0\\0",16662569],["isat","\\0\\0\\0",16662585],["isat","\\0\\0\\0",16662601],["isat","\\0\\0\\0",16662617],["isat","\\0\\0\\0",16662633],["isat","\\0\\0\\0",16662649],["isat","\\0\\0\\0",16662665],["isat","\\0\\0\\0",16662681]],
+        "rs":"Konami GAME.DAT"
+    },
+    {
+        "rqr":"Win32 Executable (generic)",
+        "d":[["size",[42000,null]],["isat","MZ",0],["isat","yz",41984],["str",41986,6]],
+        "rs":"Yamazaki Zipper","s":1
+    },
+    {
+        "rq":"UCEXE",
+        "d":[["size",[12992,null]],["contain","UC2SFX Header",[12976,14592]]],
+        "rs":"UltraCompressor 2","s":1
+    },
+    {
+        "rq":"PKLITE",
+        "d":[["size",[16400,null]],["contain","HLSQZ1",[16384,24576]]],
+        "rs":"Squeeze It","s":1
+    },
+    {
+        "rqr":"Microsoft Visual C/C++",
+        "d":["isat","DGCA",222528],
+        "rs":"DGCA","s":1
+    },
+    {
+        "rq":null,
+        "rqr":null,
+        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],
+             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
+        "rs":"ZCM"
+    },
+    {
+        "rq":null,
+        "rqr":null,
+        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",8,48],
+             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif dn and dn[-1:]!=b'/':return\nv1=f.read(3)\nif not sum(f.read(6)) and f.read(3) == v1 and not sum(f.read(6+8)):return True"]],
+        "rs":"Flashzip"
+    },
+    {
+        "rq":"aPACK",
+        "d":["isat","Rar\\x21\\x1A\\x07\\0",8221],
+        "rs":"RAR","s":1
+    },
+    {
+        "rq":"UPX",
+        "d":[["size",[69136,null]],["isat","RK",-2],["isat","R\\x00K\\x00 \\x00S\\x00e\\x00l\\x00f\\x00-\\x00E\\x00x\\x00t\\x00r\\x00a\\x00c\\x00t\\x00i\\x00n\\x00g\\x00 \\x00A\\x00r\\x00c\\x00h\\x00i\\x00v\\x00e\\x00",68508]],
+        "rs":"RK","s":1
+    },
+    {
+        "rq":null,
+        "d":[["size",[32,null]],["isat","RK",-2],["isat","\\0\\0\\0\\0",-12]],
+        "rs":"RK"
+    },
+    {
+        "rq":"UPX",
+        "d":[["size",[103434,null],false],
+             ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true],[false]],
+             "qq":true,
+        "rs":"Squeez","s":1
+    },
+    {
+        "rq":"UPX",
+        "d":[["size",[36874,null]],["isat","ASD02",36864]],
+        "rs":"ASD","s":1
+    },
+    {
+        "rq":null,
+        "rqr":"Win32 Executable (generic)",
+        "d":[["size",[200,1048576]],
+             ["py","f=open(inp,'rb')\nf.seek(60);o=int.from_bytes(f.read(4),'little');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n\tf.seek(2);av,iv=f.read(1)[0],f.read(1)[0]\n\tf.seek(12)\n\tif f.read(1)[0] not in (124,102,185,106,127,15,191,90,141,75,232,190):return\nelif o==12: f.seek(38);av,iv=f.read(1)[0],f.read(1)[0]\nelse:return\nif av not in (48,49,50) or iv<48 or iv>57 or (av==48 and iv>54) or (av==49 and iv>52) or (av==50 and iv>51):return\nreturn True"]],
+        "rs":"Crinkler"
+    },
+    {
+        "rqr":null,
+        "d":[["isat","HEAD",256],["py","f=open(inp,'rb');f.seek(0x130);f.seek(int.from_bytes(f.read(8),'little'));return f.read(4)==b'HFS0'"]],
+        "rs":"Switch XCI","s":1
+    },
+    {
+        "rq":null,
+        "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f=open(inp,'rb');f.seek(11);sl=f.read(1)[0]\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
+        "rs":"QuARK","s":1
+    },
+    {
+        "rq":null,
+        "d":[["isat","GC",5],["py","f=open(inp,'rb');return sum(f.read(4))>3 and f.read(1)[0]&3==3"]],
+        "rs":"Konami LZSS"
+    },
+    {
+        "d":[["isat","\\0\\0\\0\\0",256],
+             ["str0",0,256,2]],
+        "rs":"BBC Micro SSD"
+    },
+    {
+        "d":[["s%",2048],["ext",".dat"],
+             ["py","import re;d=dirname(inp)\nfor _ in range(3):\n\tif exists(d+'/SYSTEM.CNF'):break\n\td=dirname(d)\nelse:return False\nmf=re.search(r'cdrom0:\\\\(.+);\\d+\\n',open(d+'/SYSTEM.CNF').read())[1]\nreturn exists(d+'/'+mf)"]],
+        "rs":"DDR DAT"
+    },
+    {
+        "rqr":null,
+        "d":[["isat","\\x54",0],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0]&15==1"]],
+        "rs":"Turbo Range Coder"
+    },
+    {
+        "rq":null,
+        "d":[["isin",["\\x80","\\x81","\\x82","\\x83","\\x84"],1],["isat","\\0",3]],
+        "rs":"ACB"
+    },
+    {
+        "rq":null,
+        "d":[["isat","\\x03\\0\\0\\0",0]],
+        "rs":"Minecraft PCK"
+    },
+    {
+        "rqr":null,
+        "d":[["isat","\\1",0],["str",1,11],["isin",["\\0","\\xFF"],13],["isat","\\1",14],["isin",["\\0","\\1"],18]],
+        "rs":"The Compressor"
+    },
+    {
+        "rqr":null,
+        "d":[["ext",".arg"],["isat","\\0",0],["isat","\\1",-1],["str0",1,2,1]],
+        "rs":"ARG"
+    },
+    {
+        "rqr":null,
+        "d":[["ext",".car"],["str0",0,2,1]],
+        "rs":"CarComp"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".zl"],
+        "rs":"OpenZL"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".nca"],
+        "rs":"Switch NCA"
+    },
+    {
         "rqr":null,
         "d":["ext",".nub2"],
         "rs":"NUB2"
-    },
-    {
-        "d":["py","m=['SLUS_213.77','SLES_551.97','SLUS_217.67','SLUS_219.17']\nreturn ((basename(inp).lower().startswith('mdb_') and inp.lower().endswith('.dat')) or basename(inp).lower() == 'sound.dat') and ([x for x in os.listdir(dirname(inp)) if x.upper() in m] or [x for x in os.listdir(dirname(dirname(inp))) if x.upper() in m])"],
-        "rs":"DDR DAT"
     },
     {
         "rqr":null,
@@ -241,12 +522,81 @@
         "rs":"Ridge Racer V A"
     },
     {
+        "rqr":null,
+        "d":["ext",".ucas"],
+        "rs":"Unreal ZenLoader"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".nlzm"],
+        "rs":"NLZM"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".br"],
+        "rs":"Brotli"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".crush"],
+        "rs":"CRUSH (I.M.)"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".lzpx"],
+        "rs":"LZPX"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".lzpxj"],
+        "rs":"LZPXJ"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".ulz"],
+        "rs":"ULZ"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".quad"],
+        "rs":"QUAD"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".lzpm"],
+        "rs":"LZPM"
+    },
+    {
+        "rqr":null,
+        "d":[["ext",".zh",true],["ext",".zhuff",true]],"noq":true,
+        "rs":"Zhuff"
+    },
+    {
         "rq":null,
         "d":["ext",".toast"],
         "rs":"Roxio Toast IMG"
     },
     {
+        "rq":null,
+        "d":["ext",".qbp"],
+        "rs":"qbp"
+    },
+    {
+        "rq":null,
+        "d":["ext",".tangelo"],
+        "rs":"TANGELO"
+    },
+    {
+        "rq":null,
+        "d":["ext",".csc"],
+        "rs":"CSC"
+    },
+    {
         "d":["ext",".xbp"],
         "rs":"XBP"
+    },
+    {
+        "d":["ext",".tde"],
+        "rs":"Teardown Encrypted File"
     }
 ]

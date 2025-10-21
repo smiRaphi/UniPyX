@@ -29,12 +29,27 @@ class DLDB:
         if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
         if useos:
-            r = os.system((subprocess.list2cmdline(cmd) if type(cmd) == list else cmd) + ' >NUL')
-            o = e = None
+            if stdin:
+                tfi = gtmp('.i')
+                if type(stdin) == str: stdin = stdin.encode()
+                open(tfi,'wb').write(stdin)
+            tfo,tfe = gtmp('.o'),gtmp('.e')
+
+            if 'cwd' in kwargs:
+                cd = os.getcwd()
+                os.chdir(kwargs['cwd'])
+            r = os.system((subprocess.list2cmdline(cmd) if type(cmd) == list else cmd) + (f' <{tfi}' if stdin else '') + f' >{tfo} 2>{tfe}')
+            if 'cwd' in kwargs: os.chdir(cd)
+
+            o,e = open(tfo,'rb').read(),open(tfe,'rb').read()
+            os.remove(tfo)
+            os.remove(tfe)
+            if stdin: os.remove(tfi)
+            if text: o,e = o.decode('cp437'),e.decode('cp437')
         else:
             p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=-1,stderr=-1,stdin=-1 if stdin != None else None,**kwargs)
             if timeout:
-                for _ in range(timeout*10):
+                for _ in range(int(timeout*10)):
                     if p.poll() != None: break
                     sleep(0.1)
                 else: p.kill()
@@ -66,67 +81,109 @@ class DLDB:
                             ex = e['u'].split('?')[0].split('/')[-1].lower()
                             if ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
                             else: ex = '.' + ex.split('.')[-1]
-                        p = gtmp(ex)
+                        p = gtmp('.exe' if ex in ('run','inno','nsis') else ex)
 
-                    self.dl(e['u'],p)
+                    if e['u'] == '.': p,ex = 'bin/bin.7z','.7z'
+                    else: self.dl(e['u'],p,verify=e.get('v',True))
                     if 'x' in e:
                         bk = self.print_try
                         self.print_try = False
-                        if ex == '.zip':
-                            with zipfile.ZipFile(p,'r') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.read(tx))
-                        elif ex in ['.tgz','.tar.gz']:
-                            with tarfile.open(p,'r:gz') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile(tx).read())
-                        elif ex == '.7z':
-                            td = gtmp()
-                            self.run(['7z','x','-y','-o' + td,p])
-                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
-                            rmtree(td)
-                        elif ex == '.rar':
-                            td = gtmp()
-                            self.run(['unrar','x','-or','-op' + td,p])
-                            for tx in e['x']: copy(td + '/' + tx,'bin/' + e['x'][tx])
-                            rmtree(td)
-                        elif ex == '.msi':
-                            td = gtmp()
-                            os.makedirs(td,exist_ok=True)
-                            self.run(['lessmsi','x',p,td + '\\'],getexe=False)
-                            for tx in e['x']: copy(td + '/SourceDir/' + tx,'bin/' + e['x'][tx])
-                            rmtree(td)
-                        elif ex == '.deb':
-                            td = gtmp()
-                            os.makedirs(td,exist_ok=True)
-                            self.run(['7z','x','-y','-o' + td,p])
-                            with tarfile.open(td + '/data.tar','r') as z:
-                                for tx in e['x']: xopen('bin/' + e['x'][tx],'wb').write(z.extractfile('./' + tx).read())
-                            rmtree(td)
-                        else: raise NotImplementedError(p + f' [{ex}]')
+
+                        self.ext(p,ex,e['x'])
+
                         self.print_try = bk
-                        os.remove(p)
+                        if e['u'] != '.': os.remove(p)
             exei = os.path.abspath('bin/' + exi['p'])
             self.udb[exe] = t
             self.save()
             os.chdir(cd)
         return exei,up
-    def dl(self,url:str,out:str):
+    def ext(self,p:str,ex:str,xl:dict):
+        if ex == '.zip':
+            with zipfile.ZipFile(p,'r') as z:
+                for tx in xl:
+                    if tx == '*':
+                        os.makedirs('bin/' + xl[tx],exist_ok=True)
+                        z.extractall('bin/' + xl[tx])
+                    elif type(xl[tx]) == dict:
+                        if '?ex' in xl[tx]: ex = xl[tx].pop('?ex')
+                        else: ex = os.path.splitext(tx)[1].lower()
+                        tf = gtmp(ex)
+                        xopen(tf,'wb').write(z.read(tx))
+                        self.ext(tf,ex,xl[tx])
+                        os.remove(tf)
+                    else: xopen('bin/' + xl[tx],'wb').write(z.read(tx))
+        elif ex in ('.tgz','.tar.gz'):
+            with tarfile.open(p,'r:gz') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+        elif ex in ['.txz','.tar.xz']:
+            with tarfile.open(p,'r:xz') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+        elif ex in ('.tzt','.tar.zst'):
+            td = gtmp()
+            self.run(['7z','x','-y','-o' + td,p])
+            with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+            rmtree(td)
+        elif ex in ('.7z','.arj','.zipx','nsis'):
+            td = gtmp()
+            self.run(['7z','x','-y','-o' + td,'-aoa',p])
+            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == '.rar':
+            td = gtmp()
+            self.run(['unrar','x','-or','-op' + td,p])
+            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == '.msi':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run(['lessmsi','x',p,td + '\\'])
+            for tx in xl: copy(td + '/SourceDir/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == '.deb':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run(['7z','x','-y','-o' + td,p])
+            with tarfile.open(td + '/data.tar','r') as z:
+                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile('./' + tx).read())
+            rmtree(td)
+        elif ex == 'inno':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run(['innounp-2','-x','-b','-m','-d' + td,'-u','-h','-o','-y',p])
+            for tx in xl: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,'bin/' + xl[tx])
+            rmtree(td)
+        elif ex == 'run':
+            td = gtmp()
+            os.makedirs(td,exist_ok=True)
+            self.run([p,'-y'],stdin='\n',getexe=False,cwd=td)
+            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            rmtree(td)
+        else: raise NotImplementedError(p + f' [{ex}]')
+    def dl(self,url:str,out:str,verify=True):
         start = 0
+        kwargs = {}
+        if not verify:
+            cl = httpx
+            kwargs['verify'] = False
+        else: cl = self.c
         try:
             with xopen(out,'wb') as f:
                 for _ in range(10):
                     try:
-                        with self.c.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True) as r:
+                        with cl.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True,**kwargs) as r:
                             if r.headers.get('Content-Length') and not int(r.headers['Content-Length']): continue
                             for c in r.iter_bytes(4096): f.write(c)
                         break
                     except httpx.ConnectError: pass
                     except httpx.ReadTimeout: start = f.tell()
-                else: f.write(self.c.get(url,follow_redirects=True).content)
+                else: f.write(cl.get(url,follow_redirects=True,**kwargs).content)
         except:
             if os.path.exists(out): os.remove(out)
             raise
 
     def save(self):
-        open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False))
+        open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))
 
 from io import open

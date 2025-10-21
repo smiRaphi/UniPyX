@@ -2,6 +2,26 @@ import os
 if __name__ == '__main__':
     from sys import argv
 
+    if argv[1:] == ['-clean']:
+        import re
+        from shutil import rmtree
+        assert os.path.exists('.gitignore'),".gitignore does not exist"
+
+        nr = re.findall(r'!/bin/([^\n]+\.\w+|[^\n/\\]+(?=/\*))',open('.gitignore',encoding='utf-8').read())
+        for x in os.listdir('bin'):
+            if x in nr: continue
+            p = 'bin/' + x
+            if os.path.isfile(p): os.remove(p)
+            elif os.path.isdir(p):
+                for y in os.listdir(p):
+                    tp = x + '/' + y
+                    if tp in nr: continue
+                    if os.path.isfile(p + '/' + y): os.remove(p + '/' + y)
+                    else: rmtree(p + '/' + y)
+                if not os.listdir(p): os.rmdir(p)
+
+        exit()
+
     scan = '-os' in argv
     if scan: argv.remove('-os')
 
@@ -25,10 +45,10 @@ if __name__ == '__main__':
         for x in ts: print(x)
         print()
         print('Raw:')
-        for x in rts: print(x)
+        for x in sorted(set(rts)): print(x)
     else:
         from lib.main import main_extract as extract
         extract(inp,out,quiet=False,rs=True)
 else:
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    from lib.main import main_extract as extract
+    from lib.main import analyze,main_extract as extract,extract as sub_extract

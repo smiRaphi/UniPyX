@@ -1,20 +1,43 @@
 {
+    "msdos":{
+        "p":"msdos.exe",
+        "fs":[{
+            "u":"http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z",
+            "x":{
+                "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
+            },
+            "ts":1760220000
+        }],
+        "ts":1760220000
+    },
+    "dosbox":{
+        "p":"DOSBox-X/dosbox-x.exe",
+        "fs":[{
+            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.10.07/dosbox-x-vsbuild-win64-20251007154914.zip",
+            "x":{
+                "bin/x64/Release SDL2/dosbox-x.exe":"DOSBox-X/dosbox-x.exe",
+                "bin/x64/Release SDL2/inpoutx64.dll":"DOSBox-X/inpoutx64.dll"
+            },
+            "ts":0
+        }],
+        "ts":0
+    },
     "trid":{
         "p":"trid/trid.exe",
         "fs":[{
-            "u":"https://mark0.net/download/trid_w32.zip",
+            "u":"https://mark0.net/download/trid_win64.zip",
             "x":{
                 "trid.exe":"trid/trid.exe"
             },
-            "ts":1459602900
+            "ts":1758628368
         },{
             "u":"https://mark0.net/download/triddefs.zip",
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1756245600
+            "ts":1760306400
         }],
-        "ts":1756245600
+        "ts":1760306400
     },
     "file":{
         "p":"file/file.exe",
@@ -25,13 +48,13 @@
                 "libmagic.dll":"file/libmagic.dll"
             }
         },{
-            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5_i386.deb",
+            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5build1_i386.deb",
             "x":{
                 "usr/share/file/magic.mgc":"file/magic.mgc"
             },
-            "ts":1746109560
+            "ts":1756929540
         }],
-        "ts":1746109560
+        "ts":1756929540
     },
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
@@ -58,6 +81,25 @@
         ]],
         "ts":0
     },
+    "die":{
+        "p":"DiE/diec.exe",
+        "fs":[{
+            "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/die_win64_portable_3.10_x64.zip",
+            "x":{
+                "diec.exe":"DiE/diec.exe",
+                "Qt5Core.dll":"DiE/Qt5Core.dll",
+                "Qt5Script.dll":"DiE/Qt5Script.dll"
+            },
+            "ts":1735686000
+        },{
+            "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip",
+            "x":{
+                "*":"DiE"
+            },
+            "ts":1760392800
+        }],
+        "ts":1760392800
+    },
     "7z":{
         "p":"7z/7z.exe",
         "fs":[{
@@ -76,6 +118,16 @@
             "u":"https://www.tc4shell.com/binary/Iso7z.zip",
             "x":{
                 "Iso7z.64.dll":"7z/Formats/Iso7z.64.dll"
+            }
+        },{
+            "u":"https://www.tc4shell.com/binary/Lzip.zip",
+            "x":{
+                "Lzip.64.dll":"7z/Formats/Lzip.64.dll"
+            }
+        },{
+            "u":"https://www.tc4shell.com/binary/Asar.zip",
+            "x":{
+                "Asar.64.dll":"7z/Formats/Asar.64.dll"
             }
         }],
         "ts":1754212738
@@ -151,6 +203,20 @@
             "u":"https://cdn.theunarchiver.com/downloads/unarWindows.zip",
             "x":{
                 "unar.exe":"Unarchiver/unar.exe",
+                "lsar.exe":"Unarchiver/lsar.exe",
+                "Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"
+            },
+            "ts":1735686000
+        }],
+        "ts":1735686000
+    },
+    "lsar":{
+        "p":"Unarchiver/lsar.exe",
+        "fs":[{
+            "u":"https://cdn.theunarchiver.com/downloads/unarWindows.zip",
+            "x":{
+                "unar.exe":"Unarchiver/unar.exe",
+                "lsar.exe":"Unarchiver/lsar.exe",
                 "Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"
             },
             "ts":1735686000
@@ -162,7 +228,7 @@
         "fs":[{
             "u":"https://entropymine.com/deark/releases/deark-1.7.1.tar.gz",
             "x":{
-                "deark-1.7.0/x64/deark.exe":"deark.exe"
+                "deark-1.7.1/x64/deark.exe":"deark.exe"
             },
             "ts":1755919440
         }],
@@ -307,78 +373,22 @@
         "ts":0
     },
     "aaru":{
-        "p":"Aaru/aaru.exe",
+        "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v5.4.1/aaru-5.4.1_windows_x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.12/aaru-6.0.0-alpha.12_windows-x64.zip",
             "x":{
-                "Aaru.Checksums.dll":"Aaru/Aaru.Checksums.dll",
-                "Aaru.CommonTypes.dll":"Aaru/Aaru.CommonTypes.dll",
-                "Aaru.Compression.dll":"Aaru/Aaru.Compression.dll",
-                "Aaru.Console.dll":"Aaru/Aaru.Console.dll",
-                "Aaru.Core.dll":"Aaru/Aaru.Core.dll",
-                "Aaru.Database.dll":"Aaru/Aaru.Database.dll",
-                "Aaru.Decoders.dll":"Aaru/Aaru.Decoders.dll",
-                "Aaru.Decryption.dll":"Aaru/Aaru.Decryption.dll",
-                "aaru.deps.json":"Aaru/aaru.deps.json",
-                "Aaru.Devices.dll":"Aaru/Aaru.Devices.dll",
-                "aaru.dll":"Aaru/aaru.dll",
-                "Aaru.Dto.dll":"Aaru/Aaru.Dto.dll",
-                "aaru.exe":"Aaru/aaru.exe",
-                "Aaru.Filesystems.dll":"Aaru/Aaru.Filesystems.dll",
-                "Aaru.Filters.dll":"Aaru/Aaru.Filters.dll",
-                "Aaru.Helpers.dll":"Aaru/Aaru.Helpers.dll",
-                "Aaru.Images.dll":"Aaru/Aaru.Images.dll",
-                "Aaru.Partitions.dll":"Aaru/Aaru.Partitions.dll",
-                "aaru.runtimeconfig.json":"Aaru/aaru.runtimeconfig.json",
-                "Aaru.Settings.dll":"Aaru/Aaru.Settings.dll",
-                "Castle.Core.dll":"Aaru/Castle.Core.dll",
-                "Claunia.Encoding.dll":"Aaru/Claunia.Encoding.dll",
-                "Claunia.RsrcFork.dll":"Aaru/Claunia.RsrcFork.dll",
-                "DotNetZip.dll":"Aaru/DotNetZip.dll",
-                "e_sqlite3.dll":"Aaru/e_sqlite3.dll",
-                "JetBrains.Annotations.dll":"Aaru/JetBrains.Annotations.dll",
-                "Microsoft.Data.Sqlite.dll":"Aaru/Microsoft.Data.Sqlite.dll",
-                "Microsoft.EntityFrameworkCore.Abstractions.dll":"Aaru/Microsoft.EntityFrameworkCore.Abstractions.dll",
-                "Microsoft.EntityFrameworkCore.dll":"Aaru/Microsoft.EntityFrameworkCore.dll",
-                "Microsoft.EntityFrameworkCore.Proxies.dll":"Aaru/Microsoft.EntityFrameworkCore.Proxies.dll",
-                "Microsoft.EntityFrameworkCore.Relational.Design.dll":"Aaru/Microsoft.EntityFrameworkCore.Relational.Design.dll",
-                "Microsoft.EntityFrameworkCore.Relational.dll":"Aaru/Microsoft.EntityFrameworkCore.Relational.dll",
-                "Microsoft.EntityFrameworkCore.Sqlite.Design.dll":"Aaru/Microsoft.EntityFrameworkCore.Sqlite.Design.dll",
-                "Microsoft.EntityFrameworkCore.Sqlite.dll":"Aaru/Microsoft.EntityFrameworkCore.Sqlite.dll",
-                "Microsoft.Extensions.Caching.Abstractions.dll":"Aaru/Microsoft.Extensions.Caching.Abstractions.dll",
-                "Microsoft.Extensions.Caching.Memory.dll":"Aaru/Microsoft.Extensions.Caching.Memory.dll",
-                "Microsoft.Extensions.Configuration.Abstractions.dll":"Aaru/Microsoft.Extensions.Configuration.Abstractions.dll",
-                "Microsoft.Extensions.DependencyInjection.Abstractions.dll":"Aaru/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-                "Microsoft.Extensions.DependencyInjection.dll":"Aaru/Microsoft.Extensions.DependencyInjection.dll",
-                "Microsoft.Extensions.DependencyModel.dll":"Aaru/Microsoft.Extensions.DependencyModel.dll",
-                "Microsoft.Extensions.Logging.Abstractions.dll":"Aaru/Microsoft.Extensions.Logging.Abstractions.dll",
-                "Microsoft.Extensions.Logging.dll":"Aaru/Microsoft.Extensions.Logging.dll",
-                "Microsoft.Extensions.Options.dll":"Aaru/Microsoft.Extensions.Options.dll",
-                "Microsoft.Extensions.Primitives.dll":"Aaru/Microsoft.Extensions.Primitives.dll",
-                "Newtonsoft.Json.dll":"Aaru/Newtonsoft.Json.dll",
-                "plist-cil.dll":"Aaru/plist-cil.dll",
-                "SharpCompress.dll":"Aaru/SharpCompress.dll",
-                "SQLitePCLRaw.batteries_v2.dll":"Aaru/SQLitePCLRaw.batteries_v2.dll",
-                "SQLitePCLRaw.core.dll":"Aaru/SQLitePCLRaw.core.dll",
-                "SQLitePCLRaw.provider.e_sqlite3.dll":"Aaru/SQLitePCLRaw.provider.e_sqlite3.dll",
-                "System.CodeDom.dll":"Aaru/System.CodeDom.dll",
-                "System.CommandLine.dll":"Aaru/System.CommandLine.dll",
-                "System.Diagnostics.EventLog.dll":"Aaru/System.Diagnostics.EventLog.dll",
-                "System.Diagnostics.EventLog.Messages.dll":"Aaru/System.Diagnostics.EventLog.Messages.dll",
-                "System.Management.dll":"Aaru/System.Management.dll",
-                "System.Resources.Extensions.dll":"Aaru/System.Resources.Extensions.dll",
-                "System.Security.Permissions.dll":"Aaru/System.Security.Permissions.dll"
+                "aaru.exe":"aaru.exe"
             },
-            "ts":1755162013
+            "ts":1759022555
         }],
-        "ts":1755162013
+        "ts":1759022555
     },
     "ancient":{
-        "p":"ancient.exe",
+        "p":"Ancient.exe",
         "fs":[{
-            "u":"https://github.com/temisu/ancient/releases/download/v2.0.0/ancient_2.0.0.zip",
+            "u":"https://github.com/temisu/ancient/releases/download/v2.3.0/windows_binaries_Release.zip",
             "x":{
-                "ancient_2.0.0/ancient.exe":"ancient.exe"
+                "Ancient64.exe":"Ancient.exe"
             }
         }],
         "ts":0
@@ -396,7 +406,7 @@
     "gameextractor":{
         "p":"GameExtractor/GameExtractor.jar",
         "fs":[{
-            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0001/extract.zip",
+            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0003/extract.zip",
             "x":{
                 "GameExtractor.jar":"GameExtractor/GameExtractor.jar",
                 "settings/default.xml":"GameExtractor/settings/default.xml",
@@ -405,9 +415,10 @@
                 "interface/default.xml":"GameExtractor/interface/default.xml",
                 "interface/SidePanel_DirectoryList.xml":"GameExtractor/interface/SidePanel_DirectoryList.xml",
                 "interface/SidePanel_DirectoryList_ReadPanel.xml":"GameExtractor/interface/SidePanel_DirectoryList_ReadPanel.xml"
-            }
+            },
+            "ts":1759875616
         }],
-        "ts":0
+        "ts":1759875616
     },
     "buildgdi":{
         "p":"buildgdi.exe",
@@ -420,10 +431,27 @@
         "ts":0
     },
     "hac2l":{
-        "p":"hac2l.exe"
+        "p":"hac2l.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "hac2l.exe":"hac2l.exe"
+            }
+        }]
     },
     "psvpfsparser":{
-        "p":"psvpfsparser/psvpfsparser.exe"
+        "p":"psvpfsparser/psvpfsparser.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "psvpfsparser/psvpfsparser.exe":"psvpfsparser/psvpfsparser.exe",
+                "psvpfsparser/libgcc_s_seh-1.dll":"psvpfsparser/libgcc_s_seh-1.dll",
+                "psvpfsparser/libgmp-10.dll":"psvpfsparser/libgmp-10.dll",
+                "psvpfsparser/libtomcrypt-1.dll":"psvpfsparser/libtomcrypt-1.dll",
+                "psvpfsparser/libtommath-1.dll":"psvpfsparser/libtommath-1.dll",
+                "psvpfsparser/libwinpthread-1.dll":"psvpfsparser/libwinpthread-1.dll"
+            }
+        }]
     },
     "ps4pkg":{
         "p":"ps4pkg/orbis-pub-cmd.exe",
@@ -451,7 +479,7 @@
         "fs":[
         "https://update.bioruebe.com/uniextract/nightly/bin/x64/UnRAR.exe"
         ],
-        "ts":0
+        "ts":1757254045798
     },
     "upx":{
         "p":"upx.exe",
@@ -467,13 +495,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/4b/51/dolphin-master-2506-406-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/b2/98/dolphin-master-2509-182-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1756007433
+            "ts":1760404929
         }],
-        "ts":1756007433
+        "ts":1760404929
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -551,13 +579,13 @@
     "mrst":{
         "p":"mrst.exe",
         "fs":[{
-            "u":"https://github.com/em-eight/mrst/releases/download/v1.2-rc8/mrst-Windows.zip",
+            "u":"https://github.com/em-eight/mrst/releases/download/v1.2-rc9/mrst-Windows.zip",
             "x":{
                 "bin/mrst.exe":"mrst.exe"
             },
-            "ts":1754502477
+            "ts":1759240568
         }],
-        "ts":1754502477
+        "ts":1759240568
     },
     "cvm_tool":{
         "p":"cvm_tool.exe",
@@ -630,14 +658,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0279/mame0279b_64bit.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0281/mame0281b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1754035789
+            "ts":1756582295
         }],
-        "ts":1754035789
+        "ts":1756582295
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -648,16 +676,20 @@
     },
     "ndssndext":{
         "p":"ndssndext.exe",
-        "fs":[[
-            "https://files.catbox.moe/k4141a.bin",
-            "ndssndext.exe"
-        ]],
+        "fs":[{
+            "u":"https://filetrip.net/files/f/28818-ndssndext_v04.zip",
+            "x":{
+                "ndssndext_v04.zip":{
+                    "ndssndext.exe":"ndssndext.exe"
+                }
+            }
+        }],
         "ts":0
     },
     "ps3dec":{
-        "p":"ps3dec.exe",
+        "p":"ps3decrs.exe",
         "fs":[
-        "https://github.com/Redrrx/ps3dec/releases/download/0.2.0/ps3dec.exe"
+        "https://github.com/Redrrx/ps3dec/releases/download/2.0.0/ps3decrs.exe"
         ],
         "ts":0
     },
@@ -703,7 +735,7 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.2/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.5/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "Texture2DDecoderNative.dll":"AssetRipper/Texture2DDecoderNative.dll",
@@ -711,9 +743,9 @@
                 "crunch.dll":"AssetRipper/crunch.dll",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1754808194
+            "ts":1760326925
         }],
-        "ts":1754808194
+        "ts":1760326925
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -729,15 +761,14 @@
     "hfsexplorer":{
         "p":"hfsexplorer/hfsx.jar",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/catacombae/HFSExplorer/0.23.1/hfsexplorer-0.23.1-bin.zip?viasf=1",
+            "u":"https://github.com/unsound/hfsexplorer/releases/download/hfsexplorer-2021.10.9/hfsexplorer-2021.10.9-bin.zip",
             "x":{
                 "lib/apache-ant-1.7.0-bzip2.jar":"hfsexplorer/apache-ant-1.7.0-bzip2.jar",
                 "lib/csframework.jar":"hfsexplorer/csframework.jar",
                 "lib/hfsx.jar":"hfsexplorer/hfsx.jar",
                 "lib/hfsx_dmglib.jar":"hfsexplorer/hfsx_dmglib.jar",
                 "lib/iharder-base64.jar":"hfsexplorer/iharder-base64.jar",
-                "lib/llio_amd64.dll":"hfsexplorer/llio_amd64.dll",
-                "lib/swing-layout-1.0.4.jar":"hfsexplorer/swing-layout-1.0.4.jar"
+                "lib/llio_amd64.dll":"hfsexplorer/llio_amd64.dll"
             }
         }],
         "ts":0
@@ -784,7 +815,7 @@
     "rpkg":{
         "p":"rpkg/rpkg-cli.exe",
         "fs":[{
-            "u":"https://github.com/glacier-modding/RPKG-Tool/releases/download/v2.33.0/rpkg_v2.33.0-cli.zip",
+            "u":"https://github.com/glacier-modding/RPKG-Tool/releases/download/v2.33.2/rpkg_v2.33.2-cli.zip",
             "x":{
                 "ResourceLib_HM3.dll":"rpkg/ResourceLib_HM3.dll",
                 "rpkg-cli.exe":"rpkg/rpkg-cli.exe",
@@ -794,15 +825,387 @@
                 "ResourceLib_HM2.dll":"rpkg/ResourceLib_HM2.dll",
                 "assimp.dll":"rpkg/assimp.dll",
                 "hash_list.hmla":"rpkg/hash_list.hmla"
-            }
+            },
+            "ts":1759277359
         }],
-        "ts":0
+        "ts":1759277359
     },
     "sarc":{
         "p":"sarc.py",
         "fs":[
         "https://raw.githubusercontent.com/zeldamods/sarc/refs/heads/master/sarc/sarc.py"
         ],
+        "ts":0
+    },
+    "tdedecrypt":{
+        "p":"TDEDecrypt.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "TDEDecrypt.exe":"TDEDecrypt.exe"
+            }
+        }]
+    },
+    "repak":{
+        "p":"repak.exe",
+        "fs":[{
+            "u":"https://github.com/trumank/repak/releases/download/v0.2.2/repak_cli-x86_64-pc-windows-msvc.zip",
+            "x":{
+                "repak.exe":"repak.exe"
+            }
+        }],
+        "ts":0
+    },
+    "wad_archiver":{
+        "p":"wad_archiver.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/vn-tools/danganronpa-tools/refs/heads/master/wad_archiver/wad_archiver",
+            "wad_archiver.py"
+        ]],
+        "ts":0
+    },
+    "vpkedit":{
+        "p":"vpkeditcli.exe",
+        "fs":[{
+            "u":"https://github.com/craftablescience/VPKEdit/releases/download/v5.0.0.3/VPKEdit-Windows-Standalone-msvc-Release.zip",
+            "x":{
+                "vpkeditcli.exe":"vpkeditcli.exe"
+            },
+            "ts":1759388231
+        }],
+        "ts":1759388231
+    },
+    "unpsarc":{
+        "p":"UnPSARC/UnPSARC.exe",
+        "fs":[{
+            "u":"https://github.com/rm-NoobInCoding/UnPSARC/releases/download/v2.7/UnPSARC_v2.7.zip",
+            "x":{
+                "Gibbed.IO.dll":"UnPSARC/Gibbed.IO.dll",
+                "ICSharpCode.SharpZipLib.dll":"UnPSARC/ICSharpCode.SharpZipLib.dll",
+                "K4os.Compression.LZ4.dll":"UnPSARC/K4os.Compression.LZ4.dll",
+                "System.Buffers.dll":"UnPSARC/System.Buffers.dll",
+                "System.Memory.dll":"UnPSARC/System.Memory.dll",
+                "System.Numerics.Vectors.dll":"UnPSARC/System.Numerics.Vectors.dll",
+                "System.Runtime.CompilerServices.Unsafe.dll":"UnPSARC/System.Runtime.CompilerServices.Unsafe.dll",
+                "System.Threading.Tasks.Extensions.dll":"UnPSARC/System.Threading.Tasks.Extensions.dll",
+                "UnPSARC.exe":"UnPSARC/UnPSARC.exe"
+            }
+        },[
+            "https://github.com/new-world-tools/go-oodle/releases/download/v0.2.3-files/oo2core_9_win64.dll",
+            "UnPSARC/oo2core_9_win64.dll"
+        ]],
+        "ts":0
+    },
+    "ps5pkg":{
+        "p":"ps5pkg/prospero-pub-cmd.exe",
+        "fs":[[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/prospero-pub-cmd.exe",
+            "ps5pkg/prospero-pub-cmd.exe"
+        ],[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/p2d.exe",
+            "ps5pkg/ext/p2d.exe"
+        ],[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/sc2.exe",
+            "ps5pkg/ext/sc2.exe"
+        ],[
+            "https://raw.githubusercontent.com/DNNDHH/PS5-PKGs/refs/heads/main/ext/ric.exe",
+            "ps5pkg/ext/ric.exe"
+        ]],
+        "ts":0
+    },
+    "bbccp":{
+        "p":"bbccp.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "bbccp.exe":"bbccp.exe"
+            }
+        }]
+    },
+    "chrome-pak":{
+        "p":"chrome-pak.exe",
+        "fs":[[
+            "https://github.com/myfreeer/chrome-pak-customizer/releases/download/2.0/pak_mingw64.exe",
+            "chrome-pak.exe"
+        ]],
+        "ts":0
+    },
+    "rpgmakerdecrypter":{
+        "p":"RPGMakerDecrypter-cli.exe",
+        "fs":[
+        "https://github.com/uuksu/RPGMakerDecrypter/releases/download/v3.0.4/RPGMakerDecrypter-cli.exe"
+        ],
+        "ts":0
+    },
+    "zentools":{
+        "p":"ZenTools.exe",
+        "fs":[
+        "https://github.com/WistfulHopes/ZenTools-UE4/releases/download/ue4-1.0.3/ZenTools.exe"
+        ],
+        "ts":0
+    },
+    "unrealpak":{
+        "p":"UnrealPak/UnrealPak.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/ZOAZ-Uzumaki/Rust-Rides-game.-Unreal-engine-UnrealPaks-conventor/refs/heads/main/AddonUnrealPack_Tools.rar",
+            "x":{
+                "AddonUnrealPack_Tools/UnrealPak-ApplicationCore.dll":"UnrealPak/UnrealPak-ApplicationCore.dll",
+                "AddonUnrealPack_Tools/UnrealPak-AssetRegistry.dll":"UnrealPak/UnrealPak-AssetRegistry.dll",
+                "AddonUnrealPack_Tools/UnrealPak-AutoRTFM.dll":"UnrealPak/UnrealPak-AutoRTFM.dll",
+                "AddonUnrealPack_Tools/UnrealPak-BuildSettings.dll":"UnrealPak/UnrealPak-BuildSettings.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Cbor.dll":"UnrealPak/UnrealPak-Cbor.dll",
+                "AddonUnrealPack_Tools/UnrealPak-CookMetadata.dll":"UnrealPak/UnrealPak-CookMetadata.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Core.dll":"UnrealPak/UnrealPak-Core.dll",
+                "AddonUnrealPack_Tools/UnrealPak-CorePreciseFP.dll":"UnrealPak/UnrealPak-CorePreciseFP.dll",
+                "AddonUnrealPack_Tools/UnrealPak-CoreUObject.dll":"UnrealPak/UnrealPak-CoreUObject.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DerivedDataCache.dll":"UnrealPak/UnrealPak-DerivedDataCache.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DesktopPlatform.dll":"UnrealPak/UnrealPak-DesktopPlatform.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DeveloperSettings.dll":"UnrealPak/UnrealPak-DeveloperSettings.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DeveloperToolSettings.dll":"UnrealPak/UnrealPak-DeveloperToolSettings.dll",
+                "AddonUnrealPack_Tools/UnrealPak-DevHttp.dll":"UnrealPak/UnrealPak-DevHttp.dll",
+                "AddonUnrealPack_Tools/UnrealPak-IoStoreUtilities.dll":"UnrealPak/UnrealPak-IoStoreUtilities.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Json.dll":"UnrealPak/UnrealPak-Json.dll",
+                "AddonUnrealPack_Tools/UnrealPak-PakFile.dll":"UnrealPak/UnrealPak-PakFile.dll",
+                "AddonUnrealPack_Tools/UnrealPak-PakFileUtilities.dll":"UnrealPak/UnrealPak-PakFileUtilities.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Projects.dll":"UnrealPak/UnrealPak-Projects.dll",
+                "AddonUnrealPack_Tools/UnrealPak-RenderCore.dll":"UnrealPak/UnrealPak-RenderCore.dll",
+                "AddonUnrealPack_Tools/UnrealPak-RHI.dll":"UnrealPak/UnrealPak-RHI.dll",
+                "AddonUnrealPack_Tools/UnrealPak-RSA.dll":"UnrealPak/UnrealPak-RSA.dll",
+                "AddonUnrealPack_Tools/UnrealPak-SandboxFile.dll":"UnrealPak/UnrealPak-SandboxFile.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Sockets.dll":"UnrealPak/UnrealPak-Sockets.dll",
+                "AddonUnrealPack_Tools/UnrealPak-SSL.dll":"UnrealPak/UnrealPak-SSL.dll",
+                "AddonUnrealPack_Tools/UnrealPak-TelemetryUtils.dll":"UnrealPak/UnrealPak-TelemetryUtils.dll",
+                "AddonUnrealPack_Tools/UnrealPak-TraceLog.dll":"UnrealPak/UnrealPak-TraceLog.dll",
+                "AddonUnrealPack_Tools/UnrealPak-Zen.dll":"UnrealPak/UnrealPak-Zen.dll",
+                "AddonUnrealPack_Tools/UnrealPak.exe":"UnrealPak/UnrealPak.exe",
+                "AddonUnrealPack_Tools/UnrealPak.modules":"UnrealPak/UnrealPak.modules",
+                "AddonUnrealPack_Tools/tbbmalloc.dll":"UnrealPak/tbbmalloc.dll"
+            }
+        }],
+        "ts":0
+    },
+    "zpaq":{
+        "p":"zpaq.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/zpaq.exe"
+        ],
+        "ts":0
+    },
+    "bzip":{
+        "p":"bzip.exe",
+        "fs":[{
+            "u":"https://sourceware.org/pub/bzip2/bzip-0.21.tar.gz",
+            "x":{
+                "bzip-0.21/bzip.exe":"bzip.exe"
+            }
+        }],
+        "ts":0
+    },
+    "cethleann":{
+        "p":"Cethleann/Cethleann.DataExporter.exe",
+        "fs":[{
+            "u":"https://github.com/yretenai/Cethleann/releases/download/1.2.1/cethleann-net7-win-x86-64-rel.zip",
+            "x":{
+                "Cethleann.dll":"Cethleann/Cethleann.dll",
+                "Cethleann.DataExporter.dll":"Cethleann/Cethleann.DataExporter.dll",
+                "Cethleann.DataExporter.exe":"Cethleann/Cethleann.DataExporter.exe",
+                "Cethleann.DataExporter.runtimeconfig.json":"Cethleann/Cethleann.DataExporter.runtimeconfig.json",
+                "Cethleann.Structure.dll":"Cethleann/Cethleann.Structure.dll",
+                "Cethleann.Unbundler.dll":"Cethleann/Cethleann.Unbundler.dll",
+                "DragonLib.dll":"Cethleann/DragonLib.dll"
+            }
+        }],
+        "ts":0
+    },
+    "ddrutil":{
+        "p":"ddrutil.py",
+        "fs":[
+        "https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py"
+        ],
+        "ts":0
+    },
+    "acefile":{
+        "p":"acefile.py",
+        "fs":[
+        "https://raw.githubusercontent.com/droe/acefile/refs/heads/master/acefile.py"
+        ],
+        "ts":0
+    },
+    "ain":{
+        "p":"AIN.EXE",
+        "fs":[[
+            "https://www.sac.sk/download/pack/ain232.exe",
+            "AIN.EXE"
+        ]],
+        "ts":0
+    },
+    "ha":{
+        "p":"HA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/ha0999.zip",
+            "x":{
+                "HA.EXE":"HA.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "3dt":{
+        "p":"3dt.exe",
+        "fs":[[
+            "https://github.com/trapexit/3dt/releases/download/1.1.1/3dt_win64.exe",
+            "3dt.exe"
+        ]],
+        "ts":0
+    },
+    "assamunpack":{
+        "p":"assamUnpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "assamUnpack.exe":"assamUnpack.exe"
+            }
+        }]
+    },
+    "uaeunp":{
+        "p":"uaeunp.exe",
+        "fs":[{
+            "u":"https://download.abime.net/winuae/stuff/uaeunp-0.8.zip",
+            "x":{
+                "uaeunp.exe":"uaeunp.exe"
+            }
+        }],
+        "ts":0
+    },
+    "akt":{
+        "p":"AKT.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/akt070b5.zip",
+            "x":{
+                "akt.exe":"AKT.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "amgc":{
+        "p":"AMGC.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/amgc22.zip",
+            "x":{
+                "AMGC.EXE":"AMGC.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "amstradcpcexplorer":{
+        "p":"DSKInfoV3.py",
+        "fs":[
+        "https://raw.githubusercontent.com/muckypaws/AmstradDSKExplorer/refs/heads/master/DSKInfoV3.py"
+        ],
+        "ts":0
+    },
+    "cadius":{
+        "p":"cadius.exe",
+        "fs":[
+        "https://github.com/mach-kernel/cadius/releases/download/1.4.5/cadius.exe"
+        ],
+        "ts":0
+    },
+    "acx":{
+        "p":"acx.jar",
+        "fs":[[
+            "https://github.com/AppleCommander/AppleCommander/releases/download/13.0/AppleCommander-acx-13.0.jar",
+            "acx.jar"
+        ]],
+        "ts":1760048587
+    },
+    "pyinstxtractor-ng":{
+        "p":"pyinstxtractor-ng.exe",
+        "fs":[
+        "https://github.com/pyinstxtractor/pyinstxtractor-ng/releases/download/2025.01.05/pyinstxtractor-ng.exe"
+        ],
+        "ts":0
+    },
+    "ar":{
+        "p":"binutils/ar.exe",
+        "fs":[{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-binutils-2.45-2-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/ar.exe":"binutils/ar.exe"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gettext-runtime-0.26-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libintl-8.dll":"binutils/libintl-8.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r223.gf82613935-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libwinpthread-1.dll":"binutils/libwinpthread-1.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.18-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libiconv-2.dll":"binutils/libiconv-2.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.3.1-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/zlib1.dll":"binutils/zlib1.dll"
+            },
+            "ts":0
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zstd-1.5.7-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libzstd.dll":"binutils/libzstd.dll"
+            },
+            "ts":0
+        }],
+        "ts":0
+    },
+    "pywebarchive":{
+        "p":"webarchive/webarchive.py",
+        "fs":[{
+            "u":"https://github.com/bmjcode/pywebarchive/archive/refs/heads/master.zip",
+            "x":{
+                "pywebarchive-master/webarchive/webarchive.py":"webarchive/webarchive.py",
+                "pywebarchive-master/webarchive/__init__.py":"webarchive/__init__.py",
+                "pywebarchive-master/webarchive/exceptions.py":"webarchive/exceptions.py",
+                "pywebarchive-master/webarchive/webresource.py":"webarchive/webresource.py",
+                "pywebarchive-master/webarchive/util.py":"webarchive/util.py"
+            },
+            "ts":0
+        }],
+        "ts":0
+    },
+    "arq":{
+        "p":"ARQ.EXE",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/ARQ.EXE"
+        ],
+        "ts":0
+    },
+    "atr":{
+        "p":"atr.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "atr.exe":"atr.exe"
+            }
+        }]
+    },
+    "wimlib":{
+        "p":"wimlib/wimlib-imagex.exe",
+        "fs":[{
+            "u":"https://wimlib.net/downloads/wimlib-1.14.4-windows-x86_64-bin.zip",
+            "x":{
+                "wimlib-imagex.exe":"wimlib/wimlib-imagex.exe",
+                "libwim-15.dll":"wimlib/libwim-15.dll"
+            }
+        }],
         "ts":0
     },
     "pdfimages":{
@@ -844,6 +1247,984 @@
         }],
         "ts":1707346800
     },
+    "wpack":{
+        "p":"WPACK.EXE",
+        "fs":[
+        "https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE"
+        ],
+        "ts":0
+    },
+    "xx34":{
+        "p":"XX34.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/utilfile/xx3402.zip",
+            "x":{
+                "XX3402.EXE":"XX34.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "unzoo":{
+        "p":"unzoo.exe",
+        "fs":[
+        "https://update.bioruebe.com/uniextract/nightly/bin/unzoo/unzoo.exe"
+        ],
+        "ts":0
+    },
+    "yac":{
+        "p":"YAC.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/yac102.zip",
+            "x":{
+                "YAC.EXE":"YAC.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "yzdec":{
+        "p":"yzdec.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/win32/yz1/deepf106.zip",
+            "x":{
+                "yzdec.exe":"yzdec.exe"
+            }
+        }],
+        "ts":0
+    },
+    "777":{
+        "p":"777.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20040403052028if_/http://www.7-zip.org/dl/ufa/777004b1.zip",
+            "x":{
+                "777.exe":"777.exe"
+            }
+        }],
+        "ts":0
+    },
+    "bix":{
+        "p":"bix.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20040828100613if_/http://www.7-zip.org/dl/ufa/bix100b7.zip",
+            "x":{
+                "bix.exe":"bix.exe"
+            }
+        }],
+        "ts":0
+    },
+    "ufa":{
+        "p":"ufa.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20040818235228if_/http://www.7-zip.org/dl/ufa/ufa004b1.zip",
+            "x":{
+                "ufa.exe":"ufa.exe"
+            }
+        }],
+        "ts":0
+    },
+    "qbp":{
+        "p":"qbp.exe",
+        "fs":[[
+            "https://raw.githubusercontent.com/asimba/qbp/refs/heads/master/bin/windows-x86_64/qbp-rs.exe",
+            "qbp.exe"
+        ]],
+        "ts":0
+    },
+    "tangelo":{
+        "p":"tangelo.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=2355&d=1371488428",
+            "ex":".zip",
+            "x":{
+                "tangelo.exe":"tangelo.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zcm":{
+        "p":"zcm.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20250219173903if_/http://heartofcomp.altervista.org/zcm093.zip",
+            "x":{
+                "zcmx64.exe":"zcm.exe"
+            }
+        }],
+        "ts":0
+    },
+    "bcm":{
+        "p":"bcm.exe",
+        "fs":[{
+            "u":"https://compressme.net/bcm203.zip",
+            "x":{
+                "bcm.exe":"bcm.exe"
+            }
+        }],
+        "ts":0
+    },
+    "rz":{
+        "p":"rz.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=5854&d=1521756803",
+            "ex":".zip",
+            "x":{
+                "rz.exe":"rz.exe"
+            }
+        }],
+        "ts":0
+    },
+    "nz":{
+        "p":"nz.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20160304180916if_/http://nanozip.net/nanozip-0.09a.win64.zip",
+            "x":{
+                "nz.exe":"nz.exe"
+            }
+        }],
+        "ts":0
+    },
+    "bsc":{
+        "p":"bsc.exe",
+        "fs":[{
+            "u":"https://github.com/IlyaGrebnov/libbsc/releases/download/v3.3.12/bsc-3.3.12-x64.zip",
+            "x":{
+                "bsc.exe":"bsc.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lzham":{
+        "p":"lzham/lzham.exe",
+        "fs":[{
+            "u":"https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/lzham/lzham_alpha7_r1.7z",
+            "x":{
+                "bin/lzhamtest_x64.exe":"lzham/lzham.exe",
+                "bin/lzham_x64.dll":"lzham/lzham_x64.dll"
+            }
+        }],
+        "ts":0
+    },
+    "ybs":{
+        "p":"ybs.exe",
+        "fs":[{
+            "u":"https://compression.ru/compression.ru/ybs/ybs003fw.zip",
+            "x":{
+                "YBS.EXE":"ybs.exe"
+            }
+        }],
+        "ts":0
+    },
+    "csc":{
+        "p":"csc.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "csc.exe":"csc.exe"
+            }
+        }]
+    },
+    "csarc":{
+        "p":"csarc.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "csarc.exe":"csarc.exe"
+            }
+        }]
+    },
+    "nlzm":{
+        "p":"nlzm.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "nlzm.exe":"nlzm.exe"
+            }
+        }]
+    },
+    "uharcd":{
+        "p":"UHARCD.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/uharc06b.zip",
+            "x":{
+                "UHARCD.EXE":"UHARCD.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "rk":{
+        "p":"rk.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/win32/rk/rk104a1e.zip",
+            "x":{
+                "rk.exe":"rk.exe"
+            }
+        }],
+        "ts":0
+    },
+    "grzip":{
+        "p":"GRZip.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/grzip.zip",
+            "x":{
+                "GRZipWin.zip":{
+                    "GRZip.exe":"GRZip.exe"
+                }
+            }
+        }],
+        "ts":0
+    },
+    "grzipii":{
+        "p":"GRZipII.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/grzipiiw.zip",
+            "x":{
+                "GRZipII.exe":"GRZipII.exe"
+            }
+        }],
+        "ts":0
+    },
+    "boa":{
+        "p":"BOA/BOA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/boa058.zip",
+            "x":{
+                "BOA.EXE":"BOA/BOA.EXE",
+                "CWSDPMI.EXE":"BOA/CWSDPMI.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "flashzip":{
+        "p":"flashzip.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20250505230415if_/http://heartofcomp.altervista.org/flashzip.zip",
+            "x":{
+                "WFlashzip.exe":{
+                    "?ex":"inno",
+                    "flashzip.exe":"flashzip.exe"
+                }
+            }
+        }],
+        "ts":0
+    },
+    "dark":{
+        "p":"dark.exe",
+        "fs":[{
+            "u":"https://darchiver.narod.ru/dark/dark-0.51-win.zip",
+            "x":{
+                "dark.exe":"dark.exe"
+            }
+        }],
+        "ts":0
+    },
+    "brotli":{
+        "p":"brotli.exe",
+        "fs":[{
+            "u":"https://github.com/google/brotli/releases/download/v1.1.0/brotli-x64-windows-static.zip",
+            "x":{
+                "brotli.exe":"brotli.exe"
+            }
+        }],
+        "ts":0
+    },
+    "sbc":{
+        "p":"sbc.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20201010022623if_/https://86c32373-a-62cb3a1a-s-sites.googlegroups.com/site/sbcarchiver/sbc-0.970r3.win.amd64.zip?attachauth=ANoY7cqBXzoR2QXAJqnmfjR0L8J430qTD7_NyzuoW-rplsemNXQt_900VMd9u5ebzPp4j2yh0cywTd1VviVjoRnpahwAlm6EreGyZm5kn6BRuaYI-OHc1o9DEfV5YnFiVAhUjfwnn-Qp0FDKVlH2gf8ggU-xKExbaOlwMYQcCzLw-FPRXHggh7e02RS3QadkNsOPatl0nR457MSp6zwdCv5_aLoX7ct-d70UtiId54_KA2tLXAZpd6c%3D&attredirects=0",
+            "x":{
+                "sbc.exe":"sbc.exe"
+            }
+        }],
+        "ts":0
+    },
+    "szip":{
+        "p":"szip.exe",
+        "fs":[{
+            "u":"http://www.compressconsult.com/szip/szip_112a_win32.zip",
+            "x":{
+                "szip.exe":"szip.exe"
+            }
+        }],
+        "ts":0
+    },
+    "balz":{
+        "p":"balz.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/balz/BALZ/1.50/balz150_win32.zip?viasf=1",
+            "x":{
+                "balz.exe":"balz.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zzip":{
+        "p":"zzip.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20160530091207if_/http://archives.damiendebin.net/zzip/files/zzip-win32.zip",
+            "x":{
+                "zzip-win32/zzip.exe":"zzip.exe"
+            }
+        }],
+        "ts":0
+    },
+    "sqx":{
+        "p":"sqx_std64.sfx",
+        "fs":[{
+            "u":".",
+            "x":{
+                "sqx_std64.sfx":"sqx_std64.sfx"
+            }
+        }]
+    },
+    "sr3":{
+        "p":"sr3.exe",
+        "fs":[{
+            "u":"http://mattmahoney.net/dc/sr3a.zip",
+            "x":{
+                "sr3a.exe":"sr3.exe"
+            }
+        }],
+        "ts":0
+    },
+    "imp":{
+        "p":"imp.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/win32/imp/imp112.zip",
+            "x":{
+                "imp.exe":"imp.exe"
+            }
+        }],
+        "ts":0
+    },
+    "squid":{
+        "p":"squid.exe",
+        "fs":[{
+            "u":"https://compressme.net/squid003.zip",
+            "x":{
+                "squid.exe":"squid.exe"
+            }
+        }],
+        "ts":0
+    },
+    "crush":{
+        "p":"crush.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/crush/CRUSH/1.00/crush100.zip?viasf=1",
+            "x":{
+                "crush.exe":"crush.exe"
+            }
+        }],
+        "ts":0
+    },
+    "arhangel":{
+        "p":"ARHANGEL.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/arh140.zip",
+            "x":{
+                "ARHANGEL.EXE":"ARHANGEL.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "lzpx":{
+        "p":"lzpx.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/lzpx/LZPX/1.5b/lzpx-1.5b.zip?viasf=1",
+            "x":{
+                "lzpx-1.5b/lzpx.exe":"lzpx.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lzpxj":{
+        "p":"lzpxj.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/lzpx/LZPXJ/1.2h/lzpxj-1.2h.zip?viasf=1",
+            "x":{
+                "lzpxj-1.2h/lzpxj.exe":"lzpxj.exe"
+            }
+        }],
+        "ts":0
+    },
+    "jar":{
+        "p":"jar.exe",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/win32/j/jar102x.zip",
+            "x":{
+                "JAR32.EXE":"jar.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lizard":{
+        "p":"lizard.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "lizard.exe":"lizard.exe"
+            }
+        }]
+    },
+    "zhuff":{
+        "p":"Zhuff.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20161227114805if_/https://dl.dropboxusercontent.com/u/59565338/Zhuff/Zhuffv099beta.zip",
+            "x":{
+                "Zhuff_beta.exe":"Zhuff.exe"
+            }
+        }],
+        "ts":0
+    },
+    "blzpack":{
+        "p":"blzpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "blzpack.exe":"blzpack.exe"
+            }
+        }]
+    },
+    "thor":{
+        "p":"THOR.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20140115050229if_/http://www.maximumcompression.com/thor_096.zip",
+            "x":{
+                "THOR.exe":"THOR.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lzfse":{
+        "p":"lzfse.exe",
+        "fs":[
+        "https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe"
+        ],
+        "ts":0
+    },
+    "limit":{
+        "p":"LIMIT.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/nightowl/nopv13/014A/LIMIT12.ZIP",
+            "X":{
+                "LIMIT.EXE":"LIMIT.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "sqz":{
+        "p":"SQZ.EXE",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/sourcekris/uniextract/refs/heads/main/toolsdist/dos/sqz/sqz1084.zip",
+            "x":{
+                "SQZ.EXE":"SQZ.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "quark":{
+        "p":"QUARK.EXE",
+        "fs":[{
+            "u":"http://old-dos.ru/dl.php?id=488",
+            "ex":".zip",
+            "x":{
+                "quarkr.exe":"QUARK.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "ulz":{
+        "p":"ulz.exe",
+        "fs":[{
+            "u":"https://compressme.net/ulz102BETA.zip",
+            "x":{
+                "ulz.exe":"ulz.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lzop":{
+        "p":"lzop.exe",
+        "fs":[{
+            "u":"https://www.lzop.org/download/lzop103w.zip",
+            "x":{
+                "lzop103w/lzop.exe":"lzop.exe"
+            }
+        }],
+        "ts":0
+    },
+    "quad":{
+        "p":"quad.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/quad/QUAD/1.12/quad112.zip?viasf=1",
+            "x":{
+                "quad.exe":"quad.exe"
+            }
+        }],
+        "ts":0
+    },
+    "lzpm":{
+        "p":"lzpm.exe",
+        "fs":[{
+            "u":"https://compressme.net/lzpm018.zip",
+            "x":{
+                "lzpm.exe":"lzpm.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zarchive":{
+        "p":"zarchive.exe",
+        "fs":[
+        "https://github.com/Exzap/ZArchive/releases/download/v0.1.2/zarchive.exe"
+        ],
+        "ts":0
+    },
+    "bzip3":{
+        "p":"bzip3.exe",
+        "fs":[[
+            "https://github.com/iczelia/bzip3/releases/download/1.5.3/bzip3-x86_64.exe",
+            "bzip3.exe"
+        ]],
+        "ts":0
+    },
+    "turborc":{
+        "p":"turborc.exe",
+        "fs":[{
+            "u":"https://github.com/powturbo/Turbo-Range-Coder/releases/download/2023.06/TurboRC_amd64_win64.zip",
+            "x":{
+                "turborc.exe":"turborc.exe"
+            }
+        }],
+        "ts":0
+    },
+    "dirmaster":{
+        "p":"DirMaster.exe",
+        "fs":[{
+            "u":"https://style64.org/file/DirMaster_v3.1.5-STYLE.zip",
+            "x":{
+                "DirMaster_v3.1.5-STYLE/DirMasterSetup.exe":{
+                    "?ex":"inno",
+                    "DirMaster.exe":"DirMaster.exe"
+                }
+            }
+        }],
+        "ts":0
+    },
+    "unp64":{
+        "p":"unp64.exe",
+        "fs":[{
+            "u":"https://iancoog.altervista.org/C/unp64_241.7z",
+            "v":false,
+            "x":{
+                "unp64_241/unp64.exe":"unp64.exe"
+            }
+        }],
+        "ts":0
+    },
+    "chdecrypt":{
+        "p":"chdecrypt.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "chdecrypt.exe":"chdecrypt.exe"
+            }
+        }]
+    },
+    "chextract-fatx":{
+        "p":"chextract-fatx.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "chextract-fatx.exe":"chextract-fatx.exe"
+            }
+        }]
+    },
+    "mpqextractor":{
+        "p":"MPQExtractor.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "MPQExtractor.exe":"MPQExtractor.exe"
+            }
+        }]
+    },
+    "zli":{
+        "p":"zli.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "zli.exe":"zli.exe"
+            }
+        }],
+        "ts":0
+    },
+    "dabe":{
+        "p":"DABE.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/simtel/simtel9510/disk2/DISC2/DECODE/ABE.ZIP",
+            "x":{
+                "DABE.EXE":"DABE.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "car":{
+        "p":"CAR.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/carcom11.zip",
+            "x":{
+                "CAR.EXE":"CAR.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "flash":{
+        "p":"FLASH.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/flash100.zip",
+            "x":{
+                "FLASH.EXE":"FLASH.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "gamearch":{
+        "p":"camoto/gamearch.exe",
+        "fs":[{
+            "u":"http://files.shikadi.net/camoto/desktop/camoto-install-20150221.exe",
+            "ex":"nsis",
+            "x":{
+                "gamearch.exe":"camoto/gamearch.exe",
+                "libgamecommon.dll":"camoto/libgamecommon.dll",
+                "boost_program_options-vc120-mt-1_57.dll":"camoto/boost_program_options-vc120-mt-1_57.dll",
+                "libgamearchive.dll":"camoto/libgamearchive.dll",
+                "boost_filesystem-vc120-mt-1_57.dll":"camoto/boost_filesystem-vc120-mt-1_57.dll",
+                "boost_system-vc120-mt-1_57.dll":"camoto/boost_system-vc120-mt-1_57.dll"
+            }
+        }],
+        "ts":0
+    },
+    "hmmunpack":{
+        "p":"hmmunpack.py",
+        "fs":[
+        "https://raw.githubusercontent.com/ross-spencer/hmmunpack/refs/heads/main/hmmunpack.py"
+        ],
+        "ts":0
+    },
+    "acb":{
+        "p":"ACB.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/acb_200c.zip",
+            "x":{
+                "ACB.EXE":"ACB.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "ai":{
+        "p":"ai.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/ai11.zip",
+            "x":{
+                "ai.exe":"ai.exe"
+            }
+        }],
+        "ts":0
+    },
+    "alzipcon":{
+        "p":"ALZip/ALZipCon.exe",
+        "fs":[{
+            "u":"https://aldn.altools.co.kr/setup/ALZip1232.exe",
+            "ex":"inno",
+            "x":{
+                "{tmp}/ALZipCon.exe":"ALZip/ALZipCon.exe",
+                "Coders/AZO.dll":"ALZip/Coders/AZO.dll",
+                "Coders/BZ2.dll":"ALZip/Coders/BZ2.dll",
+                "Coders/Coder7z.dll":"ALZip/Coders/Coder7z.dll",
+                "Coders/Deflate.dll":"ALZip/Coders/Deflate.dll",
+                "Coders/Implode.dll":"ALZip/Coders/Implode.dll",
+                "Coders/LZH.dll":"ALZip/Coders/LZH.dll",
+                "Coders/LZMA.dll":"ALZip/Coders/LZMA.dll",
+                "Coders/PPMD.dll":"ALZip/Coders/PPMD.dll",
+                "Formats/Alz.dll":"ALZip/Formats/Alz.dll",
+                "Formats/Egg.dll":"ALZip/Formats/Egg.dll"
+            }
+        }],
+        "ts":0
+    },
+    "ar7":{
+        "p":"AR7.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/640swstudio/COMPRESS/AR712.ZIP",
+            "x":{
+                "AR7.EXE":"AR7.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "arg":{
+        "p":"ARG.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/arg.zip",
+            "x":{
+                "arg.exe":"ARG.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "ari":{
+        "p":"ARI.EXE",
+        "fs":[[
+            "http://cd.textfiles.com/simtel/simtel0101/simtel/arcers/ari22.exe",
+            "ARI.EXE"
+        ]],
+        "ts":0
+    },
+    "resource_dasm":{
+        "p":"resource_dasm/resource_dasm.exe",
+        "fs":[{
+            "u":"https://github.com/fuzziqersoftware/resource_dasm/releases/download/v2025-05-26/release-windows.zip",
+            "x":{
+                "release-windows/resource_dasm.exe":"resource_dasm/resource_dasm.exe"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r223.gf82613935-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libwinpthread-1.dll":"resource_dasm/libwinpthread-1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-15.2.0-8-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libgcc_s_seh-1.dll":"resource_dasm/libgcc_s_seh-1.dll",
+                "mingw64/bin/libstdc++-6.dll":"resource_dasm/libstdc++-6.dll"
+            }
+        }],
+        "ts":0
+    },
+    "asd":{
+        "p":"asd.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "asd.exe":"asd.exe"
+            }
+        }]
+    },
+    "b1-pack":{
+        "p":"b1-pack-tool.jar",
+        "fs":[[
+            "http://dev.b1.org/snapshots/org/b1/pack/b1-pack-tool/0.9.3-SNAPSHOT/b1-pack-tool-0.9.3-20130524.124731-1.jar",
+            "b1-pack-tool.jar"
+        ]]
+    },
+    "izarccl":{
+        "p":"IZARCE.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20241119051656if_/https://www.izarc.org/download/IZArcCL.exe",
+            "ex":"inno",
+            "x":{
+                "IZARCE.exe":"IZARCE.exe"
+            }
+        }]
+    },
+    "blink":{
+        "p":"blink.exe",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/blink.zip",
+            "x":{
+                "blinkw.exe":"blink.exe"
+            }
+        }]
+    },
+    "bsa":{
+        "p":"BSA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/bsa.zip",
+            "x":{
+                "BSA.EXE":"BSA.EXE"
+            }
+        }]
+    },
+    "btspk":{
+        "p":"BTSPK.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/btspk.arj",
+            "x":{
+                "BTSPK.EXE":"BTSPK.EXE"
+            }
+        }]
+    },
+    "uncfl":{
+        "p":"uncfl.exe",
+        "fs":[{
+            "u":"https://solhsa.com/zip/cfl3r3.zip",
+            "x":{
+                "bin/uncfl.exe":"uncfl.exe"
+            }
+        }]
+    },
+    "charc":{
+        "p":"CHARC.EXE",
+        "fs":[{
+            "u":".",
+            "x":{
+                "CHARC.EXE":"CHARC.EXE"
+            }
+        }]
+    },
+    "lza":{
+        "p":"LZA.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/lza101.zip",
+            "x":{
+                "LZA32.EXE":"LZA.EXE"
+            }
+        }]
+    },
+    "uncmz":{
+        "p":"uncmz.exe",
+        "fs":[{
+            "u":"https://github.com/sourcekris/uncmz/releases/download/v1.0.0/uncmz-windows-amd64.zip",
+            "x":{
+                "uncmz.exe":"uncmz.exe"
+            }
+        }]
+    },
+    "compressia":{
+        "p":"compcl.exe",
+        "fs":[
+        "https://web.archive.org/web/20021210174357if_/http://www.compressia.com:80/compcl.exe"
+        ]
+    },
+    "lha":{
+        "p":"lha.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "lha.exe":"lha.exe"
+            }
+        }]
+    },
+    "gdre_tools":{
+        "p":"GDRETools/gdre_tools.exe",
+        "fs":[{
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.0.0-beta.8/GDRE_tools-v2.0.0-beta.8-windows.zip",
+            "x":{
+                "gdre_tools.exe":"GDRETools/gdre_tools.exe",
+                "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
+                "gdre_tools.pck":"GDRETools/gdre_tools.pck"
+            }
+        }]
+    },
+    "uncrush":{
+        "p":"UNCRUSH.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/pdos9606/ARCHIVER/TOOLS/CRUSH18.ZIP",
+            "x":{
+                "UNCRUSH.EXE":"UNCRUSH.EXE"
+            }
+        }]
+    },
+    "dar":{
+        "p":"DAR/dar.exe",
+        "fs":[{
+            "u":"https://cyfuture.dl.sourceforge.net/project/dar/dar/2.8.1/dar64-2.8.1-win64.zip?viasf=1",
+            "x":{
+                "dar64-2.8.1-win64/bin/dar.exe":"DAR/dar.exe",
+                "dar64-2.8.1-win64/bin/cygbz2-1.dll":"DAR/cygbz2-1.dll",
+                "dar64-2.8.1-win64/bin/cygargon2-1.dll":"DAR/cygargon2-1.dll",
+                "dar64-2.8.1-win64/bin/cygcurl-4.dll":"DAR/cygcurl-4.dll",
+                "dar64-2.8.1-win64/bin/cygwin1.dll":"DAR/cygwin1.dll",
+                "dar64-2.8.1-win64/bin/cyggcrypt-20.dll":"DAR/cyggcrypt-20.dll",
+                "dar64-2.8.1-win64/bin/cygintl-8.dll":"DAR/cygintl-8.dll",
+                "dar64-2.8.1-win64/bin/cyglz4-1.dll":"DAR/cyglz4-1.dll",
+                "dar64-2.8.1-win64/bin/cyglzma-5.dll":"DAR/cyglzma-5.dll",
+                "dar64-2.8.1-win64/bin/cygrhash-0.dll":"DAR/cygrhash-0.dll",
+                "dar64-2.8.1-win64/bin/cygrsync-2.dll":"DAR/cygrsync-2.dll",
+                "dar64-2.8.1-win64/bin/cyglzo2-2.dll":"DAR/cyglzo2-2.dll",
+                "dar64-2.8.1-win64/bin/cygssh-4.dll":"DAR/cygssh-4.dll",
+                "dar64-2.8.1-win64/bin/cygstdc++-6.dll":"DAR/cygstdc++-6.dll",
+                "dar64-2.8.1-win64/bin/cyggcc_s-seh-1.dll":"DAR/cyggcc_s-seh-1.dll",
+                "dar64-2.8.1-win64/bin/cygzstd-1.dll":"DAR/cygzstd-1.dll",
+                "dar64-2.8.1-win64/bin/cygz.dll":"DAR/cygz.dll",
+                "dar64-2.8.1-win64/bin/cyggsasl-18.dll":"DAR/cyggsasl-18.dll",
+                "dar64-2.8.1-win64/bin/cyggssapi_krb5-2.dll":"DAR/cyggssapi_krb5-2.dll",
+                "dar64-2.8.1-win64/bin/cygbrotlidec-1.dll":"DAR/cygbrotlidec-1.dll",
+                "dar64-2.8.1-win64/bin/cygcrypto-3.dll":"DAR/cygcrypto-3.dll",
+                "dar64-2.8.1-win64/bin/cygldap-2.dll":"DAR/cygldap-2.dll",
+                "dar64-2.8.1-win64/bin/cygnghttp2-14.dll":"DAR/cygnghttp2-14.dll",
+                "dar64-2.8.1-win64/bin/cygidn2-0.dll":"DAR/cygidn2-0.dll",
+                "dar64-2.8.1-win64/bin/cyglber-2.dll":"DAR/cyglber-2.dll",
+                "dar64-2.8.1-win64/bin/cygssh2-1.dll":"DAR/cygssh2-1.dll",
+                "dar64-2.8.1-win64/bin/cyggpg-error-0.dll":"DAR/cyggpg-error-0.dll",
+                "dar64-2.8.1-win64/bin/cygssl-3.dll":"DAR/cygssl-3.dll",
+                "dar64-2.8.1-win64/bin/cygpsl-5.dll":"DAR/cygpsl-5.dll",
+                "dar64-2.8.1-win64/bin/cygiconv-2.dll":"DAR/cygiconv-2.dll",
+                "dar64-2.8.1-win64/bin/cygbrotlicommon-1.dll":"DAR/cygbrotlicommon-1.dll",
+                "dar64-2.8.1-win64/bin/cygidn-12.dll":"DAR/cygidn-12.dll",
+                "dar64-2.8.1-win64/bin/cygkrb5support-0.dll":"DAR/cygkrb5support-0.dll",
+                "dar64-2.8.1-win64/bin/cygkrb5-3.dll":"DAR/cygkrb5-3.dll",
+                "dar64-2.8.1-win64/bin/cygntlm-0.dll":"DAR/cygntlm-0.dll",
+                "dar64-2.8.1-win64/bin/cygk5crypto-3.dll":"DAR/cygk5crypto-3.dll",
+                "dar64-2.8.1-win64/bin/cygsasl2-3.dll":"DAR/cygsasl2-3.dll",
+                "dar64-2.8.1-win64/bin/cygunistring-5.dll":"DAR/cygunistring-5.dll",
+                "dar64-2.8.1-win64/bin/cygcom_err-2.dll":"DAR/cygcom_err-2.dll",
+                "dar64-2.8.1-win64/bin/cygcrypto-1.1.dll":"DAR/cygcrypto-1.1.dll"
+            }
+        }]
+    },
+    "dgcac":{
+        "p":"dgcac.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20190306080212if_/http://www.emit.jp/dgca/dgca_v110.zip",
+            "x":{
+                "DGCA/dgcac.exe":"dgcac.exe"
+            }
+        }]
+    },
+    "dietdisk":{
+        "p":"DIETDISC/DIETDISK.COM",
+        "fs":[{
+            "u":"http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP",
+            "ex":".zipx",
+            "x":{
+                "FATTEN.EXE":"DIETDISC/FATTEN.EXE",
+                "DIETDISK.COM":"DIETDISC/DIETDISK.COM"
+            }
+        }]
+    },
+    "dwc":{
+        "p":"DWC.EXE",
+        "fs":[{
+            "u":".",
+            "x":{
+                "DWC.EXE":"DWC.EXE"
+            }
+        }]
+    },
+    "dzip":{
+        "p":"dzip.exe",
+        "fs":[{
+            "u":"https://quake.speeddemosarchive.com/quake/downloads/dzip31.zip",
+            "x":{
+                "dzip.exe":"dzip.exe"
+            }
+        }],
+        "ts":0
+    },
+    "unesp":{
+        "p":"UNESP.EXE",
+        "fs":[{
+            "u":".",
+            "x":{
+                "UNESP.EXE":"UNESP.EXE"
+            }
+        }]
+    },
+    "amime":{
+        "p":"amime.py",
+        "fs":[
+        "https://raw.githubusercontent.com/idiom/activemime-format/refs/heads/master/amime.py"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
@@ -854,14 +2235,66 @@
         }],
         "ts":0
     },
-    "cls-srep":{
-        "p":"cls-srep/cls-srep.dll",
+    "wfrrx64":{
+        "p":"WFRRx64/WFRR.exe",
         "fs":[{
-            "u":"https://files.catbox.moe/e9ac5w.7z",
+            "u":"https://github.com/peitaosu/WFRR/releases/download/v1.0.0/WFRR_v1.0.0.0_x64_release.zip",
             "x":{
-                "cls-srep.dll":"cls-srep/cls-srep.dll",
-                "cls-srep_x64.exe":"cls-srep/cls-srep_x64.exe",
-                "cls-srep_x86.exe":"cls-srep/cls-srep_x86.exe"
+                "WFRR.exe":"WFRRx64/WFRR.exe",
+                "FSHook.dll":"WFRRx64/FSHook.dll",
+                "RegHook.dll":"WFRRx64/RegHook.dll",
+                "WFRR.exe.config":"WFRRx64/WFRR.exe.config",
+                "EasyHook.dll":"WFRRx64/EasyHook.dll",
+                "EasyHook64.dll":"WFRRx64/EasyHook64.dll",
+                "EasyHook64Svc.exe":"WFRRx64/EasyHook64Svc.exe",
+                "EasyLoad64.dll":"WFRRx64/EasyLoad64.dll",
+                "Newtonsoft.Json.dll":"WFRRx64/Newtonsoft.Json.dll",
+                "log4net.dll":"WFRRx64/log4net.dll"
+            }
+        }],
+        "ts":0
+    },
+    "wfrrx86":{
+        "p":"WFRRx86/WFRR.exe",
+        "fs":[{
+            "u":"https://github.com/peitaosu/WFRR/releases/download/v1.0.0/WFRR_v1.0.0.0_x86_release.zip",
+            "x":{
+                "WFRR.exe":"WFRRx86/WFRR.exe",
+                "FSHook.dll":"WFRRx86/FSHook.dll",
+                "RegHook.dll":"WFRRx86/RegHook.dll",
+                "WFRR.exe.config":"WFRRx86/WFRR.exe.config",
+                "EasyHook.dll":"WFRRx86/EasyHook.dll",
+                "EasyHook32.dll":"WFRRx86/EasyHook32.dll",
+                "EasyHook32Svc.exe":"WFRRx86/EasyHook32Svc.exe",
+                "EasyLoad32.dll":"WFRRx86/EasyLoad32.dll",
+                "Newtonsoft.Json.dll":"WFRRx86/Newtonsoft.Json.dll",
+                "log4net.dll":"WFRRx86/log4net.dll"
+            }
+        }],
+        "ts":0
+    },
+    "resourceextractor":{
+        "p":"ResourceExtractor.exe",
+        "fs":[
+        "https://github.com/rgl/ResourceExtractor/releases/download/v1.0.1/ResourceExtractor.exe"
+        ],
+        "ts":0
+    },
+    "steamless":{
+        "p":"Steamless/Steamless.CLI.exe",
+        "fs":[{
+            "u":"https://github.com/atom0s/Steamless/releases/download/v3.1.0.5/Steamless.v3.1.0.5.-.by.atom0s.zip",
+            "x":{
+                "Steamless.CLI.exe":"Steamless/Steamless.CLI.exe",
+                "Plugins/SharpDisasm.dll":"Steamless/Plugins/SharpDisasm.dll",
+                "Plugins/Steamless.API.dll":"Steamless/Plugins/Steamless.API.dll",
+                "Plugins/Steamless.Unpacker.Variant10.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant10.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant20.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant20.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant21.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant21.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant30.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x64.dll",
+                "Plugins/Steamless.Unpacker.Variant30.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant30.x86.dll",
+                "Plugins/Steamless.Unpacker.Variant31.x64.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x64.dll",
+                "Plugins/Steamless.Unpacker.Variant31.x86.dll":"Steamless/Plugins/Steamless.Unpacker.Variant31.x86.dll"
             }
         }],
         "ts":0
@@ -976,7 +2409,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.7.3/lessmsi-v2.7.3.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.3/lessmsi-v2.10.3.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -984,9 +2417,10 @@
                 "libmspackn.dll":"lessmsi/libmspackn.dll",
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
-            }
+            },
+            "ts":1760119873
         }],
-        "ts":0
+        "ts":1760119873
     },
     "msix":{
         "p":"MsiX.exe",
@@ -996,6 +2430,43 @@
                 "Release/MsiX.exe":"MsiX.exe"
             }
         }],
+        "ts":0
+    },
+    "com2txt":{
+        "p":"COM2TXT.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/utilprog/com2t111.rar",
+            "x":{
+                "COM2TXT.EXE":"COM2TXT.EXE"
+            }
+        }],
+        "ts":0
+    },
+    "bytepressdecompressor":{
+        "p":"BytePressDecompressor/BytePressDecompressor.exe",
+        "fs":[[
+            "https://web.archive.org/web/20201001175539if_/https://github.com/ribthegreat99OrN0P/BytePressDecompressor/releases/download/1/BytePressDecompressor.exe",
+            "BytePressDecompressor/BytePressDecompressor.exe"
+        ],{
+            "u":"https://github.com/roachadam/bytepress/releases/download/v1.0.0.2/bytepress.v1.0.0.2.zip",
+            "x":{
+                "bytepress.lib.dll":"BytePressDecompressor/bytepress.lib.dll"
+            }
+        }],
+        "ts":0
+    },
+    "cup386":{
+        "p":"CUP386.COM",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/8f3d56b9830b496f248ce98216935b5ff47c87bd/dos/CUP386/CUP386.COM"
+        ],
+        "ts":0
+    },
+    "unp":{
+        "p":"UNP.EXE",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/8f3d56b9830b496f248ce98216935b5ff47c87bd/dos/UNP.EXE"
+        ],
         "ts":0
     },
     "sonic4":{
@@ -1057,14 +2528,6 @@
         ]],
         "ts":0
     },
-    "ddr_dat":{
-        "p":"BMS/ddr_dat.bms",
-        "fs":[[
-            "https://raw.githubusercontent.com/bnnm/vgm-tools/96e0f8de47b85cfce33582ae0182800adba5297a/bms/archives/kces_ddr_dat.bms",
-            "BMS/ddr_dat.bms"
-        ]],
-        "ts":0
-    },
     "blur":{
         "p":"BMS/blur.bms",
         "fs":[[
@@ -1073,13 +2536,29 @@
         ]],
         "ts":0
     },
+    "arcsys":{
+        "p":"BMS/arcsys.bms",
+        "fs":[[
+            "https://aluigi.org/bms/arcsys.bms",
+            "BMS/arcsys.bms"
+        ]],
+        "ts":0
+    },
+    "minecraft_pck":{
+        "p":"BMS/minecraft_pck.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/minecraft_x360_pck.bms",
+            "BMS/minecraft_pck.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
             "u":"https://files.prodkeys.net/ProdKeys.net-v20.3.0.zip",
             "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
+                "ProdKeys.net-v20.3.0/prod.keys":"prodkeys/prod.keys",
+                "ProdKeys.net-v20.3.0/title.keys":"prodkeys/title.keys"
             },
             "ts":1754702838
         }],
@@ -1090,12 +2569,15 @@
         "fs":[{
             "u":"https://files.prodkeys.net/ProdKeys.net-v20.3.0.zip",
             "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
+                "ProdKeys.net-v20.3.0/prod.keys":"prodkeys/prod.keys",
+                "ProdKeys.net-v20.3.0/title.keys":"prodkeys/title.keys"
             },
             "ts":1754702838
         }],
         "ts":1754702838
+    },
+    "devkeys":{
+        "p":"prodkeys/dev.keys"
     },
     "rrv3va":{
         "p":"RRVArcTool/rrv3vera.ic002",

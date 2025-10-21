@@ -9,12 +9,10 @@ __pycache__
 /out
 *.exe
 
-!/bin/hac2l.exe
-!/bin/ndssndext.exe
+!/bin/bin.7z
 !/bin/ps3key.py
 !/bin/wiiudk.py
 !/bin/BMS/xbp.bms
 !/bin/AssetRipper/client.py
-!/bin/psvpfsparser/
-!/bin/psvpfsparser/psvpfsparser.exe
 !/bin/tmd.py
+!/bin/chkey.py
