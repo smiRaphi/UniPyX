@@ -814,5 +814,8 @@
     ],
     "ActiveMime":[
         "activemime object"
+    ],
+    "N64DD":[
+        "nintendo 64 disk drive disk image"
     ]
 }

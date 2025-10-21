@@ -2225,6 +2225,16 @@
         "https://raw.githubusercontent.com/idiom/activemime-format/refs/heads/master/amime.py"
         ]
     },
+    "mfs_manager":{
+        "p":"MFSManager/mfs_manager.exe",
+        "fs":[{
+            "u":"https://github.com/LuigiBlood/mfs_manager/releases/download/1.3.0.0/mfs_manager_1.3.0.0.zip",
+            "x":{
+                "mfs_manager.exe":"MFSManager/mfs_manager.exe",
+                "mfs_library.dll":"MFSManager/mfs_library.dll"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

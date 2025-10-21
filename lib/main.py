@@ -1089,6 +1089,9 @@ def extract(inp:str,out:str,t:str) -> bool:
                 run(['chextract-fatx',tf,od])
                 if exists(od) and not os.listdir(od): rmdir(od)
             return
+        case 'N64DD':
+            run(['mfs_manager',i,'-e'],cwd=o)
+            if os.listdir(o): return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
