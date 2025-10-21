@@ -13,7 +13,8 @@
         "apkmirror bundle"
     ],
     "LHARC":[
-        "lharc/lzark compressed archive (generic)"
+        "lharc/lzark compressed archive (generic)",
+        "amiga whdload package (lha compressed)"
     ],
     "RAR":[
         "winrar self extracting archive (4.x-5.x)",
