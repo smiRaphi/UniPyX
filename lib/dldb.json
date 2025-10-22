@@ -2244,6 +2244,16 @@
             }
         }]
     },
+    "mcp":{
+        "p":"mcp.exe",
+        "fs":[{
+            "u":"https://github.com/apoloval/mcp/releases/download/v0.4.1/mcp-0.4.1_x64.exe",
+            "ex":"inno",
+            "x":{
+                "mcp.exe":"mcp.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

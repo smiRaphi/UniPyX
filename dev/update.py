@@ -30,6 +30,7 @@ GFMTS = {
     'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
     'GDRETools/gdsdecomp':lambda tag:f'GDRE_tools-{tag}-windows.zip',
     '0CBH0/nsnsotool':lambda tag:f'nsnsotool_{tag}.zip',
+    'apoloval/mcp':lambda tag:f'mcp-{tag[1:]}_x64.exe',
 }
 
 def ft(i:str,f:str,loc='en_US'):

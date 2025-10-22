@@ -829,5 +829,8 @@
         "compress by spencer thomas",
         "compress compressed data",
         "unix compressed data"
+    ],
+    "MSX Cassette IMG":[
+        "msx cassette tape image"
     ]
 }
