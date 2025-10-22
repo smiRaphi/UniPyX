@@ -1097,6 +1097,26 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ZX Spectrum Tape IMG':
             run(['tapsplit',i,o])
             if os.listdir(o): return
+        case 'CPC Plus IMG':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i)
+            f._end = {b'RIFF':'<',b'FFIR':'>'}[f.read(4)]
+            f.skip(4)
+            assert f.read(4) == b'AMS!'
+            cns = {}
+            while True:
+                cn = f.read(4)
+                if not cn: break
+                assert cn[:2] == b'cb' and cn[2:].isdigit()
+                cns[int(cn[2:])] = f.read(f.readu32())
+            assert (len(cns)-1) == max(list(cns))
+
+            of = open(o + '/' + tbasename(i) + '.bin','wb')
+            for ix in range(1,len(cns)): of.write(cns[ix])
+            of.close()
+            if cns: return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
