@@ -328,10 +328,12 @@ def analyze(inp:str,raw=False):
                     ret = sum(f.read(x[1])) != 0
                     f.close()
                 elif type(x[0]) == bool and x[0] == False: tret = ret = False
+            if xv.get('qq') and (type(x[-1]) != bool or x[-1]) and ret:
+                tret = True
+                break
             if type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = (tret or type(tret) != bool) and ret
-            if xv.get('qq') and (type(x[-1]) != bool or x[-1]) and ret: break
-            if not (xv.get('noq') and (type(x[-1]) != bool or x[-1])) and not tret: break
+            if not ((xv.get('noq') or xv.get('qq')) and (type(x[-1]) != bool or x[-1])) and not tret: break
         if tret:
             if xv.get('s'):
                 nts = [xv['rs']]
@@ -436,6 +438,17 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['pdftohtml','-embedbackground','-meta','-overwrite','-q',i,o + '\\html'])
             if os.listdir(o + '/html'): return
             remove(o + '/html')
+        case 'Nero CD IMG':
+            run(['7z','x','-tnrg',i,'-o' + o,'-aou'])
+            for ix,f in enumerate(os.listdir(o)):
+                tf = o + f'/{ix:02d}' + extname(f).lower()
+                to = o + f'\\{ix:02d}'
+                os.rename(o + '/' + f,tf)
+                if extname(tf) == '.iso':
+                    mkdir(to)
+                    if extract(tf,to,'ISO'): remove(to)
+                    else: remove(tf)
+            if os.listdir(o): return
         case 'ISO'|'IMG'|'Floppy Image'|'CDI'|'UDF'|'Aaru':
             osj = OSJump()
             osj.jump(dirname(i))
@@ -2432,7 +2445,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
 
             if fs: return
-        case 'The Sims FAR':
+        case 'The Sims FAR'|'Quake PAK'|'WAD':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
