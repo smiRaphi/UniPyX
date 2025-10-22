@@ -253,8 +253,10 @@
     ],
     "TAR":[
         "tar - tape archive (gnu)",
+        "tar - tape archive (posix)",
         "tar - tape archive (file)",
-        "tar - tape archive (directory)"
+        "tar - tape archive (directory)",
+        "tar"
     ],
     "RPG Maker Archive (XP/VX/VX Ace)":[
         "rpg maker vx encrypted archive (v2)",
@@ -817,5 +819,14 @@
     ],
     "N64DD":[
         "nintendo 64 disk drive disk image"
+    ],
+    "IRIX IDB":[
+        "irix software distribution format installation db (f)"
+    ],
+    "Z":[
+        "compress",
+        "compress by spencer thomas",
+        "compress compressed data",
+        "unix compressed data"
     ]
 }

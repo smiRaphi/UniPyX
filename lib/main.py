@@ -51,7 +51,7 @@ def copydir(i:str,o:str,delete=False):
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
 def xopen(f:str,m='r',encoding='utf-8'):
-    f = os.path.realpath(str(f))
+    f = os.path.abspath(str(f))
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding)
@@ -110,7 +110,7 @@ def cleanp(i:str):
     while i.endswith('\\.'): i = i[:-1].rstrip('\\')
     while i.startswith('.\\'): i = i[1:].lstrip('\\')
     i = i.replace('\\.\\','\\')
-    return os.path.realpath(i)
+    return os.path.abspath(i)
 def checktdb(i:list[str]) -> list[str]:
     o = []
     for x in i:
@@ -411,7 +411,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
     match t:
         case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
-             'DiskDupe IMG'|'XAR':
+             'DiskDupe IMG'|'XAR'|'Z':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -1660,6 +1660,150 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['gdre_tools','--headless','--extract=' + i,'--output=' + o,'--ignore-checksum-errors'])
             if exists(o): remove(o + '/gdre_export.log')
             if os.listdir(o): return
+        case 'IRIX IDB':
+            if db.print_try: print('Trying with custom extractor')
+
+            cps = {}
+            pr7z = db.print_try
+            lerr = False
+            errp = ''
+            for x in open(i,encoding='utf-8').read().strip().split('\n'):
+                x = x.strip() + ' '
+                t,x = x.split(' ',1)
+                assert t in 'fdl',t
+                t = t
+                mode,x = x.split(' ',1)
+                mode = int(mode,8)
+                user,x = x.split(' ',1)
+                group,x = x.split(' ',1)
+                path,x = x.split(' ',1)
+                if errp:
+                    if errp != path: continue
+                    else: errp = ''
+                path2,x = x.split(' ',1)
+
+                od,x = x.split(' ',1)
+                d = od
+                for _ in range(2):
+                    if exists(dirname(i) + '/' + d): d = dirname(i) + '/' + d;break
+                    elif exists(d): d = abspath(d);break
+                    else: d = noext(d)
+                else:
+                    x = od + ' ' + x
+                    if exists(noext(i) + '.dev'): d = noext(i) + '.dev'
+                    elif exists(noext(i) + '.sw'): d = noext(i) + '.sw'
+                    elif exists(noext(i) + '.sw64'): d = noext(i) + '.sw64'
+                    else: raise FileNotFoundError(od)
+                if not d in cps:
+                    cps[d] = open(d,'rb')
+                    cps[d].seek(13)
+                d = cps[d]
+
+                ne = {}
+                while x.strip():
+                    xv,x = x.split(' ',1)
+                    if '(' in xv:
+                        xn,xv = xv.split('(',1)
+                        xv,x = (xv + ' ' + x).split(') ',1)
+                    else: xn,xv = xv,True
+                    if xn in ('sum','size','cmpsize','f'): xv = int(xv)
+                    ne[xn] = xv
+                if t == 'f':
+                    fpos = ffpos = d.tell()
+                    p1 = d.read(int.from_bytes(d.read(2),'big')).decode(errors='ignore')
+                    lerr = lerr or p1.strip() != path.strip()
+                    if lerr:
+                        while p1.strip() != path.strip():
+                            fpos += 1
+                            d.seek(fpos)
+                            p1 = d.read(int.from_bytes(d.read(2),'big')).decode(errors='ignore')
+                            if not p1: break
+                        else:
+                            print('Recovered to',p1)
+                            lerr = False
+                        if lerr:
+                            fpos = ffpos - 1
+                            while p1.strip() != lpath.strip():
+                                fpos += 1
+                                d.seek(fpos)
+                                p1 = d.read(int.from_bytes(d.read(2),'big')).decode(errors='ignore')
+                                if not p1: break
+                            else:
+                                print('Recovered to',p1)
+                                lerr = False
+                        if lerr:
+                            fpos = ffpos - 1
+                            lng = 0
+                            while True:
+                                fpos += 1
+                                d.seek(fpos)
+                                lng = int.from_bytes(d.read(2),'big')
+                                if lng <= 8 or lng > 0xFF: continue
+                                try: p1 = d.read(lng).decode()
+                                except: continue
+                                if not p1: raise EOFError
+                                if '\r' in p1.strip() or '\n' in p1.strip() or ' ' in p1 or '\t' in p1 or '\\' in p1 or '"' in p1 or "'" in p1 or '?' in p1 or '*' in p1: continue
+                                if '/' in p1 and p1.startswith(path.split('/')[0] + '/'): break
+                            lerr = False
+                            d.seek(-(len(p1) + 2),1)
+
+                            errp = p1.strip()
+                            print('Recovered to',errp)
+
+                            continue
+
+                    fpos = d.tell()
+                    p2 = d.read(int.from_bytes(d.read(2),'big'))
+                    try: p2 = p2.decode()
+                    except: d.seek(fpos)
+                    else:
+                        if p2.strip() != path2.strip(): d.seek(fpos)
+                    rs = ne['cmpsize'] if ne.get('cmpsize',0) > 0 else ne['size']
+                    dat = d.read(rs)
+                    assert len(dat) == rs,d.name
+
+                    if ne.get('cmpsize',0) > 0:
+                        assert dat[:2] == b'\x1F\x9D'
+                        tf = TmpFile('.z')
+                        open(tf.p,'wb').write(dat)
+                        _,dat,err = run(['7z','e','-so','-tZ',tf],text=False,print_try=pr7z)
+                        if pr7z: pr7z = False
+                        tf.destroy()
+
+                        if len(dat) != ne['size']:
+                            print(err.decode().strip(),path,f'[{d.name}@{d.tell():2X}]')
+                            lerr = pr7z = True
+
+                    xopen(o + '/' + path,'wb').write(dat)
+                    try: xopen(o + '/' + path2,'wb').write(dat)
+                    except FileExistsError as e:
+                        op = e.filename
+                        while os.path.lexists(op): op = e.filename + f'${c}';c += 1
+                        xopen((o + '/' + path2).replace('/','\\').replace(e.filename,op,1),'wb').write(dat)
+                    lpath = path
+                elif t == 'd':
+                    mkdir(o + '/' + path)
+                    mkdir(o + '/' + path2)
+                elif t == 'l':
+                    mkdir(dirname(o + '/' + path))
+                    mkdir(dirname(o + '/' + path2))
+                    sym = ne['symval']
+                    if sym.startswith('../'): sym = (path.split('/')[0] if '/' in path else '') + sym[2:]
+                    sym = o + '/' + sym
+
+                    op = o + '/' + path
+                    c = 0
+                    while os.path.lexists(op): op = o + '/' + path + f'${c}';c += 1
+                    symlink(sym,op)
+
+                    op = o + '/' + path2
+                    if exists(op):
+                        if os.path.realpath(op) == os.path.realpath(sym): continue
+                        c = 0
+                        while os.path.lexists(op): op = o + '/' + path2 + f'${c}';c += 1
+                    symlink(sym,op)
+            for f in cps: cps[f].close()
+            if cps: return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
