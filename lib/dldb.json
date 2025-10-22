@@ -2254,6 +2254,15 @@
             }
         }]
     },
+    "tapsplit":{
+        "p":"tapsplit.exe",
+        "fs":[{
+            "u":"http://www.seasip.info/ZX/taptools-w32-113.zip",
+            "x":{
+                "tapsplit.exe":"tapsplit.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

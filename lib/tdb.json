@@ -129,7 +129,8 @@
     ],
     "IMG":[
         "generic pc disk image (ntfs)",
-        "generic pc disk image"
+        "generic pc disk image",
+        "msx-dos disk image"
     ],
     "Floppy Image":[
         "anex86 pc98 floppy image (generic)"
@@ -832,5 +833,8 @@
     ],
     "MSX Cassette IMG":[
         "msx cassette tape image"
+    ],
+    "ZX Spectrum Tape IMG":[
+        "zx spectrum tape image"
     ]
 }

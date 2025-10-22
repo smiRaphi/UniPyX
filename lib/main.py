@@ -1094,6 +1094,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'MSX Cassette IMG':
             run(['mcp','-x',i],cwd=o)
             if os.listdir(o): return
+        case 'ZX Spectrum Tape IMG':
+            run(['tapsplit',i,o])
+            if os.listdir(o): return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
