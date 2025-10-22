@@ -56,7 +56,8 @@
     ],
     "ZLIB":[
         "zlib compressed data (default comp.)",
-        "zlib compressed data (best comp.)"
+        "zlib compressed data (best comp.)",
+        "zlib data"
     ],
     "MSCAB SFX":[
         "ms generic-sfx cabinet file unpacker (32/64bit mscfu)",

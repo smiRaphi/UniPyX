@@ -29,6 +29,7 @@ GFMTS = {
     'unsound/hfsexplorer':lambda tag:f'{tag}-bin.zip',
     'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
     'GDRETools/gdsdecomp':lambda tag:f'GDRE_tools-{tag}-windows.zip',
+    '0CBH0/nsnsotool':lambda tag:f'nsnsotool_{tag}.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):

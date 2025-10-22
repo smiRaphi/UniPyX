@@ -1804,6 +1804,10 @@ def extract(inp:str,out:str,t:str) -> bool:
                     symlink(sym,op)
             for f in cps: cps[f].close()
             if cps: return
+        case 'Compressed Nintendo Switch Executable':
+            of = o + '/' + tbasename(i) + '.nso'
+            run(['nsnsotool',i,of])
+            if exists(of) and os.path.getsize(of): return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
