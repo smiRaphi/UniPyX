@@ -848,6 +848,7 @@ def extract(inp:str,out:str,t:str) -> bool:
                 except:pass
                 else:return
         case 'GameCube GCAM ISO':
+            if db.print_try: print('Trying with custom extractor')
             tf = TmpFile('.iso')
             with open(i,'rb') as fi:
                 fi.seek(0x20)
@@ -857,6 +858,29 @@ def extract(inp:str,out:str,t:str) -> bool:
                         d = fi.read(0x4000)
                         if not d: break
                         f.write(d)
+            if extract(tf.p,o,'GameCube ISO'): mv(tf.p,o + '/' + tbasename(i) + '.iso')
+            tf.destroy()
+            return
+        case 'GameCube TGC ISO':
+            if db.print_try: print('Trying with custom extractor')
+            tf = TmpFile('.iso')
+            with open(i,'rb') as fi:
+                fi.seek(8)
+                off = int.from_bytes(fi.read(4),'big')
+                fi.seek(0x10)
+                fst = int.from_bytes(fi.read(4),'big') - off
+                fi.seek(0x1C)
+                dol = int.from_bytes(fi.read(4),'big') - off
+                fi.seek(off)
+                with open(tf.p,'wb') as f:
+                    d = b''
+                    while True:
+                        d = fi.read(0x4000)
+                        if not d: break
+                        f.write(d)
+                    f.seek(0x420)
+                    f.write(int.to_bytes(dol,4,'big'))
+                    f.write(int.to_bytes(fst,4,'big'))
             if extract(tf.p,o,'GameCube ISO'): mv(tf.p,o + '/' + tbasename(i) + '.iso')
             tf.destroy()
             return

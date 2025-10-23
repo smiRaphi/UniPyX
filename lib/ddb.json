@@ -40,6 +40,10 @@
         "rs":"GameCube GCAM ISO","s":1
     },
     {
+        "d":[["isat","\\xAE\\x0F\\x38\\xA2",0]],
+        "rs":"GameCube TGC ISO","s":1
+    },
+    {
         "rq":null,
         "d":[["isat","GDPC",0],["n0",1,4],["isat","\\0\\0\\0",5]],
         "rs":"Godot Pack","s":1
