@@ -1896,6 +1896,19 @@ def extract(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i) + '.nso'
             run(['nsnsotool',i,of])
             if exists(of) and os.path.getsize(of): return
+        case 'GameCube DOLXZ'|'Wii DOLXZ':
+            if db.print_try: print('Trying with custom extractor')
+            import lzma
+
+            f = open(i,'rb')
+            f.seek(0x20)
+            off = int.from_bytes(f.read(4),'big')
+            f.seek(0x124)
+            siz = int.from_bytes(f.read(4),'big')
+            f.seek(off)
+            open(o + '/' + basename(i),'wb').write(lzma.decompress(f.read(siz)))
+            f.close()
+            return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
