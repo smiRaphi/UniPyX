@@ -432,6 +432,10 @@
         "rs":"RK"
     },
     {
+        "d":[["isat","VIPR",0],["isatS","\\0",10,6],["str0",16,16,4]],
+        "rs":"Viper Flash IMG","s":1
+    },
+    {
         "rqr":null,
         "d":[["str0",4,244,4,false],["isat","\\0\\0\\0\\0",248,false],
              ["isat","(C) ",0],["isat","ELF0",0],["isat","DOL0",0],["isat","BIN0",0]],"qq":true,

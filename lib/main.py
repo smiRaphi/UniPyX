@@ -2563,6 +2563,19 @@ def extract(inp:str,out:str,t:str) -> bool:
             open(o + '/' + n,'wb').write(f.read())
             f.close()
             return
+        case 'Viper Flash IMG':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.seek(0x10)
+            n = f.read(0x10).rstrip(b'\0').decode()
+            if '\n' in n: n = n.split('\n')[0]
+            if not n: n = tbasename(i)
+            n += '.vipr'
+
+            f.seek(0x20)
+            open(o + '/' + n,'wb').write(f.read())
+            f.close()
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
