@@ -2525,6 +2525,20 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'FATX':
             run(['chextract-fatx',tf,od])
             if os.listdir(o): return
+        case 'QOOB Flash IMG':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            tp = f.read(4)
+
+            n = f.read(0xF4).rstrip(b'\0').decode()
+            if '\n' in n: n = n.split('\n')[0]
+            if not n: n = tbasename(i)
+            n += {b'(C) ':'.qoob',b'ELF0':'.elf',b'DOL0':'.dol',b'BIN0':'.bin'}[tp]
+
+            f.seek(0x100)
+            open(o + '/' + n,'wb').write(f.read())
+            f.close()
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
