@@ -129,7 +129,8 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
-    if 'plain text' in ts: ts.remove('plain text')
+    for wt in ('plain text','Plain text'):
+        if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
         idt = open(inp,'rb').read(0x4000)
@@ -319,7 +320,7 @@ def analyze(inp:str,raw=False):
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=': ret = False;break
+                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': ret = False;break
                     else: ret = True
                     f.close()
                 elif x[0] == 'n0':
@@ -846,6 +847,19 @@ def extract(inp:str,out:str,t:str) -> bool:
                     remove(o + '/' + fs[0])
                 except:pass
                 else:return
+        case 'GameCube GCAM ISO':
+            tf = TmpFile('.iso')
+            with open(i,'rb') as fi:
+                fi.seek(0x20)
+                with open(tf.p,'wb') as f:
+                    d = b''
+                    while True:
+                        d = fi.read(0x4000)
+                        if not d: break
+                        f.write(d)
+            if extract(tf.p,o,'GameCube ISO'): mv(tf.p,o + '/' + tbasename(i) + '.iso')
+            tf.destroy()
+            return
         case 'NCSD':
             e,_,_ = run(['3dstool','-xt01267f','cci',o + '\\DP0.bin',o + '\\DP1.bin',o + '\\DP2.bin',o + '\\DP6.bin',o + '\\DP7.bin',i,'--header',o + '\\HNCSD.bin'])
             if e: return 1
@@ -998,8 +1012,8 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
             if os.listdir(o):
-                from bin.chkey import CHKeys
-                if exists(o + '/IP.BIN') and CHKeys().get(o): return extract(o + '\\IP.BIN',o,'Chihiro Extracted GD-ROM')
+                from bin.sgkey import SGKeys
+                if exists(o + '/IP.BIN') and SGKeys().get(o): return extract(o + '\\IP.BIN',o,'Encrypted GD-ROM')
                 return
         case 'Wii TMD':
             ckey = dirname(db.get('tmd_wii')) + '/'
@@ -1067,14 +1081,14 @@ def extract(inp:str,out:str,t:str) -> bool:
             run(['unp64',tf])
             remove(tf)
             if os.listdir(o): return
-        case 'Chihiro Extracted GD-ROM':
-            from bin.chkey import CHKeys
+        case 'Encrypted GD-ROM':
+            from bin.sgkey import SGKeys
 
             id = dirname(i)
-            key = CHKeys().get(i)
+            t,key = SGKeys().get(i)
             if not key: return 1
 
-            fats = []
+            drvs = []
             for f in os.listdir(id):
                 if len(f) != 7: continue
                 ld = id + '\\' + f
@@ -1083,22 +1097,33 @@ def extract(inp:str,out:str,t:str) -> bool:
                 lf = open(ld,'rb')
                 if sum(lf.read(8)) == 0 and sum(lf.read(8)) != 0 and sum(lf.read(3)) == 0 and lf.read(1)[0] == 0xFF and sum(lf.read(0x8C)) == 0:
                     lf.seek(0xC0)
-                    fatx = lf.read(0x20).strip(b'\0')
-                    if fatx:
-                        try:fatx = id + '\\' + fatx.decode()
+                    drv = lf.read(0x20).strip(b'\0')
+                    if drv:
+                        try:drv = id + '\\' + drv.decode()
                         except:pass
                         else:
-                            if exists(fatx): fats.append(fatx)
+                            if exists(drv): drvs.append(drv)
                 lf.close()
 
-            if not fats: return 1
+            if not drvs: return 1
 
-            for f in fats:
+            for f in drvs:
                 tf = f + '.dec'
                 run(['chdecrypt',f,tf,key.hex().upper()])
-                assert exists(tf) and open(tf,'rb').read(4) == b'FATX',basename(tf)
+                assert exists(tf)
                 od = f + '_ext'
-                run(['chextract-fatx',tf,od])
+                if t == 'C':
+                    assert open(tf,'rb').read(4) == b'FATX',basename(tf)
+                    mkdir(od)
+                    extract(tf,od,'FATX')
+                elif t == 'T':
+                    tff = open(tf,'rb')
+                    tff.seek(28)
+                    chk = tff.read(4) == b'\xC2\x33\x9F\x3D'
+                    tff.close()
+                    assert chk,basename(tf)
+                    mkdir(od)
+                    extract(tf,od,'GameCube ISO')
                 if exists(od) and not os.listdir(od): rmdir(od)
             return
         case 'N64DD':
@@ -2497,6 +2522,9 @@ def extract(inp:str,out:str,t:str) -> bool:
             open(o + '/' + hashlib.sha256(amd.data).hexdigest(),'wb').write(amd.data)
             del amd
             return
+        case 'FATX':
+            run(['chextract-fatx',tf,od])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

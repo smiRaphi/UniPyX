@@ -15,4 +15,4 @@ __pycache__
 !/bin/BMS/xbp.bms
 !/bin/AssetRipper/client.py
 !/bin/tmd.py
-!/bin/chkey.py
+!/bin/sgkey.py

@@ -125,7 +125,8 @@
         "virtualbox disk image (generic)"
     ],
     "ISO":[
-        "iso 9660 cd image"
+        "iso 9660 cd image",
+        "iso 9660"
     ],
     "IMG":[
         "generic pc disk image (ntfs)",

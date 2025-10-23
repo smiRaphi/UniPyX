@@ -32,9 +32,12 @@
         "rs":"XISO","s":1
     },
     {
-        "rqr":null,
         "d":["isat","\\xC2\\x33\\x9F\\x3D",28],
         "rs":"GameCube ISO","s":1
+    },
+    {
+        "d":[["isat","GCAM",0],["isat","\\xC2\\x33\\x9F\\x3D",60]],
+        "rs":"GameCube GCAM ISO","s":1
     },
     {
         "rq":null,
@@ -86,6 +89,14 @@
         "rqr":"DOS Executable Generic",
         "d":["isat","SChF",1850],
         "rs":"ChArc","s":1
+    },
+    {
+        "rqr":null,
+        "d":[["size",32768],["isat","SEGA SEGAKATANA SEGA ENTERPRISES",0],["str",32,224],
+             ["str"      ,14084,28],["str"      ,14116,28],["str"      ,14148,28],["isatS"," ",28,14180],
+             ["isatS"," ",28,14212],["isatS"," ",28,14244],["isatS"," ",28,14276],["isatS"," ",28,14308],
+             ["py","from bin.sgkey import SGKeys;return bool(SGKeys().get(inp))"]],
+        "rs":"Encrypted GD-ROM","s":1
     },
     {
         "rqr":null,
