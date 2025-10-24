@@ -2263,6 +2263,16 @@
             }
         }]
     },
+    "dolpak":{
+        "p":"dolpak.exe",
+        "fs":[{
+            "u":"http://www.gc-forever.com/forums/download/file.php?id=262&sid=44b784ded0ffc5354ac6d273fda570a9",
+            "ex":".7z",
+            "x":{
+                "win32/dolpak.exe":"dolpak.exe"
+            }
+        }]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{

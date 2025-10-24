@@ -458,6 +458,14 @@
         "rs":"Wii DOLXZ","s":1
     },
     {
+        "d":[["isat","\\0\\0\\1\\0",0],["isatS","\\0",24,4],["isat","\\0\\x02\\x03\\x40\\0\\x02\\x39\\x80",28],["isatS","\\0",36,36],
+             ["isat","\\x80\\0\\x31\\0",72],["isatS","\\0",24,76],["isat","\\x80\\x02\\x33\\x40\\x80\\x16\\0\\0",100],["isatS","\\0",36,108],
+             ["isat","\\0\\x02\\x02\\x40",144],["isatS","\\0",24,148],["isat","\\0\\0\\x36\\x40",172],["isatS","\\0",36,180],
+             ["isat","\\x80\\x02\\x69\\x80\\0\\0\\x85\\x80\\x80\\0\\x31\\0",216],["isatS","\\0",28,228],
+             ["isat","DOLPAK ",134096],["isat","\\0\\0DOLPAK ",134106]],
+        "rs":"DOLPAK","s":1
+    },
+    {
         "rq":"UPX",
         "d":[["size",[103434,null],false],
              ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true],[false]],

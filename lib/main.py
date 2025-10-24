@@ -1909,6 +1909,16 @@ def extract(inp:str,out:str,t:str) -> bool:
             open(o + '/' + basename(i),'wb').write(lzma.decompress(f.read(siz)))
             f.close()
             return
+        case 'DOLPAK':
+            ti = o + '/' + tbasename(i) + '.dol'
+            tf = o + '/' + tbasename(i) + '.7z'
+            symlink(i,ti)
+            run(['dolpak',ti])
+            remove(ti)
+            assert exists(tf)
+            extract(tf,o,'7z')
+            remove(tf)
+            if os.listdir(o): return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
