@@ -466,6 +466,11 @@
         "rs":"DOLPAK","s":1
     },
     {
+        "d":[["isat","\\0\\0\\1\\0\\0\\0\\x08\\xE0",0],["isatS","\\0",64,8],["isatS","\\0",64,80],["isat","\\0\\0\\x07\\xE0"],
+             ["isatS","\\0",72,152],["isatS","\\0",28,228]],
+        "rs":"d0lLZ","s":1
+    },
+    {
         "rq":"UPX",
         "d":[["size",[103434,null],false],
              ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true],[false]],
@@ -652,6 +657,10 @@
     {
         "d":["ext",".xbp"],
         "rs":"XBP"
+    },
+    {
+        "d":["ext",".snappy","ext",".iwa"],"qq":true,
+        "rs":"Snappy"
     },
     {
         "d":["ext",".tde"],

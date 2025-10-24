@@ -846,5 +846,14 @@
     ],
     "WAD":[
         "wad3 game data"
+    ],
+    "Snappy":[
+        "snzip compressed (framing2 format)",
+        "snzip compressed (framing format)",
+        "snzip compressed (snzip format)",
+        "snzip compressed (snappy-java format)",
+        "snzip compressed (snappy-in-java format)",
+        "snzip compressed (comment-43 format)",
+        "snappy compressed data"
     ]
 }

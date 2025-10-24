@@ -1919,6 +1919,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             extract(tf,o,'7z')
             remove(tf)
             if os.listdir(o): return
+        case 'd0lLZ': raise NotImplementedError
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
@@ -2837,6 +2838,11 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'ESP':
             dosbox(['unesp','xys',i])
             if os.listdir(o): return
+        case 'Snappy':
+            _,od,_ = run(['snzip','-d','-k','-c',i],text=False)
+            if not od: return 1
+            open(o + '/' + tbasename(i),'wb').write(od)
+            return
 
     return 1
 def fix_isinstext(o:str,oi:str=None):
