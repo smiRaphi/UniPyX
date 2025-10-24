@@ -855,5 +855,9 @@
         "snzip compressed (snappy-in-java format)",
         "snzip compressed (comment-43 format)",
         "snappy compressed data"
+    ],
+    "Xamarin Compressed":[
+        "xamarin compressed dll",
+        "xamarin lz4 compressed dll"
     ]
 }

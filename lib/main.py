@@ -1920,6 +1920,11 @@ def extract(inp:str,out:str,t:str) -> bool:
             remove(tf)
             if os.listdir(o): return
         case 'd0lLZ': raise NotImplementedError
+        case 'Xamarin Compressed':
+            if db.print_try: print('Trying with custom extractor')
+            import lz4.block # type: ignore
+            open(o + '/' + basename(i),'wb').write(lz4.block.decompress(open(i,'rb').read()[8:]))
+            return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
