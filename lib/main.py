@@ -129,7 +129,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
-    for wt in ('plain text','Plain text'):
+    for wt in ('plain text','Plain text','XBase DataBase (generic)'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
@@ -2605,6 +2605,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             open(o + '/' + n,'wb').write(f.read())
             f.close()
             return
+        case 'Blitz Games Archive': return quickbms('blitz_games')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

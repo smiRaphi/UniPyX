@@ -229,6 +229,10 @@
     "Unity Bundle":[
         "unity unityfs asset bundle"
     ],
+    "Unity Assets":[
+        "unity assets",
+        "unity/unity asset"
+    ],
     "LEGO JAM":[
         "lego racers game data archive"
     ],
@@ -859,5 +863,8 @@
     "Xamarin Compressed":[
         "xamarin compressed dll",
         "xamarin lz4 compressed dll"
+    ],
+    "Xbox Zip":[
+        "xbox zip file"
     ]
 }

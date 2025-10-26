@@ -23,12 +23,7 @@
         "rs":"Wii ISO","s":1
     },
     {
-        "t":"null",
-        "d":["isat","MICROSOFT*XBOX*MEDIA",65536],
-        "rs":"XISO","s":1
-    },{
-        "rq":"UDF",
-        "d":["isat","MICROSOFT*XBOX*MEDIA",405864448],
+        "d":[["isat","MICROSOFT*XBOX*MEDIA",65536],["isat","MICROSOFT*XBOX*MEDIA",265945088],["isat","MICROSOFT*XBOX*MEDIA",405864448]],"qq":true,
         "rs":"XISO","s":1
     },
     {
@@ -573,6 +568,11 @@
         "rqr":null,
         "d":["ext",".lz77"],
         "rs":"LZ77"
+    },
+    {
+        "rqr":null,
+        "d":[["isat","\\0\\0",9,false],["isat","\\0\\0",25,false],["n0",4,0,false],["n0",4,4,false],["n0",4,12,false],["ext",".xen"],["ext",".ps2"]],"qq":true,
+        "rs":"Blitz Games Archive"
     },
     {
         "rqr":null,

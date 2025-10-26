@@ -738,9 +738,6 @@
             "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.5/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
-                "Texture2DDecoderNative.dll":"AssetRipper/Texture2DDecoderNative.dll",
-                "crunchunity.dll":"AssetRipper/crunchunity.dll",
-                "crunch.dll":"AssetRipper/crunch.dll",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
             "ts":1760326925
@@ -2608,6 +2605,13 @@
             "BMS/minecraft_pck.bms"
         ]],
         "ts":0
+    },
+    "blitz_games":{
+        "p":"BMS/blitz_games.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/blitz_games.bms",
+            "BMS/blitz_games.bms"
+        ]]
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
