@@ -2606,6 +2606,38 @@ def extract(inp:str,out:str,t:str) -> bool:
             f.close()
             return
         case 'Blitz Games Archive': return quickbms('blitz_games')
+        case 'Digimon Story Lost Evolution PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            fc = f.readu32()
+            assert f.read(4) == b'2.01'
+            f.skip(8)
+
+            fs = []
+            for _ in range(fc):
+                off = f.readu32()
+                f.skip(4)
+                siz = f.readu32()
+                if not f.readu32():
+                    siz -= 5
+                    off += 5
+                fs.append((off,siz))
+
+            mx = len(str(len(fs)))
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+
+                tag = f.read(4)
+                f.skip(-4)
+                if tag[::-1] in (b'NCGR',b'NCLR',b'NSCR',b'NANR',b'NCBR',b'NCER',b'NFTR',b'MAPI'):
+                    ext = tag.decode()[::-1].lower()
+                elif tag == b'NARC': ext = 'narc'
+                else: ext = 'bin'
+
+                open(o + f'/{ix:0{mx}d}.{ext}','wb').write(f.read(fe[1]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

@@ -372,6 +372,11 @@
         "rs":"ZArchive","s":1
     },
     {
+        "rqr":null,
+        "d":[["isat","2.01",4],["n0",4,0],["isatS","\\0",8,8],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(0x10);return int.from_bytes(f.read(4),'little') == (c * 0x10 + 0x10)"]],
+        "rs":"Digimon Story Lost Evolution PAK","s":1
+    },
+    {
         "d":[["size",16777216],
              ["isatS","\\xFF",7168,16655360],
              ["isat","\\0\\0\\0",16662537],["isat","\\0\\0\\0",16662553],["isat","\\0\\0\\0",16662569],["isat","\\0\\0\\0",16662585],["isat","\\0\\0\\0",16662601],["isat","\\0\\0\\0",16662617],["isat","\\0\\0\\0",16662633],["isat","\\0\\0\\0",16662649],["isat","\\0\\0\\0",16662665],["isat","\\0\\0\\0",16662681]],
@@ -434,7 +439,7 @@
         "rqr":null,
         "d":[["str0",4,244,4,false],["isat","\\0\\0\\0\\0",248,false],
              ["isat","(C) ",0],["isat","ELF0",0],["isat","DOL0",0],["isat","BIN0",0]],"qq":true,
-        "rs":"QOOB Flash IMG","s":1
+        "rs":"QOOB Flash IMG"
     },
     {
         "d":[["isat","\\0\\0\\1\\0",0],["isatS","\\0",24,4],["isat","\\0\\0\\x3A\\x40\\0\\0\\x40\\xC0",28],["isatS","\\0",36,36],

@@ -1,5 +1,6 @@
 import os
 if __name__ == '__main__':
+    print('UniPyX')
     from sys import argv
 
     if argv[1:] == ['-clean']:
