@@ -349,6 +349,18 @@
         "rs":"BTSPK","s":1
     },
     {
+        "d":[["isat","\\x96",178],["isat","SFCD",3640],["hash","17daa0fec02fc33c0f6abb549a8b80b6613b48ee",4,160]],
+        "rs":"GBA ADS Video ROM","s":1
+    },
+    {
+        "d":["isat","SFCD",0],
+        "rs":"GBA ADS SFCD","s":1
+    },
+    {
+        "d":[["isat","\\0\\0\\0",5],["n0",1,4],["py","f=open(inp,'rb');return int.from_bytes(f.read(4),'little') == f.seek(0,2)"]],
+        "rs":"GBA ADS MMSTR"
+    },
+    {
         "d":[["s%",2048],
              ["isat","\\1ZZZZZ\\1",0],["isatS","\\0",32,8],["str0",40,8,1]],
         "rs":"3DO IMG","s":1

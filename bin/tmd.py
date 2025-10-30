@@ -57,6 +57,7 @@ class File:
     def writes64(self,data:int): return self.write(struct.pack(self._end+'q',data))
 
     def align(self,blocksize:int): return self.write(b'\0' * align(self.tell(),blocksize))
+    def alignpos(self,blocksize:int): self.skip(align(self.tell(),blocksize))
 
     def add_file(self,f):
         if type(f) == str: f = open(f,'rb')
@@ -64,6 +65,9 @@ class File:
             p = f.read(0x4000)
             if not p: break
             self.write(p)
+
+    @property
+    def pos(self): return self.tell()
 
     def update_size(self): self._size = self.tell()
     def __len__(self): return self._size

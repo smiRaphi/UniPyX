@@ -2260,6 +2260,12 @@
             }
         }]
     },
+    "load_from_mmstr":{
+        "p":"load_from_mmstr.py",
+        "fs":[
+        "https://raw.githubusercontent.com/Matt-Hurd/GBAVideoDecomp/refs/heads/master/InternalELF/research_scripts/load_from_mmstr.py"
+        ]
+    },
     "snzip":{
         "p":"snzip.exe",
         "fs":[{

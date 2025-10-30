@@ -1179,6 +1179,34 @@ def extract(inp:str,out:str,t:str) -> bool:
             for ix in range(1,len(cns)): of.write(cns[ix])
             of.close()
             if cns: return
+        case 'GBA ADS Video ROM'|'GBA ADS SFCD':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            f = File(i,endian='<')
+            if t == 'GBA ADS Video ROM': f.seek(0xE38)
+            aoff = f.pos
+            assert f.read(4) == b'SFCD'
+
+            boff = f.readu16() + 8
+            f.skip(2)
+            fsc = f.readu32()
+            for _ in range(fsc):
+                siz = f.readu32()
+                off = aoff + boff + f.readu32()
+                name = ''
+                while True:
+                    b = f.read(1)
+                    if not b: raise EOFError
+                    if b == b'\0': break
+                    name += b.decode()
+                cp = f.pos + -(f.pos-aoff) % 4
+                f.seek(off)
+                of = open(o + '/' + name,'wb')
+                of.write(f.read(siz))
+                of.close()
+                f.seek(cp)
+            if fsc: return
 
         case 'U8'|'RARC':
             run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
@@ -2548,7 +2576,6 @@ def extract(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'ActiveMime':
             afp = db.get('amime')
-
             af = open(afp).read()
             if 'def main():' in af: open(afp,'w').write(af.split('def main():')[0])
 
@@ -2638,6 +2665,35 @@ def extract(inp:str,out:str,t:str) -> bool:
 
                 open(o + f'/{ix:0{mx}d}.{ext}','wb').write(f.read(fe[1]))
             if fs: return
+        case 'GBA ADS MMSTR':
+            mfp = db.get('load_from_mmstr')
+            mf = open(mfp).read()
+            if 'extract_mmstr_archive("commonresources.mmstr", True)' in mf: open(mfp,'w').write(mf.split('extract_mmstr_archive("commonresources.mmstr", True)')[0])
+
+            if db.print_try: print('Trying with load_from_mmstr')
+            import bin.load_from_mmstr as lfmmstr # type: ignore
+            lfmmstr.print = lambda *args,**kwargs:None
+            _splitext = lfmmstr.os.path.splitext
+            lfmmstr.os.path.splitext = lambda *args,**kwargs: (o,) if args == (basename(i),) else _splitext(*args,**kwargs)
+            REPM = {
+                '*':'_',
+                '?':'_',
+                '\\':'_',
+                '/':'_',
+                '<':'_',
+                '>':'_',
+                ':':'_',
+                '\n':' ',
+                '\x99':'™',
+                '\xA9':'©',
+                '\xAE':'®',
+                '"':"''",
+            }
+            _join = lfmmstr.os.path.join
+            lfmmstr.os.path.join = lambda i1,i2: _join(i1,i2.translate(str.maketrans(REPM)))
+
+            lfmmstr.extract_mmstr_archive(i,True)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
