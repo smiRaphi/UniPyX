@@ -2543,6 +2543,13 @@
             "jsbeautifier_myobfuscate.py"
         ]]
     },
+    "jsbeautifier_jsobfuscator":{
+        "p":"jsbeautifier_jsobfuscator.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/javascriptobfuscator.py",
+            "jsbeautifier_jsobfuscator.py"
+        ]]
+    },
     "sonic4":{
         "p":"BMS/sonic4.bms",
         "fs":[[

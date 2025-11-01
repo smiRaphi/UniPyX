@@ -430,6 +430,9 @@ def extract(inp:str,out:str,t:str) -> bool:
         if db.print_try: print('Trying with',scr)
         jsm = getattr(__import__(f'bin.{scr}'),scr)
         if t == 'myobfuscate': jsm.CAVEAT = ''
+        elif t == 'jsobfuscator':
+            jsm._smartsplit = jsm.smartsplit
+            jsm.smartsplit = lambda x: [ast.literal_eval('"' + x.replace('"','\\"') + '"') for x in jsm._smartsplit(x)]
 
         d = open(i,encoding='utf-8').read()
         jsm.detect(d)
@@ -2023,6 +2026,7 @@ def extract(inp:str,out:str,t:str) -> bool:
             return
         case 'JS P.A.C.K.E.R.': return jsbeautifier('packer')
         case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
+        case 'JavaScriptObfuscator': return jsbeautifier('jsobfuscator')
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
