@@ -419,6 +419,66 @@ def extract(inp:str,out:str,t:str) -> bool:
 
         if os.listdir(o): return
         return 1
+    def jsbeautifier(scr,inf=i,oup=o):
+        t = scr
+        scr = 'jsbeautifier_' + scr
+
+        jfp = db.get(scr)
+        jf = open(jfp).read()
+        if 'from jsbeautifier.unpackers import UnpackingError' in jf: open(jfp,'w').write(jf.replace('from jsbeautifier.unpackers import UnpackingError','class UnpackingError(Exception): pass'))
+
+        if db.print_try: print('Trying with',scr)
+        jsm = getattr(__import__(f'bin.{scr}'),scr)
+        if t == 'myobfuscate': jsm.CAVEAT = ''
+
+        d = open(i,encoding='utf-8').read()
+        jsm.detect(d)
+        try: d = jsm.unpack(d)
+        except Exception as e:
+            if e.__class__.__name__ == 'UnpackingError': return 1
+            else: raise
+
+        if t == 'packer':
+            sds = sorted([0,len(d)] + list(set(sum([[x.start(),x.end()] for x in re.finditer(r'((?<!\\)\'.*?\'|(?<!\\)\".*?\"|(?<!\w)/.*?/)',d)],[]))))
+            sd = []
+            for ix in range(len(sds)-1): sd.append(d[sds[ix]:sds[ix+1]])
+
+            for ix in range(len(sd)):
+                if ix % 2: continue
+                for rg,rp in (
+                    (r';',r';\n'),
+                    (r',',r', '),
+                    (r'([\{\}])',r'\n\1\n'),
+                    (r'\n+(;)?\n+',r'\1\n'),
+                    (r'\n{\n\}\n',r' {}\n'),
+                    (r'(?<=\w)=\n\{\n',r' = {\n' + '\0'),
+                    (r'(?<=, )\n\{\n',r'{\n' + '\0'),
+                    (r'}\n\)\n',r'})\n'),
+                    (r'(?:^|(?<=[\w\)\]]))([\?\:<>=&^\|\*\+\-~%]|&&|\|\||[=!]==|(?:[\+\-&\|\^~\*/%<>!=]|<<|>>)=)(?:$|(?=[\w\(\[!]))',r' \1 '),
+                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n(\))',r'for \1 \2\3 '),
+                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n([^;]*?\))',r'for \1 \2 \3 '),
+                    (r'if(\([^;]*?\))',r'if \1 '),
+                    (r'return(!|$)',r'return \1'),
+                ): sd[ix] = re.sub(rg,rp,sd[ix])
+            d = ''.join(sd).split('\n')
+
+            tabs = 0
+            old = -1
+            add = ''
+            for ix in range(len(d)):
+                if d[ix] and d[ix][0] == '\x00':
+                    d[ix] = d[ix][1:]
+                    tabs += 1
+                if '{' in d[ix]: tabs += 1
+                if '}' in d[ix]: tabs -= 1
+                if old != tabs:
+                    add = "\t"*tabs
+                    old = tabs
+                d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
+            d = '\n'.join(d)
+
+        open(o + '/' + tbasename(i) + '.js','w',encoding='utf-8').write(d)
+        if d: return
 
     match t:
         case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
@@ -1961,59 +2021,8 @@ def extract(inp:str,out:str,t:str) -> bool:
             import lz4.block # type: ignore
             open(o + '/' + basename(i),'wb').write(lz4.block.decompress(open(i,'rb').read()[8:]))
             return
-        case 'JS P.A.C.K.E.R.':
-            jfp = db.get('jsbeautifier_packer')
-            jf = open(jfp).read()
-            if 'from jsbeautifier.unpackers import UnpackingError' in jf: open(jfp,'w').write(jf.replace('from jsbeautifier.unpackers import UnpackingError','class UnpackingError(Exception): pass'))
-
-            if db.print_try: print('Trying with jsbeautifier_packer')
-            from bin.jsbeautifier_packer import unpack as js_unpack,detect as js_detect # type: ignore
-
-            d = open(i,encoding='utf-8').read()
-            js_detect(d)
-            try: d = js_unpack(d)
-            except Exception as e:
-                if e.__class__.__name__ != 'UnpackingError': raise
-
-            sds = sorted([0,len(d)] + list(set(sum([[x.start(),x.end()] for x in re.finditer(r'((?<!\\)\'.*?\'|(?<!\\)\".*?\"|(?<!\w)/.*?/)',d)],[]))))
-            sd = []
-            for ix in range(len(sds)-1): sd.append(d[sds[ix]:sds[ix+1]])
-
-            for ix in range(len(sd)):
-                if ix % 2: continue
-                for rg,rp in (
-                    (r';',r';\n'),
-                    (r',',r', '),
-                    (r'([\{\}])',r'\n\1\n'),
-                    (r'\n+(;)?\n+',r'\1\n'),
-                    (r'\n{\n\}\n',r' {}\n'),
-                    (r'(?<=\w)=\n\{\n',r' = {\n' + '\0'),
-                    (r'(?<=, )\n\{\n',r'{\n' + '\0'),
-                    (r'}\n\)\n',r'})\n'),
-                    (r'(?:^|(?<=[\w\)\]]))([\?\:<>=&^\|\*\+\-~%]|&&|\|\||[=!]==|(?:[\+\-&\|\^~\*/%<>!=]|<<|>>)=)(?:$|(?=[\w\(\[!]))',r' \1 '),
-                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n(\))',r'for \1 \2\3 '),
-                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n([^;]*?\))',r'for \1 \2 \3 '),
-                    (r'if(\([^;]*?\))',r'if \1 '),
-                    (r'return(!|$)',r'return \1'),
-                ): sd[ix] = re.sub(rg,rp,sd[ix])
-            d = ''.join(sd).split('\n')
-
-            tabs = 0
-            old = -1
-            add = ''
-            for ix in range(len(d)):
-                if d[ix] and d[ix][0] == '\x00':
-                    d[ix] = d[ix][1:]
-                    tabs += 1
-                if '{' in d[ix]: tabs += 1
-                if '}' in d[ix]: tabs -= 1
-                if old != tabs:
-                    add = "\t"*tabs
-                    old = tabs
-                d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
-
-            open(o + '/' + tbasename(i) + '.js','w',encoding='utf-8').write('\n'.join(d))
-            if d: return
+        case 'JS P.A.C.K.E.R.': return jsbeautifier('packer')
+        case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
