@@ -2027,6 +2027,170 @@ def extract(inp:str,out:str,t:str) -> bool:
         case 'JS P.A.C.K.E.R.': return jsbeautifier('packer')
         case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
         case 'JavaScriptObfuscator': return jsbeautifier('jsobfuscator')
+        case 'Javascript Obfuscator.com':
+            if db.print_try: print('Trying with custom extractor')
+            d = open(i,encoding='utf-8').read()
+
+            def jsstr(i:str) -> str: return ast.literal_eval(i.replace(r'\/','/'))
+
+            dec1n,*vals1 = re.search(r'function ([a-zA-Z]{3})\([a-z]\)\{var [a-z]=(\d+);var [a-z]=[a-z]\.length;var [a-z]=\[\];for\(var [a-z]=0;[a-z]<[a-z];[a-z]\+\+\)\{[a-z]\[[a-z]\]=[a-z]\.charAt\([a-z]\)\};for\(var [a-z]=0;[a-z]<[a-z];[a-z]\+\+\)\{var [a-z]=[a-z]\*\([a-z]\+(\d+)\)\+\([a-z]%(\d+)\);var [a-z]=[a-z]\*\([a-z]\+(\d+)\)\+\([a-z]%(\d+)\);var [a-z]=[a-z]%[a-z];var [a-z]=[a-z]%[a-z];var [a-z]=[a-z]\[[a-z]\];[a-z]\[[a-z]\]=[a-z]\[[a-z]\];[a-z]\[[a-z]\]=[a-z];[a-z]=\([a-z]\+[a-z]\)%(\d+);\}',d).groups()
+            vals1 = [int(x) for x in vals1]
+            def decjs1(i:str):
+                t = vals1[0]
+                o = list(i)
+                for ix in range(len(i)):
+                    a = t * (ix + vals1[1]) + (t % vals1[2])
+                    b = t * (ix + vals1[3]) + (t % vals1[4])
+                    c = a % len(i)
+                    d = b % len(i)
+                    o[c],o[d] = o[d],o[c]
+                    t = (a + b) % vals1[5]
+                return ''.join(o)
+
+            dec1 = decjs1(jsstr(re.search(r';var [a-zA-Z]{3}=(\'.+?\');',d)[1]))
+
+            vals2 = list(re.search(r'var [a-z]=(\d+),[a-z]=(\d+),[a-z]=(\d+);var [a-z]="abcdefghijklmnopqrstuvwxyz";var [a-z]=\[([\d,]+)\];[^;]+;for\([^;]+;[^;]+;[^;]+;var [a-z]=\[\];[a-z]\+=(\d+);[a-z]\+=(\d+);[a-z]\+=(\d+);for\(var [a-z]=0;[a-z]<arguments\.length;[a-z]\+\+\).+?\.join\(""\);var [a-z]=\[([\d,]+)\]',dec1).groups())
+            vals2[3] = [int(x) for x in vals2[3].split(',')]
+            for ix in range(3): vals2[ix] = int(vals2[ix]) + int(vals2.pop(4))
+            vals2[4] = [int(x) for x in vals2[4].split(',')] + vals2[3]
+            def decjs2(i:str):
+                a = {}
+                for ix,x in enumerate(vals2[3]): a[x] = ix + 1
+
+                l = i.split(' ')
+                for ix in range(len(l)-1,-1,-1):
+                    z = b = 0
+                    r = None
+                    while b < len(l[ix]):
+                        c = ord(l[ix][b])
+                        if c in a:
+                            u = (a[c] - 1) * vals2[1] + ord(l[ix][b+1]) - vals2[0]
+                            v = b
+                            b += 1
+                        elif c == vals2[2]:
+                            u = vals2[1] * (len(vals2[3]) - vals2[0] + ord(l[ix][b+1])) + ord(l[ix][b+2]) - vals2[0]
+                            v = b
+                            b += 2
+                        else:
+                            b += 1
+                            continue
+
+                        if r is None: r = []
+                        if v > z: r.append(l[ix][z:v])
+                        r.append(l[u+1])
+                        z = b + 1
+
+                        b += 1
+                    if r is not None:
+                        if z < len(l[ix]): r.append(l[ix][z:])
+                        l[ix] = "".join(r)
+                o1 = [l[0]]
+
+                o = "".join(o1)
+                for ix in range(len(vals2[4])): o = chr(vals2[4][ix]).join(o.split('.' + "abcdefghijklmnopqrstuvwxyz"[ix]))
+                return '.'.join(o.split('.!'))
+
+            dec2 = jsstr(re.search(r'\([a-zA-Z]{3}\((\'.+\')\)\);',d)[1])
+            dec2 = decjs1(dec2)
+            dec2 = decjs2(dec2)
+
+            dec3n,*vals3 = re.search(r'function (_\$af\d{6})\([a-z],jso\$setrpl\$[a-z]\)\{var (?:[a-z]=\{\},){6}[a-z]=\{\};[a-z]\._= ?jso\$setrpl\$[a-z];.+?;[a-z]\+\+\)\{[a-z]\._= ?jso\$ft\$boe\$_\d+\([a-z]\._\* \(jso\$ft\$boe\$_\d+\([a-z],(\d+)\)\),\(jso\$ft\$boe\$_\d+\([a-z]\._,(\d+)\)\)\);;?[a-z]\._= ?jso\$ft\$boe\$_\d+\(n\._\* \(jso\$ft\$boe\$_\d+\([a-z],(\d+)\)\),\(jso\$ft\$boe\$_\d+\([a-z]\._,(\d+)\)\)\);;?.+\([a-z],[a-z],[a-z]\)\{[a-z]\._= ?jso\$ft\$boe\$_\d+\(\(jso\$ft\$boe\$_\d+\([a-z]\._,[a-z]\._\)\),(\d+)\)\}',dec2).groups()
+            vals3 = [int(x) for x in vals3]
+            def decjs3(i1:str,i2:int):
+                t = i2
+                o = list(i1)
+                for ix in range(len(i1)):
+                    a = t * (ix + vals3[0]) + (t % vals3[1])
+                    b = t * (ix + vals3[2]) + (t % vals3[3])
+                    c = a % len(i1)
+                    d = b % len(i1)
+                    o[c],o[d] = o[d],o[c]
+                    t = (a + b) % vals3[4]
+                return '#'.join('%'.join('\x7F'.join(''.join(o).split('%')).split('#1')).split('#0')).split('\x7F')
+
+            dec3 = re.findall(r'var (_\$_[a-f\d]{4})=\(' + re.escape(dec3n) + r'\)\((".+"),(\d+)\);',dec2)
+            dec3_1 = {x[0]:decjs3(jsstr(x[1]),int(x[2])) for x in dec3}
+            dec3f = dec2.split('function ' + dec3n)[0].split('var ')[0]
+            dec = re.split(r'var [a-z]=\'#\';return [a-z]\._(?:\.join\([a-z]\)\.split\([a-z]\)){4}\}',dec2,maxsplit=1)[1]
+            dec = re.sub(r'function jso\$spliter_\$af\d{6}\([a-z],[a-z],[a-z]\)\{.+?\}','',dec)
+            dec = re.sub(r'if\(!_\$(?:_[a-f\d]{4}|af\d{6})\)\{_\$af\d{6}\([^\)]*\);.*?return\};','',dec)
+
+            dec3_2 = {x[0]:x[1] for x in re.findall(r'function (jso\$ft\$giden\$[^\(]+)\(\)\{return ([^\}]+)\}',dec3f)}
+            dec3_3 = {x[0]:x[1] for x in re.findall(r'function (jso\$ft\$[^\(]+)\(a,b\)\{return a(.) b\}',dec3f)}
+
+            for bs,rp in dec3_1.items():
+                for ix in range(len(rp)): dec = dec.replace(f'{bs}[{ix}]',repr(rp[ix]).replace('/',r'\/'))
+            for bs,rp in dec3_2.items(): dec = dec.replace(bs,rp)
+            for bs,rp in dec3_3.items(): dec = re.sub(rf'{bs}\((.+?),(.+?)\)',fr'\1 {rp} \2',dec)
+
+            if d.startswith('var '): ivar = d.split(';')[0][4:].split(',')
+            else: ivar = []
+
+            for var in ivar.copy():
+                rg = re.compile(re.escape(var) + r'= ?(_\$af\d{6});')
+                rn = rg.search(dec)
+                if not rn:continue
+                dec = rg.sub('',dec)
+                dec = dec.replace(rn[1],var)
+                ivar.remove(var)
+
+            for x in re.findall(r'jso\$setrpl\$[a-zA-Z_][a-zA-Z_\$\d_]*',dec):
+                rn = x.split('$',2)[2]
+
+                dec = re.sub('var ' + re.escape(rn) + r' ?= ?\{\};','',dec)
+                dec = re.sub('var ' + re.escape(rn) + r' ?= ?\{\},',r'var ',dec)
+                dec = re.sub(',' + re.escape(rn) + r' ?= ?\{\}([;,])',r'\1',dec)
+
+                dec = re.sub(re.escape(rn) + r'\._ ?= ?' + re.escape(x) + ';','',dec)
+
+                dec = dec.replace(x,rn)
+
+            if ivar: dec = 'var ' + ','.join(ivar) + ';' + dec
+            d = dec
+
+            sds = sorted([0,len(d)] + list(set(sum([[x.start(),x.end()] for x in re.finditer(r'((?<!\\)\'.*?\'|(?<!\\)\".*?\"|(?<![\w_\\])/.*?/)',d)],[]))))
+            sd = []
+            for ix in range(len(sds)-1): sd.append(d[sds[ix]:sds[ix+1]])
+
+            for ix in range(len(sd)):
+                if ix % 2: continue
+                for rg,rp in (
+                    (r'([=<>]) ',r'\1'),
+                    (';',r';\n'),
+                    (',',', '),
+                    (r'([\{\}])',r'\n\1\n'),
+                    (r'\n+(;)?\n+',r'\1\n'),
+                    (r'\n?{\n\}(;?)\n',r' {}\1\n'),
+                    (r'\}\n,',r'},'),
+                    (r'(?<=\w)=\n\{\n',r' = {\n' + '\0'),
+                    (r'(?<=, )\n\{\n',r'{\n' + '\0'),
+                    (r'}\n\)\n',r'})\n'),
+                    (r'([=<>]) ',r'\1'),
+                    (r'(?:^|(?<=[\w\)\]\}]))([\?\:<>=&^\|\*\+\-~%]|&&|\|\||[=!]==|(?:[\+\-&\|\^~\*/%<>!=]|<<|>>)=)(?:$|(?=[\w\(\[\{!]))',r' \1 '),
+                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n(\))',r'for \1 \2\3 '),
+                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n([^;]*?\))',r'for \1 \2 \3 '),
+                    (r'if(\([^;]*?\))',r'if \1 '),
+                    (r'return(!|$)',r'return \1'),
+                ): sd[ix] = re.sub(rg,rp,sd[ix])
+            d = ''.join(sd).split('\n')
+
+            tabs = 0
+            old = -1
+            add = ''
+            for ix in range(len(d)):
+                if d[ix] and d[ix][0] == '\x00':
+                    d[ix] = d[ix][1:]
+                    tabs += 1
+                if '{' in d[ix]: tabs += 1
+                if '}' in d[ix]: tabs -= 1
+                if old != tabs:
+                    add = "\t"*tabs
+                    old = tabs
+                d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
+            d = '\n'.join(d)
+
+            open(o + '/' + tbasename(i) + '.js','w',encoding='utf-8').write(d)
+            if d: return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()
