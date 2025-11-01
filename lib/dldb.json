@@ -2529,6 +2529,13 @@
         ],
         "ts":0
     },
+    "jsbeautifier_packer":{
+        "p":"jsbeautifier_packer.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/packer.py",
+            "jsbeautifier_packer.py"
+        ]]
+    },
     "sonic4":{
         "p":"BMS/sonic4.bms",
         "fs":[[

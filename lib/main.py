@@ -280,10 +280,7 @@ def analyze(inp:str,raw=False):
                     f = open(inp,'rb')
                     if len(x) > 3: mn,mx = x[2],x[3]
                     elif len(x) > 2: mn,mx = 0,x[2]
-                    else:
-                        mn = 0
-                        mx = f.seek(0,2)
-                        f.seek(0)
+                    else: mn,mx = 0,f.seek(0,2)
 
                     f.seek(mn)
                     c = mx - mn
@@ -328,7 +325,18 @@ def analyze(inp:str,raw=False):
                     f.seek(x[2])
                     ret = sum(f.read(x[1])) != 0
                     f.close()
+                elif x[0] == 'reg':
+                    reg = re.compile(x[1].encode())
+                    f = open(inp,'rb')
+                    if len(x) > 3: mn,mx = x[2],x[3]
+                    elif len(x) > 2: mn,mx = x[2],f.seek(0,2)
+                    else: mn,mx = 0,f.seek(0,2)
+
+                    f.seek(mn)
+                    ret = reg.match(f.read(mx-mn)) != None
+                    f.close()
                 elif type(x[0]) == bool and x[0] == False: tret = ret = False
+                else: raise ValueError('Unknown detection instruction: ' + str(x))
             if xv.get('qq') and (type(x[-1]) != bool or x[-1]) and ret:
                 tret = True
                 break
@@ -1953,6 +1961,59 @@ def extract(inp:str,out:str,t:str) -> bool:
             import lz4.block # type: ignore
             open(o + '/' + basename(i),'wb').write(lz4.block.decompress(open(i,'rb').read()[8:]))
             return
+        case 'JS P.A.C.K.E.R.':
+            jfp = db.get('jsbeautifier_packer')
+            jf = open(jfp).read()
+            if 'from jsbeautifier.unpackers import UnpackingError' in jf: open(jfp,'w').write(jf.replace('from jsbeautifier.unpackers import UnpackingError','class UnpackingError(Exception): pass'))
+
+            if db.print_try: print('Trying with jsbeautifier_packer')
+            from bin.jsbeautifier_packer import unpack as js_unpack,detect as js_detect # type: ignore
+
+            d = open(i,encoding='utf-8').read()
+            js_detect(d)
+            try: d = js_unpack(d)
+            except Exception as e:
+                if e.__class__.__name__ != 'UnpackingError': raise
+
+            sds = sorted([0,len(d)] + list(set(sum([[x.start(),x.end()] for x in re.finditer(r'((?<!\\)\'.*?\'|(?<!\\)\".*?\"|(?<!\w)/.*?/)',d)],[]))))
+            sd = []
+            for ix in range(len(sds)-1): sd.append(d[sds[ix]:sds[ix+1]])
+
+            for ix in range(len(sd)):
+                if ix % 2: continue
+                for rg,rp in (
+                    (r';',r';\n'),
+                    (r',',r', '),
+                    (r'([\{\}])',r'\n\1\n'),
+                    (r'\n+(;)?\n+',r'\1\n'),
+                    (r'\n{\n\}\n',r' {}\n'),
+                    (r'(?<=\w)=\n\{\n',r' = {\n' + '\0'),
+                    (r'(?<=, )\n\{\n',r'{\n' + '\0'),
+                    (r'}\n\)\n',r'})\n'),
+                    (r'(?:^|(?<=[\w\)\]]))([\?\:<>=&^\|\*\+\-~%]|&&|\|\||[=!]==|(?:[\+\-&\|\^~\*/%<>!=]|<<|>>)=)(?:$|(?=[\w\(\[!]))',r' \1 '),
+                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n(\))',r'for \1 \2\3 '),
+                    (r'(?s)for(\([^;]*;)\n([^;]*;)\n([^;]*?\))',r'for \1 \2 \3 '),
+                    (r'if(\([^;]*?\))',r'if \1 '),
+                    (r'return(!|$)',r'return \1'),
+                ): sd[ix] = re.sub(rg,rp,sd[ix])
+            d = ''.join(sd).split('\n')
+
+            tabs = 0
+            old = -1
+            add = ''
+            for ix in range(len(d)):
+                if d[ix] and d[ix][0] == '\x00':
+                    d[ix] = d[ix][1:]
+                    tabs += 1
+                if '{' in d[ix]: tabs += 1
+                if '}' in d[ix]: tabs -= 1
+                if old != tabs:
+                    add = "\t"*tabs
+                    old = tabs
+                d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
+
+            open(o + '/' + tbasename(i) + '.js','w',encoding='utf-8').write('\n'.join(d))
+            if d: return
 
         case 'F-Zero G/AX .lz':
             td = TmpDir()

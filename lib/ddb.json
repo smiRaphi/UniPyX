@@ -483,6 +483,11 @@
         "rs":"d0lLZ","s":1
     },
     {
+        "t":"text",
+        "d":[["size",[100,null]],["reg","eval *\\( *function *\\( *p *, *a *, *c *, *k *, *e *, *[rd] *\\)\\s*\\{",0]],
+        "rs":"JS P.A.C.K.E.R."
+    },
+    {
         "rq":"UPX",
         "d":[["size",[103434,null],false],
              ["isat","SCSFX",103936,true],["isat","SCSFX",118272,true],["isat","SCSFX",351232,true],["isat","SCSFX",115712,true],["isat","SCSFX",131584,true],["isat","SCSFX",416256,true],["isat","SCSFX",103424,true],["isat","SCSFX",117248,true],["isat","SCSFX",348160,true],[false]],
