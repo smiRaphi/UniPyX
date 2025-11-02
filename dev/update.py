@@ -11,7 +11,7 @@ GFMTS = {
     'ip7z/7zip':lambda tag:f'7z{tag.replace(".","")}-x64.msi',
     'julian-r/file-windows':lambda tag:f'file_{tag[1:]}-build104-vs2022-x64.zip',
     'ExeinfoASL/ASL':lambda tag:f'Exeinfo_{tag[1:].replace(".","")}.zip',
-    'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows-x64.zip',
+    'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows_x64.zip',
     'Sappharad/GDIbuilder':lambda tag:f'gdibuilder{tag[1:].replace(".","")}_cmd_win_x64.zip',
     'upx/upx':lambda tag:f'upx-{tag[1:]}-win64.zip',
     'xchellx/bnrtool':lambda tag:f'bnrtool_{tag}_msys2-clang64_net9.0_win-x64.7z',
@@ -95,25 +95,26 @@ def update():
             elif dom == 'github.com' and '/releases/download/' in u:
                 repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
-                elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
-                else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
+                if repo not in ('VirusTotal/yara'):
+                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                    elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
+                    else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
-                ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
-                tag = GRELTG.search(s)[1]
+                    ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
+                    tag = GRELTG.search(s)[1]
 
-                if ts > ots:
-                    if repo in GFMTS:
-                        if repo == 'peitaosu/WFRR': of = GFMTS[repo](tag,u.split('_')[-2])
-                        else: of = GFMTS[repo](tag)
-                        nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
-                    else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
-                    if u != nu:
-                        if c.c.head(nu).status_code == 302: u = nu
-                        else:
-                            print('[!] 404:',u,'!->',nu)
-                            ts = ots
-                    else: ts = ots
+                    if ts > ots:
+                        if repo in GFMTS:
+                            if repo == 'peitaosu/WFRR': of = GFMTS[repo](tag,u.split('_')[-2])
+                            else: of = GFMTS[repo](tag)
+                            nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
+                        else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
+                        if u != nu:
+                            if c.c.head(nu).status_code == 302: u = nu
+                            else:
+                                print('[!] 404:',u,'!->',nu)
+                                ts = ots
+                        else: ts = ots
             elif dom == 'archive.ubuntu.com':
                 bu = os.path.dirname(u) + '/'
                 s = c.get(bu)

@@ -29,24 +29,25 @@
             "x":{
                 "trid.exe":"trid/trid.exe"
             },
-            "ts":1758628368
+            "ts":1760479200
         },{
             "u":"https://mark0.net/download/triddefs.zip",
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1760306400
+            "ts":1761865200
         }],
-        "ts":1760306400
+        "ts":1761865200
     },
     "file":{
         "p":"file/file.exe",
         "fs":[{
-            "u":"https://github.com/julian-r/file-windows/releases/download/v5.44/file_5.44-build104-vs2022-x64.zip",
+            "u":".",
             "x":{
-                "file.exe":"file/file.exe",
-                "libmagic.dll":"file/libmagic.dll"
-            }
+                "file/file.exe":"file/file.exe",
+                "file/libmagic.dll":"file/libmagic.dll"
+            },
+            "ts":1762090000
         },{
             "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5build1_i386.deb",
             "x":{
@@ -54,7 +55,7 @@
             },
             "ts":1756929540
         }],
-        "ts":1756929540
+        "ts":1762090000
     },
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
@@ -70,7 +71,7 @@
     "yara":{
         "p":"yara/yara.exe",
         "fs":[{
-            "u":"https://github.com/VirusTotal/yara/releases/download/v4.5.4/yara-master-v4.5.4-win64.zip",
+            "u":"https://github.com/VirusTotal/yara/releases/download/v4.5.5/yara-4.5.5-2368-win64.zip",
             "x":{
                 "yara64.exe":"yara/yara.exe",
                 "yarac64.exe":"yara/yarac.exe"
@@ -96,9 +97,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1760392800
+            "ts":1762038000
         }],
-        "ts":1760392800
+        "ts":1762038000
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -375,13 +376,13 @@
     "aaru":{
         "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.12/aaru-6.0.0-alpha.12_windows-x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.14/aaru-6.0.0-alpha.14_windows_x64.zip",
             "x":{
                 "aaru.exe":"aaru.exe"
             },
-            "ts":1759022555
+            "ts":1761595631
         }],
-        "ts":1759022555
+        "ts":1761595631
     },
     "ancient":{
         "p":"Ancient.exe",
@@ -495,13 +496,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/b2/98/dolphin-master-2509-182-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/72/86/dolphin-master-2509-283-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1760404929
+            "ts":1761996345
         }],
-        "ts":1760404929
+        "ts":1761996345
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -658,14 +659,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0281/mame0281b_x64.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0282/mame0282b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1756582295
+            "ts":1761900716
         }],
-        "ts":1756582295
+        "ts":1761900716
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -1515,12 +1516,13 @@
     "brotli":{
         "p":"brotli.exe",
         "fs":[{
-            "u":"https://github.com/google/brotli/releases/download/v1.1.0/brotli-x64-windows-static.zip",
+            "u":"https://github.com/google/brotli/releases/download/v1.2.0/brotli-x64-windows-static.zip",
             "x":{
                 "brotli.exe":"brotli.exe"
-            }
+            },
+            "ts":1761577412
         }],
-        "ts":0
+        "ts":1761577412
     },
     "sbc":{
         "p":"sbc.exe",
@@ -2010,7 +2012,8 @@
         "fs":[[
             "http://dev.b1.org/snapshots/org/b1/pack/b1-pack-tool/0.9.3-SNAPSHOT/b1-pack-tool-0.9.3-20130524.124731-1.jar",
             "b1-pack-tool.jar"
-        ]]
+        ]],
+        "ts":0
     },
     "izarccl":{
         "p":"IZARCE.exe",
@@ -2020,7 +2023,8 @@
             "x":{
                 "IZARCE.exe":"IZARCE.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "blink":{
         "p":"blink.exe",
@@ -2029,7 +2033,8 @@
             "x":{
                 "blinkw.exe":"blink.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "bsa":{
         "p":"BSA.EXE",
@@ -2038,7 +2043,8 @@
             "x":{
                 "BSA.EXE":"BSA.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "btspk":{
         "p":"BTSPK.EXE",
@@ -2047,7 +2053,8 @@
             "x":{
                 "BTSPK.EXE":"BTSPK.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "uncfl":{
         "p":"uncfl.exe",
@@ -2056,7 +2063,8 @@
             "x":{
                 "bin/uncfl.exe":"uncfl.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "charc":{
         "p":"CHARC.EXE",
@@ -2074,7 +2082,8 @@
             "x":{
                 "LZA32.EXE":"LZA.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "uncmz":{
         "p":"uncmz.exe",
@@ -2083,13 +2092,15 @@
             "x":{
                 "uncmz.exe":"uncmz.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "compressia":{
         "p":"compcl.exe",
         "fs":[
         "https://web.archive.org/web/20021210174357if_/http://www.compressia.com:80/compcl.exe"
-        ]
+        ],
+        "ts":0
     },
     "lha":{
         "p":"lha.exe",
@@ -2103,13 +2114,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.0.0-beta.8/GDRE_tools-v2.0.0-beta.8-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.0.1/GDRE_tools-v2.0.1-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
-            }
-        }]
+            },
+            "ts":1761163654
+        }],
+        "ts":1761163654
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2118,7 +2131,8 @@
             "x":{
                 "UNCRUSH.EXE":"UNCRUSH.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "dar":{
         "p":"DAR/dar.exe",
@@ -2166,7 +2180,8 @@
                 "dar64-2.8.1-win64/bin/cygcom_err-2.dll":"DAR/cygcom_err-2.dll",
                 "dar64-2.8.1-win64/bin/cygcrypto-1.1.dll":"DAR/cygcrypto-1.1.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "dgcac":{
         "p":"dgcac.exe",
@@ -2175,7 +2190,8 @@
             "x":{
                 "DGCA/dgcac.exe":"dgcac.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "dietdisk":{
         "p":"DIETDISC/DIETDISK.COM",
@@ -2186,7 +2202,8 @@
                 "FATTEN.EXE":"DIETDISC/FATTEN.EXE",
                 "DIETDISK.COM":"DIETDISC/DIETDISK.COM"
             }
-        }]
+        }],
+        "ts":0
     },
     "dwc":{
         "p":"DWC.EXE",
@@ -2220,7 +2237,8 @@
         "p":"amime.py",
         "fs":[
         "https://raw.githubusercontent.com/idiom/activemime-format/refs/heads/master/amime.py"
-        ]
+        ],
+        "ts":0
     },
     "mfs_manager":{
         "p":"MFSManager/mfs_manager.exe",
@@ -2230,7 +2248,8 @@
                 "mfs_manager.exe":"MFSManager/mfs_manager.exe",
                 "mfs_library.dll":"MFSManager/mfs_library.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "nsnsotool":{
         "p":"nsnsotool.exe",
@@ -2239,7 +2258,8 @@
             "x":{
                 "nsnsotool.exe":"nsnsotool.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "mcp":{
         "p":"mcp.exe",
@@ -2249,7 +2269,8 @@
             "x":{
                 "mcp.exe":"mcp.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "tapsplit":{
         "p":"tapsplit.exe",
@@ -2258,13 +2279,15 @@
             "x":{
                 "tapsplit.exe":"tapsplit.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "load_from_mmstr":{
         "p":"load_from_mmstr.py",
         "fs":[
         "https://raw.githubusercontent.com/Matt-Hurd/GBAVideoDecomp/refs/heads/master/InternalELF/research_scripts/load_from_mmstr.py"
-        ]
+        ],
+        "ts":0
     },
     "snzip":{
         "p":"snzip.exe",
@@ -2273,7 +2296,8 @@
             "x":{
                 "snzip-1.0.5-win64/snzip.exe":"snzip.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "dolpak":{
         "p":"dolpak.exe",
@@ -2283,7 +2307,8 @@
             "x":{
                 "win32/dolpak.exe":"dolpak.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
@@ -2534,21 +2559,24 @@
         "fs":[[
             "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/packer.py",
             "jsbeautifier_packer.py"
-        ]]
+        ]],
+        "ts":0
     },
     "jsbeautifier_myobfuscate":{
         "p":"jsbeautifier_myobfuscate.py",
         "fs":[[
             "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/myobfuscate.py",
             "jsbeautifier_myobfuscate.py"
-        ]]
+        ]],
+        "ts":0
     },
     "jsbeautifier_jsobfuscator":{
         "p":"jsbeautifier_jsobfuscator.py",
         "fs":[[
             "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/javascriptobfuscator.py",
             "jsbeautifier_jsobfuscator.py"
-        ]]
+        ]],
+        "ts":0
     },
     "sonic4":{
         "p":"BMS/sonic4.bms",
@@ -2638,7 +2666,8 @@
         "fs":[[
             "https://aluigi.altervista.org/bms/blitz_games.bms",
             "BMS/blitz_games.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
