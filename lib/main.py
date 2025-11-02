@@ -124,7 +124,7 @@ def analyze(inp:str,raw=False):
     inp = cleanp(inp)
     _,o,_ = db.run(['trid','-d',dirname(db.get('trid')) + '\\triddefs.trd','-n','5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
-    _,o,_ = db.run(['file','-bnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
+    _,o,_ = db.run(['file','-bsnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.split('\n') if x.strip()]
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
@@ -485,7 +485,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
     match t:
         case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
-             'DiskDupe IMG'|'XAR'|'Z':
+             'DiskDupe IMG'|'XAR'|'Z'|'EXT':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
