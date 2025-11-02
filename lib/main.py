@@ -499,6 +499,39 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if t == 'MSCAB': fix_cab(o);return
                 elif t in ('ZSTD','xz','BZip2','LZIP'): return fix_tar(o)
                 else: return
+        case 'Stripped TAR':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+
+            while True:
+                fn = f.read(100)
+                if len(fn) != 100: break
+                if fn[0] == 0:
+                    f.seek(-99,1)
+                    b = b''
+                    while True:
+                        b = f.read(1)
+                        if not b:
+                            fn = b''
+                            break
+                        if b[0] != 0:
+                            fn = b + f.read(99)
+                            break
+
+                if len(fn) != 100: break
+                fn = fn.rstrip(b'\0').decode()
+
+                assert f.read(8*3) == (b'0000000\0'*3)
+                fs = int(f.read(11).decode(),8)
+
+                assert f.read(22) == (b'\0' + b'0'*11 + b'\0' + b'0'*7 + b'\0 ')
+                f.seek(0xAC,1)
+                #assert sum(f.read(0xAC)) == 0,f.tell()
+                assert f.read(0x10) == (b'0000000\0'*2)
+                assert sum(f.read(0xA7)) == 0
+
+                open(o + '/' + fn,'wb').write(f.read(fs))
+            return
         case 'LHARC':
             run(['lha','xf','--extract-broken-archive','-w=' + o,i])
             if os.listdir(o): return
@@ -3249,8 +3282,8 @@ def fix_tar(o:str,rem=True):
         f = o + '/' + os.listdir(o)[0]
         if open(f,'rb').read(2) == b'MZ': return
         nts,_ = analyze(f,True)
-        if nts == ['TAR']:
-            r = extract(f,o,'TAR')
+        if nts == ['TAR'] or nts == ['Stripped TAR']:
+            r = extract(f,o,nts[0])
             if not r and rem:
                 try:remove(f)
                 except PermissionError:pass
