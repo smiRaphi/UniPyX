@@ -129,7 +129,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
-    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image'):
+    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
@@ -1001,9 +1001,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             remove(o + '\\DP0.bin',o + '\\DP1.bin',o + '\\DP2.bin',o + '\\DP6.bin',o + '\\DP7.bin')
             e,_,_ = run(['3dstool','-xtfu','exefs',o + '\\DExeFS.bin','--header',o + '\\HExeFS.bin','--exefs-dir',o + '\\ExeFS'])
-            if e: return 1
             e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
-            if e: return 1
             run(['3dstool','-xtf','romfs',o + '\\DecManual.bin','--romfs-dir',o + '\\Manual'])
             run(['3dstool','-xtf','romfs',o + '\\DecDLPlay.bin','--romfs-dir',o + '\\DownloadPlay'])
             run(['3dstool','-xtf','romfs',o + '\\DecN3DSU.bin','--romfs-dir',o + '\\N3DSUpdate'])
@@ -1011,7 +1009,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             for x in os.listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
-            return
+            if os.listdir(o): return
         case 'NCCH CXI':
             e,_,_ = run(['3dstool','-xtf','cxi',i,'--header',o + '\\HNCCH.bin','--exh',o + '\\DecExH.bin','--exh-auto-key','--exefs',o + '\\DExeFS.bin','--exefs-auto-key','--exefs-top-auto-key','--romfs',o + '\\DRomFS.bin','--romfs-auto-key','--logo',o + '\\LogoLZ.bin','--plain',o + '\\PlainRGN.bin'])
             if e: return 1
@@ -2965,6 +2963,20 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             lfmmstr.extract_mmstr_archive(i,True)
             if os.listdir(o): return
+        case 'Exient XPK':
+            f = open(i,'rb')
+            ver = f.read(1)[0]
+            if ver == 1:
+                f.seek(0x10)
+                v12 = b''
+                for _ in range(3):
+                    v12 += f.read(4)
+                    f.seek(4,1)
+                f.close()
+                if not sum(v12): return quickbms('angry_birds_starwars')
+            else: f.close()
+
+            return quickbms(['nfshp2010wii','angry_birds_go','xpk2'][ver])
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

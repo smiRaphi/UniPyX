@@ -2669,6 +2669,38 @@
         ]],
         "ts":0
     },
+    "nfshp2010wii":{
+        "p":"BMS/nfshp2010wii.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/nfshp2010wii.bms",
+            "BMS/nfshp2010wii.bms"
+        ]],
+        "ts":0
+    },
+    "angry_birds_go":{
+        "p":"BMS/angry_birds_go.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/angry_birds_go.bms",
+            "BMS/angry_birds_go.bms"
+        ]],
+        "ts":0
+    },
+    "angry_birds_starwars":{
+        "p":"BMS/angry_birds_starwars.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/angry_birds_starwars.bms",
+            "BMS/angry_birds_starwars.bms"
+        ]],
+        "ts":0
+    },
+    "xpk2":{
+        "p":"BMS/xpk2.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/xpk2.bms",
+            "BMS/xpk2.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

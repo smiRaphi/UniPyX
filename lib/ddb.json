@@ -355,6 +355,10 @@
         "rs":"BTSPK","s":1
     },
     {
+        "d":[["isat","KPX",1],["isin",["\\0","\\1","\\2"],0]],
+        "rs":"Exient XPK","s":1
+    },
+    {
         "d":[["isat","\\x96",178],["isat","SFCD",3640],["hash","17daa0fec02fc33c0f6abb549a8b80b6613b48ee",4,160]],
         "rs":"GBA ADS Video ROM","s":1
     },
