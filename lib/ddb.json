@@ -355,6 +355,10 @@
         "rs":"BTSPK","s":1
     },
     {
+        "d":[["isat","NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ",0,"hash","EE0D39E8421F9B464A999CCF587C176B7808CC8C",0,1280]],
+        "rs":"Monkey Ball A","s":1
+    },
+    {
         "d":[["isat","KPX",1],["isin",["\\0","\\1","\\2"],0]],
         "rs":"Exient XPK","s":1
     },

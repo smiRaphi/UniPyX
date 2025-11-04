@@ -24,7 +24,7 @@ class DLDB:
         if os.path.exists(self.udbp): self.udb = json.load(xopen(self.udbp))
         else: self.udb = {}
 
-    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,**kwargs) -> tuple[int,str|bytes,str|bytes]:
+    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,print_out=False,**kwargs) -> tuple[int,str|bytes,str|bytes]:
         if print_try and self.print_try: print('Trying with',cmd[0])
         if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
         if type(stdin) == str and not text: stdin = stdin.encode()
@@ -47,7 +47,7 @@ class DLDB:
             if stdin: os.remove(tfi)
             if text: o,e = o.decode('cp437'),e.decode('cp437')
         else:
-            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=-1,stderr=-1,stdin=-1 if stdin != None else None,**kwargs)
+            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=None if print_out else -1,stderr=None if print_out else -1,stdin=-1 if stdin != None else None,**kwargs)
             if timeout:
                 for _ in range(int(timeout*10)):
                     if p.poll() != None: break

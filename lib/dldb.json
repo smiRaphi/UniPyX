@@ -2701,6 +2701,27 @@
         ]],
         "ts":0
     },
+    "monkey ball chunk extract":{
+        "p":"BMS/MONKEY BALL CHUNK EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20CHUNK%20EXTRACT.bms",
+            "BMS/MONKEY BALL CHUNK EXTRACT.bms"
+        ]]
+    },
+    "monkey ball dtpk extract":{
+        "p":"BMS/MONKEY BALL DTPK EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20DTPK%20EXTRACT.bms",
+            "BMS/MONKEY BALL DTPK EXTRACT.bms"
+        ]]
+    },
+    "monkey ball spsd extract":{
+        "p":"BMS/MONKEY BALL SPSD EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20SPSD%20EXTRACT.bms",
+            "BMS/MONKEY BALL SPSD EXTRACT.bms"
+        ]]
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

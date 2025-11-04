@@ -362,7 +362,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
     def quickbms(scr,inf=i,ouf=o):
         if db.print_try: print('Trying with',scr)
-        run(['quickbms',db.get(scr),inf,ouf],print_try=False)
+        run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
         if os.listdir(ouf): return
         return 1
     def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
@@ -1250,6 +1250,14 @@ def extract(inp:str,out:str,t:str) -> bool:
                     assert chk,basename(tf)
                     mkdir(od)
                     extract(tf,od,'GameCube ISO')
+                elif t == 'N':
+                    tff = open(tf,'rb')
+                    nt = None
+                    if tff.read(0x50) == b"NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ": nt = 'Monkey Ball A'
+                    tff.close()
+                    if nt:
+                        mkdir(od)
+                        extract(tf,od,nt)
                 if exists(od) and not os.listdir(od): rmdir(od)
             return
         case 'N64DD':
@@ -3026,6 +3034,17 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fs: return
+        case 'Monkey Ball A':
+            for d in ('CHUNK','DTPK','SPSD'):
+                scn = f'monkey ball {d} extract'
+                if d == 'CHUNK':
+                    scp = db.get(scn)
+                    scc = open(scp,encoding='utf-8').read()
+                    if '\nnext A\n' in scc: open(scp,'w',encoding='utf-8').write(scc.replace('\nnext A\n','\nmath A + 1\n'))
+
+                mkdir(o + '\\' + d)
+                if quickbms(scn,ouf=o + '\\' + d): break
+            else: return
 
         case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH (I.M.)'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
             # merge some small compressors
