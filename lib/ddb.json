@@ -359,6 +359,14 @@
         "rs":"Monkey Ball A","s":1
     },
     {
+        "d":[["isat","Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ",0,"hash","9C94430466D7DC2B4E12F4D422D8FD7E86714A5E",0,1280]],
+        "rs":"Initial D 3 Export A","s":1
+    },
+    {
+        "d":[["isat","NMZIP",0],["isatS","\\0",11,5]],
+        "rs":"NMZIP","s":1
+    },
+    {
         "d":[["isat","KPX",1],["isin",["\\0","\\1","\\2"],0]],
         "rs":"Exient XPK","s":1
     },

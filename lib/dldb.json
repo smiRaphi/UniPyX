@@ -2722,6 +2722,27 @@
             "BMS/MONKEY BALL SPSD EXTRACT.bms"
         ]]
     },
+    "initd3e nmzip extract":{
+        "p":"BMS/INITD3E NMZIP EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/NMZIP.bms",
+            "BMS/INITD3E NMZIP EXTRACT.bms"
+        ]]
+    },
+    "initd3e tex extract":{
+        "p":"BMS/INITD3E TEX EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/MISSING_TEX.bms",
+            "BMS/INITD3E TEX EXTRACT.bms"
+        ]]
+    },
+    "initd3e spsd extract":{
+        "p":"BMS/INITD3E SPSD EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/SPSD_EXTRACT.bms",
+            "BMS/INITD3E SPSD EXTRACT.bms"
+        ]]
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

@@ -129,7 +129,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
-    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver'):
+    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
@@ -2985,6 +2985,27 @@ def extract(inp:str,out:str,t:str) -> bool:
             else: f.close()
 
             return quickbms(['nfshp2010wii','angry_birds_go','xpk2'][ver])
+        case 'NMZIP':
+            import zlib
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.seek(0x20)
+            data = zlib.decompress(f.read())
+            f.close()
+
+            ext = 'bin'
+            if data[:4] == b'1LCR': ext = 'llcr'
+            elif data[:4] == b'DTPK': ext = 'snd'
+            elif data[:4] == b'\0\1\0\0' and data[5:8] == b'\0\0\0' and data[4] in (3,1,7,0x11,0xb):
+                ext = 'pol'
+            elif 0 < int.from_bytes(data[:4]) < 0xff and 0 < int.from_bytes(data[4:8]) < 0xff and 0 < int.from_bytes(data[8:12]) < 0xff:
+                ext = 'mot'
+            elif (len(data) == 0x004800 and data[-4: ] == b'\xFF\xFF\xFF\xFF') or\
+                 (len(data) == 0x1DED10 and data[  :4] == b'\x97Z+C'):
+                   ext = 'def'
+
+            open(o + '/' + tbasename(i) + '.' + ext,'wb').write(data)
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
@@ -3044,6 +3065,11 @@ def extract(inp:str,out:str,t:str) -> bool:
 
                 mkdir(o + '\\' + d)
                 if quickbms(scn,ouf=o + '\\' + d): break
+            else: return
+        case 'Initial D 3 Export A':
+            for d in ('NMZIP','TEX','SPSD'):
+                mkdir(o + '\\' + d)
+                if quickbms(f'initd3e {d} extract',ouf=o + '\\' + d): break
             else: return
 
         case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH (I.M.)'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
