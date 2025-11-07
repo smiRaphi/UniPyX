@@ -125,7 +125,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['trid','-d',dirname(db.get('trid')) + '\\triddefs.trd','-n','5',inp])
     ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
     _,o,_ = db.run(['file','-bsnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
-    ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip() for x in o.split('\n') if x.strip()]
+    ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 

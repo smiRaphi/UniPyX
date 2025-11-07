@@ -126,7 +126,8 @@
     ],
     "ISO":[
         "iso 9660 cd image",
-        "iso 9660"
+        "iso 9660",
+        "iso 9660 cd-rom filesystem data"
     ],
     "IMG":[
         "generic pc disk image (ntfs)",
