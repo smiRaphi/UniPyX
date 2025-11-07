@@ -129,7 +129,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
     ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
-    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image'):
+    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
@@ -362,7 +362,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
     def quickbms(scr,inf=i,ouf=o):
         if db.print_try: print('Trying with',scr)
-        run(['quickbms',db.get(scr),inf,ouf],print_try=False)
+        run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
         if os.listdir(ouf): return
         return 1
     def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
@@ -1001,9 +1001,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             remove(o + '\\DP0.bin',o + '\\DP1.bin',o + '\\DP2.bin',o + '\\DP6.bin',o + '\\DP7.bin')
             e,_,_ = run(['3dstool','-xtfu','exefs',o + '\\DExeFS.bin','--header',o + '\\HExeFS.bin','--exefs-dir',o + '\\ExeFS'])
-            if e: return 1
             e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
-            if e: return 1
             run(['3dstool','-xtf','romfs',o + '\\DecManual.bin','--romfs-dir',o + '\\Manual'])
             run(['3dstool','-xtf','romfs',o + '\\DecDLPlay.bin','--romfs-dir',o + '\\DownloadPlay'])
             run(['3dstool','-xtf','romfs',o + '\\DecN3DSU.bin','--romfs-dir',o + '\\N3DSUpdate'])
@@ -1011,7 +1009,7 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             for x in os.listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
-            return
+            if os.listdir(o): return
         case 'NCCH CXI':
             e,_,_ = run(['3dstool','-xtf','cxi',i,'--header',o + '\\HNCCH.bin','--exh',o + '\\DecExH.bin','--exh-auto-key','--exefs',o + '\\DExeFS.bin','--exefs-auto-key','--exefs-top-auto-key','--romfs',o + '\\DRomFS.bin','--romfs-auto-key','--logo',o + '\\LogoLZ.bin','--plain',o + '\\PlainRGN.bin'])
             if e: return 1
@@ -1252,6 +1250,14 @@ def extract(inp:str,out:str,t:str) -> bool:
                     assert chk,basename(tf)
                     mkdir(od)
                     extract(tf,od,'GameCube ISO')
+                elif t == 'N':
+                    tff = open(tf,'rb')
+                    nt = None
+                    if tff.read(0x50) == b"NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ": nt = 'Monkey Ball A'
+                    tff.close()
+                    if nt:
+                        mkdir(od)
+                        extract(tf,od,nt)
                 if exists(od) and not os.listdir(od): rmdir(od)
             return
         case 'N64DD':
@@ -2965,6 +2971,41 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             lfmmstr.extract_mmstr_archive(i,True)
             if os.listdir(o): return
+        case 'Exient XPK':
+            f = open(i,'rb')
+            ver = f.read(1)[0]
+            if ver == 1:
+                f.seek(0x10)
+                v12 = b''
+                for _ in range(3):
+                    v12 += f.read(4)
+                    f.seek(4,1)
+                f.close()
+                if not sum(v12): return quickbms('angry_birds_starwars')
+            else: f.close()
+
+            return quickbms(['nfshp2010wii','angry_birds_go','xpk2'][ver])
+        case 'NMZIP':
+            import zlib
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.seek(0x20)
+            data = zlib.decompress(f.read())
+            f.close()
+
+            ext = 'bin'
+            if data[:4] == b'1LCR': ext = 'llcr'
+            elif data[:4] == b'DTPK': ext = 'snd'
+            elif data[:4] == b'\0\1\0\0' and data[5:8] == b'\0\0\0' and data[4] in (3,1,7,0x11,0xb):
+                ext = 'pol'
+            elif 0 < int.from_bytes(data[:4]) < 0xff and 0 < int.from_bytes(data[4:8]) < 0xff and 0 < int.from_bytes(data[8:12]) < 0xff:
+                ext = 'mot'
+            elif (len(data) == 0x004800 and data[-4: ] == b'\xFF\xFF\xFF\xFF') or\
+                 (len(data) == 0x1DED10 and data[  :4] == b'\x97Z+C'):
+                   ext = 'def'
+
+            open(o + '/' + tbasename(i) + '.' + ext,'wb').write(data)
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
@@ -3014,6 +3055,22 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fs: return
+        case 'Monkey Ball A':
+            for d in ('CHUNK','DTPK','SPSD'):
+                scn = f'monkey ball {d} extract'
+                if d == 'CHUNK':
+                    scp = db.get(scn)
+                    scc = open(scp,encoding='utf-8').read()
+                    if '\nnext A\n' in scc: open(scp,'w',encoding='utf-8').write(scc.replace('\nnext A\n','\nmath A + 1\n'))
+
+                mkdir(o + '\\' + d)
+                if quickbms(scn,ouf=o + '\\' + d): break
+            else: return
+        case 'Initial D 3 Export A':
+            for d in ('NMZIP','TEX','SPSD'):
+                mkdir(o + '\\' + d)
+                if quickbms(f'initd3e {d} extract',ouf=o + '\\' + d): break
+            else: return
 
         case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH (I.M.)'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
             # merge some small compressors

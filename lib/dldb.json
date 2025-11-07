@@ -2669,6 +2669,80 @@
         ]],
         "ts":0
     },
+    "nfshp2010wii":{
+        "p":"BMS/nfshp2010wii.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/nfshp2010wii.bms",
+            "BMS/nfshp2010wii.bms"
+        ]],
+        "ts":0
+    },
+    "angry_birds_go":{
+        "p":"BMS/angry_birds_go.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/angry_birds_go.bms",
+            "BMS/angry_birds_go.bms"
+        ]],
+        "ts":0
+    },
+    "angry_birds_starwars":{
+        "p":"BMS/angry_birds_starwars.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/angry_birds_starwars.bms",
+            "BMS/angry_birds_starwars.bms"
+        ]],
+        "ts":0
+    },
+    "xpk2":{
+        "p":"BMS/xpk2.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/xpk2.bms",
+            "BMS/xpk2.bms"
+        ]],
+        "ts":0
+    },
+    "monkey ball chunk extract":{
+        "p":"BMS/MONKEY BALL CHUNK EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20CHUNK%20EXTRACT.bms",
+            "BMS/MONKEY BALL CHUNK EXTRACT.bms"
+        ]]
+    },
+    "monkey ball dtpk extract":{
+        "p":"BMS/MONKEY BALL DTPK EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20DTPK%20EXTRACT.bms",
+            "BMS/MONKEY BALL DTPK EXTRACT.bms"
+        ]]
+    },
+    "monkey ball spsd extract":{
+        "p":"BMS/MONKEY BALL SPSD EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20SPSD%20EXTRACT.bms",
+            "BMS/MONKEY BALL SPSD EXTRACT.bms"
+        ]]
+    },
+    "initd3e nmzip extract":{
+        "p":"BMS/INITD3E NMZIP EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/NMZIP.bms",
+            "BMS/INITD3E NMZIP EXTRACT.bms"
+        ]]
+    },
+    "initd3e tex extract":{
+        "p":"BMS/INITD3E TEX EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/MISSING_TEX.bms",
+            "BMS/INITD3E TEX EXTRACT.bms"
+        ]]
+    },
+    "initd3e spsd extract":{
+        "p":"BMS/INITD3E SPSD EXTRACT.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/SPSD_EXTRACT.bms",
+            "BMS/INITD3E SPSD EXTRACT.bms"
+        ]]
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

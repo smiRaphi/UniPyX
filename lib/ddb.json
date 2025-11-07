@@ -355,6 +355,22 @@
         "rs":"BTSPK","s":1
     },
     {
+        "d":[["isat","NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ",0,"hash","EE0D39E8421F9B464A999CCF587C176B7808CC8C",0,1280]],
+        "rs":"Monkey Ball A","s":1
+    },
+    {
+        "d":[["isat","Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ",0,"hash","9C94430466D7DC2B4E12F4D422D8FD7E86714A5E",0,1280]],
+        "rs":"Initial D 3 Export A","s":1
+    },
+    {
+        "d":[["isat","NMZIP",0],["isatS","\\0",11,5]],
+        "rs":"NMZIP","s":1
+    },
+    {
+        "d":[["isat","KPX",1],["isin",["\\0","\\1","\\2"],0]],
+        "rs":"Exient XPK","s":1
+    },
+    {
         "d":[["isat","\\x96",178],["isat","SFCD",3640],["hash","17daa0fec02fc33c0f6abb549a8b80b6613b48ee",4,160]],
         "rs":"GBA ADS Video ROM","s":1
     },
