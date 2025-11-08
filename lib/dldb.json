@@ -2743,6 +2743,14 @@
             "BMS/INITD3E SPSD EXTRACT.bms"
         ]]
     },
+    "ttgames":{
+        "p":"BMS/ttgames.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/ttgames.bms",
+            "BMS/ttgames.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

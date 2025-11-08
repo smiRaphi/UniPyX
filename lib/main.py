@@ -228,6 +228,7 @@ def analyze(inp:str,raw=False):
                 ret = p.stdout.read().decode(errors='ignore').strip() == 'True'
             elif x[0] == 'ext': ret = inp.lower().endswith(x[1])
             elif x[0] == 'name': ret = basename(inp) == x[1]
+            elif x[0] == 'print': print(*x[1:]);continue
             elif os.path.isfile(inp):
                 if x[0] == 'contain':
                     cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
@@ -337,10 +338,11 @@ def analyze(inp:str,raw=False):
                     f.close()
                 elif type(x[0]) == bool and x[0] == False: tret = ret = False
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
-            if xv.get('qq') and (type(x[-1]) != bool or x[-1]) and ret:
-                tret = True
-                break
-            if type(x[-1]) == bool and x[-1]: tret = tret or ret
+            if xv.get('qq') and (type(x[-1]) != bool or x[-1]):
+                if ret:
+                    tret = True
+                    break
+            elif type(x[-1]) == bool and x[-1]: tret = tret or ret
             else: tret = (tret or type(tret) != bool) and ret
             if not ((xv.get('noq') or xv.get('qq')) and (type(x[-1]) != bool or x[-1])) and not tret: break
         if tret:
@@ -3006,6 +3008,12 @@ def extract(inp:str,out:str,t:str) -> bool:
 
             open(o + '/' + tbasename(i) + '.' + ext,'wb').write(data)
             return
+        case 'TTGames DAT':
+            if i.lower().endswith('.hdr'):
+                i = i[:-3] + 'dat'
+                if not exists(i): return 1
+
+            return quickbms('ttgames')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

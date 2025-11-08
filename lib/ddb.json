@@ -109,8 +109,8 @@
     },
     {
         "rqr":null,
-        "d":[["isat","PAK2\\0\\0\\0\\1",0,true],
-             ["isat","2KAP\\1\\0\\0\\0",0,true]],"noq":true,
+        "d":[["isat","PAK2\\0\\0\\0\\1",0],
+             ["isat","2KAP\\1\\0\\0\\0",0]],"qq":true,
         "rs":"Blur PAK","s":1
     },
     {
@@ -118,8 +118,8 @@
         "rs":"BRSAR","s":1
     },
     {
-        "d":[["isat","BNR1\\0\\0\\0\\0\\0",0,true],
-             ["isat","BNR2\\0\\0\\0\\0\\0",0,true]],"noq":true,
+        "d":[["isat","BNR1\\0\\0\\0\\0\\0",0],
+             ["isat","BNR2\\0\\0\\0\\0\\0",0]],"qq":true,
         "rs":"GC opening.bnr","s":1
     },
     {
@@ -128,15 +128,19 @@
     },
     {
         "d":["isat","\\0\\3\\0\\5\\0\\0\\0\\0",0],
-        "rs":"RetroStudio PAK","s":1
+        "rs":"RetroStudio PAK"
+    },
+    {
+        "d":[["isat",".CC40TAD",4],["isat",".CC4HSERHSER",292],["isat","\\xFF",3,false],["ext",".dat",false],["py","inf=inp[:-3] + 'hdr'\nif not exists(inf):return\nf=open(inf,'rb');f.seek(4);return f.read(8)==b'.CC40TAD'"]],"qq":true,
+        "rs":"TTGames DAT","s":1
     },
     {
         "d":["isat","DP2\\x1A0001",0],
         "rs":"Konami DPG","s":1
     },
     {
-        "d":[["isat","2KPR\\1\\0\\0\\0",0,true],
-             ["isat","GKPR\\1\\0\\0\\0",0,true]],"noq":true,
+        "d":[["isat","2KPR\\1\\0\\0\\0",0],
+             ["isat","GKPR\\1\\0\\0\\0",0]],"qq":true,
         "rs":"Glacier RPKG","s":1
     },
     {
@@ -718,7 +722,7 @@
         "rs":"XBP"
     },
     {
-        "d":["ext",".snappy","ext",".iwa"],"qq":true,
+        "d":[["ext",".snappy"],["ext",".iwa"]],"qq":true,
         "rs":"Snappy"
     },
     {
