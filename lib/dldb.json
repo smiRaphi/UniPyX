@@ -2795,5 +2795,11 @@
             "tmd_wii/cetk"
         ]],
         "ts":0
+    },
+    "sasr_xpac_hashes":{
+        "p":"sasr_xpac_hashes.bt",
+        "fs":[
+        "https://raw.githubusercontent.com/tge-was-taken/010-Editor-Templates/656453e2b101b9999a72bd6179c95a490e12addf/templates/sasr_xpac_hashes.bt"
+        ]
     }
 }

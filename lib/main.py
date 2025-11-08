@@ -3014,6 +3014,47 @@ def extract(inp:str,out:str,t:str) -> bool:
                 if not exists(i): return 1
 
             return quickbms('ttgames')
+        case 'XPAC':
+            import zlib
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+
+            hshs = {int(x[0],16):x[1][2:] for x in re.findall(r'case 0x([A-F\d]{8}): return "([^"]+)";',open(db.get('sasr_xpac_hashes'),encoding='utf-8').read())}
+            hshs |= {0x72E575D5:'Resource/Audio/cars/AIAI.abc'         ,0x28A48754:'Resource/Audio/cars/AVATAR.abc'  ,0x937805F5:'Resource/Audio/cars/BANJO.abc',
+                     0xB2AEE867:'Resource/Audio/cars/BDJOE.abc'        ,0xF71A6E43:'Resource/Audio/cars/BEAT.abc'    ,0xD88EA041:'Resource/Audio/cars/BIG.abc',
+                     0xB594EA59:'Resource/Audio/cars/BILLY_HATCHER.abc',0x2CC5AD38:'Resource/Audio/cars/EGGMAN.abc'  ,0xD4202A23:'Resource/Audio/cars/HOUSEOFTHEDEAD.abc',
+                     0x1C359E16:'Resource/Audio/cars/MII.abc'          ,0x5541CF1D:'Resource/Audio/cars/RYO_BIKE.abc',0x8C56C758:'Resource/Audio/cars/RYO_FL.abc',
+                     0xE0289AB1:'Resource/Audio/cars/SHADOW.abc'       ,0x7841A33C:'Resource/Audio/cars/TAILS.abc'   ,0x360B3EA4:'Resource/Audio/cars/ULALA.abc',
+                     0x69D5A62D:'Resource/Audio/cars/ALEXKIDD.abc'     ,0x00022583:'Resource/Audio/wav/COM_FRE/COM_COL_H_126.str'}
+            hshs |= {0x77CC3C42:'Resource/DebugLights.zig',0x53310504:'Resource/Machine.zif',0xB0784A37:'Resource/Machine.zig',0x98F6FCDF:'$Unknown/Pipe.zif',0x0238A928:'$Unknown/Pipe.zig'}
+            hshs |= {0xB3E850E4:'$Unknown/Unk1.zig',0x5875B07C:'$Unknown/Unk1.zif',0x8A3B39B7:'$Unknown/Particles.zig',0x71CA44A2:'$Unknown/Effects.zig',0x3C5249FB:'$Unknown/Effects.zif',0xC03C389F:'$Unknown/Particles.zif'}
+            for h in (0x00FC9F2D,0x0AC1CFB4,0xF0B4ADEA,0x55F4D9E6,0x71F1ACF3,0x4638DEE8): hshs[h] = f'$Unknown/{h:08X}.zig'
+            for h in (0x09A915C5,0x94AAD2E5,0x15048861,0x25A5E8D2): hshs[h] = f'$Unknown/{h:08X}.zif'
+            for h in (0x0090AE05,0x9D853559,0x7EFC3B8B): hshs[h] = f'$Unknown/{h:08X}.tso'
+            for h in (0xFFE6BEC5,0x59C8DA80): hshs[h] = f'$Unknown/{h:08X}.txt'
+
+            f = File(i,endian='<')
+            f.skip(12)
+            c = f.readu32()
+            f.skip(4)
+
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                hs = f.readu32()
+                off = f.readu32()
+                zsiz = f.readu32()
+                siz = f.readu32()
+                fs.append((hshs[hs] if hs in hshs else f'$Unknown/{hs:08X}',off,zsiz,siz))
+
+            for of in fs:
+                f.seek(of[1])
+                zlb = of[2] >= 12 and f.read(2) == b'\x78\xDA'
+                f.skip(-2)
+                if zlb: d = zlib.decompress(f.read(of[2]))
+                else: d = f.read(of[2] or of[3])
+                xopen(o + '/' + of[0],'wb').write(d)
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
