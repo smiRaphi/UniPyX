@@ -71,6 +71,10 @@ class File:
 
     def update_size(self): self._size = self.tell()
     def __len__(self): return self._size
+    def __bool__(self):
+        b = self.reads()
+        self.skip(-1)
+        return bool(b)
 
 def check_sha1(f:str,hsh:bytes):
     f = open(str(f),'rb')

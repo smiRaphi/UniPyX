@@ -889,6 +889,55 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 else: d = f.read(of[2] or of[3])
                 xopen(o + '/' + of[0],'wb').write(d)
             if fs: return
+        case 'IFF Data':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='>')
+
+            assert f.read(4) == b'FORM'
+            f.skip(4)
+            BTYPE = f.read(4)
+
+            cnt = [0]
+            FNAMES = []
+            def read_block(fpath:str,fname:str=None,addext=True):
+                name = f.read(4)
+                size = f.readu32()
+                pos = f.pos
+                epos = pos + size
+
+                if name == b'FORM':
+                    typ = f.read(4).strip(b'\0 \t\r\n')
+
+                    if BTYPE in (b'NSF1',b'NMF1') and typ[3:].isdigit(): typ = typ[:3]
+
+                    try: typ = '.' + typ.decode().lower()
+                    except: typ = '.iff'
+                    f.skip(-12)
+
+                    if not fname and FNAMES: fname = FNAMES.pop(0)
+                    fname = fpath + '/' + (fname or f'{cnt[0]}')
+                    fcnt = 1
+                    while exists(fname + (typ if addext else '')):
+                        if fcnt > 1: fname = fname.rsplit('_',1)[0]
+                        fname += f'_{fcnt}'
+                        fcnt += 1
+
+                    xopen(fname + (typ if addext else ''),'wb').write(f.read(8 + size))
+                    cnt[0] += 1
+
+                    f.seek(pos + 4)
+                    while f.pos < epos: read_block(fname + '_EXT')
+                elif name == b'WRCH' and BTYPE == b'NSF1':
+                    f.skip(4)
+                    while f.pos < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
+                elif name == b'NETN' and BTYPE in (b'NSF1',b'NMF1'):
+                    FNAMES.append(f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
+
+                f.seek(epos)
+
+            while f: read_block(o)
+            if cnt[0]: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

@@ -870,5 +870,9 @@
     ],
     "EXT":[
         "linux rev 1.0 ext3 filesystem data"
+    ],
+    "IFF Data":[
+        "generic iff container",
+        "iff data"
     ]
 }
