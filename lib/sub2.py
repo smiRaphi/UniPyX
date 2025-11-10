@@ -234,7 +234,28 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'XISO':
             run(['xdvdfs','unpack',i,o])
             if os.listdir(o): return
-        case 'Xbox LIVE ROM': raise NotImplementedError
+        case 'Xbox LIVE ROM'|'Xbox PIRS':
+            xpt = db.get('py360_stfs')
+            xpd = open(xpt,encoding='utf-8').read()
+            if 'from cStringIO import StringIO' in xpd:
+                open(xpt,'w',encoding='utf-8').write(xpd.replace(
+                    'from cStringIO import StringIO','from io import BytesIO as StringIO').replace(
+                    'from constants import','from .constants import').replace(
+                    ' print ',' pass#').replace(
+                    'assert data in ("CON ",','assert data.decode() in ("CON ",').replace(
+                    "'\\x00'","b'\\0'").replace(
+                    '"%s\\x00"',"b'%s\\0'").replace(
+                    "data[:0x28].strip(b'\\0')","data[:0x28].strip(b'\\0').decode()").replace(
+                    "self.filename != ''","self.filename"))
+
+            if db.print_try: print('Trying with py360_stfs')
+            import bin.py360.stfs as stfs # type: ignore
+            stfs.xrange = range
+            stfs.ord = lambda x: x[0] if isinstance(x,bytes) else (x if isinstance(x,int) else ord(x))
+            stfs.os = os
+
+            stfs.extract_all(['',i,o])
+            if os.listdir(o): return
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
             if os.listdir(o):
@@ -342,11 +363,19 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     tff.close()
                     assert chk,basename(tf)
                     mkdir(od)
-                    extract(tf,od,'GameCube ISO')
+                    extract2(tf,od,'GameCube ISO')
                 elif t == 'N':
                     tff = open(tf,'rb')
                     nt = None
                     if tff.read(0x50) == b"NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ": nt = 'Monkey Ball A'
+                    tff.close()
+                    if nt:
+                        mkdir(od)
+                        extract(tf,od,nt)
+                elif t == '2':
+                    tff = open(tf,'rb')
+                    nt = None
+                    if tff.read(0x60) == b'Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ': nt = 'Initial D 3 Export A'
                     tff.close()
                     if nt:
                         mkdir(od)

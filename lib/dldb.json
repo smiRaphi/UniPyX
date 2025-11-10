@@ -2289,6 +2289,28 @@
         ],
         "ts":0
     },
+    "py360_stfs":{
+        "p":"py360/stfs.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/arkem/py360/refs/heads/main/py360/stfs.py",
+            "py360/stfs.py"
+        ],[
+            "https://raw.githubusercontent.com/arkem/py360/refs/heads/main/py360/constants.py",
+            "py360/constants.py"
+        ]]
+    },
+    "xbdecompress":{
+        "p":"xbdecompress/xbdecompress.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "xbdecompress/xbdecompress.exe":"xbdecompress/xbdecompress.exe",
+                "xbdecompress/msvcp71.dll":"xbdecompress/msvcp71.dll",
+                "xbdecompress/msvcr71.dll":"xbdecompress/msvcr71.dll",
+                "xbdecompress/xbdm.dll":"xbdecompress/xbdm.dll"
+            }
+        }]
+    },
     "snzip":{
         "p":"snzip.exe",
         "fs":[{

@@ -128,7 +128,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 os.rename(o + '/' + f,tf)
                 if extname(tf) == '.iso':
                     mkdir(to)
-                    if extract(tf,to,'ISO'): remove(to)
+                    if extract1(tf,to,'ISO'): remove(to)
                     else: remove(tf)
             if os.listdir(o): return
         case 'ISO'|'IMG'|'Floppy Image'|'CDI'|'UDF'|'Aaru':
@@ -145,8 +145,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 return
             remove(td)
 
+            bd = os.listdir(o)
             run(['7z','x',i,'-o' + o,'-aou'])
-            if exists(o) and os.listdir(o): return
+            if exists(o):
+                for f in os.listdir(o):
+                    if f not in bd: return
         case 'CUE+BIN'|'CDI CUE+BIN':
             osj = OSJump()
             osj.jump(dirname(i))
@@ -167,7 +170,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 for f in os.listdir(o):
                     if f.endswith('.iso'):
                         f = o + '\\' + f
-                        if not extract(f,o,'ISO'): remove(f)
+                        if not extract1(f,o,'ISO'): remove(f)
                 return
         case 'Apple Partition Map':
             _,e,_ = run(['7z','l','-tAPM',i],print_try=False)

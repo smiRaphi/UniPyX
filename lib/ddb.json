@@ -127,6 +127,14 @@
         "rs":"Pokemon FSYS","s":1
     },
     {
+        "d":[["isat","\\x0F\\xF5\\x12",0],["isin",["\\xED","\\xEE"],3]],
+        "rs":"Xbox XB Compressed","s":1
+    },
+    {
+        "d":[["isat","FArc",0],["isat","\\0\\0\\0",8],["isin",["\\1","\\4"],11]],
+        "rs":"Xbox FArc"
+    },
+    {
         "d":["isat","\\0\\3\\0\\5\\0\\0\\0\\0",0],
         "rs":"RetroStudio PAK"
     },

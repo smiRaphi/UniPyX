@@ -874,5 +874,8 @@
     "IFF Data":[
         "generic iff container",
         "iff data"
+    ],
+    "Xbox PIRS":[
+        "xbox 360 pirs container data file"
     ]
 }

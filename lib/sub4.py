@@ -938,6 +938,33 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             while f: read_block(o)
             if cnt[0]: return
+        case 'Xbox XB Compressed':
+            run(['xbdecompress','/Y','/T',i,o])
+            if os.listdir(o): return
+        case 'Xbox FArc':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='>')
+
+            assert f.read(4) == b'FArc'
+            f.skip(8)
+            fs = []
+            foff = 0
+            while not foff or (f.pos+9) < foff:
+                nm = b''
+                while True:
+                    b = f.read(1)
+                    if not b: raise EOFError
+                    if b == b'\0': break
+                    nm += b
+                off = f.readu32()
+                if not foff: foff = off
+                fs.append((nm.decode(),off,f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
