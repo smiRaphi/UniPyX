@@ -10,7 +10,7 @@ GRELTG = re.compile(r'/releases/tag/([^"]+)" data-view-component=')
 GFMTS = {
     'ip7z/7zip':lambda tag:f'7z{tag.replace(".","")}-x64.msi',
     'julian-r/file-windows':lambda tag:f'file_{tag[1:]}-build104-vs2022-x64.zip',
-    'ExeinfoASL/ASL':lambda tag:f'Exeinfo_{tag[1:].replace(".","")}.zip',
+    #'ExeinfoASL/ASL':lambda tag:f'Exeinfo_{tag[1:].replace(".","")}.zip',
     'aaru-dps/Aaru':lambda tag:f'aaru-{tag[1:]}_windows_x64.zip',
     'Sappharad/GDIbuilder':lambda tag:f'gdibuilder{tag[1:].replace(".","")}_cmd_win_x64.zip',
     'upx/upx':lambda tag:f'upx-{tag[1:]}-win64.zip',

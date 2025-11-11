@@ -965,6 +965,57 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[1])
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
             if fs: return
+        case 'RouterOS Package':
+            db.get('npkpy')
+
+            import importlib,importlib.util,zlib
+            class RedSpec:
+                @classmethod
+                def find_spec(cls,fullname,path,target=None):
+                    if '.npk.' in fullname: rename = fullname.replace('.npk.','.')
+                    elif fullname == 'npkpy.npk': rename = 'npkpy'
+                    elif fullname == 'bin.npkpy._npk': rename = 'bin.npkpy.npk'
+                    elif fullname.startswith('npkpy'): rename = fullname
+                    else: rename = None
+                    if rename:
+                        if rename.startswith('npkpy.') or rename == 'npkpy': rename = 'bin.' + rename
+                        spec = importlib.util.find_spec(rename)
+                        spec.name = fullname
+                        spec.fake = rename
+                        spec.loader = cls
+                        return spec
+                @staticmethod
+                def create_module(spec):return importlib.import_module(spec.fake) if hasattr(spec,'fake') else None
+                @staticmethod
+                def exec_module(spec):pass
+            sys.meta_path.append(RedSpec)
+
+            class Empty:pass
+            com = Empty()
+            com.sha1_sum_from_file = lambda x: hashlib.sha1(open(x,'rb').read()).digest()
+            com.sha1_sum_from_binary = lambda x: hashlib.sha1(x).digest()
+            for e in ('','Id','MagicBytes'): setattr(com,f'NPK{e}Error',Exception)
+
+            sys.modules['npkpy.npk'] = __import__('bin.npkpy')
+            sys.modules['npkpy.common'] = com
+
+            from pathlib import Path
+
+            if db.print_try: print('Trying with npkpy')
+            from bin.npkpy._npk import Npk # type: ignore
+
+            try: npk = Npk(Path(i))
+            except: return 1
+            inf = b''
+            for f in npk.pck_cnt_list:
+                if f.cnt_id_name in ('PckReleaseTyp','CntArchitectureTag','PckDescription','PckEckcdsaHash'): inf += f.cnt_id_name[3:].encode() + b': ' + f.cnt_payload + b'\n'
+                elif f.cnt_id_name == 'CntZlibDompressedData': open(o + '/data.bin','wb').write(zlib.decompress(f.cnt_payload))
+                elif f.cnt_id_name == 'CntSquashFsImage':
+                    tf = o + '/cnt.squashsf'
+                    open(tf,'wb').write(f.cnt_payload)
+                    if not extract(tf,o,'SquashFS'): remove(tf)
+            if inf: open(o + '/package.txt','wb').write(inf)
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

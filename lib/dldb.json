@@ -6,9 +6,9 @@
             "x":{
                 "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
             },
-            "ts":1760220000
+            "ts":1762729200
         }],
-        "ts":1760220000
+        "ts":1762729200
     },
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
@@ -29,15 +29,15 @@
             "x":{
                 "trid.exe":"trid/trid.exe"
             },
-            "ts":1760479200
+            "ts":1762210800
         },{
             "u":"https://mark0.net/download/triddefs.zip",
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1761865200
+            "ts":1762556400
         }],
-        "ts":1761865200
+        "ts":1762556400
     },
     "file":{
         "p":"file/file.exe",
@@ -60,13 +60,14 @@
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
         "fs":[{
-            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.0/Exeinfo_0090.zip",
+            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.3/exeinfope.zip",
             "x":{
                 "ExeinfoPe/exeinfope.exe":"ExeinfoPe/exeinfope.exe",
                 "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll"
-            }
+            },
+            "ts":1762290350
         }],
-        "ts":0
+        "ts":1762290350
     },
     "yara":{
         "p":"yara/yara.exe",
@@ -97,9 +98,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1762038000
+            "ts":1762815600
         }],
-        "ts":1762038000
+        "ts":1762815600
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -496,13 +497,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/72/86/dolphin-master-2509-283-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/da/c1/dolphin-master-2509-371-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1761996345
+            "ts":1762817753
         }],
-        "ts":1761996345
+        "ts":1762817753
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -736,14 +737,14 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.5/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.6/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1760326925
+            "ts":1762544395
         }],
-        "ts":1760326925
+        "ts":1762544395
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -2114,15 +2115,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.0.1/GDRE_tools-v2.0.1-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.1.0/GDRE_tools-v2.1.0-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1761163654
+            "ts":1762532286
         }],
-        "ts":1761163654
+        "ts":1762532286
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2297,7 +2298,8 @@
         ],[
             "https://raw.githubusercontent.com/arkem/py360/refs/heads/main/py360/constants.py",
             "py360/constants.py"
-        ]]
+        ]],
+        "ts":0
     },
     "xbdecompress":{
         "p":"xbdecompress/xbdecompress.exe",
@@ -2310,6 +2312,37 @@
                 "xbdecompress/xbdm.dll":"xbdecompress/xbdm.dll"
             }
         }]
+    },
+    "npkpy":{
+        "p":"npkpy/npk.py",
+        "fs":[{
+            "u":"https://github.com/botlabsDev/npkpy/archive/refs/heads/master.zip",
+            "x":{
+                "npkpy-master/npkpy/npk/__init__.py":"npkpy/__init__.py",
+                "npkpy-master/npkpy/npk/cnt_architecture_tag.py":"npkpy/cnt_architecture_tag.py",
+                "npkpy-master/npkpy/npk/cnt_basic.py":"npkpy/cnt_basic.py",
+                "npkpy-master/npkpy/npk/cnt_flag_a.py":"npkpy/cnt_flag_a.py",
+                "npkpy-master/npkpy/npk/cnt_flag_b.py":"npkpy/cnt_flag_b.py",
+                "npkpy-master/npkpy/npk/cnt_flag_c.py":"npkpy/cnt_flag_c.py",
+                "npkpy-master/npkpy/npk/cnt_mpls.py":"npkpy/cnt_mpls.py",
+                "npkpy-master/npkpy/npk/cnt_null_block.py":"npkpy/cnt_null_block.py",
+                "npkpy-master/npkpy/npk/cnt_squasfs_image.py":"npkpy/cnt_squasfs_image.py",
+                "npkpy-master/npkpy/npk/cnt_squashfs_hash_signature.py":"npkpy/cnt_squashfs_hash_signature.py",
+                "npkpy-master/npkpy/npk/cnt_zlib_compressed_data.py":"npkpy/cnt_zlib_compressed_data.py",
+                "npkpy-master/npkpy/npk/npk.py":"npkpy/npk.py",
+                "npkpy-master/npkpy/npk/npk_constants.py":"npkpy/npk_constants.py",
+                "npkpy-master/npkpy/npk/npk_file_basic.py":"npkpy/npk_file_basic.py",
+                "npkpy-master/npkpy/npk/pck_description.py":"npkpy/pck_description.py",
+                "npkpy-master/npkpy/npk/pck_eckcdsa_hash.py":"npkpy/pck_eckcdsa_hash.py",
+                "npkpy-master/npkpy/npk/pck_header.py":"npkpy/pck_header.py",
+                "npkpy-master/npkpy/npk/pck_multicontainer_header.py":"npkpy/pck_multicontainer_header.py",
+                "npkpy-master/npkpy/npk/pck_multicontainer_list.py":"npkpy/pck_multicontainer_list.py",
+                "npkpy-master/npkpy/npk/pck_preheader.py":"npkpy/pck_preheader.py",
+                "npkpy-master/npkpy/npk/pck_release_typ.py":"npkpy/pck_release_typ.py",
+                "npkpy-master/npkpy/npk/pck_requirements_header.py":"npkpy/pck_requirements_header.py"
+            }
+        }],
+        "ts":0
     },
     "snzip":{
         "p":"snzip.exe",
@@ -2336,7 +2369,8 @@
         "p":"DecryptEACPayload.exe",
         "fs":[
         "https://github.com/lguilhermee/EAC-Extractor-Utility/releases/download/v2.0.0/DecryptEACPayload.exe"
-        ]
+        ],
+        "ts":0
     },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
@@ -2503,7 +2537,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.3/lessmsi-v2.10.3.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.4/lessmsi-v2.10.4.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -2512,9 +2546,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1760119873
+            "ts":1762144303
         }],
-        "ts":1760119873
+        "ts":1762144303
     },
     "msix":{
         "p":"MsiX.exe",
@@ -2715,42 +2749,48 @@
         "fs":[[
             "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20CHUNK%20EXTRACT.bms",
             "BMS/MONKEY BALL CHUNK EXTRACT.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "monkey ball dtpk extract":{
         "p":"BMS/MONKEY BALL DTPK EXTRACT.bms",
         "fs":[[
             "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20DTPK%20EXTRACT.bms",
             "BMS/MONKEY BALL DTPK EXTRACT.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "monkey ball spsd extract":{
         "p":"BMS/MONKEY BALL SPSD EXTRACT.bms",
         "fs":[[
             "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/Naomi_MonkeyBall/Script_Tools/MONKEY%20BALL%20SPSD%20EXTRACT.bms",
             "BMS/MONKEY BALL SPSD EXTRACT.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "initd3e nmzip extract":{
         "p":"BMS/INITD3E NMZIP EXTRACT.bms",
         "fs":[[
             "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/NMZIP.bms",
             "BMS/INITD3E NMZIP EXTRACT.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "initd3e tex extract":{
         "p":"BMS/INITD3E TEX EXTRACT.bms",
         "fs":[[
             "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/MISSING_TEX.bms",
             "BMS/INITD3E TEX EXTRACT.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "initd3e spsd extract":{
         "p":"BMS/INITD3E SPSD EXTRACT.bms",
         "fs":[[
             "https://raw.githubusercontent.com/NaomiMod/games-ExtractTools/refs/heads/main/InitialD3_Exp/Script_Tools/SPSD_EXTRACT.bms",
             "BMS/INITD3E SPSD EXTRACT.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "ttgames":{
         "p":"BMS/ttgames.bms",
@@ -2809,6 +2849,7 @@
         "p":"sasr_xpac_hashes.bt",
         "fs":[
         "https://raw.githubusercontent.com/tge-was-taken/010-Editor-Templates/656453e2b101b9999a72bd6179c95a490e12addf/templates/sasr_xpac_hashes.bt"
-        ]
+        ],
+        "ts":0
     }
 }

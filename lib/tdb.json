@@ -882,5 +882,12 @@
         "vmprotect",
         "vmprotect v.2.x",
         "www.vmpsoft.com"
+    ],
+    "RouterOS Package":[
+        "mikrotik routeros upgrade package"
+    ],
+    "SquashFS":[
+        "squashfs image file",
+        "squashsf image file (little endian)"
     ]
 }

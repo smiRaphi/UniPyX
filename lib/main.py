@@ -446,7 +446,10 @@ def fix_innoinstext(o:str,i:str):
     for f in os.listdir(dirname(i)):
         f = dirname(i) + '\\' + f
         if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
-        hookshot(bcmd + [f],{f'{os.environ["SYSTEMROOT"]}\\Temp':TMP,'C:\\Windows\\Temp':TMP},cwd=td.p)
+        mkdir(TMP + '\\INNOTMP1')
+        mkdir(TMP + '\\INNOTMP2')
+        hookshot(bcmd + [f],{f'{os.environ["SYSTEMROOT"]}\\Temp':TMP + '\\INNOTMP1','C:\\Windows\\Temp':TMP + '\\INNOTMP2'},cwd=td.p)
+        remove(TMP + '\\INNOTMP1',TMP + '\\INNOTMP2')
     td.destroy()
 
     return True
