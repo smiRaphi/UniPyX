@@ -70,6 +70,17 @@
         "rs":"Qt IFW","s":1
     },
     {
+        "rqr":null,
+        "d":[["isat","\\xA7\\xED\\x96\\x0C\\x0F\\x0F\\x12\\x19\\x1C\\x1B\\x1E\\x20\\x22\\x26\\x2A\\xE5\\xE8\\x33\\x36\\x39\\x3C\\x3F\\x42\\x85\\x88\\x4B\\x4E\\x51\\x54\\x57\\x5A\\x5D",0],
+             ["isat","\\x0B\\x41\\x42\\x14\\xB4\\x87",552]],
+        "rs":"Encrypted EAC Payload","s":1
+    },
+    {
+        "rq":"VMProtect",
+        "d":[["isat",".eac0\\0\\0\\0",552],["isat",".eac1\\0\\0\\0",592]],
+        "rs":"EAC Payload","s":1
+    },
+    {
         "rqr":"Generic Win/DOS Executable",
         "d":[["isat","GDPC",-4],["contain","pck\\0\\0\\0\\0\\0",[384,911]]],
         "rs":"Godot Game","s":1

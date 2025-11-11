@@ -24,7 +24,6 @@ GFMTS = {
     'lifenjoiner/ISx':lambda tag:f'ISx-{tag}.7z',
     'activescott/lessmsi':lambda tag:f'lessmsi-{tag}.zip',
     'rm-NoobInCoding/UnPSARC':lambda tag:f'UnPSARC_{tag}.zip',
-    'peitaosu/WFRR':lambda tag,arch:f'WFRR_{tag}.0_{arch}_release.zip',
     'AppleCommander/AppleCommander':lambda tag:f'AppleCommander-acx-{tag}.jar',
     'unsound/hfsexplorer':lambda tag:f'{tag}-bin.zip',
     'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
@@ -105,8 +104,7 @@ def update():
 
                     if ts > ots:
                         if repo in GFMTS:
-                            if repo == 'peitaosu/WFRR': of = GFMTS[repo](tag,u.split('_')[-2])
-                            else: of = GFMTS[repo](tag)
+                            of = GFMTS[repo](tag)
                             nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
                         else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
                         if u != nu:

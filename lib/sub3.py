@@ -977,5 +977,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['unp64',tf])
             remove(tf)
             if os.listdir(o): return
+        case 'VMProtect': raise NotImplementedError
+        case 'Encrypted EAC Payload':
+            hookshot(['decrypteacpayload','-e',i],{'C:\\EAC_Dumps':o})
+
+            for f in os.listdir(o):
+                p = o + '\\' + f
+                if f.startswith('Dump_') and isdir(p) and exists(p + '/EAC_Launcher_decrypted.dll'): break
+            else: return 1
+
+            remove(p + '/original_eac.bin',p + '/eac_.bin')
+            copydir(p,o,True)
+            if open(o + '/EAC_Launcher_decrypted.dll','rb').read(4) in (b'MZ\x90\x00',b'\x7FELF'): return
 
     return 1

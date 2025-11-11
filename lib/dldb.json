@@ -2332,6 +2332,12 @@
         }],
         "ts":0
     },
+    "decrypteacpayload":{
+        "p":"DecryptEACPayload.exe",
+        "fs":[
+        "https://github.com/lguilhermee/EAC-Extractor-Utility/releases/download/v2.0.0/DecryptEACPayload.exe"
+        ]
+    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
@@ -2342,40 +2348,21 @@
         }],
         "ts":0
     },
-    "wfrrx64":{
-        "p":"WFRRx64/WFRR.exe",
+    "hookshot":{
+        "p":"Hookshot/Hookshot.64.exe",
         "fs":[{
-            "u":"https://github.com/peitaosu/WFRR/releases/download/v1.0.0/WFRR_v1.0.0.0_x64_release.zip",
+            "u":"https://github.com/samuelgr/Hookshot/releases/download/v1.3.1/Hookshot-v1.3.1.zip",
             "x":{
-                "WFRR.exe":"WFRRx64/WFRR.exe",
-                "FSHook.dll":"WFRRx64/FSHook.dll",
-                "RegHook.dll":"WFRRx64/RegHook.dll",
-                "WFRR.exe.config":"WFRRx64/WFRR.exe.config",
-                "EasyHook.dll":"WFRRx64/EasyHook.dll",
-                "EasyHook64.dll":"WFRRx64/EasyHook64.dll",
-                "EasyHook64Svc.exe":"WFRRx64/EasyHook64Svc.exe",
-                "EasyLoad64.dll":"WFRRx64/EasyLoad64.dll",
-                "Newtonsoft.Json.dll":"WFRRx64/Newtonsoft.Json.dll",
-                "log4net.dll":"WFRRx64/log4net.dll"
+                "Hookshot-v1.3.1/Hookshot.64.exe":"Hookshot/Hookshot.64.exe",
+                "Hookshot-v1.3.1/Hookshot.32.exe":"Hookshot/Hookshot.32.exe",
+                "Hookshot-v1.3.1/Hookshot.64.dll":"Hookshot/Hookshot.64.dll",
+                "Hookshot-v1.3.1/Hookshot.32.dll":"Hookshot/Hookshot.32.dll"
             }
-        }],
-        "ts":0
-    },
-    "wfrrx86":{
-        "p":"WFRRx86/WFRR.exe",
-        "fs":[{
-            "u":"https://github.com/peitaosu/WFRR/releases/download/v1.0.0/WFRR_v1.0.0.0_x86_release.zip",
+        },{
+            "u":"https://github.com/samuelgr/Pathwinder/releases/download/v1.2.0/Pathwinder-v1.2.0.zip",
             "x":{
-                "WFRR.exe":"WFRRx86/WFRR.exe",
-                "FSHook.dll":"WFRRx86/FSHook.dll",
-                "RegHook.dll":"WFRRx86/RegHook.dll",
-                "WFRR.exe.config":"WFRRx86/WFRR.exe.config",
-                "EasyHook.dll":"WFRRx86/EasyHook.dll",
-                "EasyHook32.dll":"WFRRx86/EasyHook32.dll",
-                "EasyHook32Svc.exe":"WFRRx86/EasyHook32Svc.exe",
-                "EasyLoad32.dll":"WFRRx86/EasyLoad32.dll",
-                "Newtonsoft.Json.dll":"WFRRx86/Newtonsoft.Json.dll",
-                "log4net.dll":"WFRRx86/log4net.dll"
+                "Pathwinder-v1.2.0/x64/Pathwinder.HookModule.64.dll":"Hookshot/Pathwinder.HookModule.64.dll",
+                "Pathwinder-v1.2.0/Win32/Pathwinder.HookModule.32.dll":"Hookshot/Pathwinder.HookModule.32.dll"
             }
         }],
         "ts":0

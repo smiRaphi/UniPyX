@@ -167,8 +167,8 @@ def analyze(inp:str,raw=False):
                     for x in msplit(' - ' + lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' ]   ',' stub : ',' Ovl like : ',' - ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
                         elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown ','*Unknown ','Stub : *Unknown ','EP Token : ','File is corrupted ')):
-                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].split('Warning : ')[0].strip(' ,!:;-')
-                            if x and x.lower() not in ('genuine','unknown','more than necessary )') and not (len(x) == 4 and x.isdigit()): ts.append(x)
+                            x = x.split('(')[0].split('[')[0].split(' -> OVL Offset : ')[0].split(' > section : ')[0].split(' , size : ')[0].split('Warning : ')[0].split('Structure : ')[-1].strip(' ,!:;-')
+                            if x and x.lower() not in ('genuine','unknown','more than necessary )') and not (len(x) == 4 and x.isdigit()) and not (len(x) == 9 and x.replace('-','').isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
                 yp = os.path.dirname(yrep[0])
@@ -370,6 +370,29 @@ def extract(inp:str,out:str,t:str) -> bool:
         if not r: return r
 
     return 1
+def hookshot(cmd:list,redirect:dict,**kwargs):
+    scr = cmd[0]
+    if not 'print_try' in kwargs or kwargs.pop('print_try'): print('Trying with',scr)
+    scr = db.get(scr)
+    hks = scr + '.hookshot'
+    open(hks,'x').close()
+
+    #hkc = dirname(hks) + '/Hookshot.ini'
+    #open(hkc,'wb').write(b'LoadHookModulesFromHookshotDirectory = yes\n')
+    pwc = dirname(hks) + '/Pathwinder.ini'
+    pwf = open(pwc,'w',encoding='utf-8')
+    for i,(k,v) in enumerate(redirect.items()):
+        pwf.write(f'[FilesystemRule:Rule{i}]\nOriginDirectory = {k}\nTargetDirectory = {v}\n\n')
+    pwf.close()
+
+    pw3 = dirname(hks) + '/Pathwinder.HookModule.32.dll'
+    pw6 = dirname(hks) + '/Pathwinder.HookModule.64.dll'
+    symlink(dirname(db.get('hookshot')) + '/Pathwinder.HookModule.32.dll',pw3)
+    symlink(dirname(db.get('hookshot')) + '/Pathwinder.HookModule.64.dll',pw6)
+
+    r = db.run(['hookshot',scr] + cmd[1:],print_try=False,**kwargs)
+    remove(hks,pwc,pw3,pw6)
+    return r
 def fix_isinstext(o:str,oi:str=None):
     ret = True
     oi = oi or o
@@ -417,25 +440,15 @@ def fix_innoinstext(o:str,i:str):
 
     td = TmpDir()
     copydir(uad,td.p)
-
-    wfd64 = dirname(db.get('wfrrx64'))
-    wfd86 = dirname(db.get('wfrrx86'))
-    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd64 + '/V_FS.json','w'),separators=(',',':'))
-    json.dump({'Mapping':[{'Source':f'{os.environ["SYSTEMROOT"]}\\Temp','Target':TMP},{'Source':r'C:\\Windows\\Temp','Target':TMP}]},open(wfd86 + '/V_FS.json','w'),separators=(',',':'))
-    prcs = []
-    for f in os.listdir(td.p):
-        if f.startswith('cls-') and f.endswith('_x64.exe'): prcs.append(subprocess.Popen([db.get('wfrrx64'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
-        elif f.startswith('cls-') and f.endswith('_x86.exe'): prcs.append(subprocess.Popen([db.get('wfrrx86'),'-n',f[:-4],'--file'],stdout=-1,stderr=-1))
+    open(td + '/.hookshot','x').close()
 
     bcmd = ['unarc-cpp',td + '\\unarc.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
     for f in os.listdir(dirname(i)):
         f = dirname(i) + '\\' + f
         if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
-        db.run(bcmd + [f],cwd=td.p)
+        hookshot(bcmd + [f],{f'{os.environ["SYSTEMROOT"]}\\Temp':TMP,'C:\\Windows\\Temp':TMP},cwd=td.p)
     td.destroy()
 
-    for p in prcs: p.kill()
-    remove(wfd64 + '/WFRR.log',wfd64 + '/V_FS.json',wfd86 + '/WFRR.log',wfd86 + '/V_FS.json')
     return True
 def fix_tar(o:str,rem=True):
     if len(os.listdir(o)) == 1:
