@@ -2353,6 +2353,24 @@
             }
         }]
     },
+    "exceldna-unpack":{
+        "p":"exceldna-unpack.exe",
+        "fs":[{
+            "u":"https://github.com/augustoproiete/exceldna-unpack/releases/download/v2.1.0/exceldna-unpack-2.1.0-win7-x64.zip",
+            "x":{
+                "exceldna-unpack.exe":"exceldna-unpack.exe"
+            }
+        }]
+    },
+    "android-ota-extractor":{
+        "p":"android-ota-extrator.exe",
+        "fs":[{
+            "u":"https://github.com/tobyxdd/android-ota-payload-extractor/releases/download/v1.1/android-ota-extractor-v1.1-windows-amd64.zip",
+            "x":{
+                "android-ota-extrator.exe":"android-ota-extrator.exe"
+            }
+        }]
+    },
     "snzip":{
         "p":"snzip.exe",
         "fs":[{

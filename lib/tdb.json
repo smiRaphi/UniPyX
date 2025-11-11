@@ -893,5 +893,9 @@
     "PeaZip":[
         "pea compressed archive (v1.x)",
         "peazip archive"
+    ],
+    "Chromium Delta Update":[
+        "chromium delta update format",
+        "chromoium delta update format"
     ]
 }

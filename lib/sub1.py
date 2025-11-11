@@ -140,9 +140,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
             td = dirname(i) + '\\' + td
             if exists(td) and os.listdir(td):
                 td1 = td + '/' + os.listdir(td)[0]
-                copydir(td1 + '/' + os.listdir(td1)[0],o)
-                remove(td)
-                return
+                if os.listdir(td1):
+                    copydir(td1 + '/' + os.listdir(td1)[0],o)
+                    remove(td)
+                    return
             remove(td)
 
             bd = os.listdir(o)
