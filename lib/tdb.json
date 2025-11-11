@@ -180,7 +180,8 @@
     "MSI":[
         "microsoft windows installer",
         "windows sdk setup transformer script",
-        "windows sdk setup transform script"
+        "windows sdk setup transform script",
+        "microsoft installer"
     ],
     "MSP":[
         "windows installer patch"
@@ -897,5 +898,18 @@
     "Chromium Delta Update":[
         "chromium delta update format",
         "chromoium delta update format"
+    ],
+    "Nuitka Compiled":[
+        "http://nuitka.net",
+        "nuitka python compiler"
+    ],
+    "PyInstaller":[
+        "pyinstaller",
+        "pyinstaller v.3.6",
+        "www.pyinstaller.org"
+    ],
+    "Python Compiled Module":[
+        "cpython 3.8 bytecode",
+        "python compiled module"
     ]
 }

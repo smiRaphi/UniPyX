@@ -439,11 +439,5 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 of.close()
                 f.seek(cp)
             if fsc: return
-        case 'Chromium Delta Update':
-            run(['android-ota-extract',i],cwd=o)
-            if os.listdir(o): return
-        case 'Excel DNA XLL':
-            run(["exceldna-unpack",'--xllFile=' + i,'--outFolder=' + o,'--overwrite'])
-            if os.listdir(o): return
 
     return 1

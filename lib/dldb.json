@@ -2371,6 +2371,21 @@
             }
         }]
     },
+    "nuitka-extractor":{
+        "p":"nuitka-extractor.exe",
+        "fs":[
+        "https://github.com/extremecoders-re/nuitka-extractor/releases/download/2024.01.11/nuitka-extractor.exe"
+        ]
+    },
+    "pycdc":{
+        "p":"pycdc.exe",
+        "fs":[{
+            "u":"https://nightly.link/zrax/pycdc/actions/artifacts/3993086451.zip",
+            "x":{
+                "pycdc.exe":"pycdc.exe"
+            }
+        }]
+    },
     "snzip":{
         "p":"snzip.exe",
         "fs":[{

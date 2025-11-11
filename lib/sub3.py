@@ -989,5 +989,19 @@ def extract3(inp:str,out:str,t:str) -> bool:
             remove(p + '/original_eac.bin',p + '/eac_.bin')
             copydir(p,o,True)
             if open(o + '/EAC_Launcher_decrypted.dll','rb').read(4) in (b'MZ\x90\x00',b'\x7FELF'): return
+        case 'Chromium Delta Update':
+            run(['android-ota-extract',i],cwd=o)
+            if os.listdir(o): return
+        case 'Excel DNA XLL':
+            run(["exceldna-unpack",'--xllFile=' + i,'--outFolder=' + o,'--overwrite'])
+            if os.listdir(o): return
+        case 'Nuitka Compiled':
+            run(['nuitka-extractor',i],cwd=o)
+            if os.listdir(o): return
+        case 'Python Compiled Module':
+            err,r,_ = run(['pycdc',i],text=False)
+            assert not err
+            open(o + '/' + tbasename(i) + '.py','wb').write(r.split(b'\r\n',3)[3])
+            return
 
     return 1
