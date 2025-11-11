@@ -889,5 +889,9 @@
     "SquashFS":[
         "squashfs image file",
         "squashsf image file (little endian)"
+    ],
+    "PeaZip":[
+        "pea compressed archive (v1.x)",
+        "peazip archive"
     ]
 }

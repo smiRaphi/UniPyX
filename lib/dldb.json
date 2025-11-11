@@ -2344,6 +2344,15 @@
         }],
         "ts":0
     },
+    "pea":{
+        "p":"pea.exe",
+        "fs":[{
+            "u":"https://github.com/peazip/PeaZip/releases/download/10.7.0/peazip_portable-10.7.0.WIN64.zip",
+            "x":{
+                "peazip_portable-10.7.0.WIN64/pea.exe":"pea.exe"
+            }
+        }]
+    },
     "snzip":{
         "p":"snzip.exe",
         "fs":[{
@@ -2451,9 +2460,10 @@
             "u":"https://raw.githubusercontent.com/jrathlev/InnoUnpacker-Windows-GUI/refs/heads/master/innounp-2/bin/innounp-2.zip",
             "x":{
                 "innounp.exe":"innounp-2.exe"
-            }
+            },
+            "ts":1762860871
         }],
-        "ts":0
+        "ts":1762860871
     },
     "innoextract":{
         "p":"innoextract/innoextract.exe",

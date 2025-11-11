@@ -487,5 +487,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
         case 'ABE': return msdos(['dabe','-v','+i',i],cwd=o)
         case 'CarComp': return msdos(['car','x',i],cwd=o)
+        case 'PeaZip':
+            td = o + '\\tmp' + os.urandom(4).hex()
+            run(['pea','UNPEA',i,td,'RESETDATE','SETATTR','EXTRACT2DIR','HIDDEN'])
+            if exists(td):
+                if os.listdir(td):
+                    copydir(td,o,True)
+                    return
+                remove(td)
 
     return 1
