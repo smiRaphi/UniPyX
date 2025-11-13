@@ -1016,6 +1016,78 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if not extract(tf,o,'SquashFS'): remove(tf)
             if inf: open(o + '/package.txt','wb').write(inf)
             return
+        case 'Zeebo Resources':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            fs = []
+            if f.read(8) == b'PPCPRCON':
+                fc = f.readu32()
+
+                for _ in range(fc): fs.append((f.readu32(),f.readu32(),f.readu32(),f.readu8()))
+
+                fns = {}
+                for fe in fs:
+                    f.seek(fe[0])
+                    fn = str(fe[2]).zfill(4)
+
+                    if fe[2] in fns: fn += f'_{fns[fe[2]]}'
+                    else: fns[fe[2]] = 0
+                    fns[fe[2]] += 1
+
+                    fn += '.'
+                    if fe[3] == 2:
+                        fn += 'txt'
+                        if f.readu16('>') == (fe[1] - 2): fn += '.res'
+                    else: fn += fix_zeebo(f,fe[3]) or f'{fe[3]}.unk'
+
+                    f.seek(fe[0])
+                    open(o + '/' + fn,'wb').write(f.read(fe[1]))
+            else:
+                f.seek(0)
+                fc = f.readu32()
+                boff = 4 + fc * 0x48
+                for _ in range(fc): fs.append((f.read(0x40).strip(b'\0').decode(),boff + f.readu32(),f.readu32()))
+                for fe in fs:
+                    f.seek(fe[1])
+                    open(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+
+            if fs: return
+        case 'Zeebo FUFS':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'FUFS'
+            f.skip(4)
+            fc = f.readu32()
+
+            fs = []
+            for _ in range(fc): fs.append((f.readu32(),f.readu32(),f.readu32()))
+            for fe in fs:
+                f.seek(fe[0])
+
+                tag = f.read(4)
+                ext = fix_zeebo(f)
+                if not ext and fe[2] < 0x1000:
+                    try: (tag + f.read(fe[2]-4)).decode('utf-8')
+                    except: ext = 'bin'
+                    else: ext = 'txt'
+                else: ext = 'bin'
+
+                f.seek(fe[0])
+                open(o + '/' + hex(fe[1])[2:].upper().zfill(8) + '.' + ext,'wb').write(f.read(fe[2]))
+            if fs: return
+        case 'Zeebo PLZP':
+            import zlib
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.seek(12)
+            data = zlib.decompress(f.read())
+            try: open(o + '/' + tbasename(i) + '.' + (fix_zeebo(data) or 'bin'),'wb').write(data)
+            except zlib.error: pass
+            else: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

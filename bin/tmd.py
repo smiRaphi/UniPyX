@@ -33,28 +33,28 @@ class File:
     def skip(self,n:int): self.seek(n,1)
     def reads(self): return self.read(1)
 
-    def readu8 (self) -> int: return struct.unpack(self._end+'B',self.read(1))[0]
-    def readu16(self) -> int: return struct.unpack(self._end+'H',self.read(2))[0]
-    def readu24(self) -> int:
+    def readu8 (self) -> int: return self.read(1)[0]
+    def readu16(self,end=None) -> int: return struct.unpack((end or self._end)+'H',self.read(2))[0]
+    def readu24(self,end=None) -> int:
         d = self.read(3)
-        if self._end == '<': d = d + b'\0'
+        if (end or self._end) == '<': d = d + b'\0'
         else: d = b'\0' + d
-        return struct.unpack(self._end+'I',d)[0]
-    def readu32(self) -> int: return struct.unpack(self._end+'I',self.read(4))[0]
-    def readu64(self) -> int: return struct.unpack(self._end+'Q',self.read(8))[0]
-    def reads8 (self) -> int: return struct.unpack(self._end+'b',self.read(1))[0]
-    def reads16(self) -> int: return struct.unpack(self._end+'h',self.read(2))[0]
-    def reads32(self) -> int: return struct.unpack(self._end+'i',self.read(4))[0]
-    def reads64(self) -> int: return struct.unpack(self._end+'q',self.read(8))[0]
+        return struct.unpack((end or self._end)+'I',d)[0]
+    def readu32(self,end=None) -> int: return struct.unpack((end or self._end)+'I',self.read(4))[0]
+    def readu64(self,end=None) -> int: return struct.unpack((end or self._end)+'Q',self.read(8))[0]
+    def reads8 (self) -> int: return struct.unpack('b',self.read(1))[0]
+    def reads16(self,end=None) -> int: return struct.unpack((end or self._end)+'h',self.read(2))[0]
+    def reads32(self,end=None) -> int: return struct.unpack((end or self._end)+'i',self.read(4))[0]
+    def reads64(self,end=None) -> int: return struct.unpack((end or self._end)+'q',self.read(8))[0]
 
-    def writeu8 (self,data:int): return self.write(struct.pack(self._end+'B',data))
-    def writeu16(self,data:int): return self.write(struct.pack(self._end+'H',data))
-    def writeu32(self,data:int): return self.write(struct.pack(self._end+'I',data))
-    def writeu64(self,data:int): return self.write(struct.pack(self._end+'Q',data))
-    def writes8 (self,data:int): return self.write(struct.pack(self._end+'b',data))
-    def writes16(self,data:int): return self.write(struct.pack(self._end+'h',data))
-    def writes32(self,data:int): return self.write(struct.pack(self._end+'i',data))
-    def writes64(self,data:int): return self.write(struct.pack(self._end+'q',data))
+    def writeu8 (self,data:int): return self.write(struct.pack('B',data))
+    def writeu16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'H',data))
+    def writeu32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'I',data))
+    def writeu64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'Q',data))
+    def writes8 (self,data:int): return self.write(struct.pack('b',data))
+    def writes16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'h',data))
+    def writes32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'i',data))
+    def writes64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'q',data))
 
     def align(self,blocksize:int): return self.write(b'\0' * align(self.tell(),blocksize))
     def alignpos(self,blocksize:int): self.skip(align(self.tell(),blocksize))

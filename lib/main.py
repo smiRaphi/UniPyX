@@ -496,6 +496,32 @@ def fix_cab(o:str,rem=True):
     i.close()
 
     if not err and rem: remove(o + '/' + ids[0])
+def fix_zeebo(f,hint:int=None):
+    import io
+    if type(f) == bytes: f = io.BytesIO(f)
+
+    tag = f.read(4)
+
+    if tag == b'\x89PNG': ext = 'png'
+    elif tag == b'RIFF': ext = 'wav'
+    elif tag == b'MThd': ext = 'mid'
+    elif tag == b'PLZP': ext = 'plzp'
+    else:
+        f.skip(2)
+        if f.read(4) == b'JFIF': ext = 'jpg'
+        elif tag[:3] == b'ID3' or\
+            (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
+                ext = 'mp3'
+        elif tag[0] == 0x78: ext = 'zlib'
+        elif not hint is None and hint <= 3: ext = ('image','audio','txt','bin')[hint]
+        else: ext = None
+
+    if not hint is None:
+        if hint == 0 and ext not in ('png','jpg'): ext = 'image'
+        elif hint == 1 and ext not in ('wav','mid'): ext = 'audio'
+        elif hint == 2: ext = 'txt'
+
+    return ext
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     out = cleanp(out)

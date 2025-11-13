@@ -420,6 +420,20 @@
         "rs":"GBA ADS MMSTR"
     },
     {
+        "d":[["isat","PPCPRCON",0],["n0",4,8],["n0",4,12]],
+        "rs":"Zeebo Resources","s":1},{
+        "d":[["isat","\\0\\0\\0\\0",68],["n0",4,0],["n0",4,72],["str0",4,64,1]],
+        "rs":"Zeebo Resources"
+    },
+    {
+        "d":[["isat","FUFS",0],["n0",4,8],["n0",4,12]],
+        "rs":"Zeebo FUFS","s":1
+    },
+    {
+        "d":[["isat","PLZP",0],["isat","\\x78",12],["n0",4,4],["n0",4,8]],
+        "rs":"Zeebo PLZP","s":1
+    },
+    {
         "d":[["s%",2048],
              ["isat","\\1ZZZZZ\\1",0],["isatS","\\0",32,8],["str0",40,8,1]],
         "rs":"3DO IMG","s":1
