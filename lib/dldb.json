@@ -2353,6 +2353,19 @@
             }
         }]
     },
+    "icupkg":{
+        "p":"icu4c/icupkg.exe",
+        "fs":[{
+            "u":"https://github.com/unicode-org/icu/releases/download/release-78.1/icu4c-78.1-Win64-MSVC2022.zip",
+            "x":{
+                "bin64/icupkg.exe":"icu4c/icupkg.exe",
+                "bin64/icutu78.dll":"icu4c/icutu78.dll",
+                "bin64/icuin78.dll":"icu4c/icuin78.dll",
+                "bin64/icuuc78.dll":"icu4c/icuuc78.dll",
+                "bin64/icudt78.dll":"icu4c/icudt78.dll"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{

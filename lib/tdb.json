@@ -688,7 +688,8 @@
     ],
     "Asar":[
         "asar archive",
-        "asar electron archive"
+        "asar electron archive",
+        "electron asar archive"
     ],
     "Mo'PaQ":[
         "mpq",
@@ -912,5 +913,8 @@
     "Python Compiled Module":[
         "cpython 3.8 bytecode",
         "python compiled module"
+    ],
+    "ICU Data":[
+        "icu data"
     ]
 }

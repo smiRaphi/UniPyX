@@ -1105,6 +1105,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[0])
                 open(o + '/' + fe[2],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'ICU Data':
+            run(['icupkg','-x','*','-d',o,'--ignore-deps','--auto_toc_prefix',i])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
