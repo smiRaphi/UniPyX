@@ -1088,6 +1088,23 @@ def extract4(inp:str,out:str,t:str) -> bool:
             try: open(o + '/' + tbasename(i) + '.' + (fix_zeebo(data) or 'bin'),'wb').write(data)
             except zlib.error: pass
             else: return
+        case 'ZLARC':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='>')
+
+            fc = f.readu32()
+            fso = [f.readu32() for _ in range(fc)]
+            boff = f.readu32()
+
+            fs = []
+            for fo in fso:
+                f.seek(fo)
+                fs.append((boff + f.readu32(),f.readu32(),f.read(f.readu32()-1).decode()))
+            for fe in fs:
+                f.seek(fe[0])
+                open(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

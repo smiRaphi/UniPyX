@@ -146,6 +146,10 @@
         "rs":"Xbox FArc"
     },
     {
+        "d":[["isat","\\0",0],["isat","\\0\\0",4],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');fc=int.from_bytes(f.read(4),'big');fo=int.from_bytes(f.read(4),'big');return (8+fc*4)==fo"]],
+        "rs":"ZLARC"
+    },
+    {
         "d":["isat","\\0\\3\\0\\5\\0\\0\\0\\0",0],
         "rs":"RetroStudio PAK"
     },

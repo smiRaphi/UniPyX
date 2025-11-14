@@ -173,13 +173,13 @@ def analyze(inp:str,raw=False):
                     os.remove(log)
                     m = EIPER1.search(lg)
                     if m: ts.append(m[1])
-                    for x in msplit(lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' [ ',' ] ',' stub : ',' Ovl like : ',' - ']):
+                    for x in msplit(lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' [ ',' ] ',' stub : ',' Ovl like : ',' - ',' , ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
-                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown ','*Unknown ','Stub : *Unknown ','EP Token : ','File is corrupted ')):
+                        elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown ','*Unknown ','Stub : *Unknown ','EP Token : ','File is corrupted ','EP : ')):
                             for sp in (' -> OVL Offset : ',' > section : ',' , size : ','Warning : '): x = x.split(sp)[0]
                             for sp in ('Structure : ','use : ','stub : '): x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
-                            if x and x.lower() not in ('genuine','unknown','more than necessary )') and not (len(x) == 4 and x.isdigit()) and not (len(x) in (8,9) and x.replace('-','').isdigit()) and\
+                            if x and x.lower() not in ('genuine','unknown','more than necessary','sections') and not x.lower().endswith(' sections') and not (len(x) in (2,4) and x.isdigit()) and not (len(x) in (8,9) and x.replace('-','').isdigit()) and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
