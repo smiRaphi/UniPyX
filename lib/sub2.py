@@ -488,11 +488,11 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     f.skip(0x24)
                 elif blockt == 2: FC = f.readu8()
                 elif blockt == 3:
-                    bname = f'{f.readu8()}_{f.readu8()}.'
-                    name = f.read(8).strip(b' \0').decode()
+                    bname = f'{f.readu8()}_{f.readu8()}'
+                    name = f.read(8).strip(b' \0').decode() or bname
                     f.skip(2)
                     size = f.readu16()
-                    if not name: name = bname + ('prg','chr','nam')[f.readu8()]
+                    if not '.' in name: name += '.' + ('prg','chr','nam')[f.readu8()]
                     else: f.skip(1)
                     FNAMES.append((od + '/' + name,size))
                 elif blockt == 4:
