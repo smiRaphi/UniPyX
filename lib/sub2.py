@@ -439,5 +439,30 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 of.close()
                 f.seek(cp)
             if fsc: return
+        case 'NES Remix ROM':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            f.skip(8)
+            start = f.readu32()
+            size = f.readu32() - start
+            f.skip(0x10)
+            name = f.read(0x10).strip(b'\0').decode()
+
+            f.seek(start)
+            tag = f.read(3)
+            if tag in (b'NES',b'UNI'):
+                if not name: name = tbasename(i)
+                name += '.' + tag.decode().lower()
+            elif (tag+f.read(13)) == b'\x01*NINTENDO-HVC*\x01':
+                if not name: name = f.read(4).strip(b' \0').decode()
+                name += '.qd'
+            else:
+                if not name: name = tbasename(i)
+                name += '.bin'
+            f.seek(start)
+            open(o + '/' + name,'wb').write(f.read(size))
+            return
 
     return 1
