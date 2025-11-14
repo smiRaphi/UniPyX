@@ -116,7 +116,7 @@
     {
         "d":[["isat","\\0\\0\\0\\0",0,false],["isat","\\x30\\0\\0\\0",8,false],["isat","\\0\\0\\0\\0",20,false],
              ["n0",4,4,false],["n0",4,12,false],["n0",4,16,false],["str0",32,16,0,false],
-             ["isat","\\x01*NINTENDO-HVC*\\x01",48],["isat","NES",48],["isat","UNI",48]],"qq":true,
+             ["isat","\\x01*NINTENDO-HVC*",48],["isat","NES",48],["isat","UNI",48]],"qq":true,
         "rs":"NES Remix ROM"
     },
     {

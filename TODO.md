@@ -5,4 +5,4 @@
 |ARC (Web Archive)|http://fileformats.archiveteam.org/wiki/ARC_(Internet_Archive)<br>https://archive.org/web/researcher/ArcFileFormat.php|?|https://github.com/ikreymer/webarchiveplayer|
 | Astrotite |http://fileformats.archiveteam.org/wiki/Astrotite|?|http://download.cnet.com/Astrotite-200X-and-AstroA2P/3000-2250_4-75064900.html|
 |    B6Z    |http://fileformats.archiveteam.org/wiki/B6Z|?|https://web.archive.org/web/20250906002136/http://b6zip.com/|
-|           |             |      |                  |
+|  SSBU DT  |-|SSBU WiiU/3DS|https://github.com/Sammi-Husky/Sm4sh-Tools/releases|

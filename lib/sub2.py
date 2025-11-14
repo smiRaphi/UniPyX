@@ -464,5 +464,43 @@ def extract2(inp:str,out:str,t:str) -> bool:
             f.seek(start)
             open(o + '/' + name,'wb').write(f.read(size))
             return
+        case 'Famicom Disk Image':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            fds = f.read(3) == b'FDS'
+            if fds: f.skip(13)
+            else: f.skip(-3)
+
+            od = o
+            FNAMES = []
+            FC = 0
+            while f:
+                blockt = f.readu8()
+                if blockt == 1:
+                    assert f.read(14) == b'*NINTENDO-HVC*'
+                    f.skip(1)
+                    disk_pos = f.pos - 0x10
+
+                    name = f.read(4).strip(b' \0').decode()
+                    if name: od = o + '/' + name;mkdir(od)
+                    f.skip(0x24)
+                elif blockt == 2: FC = f.readu8()
+                elif blockt == 3:
+                    bname = f'{f.readu8()}_{f.readu8()}.'
+                    name = f.read(8).strip(b' \0').decode()
+                    f.skip(2)
+                    size = f.readu16()
+                    if not name: name = bname + ('prg','chr','nam')[f.readu8()]
+                    else: f.skip(1)
+                    FNAMES.append((od + '/' + name,size))
+                elif blockt == 4:
+                    name,size = FNAMES.pop(0)
+                    open(name,'wb').write(f.read(size))
+                    FC -= 1
+                    if not FC: f.seek(disk_pos + 0xFFDC)
+                if not fds: f.skip(2)
+            if os.listdir(o): return
 
     return 1
