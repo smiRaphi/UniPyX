@@ -1108,6 +1108,30 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'ICU Data':
             run(['icupkg','-x','*','-d',o,'--ignore-deps','--auto_toc_prefix',i])
             if os.listdir(o): return
+        case 'Unreal Engine Web Package':
+            if inp.endswith('.data'): inp += '.js'
+            elif inp.endswith('.data.gz'): inp = inp[:-2] + 'js.gz'
+            assert exists(inp)
+            if db.print_try: print('Trying with custom extractor')
+
+            scr = open(i,encoding='utf-8').read()
+            inf = json.loads(re.search(r'loadPackage\((\{.+\})\);\n',scr)[1])
+            dirs = re.findall(r"Module\['FS_createPath'\]\(\"([^\"]+)\", *\"([^\"]+)\", *true, *true\);\n",scr)
+            dat = re.search(r"var REMOTE_PACKAGE_BASE = '(.+)';\n",scr)[1]
+            for d in dirs: mkdir(o + ('/' + d[0].strip('/') + '/').replace('//','/') + d[1])
+
+            binp = inp
+            if inp.endswith('.gz'): binp = inp[:-3]
+            binp[:-3]
+            for df in (dat,dat + '.gz',binp + '.data',binp + '.data.gz'):
+                if exists(df): break
+            else: return 1
+
+            df = open(df,'rb')
+            for fe in inf['files']:
+                df.seek(fe['start'])
+                xopen(o + '/' + fe['filename'].strip('/'),'wb').write(df.read(fe['end'] - fe['start']))
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

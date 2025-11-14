@@ -387,7 +387,20 @@
     },
     {
         "d":["contain","\\xE1\\x12\\x6F\\x5A",[-269,null]],
-        "rs":"Unreal Engine Package","s":1
+        "rs":"Unreal Engine Package"
+    },
+    {
+        "rq":"Unreal Engine Package",
+        "d":[["ext","data"],["py","return exists(inp + '.js')"]],
+        "rs":"Unreal Engine Web Package","s":1},{
+        "rq":"Unreal Engine Package",
+        "d":[["ext","gz"],["py","return inp.endswith('.data.gz') and exists(inp[:-2] + 'js.gz')"]],
+        "rs":"Unreal Engine Web Package","s":1
+    },
+    {
+        "rqr":"JavaScript source",
+        "d":[["contain","var REMOTE_PACKAGE_BASE = ",[0,2480]],["contain","function loadPackage(metadata) {",[0,2480]],["contain","function fetchRemotePackage(packageName, packageSize, callback, errback) {",[0,2480]]],
+        "rs":"Unreal Engine Web Package","s":1
     },
     {
         "d":["isat","AMPK\\x04\\0\\0",0],
