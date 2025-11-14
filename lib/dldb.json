@@ -23,11 +23,11 @@
         "ts":0
     },
     "trid":{
-        "p":"trid/trid.exe",
+        "p":"trid/trid.py",
         "fs":[{
-            "u":"https://mark0.net/download/trid_win64.zip",
+            "u":"https://mark0.net/download/trid.zip",
             "x":{
-                "trid.exe":"trid/trid.exe"
+                "trid.py":"trid/trid.py"
             },
             "ts":1762210800
         },{

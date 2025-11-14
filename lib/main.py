@@ -103,6 +103,7 @@ def msplit(i:str|list[str],seps:list[str]) -> list[str]:
 TDB:dict = json.load(xopen('lib/tdb.json'))
 DDB:list[dict] = json.load(xopen('lib/ddb.json'))
 TDBF = set(sum(TDB.values(),[]))
+TRDB = None
 db = DLDB()
 
 def cleanp(i:str):
@@ -119,15 +120,23 @@ def checktdb(i:list[str]) -> list[str]:
             if x.lower() in TDB[t]: o.append(t)
     return o
 def analyze(inp:str,raw=False):
+    global TRDB
+
     opt = db.print_try
     db.print_try = False
     inp = cleanp(inp)
-    _,o,_ = db.run(['trid','-d',dirname(db.get('trid')) + '\\triddefs.trd','-n','5',inp])
-    ts = [x[1] for x in TRIDR.findall(o) if float(x[0]) >= 10]
+
+    ts = []
+    if isfile(inp):
+        db.get('trid')
+        import bin.trid.trid as trid # type: ignore
+        trid.print = lambda *_,**__:None
+        if not TRDB: TRDB = trid.trdpkg2defs(dirname(db.get('trid')) + '\\triddefs.trd',usecache=True)
+        ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
+        _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
+        ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
     _,o,_ = db.run(['file','-bsnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
-    _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
-    ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
 
     for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files'):
         if wt in ts: ts.remove(wt)

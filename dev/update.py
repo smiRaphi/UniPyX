@@ -75,10 +75,10 @@ def update():
 
             ts = ots
             if u == '.': tts = -1
-            elif u in ['https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip']:
+            elif u in ('https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'):
                 ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
                 ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
-                u = 'https://mark0.net/download/trid_win64.zip'
+                u = 'https://mark0.net/download/trid.zip'
             elif u == 'https://mark0.net/download/triddefs.zip':
                 ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
             elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':

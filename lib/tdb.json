@@ -52,6 +52,7 @@
     ],
     "ZSTD":[
         "zstandard compressed data",
+        "zstandard compressed data (v0.8+)",
         "facebook zstandard/zstd compressed data"
     ],
     "ZLIB":[
