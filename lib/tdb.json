@@ -918,6 +918,7 @@
         "icu data"
     ],
     "Famicom Disk Image":[
-        "famicom disk system disk image"
+        "famicom disk system disk image",
+        "famicom disk system disk image (header-less)"
     ]
 }

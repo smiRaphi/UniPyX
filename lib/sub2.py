@@ -486,6 +486,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     name = f.read(4).strip(b' \0').decode()
                     if name: od = o + '/' + name;mkdir(od)
                     f.skip(0x24)
+
+                    if not fds:
+                        blockt = f.readu8()
+                        f.skip(1)
+                        blockt2 = f.readu8()
+                        if blockt == 2 and blockt2 == 3: fds = True
+                        f.skip(-3)
                 elif blockt == 2: FC = f.readu8()
                 elif blockt == 3:
                     bname = f'{f.readu8()}_{f.readu8()}'
