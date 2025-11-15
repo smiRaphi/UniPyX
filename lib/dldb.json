@@ -2366,6 +2366,31 @@
             }
         }]
     },
+    "xvdtool.streaming":{
+        "p":"XvdTool.Streaming/XvdTool.Streaming.exe",
+        "fs":[{
+            "u":"https://github.com/LukeFZ/XvdTool.Streaming/releases/download/v1.2.1/win-x64.zip",
+            "x":{
+                "win-x64/BouncyCastle.Crypto.dll":"XvdTool.Streaming/BouncyCastle.Crypto.dll",
+                "win-x64/DiscUtils.Core.dll":"XvdTool.Streaming/DiscUtils.Core.dll",
+                "win-x64/DiscUtils.Ntfs.dll":"XvdTool.Streaming/DiscUtils.Ntfs.dll",
+                "win-x64/DiscUtils.Streams.dll":"XvdTool.Streaming/DiscUtils.Streams.dll",
+                "win-x64/DiscUtils.Vhd.dll":"XvdTool.Streaming/DiscUtils.Vhd.dll",
+                "win-x64/DotNext.dll":"XvdTool.Streaming/DotNext.dll",
+                "win-x64/DotNext.Unsafe.dll":"XvdTool.Streaming/DotNext.Unsafe.dll",
+                "win-x64/LibXboxOne.dll":"XvdTool.Streaming/LibXboxOne.dll",
+                "win-x64/LTRData.Extensions.dll":"XvdTool.Streaming/LTRData.Extensions.dll",
+                "win-x64/Microsoft.Bcl.HashCode.dll":"XvdTool.Streaming/Microsoft.Bcl.HashCode.dll",
+                "win-x64/Spectre.Console.Cli.dll":"XvdTool.Streaming/Spectre.Console.Cli.dll",
+                "win-x64/Spectre.Console.dll":"XvdTool.Streaming/Spectre.Console.dll",
+                "win-x64/System.IO.Packaging.dll":"XvdTool.Streaming/System.IO.Packaging.dll",
+                "win-x64/XvdTool.Streaming.deps.json":"XvdTool.Streaming/XvdTool.Streaming.deps.json",
+                "win-x64/XvdTool.Streaming.dll":"XvdTool.Streaming/XvdTool.Streaming.dll",
+                "win-x64/XvdTool.Streaming.exe":"XvdTool.Streaming/XvdTool.Streaming.exe",
+                "win-x64/XvdTool.Streaming.runtimeconfig.json":"XvdTool.Streaming/XvdTool.Streaming.runtimeconfig.json"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{

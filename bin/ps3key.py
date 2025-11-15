@@ -9,13 +9,13 @@ class PS3Keys:
         if not os.path.exists(__db__): makedb()
 
         i = open(__db__,'rb')
-        self._db = {}
+        self.db = {}
         while True:
             id1 = i.read(4)
             if not id1: break
             zs = i.read(1)[0]
             nm = id1.decode() + '0'*zs + str(int.from_bytes(i.read(3),'little'))
-            self._db[nm] = i.read(16).hex().upper()
+            self.db[nm] = i.read(16).hex().upper()
         i.close()
 
     def get(self,key:str) -> str|None:
@@ -26,7 +26,7 @@ class PS3Keys:
         f.seek(4,1)
         key = f.read(0x20).strip().decode().replace('-','')
 
-        return self._db.get(key) or self.__db['TEST01814']
+        return self.db.get(key) or self.__db['TEST01814']
     def __getitem__(self,key): return self.get(key)
 
 def makedb():

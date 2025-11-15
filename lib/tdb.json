@@ -920,5 +920,14 @@
     "Famicom Disk Image":[
         "famicom disk system disk image",
         "famicom disk system disk image (header-less)"
+    ],
+    "VHD":[
+        "microsoft virtual hard disk",
+        "virtual pc virtual hd image",
+        "virtual pc virtual hd image (dynamic)"
+    ],
+    "XVD":[
+        "xbox virtual disk (msixvc/xvc)",
+        "xbox virtual disk (xvd)"
     ]
 }

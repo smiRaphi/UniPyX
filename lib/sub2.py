@@ -509,5 +509,37 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     if not FC: f.seek(disk_pos + 0xFFDC)
                 if not fds: f.skip(2)
             if os.listdir(o): return
+        case 'XVD':
+            from bin.xb1key import XB1Keys
+
+            xb1k = XB1Keys()
+
+            for p in ('../',''):
+                p = dirname(i) + '/' + p + 'Licenses'
+                if exists(p):
+                    for f in os.listdir(p):
+                        if f.endswith('.xml') and f.lower().startswith('license'): xb1k.add_license(p + '/' + f)
+                    xb1k.save()
+
+            _,inf,_ = run(['xvdtool.streaming','info',i],print_try=False)
+            keyid = re.search(r'Encryption Key 0 GUID: ([a-f\d]{8}(?:-[a-f\d]{4}){4}[a-f\d]{8})',inf)
+            cmd = ['xvdtool.streaming','extract','-o',o]
+            if keyid:
+                cik = xb1k.get(keyid[1])
+                if not cik: return 1
+                tf = TmpFile('.cik')
+                open(tf.p,'wb').write(cik)
+                cmd += ['-c',tf.p]
+            else: tf = None
+
+            run(cmd + [i])
+            if tf:
+                if not os.listdir(o):
+                    copy(i,o + '/' + basename(i) + '.dec.xvd')
+                    run(['xvdtool.streaming','decrypt','-c',tf.p,'-n',o + '/' + basename(i) + '.dec.xvd'])
+                    remove(tf.p)
+                    return
+                remove(tf.p)
+            if os.listdir(o): return
 
     return 1
