@@ -131,10 +131,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if extract1(tf,to,'ISO'): remove(to)
                     else: remove(tf)
             if os.listdir(o): return
-        case 'ISO'|'IMG'|'Floppy Image'|'CDI'|'UDF'|'Aaru':
-            _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
-            if t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e: return extract1(i,o,'7z')
-
+        case 'CDI'|'Aaru'|'ACT Apricot IMG':
             osj = OSJump()
             osj.jump(dirname(i))
             td = 'tmp' + os.urandom(8).hex()
@@ -151,6 +148,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 remove(td)
                 if ret: return
             remove(td)
+        case 'ISO'|'IMG'|'Floppy Image'|'UDF':
+            _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
+            iso_udf = t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e
+
+            if not iso_udf and not extract1(i,o,'Aaru'): return
 
             bd = os.listdir(o)
             run(['7z','x',i,'-o' + o,'-aou'])

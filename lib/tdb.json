@@ -929,5 +929,8 @@
     "XVD":[
         "xbox virtual disk (msixvc/xvc)",
         "xbox virtual disk (xvd)"
+    ],
+    "ACT Apricot IMG":[
+        "act apricot disk image"
     ]
 }
