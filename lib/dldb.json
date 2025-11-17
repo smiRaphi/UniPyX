@@ -2391,6 +2391,15 @@
             }
         }]
     },
+    "discimagemanager":{
+        "p":"DiscImageManager.exe",
+        "fs":[{
+            "u":"https://github.com/geraldholdsworth/DiscImageManager/releases/download/1.49/Disc.Image.Manager.1.49.Windows.64.bit.Intel.zip",
+            "x":{
+                "DiscImageManager.exe":"DiscImageManager.exe"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{

@@ -541,5 +541,35 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     return
                 remove(tf.p)
             if os.listdir(o): return
+        case 'Acorn Disc Filing IMG':
+            tf = TmpFile('.txt')
+            open(tf.p,'w',encoding='utf-8').write(f'insert "{i}"\nextract *\nfree\nexit\n')
+            run(['discimagemanager','-c',tf],cwd=o)
+            tf.destroy()
+            if os.listdir(o):
+                from time import strptime,mktime
+
+                for f in rldir(o,False):
+                    if not exists(f): continue
+                    if exists(f + '.inf'):
+                        finf = open(f + '.inf',encoding='utf-8').read()
+                        remove(f + '.inf')
+
+                        if isfile(f) and len(f) > 4 and f[-4] == ',':
+                            try: int(f[-3:],16)
+                            except:pass
+                            else:
+                                nf = f.rsplit(',',1)[0]
+                                if exists(nf):
+                                    c = 1
+                                    nf += '_0'
+                                    while exists(nf): nf = nf.rsplit('_',1)[0] + f'_{c}';c += 1
+                                rename(f,nf)
+                                f = nf
+
+                        if 'DATETIME=' in finf:
+                            ft = mktime(strptime(finf.split('DATETIME=')[1].split()[0],'%Y%m%d%H%M%S'))
+                            os.utime(f,(ft,ft))
+                return
 
     return 1

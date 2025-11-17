@@ -31,6 +31,7 @@ GFMTS = {
     '0CBH0/nsnsotool':lambda tag:f'nsnsotool_{tag}.zip',
     'apoloval/mcp':lambda tag:f'mcp-{tag[1:]}_x64.exe',
     'unicode-org/icu':lambda tag:f'icu4c-{tag.split("-")[1]}-Win64-MSVC2022.zip',
+    'geraldholdsworth/DiscImageManager':lambda tag:f'Disc.Image.Manager.{tag}.Windows.64.bit.Intel.zip',
 }
 
 def ft(i:str,f:str,loc='en_US'):
