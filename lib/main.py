@@ -55,14 +55,15 @@ def xopen(f:str,m='r',encoding='utf-8'):
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding)
-def rldir(i:str,files=True):
+def rldir(i:str,files=True) -> list[str]:
+    i = str(i)
     o = []
-    for x in os.listdir(str(i)):
-        x = str(i) + '\\' + x
+    for x in os.listdir(i):
+        x = i + '\\' + x
         if isfile(x): o.append(x)
         else:
             if not files: o.append(x)
-            o += rldir(x)
+            o += rldir(x,files=files)
     return o
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'

@@ -552,7 +552,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 for f in rldir(o,False):
                     if not exists(f): continue
                     if exists(f + '.inf'):
-                        finf = open(f + '.inf',encoding='utf-8').read()
+                        finf = open(f + '.inf','rb').read()
+                        if b'\n' in finf or b'\r' in finf: continue
+                        try: finf = finf.decode()
+                        except: continue
                         remove(f + '.inf')
 
                         if isfile(f) and len(f) > 4 and f[-4] == ',':
