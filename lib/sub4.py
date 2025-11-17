@@ -1132,6 +1132,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 df.seek(fe['start'])
                 xopen(o + '/' + fe['filename'].strip('/'),'wb').write(df.read(fe['end'] - fe['start']))
             return
+        case 'Wallpaper Engine PKG':
+            run(['repkg','extract','-o',o,'-n','--no-tex-convert','--overwrite',i])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

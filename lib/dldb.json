@@ -2409,6 +2409,15 @@
             }
         }]
     },
+    "repkg":{
+        "p":"RePKG.exe",
+        "fs":[{
+            "u":"https://github.com/notscuffed/repkg/releases/download/v0.4.0-alpha/RePKG.zip",
+            "x":{
+                "RePKG.exe":"RePKG.exe"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{
