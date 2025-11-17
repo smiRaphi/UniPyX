@@ -11,6 +11,11 @@
         "rq":["ARJZ","ARJ"],
         "rs":"ARJZ","s":1
     },
+    {
+        "rqr":["TERSE compressed data (PACK, U)","TERSE compressed data (PACK, V)","TERSE compressed data (SPACK, U)","TERSE compressed data (SPACK, V)"],
+        "d":["py","f=open(inp,'rb');v=f.read(1)[0]\nif v in (1,7):return True\nif not v in (2,5):return False\nf.seek(2);r1=int.from_bytes(f.read(2),'big');f.seek(8);r2=int.from_bytes(f.read(4),'big')\nreturn r1+r2!=0 and (r1==0 or r2==0 or r1==r2)"],
+        "rs":"TERSE","s":1
+    },
 
     {
         "rq":"ISO",

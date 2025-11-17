@@ -1,3 +1,4 @@
+from tokenize import endpats
 from .main import *
 
 def extract5(inp:str,out:str,t:str) -> bool:
@@ -254,5 +255,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if not od: return 1
             open(o + '/' + tbasename(i),'wb').write(od)
             return
+        case 'TERSE':
+            of = o + '/' + (tbasename(i) if i.lower().endswith(('.pack','.spack','.terse')) else basename(i))
+            run(['tersedecompress++',i,of])
+            if exists(of) and os.path.getsize(of): return
+            run(['tersedecompress++',i,of,'-b'])
+            if exists(of) and os.path.getsize(of): return
 
     return 1

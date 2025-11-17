@@ -2400,6 +2400,15 @@
             }
         }]
     },
+    "tersedecompress++":{
+        "p":"tersedecompress++.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "tersedecompress++.exe":"tersedecompress++.exe"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{
