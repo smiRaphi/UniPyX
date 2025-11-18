@@ -2,8 +2,8 @@ import os,locale
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import json,httpx,time,re
+from multiprocessing.pool import ThreadPool
 DLDB = json.load(open('lib/dldb.json',encoding='utf-8'))
-NDLDB = {}
 
 GRELTS = re.compile(r'<relative-time class="no-wrap" prefix="[^"]*" datetime="([^"]+)">')
 GRELTG = re.compile(r'/releases/tag/([^"]+)" data-view-component=')
@@ -33,12 +33,11 @@ GFMTS = {
     'unicode-org/icu':lambda tag:f'icu4c-{tag.split("-")[1]}-Win64-MSVC2022.zip',
     'geraldholdsworth/DiscImageManager':lambda tag:f'Disc.Image.Manager.{tag}.Windows.64.bit.Intel.zip',
 }
+NCHKS = {
+    'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
+}
 
-def ft(i:str,f:str,loc='en_US'):
-    locale.setlocale(locale.LC_TIME,loc)
-    r = int(time.mktime(time.strptime(i,f)))
-    locale.setlocale(locale.LC_TIME,'')
-    return r
+def ft(i:str,f:str): return int(time.mktime(time.strptime(i,f)))
 def t(): return int(time.time())
 
 class Cache:
@@ -56,129 +55,149 @@ class Cache:
     def srcht(self,p:str,f:str,u:str) -> int:
         return ft(self.srch(p,u),f)
 
-def update():
-    c = Cache()
+def supdate(c:Cache,k:str,inf:dict):
+    nfs = []
+    tts = inf.get('ts',0)
+    for f in inf['fs']:
+        ots = tts
+        if type(f) == str: u = f
+        elif type(f) == list: u,p = f
+        elif type(f) == dict:
+            u = f['u']
+            if 'ts' in f: ots = f['ts'] or tts
+        if u == '.': dom = None
+        else: dom = u.split('://')[1].split('/')[0]
 
-    for k,inf in DLDB.items():
-        NDLDB[k] = inf
-        if 'fs' not in inf: continue
+        ts = ots
+        if u == '.': tts = -1
+        elif u in ('https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'):
+            ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
+            ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
+            u = 'https://mark0.net/download/trid.zip'
+        elif u == 'https://mark0.net/download/triddefs.zip':
+            ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
+        elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
+            ts = ft(str(time.gmtime().tm_year),'%Y')
+        elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
+            ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
+        elif u.startswith('https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/'):
+            ts = ft(str(time.gmtime().tm_year),'%Y')
+        elif u == "https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip":
+            ct = time.gmtime()
+            ts = ft(f'{ct.tm_year}.{ct.tm_mon:02d}.{ct.tm_mday:02d}','%Y.%m.%d')
 
-        nfs = []
-        tts = inf.get('ts',0)
-        for f in inf['fs']:
-            ots = tts
-            if type(f) == str: u = f
-            elif type(f) == list: u,p = f
-            elif type(f) == dict:
-                u = f['u']
-                if 'ts' in f: ots = f['ts'] or tts
-            if u == '.': dom = None
-            else: dom = u.split('://')[1].split('/')[0]
+        elif dom == 'github.com' and '/releases/download/' in u:
+            repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-            ts = ots
-            if u == '.': tts = -1
-            elif u in ('https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'):
-                ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
-                ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
-                u = 'https://mark0.net/download/trid.zip'
-            elif u == 'https://mark0.net/download/triddefs.zip':
-                ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
-            elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
-                ts = ft(str(time.gmtime().tm_year),'%Y')
-            elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
-                ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
-            elif u.startswith('https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/'):
-                ts = ft(str(time.gmtime().tm_year),'%Y')
-            elif u == "https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip":
-                ct = time.gmtime()
-                ts = ft(f'{ct.tm_year}.{ct.tm_mon:02d}.{ct.tm_mday:02d}','%Y.%m.%d')
+            if repo not in ('VirusTotal/yara'):
+                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
+                else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
-            elif dom == 'github.com' and '/releases/download/' in u:
-                repo = u.split('/releases/download/')[0].split('//github.com/')[1]
+                ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
+                tag = GRELTG.search(s)[1]
 
-                if repo not in ('VirusTotal/yara'):
-                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
-                    elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
-                    else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
-
-                    ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
-                    tag = GRELTG.search(s)[1]
-
-                    if ts > ots:
-                        if repo in GFMTS:
-                            of = GFMTS[repo](tag)
-                            nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
-                        else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
-                        if u != nu:
-                            if c.c.head(nu).status_code == 302: u = nu
-                            else:
-                                print('[!] 404:',u,'!->',nu)
-                                ts = ots
-                        else: ts = ots
-            elif dom == 'archive.ubuntu.com':
-                bu = os.path.dirname(u) + '/'
-                s = c.get(bu)
-                ms = re.findall(r'"(' + re.escape(u.split('/')[-1].split('_')[0]) + r'_\d+\.\d+-[^"]+)">[^<]*</a></td><td[^>]*>([^<]+?) *</td>',s)[-1]
-                ts = ft(ms[1],'%Y-%m-%d %H:%M')
                 if ts > ots:
-                    nu = bu + ms[0]
-                    if u != nu: u = nu
-                    else: ts = 0
-            elif dom == 'entropymine.com':
-                bu = os.path.dirname(u) + '/'
-                s = c.get(bu)
-                ms = re.findall(r'href="([^"]+)">[^<]+</a> *(\d{4}-\d\d-\d\d \d\d:\d\d)',s)[-1]
-                ts = ft(ms[1],'%Y-%m-%d %H:%M')
-                if ts > ots: u = bu + ms[0]
-            elif dom == 'dl.dolphin-emu.org':
-                s = c.get('https://dolphin-emu.org/download/')
-                m = re.search(r'href="/download/dev/[^"]+">[^<]+</a></td>\s*<td class="reldate" title="([^"Z\.]+)[^"]*">[^<]*</td>\s*.+\s*</tr>\s*<tr class="download">\s*.+\s*<td class="download-links".*>\s*<a href="(https://[^"]+-x64\.7z)"',s)
-                ts = ft(m[1],'%Y-%m-%dT%H:%M:%S')
-                if m[2] != u: u = m[2]
+                    if repo in GFMTS:
+                        of = GFMTS[repo](tag)
+                        nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
+                    else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
+                    if u != nu:
+                        if c.c.head(nu).status_code == 302: u = nu
+                        else:
+                            print('[!] 404:',u,'!->',nu)
+                            ts = ots
+                    else: ts = ots
+        elif dom == 'nightly.link' and '/workflows/' in u:
+            repo = u.split('/')[3] + '/' + u.split('/')[4]
+
+            s = c.get(u.rsplit('/',1)[0] + '?preview')
+            pkgs = set(re.findall(r'<a rel="nofollow" href="([^"]+)">https://',s))
+            if len(pkgs) == 1: nu = pkgs.pop()
+            else:
+                for p in pkgs:
+                    if NCHKS[repo] in p.split('/')[-1]: nu = p;break
+                else: nu = None
+
+            if nu and nu != u:
+                run = int(c.srch(r'/runs/(\d+)/',nu[:-4] + '?preview'))
+                if f.get('nightly_run') != run:
+                    f['nightly_run'] = run
+                    u = nu
+                    ts = t()
+        elif dom == 'archive.ubuntu.com':
+            bu = os.path.dirname(u) + '/'
+            s = c.get(bu)
+            ms = re.findall(r'"(' + re.escape(u.split('/')[-1].split('_')[0]) + r'_\d+\.\d+-[^"]+)">[^<]*</a></td><td[^>]*>([^<]+?) *</td>',s)[-1]
+            ts = ft(ms[1],'%Y-%m-%d %H:%M')
+            if ts > ots:
+                nu = bu + ms[0]
+                if u != nu: u = nu
                 else: ts = 0
-            elif dom.endswith('.wiimm.de'):
-                s = c.get(f'https://{dom}/download.html')
-                m = re.search(r'<a href="(/download/[^"]+-cygwin64\.zip)">[^<\n]*</a>[^,\n]+, (\d{4}-\d\d-\d\d)',s)
-                ts = ft(m[2],'%Y-%m-%d')
-                nu = f'https://{dom}{m[1]}'
-                if nu != u: u = nu
-                else: ts = 0
-            elif dom == 'files.prodkeys.net':
-                s = c.get(c.srch(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"','https://prodkeys.net/'))
+        elif dom == 'entropymine.com':
+            bu = os.path.dirname(u) + '/'
+            s = c.get(bu)
+            ms = re.findall(r'href="([^"]+)">[^<]+</a> *(\d{4}-\d\d-\d\d \d\d:\d\d)',s)[-1]
+            ts = ft(ms[1],'%Y-%m-%d %H:%M')
+            if ts > ots: u = bu + ms[0]
+        elif dom == 'dl.dolphin-emu.org':
+            s = c.get('https://dolphin-emu.org/download/')
+            m = re.search(r'href="/download/dev/[^"]+">[^<]+</a></td>\s*<td class="reldate" title="([^"Z\.]+)[^"]*">[^<]*</td>\s*.+\s*</tr>\s*<tr class="download">\s*.+\s*<td class="download-links".*>\s*<a href="(https://[^"]+-x64\.7z)"',s)
+            ts = ft(m[1],'%Y-%m-%dT%H:%M:%S')
+            if m[2] != u: u = m[2]
+            else: ts = 0
+        elif dom.endswith('.wiimm.de'):
+            s = c.get(f'https://{dom}/download.html')
+            m = re.search(r'<a href="(/download/[^"]+-cygwin64\.zip)">[^<\n]*</a>[^,\n]+, (\d{4}-\d\d-\d\d)',s)
+            ts = ft(m[2],'%Y-%m-%d')
+            nu = f'https://{dom}{m[1]}'
+            if nu != u: u = nu
+            else: ts = 0
+        elif dom == 'files.prodkeys.net':
+            s = c.get('https://prodkeys.net/')
+            if not '500: Internal server error' in s:
+                s = c.get(re.search(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"',s))
                 ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1].split('+')[0],'%Y-%m-%dT%H:%M:%S')
                 if ts > ots:
                     nu = re.search(r'href="(https://files\.prodkeys\.net/ProdKeys\.net-v\d+\.\d+\.\d+\.zip)"',s)[1]
                     if nu != u: u = nu
                     else: ts = 0
-            elif dom == 'dl.xpdfreader.com':
-                s = c.get('https://www.xpdfreader.com/download.html')
-                ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')
-                if ts > ots:
-                    nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
-                    if nu != u: u = nu
-                    else: ts = 0
-            elif dom == 'wimlib.net':
-                s = c.get('https://wimlib.net/')
-                m = re.search(r'Current release: (wimlib\-\d+\.\d+\.\d+) \(released (\w+ \d{1,2}, \d{4})\)',s)
-                ts = ft(m[2],'%B %d, %Y')
-                if ts > ots:
-                    nu = f'https://wimlib.net/downloads/{m[1]}-windows-x86_64-bin.zip'
-                    if nu != u: u = nu
-                    else: ts = 0
-
+        elif dom == 'dl.xpdfreader.com':
+            s = c.get('https://www.xpdfreader.com/download.html')
+            ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')
             if ts > ots:
-                print(k,'->',u)
-                tts = max(tts,ts)
-                if type(f) == str: nfs.append(u)
-                elif type(f) == list: nfs.append([u,p])
-                elif type(f) == dict:
-                    f['u'] = u
-                    f['ts'] = ts
-                    nfs.append(f)
-            else: nfs.append(f)
+                nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
+                if nu != u: u = nu
+                else: ts = 0
+        elif dom == 'wimlib.net':
+            s = c.get('https://wimlib.net/')
+            m = re.search(r'Current release: (wimlib\-\d+\.\d+\.\d+) \(released (\w+ \d{1,2}, \d{4})\)',s)
+            ts = ft(m[2],'%B %d, %Y')
+            if ts > ots:
+                nu = f'https://wimlib.net/downloads/{m[1]}-windows-x86_64-bin.zip'
+                if nu != u: u = nu
+                else: ts = 0
 
-        inf['fs'] = nfs
-        if tts >= 0: inf['ts'] = tts
+        if ts > ots:
+            print(k,'->',u)
+            tts = max(tts,ts)
+            if type(f) == str: nfs.append(u)
+            elif type(f) == list: nfs.append([u,p])
+            elif type(f) == dict:
+                f['u'] = u
+                f['ts'] = ts
+                nfs.append(f)
+        else: nfs.append(f)
+
+    inf['fs'] = nfs
+    if tts >= 0: inf['ts'] = tts
+def update():
+    c = Cache()
+
+    locale.setlocale(locale.LC_TIME,'en_US')
+    with ThreadPool() as p:
+        p.starmap(supdate,[(c,k,inf) for k,inf in DLDB.items() if 'fs' in inf])
+    locale.setlocale(locale.LC_TIME,'')
 
     out = json.dumps(DLDB,ensure_ascii=False,separators=(',',':'),indent=4).replace(
                     '\n            {',           '{').replace(
