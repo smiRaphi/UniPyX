@@ -596,5 +596,14 @@ def extract2(inp:str,out:str,t:str) -> bool:
                             ft = mktime(strptime(finf.split('DATETIME=')[1].split()[0],'%Y%m%d%H%M%S'))
                             os.utime(f,(ft,ft))
                 return
+        case 'C64 IMG':
+            run(['c1541'],stdin=f'attach "{i}"\nextract\nquit\n',cwd=o)
+            cd = dirname(db.get('c1541'))
+            remove(cd + '/stderr.txt',cd + '/stdout.txt')
+            if os.listdir(o): return
+
+            if not extract(i,o,'DIET'):return # deark 
+
+            return extract2(i,o,'C64 Tape')
 
     return 1

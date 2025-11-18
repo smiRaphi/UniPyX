@@ -946,5 +946,10 @@
     "AMOS Memory Bank":[
         "amos data bank",
         "amos memory bank (generic)"
+    ],
+    "C64 IMG":[
+        "c64 cartridge image",
+        "ccs64 cartridge",
+        "c64 nib disk image"
     ]
 }

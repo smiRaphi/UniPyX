@@ -32,6 +32,7 @@ GFMTS = {
     'apoloval/mcp':lambda tag:f'mcp-{tag[1:]}_x64.exe',
     'unicode-org/icu':lambda tag:f'icu4c-{tag.split("-")[1]}-Win64-MSVC2022.zip',
     'geraldholdsworth/DiscImageManager':lambda tag:f'Disc.Image.Manager.{tag}.Windows.64.bit.Intel.zip',
+    'VICE-Team/svn-mirror':lambda tag:f'SDLVICE-3.9-win64-{tag}.7z',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -90,7 +91,7 @@ def supdate(c:Cache,k:str,inf:dict):
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
             if repo not in ('VirusTotal/yara'):
-                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                 elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
@@ -103,7 +104,11 @@ def supdate(c:Cache,k:str,inf:dict):
                         nu = f'https://github.com/{repo}/releases/download/{tag}/{of}'
                     else: nu = f'https://github.com/{repo}/releases/download/{tag}/' + u.split('/')[-1]
                     if u != nu:
-                        if c.c.head(nu).status_code == 302: u = nu
+                        if c.c.head(nu).status_code == 302:
+                            u = nu
+                            if repo == 'VICE-Team/svn-mirror':
+                                bdir = u.split('/')[-1].rsplit('.',1)[0]
+                                for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
                         else:
                             print('[!] 404:',u,'!->',nu)
                             ts = ots
@@ -167,7 +172,10 @@ def supdate(c:Cache,k:str,inf:dict):
             ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')
             if ts > ots:
                 nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
-                if nu != u: u = nu
+                if nu != u:
+                    u = nu
+                    bdir = u.split('/')[-1].rsplit('.',1)[0]
+                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
                 else: ts = 0
         elif dom == 'wimlib.net':
             s = c.get('https://wimlib.net/')

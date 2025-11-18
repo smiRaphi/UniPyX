@@ -2430,6 +2430,25 @@
         }],
         "ts":0
     },
+    "c1541":{
+        "p":"VICE/c1541.exe",
+        "fs":[{
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45857/SDLVICE-3.9-win64-r45857.7z",
+            "x":{
+                "SDLVICE-3.9-win64-r45857/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.9-win64-r45857/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.9-win64-r45857/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.9-win64-r45857/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.9-win64-r45857/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.9-win64-r45857/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+            }
+        },{
+            "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
+            "x":{
+                "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{
