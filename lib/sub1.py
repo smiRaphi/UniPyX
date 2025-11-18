@@ -307,10 +307,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UPX':
             run(['upx','-d','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return
-        case 'KryoFlux':
-            tf = TmpFile('.script')
-            xopen(tf,'w').write('set FLUXSTREAM_PLL_INITIAL_BITRATE 250000\n')
-            bcmd = ['hxcfe','-finput:' + i,'-script:' + tf]
+        case 'KryoFlux'|'SCP Flux':
+            bcmd = ['hxcfe','-finput:' + i]
             _,op,_ = run(bcmd + ['-list'])
 
             op = op.replace('\r','')
@@ -328,7 +326,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         run(bcmd + ['-getfile:/' + f],cwd=dirname(o + '/' + f),print_try=False)
 
                 if fs and rldir(o): return
-            tf.destroy()
         case 'BBC Micro SSD':
             run(['bbccp','-i',i,'.',o + '\\'])
             if os.listdir(o): return
@@ -391,7 +388,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark':
             od = rldir(o)
-            run(["deark","-od",o,i])
+            run(["deark","-od",o,'-a',i])
             for x in rldir(o):
                 if x in od: continue
                 xb = basename(x)

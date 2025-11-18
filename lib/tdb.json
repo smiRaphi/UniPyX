@@ -951,5 +951,8 @@
         "c64 cartridge image",
         "ccs64 cartridge",
         "c64 nib disk image"
+    ],
+    "SCP Flux":[
+        "supercard pro flux image"
     ]
 }

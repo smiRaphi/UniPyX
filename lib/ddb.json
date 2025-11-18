@@ -670,6 +670,12 @@
         "rs":"The Compressor"
     },
     {
+        "d":[["size",174848],["ext",".d64"]],
+        "rs":"C64 IMG"},{
+        "d":[["size",819200],["ext",".d81"]],
+        "rs":"C64 IMG"
+    },
+    {
         "rqr":null,
         "d":[["ext",".arg"],["isat","\\0",0],["isat","\\1",-1],["str0",1,2,1]],
         "rs":"ARG"
