@@ -942,5 +942,9 @@
     ],
     "SPS IPF":[
         "interchangeable preservation format floppy disk image"
+    ],
+    "AMOS Memory Bank":[
+        "amos data bank",
+        "amos memory bank (generic)"
     ]
 }

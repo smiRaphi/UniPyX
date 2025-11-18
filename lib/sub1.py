@@ -310,14 +310,25 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'KryoFlux':
             tf = TmpFile('.script')
             xopen(tf,'w').write('set FLUXSTREAM_PLL_INITIAL_BITRATE 250000\n')
-            _,o,_ = run(['hxcfe','-finput:' + i,'-script:' + tf,'-list'])
-            tf.destroy()
+            bcmd = ['hxcfe','-finput:' + i,'-script:' + tf]
+            _,op,_ = run(bcmd + ['-list'])
 
-            if '------- Disk Tree --------' in o:
-                o = o.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
-                if not 'ERROR -> Sector not found' in o:
-                    print(o)
-                    raise NotImplementedError()
+            op = op.replace('\r','')
+            if '------- Disk Tree --------' in op:
+                op = op.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
+                cp = []
+                fs = []
+                for t in re.findall(r"( *)([> ])([^<\n]+) <\d+>\n",op):
+                    while len(cp)*4 > len(t[0]): cp.pop()
+                    if t[1] == '>':
+                        cp.append(t[2])
+                        mkdir(o + '/' + '/'.join(cp))
+                    else:
+                        f = '/'.join(cp + [t[2]])
+                        run(bcmd + ['-getfile:/' + f],cwd=dirname(o + '/' + f),print_try=False)
+
+                if fs and rldir(o): return
+            tf.destroy()
         case 'BBC Micro SSD':
             run(['bbccp','-i',i,'.',o + '\\'])
             if os.listdir(o): return

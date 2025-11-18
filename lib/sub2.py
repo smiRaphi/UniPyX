@@ -316,6 +316,24 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if isdir(td.p + '/' + f): copydir(td.p + '/' + f,o)
             td.destroy()
             if os.listdir(o): return
+
+            bcmd = ['hxcfe','-finput:' + i]
+            _,op,_ = run(bcmd + ['-list'])
+
+            op = op.replace('\r','')
+            if '------- Disk Tree --------' in op:
+                op = op.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
+                cp = []
+                for t in re.findall(r"( *)([> ])([^<\n]+) <\d+>\n",op):
+                    while len(cp)*4 > len(t[0]): cp.pop()
+                    if t[1] == '>':
+                        cp.append(t[2])
+                        mkdir(o + '/' + '/'.join(cp))
+                    else:
+                        f = '/'.join(cp + [t[2]])
+                        run(bcmd + ['-getfile:/' + f],cwd=dirname(o + '/' + f).replace('/','\\'),print_try=False)
+
+                if rldir(o): return
         case 'Atari ATR':
             run(['atr',i,'x','-a'],cwd=o)
             if os.listdir(o): return
