@@ -137,7 +137,8 @@
         "master boot record dump"
     ],
     "Floppy Image":[
-        "anex86 pc98 floppy image (generic)"
+        "anex86 pc98 floppy image (generic)",
+        "fm towns bootable disk image"
     ],
     "Apple Disk Image":[
         "disk image",
@@ -954,5 +955,8 @@
     ],
     "SCP Flux":[
         "supercard pro flux image"
+    ],
+    "HxC Floppy IMG":[
+        "hxc floppy emulator disk image"
     ]
 }

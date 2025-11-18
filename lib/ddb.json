@@ -319,6 +319,16 @@
         "rs":"Stripped TAR","s":1
     },
     {
+        "d":["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",0],
+        "rs":"UCL","s":1
+    },
+    {
+        "rqr":"GLIBC",
+        "d":[["contain","GPEComp ",[30928,40975],false],
+             ["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43592],["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43632]],"qq":true,
+        "rs":"GPEComp","s":1
+    },
+    {
         "rq":null,
         "d":[["isatS","\\0",1024,0],["isat","BD\\xC7M",1024]],
         "rs":"Apple Disk Image"
@@ -653,6 +663,11 @@
         "rqr":null,
         "d":[["isat","\\x54",0],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0]&15==1"]],
         "rs":"Turbo Range Coder"
+    },
+    {
+        "rqr":null,
+        "d":[["isatS","\\0",10,16],["isin",["\\0","\\x10","\\x20","\\x30","\\x40"],27],["str0",0,16,0],["py","f=open(inp,'rb');f.seek(0x1C);end=int.from_bytes(f.read(4),'little')\nif end!=f.seek(0,2):return False\nf.seek(32)\nfor _ in range(80):\n\ta=int.from_bytes(f.read(4),'little')\n\tif a!=0 and (a<352 or a>end):return False\nreturn True"]],
+        "rs":"Floppy Image"
     },
     {
         "rq":null,

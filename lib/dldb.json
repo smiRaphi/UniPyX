@@ -2449,6 +2449,15 @@
             }
         }]
     },
+    "uclpack":{
+        "p":"uclpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "uclpack.exe":"uclpack.exe"
+            }
+        }]
+    },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
         "fs":[{

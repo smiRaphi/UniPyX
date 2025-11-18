@@ -129,7 +129,8 @@ class DLDB:
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,'-aoa',p])
             for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
-            rmtree(td)
+            try: rmtree(td)
+            except PermissionError: pass
         elif ex == '.rar':
             td = gtmp()
             self.run(['unrar','x','-or','-op' + td,p])

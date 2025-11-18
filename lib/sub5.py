@@ -261,5 +261,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if exists(of) and os.path.getsize(of): return
             run(['tersedecompress++',i,of,'-b'])
             if exists(of) and os.path.getsize(of): return
+        case 'UCL':
+            of = o + '/' + tbasename(i)
+            run(['uclpack','-d',i,o])
+            if exists(of) and os.path.getsize(of): return
 
     return 1

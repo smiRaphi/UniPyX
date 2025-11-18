@@ -605,5 +605,20 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if not extract(i,o,'DIET'):return # deark 
 
             return extract2(i,o,'C64 Tape')
+        case 'GPEComp':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            for pos in (0xAA48,0xAA70):
+                f.seek(pos)
+                if f.read(8) == b"\x00\xE9\x55\x43\x4C\xFF\x01\x1A": break
+            else: return 1
+            f.seek(-8,1)
+            tf = TmpFile('.ucl')
+            open(tf.p,'wb').write(f.read())
+
+            of = o + '\\' + basename(i) + '.elf'
+            run(['uclpack','-d',tf.p,of])
+            tf.destroy()
+            if exists(of) and os.path.getsize(of): return
 
     return 1
