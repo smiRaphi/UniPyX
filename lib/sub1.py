@@ -504,5 +504,35 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     copydir(td,o,True)
                     return
                 remove(td)
+        case 'Intel HEX':
+            if db.print_try: print('Trying with custom extractor')
+
+            f = open(i,encoding='utf-8')
+
+            fs = [[]]
+            for l in f.readlines():
+                if l[0] != ':': continue
+                datal = int(l[1:1+2],16)
+                addr = int(l[3:3+4],16)
+                typ = int(l[7:7+2],16)
+                assert typ in (0,1),hex(datal)[2:].upper()
+
+                if datal:
+                    data = bytes.fromhex(l[9:9+2*datal])
+                    fs[-1].append((addr,data))
+                if typ == 1: fs.append([])
+            f.close()
+            if not fs[-1]: fs.pop(-1)
+
+            mf = len(fs) > 1
+            for ix,fe in enumerate(fs):
+                of = o + '/' + tbasename(i)
+                if mf: of += f'_{ix}'
+                of = open(of + '.bin','wb')
+                for addr,data in fe:
+                    if addr > of.seek(0,2): of.write(b'\xFF'*(addr-of.tell()))
+                    of.write(data)
+                of.close()
+            if fs: return
 
     return 1

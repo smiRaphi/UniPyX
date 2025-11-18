@@ -935,5 +935,8 @@
     ],
     "Acorn Disc Filing IMG":[
         "acorn disc filing system disk image (map e)"
+    ],
+    "Intel HEX":[
+        "intel hexadecimal object format"
     ]
 }
