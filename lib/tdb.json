@@ -939,5 +939,8 @@
     ],
     "Intel HEX":[
         "intel hexadecimal object format"
+    ],
+    "SPS IPF":[
+        "interchangeable preservation format floppy disk image"
     ]
 }

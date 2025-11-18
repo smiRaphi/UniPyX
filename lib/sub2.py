@@ -309,8 +309,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if os.listdir(o) and os.listdir(o + '/' + basename(i) + '.unpacked'):
                 copydir(o + '/' + basename(i) + '.unpacked',o,True)
                 return
-        case 'Amiga IMG':
-            run(['uaeunp','-x',i,'**'],cwd=o)
+        case 'Amiga IMG'|'SPS IPF':
+            td = TmpDir()
+            run(['uaeunp','-x',i,'**'],cwd=td.p)
+            for f in os.listdir(td.p):
+                if isdir(td.p + '/' + f): copydir(td.p + '/' + f,o)
+            td.destroy()
             if os.listdir(o): return
         case 'Atari ATR':
             run(['atr',i,'x','-a'],cwd=o)
