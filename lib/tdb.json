@@ -133,10 +133,12 @@
     "IMG":[
         "generic pc disk image (ntfs)",
         "generic pc disk image",
-        "msx-dos disk image"
+        "msx-dos disk image",
+        "master boot record dump"
     ],
     "Floppy Image":[
-        "anex86 pc98 floppy image (generic)"
+        "anex86 pc98 floppy image (generic)",
+        "fm towns bootable disk image"
     ],
     "Apple Disk Image":[
         "disk image",
@@ -936,5 +938,32 @@
     ],
     "BackupMii NAND Image":[
         "backupmii"
+    ],
+    "ACT Apricot IMG":[
+        "act apricot disk image"
+    ],
+    "Acorn Disc Filing IMG":[
+        "acorn disc filing system disk image (map e)"
+    ],
+    "Intel HEX":[
+        "intel hexadecimal object format"
+    ],
+    "SPS IPF":[
+        "interchangeable preservation format floppy disk image"
+    ],
+    "AMOS Memory Bank":[
+        "amos data bank",
+        "amos memory bank (generic)"
+    ],
+    "C64 IMG":[
+        "c64 cartridge image",
+        "ccs64 cartridge",
+        "c64 nib disk image"
+    ],
+    "SCP Flux":[
+        "supercard pro flux image"
+    ],
+    "HxC Floppy IMG":[
+        "hxc floppy emulator disk image"
     ]
 }

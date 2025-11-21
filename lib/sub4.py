@@ -1222,6 +1222,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     of.close()
             get_fst(0,o + '/NAND')
             if os.listdir(o + '/NAND'): return
+        case 'Wallpaper Engine PKG':
+            run(['repkg','extract','-o',o,'-n','--no-tex-convert','--overwrite',i])
+            if os.listdir(o): return
+        case 'AMOS Memory Bank':
+            if db.print_try: print('Trying with custom extractor')
+            open(o + '/' + tbasename(i) + '.bin','wb').write(open(i,'rb').read()[20:])
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

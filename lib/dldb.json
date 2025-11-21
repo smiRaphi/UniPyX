@@ -6,9 +6,9 @@
             "x":{
                 "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
             },
-            "ts":1762729200
+            "ts":1763420400
         }],
-        "ts":1762729200
+        "ts":1763420400
     },
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
@@ -29,15 +29,15 @@
             "x":{
                 "trid.py":"trid/trid.py"
             },
-            "ts":1762210800
+            "ts":1762988400
         },{
             "u":"https://mark0.net/download/triddefs.zip",
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1762556400
+            "ts":1763247600
         }],
-        "ts":1762556400
+        "ts":1763247600
     },
     "file":{
         "p":"file/file.exe",
@@ -98,9 +98,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1762815600
+            "ts":1763420400
         }],
-        "ts":1762815600
+        "ts":1763420400
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -190,11 +190,18 @@
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
         "fs":[{
-            "u":"https://github.com/jfdelnero/HxCFloppyEmulator/releases/download/HxCFloppyEmulator_V2_16_13_1/HxCFloppyEmulator_soft.zip",
+            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-81a3a3fc96c5a6cc2fb757ad59475e9591d1286d.zip",
             "x":{
-                "HxCFloppyEmulator_soft/HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
-                "HxCFloppyEmulator_soft/HxCFloppyEmulator_Software/Windows_x64/libhxcfe.dll":"hxcfe/libhxcfe.dll",
-                "HxCFloppyEmulator_soft/HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
+                "HxCFloppyEmulator_Software_win_x64.zip":{
+                    "HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
+                    "HxCFloppyEmulator_Software/Windows_x64/libhxcfe.dll":"hxcfe/libhxcfe.dll",
+                    "HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
+                }
+            }
+        },{
+            "u":"https://softpres.org/_media/files:spsdeclib_5.1_windows.zip?id=download&cache=cache",
+            "x":{
+                "capsimg_binary/x64/CAPSImg.dll":"hxcfe/CAPSImg.dll"
             }
         }],
         "ts":0
@@ -408,7 +415,7 @@
     "gameextractor":{
         "p":"GameExtractor/GameExtractor.jar",
         "fs":[{
-            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0003/extract.zip",
+            "u":"https://github.com/wattostudios/GameExtractor/releases/download/v3.16.0004/extract.zip",
             "x":{
                 "GameExtractor.jar":"GameExtractor/GameExtractor.jar",
                 "settings/default.xml":"GameExtractor/settings/default.xml",
@@ -418,9 +425,9 @@
                 "interface/SidePanel_DirectoryList.xml":"GameExtractor/interface/SidePanel_DirectoryList.xml",
                 "interface/SidePanel_DirectoryList_ReadPanel.xml":"GameExtractor/interface/SidePanel_DirectoryList_ReadPanel.xml"
             },
-            "ts":1759875616
+            "ts":1763284118
         }],
-        "ts":1759875616
+        "ts":1763284118
     },
     "buildgdi":{
         "p":"buildgdi.exe",
@@ -497,13 +504,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/da/c1/dolphin-master-2509-371-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/3a/91/dolphin-master-2509-455-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1762817753
+            "ts":1763416000
         }],
-        "ts":1762817753
+        "ts":1763416000
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -1210,41 +1217,41 @@
     "pdfimages":{
         "p":"xpdf-tools/pdfimages.exe",
         "fs":[{
-            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip",
+            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.06.zip",
             "x":{
-                "xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
-                "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
-                "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"
+                "xpdf-tools-win-4.06/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
+                "xpdf-tools-win-4.06/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
+                "xpdf-tools-win-4.06/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"
             },
-            "ts":1707346800
+            "ts":1763074800
         }],
-        "ts":1707346800
+        "ts":1763074800
     },
     "pdfdetach":{
         "p":"xpdf-tools/pdfdetach.exe",
         "fs":[{
-            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip",
+            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.06.zip",
             "x":{
-                "xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
-                "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
-                "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"
+                "xpdf-tools-win-4.06/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
+                "xpdf-tools-win-4.06/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
+                "xpdf-tools-win-4.06/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"
             },
-            "ts":1707346800
+            "ts":1763074800
         }],
-        "ts":1707346800
+        "ts":1763074800
     },
     "pdftohtml":{
         "p":"xpdf-tools/pdftohtml.exe",
         "fs":[{
-            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip",
+            "u":"https://dl.xpdfreader.com/xpdf-tools-win-4.06.zip",
             "x":{
-                "xpdf-tools-win-4.05/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
-                "xpdf-tools-win-4.05/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
-                "xpdf-tools-win-4.05/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"
+                "xpdf-tools-win-4.06/bin64/pdfimages.exe":"xpdf-tools/pdfimages.exe",
+                "xpdf-tools-win-4.06/bin64/pdfdetach.exe":"xpdf-tools/pdfdetach.exe",
+                "xpdf-tools-win-4.06/bin64/pdftohtml.exe":"xpdf-tools/pdftohtml.exe"
             },
-            "ts":1707346800
+            "ts":1763074800
         }],
-        "ts":1707346800
+        "ts":1763074800
     },
     "wpack":{
         "p":"WPACK.EXE",
@@ -2351,7 +2358,8 @@
             "x":{
                 "peazip_portable-10.7.0.WIN64/pea.exe":"pea.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "icupkg":{
         "p":"icu4c/icupkg.exe",
@@ -2364,7 +2372,8 @@
                 "bin64/icuuc78.dll":"icu4c/icuuc78.dll",
                 "bin64/icudt78.dll":"icu4c/icudt78.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "xvdtool.streaming":{
         "p":"XvdTool.Streaming/XvdTool.Streaming.exe",
@@ -2389,6 +2398,64 @@
                 "win-x64/XvdTool.Streaming.exe":"XvdTool.Streaming/XvdTool.Streaming.exe",
                 "win-x64/XvdTool.Streaming.runtimeconfig.json":"XvdTool.Streaming/XvdTool.Streaming.runtimeconfig.json"
             }
+        }],
+        "ts":0
+    },
+    "discimagemanager":{
+        "p":"DiscImageManager.exe",
+        "fs":[{
+            "u":"https://github.com/geraldholdsworth/DiscImageManager/releases/download/1.49/Disc.Image.Manager.1.49.Windows.64.bit.Intel.zip",
+            "x":{
+                "DiscImageManager.exe":"DiscImageManager.exe"
+            }
+        }],
+        "ts":0
+    },
+    "tersedecompress++":{
+        "p":"tersedecompress++.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "tersedecompress++.exe":"tersedecompress++.exe"
+            }
+        }]
+    },
+    "repkg":{
+        "p":"RePKG.exe",
+        "fs":[{
+            "u":"https://github.com/notscuffed/repkg/releases/download/v0.4.0-alpha/RePKG.zip",
+            "x":{
+                "RePKG.exe":"RePKG.exe"
+            }
+        }],
+        "ts":0
+    },
+    "c1541":{
+        "p":"VICE/c1541.exe",
+        "fs":[{
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45857/SDLVICE-3.9-win64-r45857.7z",
+            "x":{
+                "SDLVICE-3.9-win64-r45857/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.9-win64-r45857/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.9-win64-r45857/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.9-win64-r45857/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.9-win64-r45857/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.9-win64-r45857/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+            }
+        },{
+            "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
+            "x":{
+                "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
+            }
+        }]
+    },
+    "uclpack":{
+        "p":"uclpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "uclpack.exe":"uclpack.exe"
+            }
         }]
     },
     "exceldna-unpack":{
@@ -2398,7 +2465,8 @@
             "x":{
                 "exceldna-unpack.exe":"exceldna-unpack.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "android-ota-extractor":{
         "p":"android-ota-extrator.exe",
@@ -2407,22 +2475,26 @@
             "x":{
                 "android-ota-extrator.exe":"android-ota-extrator.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "nuitka-extractor":{
         "p":"nuitka-extractor.exe",
         "fs":[
         "https://github.com/extremecoders-re/nuitka-extractor/releases/download/2024.01.11/nuitka-extractor.exe"
-        ]
+        ],
+        "ts":0
     },
     "pycdc":{
         "p":"pycdc.exe",
         "fs":[{
-            "u":"https://nightly.link/zrax/pycdc/actions/artifacts/3993086451.zip",
+            "u":"https://nightly.link/zrax/pycdc/workflows/msvc-ci/master/pycdc-release.zip",
             "x":{
                 "pycdc.exe":"pycdc.exe"
-            }
-        }]
+            },
+            "nightly_run":17346356991
+        }],
+        "ts":0
     },
     "snzip":{
         "p":"snzip.exe",

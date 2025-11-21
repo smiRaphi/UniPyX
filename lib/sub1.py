@@ -131,10 +131,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if extract1(tf,to,'ISO'): remove(to)
                     else: remove(tf)
             if os.listdir(o): return
-        case 'ISO'|'IMG'|'Floppy Image'|'CDI'|'UDF'|'Aaru':
-            _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
-            if t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e: return extract1(i,o,'7z')
-
+        case 'CDI'|'Aaru'|'ACT Apricot IMG':
             osj = OSJump()
             osj.jump(dirname(i))
             td = 'tmp' + os.urandom(8).hex()
@@ -151,6 +148,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 remove(td)
                 if ret: return
             remove(td)
+        case 'ISO'|'IMG'|'Floppy Image'|'UDF':
+            _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
+            iso_udf = t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e
+
+            if not iso_udf and not extract1(i,o,'Aaru'): return
 
             bd = os.listdir(o)
             run(['7z','x',i,'-o' + o,'-aou'])
@@ -318,17 +320,25 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UPX':
             run(['upx','-d','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return
-        case 'KryoFlux':
-            tf = TmpFile('.script')
-            xopen(tf,'w').write('set FLUXSTREAM_PLL_INITIAL_BITRATE 250000\n')
-            _,o,_ = run(['hxcfe','-finput:' + i,'-script:' + tf,'-list'])
-            tf.destroy()
+        case 'KryoFlux'|'SCP Flux'|'HxC Floppy IMG':
+            bcmd = ['hxcfe','-finput:' + i]
+            _,op,_ = run(bcmd + ['-list'])
 
-            if '------- Disk Tree --------' in o:
-                o = o.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
-                if not 'ERROR -> Sector not found' in o:
-                    print(o)
-                    raise NotImplementedError()
+            op = op.replace('\r','')
+            if '------- Disk Tree --------' in op:
+                op = op.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
+                cp = []
+                fs = []
+                for t in re.findall(r"( *)([> ])([^<\n]+) <\d+>\n",op):
+                    while len(cp)*4 > len(t[0]): cp.pop()
+                    if t[1] == '>':
+                        cp.append(t[2])
+                        mkdir(o + '/' + '/'.join(cp))
+                    else:
+                        f = '/'.join(cp + [t[2]])
+                        run(bcmd + ['-getfile:/' + f],cwd=dirname(o + '/' + f),print_try=False)
+
+                if fs and rldir(o): return
         case 'BBC Micro SSD':
             run(['bbccp','-i',i,'.',o + '\\'])
             if os.listdir(o): return
@@ -391,7 +401,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark':
             od = rldir(o)
-            run(["deark","-od",o,i])
+            run(["deark","-od",o,'-a',i])
             for x in rldir(o):
                 if x in od: continue
                 xb = basename(x)
@@ -515,5 +525,35 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     copydir(td,o,True)
                     return
                 remove(td)
+        case 'Intel HEX':
+            if db.print_try: print('Trying with custom extractor')
+
+            f = open(i,encoding='utf-8')
+
+            fs = [[]]
+            for l in f.readlines():
+                if l[0] != ':': continue
+                datal = int(l[1:1+2],16)
+                addr = int(l[3:3+4],16)
+                typ = int(l[7:7+2],16)
+                assert typ in (0,1),hex(datal)[2:].upper()
+
+                if datal:
+                    data = bytes.fromhex(l[9:9+2*datal])
+                    fs[-1].append((addr,data))
+                if typ == 1: fs.append([])
+            f.close()
+            if not fs[-1]: fs.pop(-1)
+
+            mf = len(fs) > 1
+            for ix,fe in enumerate(fs):
+                of = o + '/' + tbasename(i)
+                if mf: of += f'_{ix}'
+                of = open(of + '.bin','wb')
+                for addr,data in fe:
+                    if addr > of.seek(0,2): of.write(b'\xFF'*(addr-of.tell()))
+                    of.write(data)
+                of.close()
+            if fs: return
 
     return 1

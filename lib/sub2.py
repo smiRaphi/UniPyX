@@ -309,9 +309,31 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if os.listdir(o) and os.listdir(o + '/' + basename(i) + '.unpacked'):
                 copydir(o + '/' + basename(i) + '.unpacked',o,True)
                 return
-        case 'Amiga IMG':
-            run(['uaeunp','-x',i,'**'],cwd=o)
+        case 'Amiga IMG'|'SPS IPF':
+            td = TmpDir()
+            run(['uaeunp','-x',i,'**'],cwd=td.p)
+            for f in os.listdir(td.p):
+                if isdir(td.p + '/' + f): copydir(td.p + '/' + f,o)
+            td.destroy()
             if os.listdir(o): return
+
+            bcmd = ['hxcfe','-finput:' + i]
+            _,op,_ = run(bcmd + ['-list'])
+
+            op = op.replace('\r','')
+            if '------- Disk Tree --------' in op:
+                op = op.split('------- Disk Tree --------\n')[1].split('--------------------------\n')[0]
+                cp = []
+                for t in re.findall(r"( *)([> ])([^<\n]+) <\d+>\n",op):
+                    while len(cp)*4 > len(t[0]): cp.pop()
+                    if t[1] == '>':
+                        cp.append(t[2])
+                        mkdir(o + '/' + '/'.join(cp))
+                    else:
+                        f = '/'.join(cp + [t[2]])
+                        run(bcmd + ['-getfile:/' + f],cwd=dirname(o + '/' + f).replace('/','\\'),print_try=False)
+
+                if rldir(o): return
         case 'Atari ATR':
             run(['atr',i,'x','-a'],cwd=o)
             if os.listdir(o): return
@@ -541,6 +563,63 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     return
                 remove(tf.p)
             if os.listdir(o): return
+        case 'Acorn Disc Filing IMG':
+            tf = TmpFile('.txt')
+            open(tf.p,'w',encoding='utf-8').write(f'insert "{i}"\nextract *\nfree\nexit\n')
+            run(['discimagemanager','-c',tf],cwd=o)
+            tf.destroy()
+            if os.listdir(o):
+                from time import strptime,mktime
+
+                for f in rldir(o,False):
+                    if not exists(f): continue
+                    if exists(f + '.inf'):
+                        finf = open(f + '.inf','rb').read()
+                        if b'\n' in finf or b'\r' in finf: continue
+                        try: finf = finf.decode()
+                        except: continue
+                        remove(f + '.inf')
+
+                        if isfile(f) and len(f) > 4 and f[-4] == ',':
+                            try: int(f[-3:],16)
+                            except:pass
+                            else:
+                                nf = f.rsplit(',',1)[0]
+                                if exists(nf):
+                                    c = 1
+                                    nf += '_0'
+                                    while exists(nf): nf = nf.rsplit('_',1)[0] + f'_{c}';c += 1
+                                rename(f,nf)
+                                f = nf
+
+                        if 'DATETIME=' in finf:
+                            ft = mktime(strptime(finf.split('DATETIME=')[1].split()[0],'%Y%m%d%H%M%S'))
+                            os.utime(f,(ft,ft))
+                return
+        case 'C64 IMG':
+            run(['c1541'],stdin=f'attach "{i}"\nextract\nquit\n',cwd=o)
+            cd = dirname(db.get('c1541'))
+            remove(cd + '/stderr.txt',cd + '/stdout.txt')
+            if os.listdir(o): return
+
+            if not extract(i,o,'DIET'):return # deark 
+
+            return extract2(i,o,'C64 Tape')
+        case 'GPEComp':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            for pos in (0xAA48,0xAA70):
+                f.seek(pos)
+                if f.read(8) == b"\x00\xE9\x55\x43\x4C\xFF\x01\x1A": break
+            else: return 1
+            f.seek(-8,1)
+            tf = TmpFile('.ucl')
+            open(tf.p,'wb').write(f.read())
+
+            of = o + '\\' + basename(i) + '.elf'
+            run(['uclpack','-d',tf.p,of])
+            tf.destroy()
+            if exists(of) and os.path.getsize(of): return
         case 'Playdate Container':
             raise NotImplementedError # https://github.com/rarenight/pdx-decrypt/blob/main/pdx-decrypt.py
 

@@ -55,14 +55,15 @@ def xopen(f:str,m='r',encoding='utf-8'):
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding)
-def rldir(i:str,files=True):
+def rldir(i:str,files=True) -> list[str]:
+    i = str(i)
     o = []
-    for x in os.listdir(str(i)):
-        x = str(i) + '\\' + x
+    for x in os.listdir(i):
+        x = i + '\\' + x
         if isfile(x): o.append(x)
         else:
             if not files: o.append(x)
-            o += rldir(x)
+            o += rldir(x,files=files)
     return o
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'
@@ -138,7 +139,8 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['file','-bsnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
-    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files'):
+    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
+               'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:

@@ -11,6 +11,11 @@
         "rq":["ARJZ","ARJ"],
         "rs":"ARJZ","s":1
     },
+    {
+        "rqr":["TERSE compressed data (PACK, U)","TERSE compressed data (PACK, V)","TERSE compressed data (SPACK, U)","TERSE compressed data (SPACK, V)"],
+        "d":["py","f=open(inp,'rb');v=f.read(1)[0]\nif v in (1,7):return True\nif not v in (2,5):return False\nf.seek(2);r1=int.from_bytes(f.read(2),'big');f.seek(8);r2=int.from_bytes(f.read(4),'big')\nreturn r1+r2!=0 and (r1==0 or r2==0 or r1==r2)"],
+        "rs":"TERSE","s":1
+    },
 
     {
         "rq":"ISO",
@@ -265,6 +270,10 @@
         "rs":"PS5 PKG","s":1
     },
     {
+        "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
+        "rs":"Wallpaper Engine PKG","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","NSO0",0],["isat","\\0\\0\\0\\0\\x3F\\0\\0\\0",8],["isatS","\\0",28,108]],
         "rs":"Compressed Nintendo Switch Executable","s":1
@@ -313,6 +322,16 @@
         "d":[["str0",0,100,1],["isat","0000000\\x000000000\\x000000000\\x00",100],["str",124,11],["isat","\\x0000000000000\\x000000000\\x00 ",135],
              ["isatS","\\0",172,157],["isat","0000000\\x000000000\\x00",329],["isatS","\\0",167,345]],
         "rs":"Stripped TAR","s":1
+    },
+    {
+        "d":["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",0],
+        "rs":"UCL","s":1
+    },
+    {
+        "rqr":"GLIBC",
+        "d":[["contain","GPEComp ",[30928,40975],false],
+             ["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43592],["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43632]],"qq":true,
+        "rs":"GPEComp","s":1
     },
     {
         "rq":null,
@@ -651,6 +670,11 @@
         "rs":"Turbo Range Coder"
     },
     {
+        "rqr":null,
+        "d":[["isatS","\\0",10,16],["isin",["\\0","\\x10","\\x20","\\x30","\\x40"],27],["str0",0,16,0],["py","f=open(inp,'rb');f.seek(0x1C);end=int.from_bytes(f.read(4),'little')\nif end!=f.seek(0,2):return False\nf.seek(32)\nfor _ in range(80):\n\ta=int.from_bytes(f.read(4),'little')\n\tif a!=0 and (a<352 or a>end):return False\nreturn True"]],
+        "rs":"Floppy Image"
+    },
+    {
         "rq":null,
         "d":[["isin",["\\x80","\\x81","\\x82","\\x83","\\x84"],1],["isat","\\0",3]],
         "rs":"ACB"
@@ -664,6 +688,12 @@
         "rqr":null,
         "d":[["isat","\\1",0],["str",1,11],["isin",["\\0","\\xFF"],13],["isat","\\1",14],["isin",["\\0","\\1"],18]],
         "rs":"The Compressor"
+    },
+    {
+        "d":[["size",174848],["ext",".d64"]],
+        "rs":"C64 IMG"},{
+        "d":[["size",819200],["ext",".d81"]],
+        "rs":"C64 IMG"
     },
     {
         "rqr":null,
