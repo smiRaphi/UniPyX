@@ -1,4 +1,3 @@
-from tokenize import endpats
 from .main import *
 
 def extract5(inp:str,out:str,t:str) -> bool:
