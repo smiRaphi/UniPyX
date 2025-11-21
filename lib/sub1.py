@@ -179,6 +179,19 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         f = o + '\\' + f
                         if not extract1(f,o,'ISO'): remove(f)
                 return
+        case 'Shifted ISO':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.seek(0x8000)
+            dat = f.read(0x1000)
+            if not b'\x01CD001\x01\x00' in dat: return 1
+            tf = o + '\\TMP' + os.urandom(8).hex() + '.iso'
+            f.seek(dat.index(b'\x01CD001\x01\x00'))
+            open(tf,'wb').write(f.read())
+
+            if extract1(tf,o,'ISO'): rename(tf,o + '/' + tbasename(i) + '_fixed.iso')
+            else: remove(tf)
+            return
         case 'Apple Partition Map':
             _,e,_ = run(['7z','l','-tAPM',i],print_try=False)
             if 'ERRORS:\nUnexpected end of archive' in e and '0.Apple_partition_map' in e:

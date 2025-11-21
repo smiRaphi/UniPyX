@@ -1132,6 +1132,96 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 df.seek(fe['start'])
                 xopen(o + '/' + fe['filename'].strip('/'),'wb').write(df.read(fe['end'] - fe['start']))
             return
+        case 'BackupMii NAND Image':
+            if db.print_try: print('Trying with custom extractor')
+            try: from Cryptodome.Cipher import AES # type: ignore
+            except ImportError: from Crypto.Cipher import AES # type: ignore
+
+            if os.path.getsize(i) == 0x400:
+                i = dirname(i) + '/nand.bin'
+                assert exists(i)
+
+            if os.path.getsize(i) != 0x21000400:
+                kf = open(dirname(i) + '/keys.bin','rb')
+            else:
+                kf = open(i,'rb')
+                kf.seek(0x21000000)
+
+            kf.seek(0x100,1)
+            open(o + '/OTP.bin','wb').write(kf.read(0x80))
+            kf.seek(0x80,1)
+            open(o + '/SEEPROM.bin','wb').write(kf.read(0x100))
+
+            kf.seek(-0x200,1)
+            open(o + '/boot1.hash','wb').write(kf.read(0x14))
+            open(o + '/common.key','wb').write(kf.read(0x10))
+            open(o + '/console.id','wb').write(kf.read(4))
+            open(o + '/ECC_private.key','wb').write(kf.read(0x1E))
+            kf.seek(-2,1)
+            open(o + '/NAND.hmac','wb').write(kf.read(0x14))
+            nand_key = kf.read(0x10)
+            open(o + '/NAND.key','wb').write(nand_key)
+            open(o + '/PRNG.seed','wb').write(kf.read(0x10))
+            kf.seek(0x8C,1)
+            open(o + '/ng.key','wb').write(kf.read(0x40))
+            kf.close()
+
+            from bin.tmd import File
+            f = File(i,endian='>')
+            noecc = os.path.getsize(i) == 0x20000000
+
+            if noecc: noffs = (0x1FC00000,0x20000000,0x40000)
+            else: noffs = (0x20BE0000,0x21000000,0x42000)
+            f.seek(noffs[0] + 4)
+
+            last = 0
+            while f.pos < noffs[1]:
+                cur = f.reads32()
+                if cur > last: last = cur
+                else: break
+                f.skip(noffs[2] - 4)
+            else: return 1
+            fato = f.pos - 8 - noffs[2]
+            fsto = fato + 0xC + (0x10000 if noecc else 0x10800)
+
+            def get_fst(entry,path):
+                f.seek(fsto + (entry // 0x40 * (0 if noecc else 2) + entry) * 0x20)
+                fs = {
+                    'path':path + '/' + f.read(0xC).replace(b'\0',b'').strip().decode('ascii').replace(':','-'),
+                    'mode':f.readu8() & 1,
+                    'attr':f.readu8(),
+                    'sub':f.readu16(),
+                    'sib':f.readu16(),
+                    'size':f.readu32(),
+                    'uid':f.readu32(),
+                    'gid':f.readu16(),
+                    'x3':f.readu32(),
+                }
+                if fs['sib'] != 0xFFFF: get_fst(fs['sib'],path)
+                if fs['mode'] == 0:
+                    mkdir(fs['path'])
+                    if fs['sub'] != 0xFFFF: get_fst(fs['sub'],fs['path'])
+                else:
+                    of = xopen(fs['path'],'wb')
+
+                    fat = fs['sub']
+                    bsiz = 0
+                    while fat < 0xFFF0:
+                        f.seek(fat * (0x4000 if noecc else 0x4200))
+                        cluster = []
+                        for _ in range(8):
+                            cluster.append(f.read(0x800))
+                            if not noecc: f.skip(0x40)
+                        data = AES.new(nand_key,AES.MODE_CBC,iv=bytes(0x10)).decrypt(b''.join(cluster))[:fs['size']-bsiz]
+                        of.write(data)
+                        bsiz += len(data)
+
+                        fat += 6
+                        f.seek(fato + (fat // 0x400 * (0 if noecc else 0x20) + fat) * 2)
+                        fat = f.readu16()
+                    of.close()
+            get_fst(0,o + '/NAND')
+            if os.listdir(o + '/NAND'): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

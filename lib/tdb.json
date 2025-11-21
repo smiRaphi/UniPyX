@@ -929,5 +929,12 @@
     "XVD":[
         "xbox virtual disk (msixvc/xvc)",
         "xbox virtual disk (xvd)"
+    ],
+    "Playdate Container":[
+        "playdate container/executable",
+        "playdate executable package"
+    ],
+    "BackupMii NAND Image":[
+        "backupmii"
     ]
 }

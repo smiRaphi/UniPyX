@@ -541,5 +541,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     return
                 remove(tf.p)
             if os.listdir(o): return
+        case 'Playdate Container':
+            raise NotImplementedError # https://github.com/rarenight/pdx-decrypt/blob/main/pdx-decrypt.py
 
     return 1

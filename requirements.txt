@@ -1,2 +1,3 @@
 httpx
 stringzilla
+pycryptodomex
