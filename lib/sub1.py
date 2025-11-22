@@ -317,9 +317,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'StuffIt'|'AMPK':
            e,_,_ = run(['unar','-f','-o',o,i])
            if not e: return
-        case 'UPX':
-            run(['upx','-d','-o',o + '/' + basename(i),i])
-            if exists(o + '/' + basename(i)): return
         case 'KryoFlux'|'SCP Flux'|'HxC Floppy IMG':
             bcmd = ['hxcfe','-finput:' + i]
             _,op,_ = run(bcmd + ['-list'])

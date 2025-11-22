@@ -886,7 +886,8 @@
     "VMProtect":[
         "vmprotect",
         "vmprotect v.2.x",
-        "www.vmpsoft.com"
+        "www.vmpsoft.com",
+        "x64 vmprotect v.3.5.1"
     ],
     "RouterOS Package":[
         "mikrotik routeros upgrade package"
@@ -965,5 +966,9 @@
     ],
     "HxC Floppy IMG":[
         "hxc floppy emulator disk image"
+    ],
+    "Install Creator Pro":[
+        "install creator/pro ver.2.0",
+        "www.clickteam.com"
     ]
 }

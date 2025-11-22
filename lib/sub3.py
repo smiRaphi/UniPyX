@@ -228,7 +228,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y'] + pwd + [i])
                 if not os.listdir(o): run(['innounp','-x','-m','-d' + o,'-y'] + pwd + [i])
                 for x in os.listdir(o):
-                    if x != '{app}': mv(o + '/' + x,o + '/$INSFILES/')
+                    if x != '{app}':
+                        try: mv(o + '/' + x,o + '/$INSFILES/')
+                        except PermissionError: copy(o + '/' + x,o + '/$INSFILES/')
                 if exists(o + '/{app}'):
                     while True:
                         try:copydir(o + '/{app}',o,True)
@@ -1003,5 +1005,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             assert not err
             open(o + '/' + tbasename(i) + '.py','wb').write(r.split(b'\r\n',3)[3])
             return
+        case 'Install Creator Pro': raise NotImplementedError
+        case 'UPX':
+            run(['upx','-d','-f','-o',o + '/' + basename(i),i])
+            if exists(o + '/' + basename(i)): return
 
     return 1
