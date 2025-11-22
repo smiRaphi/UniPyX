@@ -1005,7 +1005,14 @@ def extract3(inp:str,out:str,t:str) -> bool:
             assert not err
             open(o + '/' + tbasename(i) + '.py','wb').write(r.split(b'\r\n',3)[3])
             return
-        case 'Install Creator Pro': raise NotImplementedError
+        case 'Install Creator Pro':
+            run(['cicdec','-db',i,o])
+            if os.listdir(o):
+                for f in os.listdir(o):
+                    if f.startswith('Block 0x') and f.endswith('.bin'):
+                        mkdir(o + '/$INSFILES')
+                        mv(o + '/' + f,o + '/$INSFILES/' + f.rsplit(None,1)[1].replace('UNINSTALLER.bin','UNINSTALLER.exe'))
+                return
         case 'UPX':
             run(['upx','-d','-f','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return

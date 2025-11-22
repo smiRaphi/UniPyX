@@ -490,17 +490,6 @@
         ],
         "ts":1757254045798
     },
-    "upx":{
-        "p":"upx.exe",
-        "fs":[{
-            "u":"https://github.com/upx/upx/releases/download/v5.0.2/upx-5.0.2-win64.zip",
-            "x":{
-                "upx-5.0.2-win64/upx.exe":"upx.exe"
-            },
-            "ts":1753010702
-        }],
-        "ts":1753010702
-    },
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
@@ -2457,6 +2446,28 @@
                 "uclpack.exe":"uclpack.exe"
             }
         }]
+    },
+    "cicdec":{
+        "p":"cicdec/cicdec.exe",
+        "fs":[{
+            "u":"https://github.com/Bioruebe/cicdec/releases/download/3.0.1/cicdec.zip",
+            "x":{
+                "cicdec.exe":"cicdec/cicdec.exe",
+                "Bio.cs.dll":"cicdec/Bio.cs.dll",
+                "ICSharpCode.SharpZipLib.dll":"cicdec/ICSharpCode.SharpZipLib.dll"
+            }
+        }]
+    },
+    "upx":{
+        "p":"upx.exe",
+        "fs":[{
+            "u":"https://github.com/upx/upx/releases/download/v5.0.2/upx-5.0.2-win64.zip",
+            "x":{
+                "upx-5.0.2-win64/upx.exe":"upx.exe"
+            },
+            "ts":1753010702
+        }],
+        "ts":1753010702
     },
     "exceldna-unpack":{
         "p":"exceldna-unpack.exe",
