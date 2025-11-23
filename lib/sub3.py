@@ -799,7 +799,44 @@ def extract3(inp:str,out:str,t:str) -> bool:
             extract(tf,o,'7z')
             remove(tf)
             if os.listdir(o): return
-        case 'd0lLZ': raise NotImplementedError
+        case 'd0lLZ 1'|'d0lLZ 2':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='>')
+
+            f.seek(0x1C)
+            data0 = f.readu32()
+            f.seek(0xAC)
+            data0_size = f.readu32()
+            f.seek(data0)
+            assert f.read(3) == b'DLZ'
+            ver = f.readu8()
+
+            of = open(o + '/' + basename(i),'wb')
+            if ver == 2:
+                def dlz_dec_block():
+                    size = f.readu32()
+                    assert size > 6
+                    epos = f.pos + size
+                    f.skip(4)
+
+                    dec = bytearray()
+                    while f.pos < epos:
+                        flags = f.readu16('<')
+                        for bit in range(16):
+                            if (flags >> bit) & 1:
+                                tok = f.readu16('<')
+                                leng,off = (tok & 0x0F)+3,(tok >> 4) & 0xFFF
+                                off += 0xF
+                                assert off > 0,f'{leng},{off} = 0x{tok:04X} @ 0x{f.pos-2:04X}'
+                                off = len(dec) - off
+                                assert off >= 0,f'{leng},{off} = 0x{tok:04X} @ 0x{f.pos-2:04X}'
+                                for i in range(leng): dec.append(dec[off + i])
+                            else: dec.append(f.readu8())
+                    of.write(dec)
+            while f.pos < (data0 + data0_size): dlz_dec_block()
+            return
+        case 'd0lLZ 3': raise NotImplementedError
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
             import lz4.block # type: ignore
