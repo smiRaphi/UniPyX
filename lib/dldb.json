@@ -2467,6 +2467,15 @@
             }
         }]
     },
+    "txd":{
+        "p":"txd.exe",
+        "fs":[{
+            "u":"http://mirror.ifarchive.org/if-archive/infocom/tools/ztools/ztools731_win32.zip",
+            "x":{
+                "txd.exe":"txd.exe"
+            }
+        }]
+    },
     "cicdec":{
         "p":"cicdec/cicdec.exe",
         "fs":[{

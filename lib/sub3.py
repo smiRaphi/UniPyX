@@ -1053,5 +1053,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'UPX':
             run(['upx','-d','-f','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return
+        case 'Z-Code':
+            e,r,_ = run(['txd',i],text=False)
+            if e: return 1
+            open(o + '/' + tbasename(i) + '.asm','wb').write(r)
+            return
 
     return 1
