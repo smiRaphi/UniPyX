@@ -2438,6 +2438,15 @@
             }
         }]
     },
+    "pfs2tar":{
+        "p":"pfs2tar.exe",
+        "fs":[{
+            "u":"https://github.com/ps2homebrew/pfsshell/releases/download/latest/pfsshell-v1.1.1-win32.7z",
+            "x":{
+                "pfs2tar.exe":"pfs2tar.exe"
+            }
+        }]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{

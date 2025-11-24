@@ -274,6 +274,10 @@
         "rs":"PS5 PKG","s":1
     },
     {
+        "d":[["s%",4096],["size",[268435456,null]],["isat","APA\\0",4],["isat","Sony Computer Entertainment Inc.",256],["isatS","\\0",28,100],["str0",16,32,0]],
+        "rs":"PlayStation APA IMG","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },

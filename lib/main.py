@@ -85,7 +85,7 @@ class TmpDir:
     def __radd__(self,i): return i + self.p
     def __del__(self): self.destroy()
 class TmpFile:
-    def __init__(self,suf='',name=''): self.p = TMP + (name or (os.urandom(8).hex() + suf))
+    def __init__(self,suf='',name='',path=TMP): self.p = path + '\\' + (name or ('tmp' + os.urandom(8).hex() + suf))
     def link(self,i): symlink(i,self.p)
     def copy(self,i): cp(i,self.p)
     def destroy(self):
