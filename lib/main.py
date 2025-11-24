@@ -42,12 +42,16 @@ def copy(i:str,o:str):
         else: copytree(i,o,dirs_exist_ok=True)
 cp = copy
 def move(i:str,o:str):
-    copy(i,o)
-    remove(i)
+    if abspath(i)[0].lower() != abspath(o)[0].lower(): rename(i,o)
+    else:
+        copy(i,o)
+        remove(i)
 mv = move
 def copydir(i:str,o:str,delete=False):
     mkdir(o)
-    for x in os.listdir(str(i)): cp(i + '/' + x,o + '/' + x)
+    cfnc = cp
+    if delete and abspath(i)[0].lower() == abspath(o)[0].lower(): cfnc = move
+    for x in os.listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
 def xopen(f:str,m='r',encoding='utf-8'):
@@ -307,7 +311,7 @@ def analyze(inp:str,raw=False):
                         c -= len(cv)
                     f.close()
                     ret = h.hexdigest() == hs
-                elif x[0] == 'str0':
+                elif x[0] == 'str0nv':
                     f = open(inp,'rb')
                     sp = x[1]
                     if sp < 0: sp = f.seek(0,2) + sp
@@ -320,6 +324,23 @@ def analyze(inp:str,raw=False):
                         if not b: ret = False;break
                         if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
                         elif b != b'\0': ret = False;break
+                    else: ret = scnt >= x[3]
+                    f.close()
+                elif x[0] == 'str0':
+                    f = open(inp,'rb')
+                    sp = x[1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    scnt = 0
+                    b = b''
+                    end = False
+                    for _ in range(x[2]):
+                        b = f.read(1)
+                        if not b: ret = False;break
+                        if b == b'\0': end = True
+                        elif not end and b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        else: ret = False;break
                     else: ret = scnt >= x[3]
                     f.close()
                 elif x[0] == 'str':
