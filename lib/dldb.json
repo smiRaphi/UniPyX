@@ -2447,6 +2447,17 @@
             }
         }]
     },
+    "mymc":{
+        "p":"mymc/mymc.exe",
+        "fs":[{
+            "u":"http://www.csclub.uwaterloo.ca:11068/mymc/mymc-alpha-2.7.zip",
+            "x":{
+                "mymc.exe":"mymc/mymc.exe",
+                "python27.dll":"mymc/python27.dll",
+                "library.zip":"mymc/library.zip"
+            }
+        }]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{

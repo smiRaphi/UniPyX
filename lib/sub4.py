@@ -1229,6 +1229,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             open(o + '/' + tbasename(i) + '.bin','wb').write(open(i,'rb').read()[20:])
             return
+        case 'PS2 Memory Card':
+            run(['mymc','-i',i,'extract','*'],cwd=o)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
