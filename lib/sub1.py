@@ -314,7 +314,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
             run(['7z','x',i,'-o' + o,'-aou'])
             if os.listdir(o): return
-        case 'StuffIt'|'AMPK':
+        case 'StuffIt'|'AmiPack':
            e,_,_ = run(['unar','-f','-o',o,i])
            if not e: return
         case 'KryoFlux'|'SCP Flux'|'HxC Floppy IMG':
@@ -396,7 +396,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX':
             od = rldir(o)
             run(["deark","-od",o,'-a',i])
             for x in rldir(o):
@@ -552,5 +552,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     of.write(data)
                 of.close()
             if fs: return
+        case 'AppleSingle':
+            if not extract1(i,o,'StuffIt'): return # unar
+            if not extract1(i,o,'DIET'): return # deark
 
     return 1

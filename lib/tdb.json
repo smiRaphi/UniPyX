@@ -25,7 +25,8 @@
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
-        "amiga whdload package (lha compressed)"
+        "amiga whdload package (lha compressed)",
+        "lha"
     ],
     "RAR":[
         "winrar self extracting archive (4.x-5.x)",
@@ -160,7 +161,8 @@
         "allegro data (generic)"
     ],
     "VISE Installer":[
-        "vise mindvision wizard module"
+        "vise mindvision wizard module",
+        "installer vise custom"
     ],
     "NSIS Installer":[
         "nullsoft scriptable install system",
@@ -978,5 +980,36 @@
     ],
     "Z-Code":[
         "z-code v3 adventure for infocom z-machine"
+    ],
+    "Agon Game Archive":[
+        "agon game data archive"
+    ],
+    "Aldus LZW":[
+        "aldus lzw compressed data"
+    ],
+    "Aldus Zip":[
+        "aldus zip compressed installation data"
+    ],
+    "Alien Vs Predator Game Data":[
+        "alien vs predator game data container"
+    ],
+    "Allods 2 Rage Of Mages Game Archive":[
+        "allods 2 rage of mages game data archive"
+    ],
+    "American Conquest 2 Game Archive":[
+        "american conquest 2 game data archive",
+        "american conquest 2 game data archvie"
+    ],
+    "AppleSingle":[
+        "mac applesingle encoded"
+    ],
+    "ARX":[
+        "arx compressed archive"
+    ],
+    "ASCARON Entertainment Game Archive":[
+        "ascaron entertainment game data archive"
+    ],
+    "Atomik Cruncher":[
+        "atomik cruncher 3 compressed data (v3.5)"
     ]
 }
