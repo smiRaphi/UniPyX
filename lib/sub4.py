@@ -1232,6 +1232,69 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'PS2 Memory Card':
             run(['mymc','-i',i,'extract','*'],cwd=o)
             if os.listdir(o): return
+        case 'Coktel Vision STK':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            fc = f.readu16()
+            fs = []
+            for _ in range(fc):
+                fs.append((f.read(13).split(b'\0')[0].decode('cp866'),f.readu32(),f.readu32(),f.readu8()))
+
+            def decompress_chk(size:int):
+                bidx = 4078
+                buf = bytearray(b' ' * bidx + b'\0' * 36)
+                dat = b''
+
+                pos = f.pos
+                cmd = 0
+                while size > 0:
+                    cmd >>= 1
+                    if not cmd & 0x100: cmd = f.readu8() | 0xFF00
+
+                    if cmd & 1:
+                        b = f.reads()
+                        dat += b
+                        buf[bidx] = b[0]
+                        bidx += 1
+                        bidx %= 4096
+                        size -= 1
+                    else:
+                        h,l = f.readu8(),f.readu8()
+                        off = h | ((l & 0xF0) << 4)
+                        leng = (l & 0x0F) + 3
+
+                        for i in range(leng):
+                            dat += bytes([buf[(off + i) % 4096]])
+                            size -= 1
+                            if size <= 0: break
+
+                            buf[bidx] = buf[(off + i) % 4096]
+                            bidx += 1
+                            bidx %= 4096
+                return dat
+            def decompress():
+                csize = usize = 0
+                dat = b''
+                while csize != 0xFFFF:
+                    csize = f.readu16()
+                    rsize = f.readu16()
+                    usize += rsize
+
+                    assert csize >= 4
+                    f.skip(2)
+                    dat += decompress_chk(rsize)
+                assert len(dat) == usize
+                return dat
+
+            for fe in fs:
+                f.seek(fe[2])
+                if fe[3] == 2: dat = decompress()
+                elif fe[3] > 0: dat = decompress_chk(f.readu32())
+                else: dat = f.read(fe[1])
+                open(o + '/' + fe[0],'wb').write(dat)
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

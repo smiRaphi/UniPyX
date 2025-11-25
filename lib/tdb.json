@@ -757,7 +757,8 @@
         "bsarc compressed archive"
     ],
     "LZEXE":[
-        "lzexe"
+        "lzexe",
+        "lzexe compressed dos executable (v0.91)"
     ],
     "Compressed File Library":[
         "compressed file library 3 compressed data",

@@ -326,6 +326,21 @@ def analyze(inp:str,raw=False):
                         elif b != b'\0': ret = False;break
                     else: ret = scnt >= x[3]
                     f.close()
+                elif x[0] == 'str0e':
+                    f = open(inp,'rb')
+                    sp = x[1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    scnt = 0
+                    b = b''
+                    for _ in range(x[2]):
+                        b = f.read(1)
+                        if not b: ret = False;break
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        elif b == b'\0': ret = scnt >= x[3];break
+                    else: ret = scnt >= x[3]
+                    f.close()
                 elif x[0] == 'str0':
                     f = open(inp,'rb')
                     sp = x[1]

@@ -479,6 +479,10 @@
         "rs":"Zeebo Resources"
     },
     {
+        "d":[["n0",2,0],["n0",4,19],["str0e",2,13,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');f.seek(19);return int.from_bytes(f.read(4),'little')==(2+c*22)"]],
+        "rs":"Coktel Vision STK"
+    },
+    {
         "d":[["isat","FUFS",0],["n0",4,8],["n0",4,12]],
         "rs":"Zeebo FUFS","s":1
     },
