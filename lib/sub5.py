@@ -264,5 +264,8 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['uclpack','-d',i,o])
             if exists(of) and os.path.getsize(of): return
+        case 'Binary ][ Archive':
+            run(['nulib2','-xs',i],cwd=o)
+            if os.listdir(o): return
 
     return 1

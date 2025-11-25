@@ -61,7 +61,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         return r
 
     match t:
-        case '7z'|'MSCAB'|'BinHex'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
+        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
              'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
@@ -555,5 +555,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'AppleSingle':
             if not extract1(i,o,'StuffIt'): return # unar
             if not extract1(i,o,'DIET'): return # deark
+        case 'BinHex':
+            if not extract1(i,o,'AppleSingle'): return # unar & deark
+            if not extract1(i,o,'7z'): return # 7z
+        case 'BinSCII':
+            tf = TmpFile('.bsc')
+            open(tf.p,'wb').write(b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + open(i,'rb').read().split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
+            r = extract1(tf.p,o,'DIET')
+            tf.destroy()
+            return r
 
     return 1

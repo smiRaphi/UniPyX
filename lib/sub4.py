@@ -665,7 +665,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             if fs: return
         case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
-             'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive':
+             'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Balko UFL Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
+             'BioWare Entity Resource'|'Bloodrayne Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -896,7 +897,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='>')
 
             assert f.read(4) == b'FORM'
-            f.skip(4)
+            lng = f.readu32()
+            if lng != f.size:
+                f._end = '<'
+                f.skip(-4)
+                nlng = f.readu32()
+                if nlng != f.size and abs(f.size-nlng) > abs(f.size-lng):
+                    f._end = '>'
             BTYPE = f.read(4)
 
             cnt = [0]
@@ -934,10 +941,22 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     while f.pos < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
                 elif name == b'NETN' and BTYPE in (b'NSF1',b'NMF1'):
                     FNAMES.append(f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
+                elif name == b'RIdx' and BTYPE == b'IFRS':
+                    fc = f.readu32()
+                    fs = []
+                    for _ in range(fc):
+                        fs.append((f.read(4).decode() + str(f.readu32()),f.readu32()))
+                        cnt[0] += 1
+                    for fe in fs:
+                        f.seek(fe[1])
+                        t = f.read(4)
+                        open(fpath + '/' + fe[0] + '.' + t.decode(),'wb').write(f.read(f.readu32()))
+                    if fc: return 1
 
                 f.seek(epos)
 
-            while f: read_block(o)
+            while f:
+                if read_block(o):break
             if cnt[0]: return
         case 'Xbox XB Compressed':
             run(['xbdecompress','/Y','/T',i,o])

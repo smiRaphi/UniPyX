@@ -2726,6 +2726,15 @@
         }],
         "ts":0
     },
+    "nulib2":{
+        "p":"nulib2.exe",
+        "fs":[{
+            "u":"https://nulib.com/downloads/nulib2_310_win32.zip",
+            "x":{
+                "nulib2.exe":"nulib2.exe"
+            }
+        }]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{

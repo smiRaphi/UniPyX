@@ -68,6 +68,12 @@ class File:
 
     @property
     def pos(self): return self.tell()
+    @property
+    def size(self):
+        p = self.pos
+        r = self.seek(0,2)
+        self.seek(p)
+        return r
 
     def update_size(self): self._size = self.tell()
     def __len__(self): return self._size

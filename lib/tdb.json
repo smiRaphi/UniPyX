@@ -881,7 +881,8 @@
     ],
     "IFF Data":[
         "generic iff container",
-        "iff data"
+        "iff data",
+        "blorb interactive fiction package"
     ],
     "Xbox PIRS":[
         "xbox 360 pirs container data file"
@@ -1011,5 +1012,24 @@
     ],
     "Atomik Cruncher":[
         "atomik cruncher 3 compressed data (v3.5)"
+    ],
+    "Balko UFL Game Archive":[
+        "balko ufl game data archive"
+    ],
+    "Bank Game Archive":[
+        "bank game data archive",
+        "halloween harry bank game data container"
+    ],
+    "Battlezone 2 Game Archive":[
+        "battlezone 2 game data package"
+    ],
+    "Binary ][ Archive":[
+        "binary ][ archive"
+    ],
+    "BioWare Entity Resource":[
+        "bioware entity resource file"
+    ],
+    "Bloodrayne Game Archive":[
+        "bloodrayne game data archive"
     ]
 }
