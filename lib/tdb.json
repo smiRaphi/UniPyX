@@ -882,7 +882,9 @@
     "IFF Data":[
         "generic iff container",
         "iff data",
-        "blorb interactive fiction package"
+        "blorb interactive fiction package",
+        "iff-text document (generic)",
+        "iff flow idea processor format"
     ],
     "Xbox PIRS":[
         "xbox 360 pirs container data file"
@@ -1031,5 +1033,8 @@
     ],
     "Bloodrayne Game Archive":[
         "bloodrayne game data archive"
+    ],
+    "BOLT Game Archive":[
+        "bolt game data archive"
     ]
 }

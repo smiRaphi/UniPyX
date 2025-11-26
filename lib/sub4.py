@@ -666,7 +666,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
              'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Balko UFL Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
-             'BioWare Entity Resource'|'Bloodrayne Game Archive':
+             'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -908,6 +908,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             cnt = [0]
             FNAMES = []
+            FDATA = {}
             def read_block(fpath:str,fname:str=None,addext=True):
                 name = f.read(4)
                 size = f.readu32()
@@ -952,11 +953,23 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         t = f.read(4)
                         open(fpath + '/' + fe[0] + '.' + t.decode(),'wb').write(f.read(f.readu32()))
                     if fc: return 1
+                elif name == b'CHRS' and BTYPE == b'FTXT':
+                    open(fpath + f'/{basename(i)}{cnt[0]}.txt','wb').write(f.read(size).split(b'\0')[0])
+                    cnt[0] += 1
+                elif name == b'TEXT' and BTYPE == b'HEAD':
+                    if not 'TXT' in FDATA:
+                        FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt[0]}.txt','wb')
+                        FDATA['INDENT'] = 0
+                        cnt[0] += 1
+                    FDATA['TXT'].write(b'  '*FDATA['INDENT'] + f.read(size) + b'\n')
+                elif name == b'NEST' and BTYPE == b'HEAD' and 'TXT' in FDATA:
+                    FDATA['INDENT'] = f.readu16()
 
                 f.seek(epos)
 
-            while f:
+            while (f.pos+8) <= f.size:
                 if read_block(o):break
+                if f.pos % 2: f.skip(1)
             if cnt[0]: return
         case 'Xbox XB Compressed':
             run(['xbdecompress','/Y','/T',i,o])
