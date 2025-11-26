@@ -515,9 +515,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
             r = msdos(['dwc','x',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
             return r
-        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder':
-            run(['ancient','decompress',i,o + '/' + basename(i)])
-            if exists(o + '/' + basename(i)) and os.path.getsize(o + '/' + basename(i)): return
+        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder'|'Compact':
+            of = o + '/' + tbasename(i)
+            run(['ancient','decompress',i,of])
+            if exists(of) and os.path.getsize(of): return
         case 'ABE': return msdos(['dabe','-v','+i',i],cwd=o)
         case 'CarComp': return msdos(['car','x',i],cwd=o)
         case 'PeaZip':
@@ -568,6 +569,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             tf = TmpFile('.bsc')
             open(tf.p,'wb').write(b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + open(i,'rb').read().split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
             r = extract1(tf.p,o,'DIET')
+            tf.destroy()
+            return r
+        case 'Compaq QRST IMG':
+            tf = TmpFile('.img',path=o)
+            run(['dskconv','-otype','raw',i,tf])
+            r = extract1(tf.p,o,'IMG')
             tf.destroy()
             return r
 

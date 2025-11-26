@@ -2912,6 +2912,16 @@
             }
         ]
     },
+    "dskconv":{
+        "p":"libdsk/dskconv.exe",
+        "fs":[{
+            "u":"https://www.seasip.info/Unix/LibDsk/libdsk1522.zip",
+            "x":{
+                "dskconv.exe":"libdsk/dskconv.exe",
+                "libdsk.dll":"libdsk/libdsk.dll"
+            }
+        }]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{

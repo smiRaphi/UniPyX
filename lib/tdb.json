@@ -1043,5 +1043,12 @@
     "Compressed ISO":[
         "ciso compressed iso cd image",
         "compressed iso file"
+    ],
+    "Compact":[
+        "compact by colin l. mcmaster",
+        "compact compressed data"
+    ],
+    "Compaq QRST IMG":[
+        "compaq qrst disk image"
     ]
 }
