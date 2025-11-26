@@ -1036,5 +1036,12 @@
     ],
     "BOLT Game Archive":[
         "bolt game data archive"
+    ],
+    "Broderbund Mohawk Game Archive":[
+        "broderbund mohawk game data archive"
+    ],
+    "Compressed ISO":[
+        "ciso compressed iso cd image",
+        "compressed iso file"
     ]
 }

@@ -62,7 +62,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
     match t:
         case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
-             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD':
+             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -194,6 +194,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if extract1(tf,o,'ISO'): rename(tf,o + '/' + tbasename(i) + '_fixed.iso')
             else: remove(tf)
             return
+        case 'Cloop IMG':
+            tf = TmpFile('.img',path=o)
+            run(['qemu-img','convert','--salvage','-O','raw','-m',os.cpu_count(),'-q',i,tf])
+            r = extract1(tf.p,o,'IMG')
+            tf.destroy()
+            return r
         case 'Apple Partition Map':
             _,e,_ = run(['7z','l','-tAPM',i],print_try=False)
             if 'ERRORS:\nUnexpected end of archive' in e and '0.Apple_partition_map' in e:

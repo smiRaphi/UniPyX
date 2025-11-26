@@ -135,6 +135,10 @@
         "rs":"SLUDGE Data File","s":1
     },
     {
+        "d":[["isat","#!/bin/sh",0],["contain"," /dev/cloop $1",[32,128]],["isat","\\0\\0\\0\\0",124]],
+        "rs":"Cloop IMG","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","KCAP\\x67\\0\\0\\0",0],
         "rs":"iQiyi PAK","s":1
