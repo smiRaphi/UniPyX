@@ -1108,4 +1108,4 @@ def extract3(inp:str,out:str,t:str) -> bool:
             vamos(['xfddecrunch',i,of])
             if exists(of) and os.path.getsize(of): return
 
-    return 11
+    return 1

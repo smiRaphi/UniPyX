@@ -665,7 +665,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             if fs: return
         case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
-             'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Balko UFL Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
+             'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
              'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
@@ -1399,6 +1399,37 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(of)
                 xopen(o + '/' + fn,'wb').write(f.read(f.readu32('<')))
             if offs: return
+        case 'Balko UFL Game Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'LiArFi\n\0'
+            f.skip(4)
+            f.seek(f.readu32())
+
+            def read_dir(normal=True):
+                f.skip(8)
+                fc = f.readu32()
+                if normal: path = o + '/' + f.read(f.readu16()+1).decode().strip('\\/')
+                else: path = o
+
+                fs = []
+                for _ in range(fc):
+                    fe = [f.read(f.readu8()+1),f.readu32(),f.readu32()]
+                    f.skip(4)
+                    if fe[1] == 0x20:
+                        fe.append(f.readu32())
+                        f.skip(12)
+                    elif fe[1] != 0x10: raise NotImplementedError(str(f.pos))
+                    fs.append(fe)
+
+                for fe in fs:
+                    f.seek(fe[2])
+                    if fe[1] == 0x10: read_dir()
+                    elif fe[1] == 0x20:
+                        xopen(path + '/' + fe[0].decode().strip('\\/'),'wb').write(f.read(fe[3]))
+            read_dir(False)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
