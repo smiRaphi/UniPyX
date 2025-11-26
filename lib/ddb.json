@@ -129,6 +129,12 @@
         "rs":"NES Remix ROM"
     },
     {
+        "d":[["isat","SLUDGE\\x00\\r\\nSLUDGE data file\\r\\nSLUDGE is (c) Hungry Software and contributors 2006-2",0],
+             ["isat","\\r\\nThis data file must be run using the SLUDGE engine available at http://opensludge.github.io/\\r\\n\\x00",83],
+             ["isin",["\\0","\\1"],182]],
+        "rs":"SLUDGE Data File","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","KCAP\\x67\\0\\0\\0",0],
         "rs":"iQiyi PAK","s":1

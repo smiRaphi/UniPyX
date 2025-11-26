@@ -1328,6 +1328,77 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 else: dat = f.read(fe[1])
                 open(o + '/' + fe[0],'wb').write(dat)
             if fs: return
+        case 'SLUDGE Data File':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i)
+            assert f.read(7) == b'SLUDGE\0'
+            f.skip(0xAD + 2)
+
+            dec_str = lambda s: ''.join(chr(x-1) for x in s)
+            if f.readu8():
+                for _ in range(f.readu16('>')): f.skip(f.readu16('>'))
+                for _ in range(f.readu16('>')): f.skip(f.readu16('>'))
+                fs = [dec_str(f.read(f.readu16('>'))) for _ in range(f.readu16('>'))]
+            else: fs = None
+
+            opts = open(o + '/' + tbasename(i) + '.slp','w',encoding='utf-8')
+            opts.write('[SETTINGS]\n')
+
+            opts.write('width=' + str(f.readu16('>')) + '\n')
+            opts.write('height=' + str(f.readu16('>')) + '\n')
+
+            opb = f.readu8()
+            opts.write('fullscreen=' + ('Y' if opb & 2 else 'N') + '\n')
+            opts.write('makesilent=' + ('Y' if opb & 8 else 'N') + '\n')
+            opts.write('mouse=')
+            if opb & 4 and opb & 0x10: opts.write('3')
+            elif opb & 4: opts.write('2')
+            elif opb & 0x10: opts.write('0')
+            else: opts.write('1')
+            opts.write('\n')
+            opts.write('invisible=' + ('Y' if opb & 0x20 else 'N') + '\n')
+            opts.write('showlogo=' + ('N' if opb & 0x40 else 'Y') + '\n')
+            opts.write('showloading=' + ('N' if opb & 0x80 else 'Y') + '\n')
+
+            opts.write('speed=' + str(f.readu8()) + '\n')
+
+            f.skip(f.readu16('>') + 8)
+            f.skip(f.readu16('>'))
+
+            lngs = f.readu8()
+            if lngs: opts.write('language=' + dec_str(f.read(f.readu16('>'))) + '\n')
+            for _ in range(lngs):
+                f.skip(2)
+                f.skip(f.readu16('>'))
+
+            opts.write('chrRender_max_readIni=' + ('Y' if f.readu8() else 'N') + '\n')
+            opts.write('chrRender_max_enabled=' + ('Y' if f.readu8() else 'N') + '\n')
+            opts.write('chrRender_max_softX=' + str(f.readfloat('<') * 16) + '\n')
+            opts.write('chrRender_max_softY=' + str(f.readfloat('<') * 16) + '\n')
+
+            assert dec_str(f.read(f.readu16('>'))) == 'okSoFar'
+
+            clog = f.readu8()
+            if clog: raise NotImplementedError
+            opts.write('customicon=' + ('Y' if clog & 1 else 'N') + '\n')
+            opts.write('customlogo=' + ('Y' if clog & 2 else 'N') + '\n')
+            opts.close()
+
+            f.skip(2)
+            f.seek(f.readu32('<'))
+            f.skip(f.readu32('<'))
+            f.skip(f.readu32('<'))
+
+            offs = [f.readu32('<') + f.pos]
+            while f.pos < offs[0]: offs.append(f.readu32('<') + f.pos)
+            mx = len(str(len(offs)-1))
+            for ix,of in enumerate(offs):
+                if fs: fn = fs[ix]
+                else: fn = str(ix).zfill(mx)
+                f.seek(of)
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32('<')))
+            if offs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
