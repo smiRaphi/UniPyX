@@ -1461,6 +1461,19 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     open(o + f'/{c}.{ext}','wb').write(f.read(size))
                     c += 1
                 if c: return
+        case 'Ion Storm Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            f.seek(0xC8)
+            f.seek(f.readu32())
+            fs = []
+            while f: fs.append([f.read(0x78).split(b'\0')[0].decode(),f.readu32(),f.readu32()])
+            for fe in fs:
+                f.seek(fe[2])
+                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
