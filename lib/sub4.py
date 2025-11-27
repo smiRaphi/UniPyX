@@ -907,10 +907,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f._end = '>'
             BTYPE = f.read(4)
 
-            cnt = [0]
+            cnt = 0
             FNAMES = []
             FDATA = {}
             def read_block(fpath:str,fname:str=None,addext=True):
+                nonlocal cnt
                 name = f.read(4)
                 size = f.readu32()
                 pos = f.pos
@@ -926,7 +927,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.skip(-12)
 
                     if not fname and FNAMES: fname = FNAMES.pop(0)
-                    fname = fpath + '/' + (fname or f'{cnt[0]}')
+                    fname = fpath + '/' + (fname or f'{cnt}')
                     fcnt = 1
                     while exists(fname + (typ if addext else '')):
                         if fcnt > 1: fname = fname.rsplit('_',1)[0]
@@ -934,7 +935,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         fcnt += 1
 
                     xopen(fname + (typ if addext else ''),'wb').write(f.read(8 + size))
-                    cnt[0] += 1
+                    cnt += 1
 
                     f.seek(pos + 4)
                     while f.pos < epos: read_block(fname + '_EXT')
@@ -948,20 +949,20 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     fs = []
                     for _ in range(fc):
                         fs.append((f.read(4).decode() + str(f.readu32()),f.readu32()))
-                        cnt[0] += 1
+                        cnt += 1
                     for fe in fs:
                         f.seek(fe[1])
                         t = f.read(4)
                         open(fpath + '/' + fe[0] + '.' + t.decode(),'wb').write(f.read(f.readu32()))
                     if fc: return 1
                 elif name == b'CHRS' and BTYPE == b'FTXT':
-                    open(fpath + f'/{basename(i)}{cnt[0]}.txt','wb').write(f.read(size).split(b'\0')[0])
-                    cnt[0] += 1
+                    open(fpath + f'/{basename(i)}{cnt}.txt','wb').write(f.read(size).split(b'\0')[0])
+                    cnt += 1
                 elif name == b'TEXT' and BTYPE == b'HEAD':
                     if not 'TXT' in FDATA:
-                        FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt[0]}.txt','wb')
+                        FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
                         FDATA['INDENT'] = 0
-                        cnt[0] += 1
+                        cnt += 1
                     FDATA['TXT'].write(b'  '*FDATA['INDENT'] + f.read(size) + b'\n')
                 elif name == b'NEST' and BTYPE == b'HEAD' and 'TXT' in FDATA:
                     FDATA['INDENT'] = f.readu16()
@@ -971,7 +972,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             while (f.pos+8) <= f.size:
                 if read_block(o):break
                 if f.pos % 2: f.skip(1)
-            if cnt[0]: return
+            if cnt: return
         case 'Xbox XB Compressed':
             run(['xbdecompress','/Y','/T',i,o])
             if os.listdir(o): return
@@ -1474,6 +1475,56 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[2])
                 open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'MINICAT':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            assert f.read(8) == b'MINICAT\0'
+            f.skip(8)
+
+            cnt = 0
+            def xfile():
+                nonlocal cnt
+                so = f.readu32()
+                eo = f.readu32()
+                pos = f.pos
+                if so <= 0x70 or so > eo or eo > f.size or so > f.size: return
+
+                f.seek(so)
+                s = eo-so
+
+                fn = str(cnt) + '.'
+                hd = f.read(2)
+                if hd == b'BM':
+                    bs = f.readu32()
+                    if bs != s:
+                        if (so+bs) <= f.size: s = bs
+                    if bs == s: fn += 'bmp'
+                    else: fn += 'bin'
+                elif (hd+f.read(2)) == b'PSCT': fn += 'psct'
+                else: fn += 'bin'
+
+                f.seek(so)
+                d = f.read(s)
+                if s < 0x500 and not sum(d): return
+                open(o + '/' + fn,'wb').write(d)
+                cnt += 1
+                f.seek(pos)
+            def pfile():
+                of = f.readu32()
+                pos = f.pos
+                if (of+8) > f.size or of <= 0x70: return
+
+                f.seek(of)
+                xfile()
+                f.seek(pos)
+
+            pfile()
+            f.skip(4)
+            for _ in range(4): pfile()
+            xfile()
+            if cnt: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

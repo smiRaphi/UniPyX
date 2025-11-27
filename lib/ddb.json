@@ -144,6 +144,10 @@
         "rs":"iQiyi PAK","s":1
     },
     {
+        "d":[["isat","MINICAT\\0",0],["py","f=open(inp,'rb');f.seek(0x14);s=int.from_bytes(f.read(4),'little');return s==f.seek(0,2)"]],
+        "rs":"MINICAT","s":1
+    },
+    {
         "d":[["isat","Anna-Marie Goddard",-160],["isatS","\\0",62,-142],["isat","www.annamariegoddard.com",-80],["isatS","\\0",56,-56],["n0",4,0]],
         "rs":"Anna-Marie Archive","s":1},{
         "d":[["isat","Anna-Marie\\0\\0",0],["n0",4,102]],
