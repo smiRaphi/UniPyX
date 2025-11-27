@@ -1050,5 +1050,42 @@
     ],
     "Compaq QRST IMG":[
         "compaq qrst disk image"
+    ],
+    "CAZIP":[
+        "cazip compressed file"
+    ],
+    "Chasm Game Archive":[
+        "chasm bin archive"
+    ],
+    "CI Games Archive":[
+        "ci games game data archive"
+    ],
+    "Compression Workshop":[
+        "compression workshop compressed archive"
+    ],
+    "CopyQM IMG":[
+        "copyqm disk image"
+    ],
+    "CramFS":[
+        "cramfs",
+        "cramfs rom filesystem package (little endian)",
+        "cramfs rom filesystem package (big endian)"
+    ],
+    "Creative Assembly Game Data":[
+        "creative assembly game resource data"
+    ],
+    "CrLZH":[
+        "crlzh compressed"
+    ],
+    "Crunch":[
+        "crunch compressed archive"
+    ],
+    "Crunch-Mania":[
+        "crunch-mania by thomas schwarz",
+        "crunch-mania compressed data (lzh)"
+    ],
+    "Dark Reign Game Archive":[
+        "dark reign 2 game data archive",
+        "dark reign game data archive"
     ]
 }

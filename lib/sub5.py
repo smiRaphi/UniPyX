@@ -267,5 +267,6 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'Binary ][ Archive':
             run(['nulib2','-xs',i],cwd=o)
             if os.listdir(o): return
+        case 'Compression Workshop': return msdos(['cwunpack',i],cwd=o)
 
     return 1

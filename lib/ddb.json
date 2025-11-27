@@ -144,6 +144,12 @@
         "rs":"iQiyi PAK","s":1
     },
     {
+        "d":[["isat","Anna-Marie Goddard",-160],["isatS","\\0",62,-142],["isat","www.annamariegoddard.com",-80],["isatS","\\0",56,-56],["n0",4,0]],
+        "rs":"Anna-Marie Archive","s":1},{
+        "d":[["isat","Anna-Marie\\0\\0",0],["n0",4,102]],
+        "rs":"Anna-Marie Archive","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","PAK2\\0\\0\\0\\1",0],
              ["isat","2KAP\\1\\0\\0\\0",0]],"qq":true,

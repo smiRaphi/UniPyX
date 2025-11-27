@@ -666,7 +666,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
              'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
-             'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive':
+             'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
+             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -1430,6 +1431,36 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         xopen(path + '/' + fe[0].decode().strip('\\/'),'wb').write(f.read(fe[3]))
             read_dir(False)
             if os.listdir(o): return
+        case 'Anna-Marie Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            if f.read(12) == b'Anna-Marie\x00\x00':
+                f.seek(0x66)
+                fs = []
+                for _ in range(f.readu32()):
+                    fe = [f.read(10).split(b'\0')[0].decode()]
+                    f.skip(6)
+                    fe.append(f.readu32())
+                    fs.append(fe)
+                for fe in fs:
+                    open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+                if fs: return
+            else:
+                f.skip(-12)
+                c = 0
+                while (f.pos+0xA0) < f.size:
+                    size = f.readu32()
+                    pos = f.pos
+                    if size > 0x10:
+                        if f.read(2) == b'BM' and f.readu32() == size: ext = 'bmp'
+                        else: ext = 'bin'
+                        f.seek(pos)
+                    else: ext = 'bin'
+                    open(o + f'/{c}.{ext}','wb').write(f.read(size))
+                    c += 1
+                if c: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

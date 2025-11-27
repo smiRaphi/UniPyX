@@ -62,7 +62,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
     match t:
         case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
-             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO':
+             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
@@ -402,14 +402,19 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP':
             od = rldir(o)
             run(["deark","-od",o,'-a',i])
             for x in rldir(o):
                 if x in od: continue
                 xb = basename(x)
                 if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in (3,4,5) and xb.split('.')[1].isdigit(): move(x,dirname(x) + '\\' + xb.split('.',2)[2])
-            if os.listdir(o): return
+            fs = os.listdir(o)
+            if fs:
+                if len(fs) == 1 and isfile(o + '/' + fs[0]) and fs[0] == 'bin':
+                    if '.' in i and i[-1] == '_': mv(o + '/bin',o + '/' + basename(i[:-1]))
+                    else: mv(o + '/bin',o + '/' + tbasename(i))
+                return
         case 'ZOO':
             if open(i,'rb').read(2) == b'MZ':
                 run(['deark','-od',o,i])
@@ -515,7 +520,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             r = msdos(['dwc','x',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
             return r
-        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder'|'Compact':
+        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder'|'Compact'|'Crunch-Mania':
             of = o + '/' + tbasename(i)
             run(['ancient','decompress',i,of])
             if exists(of) and os.path.getsize(of): return
@@ -559,7 +564,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     of.write(data)
                 of.close()
             if fs: return
-        case 'AppleSingle':
+        case 'AppleSingle'|'CrLZH'|'Crunch':
             if not extract1(i,o,'StuffIt'): return # unar
             if not extract1(i,o,'DIET'): return # deark
         case 'BinHex':
@@ -571,7 +576,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             r = extract1(tf.p,o,'DIET')
             tf.destroy()
             return r
-        case 'Compaq QRST IMG':
+        case 'Compaq QRST IMG'|'CopyQM IMG':
             tf = TmpFile('.img',path=o)
             run(['dskconv','-otype','raw',i,tf])
             r = extract1(tf.p,o,'IMG')

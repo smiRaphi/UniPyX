@@ -2922,6 +2922,12 @@
             }
         }]
     },
+    "cwunpack":{
+        "p":"CWUNPACK.EXE",
+        "fs":[
+        "https://raw.githubusercontent.com/geneb/CompressionWorkshop/refs/heads/master/CWUNPACK.EXE"
+        ]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{
