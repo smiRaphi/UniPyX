@@ -1525,6 +1525,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for _ in range(4): pfile()
             xfile()
             if cnt: return
+        case 'NeoBook Cartoon':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'SN\x0C\x00'
+            f.skip(2)
+            s = f.readu32()
+            f.skip(2)
+            open(o + '/' + tbasename(i) + '.png','wb').write(f.read(s))
+            if s: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
