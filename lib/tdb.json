@@ -1109,5 +1109,9 @@
     ],
     "Shell Archive":[
         "sh-----cut"
+    ],
+    "SEMONE":[
+        "semone compressed archive",
+        "semone archive data"
     ]
 }

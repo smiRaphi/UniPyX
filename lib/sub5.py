@@ -268,5 +268,8 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['nulib2','-xs',i],cwd=o)
             if os.listdir(o): return
         case 'Compression Workshop': return msdos(['cwunpack',i],cwd=o)
+        case 'SEMONE':
+            dosbox(['semone','x',i])
+            if os.listdir(o): return
 
     return 1

@@ -2928,6 +2928,15 @@
         "https://raw.githubusercontent.com/geneb/CompressionWorkshop/refs/heads/master/CWUNPACK.EXE"
         ]
     },
+    "semone":{
+        "p":"SEMONE.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/semone06.zip",
+            "x":{
+                "SEMONE06.B02/SEMONE.EXE":"SEMONE.EXE"
+            }
+        }]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{
