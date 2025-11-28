@@ -1551,6 +1551,21 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[2])
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'Afterlife Game Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x10)
+            fc = f.readu32()
+            f.skip(8)
+            bof = 8 + 12 + 8 + 4*fc + 8 + 4*fc
+            offs = [bof + f.readu32() for _ in range(fc)]
+            for ix,of in enumerate(offs):
+                f.seek(of)
+                ext = f.read(4)[::-1].decode().lower()
+                open(o + f'/{ix}.{ext}','wb').write(f.read(f.readu32()-8))
+            if offs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
