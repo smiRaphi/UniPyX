@@ -85,6 +85,19 @@
         "rs":"Encrypted EAC Payload","s":1
     },
     {
+        "d":[["contain","# This is a shell archive.  Remove anything before this line,",[0,2500]],
+             ["contain","# This is a shell archive, meaning:\\n# 1. Remove everything ",[0,2500]],
+             ["contain","# This is a shell archive (produced by GNU sharutils"         ,[0,2500]],
+             ["contain","# This is a shell archive (shar"                              ,[0,2500]],
+             ["contain","# This is a shell archive.  To extract the files,"            ,[0,2500]],
+             ["contain",": \"This is a shell archive, meaning:"                        ,[0,2500]],
+             ["contain",": This is a shar archive.  Extract with sh, not csh."         ,[0,2500]],
+             ["contain",":  SHAR archive format.  Archive created "                    ,[0,2500]],
+             ["contain","# shar:\\tShell Archiver\\n"                                  ,[0,500 ]],
+             ["contain","#  execute this shell (sh) script on a clean directory to\\n#  install this version of",[0,500]]],"qq":true,
+        "rs":"Shell Archive"
+    },
+    {
         "rq":"VMProtect",
         "d":[["isat",".eac0\\0\\0\\0",552],["isat",".eac1\\0\\0\\0",592]],
         "rs":"EAC Payload","s":1

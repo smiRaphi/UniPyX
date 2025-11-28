@@ -1146,5 +1146,46 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if dat[:2] == b'MZ':
                 open(o + '/' + basename(i),'wb').write(dat[:-dat[-1]])
                 return
+        case 'Shell Archive':
+            if db.print_try: print('Trying with custom extractor')
+            d = open(i,newline='',encoding='utf-8').read()
+            for fs in ('# This is a shell archive.  Remove anything before this line,',
+                       '# This is a shell archive, meaning:',
+                       '# This is a shell archive (produced by GNU sharutils',
+                       '# This is a shell archive (shar',
+                       '# This is a shell archive.  To extract the files,',
+                       ': "This is a shell archive, meaning:',
+                       ': This is a shar archive.  Extract with sh, not csh.',
+                       '#  execute this shell (sh) script on a clean directory to',
+                       '# shar:\tShell Archiver',
+                       ':  SHAR archive format.  Archive created '):
+                if fs in d:
+                    d = d[d.index(fs):]
+                    break
+
+            for rge in (
+                (r"(?sm)^ *sed +(?:-e +)?(?P<q1>['\"])s/\^([^\n]+)//(?P=q1) +> *(?P<q2>['\"]?)([^\n\"]+?)(?P=q2) +<< *(?P<q3>['\"]?)(?P<fend>[^\n]+?)(?P=q3) *\n(.+?)(?P=fend)"          ,3,6,1),
+                (r"(?sm)^ *sed +(?:-e +)?(?P<q1>['\"])s/\^([^\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *> *(?P<q3>['\"]?)([^\n\"]+?)(?P=q3)(?: *&&)? *\n(.+?)(?P=fend)",5,6,1),
+                (r"(?sm)^ *cat +(?:- +)?> *(?P<q1>['\"]?)([^\n\"]+?)(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *\n(.+?)(?P=fend)",1,4),
+                (r"(?sm)^ *cat +(?:- +)?<< *\\(?P<fend>[^\n\"]+?) *> *(?P<q1>['\"]?)([^\n\"]+)(?P=q1) *\n(.+?)(?P=fend)"                  ,2,3),
+                (r"(?sm)^ *cat +(?:- +)?<< *(?P<q1>['\"])(?P<fend>[^\n]+?)(?P=q1) *> *(?P<q2>['\"]?)([^\n\"]+)(?P=q2) *\n(.+?)(?P=fend)"  ,3,4),
+                ):
+                r = re.compile(rge[0])
+                for fe in r.findall(d):
+                    dt = fe[rge[2]]
+                    if len(rge) > 3: dt = '\n'.join([x[1 if x.startswith(fe[rge[3]]) else 0:] for x in dt.split('\n')])
+                    xopen(o + '/' + fe[rge[1]].lstrip('./'),'w',newline='',encoding='utf-8').write(dt)
+                d = r.sub('',d)
+            pr = db.print_try
+            db.print_try = False
+            for fe in re.findall(r"(?sm)^ *sed +(?P<q1>['\"])s/\^([^\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *\| *uudecode +&&\n(.+?)(?P=fend)",d):
+                tf = TmpFile('.uu')
+                xopen(tf,'w',newline='',encoding='utf-8').write('\n'.join([x[1 if x.startswith(fe[1]) else 0:] for x in fe[4].split('\n')]))
+                extract(tf.p,o,'UUencoded')
+                tf.destroy()
+            db.print_try = pr
+            for de in re.findall(r"(?m)^ *mkdir +(?P<q1>['\"]?)(.+)(?P=q1)\n",d): mkdir(o + '/' + de[1])
+
+            if os.listdir(o): return
 
     return 1

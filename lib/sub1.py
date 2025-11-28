@@ -582,5 +582,22 @@ def extract1(inp:str,out:str,t:str) -> bool:
             r = extract1(tf.p,o,'IMG')
             tf.destroy()
             return r
+        case 'UUencoded':
+            if db.print_try: print('Trying with custom extractor')
+            import binascii
+            d = open(i,encoding='utf-8').read()
+            if 'begin ' in d: d = [x for x in re.findall(r'(?ms)begin \d+ ([^\n]+)\n(.+?)\nend\n',d)]
+            else: d = [(tbasename(i),d)]
+
+            for en,ed in d:
+                f = xopen(o + '/' + en.lstrip('./'),'wb')
+                for l in ed.splitlines():
+                    try: dl = binascii.a2b_uu(l)
+                    except binascii.Error:
+                        n = (((ord(l[0])-32) & 63) * 4 + 5) // 3
+                        dl = binascii.a2b_uu(l[:n])
+                    f.write(dl)
+                f.close()
+            if d: return
 
     return 1

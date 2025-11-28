@@ -54,11 +54,11 @@ def copydir(i:str,o:str,delete=False):
     for x in os.listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
-def xopen(f:str,m='r',encoding='utf-8'):
+def xopen(f:str,m='r',encoding='utf-8',newline=None):
     f = os.path.abspath(str(f))
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
-    return open(f,m,encoding=encoding)
+    return open(f,m,encoding=encoding,newline=newline)
 def rldir(i:str,files=True) -> list[str]:
     i = str(i)
     o = []
@@ -143,7 +143,7 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['file','-bsnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
-    for wt in ('plain text','Plain text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
+    for wt in ('plain text','Plain text','ASCII text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
@@ -407,8 +407,6 @@ def analyze(inp:str,raw=False):
     return nts
 
 def extract(inp:str,out:str,t:str) -> bool:
-    db.print_try = True
-
     from .sub1 import extract1
     from .sub2 import extract2
     from .sub3 import extract3
@@ -571,6 +569,7 @@ def fix_zeebo(f,hint:int=None):
     return ext
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
+    db.print_try = not quiet
     out = cleanp(out)
     #assert not exists(out),'Output directory already exists'
     inp = cleanp(inp)
