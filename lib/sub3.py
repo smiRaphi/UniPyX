@@ -823,14 +823,19 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     dec = bytearray()
                     while f.pos < epos:
                         flags = f.readu16('<')
-                        for bit in range(16):
+                        bitc = 16
+                        if (f.pos + bitc) > epos: bitc = epos - f.pos
+                        for bit in range(bitc):
                             if (flags >> bit) & 1:
-                                tok = f.readu16('<')
-                                leng,off = (tok & 0x0F)+3,(tok >> 4) & 0xFFF
-                                off += 0xF
-                                assert off > 0,f'{leng},{off} = 0x{tok:04X} @ 0x{f.pos-2:04X}'
-                                off = len(dec) - off
-                                assert off >= 0,f'{leng},{off} = 0x{tok:04X} @ 0x{f.pos-2:04X}'
+                                tok0,tok1 = f.readu8(),f.readu8()
+                                oflags,leng,off = tok0 >> 4,(tok0 & 0x0F)+3,tok1
+                                err = f'0b{oflags:04b},{leng},{off} = 0x{tok0:02X}{tok1:02X} @ 0x{f.pos-2:04X}'
+                                assert off > 0,err
+                                off = len(dec) - off + 1
+                                if off < 0:
+                                    assert off >= -16,err
+                                    dec += bytes(-off)
+                                    off = 0
                                 for i in range(leng): dec.append(dec[off + i])
                             else: dec.append(f.readu8())
                     of.write(dec)
