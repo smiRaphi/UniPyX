@@ -1536,6 +1536,21 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(2)
             open(o + '/' + tbasename(i) + '.png','wb').write(f.read(s))
             if s: return
+        case '1nsane Game Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'FFFL'
+            f.skip(8)
+            f.seek(f.readu32())
+            fc = f.readu32()
+            fs = []
+            for _ in range(fc): fs.append((f.read(0x38).split(b'\0')[0].decode(),f.readu32(),f.readu32()))
+            for fe in fs:
+                f.seek(fe[2])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
