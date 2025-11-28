@@ -271,5 +271,14 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'SEMONE':
             dosbox(['semone','x',i])
             if os.listdir(o): return
+        case 'SLIM':
+            tf = TmpFile(name='TMP.SLM',path=o)
+            copy(i,tf.p)
+            isz = os.path.getsize(tf.p)
+            dosbox(['slim','X','O:\\TMP.SLM'],xcmds=['-c','C:\\SLIM.EXE ON'],tmpi=False)
+            if os.path.getsize(tf.p) != isz:
+                rename(tf.p,o + '/' + basename(i)[:-4 if i.lower().endswith('.slm') else None])
+                return
+            tf.destroy()
 
     return 1

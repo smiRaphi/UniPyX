@@ -2956,6 +2956,15 @@
         }],
         "ts":0
     },
+    "slim":{
+        "p":"SLIM.EXE",
+        "fs":[{
+            "u":"https://archive.org/download/msdos_shareware_fb_SLIM110A/SLIM110A.ZIP",
+            "x":{
+                "SLIM.EXE":"SLIM.EXE"
+            }
+        }]
+    },
     "cicdec":{
         "p":"cicdec/cicdec.exe",
         "fs":[{
