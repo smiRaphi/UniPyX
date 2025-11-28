@@ -46,6 +46,7 @@ class File:
     def reads16(self,end=None) -> int: return struct.unpack((end or self._end)+'h',self.read(2))[0]
     def reads32(self,end=None) -> int: return struct.unpack((end or self._end)+'i',self.read(4))[0]
     def reads64(self,end=None) -> int: return struct.unpack((end or self._end)+'q',self.read(8))[0]
+    def readfloat(self,end=None) -> float: return struct.unpack((end or self._end)+'f',self.read(4))[0]
 
     def writeu8 (self,data:int): return self.write(struct.pack('B',data))
     def writeu16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'H',data))
@@ -55,6 +56,7 @@ class File:
     def writes16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'h',data))
     def writes32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'i',data))
     def writes64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'q',data))
+    def writefloat(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'f',data))
 
     def align(self,blocksize:int): return self.write(b'\0' * align(self.tell(),blocksize))
     def alignpos(self,blocksize:int): self.skip(align(self.tell(),blocksize))
@@ -68,6 +70,12 @@ class File:
 
     @property
     def pos(self): return self.tell()
+    @property
+    def size(self):
+        p = self.pos
+        r = self.seek(0,2)
+        self.seek(p)
+        return r
 
     def update_size(self): self._size = self.tell()
     def __len__(self): return self._size

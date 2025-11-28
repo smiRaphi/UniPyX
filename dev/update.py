@@ -91,7 +91,7 @@ def supdate(c:Cache,k:str,inf:dict):
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
             if repo not in ('VirusTotal/yara'):
-                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                 elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
@@ -161,7 +161,7 @@ def supdate(c:Cache,k:str,inf:dict):
         elif dom == 'files.prodkeys.net':
             s = c.get('https://prodkeys.net/')
             if not '500: Internal server error' in s:
-                s = c.get(re.search(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"',s))
+                s = c.get(re.search(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"',s)[1])
                 ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1].split('+')[0],'%Y-%m-%dT%H:%M:%S')
                 if ts > ots:
                     nu = re.search(r'href="(https://files\.prodkeys\.net/ProdKeys\.net-v\d+\.\d+\.\d+\.zip)"',s)[1]

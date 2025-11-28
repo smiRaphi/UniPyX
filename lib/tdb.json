@@ -25,7 +25,8 @@
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
-        "amiga whdload package (lha compressed)"
+        "amiga whdload package (lha compressed)",
+        "lha"
     ],
     "RAR":[
         "winrar self extracting archive (4.x-5.x)",
@@ -160,7 +161,8 @@
         "allegro data (generic)"
     ],
     "VISE Installer":[
-        "vise mindvision wizard module"
+        "vise mindvision wizard module",
+        "installer vise custom"
     ],
     "NSIS Installer":[
         "nullsoft scriptable install system",
@@ -757,7 +759,8 @@
         "bsarc compressed archive"
     ],
     "LZEXE":[
-        "lzexe"
+        "lzexe",
+        "lzexe compressed dos executable (v0.91)"
     ],
     "Compressed File Library":[
         "compressed file library 3 compressed data",
@@ -878,7 +881,10 @@
     ],
     "IFF Data":[
         "generic iff container",
-        "iff data"
+        "iff data",
+        "blorb interactive fiction package",
+        "iff-text document (generic)",
+        "iff flow idea processor format"
     ],
     "Xbox PIRS":[
         "xbox 360 pirs container data file"
@@ -970,5 +976,122 @@
     "Install Creator Pro":[
         "install creator/pro ver.2.0",
         "www.clickteam.com"
+    ],
+    "PS2 Memory Card":[
+        "ps2 memory card",
+        "ps2 memory card image"
+    ],
+    "Z-Code":[
+        "z-code v3 adventure for infocom z-machine"
+    ],
+    "Agon Game Archive":[
+        "agon game data archive"
+    ],
+    "Aldus LZW":[
+        "aldus lzw compressed data"
+    ],
+    "Aldus Zip":[
+        "aldus zip compressed installation data"
+    ],
+    "Alien Vs Predator Game Data":[
+        "alien vs predator game data container"
+    ],
+    "Allods 2 Rage Of Mages Game Archive":[
+        "allods 2 rage of mages game data archive"
+    ],
+    "American Conquest 2 Game Archive":[
+        "american conquest 2 game data archive",
+        "american conquest 2 game data archvie"
+    ],
+    "AppleSingle":[
+        "mac applesingle encoded"
+    ],
+    "ARX":[
+        "arx compressed archive"
+    ],
+    "ASCARON Entertainment Game Archive":[
+        "ascaron entertainment game data archive"
+    ],
+    "Atomik Cruncher":[
+        "atomik cruncher 3 compressed data (v3.5)"
+    ],
+    "Balko UFL Game Archive":[
+        "balko ufl game data archive"
+    ],
+    "Bank Game Archive":[
+        "bank game data archive",
+        "halloween harry bank game data container"
+    ],
+    "Battlezone 2 Game Archive":[
+        "battlezone 2 game data package"
+    ],
+    "Binary ][ Archive":[
+        "binary ][ archive"
+    ],
+    "BioWare Entity Resource":[
+        "bioware entity resource file"
+    ],
+    "Bloodrayne Game Archive":[
+        "bloodrayne game data archive"
+    ],
+    "BOLT Game Archive":[
+        "bolt game data archive"
+    ],
+    "Broderbund Mohawk Game Archive":[
+        "broderbund mohawk game data archive"
+    ],
+    "Compressed ISO":[
+        "ciso compressed iso cd image",
+        "compressed iso file"
+    ],
+    "Compact":[
+        "compact by colin l. mcmaster",
+        "compact compressed data"
+    ],
+    "Compaq QRST IMG":[
+        "compaq qrst disk image"
+    ],
+    "CAZIP":[
+        "cazip compressed file"
+    ],
+    "Chasm Game Archive":[
+        "chasm bin archive"
+    ],
+    "CI Games Archive":[
+        "ci games game data archive"
+    ],
+    "Compression Workshop":[
+        "compression workshop compressed archive"
+    ],
+    "CopyQM IMG":[
+        "copyqm disk image"
+    ],
+    "CramFS":[
+        "cramfs",
+        "cramfs rom filesystem package (little endian)",
+        "cramfs rom filesystem package (big endian)"
+    ],
+    "Creative Assembly Game Data":[
+        "creative assembly game resource data"
+    ],
+    "CrLZH":[
+        "crlzh compressed"
+    ],
+    "Crunch":[
+        "crunch compressed archive"
+    ],
+    "Crunch-Mania":[
+        "crunch-mania by thomas schwarz",
+        "crunch-mania compressed data (lzh)"
+    ],
+    "Dark Reign Game Archive":[
+        "dark reign 2 game data archive",
+        "dark reign game data archive"
+    ],
+    "Ion Storm Resource":[
+        "ion storm resource data file"
+    ],
+    "NeoBook Cartoon":[
+        "neobook cartoon"
     ]
 }

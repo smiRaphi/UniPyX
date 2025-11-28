@@ -5,10 +5,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
-    def quickbms(scr,inf=i,ouf=o):
+    def quickbms(scr,inf=i,oup=o):
         if db.print_try: print('Trying with',scr)
-        run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
-        if os.listdir(ouf): return
+        run(['quickbms','-Y',db.get(scr),inf,oup],print_try=False)
+        if os.listdir(oup): return
         return 1
     def jsbeautifier(scr,inf=i,oup=o):
         t = scr
@@ -114,6 +114,51 @@ def extract3(inp:str,out:str,t:str) -> bool:
         if tmpi: td.destroy()
 
         return r
+    def vamos(cmd:list,inf=i,oup=o):
+        raise NotImplementedError
+        if db.print_try: print('Trying with',cmd[0])
+
+        db.get('vamos')
+        import importlib,importlib.util
+        class RedSpec:
+            @classmethod
+            def find_spec(cls,fullname,path,target=None):
+                rename = None
+                if fullname.startswith('amitools.vamos') or fullname == 'amitools': rename = fullname
+                elif fullname == 'machine68k': rename = 'amitools.machine68k'
+                if rename:
+                    rename = 'bin.' + rename
+                    spec = importlib.util.find_spec(rename)
+                    spec.name = fullname
+                    spec.fake = rename
+                    spec.loader = cls
+                    return spec
+            @staticmethod
+            def create_module(spec):return importlib.import_module(spec.fake) if hasattr(spec,'fake') else None
+            @staticmethod
+            def exec_module(spec):pass
+        sys.meta_path.append(RedSpec)
+
+        import warnings
+        warnings.filterwarnings('ignore',category=RuntimeWarning)
+
+        remove(TMP + '/.vamosVols')
+        from bin.amitools.vamos import main # type: ignore
+        scr = db.get(cmd[0])
+        ncmd = [x.replace(oup.replace('\\','/'),'Output:').replace(dirname(inf).replace('\\','/'),'Input:').replace('\\','/') for x in cmd[1:]]
+        main.main(args=['System:c/' + basename(scr)] + ncmd,cfg_dict={
+        'path':{
+            'vols_base_dir':TMP + '/.vamosVols'
+        },'machine':{
+            'cpu':'68020',
+            'ram_size':8192
+        },'volumes':[
+            "System:" + dirname(dirname(scr)),
+            "Input:" + dirname(inf),
+            "Output:" + oup
+        ],'iffparse':{'library':{'mode':'amiga'}},
+          'locale'  :{'library':{'mode':'amiga'}}})
+        remove(TMP + '/.vamosVols')
 
     match t:
         case 'Qt IFW':
@@ -1058,5 +1103,14 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'UPX':
             run(['upx','-d','-f','-o',o + '/' + basename(i),i])
             if exists(o + '/' + basename(i)): return
+        case 'Z-Code':
+            e,r,_ = run(['txd',i],text=False)
+            if e: return 1
+            open(o + '/' + tbasename(i) + '.asm','wb').write(r)
+            return
+        case 'Atomik Cruncher':
+            of = o + '/' + basename(i)
+            vamos(['xfddecrunch',i,of])
+            if exists(of) and os.path.getsize(of): return
 
     return 1

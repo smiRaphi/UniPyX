@@ -42,12 +42,16 @@ def copy(i:str,o:str):
         else: copytree(i,o,dirs_exist_ok=True)
 cp = copy
 def move(i:str,o:str):
-    copy(i,o)
-    remove(i)
+    if abspath(i)[0].lower() != abspath(o)[0].lower(): rename(i,o)
+    else:
+        copy(i,o)
+        remove(i)
 mv = move
 def copydir(i:str,o:str,delete=False):
     mkdir(o)
-    for x in os.listdir(str(i)): cp(i + '/' + x,o + '/' + x)
+    cfnc = cp
+    if delete and abspath(i)[0].lower() == abspath(o)[0].lower(): cfnc = move
+    for x in os.listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
 def xopen(f:str,m='r',encoding='utf-8'):
@@ -81,7 +85,7 @@ class TmpDir:
     def __radd__(self,i): return i + self.p
     def __del__(self): self.destroy()
 class TmpFile:
-    def __init__(self,suf='',name=''): self.p = TMP + (name or (os.urandom(8).hex() + suf))
+    def __init__(self,suf='',name='',path=TMP): self.p = path + '\\' + (name or ('tmp' + os.urandom(8).hex() + suf))
     def link(self,i): symlink(i,self.p)
     def copy(self,i): cp(i,self.p)
     def destroy(self):
@@ -181,7 +185,7 @@ def analyze(inp:str,raw=False):
                             for sp in (' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( '): x = x.split(sp)[0]
                             for sp in ('Structure : ','use : ','stub : '): x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
-                            if x and x.lower() not in ('genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.') and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
+                            if x and x.lower() not in ('genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip') and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
@@ -307,7 +311,7 @@ def analyze(inp:str,raw=False):
                         c -= len(cv)
                     f.close()
                     ret = h.hexdigest() == hs
-                elif x[0] == 'str0':
+                elif x[0] == 'str0nv':
                     f = open(inp,'rb')
                     sp = x[1]
                     if sp < 0: sp = f.seek(0,2) + sp
@@ -320,6 +324,38 @@ def analyze(inp:str,raw=False):
                         if not b: ret = False;break
                         if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
                         elif b != b'\0': ret = False;break
+                    else: ret = scnt >= x[3]
+                    f.close()
+                elif x[0] == 'str0e':
+                    f = open(inp,'rb')
+                    sp = x[1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    scnt = 0
+                    b = b''
+                    for _ in range(x[2]):
+                        b = f.read(1)
+                        if not b: ret = False;break
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        elif b == b'\0': ret = scnt >= x[3];break
+                    else: ret = scnt >= x[3]
+                    f.close()
+                elif x[0] == 'str0':
+                    f = open(inp,'rb')
+                    sp = x[1]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
+                    scnt = 0
+                    b = b''
+                    end = False
+                    for _ in range(x[2]):
+                        b = f.read(1)
+                        if not b: ret = False;break
+                        if b == b'\0': end = True
+                        elif not end and b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        else: ret = False;break
                     else: ret = scnt >= x[3]
                     f.close()
                 elif x[0] == 'str':

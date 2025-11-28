@@ -664,7 +664,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.close()
 
             if fs: return
-        case 'The Sims FAR'|'Quake PAK'|'WAD':
+        case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
+             'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
+             'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
+             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -895,12 +898,20 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='>')
 
             assert f.read(4) == b'FORM'
-            f.skip(4)
+            lng = f.readu32()
+            if lng != f.size:
+                f._end = '<'
+                f.skip(-4)
+                nlng = f.readu32()
+                if nlng != f.size and abs(f.size-nlng) > abs(f.size-lng):
+                    f._end = '>'
             BTYPE = f.read(4)
 
-            cnt = [0]
+            cnt = 0
             FNAMES = []
+            FDATA = {}
             def read_block(fpath:str,fname:str=None,addext=True):
+                nonlocal cnt
                 name = f.read(4)
                 size = f.readu32()
                 pos = f.pos
@@ -916,7 +927,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.skip(-12)
 
                     if not fname and FNAMES: fname = FNAMES.pop(0)
-                    fname = fpath + '/' + (fname or f'{cnt[0]}')
+                    fname = fpath + '/' + (fname or f'{cnt}')
                     fcnt = 1
                     while exists(fname + (typ if addext else '')):
                         if fcnt > 1: fname = fname.rsplit('_',1)[0]
@@ -924,7 +935,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         fcnt += 1
 
                     xopen(fname + (typ if addext else ''),'wb').write(f.read(8 + size))
-                    cnt[0] += 1
+                    cnt += 1
 
                     f.seek(pos + 4)
                     while f.pos < epos: read_block(fname + '_EXT')
@@ -933,11 +944,35 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     while f.pos < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
                 elif name == b'NETN' and BTYPE in (b'NSF1',b'NMF1'):
                     FNAMES.append(f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
+                elif name == b'RIdx' and BTYPE == b'IFRS':
+                    fc = f.readu32()
+                    fs = []
+                    for _ in range(fc):
+                        fs.append((f.read(4).decode() + str(f.readu32()),f.readu32()))
+                        cnt += 1
+                    for fe in fs:
+                        f.seek(fe[1])
+                        t = f.read(4)
+                        open(fpath + '/' + fe[0] + '.' + t.decode(),'wb').write(f.read(f.readu32()))
+                    if fc: return 1
+                elif name == b'CHRS' and BTYPE == b'FTXT':
+                    open(fpath + f'/{basename(i)}{cnt}.txt','wb').write(f.read(size).split(b'\0')[0])
+                    cnt += 1
+                elif name == b'TEXT' and BTYPE == b'HEAD':
+                    if not 'TXT' in FDATA:
+                        FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
+                        FDATA['INDENT'] = 0
+                        cnt += 1
+                    FDATA['TXT'].write(b'  '*FDATA['INDENT'] + f.read(size) + b'\n')
+                elif name == b'NEST' and BTYPE == b'HEAD' and 'TXT' in FDATA:
+                    FDATA['INDENT'] = f.readu16()
 
                 f.seek(epos)
 
-            while f: read_block(o)
-            if cnt[0]: return
+            while (f.pos+8) <= f.size:
+                if read_block(o):break
+                if f.pos % 2: f.skip(1)
+            if cnt: return
         case 'Xbox XB Compressed':
             run(['xbdecompress','/Y','/T',i,o])
             if os.listdir(o): return
@@ -1229,6 +1264,278 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             open(o + '/' + tbasename(i) + '.bin','wb').write(open(i,'rb').read()[20:])
             return
+        case 'PS2 Memory Card':
+            run(['mymc','-i',i,'extract','*'],cwd=o)
+            if os.listdir(o): return
+        case 'Coktel Vision STK':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            fc = f.readu16()
+            fs = []
+            for _ in range(fc):
+                fs.append((f.read(13).split(b'\0')[0].decode('cp866'),f.readu32(),f.readu32(),f.readu8()))
+
+            def decompress_chk(size:int):
+                bidx = 4078
+                buf = bytearray(b' ' * bidx + b'\0' * 36)
+                dat = b''
+
+                pos = f.pos
+                cmd = 0
+                while size > 0:
+                    cmd >>= 1
+                    if not cmd & 0x100: cmd = f.readu8() | 0xFF00
+
+                    if cmd & 1:
+                        b = f.reads()
+                        dat += b
+                        buf[bidx] = b[0]
+                        bidx += 1
+                        bidx %= 4096
+                        size -= 1
+                    else:
+                        h,l = f.readu8(),f.readu8()
+                        off = h | ((l & 0xF0) << 4)
+                        leng = (l & 0x0F) + 3
+
+                        for i in range(leng):
+                            dat += bytes([buf[(off + i) % 4096]])
+                            size -= 1
+                            if size <= 0: break
+
+                            buf[bidx] = buf[(off + i) % 4096]
+                            bidx += 1
+                            bidx %= 4096
+                return dat
+            def decompress():
+                csize = usize = 0
+                dat = b''
+                while csize != 0xFFFF:
+                    csize = f.readu16()
+                    rsize = f.readu16()
+                    usize += rsize
+
+                    assert csize >= 4
+                    f.skip(2)
+                    dat += decompress_chk(rsize)
+                assert len(dat) == usize
+                return dat
+
+            for fe in fs:
+                f.seek(fe[2])
+                if fe[3] == 2: dat = decompress()
+                elif fe[3] > 0: dat = decompress_chk(f.readu32())
+                else: dat = f.read(fe[1])
+                open(o + '/' + fe[0],'wb').write(dat)
+            if fs: return
+        case 'SLUDGE Data File':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i)
+            assert f.read(7) == b'SLUDGE\0'
+            f.skip(0xAD + 2)
+
+            dec_str = lambda s: ''.join(chr(x-1) for x in s)
+            if f.readu8():
+                for _ in range(f.readu16('>')): f.skip(f.readu16('>'))
+                for _ in range(f.readu16('>')): f.skip(f.readu16('>'))
+                fs = [dec_str(f.read(f.readu16('>'))) for _ in range(f.readu16('>'))]
+            else: fs = None
+
+            opts = open(o + '/' + tbasename(i) + '.slp','w',encoding='utf-8')
+            opts.write('[SETTINGS]\n')
+
+            opts.write('width=' + str(f.readu16('>')) + '\n')
+            opts.write('height=' + str(f.readu16('>')) + '\n')
+
+            opb = f.readu8()
+            opts.write('fullscreen=' + ('Y' if opb & 2 else 'N') + '\n')
+            opts.write('makesilent=' + ('Y' if opb & 8 else 'N') + '\n')
+            opts.write('mouse=')
+            if opb & 4 and opb & 0x10: opts.write('3')
+            elif opb & 4: opts.write('2')
+            elif opb & 0x10: opts.write('0')
+            else: opts.write('1')
+            opts.write('\n')
+            opts.write('invisible=' + ('Y' if opb & 0x20 else 'N') + '\n')
+            opts.write('showlogo=' + ('N' if opb & 0x40 else 'Y') + '\n')
+            opts.write('showloading=' + ('N' if opb & 0x80 else 'Y') + '\n')
+
+            opts.write('speed=' + str(f.readu8()) + '\n')
+
+            f.skip(f.readu16('>') + 8)
+            f.skip(f.readu16('>'))
+
+            lngs = f.readu8()
+            if lngs: opts.write('language=' + dec_str(f.read(f.readu16('>'))) + '\n')
+            for _ in range(lngs):
+                f.skip(2)
+                f.skip(f.readu16('>'))
+
+            opts.write('chrRender_max_readIni=' + ('Y' if f.readu8() else 'N') + '\n')
+            opts.write('chrRender_max_enabled=' + ('Y' if f.readu8() else 'N') + '\n')
+            opts.write('chrRender_max_softX=' + str(f.readfloat('<') * 16) + '\n')
+            opts.write('chrRender_max_softY=' + str(f.readfloat('<') * 16) + '\n')
+
+            assert dec_str(f.read(f.readu16('>'))) == 'okSoFar'
+
+            clog = f.readu8()
+            if clog: raise NotImplementedError
+            opts.write('customicon=' + ('Y' if clog & 1 else 'N') + '\n')
+            opts.write('customlogo=' + ('Y' if clog & 2 else 'N') + '\n')
+            opts.close()
+
+            f.skip(2)
+            f.seek(f.readu32('<'))
+            f.skip(f.readu32('<'))
+            f.skip(f.readu32('<'))
+
+            offs = [f.readu32('<') + f.pos]
+            while f.pos < offs[0]: offs.append(f.readu32('<') + f.pos)
+            mx = len(str(len(offs)-1))
+            for ix,of in enumerate(offs):
+                if fs: fn = fs[ix]
+                else: fn = str(ix).zfill(mx)
+                f.seek(of)
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32('<')))
+            if offs: return
+        case 'Balko UFL Game Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'LiArFi\n\0'
+            f.skip(4)
+            f.seek(f.readu32())
+
+            def read_dir(normal=True):
+                f.skip(8)
+                fc = f.readu32()
+                if normal: path = o + '/' + f.read(f.readu16()+1).decode().strip('\\/')
+                else: path = o
+
+                fs = []
+                for _ in range(fc):
+                    fe = [f.read(f.readu8()+1),f.readu32(),f.readu32()]
+                    f.skip(4)
+                    if fe[1] == 0x20:
+                        fe.append(f.readu32())
+                        f.skip(12)
+                    elif fe[1] != 0x10: raise NotImplementedError(str(f.pos))
+                    fs.append(fe)
+
+                for fe in fs:
+                    f.seek(fe[2])
+                    if fe[1] == 0x10: read_dir()
+                    elif fe[1] == 0x20:
+                        xopen(path + '/' + fe[0].decode().strip('\\/'),'wb').write(f.read(fe[3]))
+            read_dir(False)
+            if os.listdir(o): return
+        case 'Anna-Marie Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            if f.read(12) == b'Anna-Marie\x00\x00':
+                f.seek(0x66)
+                fs = []
+                for _ in range(f.readu32()):
+                    fe = [f.read(10).split(b'\0')[0].decode()]
+                    f.skip(6)
+                    fe.append(f.readu32())
+                    fs.append(fe)
+                for fe in fs:
+                    open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+                if fs: return
+            else:
+                f.skip(-12)
+                c = 0
+                while (f.pos+0xA0) < f.size:
+                    size = f.readu32()
+                    pos = f.pos
+                    if size > 0x10:
+                        if f.read(2) == b'BM' and f.readu32() == size: ext = 'bmp'
+                        else: ext = 'bin'
+                        f.seek(pos)
+                    else: ext = 'bin'
+                    open(o + f'/{c}.{ext}','wb').write(f.read(size))
+                    c += 1
+                if c: return
+        case 'Ion Storm Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            f.seek(0xC8)
+            f.seek(f.readu32())
+            fs = []
+            while f: fs.append([f.read(0x78).split(b'\0')[0].decode(),f.readu32(),f.readu32()])
+            for fe in fs:
+                f.seek(fe[2])
+                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            if fs: return
+        case 'MINICAT':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            assert f.read(8) == b'MINICAT\0'
+            f.skip(8)
+
+            cnt = 0
+            def xfile():
+                nonlocal cnt
+                so = f.readu32()
+                eo = f.readu32()
+                pos = f.pos
+                if so <= 0x70 or so > eo or eo > f.size or so > f.size: return
+
+                f.seek(so)
+                s = eo-so
+
+                fn = str(cnt) + '.'
+                hd = f.read(2)
+                if hd == b'BM':
+                    bs = f.readu32()
+                    if bs != s:
+                        if (so+bs) <= f.size: s = bs
+                    if bs == s: fn += 'bmp'
+                    else: fn += 'bin'
+                elif (hd+f.read(2)) == b'PSCT': fn += 'psct'
+                else: fn += 'bin'
+
+                f.seek(so)
+                d = f.read(s)
+                if s < 0x500 and not sum(d): return
+                open(o + '/' + fn,'wb').write(d)
+                cnt += 1
+                f.seek(pos)
+            def pfile():
+                of = f.readu32()
+                pos = f.pos
+                if (of+8) > f.size or of <= 0x70: return
+
+                f.seek(of)
+                xfile()
+                f.seek(pos)
+
+            pfile()
+            f.skip(4)
+            for _ in range(4): pfile()
+            xfile()
+            if cnt: return
+        case 'NeoBook Cartoon':
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'SN\x0C\x00'
+            f.skip(2)
+            s = f.readu32()
+            f.skip(2)
+            open(o + '/' + tbasename(i) + '.png','wb').write(f.read(s))
+            if s: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

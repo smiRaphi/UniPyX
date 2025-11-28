@@ -129,9 +129,29 @@
         "rs":"NES Remix ROM"
     },
     {
+        "d":[["isat","SLUDGE\\x00\\r\\nSLUDGE data file\\r\\nSLUDGE is (c) Hungry Software and contributors 2006-2",0],
+             ["isat","\\r\\nThis data file must be run using the SLUDGE engine available at http://opensludge.github.io/\\r\\n\\x00",83],
+             ["isin",["\\0","\\1"],182]],
+        "rs":"SLUDGE Data File","s":1
+    },
+    {
+        "d":[["isat","#!/bin/sh",0],["contain"," /dev/cloop $1",[32,128]],["isat","\\0\\0\\0\\0",124]],
+        "rs":"Cloop IMG","s":1
+    },
+    {
         "rqr":null,
         "d":["isat","KCAP\\x67\\0\\0\\0",0],
         "rs":"iQiyi PAK","s":1
+    },
+    {
+        "d":[["isat","MINICAT\\0",0],["py","f=open(inp,'rb');f.seek(0x14);s=int.from_bytes(f.read(4),'little');return s==f.seek(0,2)"]],
+        "rs":"MINICAT","s":1
+    },
+    {
+        "d":[["isat","Anna-Marie Goddard",-160],["isatS","\\0",62,-142],["isat","www.annamariegoddard.com",-80],["isatS","\\0",56,-56],["n0",4,0]],
+        "rs":"Anna-Marie Archive","s":1},{
+        "d":[["isat","Anna-Marie\\0\\0",0],["n0",4,102]],
+        "rs":"Anna-Marie Archive","s":1
     },
     {
         "rqr":null,
@@ -274,6 +294,10 @@
         "rs":"PS5 PKG","s":1
     },
     {
+        "d":[["s%",4096],["size",[268435456,null]],["isat","APA\\0",4],["isat","Sony Computer Entertainment Inc.",256],["isatS","\\0",28,100],["str0",16,32,0]],
+        "rs":"PlayStation APA IMG","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },
@@ -378,6 +402,14 @@
         "rs":"DWC","s":1
     },
     {
+        "d":["contain","(This file must be converted with BinHex 4.0)",[0,1000]],
+        "rs":"BinHex"
+    },
+    {
+        "d":["contain","FiLeStArTfIlEsTaRt\\n",[0,1000]],
+        "rs":"BinSCII"
+    },
+    {
         "rqr":null,
         "d":[["isat","DZ",0],["isin",["\\0","\\1","\\2","\\3"],2],["isin",["\\0","\\1","\\2","\\x21","\\3","\\4","\\5","\\x51","\\x55","\\6","\\7","\\8","\\x81","\\x82","\\x83","\\x84","\\9"],3],["n0",4,4],
              ["py","f=open(inp,'rb');siz=f.seek(0,2);f.seek(4);o=int.from_bytes(f.read(4),'little');return (o+0x42)<=siz"]],
@@ -430,7 +462,7 @@
     },
     {
         "d":["isat","AMPK\\x04\\0\\0",0],
-        "rs":"AMPK","s":1
+        "rs":"AmiPack","s":1
     },
     {
         "d":[["isat","xaf0\\2",0],["isat","(c) SEGA CORPORATION",112]],
@@ -473,6 +505,10 @@
         "rs":"Zeebo Resources","s":1},{
         "d":[["isat","\\0\\0\\0\\0",68],["n0",4,0],["n0",4,72],["str0",4,64,1]],
         "rs":"Zeebo Resources"
+    },
+    {
+        "d":[["n0",2,0],["n0",4,19],["str0e",2,13,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');f.seek(19);return int.from_bytes(f.read(4),'little')==(2+c*22)"]],
+        "rs":"Coktel Vision STK"
     },
     {
         "d":[["isat","FUFS",0],["n0",4,8],["n0",4,12]],

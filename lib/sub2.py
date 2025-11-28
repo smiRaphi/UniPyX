@@ -622,5 +622,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if exists(of) and os.path.getsize(of): return
         case 'Playdate Container':
             raise NotImplementedError # https://github.com/rarenight/pdx-decrypt/blob/main/pdx-decrypt.py
+        case 'PlayStation APA IMG':
+            tf = TmpFile('.tar',path=o)
+            run(['pfs2tar','--backup',i,tf])
+            if not exists(tf.p): return 1
+            r = extract(tf.p,o,'TAR')
+            tf.destroy()
+            return r
 
     return 1

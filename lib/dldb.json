@@ -6,9 +6,9 @@
             "x":{
                 "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
             },
-            "ts":1763420400
+            "ts":1763766000
         }],
-        "ts":1763420400
+        "ts":1763766000
     },
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
@@ -21,6 +21,269 @@
             "ts":0
         }],
         "ts":0
+    },
+    "vamos":{
+        "p":"amitools/vamos/main.py",
+        "fs":[{
+            "u":"https://github.com/cnvogelg/amitools/archive/refs/heads/master.zip",
+            "x":{
+                "amitools-master/amitools/__init__.py":"amitools/__init__.py",
+                "amitools-master/amitools/vamos/astructs/access.py":"amitools/vamos/astructs/access.py",
+                "amitools-master/amitools/vamos/astructs/array.py":"amitools/vamos/astructs/array.py",
+                "amitools-master/amitools/vamos/astructs/astruct.py":"amitools/vamos/astructs/astruct.py",
+                "amitools-master/amitools/vamos/astructs/astructdef.py":"amitools/vamos/astructs/astructdef.py",
+                "amitools-master/amitools/vamos/astructs/bitfield.py":"amitools/vamos/astructs/bitfield.py",
+                "amitools-master/amitools/vamos/astructs/dump.py":"amitools/vamos/astructs/dump.py",
+                "amitools-master/amitools/vamos/astructs/enum.py":"amitools/vamos/astructs/enum.py",
+                "amitools-master/amitools/vamos/astructs/pointer.py":"amitools/vamos/astructs/pointer.py",
+                "amitools-master/amitools/vamos/astructs/scalar.py":"amitools/vamos/astructs/scalar.py",
+                "amitools-master/amitools/vamos/astructs/string.py":"amitools/vamos/astructs/string.py",
+                "amitools-master/amitools/vamos/astructs/typebase.py":"amitools/vamos/astructs/typebase.py",
+                "amitools-master/amitools/vamos/astructs/__init__.py":"amitools/vamos/astructs/__init__.py",
+                "amitools-master/amitools/vamos/cfg/libs.py":"amitools/vamos/cfg/libs.py",
+                "amitools-master/amitools/vamos/cfg/log.py":"amitools/vamos/cfg/log.py",
+                "amitools-master/amitools/vamos/cfg/machine.py":"amitools/vamos/cfg/machine.py",
+                "amitools-master/amitools/vamos/cfg/path.py":"amitools/vamos/cfg/path.py",
+                "amitools-master/amitools/vamos/cfg/proc.py":"amitools/vamos/cfg/proc.py",
+                "amitools-master/amitools/vamos/cfg/profile.py":"amitools/vamos/cfg/profile.py",
+                "amitools-master/amitools/vamos/cfg/trace.py":"amitools/vamos/cfg/trace.py",
+                "amitools-master/amitools/vamos/cfg/vamos.py":"amitools/vamos/cfg/vamos.py",
+                "amitools-master/amitools/vamos/cfg/__init__.py":"amitools/vamos/cfg/__init__.py",
+                "amitools-master/amitools/vamos/cfgcore/argdict.py":"amitools/vamos/cfgcore/argdict.py",
+                "amitools-master/amitools/vamos/cfgcore/cfgdict.py":"amitools/vamos/cfgcore/cfgdict.py",
+                "amitools-master/amitools/vamos/cfgcore/defdict.py":"amitools/vamos/cfgcore/defdict.py",
+                "amitools-master/amitools/vamos/cfgcore/main.py":"amitools/vamos/cfgcore/main.py",
+                "amitools-master/amitools/vamos/cfgcore/parser.py":"amitools/vamos/cfgcore/parser.py",
+                "amitools-master/amitools/vamos/cfgcore/trafo.py":"amitools/vamos/cfgcore/trafo.py",
+                "amitools-master/amitools/vamos/cfgcore/value.py":"amitools/vamos/cfgcore/value.py",
+                "amitools-master/amitools/vamos/cfgcore/__init__.py":"amitools/vamos/cfgcore/__init__.py",
+                "amitools-master/amitools/vamos/dos/run.py":"amitools/vamos/dos/run.py",
+                "amitools-master/amitools/vamos/dos/__init__.py":"amitools/vamos/dos/__init__.py",
+                "amitools-master/amitools/vamos/error.py":"amitools/vamos/error.py",
+                "amitools-master/amitools/vamos/label/lib.py":"amitools/vamos/label/lib.py",
+                "amitools-master/amitools/vamos/label/mgr.py":"amitools/vamos/label/mgr.py",
+                "amitools-master/amitools/vamos/label/range.py":"amitools/vamos/label/range.py",
+                "amitools-master/amitools/vamos/label/segment.py":"amitools/vamos/label/segment.py",
+                "amitools-master/amitools/vamos/label/struct.py":"amitools/vamos/label/struct.py",
+                "amitools-master/amitools/vamos/label/__init__.py":"amitools/vamos/label/__init__.py",
+                "amitools-master/amitools/vamos/lib/dos/AmiTime.py":"amitools/vamos/lib/dos/AmiTime.py",
+                "amitools-master/amitools/vamos/lib/dos/Args.py":"amitools/vamos/lib/dos/Args.py",
+                "amitools-master/amitools/vamos/lib/dos/CommandLine.py":"amitools/vamos/lib/dos/CommandLine.py",
+                "amitools-master/amitools/vamos/lib/dos/CSource.py":"amitools/vamos/lib/dos/CSource.py",
+                "amitools-master/amitools/vamos/lib/dos/DosLibCtx.py":"amitools/vamos/lib/dos/DosLibCtx.py",
+                "amitools-master/amitools/vamos/lib/dos/DosList.py":"amitools/vamos/lib/dos/DosList.py",
+                "amitools-master/amitools/vamos/lib/dos/DosProtection.py":"amitools/vamos/lib/dos/DosProtection.py",
+                "amitools-master/amitools/vamos/lib/dos/DosTags.py":"amitools/vamos/lib/dos/DosTags.py",
+                "amitools-master/amitools/vamos/lib/dos/Error.py":"amitools/vamos/lib/dos/Error.py",
+                "amitools-master/amitools/vamos/lib/dos/FileHandle.py":"amitools/vamos/lib/dos/FileHandle.py",
+                "amitools-master/amitools/vamos/lib/dos/FileManager.py":"amitools/vamos/lib/dos/FileManager.py",
+                "amitools-master/amitools/vamos/lib/dos/Item.py":"amitools/vamos/lib/dos/Item.py",
+                "amitools-master/amitools/vamos/lib/dos/Lock.py":"amitools/vamos/lib/dos/Lock.py",
+                "amitools-master/amitools/vamos/lib/dos/LockManager.py":"amitools/vamos/lib/dos/LockManager.py",
+                "amitools-master/amitools/vamos/lib/dos/MatchFirstNext.py":"amitools/vamos/lib/dos/MatchFirstNext.py",
+                "amitools-master/amitools/vamos/lib/dos/PathMatch.py":"amitools/vamos/lib/dos/PathMatch.py",
+                "amitools-master/amitools/vamos/lib/dos/PathPart.py":"amitools/vamos/lib/dos/PathPart.py",
+                "amitools-master/amitools/vamos/lib/dos/PatternMatch.py":"amitools/vamos/lib/dos/PatternMatch.py",
+                "amitools-master/amitools/vamos/lib/dos/Printf.py":"amitools/vamos/lib/dos/Printf.py",
+                "amitools-master/amitools/vamos/lib/dos/Process.py":"amitools/vamos/lib/dos/Process.py",
+                "amitools-master/amitools/vamos/lib/dos/SysArgs.py":"amitools/vamos/lib/dos/SysArgs.py",
+                "amitools-master/amitools/vamos/lib/dos/__init__.py":"amitools/vamos/lib/dos/__init__.py",
+                "amitools-master/amitools/vamos/lib/DosLibrary.py":"amitools/vamos/lib/DosLibrary.py",
+                "amitools-master/amitools/vamos/lib/ExecLibrary.py":"amitools/vamos/lib/ExecLibrary.py",
+                "amitools-master/amitools/vamos/lib/IntuitionLibrary.py":"amitools/vamos/lib/IntuitionLibrary.py",
+                "amitools-master/amitools/vamos/lib/lexec/Alloc.py":"amitools/vamos/lib/lexec/Alloc.py",
+                "amitools-master/amitools/vamos/lib/lexec/ExecLibCtx.py":"amitools/vamos/lib/lexec/ExecLibCtx.py",
+                "amitools-master/amitools/vamos/lib/lexec/Pool.py":"amitools/vamos/lib/lexec/Pool.py",
+                "amitools-master/amitools/vamos/lib/lexec/PortManager.py":"amitools/vamos/lib/lexec/PortManager.py",
+                "amitools-master/amitools/vamos/lib/lexec/Puddle.py":"amitools/vamos/lib/lexec/Puddle.py",
+                "amitools-master/amitools/vamos/lib/lexec/RawDoFmt.py":"amitools/vamos/lib/lexec/RawDoFmt.py",
+                "amitools-master/amitools/vamos/lib/lexec/SemaphoreManager.py":"amitools/vamos/lib/lexec/SemaphoreManager.py",
+                "amitools-master/amitools/vamos/lib/lexec/__init__.py":"amitools/vamos/lib/lexec/__init__.py",
+                "amitools-master/amitools/vamos/lib/LibList.py":"amitools/vamos/lib/LibList.py",
+                "amitools-master/amitools/vamos/lib/LocaleLibrary.py":"amitools/vamos/lib/LocaleLibrary.py",
+                "amitools-master/amitools/vamos/lib/MathFFPLibrary.py":"amitools/vamos/lib/MathFFPLibrary.py",
+                "amitools-master/amitools/vamos/lib/MathIEEEDoubBasLibrary.py":"amitools/vamos/lib/MathIEEEDoubBasLibrary.py",
+                "amitools-master/amitools/vamos/lib/MathIEEEDoubTransLibrary.py":"amitools/vamos/lib/MathIEEEDoubTransLibrary.py",
+                "amitools-master/amitools/vamos/lib/MathIEEESingBasLibrary.py":"amitools/vamos/lib/MathIEEESingBasLibrary.py",
+                "amitools-master/amitools/vamos/lib/MathIEEESingTransLibrary.py":"amitools/vamos/lib/MathIEEESingTransLibrary.py",
+                "amitools-master/amitools/vamos/lib/MathTransLibrary.py":"amitools/vamos/lib/MathTransLibrary.py",
+                "amitools-master/amitools/vamos/lib/TimerDevice.py":"amitools/vamos/lib/TimerDevice.py",
+                "amitools-master/amitools/vamos/lib/util/AmiDate.py":"amitools/vamos/lib/util/AmiDate.py",
+                "amitools-master/amitools/vamos/lib/util/TagList.py":"amitools/vamos/lib/util/TagList.py",
+                "amitools-master/amitools/vamos/lib/util/__init__.py":"amitools/vamos/lib/util/__init__.py",
+                "amitools-master/amitools/vamos/lib/UtilityLibrary.py":"amitools/vamos/lib/UtilityLibrary.py",
+                "amitools-master/amitools/vamos/lib/VamosTestDevice.py":"amitools/vamos/lib/VamosTestDevice.py",
+                "amitools-master/amitools/vamos/lib/VamosTestLibrary.py":"amitools/vamos/lib/VamosTestLibrary.py",
+                "amitools-master/amitools/vamos/lib/__init__.py":"amitools/vamos/lib/__init__.py",
+                "amitools-master/amitools/vamos/libcore/create.py":"amitools/vamos/libcore/create.py",
+                "amitools-master/amitools/vamos/libcore/ctx.py":"amitools/vamos/libcore/ctx.py",
+                "amitools-master/amitools/vamos/libcore/impl.py":"amitools/vamos/libcore/impl.py",
+                "amitools-master/amitools/vamos/libcore/info.py":"amitools/vamos/libcore/info.py",
+                "amitools-master/amitools/vamos/libcore/jumptab.py":"amitools/vamos/libcore/jumptab.py",
+                "amitools-master/amitools/vamos/libcore/mgr.py":"amitools/vamos/libcore/mgr.py",
+                "amitools-master/amitools/vamos/libcore/patch.py":"amitools/vamos/libcore/patch.py",
+                "amitools-master/amitools/vamos/libcore/profile.py":"amitools/vamos/libcore/profile.py",
+                "amitools-master/amitools/vamos/libcore/proxy.py":"amitools/vamos/libcore/proxy.py",
+                "amitools-master/amitools/vamos/libcore/registry.py":"amitools/vamos/libcore/registry.py",
+                "amitools-master/amitools/vamos/libcore/stub.py":"amitools/vamos/libcore/stub.py",
+                "amitools-master/amitools/vamos/libcore/vlib.py":"amitools/vamos/libcore/vlib.py",
+                "amitools-master/amitools/vamos/libcore/__init__.py":"amitools/vamos/libcore/__init__.py",
+                "amitools-master/amitools/vamos/libmgr/cfg.py":"amitools/vamos/libmgr/cfg.py",
+                "amitools-master/amitools/vamos/libmgr/mgr.py":"amitools/vamos/libmgr/mgr.py",
+                "amitools-master/amitools/vamos/libmgr/proxy.py":"amitools/vamos/libmgr/proxy.py",
+                "amitools-master/amitools/vamos/libmgr/setup.py":"amitools/vamos/libmgr/setup.py",
+                "amitools-master/amitools/vamos/libmgr/__init__.py":"amitools/vamos/libmgr/__init__.py",
+                "amitools-master/amitools/vamos/libnative/initresident.py":"amitools/vamos/libnative/initresident.py",
+                "amitools-master/amitools/vamos/libnative/initstruct.py":"amitools/vamos/libnative/initstruct.py",
+                "amitools-master/amitools/vamos/libnative/libfuncs.py":"amitools/vamos/libnative/libfuncs.py",
+                "amitools-master/amitools/vamos/libnative/loader.py":"amitools/vamos/libnative/loader.py",
+                "amitools-master/amitools/vamos/libnative/makefuncs.py":"amitools/vamos/libnative/makefuncs.py",
+                "amitools-master/amitools/vamos/libnative/makelib.py":"amitools/vamos/libnative/makelib.py",
+                "amitools-master/amitools/vamos/libnative/mgr.py":"amitools/vamos/libnative/mgr.py",
+                "amitools-master/amitools/vamos/libnative/__init__.py":"amitools/vamos/libnative/__init__.py",
+                "amitools-master/amitools/vamos/libstructs/dos.py":"amitools/vamos/libstructs/dos.py",
+                "amitools-master/amitools/vamos/libstructs/exec_.py":"amitools/vamos/libstructs/exec_.py",
+                "amitools-master/amitools/vamos/libstructs/util.py":"amitools/vamos/libstructs/util.py",
+                "amitools-master/amitools/vamos/libstructs/__init__.py":"amitools/vamos/libstructs/__init__.py",
+                "amitools-master/amitools/vamos/libtypes/execlib.py":"amitools/vamos/libtypes/execlib.py",
+                "amitools-master/amitools/vamos/libtypes/library.py":"amitools/vamos/libtypes/library.py",
+                "amitools-master/amitools/vamos/libtypes/list_.py":"amitools/vamos/libtypes/list_.py",
+                "amitools-master/amitools/vamos/libtypes/lock.py":"amitools/vamos/libtypes/lock.py",
+                "amitools-master/amitools/vamos/libtypes/msg.py":"amitools/vamos/libtypes/msg.py",
+                "amitools-master/amitools/vamos/libtypes/node.py":"amitools/vamos/libtypes/node.py",
+                "amitools-master/amitools/vamos/libtypes/process.py":"amitools/vamos/libtypes/process.py",
+                "amitools-master/amitools/vamos/libtypes/resident.py":"amitools/vamos/libtypes/resident.py",
+                "amitools-master/amitools/vamos/libtypes/task.py":"amitools/vamos/libtypes/task.py",
+                "amitools-master/amitools/vamos/libtypes/__init__.py":"amitools/vamos/libtypes/__init__.py",
+                "amitools-master/amitools/vamos/loader/seglist.py":"amitools/vamos/loader/seglist.py",
+                "amitools-master/amitools/vamos/loader/segload.py":"amitools/vamos/loader/segload.py",
+                "amitools-master/amitools/vamos/loader/__init__.py":"amitools/vamos/loader/__init__.py",
+                "amitools-master/amitools/vamos/log.py":"amitools/vamos/log.py",
+                "amitools-master/amitools/vamos/machine/cpustate.py":"amitools/vamos/machine/cpustate.py",
+                "amitools-master/amitools/vamos/machine/disasm.py":"amitools/vamos/machine/disasm.py",
+                "amitools-master/amitools/vamos/machine/error.py":"amitools/vamos/machine/error.py",
+                "amitools-master/amitools/vamos/machine/hwaccess.py":"amitools/vamos/machine/hwaccess.py",
+                "amitools-master/amitools/vamos/machine/machine.py":"amitools/vamos/machine/machine.py",
+                "amitools-master/amitools/vamos/machine/memmap.py":"amitools/vamos/machine/memmap.py",
+                "amitools-master/amitools/vamos/machine/mockcpu.py":"amitools/vamos/machine/mockcpu.py",
+                "amitools-master/amitools/vamos/machine/mockmachine.py":"amitools/vamos/machine/mockmachine.py",
+                "amitools-master/amitools/vamos/machine/mockmem.py":"amitools/vamos/machine/mockmem.py",
+                "amitools-master/amitools/vamos/machine/mocktraps.py":"amitools/vamos/machine/mocktraps.py",
+                "amitools-master/amitools/vamos/machine/opcodes.py":"amitools/vamos/machine/opcodes.py",
+                "amitools-master/amitools/vamos/machine/regs.py":"amitools/vamos/machine/regs.py",
+                "amitools-master/amitools/vamos/machine/__init__.py":"amitools/vamos/machine/__init__.py",
+                "amitools-master/amitools/vamos/main.py":"amitools/vamos/main.py",
+                "amitools-master/amitools/vamos/mem/alloc.py":"amitools/vamos/mem/alloc.py",
+                "amitools-master/amitools/vamos/mem/cache.py":"amitools/vamos/mem/cache.py",
+                "amitools-master/amitools/vamos/mem/__init__.py":"amitools/vamos/mem/__init__.py",
+                "amitools-master/amitools/vamos/path/amipath.py":"amitools/vamos/path/amipath.py",
+                "amitools-master/amitools/vamos/path/assign.py":"amitools/vamos/path/assign.py",
+                "amitools-master/amitools/vamos/path/env.py":"amitools/vamos/path/env.py",
+                "amitools-master/amitools/vamos/path/lazypath.py":"amitools/vamos/path/lazypath.py",
+                "amitools-master/amitools/vamos/path/mgr.py":"amitools/vamos/path/mgr.py",
+                "amitools-master/amitools/vamos/path/spec.py":"amitools/vamos/path/spec.py",
+                "amitools-master/amitools/vamos/path/vamos.py":"amitools/vamos/path/vamos.py",
+                "amitools-master/amitools/vamos/path/volume.py":"amitools/vamos/path/volume.py",
+                "amitools-master/amitools/vamos/path/__init__.py":"amitools/vamos/path/__init__.py",
+                "amitools-master/amitools/vamos/profiler/data.py":"amitools/vamos/profiler/data.py",
+                "amitools-master/amitools/vamos/profiler/main.py":"amitools/vamos/profiler/main.py",
+                "amitools-master/amitools/vamos/profiler/profiler.py":"amitools/vamos/profiler/profiler.py",
+                "amitools-master/amitools/vamos/profiler/__init__.py":"amitools/vamos/profiler/__init__.py",
+                "amitools-master/amitools/vamos/schedule/scheduler.py":"amitools/vamos/schedule/scheduler.py",
+                "amitools-master/amitools/vamos/schedule/stack.py":"amitools/vamos/schedule/stack.py",
+                "amitools-master/amitools/vamos/schedule/task.py":"amitools/vamos/schedule/task.py",
+                "amitools-master/amitools/vamos/schedule/__init__.py":"amitools/vamos/schedule/__init__.py",
+                "amitools-master/amitools/vamos/tools/libprof.py":"amitools/vamos/tools/libprof.py",
+                "amitools-master/amitools/vamos/tools/main.py":"amitools/vamos/tools/main.py",
+                "amitools-master/amitools/vamos/tools/path.py":"amitools/vamos/tools/path.py",
+                "amitools-master/amitools/vamos/tools/tool.py":"amitools/vamos/tools/tool.py",
+                "amitools-master/amitools/vamos/tools/type.py":"amitools/vamos/tools/type.py",
+                "amitools-master/amitools/vamos/tools/__init__.py":"amitools/vamos/tools/__init__.py",
+                "amitools-master/amitools/vamos/trace/mem.py":"amitools/vamos/trace/mem.py",
+                "amitools-master/amitools/vamos/trace/mgr.py":"amitools/vamos/trace/mgr.py",
+                "amitools-master/amitools/vamos/trace/__init__.py":"amitools/vamos/trace/__init__.py",
+                "amitools-master/amitools/vamos/__init__.py":"amitools/vamos/__init__.py",
+                "amitools-master/amitools/binfmt/BinFmt.py":"amitools/binfmt/BinFmt.py",
+                "amitools-master/amitools/binfmt/BinImage.py":"amitools/binfmt/BinImage.py",
+                "amitools-master/amitools/binfmt/Disassemble.py":"amitools/binfmt/Disassemble.py",
+                "amitools-master/amitools/binfmt/Dumper.py":"amitools/binfmt/Dumper.py",
+                "amitools-master/amitools/binfmt/elf/BinFmtELF.py":"amitools/binfmt/elf/BinFmtELF.py",
+                "amitools-master/amitools/binfmt/elf/DwarfDebugLine.py":"amitools/binfmt/elf/DwarfDebugLine.py",
+                "amitools-master/amitools/binfmt/elf/ELF.py":"amitools/binfmt/elf/ELF.py",
+                "amitools-master/amitools/binfmt/elf/ELFDumper.py":"amitools/binfmt/elf/ELFDumper.py",
+                "amitools-master/amitools/binfmt/elf/ELFFile.py":"amitools/binfmt/elf/ELFFile.py",
+                "amitools-master/amitools/binfmt/elf/ELFReader.py":"amitools/binfmt/elf/ELFReader.py",
+                "amitools-master/amitools/binfmt/elf/__init__.py":"amitools/binfmt/elf/__init__.py",
+                "amitools-master/amitools/binfmt/hunk/BinFmtHunk.py":"amitools/binfmt/hunk/BinFmtHunk.py",
+                "amitools-master/amitools/binfmt/hunk/Hunk.py":"amitools/binfmt/hunk/Hunk.py",
+                "amitools-master/amitools/binfmt/hunk/HunkBlockFile.py":"amitools/binfmt/hunk/HunkBlockFile.py",
+                "amitools-master/amitools/binfmt/hunk/HunkDebug.py":"amitools/binfmt/hunk/HunkDebug.py",
+                "amitools-master/amitools/binfmt/hunk/HunkDisassembler.py":"amitools/binfmt/hunk/HunkDisassembler.py",
+                "amitools-master/amitools/binfmt/hunk/HunkLoadSegFile.py":"amitools/binfmt/hunk/HunkLoadSegFile.py",
+                "amitools-master/amitools/binfmt/hunk/HunkReader.py":"amitools/binfmt/hunk/HunkReader.py",
+                "amitools-master/amitools/binfmt/hunk/HunkRelocate.py":"amitools/binfmt/hunk/HunkRelocate.py",
+                "amitools-master/amitools/binfmt/hunk/HunkShow.py":"amitools/binfmt/hunk/HunkShow.py",
+                "amitools-master/amitools/binfmt/hunk/__init__.py":"amitools/binfmt/hunk/__init__.py",
+                "amitools-master/amitools/binfmt/Relocate.py":"amitools/binfmt/Relocate.py",
+                "amitools-master/amitools/binfmt/__init__.py":"amitools/binfmt/__init__.py",
+                "amitools-master/amitools/util/BlkDevTools.py":"amitools/util/BlkDevTools.py",
+                "amitools-master/amitools/util/ByteSize.py":"amitools/util/ByteSize.py",
+                "amitools-master/amitools/util/CommandQueue.py":"amitools/util/CommandQueue.py",
+                "amitools-master/amitools/util/DataDir.py":"amitools/util/DataDir.py",
+                "amitools-master/amitools/util/HexDump.py":"amitools/util/HexDump.py",
+                "amitools-master/amitools/util/KeyValue.py":"amitools/util/KeyValue.py",
+                "amitools-master/amitools/util/Logging.py":"amitools/util/Logging.py",
+                "amitools-master/amitools/util/Math.py":"amitools/util/Math.py",
+                "amitools-master/amitools/util/slotarray.py":"amitools/util/slotarray.py",
+                "amitools-master/amitools/util/VerTag.py":"amitools/util/VerTag.py",
+                "amitools-master/amitools/util/__init__.py":"amitools/util/__init__.py",
+                "amitools-master/amitools/fd/FDFormat.py":"amitools/fd/FDFormat.py",
+                "amitools-master/amitools/fd/FuncDef.py":"amitools/fd/FuncDef.py",
+                "amitools-master/amitools/fd/FuncTable.py":"amitools/fd/FuncTable.py",
+                "amitools-master/amitools/fd/__init__.py":"amitools/fd/__init__.py",
+                "amitools-master/amitools/data/fd/bsdsocket_lib.fd":"amitools/data/fd/bsdsocket_lib.fd",
+                "amitools-master/amitools/data/fd/dos_lib.fd":"amitools/data/fd/dos_lib.fd",
+                "amitools-master/amitools/data/fd/exec_lib.fd":"amitools/data/fd/exec_lib.fd",
+                "amitools-master/amitools/data/fd/graphics_lib.fd":"amitools/data/fd/graphics_lib.fd",
+                "amitools-master/amitools/data/fd/icon_lib.fd":"amitools/data/fd/icon_lib.fd",
+                "amitools-master/amitools/data/fd/iffparse_lib.fd":"amitools/data/fd/iffparse_lib.fd",
+                "amitools-master/amitools/data/fd/intuition_lib.fd":"amitools/data/fd/intuition_lib.fd",
+                "amitools-master/amitools/data/fd/locale_lib.fd":"amitools/data/fd/locale_lib.fd",
+                "amitools-master/amitools/data/fd/mathffp_lib.fd":"amitools/data/fd/mathffp_lib.fd",
+                "amitools-master/amitools/data/fd/mathieeedoubbas_lib.fd":"amitools/data/fd/mathieeedoubbas_lib.fd",
+                "amitools-master/amitools/data/fd/mathieeedoubtrans_lib.fd":"amitools/data/fd/mathieeedoubtrans_lib.fd",
+                "amitools-master/amitools/data/fd/mathieeesingbas_lib.fd":"amitools/data/fd/mathieeesingbas_lib.fd",
+                "amitools-master/amitools/data/fd/mathieeesingtrans_lib.fd":"amitools/data/fd/mathieeesingtrans_lib.fd",
+                "amitools-master/amitools/data/fd/mathtrans_lib.fd":"amitools/data/fd/mathtrans_lib.fd",
+                "amitools-master/amitools/data/fd/testnix_lib.fd":"amitools/data/fd/testnix_lib.fd",
+                "amitools-master/amitools/data/fd/testsc_lib.fd":"amitools/data/fd/testsc_lib.fd",
+                "amitools-master/amitools/data/fd/timer_lib.fd":"amitools/data/fd/timer_lib.fd",
+                "amitools-master/amitools/data/fd/utility_lib.fd":"amitools/data/fd/utility_lib.fd",
+                "amitools-master/amitools/data/fd/vamostestdev_lib.fd":"amitools/data/fd/vamostestdev_lib.fd",
+                "amitools-master/amitools/data/fd/vamostest_lib.fd":"amitools/data/fd/vamostest_lib.fd",
+                "amitools-master/amitools/data/splitdata/cd32_ext.dat":"amitools/data/splitdata/cd32_ext.dat",
+                "amitools-master/amitools/data/splitdata/cd32_fmv.dat":"amitools/data/splitdata/cd32_fmv.dat",
+                "amitools-master/amitools/data/splitdata/cdtv_ext.dat":"amitools/data/splitdata/cdtv_ext.dat",
+                "amitools-master/amitools/data/splitdata/exec44b4.dat":"amitools/data/splitdata/exec44b4.dat",
+                "amitools-master/amitools/data/splitdata/ks31.dat":"amitools/data/splitdata/ks31.dat",
+                "amitools-master/amitools/data/splitdata/ks33.dat":"amitools/data/splitdata/ks33.dat",
+                "amitools-master/amitools/data/splitdata/ks34.dat":"amitools/data/splitdata/ks34.dat",
+                "amitools-master/amitools/data/splitdata/ks36.dat":"amitools/data/splitdata/ks36.dat",
+                "amitools-master/amitools/data/splitdata/ks37.dat":"amitools/data/splitdata/ks37.dat",
+                "amitools-master/amitools/data/splitdata/ks39.dat":"amitools/data/splitdata/ks39.dat",
+                "amitools-master/amitools/data/splitdata/ks40.dat":"amitools/data/splitdata/ks40.dat",
+                "amitools-master/amitools/data/splitdata/ks46.dat":"amitools/data/splitdata/ks46.dat",
+                "amitools-master/amitools/data/splitdata/ks47.dat":"amitools/data/splitdata/ks47.dat",
+                "amitools-master/amitools/data/splitdata/osromupdates.dat":"amitools/data/splitdata/osromupdates.dat",
+                "amitools-master/amitools/data/splitdata/README":"amitools/data/splitdata/README",
+                "amitools-master/amitools/data/splitdata/romid.idat":"amitools/data/splitdata/romid.idat"
+            }
+        },{
+            "u":".",
+            "x":{
+                "amitools/machine68k.pyd":"amitools/machine68k.pyd"
+            }
+        }]
     },
     "trid":{
         "p":"trid/trid.py",
@@ -35,9 +298,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1763247600
+            "ts":1763852400
         }],
-        "ts":1763247600
+        "ts":1763852400
     },
     "file":{
         "p":"file/file.exe",
@@ -98,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1763420400
+            "ts":1764025200
         }],
-        "ts":1763420400
+        "ts":1764025200
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -384,13 +647,13 @@
     "aaru":{
         "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.14/aaru-6.0.0-alpha.14_windows_x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.15.1/aaru-6.0.0-alpha.15.1_windows_x64.zip",
             "x":{
                 "aaru.exe":"aaru.exe"
             },
-            "ts":1761595631
+            "ts":1763686354
         }],
-        "ts":1761595631
+        "ts":1763686354
     },
     "ancient":{
         "p":"Ancient.exe",
@@ -493,13 +756,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/3a/91/dolphin-master-2509-455-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/e5/ea/dolphin-master-2509-534-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1763416000
+            "ts":1764005930
         }],
-        "ts":1763416000
+        "ts":1764005930
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2111,15 +2374,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.1.0/GDRE_tools-v2.1.0-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.2.0/GDRE_tools-v2.2.0-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1762532286
+            "ts":1763953914
         }],
-        "ts":1762532286
+        "ts":1763953914
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2422,21 +2685,248 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45857/SDLVICE-3.9-win64-r45857.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45867/SDLVICE-3.9-win64-r45867.7z",
             "x":{
-                "SDLVICE-3.9-win64-r45857/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.9-win64-r45857/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.9-win64-r45857/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.9-win64-r45857/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.9-win64-r45857/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.9-win64-r45857/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
-            }
+                "SDLVICE-3.9-win64-r45867/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.9-win64-r45867/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.9-win64-r45867/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.9-win64-r45867/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.9-win64-r45867/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.9-win64-r45867/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+            },
+            "ts":1764006734
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
+        }],
+        "ts":1764006734
+    },
+    "pfs2tar":{
+        "p":"pfs2tar.exe",
+        "fs":[{
+            "u":"https://github.com/ps2homebrew/pfsshell/releases/download/latest/pfsshell-v1.1.1-win32.7z",
+            "x":{
+                "pfs2tar.exe":"pfs2tar.exe"
+            }
+        }],
+        "ts":0
+    },
+    "mymc":{
+        "p":"mymc/mymc.exe",
+        "fs":[{
+            "u":"http://www.csclub.uwaterloo.ca:11068/mymc/mymc-alpha-2.7.zip",
+            "x":{
+                "mymc.exe":"mymc/mymc.exe",
+                "python27.dll":"mymc/python27.dll",
+                "library.zip":"mymc/library.zip"
+            }
+        }],
+        "ts":0
+    },
+    "nulib2":{
+        "p":"nulib2.exe",
+        "fs":[{
+            "u":"https://nulib.com/downloads/nulib2_310_win32.zip",
+            "x":{
+                "nulib2.exe":"nulib2.exe"
+            }
         }]
+    },
+    "qemu-img":{
+        "p":"qemu-img/qemu-img.exe",
+        "fs":[
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-qemu-image-util-10.1.2-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/qemu-img.exe":"qemu-img/qemu-img.exe"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-brotli-1.2.0-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libbrotlicommon.dll":"qemu-img/libbrotlicommon.dll",
+                    "mingw64/bin/libbrotlidec.dll":"qemu-img/libbrotlidec.dll",
+                    "mingw64/bin/libbrotlienc.dll":"qemu-img/libbrotlienc.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libbz2-1.dll":"qemu-img/libbz2-1.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-15.2.0-8-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libgcc_s_seh-1.dll":"qemu-img/libgcc_s_seh-1.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r338.gc1c6b0ff3-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libwinpthread-1.dll":"qemu-img/libwinpthread-1.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-curl-8.17.0-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libcurl-4.dll":"qemu-img/libcurl-4.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libidn2-2.3.8-4-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libidn2-0.dll":"qemu-img/libidn2-0.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gettext-runtime-0.26-2-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libintl-8.dll":"qemu-img/libintl-8.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.18-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libiconv-2.dll":"qemu-img/libiconv-2.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libunistring-1.3-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libunistring-5.dll":"qemu-img/libunistring-5.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libpsl-0.21.5-3-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libpsl-5.dll":"qemu-img/libpsl-5.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libssh2-1.11.1-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libssh2-1.dll":"qemu-img/libssh2-1.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-openssl-3.6.0-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libcrypto-3-x64.dll":"qemu-img/libcrypto-3-x64.dll",
+                    "mingw64/bin/libssl-3-x64.dll":"qemu-img/libssl-3-x64.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.3.1-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/zlib1.dll":"qemu-img/zlib1.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nghttp2-1.68.0-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libnghttp2-14.dll":"qemu-img/libnghttp2-14.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nghttp3-1.13.1-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libnghttp3-9.dll":"qemu-img/libnghttp3-9.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-ngtcp2-1.18.0-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libngtcp2-16.dll":"qemu-img/libngtcp2-16.dll",
+                    "mingw64/bin/libngtcp2_crypto_ossl-0.dll":"qemu-img/libngtcp2_crypto_ossl-0.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gnutls-3.8.11-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libgnutls-30.dll":"qemu-img/libgnutls-30.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gmp-6.3.0-2-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libgmp-10.dll":"qemu-img/libgmp-10.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libtasn1-4.20.0-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libtasn1-6.dll":"qemu-img/libtasn1-6.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nettle-3.10.2-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libhogweed-6.dll":"qemu-img/libhogweed-6.dll",
+                    "mingw64/bin/libnettle-8.dll":"qemu-img/libnettle-8.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-p11-kit-0.25.10-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libp11-kit-0.dll":"qemu-img/libp11-kit-0.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libffi-3.5.2-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libffi-8.dll":"qemu-img/libffi-8.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zstd-1.5.7-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libzstd.dll":"qemu-img/libzstd.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-glib2-2.86.2-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libglib-2.0-0.dll":"qemu-img/libglib-2.0-0.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pcre2-10.47-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libpcre2-8-0.dll":"qemu-img/libpcre2-8-0.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libnfs-5.0.3-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libnfs-14.dll":"qemu-img/libnfs-14.dll"
+                }
+            },
+            {
+                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libssh-0.11.3-1-any.pkg.tar.zst",
+                "x":{
+                    "mingw64/bin/libssh.dll":"qemu-img/libssh.dll"
+                }
+            }
+        ]
+    },
+    "dskconv":{
+        "p":"libdsk/dskconv.exe",
+        "fs":[{
+            "u":"https://www.seasip.info/Unix/LibDsk/libdsk1522.zip",
+            "x":{
+                "dskconv.exe":"libdsk/dskconv.exe",
+                "libdsk.dll":"libdsk/libdsk.dll"
+            }
+        }]
+    },
+    "cwunpack":{
+        "p":"CWUNPACK.EXE",
+        "fs":[
+        "https://raw.githubusercontent.com/geneb/CompressionWorkshop/refs/heads/master/CWUNPACK.EXE"
+        ]
     },
     "uclpack":{
         "p":"uclpack.exe",
@@ -2447,6 +2937,16 @@
             }
         }]
     },
+    "txd":{
+        "p":"txd.exe",
+        "fs":[{
+            "u":"http://mirror.ifarchive.org/if-archive/infocom/tools/ztools/ztools731_win32.zip",
+            "x":{
+                "txd.exe":"txd.exe"
+            }
+        }],
+        "ts":0
+    },
     "cicdec":{
         "p":"cicdec/cicdec.exe",
         "fs":[{
@@ -2455,6 +2955,18 @@
                 "cicdec.exe":"cicdec/cicdec.exe",
                 "Bio.cs.dll":"cicdec/Bio.cs.dll",
                 "ICSharpCode.SharpZipLib.dll":"cicdec/ICSharpCode.SharpZipLib.dll"
+            }
+        }],
+        "ts":0
+    },
+    "xfddecrunch":{
+        "p":"xfdMaster/c/xfdDecrunch",
+        "fs":[{
+            "u":"https://ftp.uni-erlangen.de/aminet/util/pack/xfdmaster.lha",
+            "x":{
+                "xfd_User/C/xfdDecrunch":"xfdMaster/c/xfdDecrunch",
+                "xfd_User/Libs/xfdmaster.library":"xfdMaster/libs/xfdmaster.library",
+                "xfd_User/Libs/xfd/4GetIt!": "xfdMaster/libs/xfd/4GetIt!", "xfd_User/Libs/xfd/Ace_": "xfdMaster/libs/xfd/Ace_", "xfd_User/Libs/xfd/AddrHeads": "xfdMaster/libs/xfd/AddrHeads", "xfd_User/Libs/xfd/ALC0": "xfdMaster/libs/xfd/ALC0", "xfd_User/Libs/xfd/ArcD": "xfdMaster/libs/xfd/ArcD", "xfd_User/Libs/xfd/ArcR": "xfdMaster/libs/xfd/ArcR", "xfd_User/Libs/xfd/ATM4": "xfdMaster/libs/xfd/ATM4", "xfd_User/Libs/xfd/ATOM": "xfdMaster/libs/xfd/ATOM", "xfd_User/Libs/xfd/B6B2AFCB": "xfdMaster/libs/xfd/B6B2AFCB", "xfd_User/Libs/xfd/B9AB": "xfdMaster/libs/xfd/B9AB", "xfd_User/Libs/xfd/BlueHouseCruncher": "xfdMaster/libs/xfd/BlueHouseCruncher", "xfd_User/Libs/xfd/BRLE": "xfdMaster/libs/xfd/BRLE", "xfd_User/Libs/xfd/ByteKillerClone": "xfdMaster/libs/xfd/ByteKillerClone", "xfd_User/Libs/xfd/ByteKillerData": "xfdMaster/libs/xfd/ByteKillerData", "xfd_User/Libs/xfd/CATC": "xfdMaster/libs/xfd/CATC", "xfd_User/Libs/xfd/CMP1": "xfdMaster/libs/xfd/CMP1", "xfd_User/Libs/xfd/CNC": "xfdMaster/libs/xfd/CNC", "xfd_User/Libs/xfd/COMatic": "xfdMaster/libs/xfd/COMatic", "xfd_User/Libs/xfd/CoMp": "xfdMaster/libs/xfd/CoMp", "xfd_User/Libs/xfd/CP": "xfdMaster/libs/xfd/CP", "xfd_User/Libs/xfd/CPic": "xfdMaster/libs/xfd/CPic", "xfd_User/Libs/xfd/Crunch": "xfdMaster/libs/xfd/Crunch", "xfd_User/Libs/xfd/CRUNCH2A": "xfdMaster/libs/xfd/CRUNCH2A", "xfd_User/Libs/xfd/CSFX": "xfdMaster/libs/xfd/CSFX", "xfd_User/Libs/xfd/D815": "xfdMaster/libs/xfd/D815", "xfd_User/Libs/xfd/Damage": "xfdMaster/libs/xfd/Damage", "xfd_User/Libs/xfd/DHp2": "xfdMaster/libs/xfd/DHp2", "xfd_User/Libs/xfd/DPRa": "xfdMaster/libs/xfd/DPRa", "xfd_User/Libs/xfd/DSC3": "xfdMaster/libs/xfd/DSC3", "xfd_User/Libs/xfd/Dtpk": "xfdMaster/libs/xfd/Dtpk", "xfd_User/Libs/xfd/Dune": "xfdMaster/libs/xfd/Dune", "xfd_User/Libs/xfd/EDP1": "xfdMaster/libs/xfd/EDP1", "xfd_User/Libs/xfd/FIRE": "xfdMaster/libs/xfd/FIRE", "xfd_User/Libs/xfd/FUNGUS": "xfdMaster/libs/xfd/FUNGUS", "xfd_User/Libs/xfd/GK90": "xfdMaster/libs/xfd/GK90", "xfd_User/Libs/xfd/GP": "xfdMaster/libs/xfd/GP", "xfd_User/Libs/xfd/GZip": "xfdMaster/libs/xfd/GZip", "xfd_User/Libs/xfd/HUF": "xfdMaster/libs/xfd/HUF", "xfd_User/Libs/xfd/HUFF": "xfdMaster/libs/xfd/HUFF", "xfd_User/Libs/xfd/IFF-HUFF": "xfdMaster/libs/xfd/IFF-HUFF", "xfd_User/Libs/xfd/IlScuro": "xfdMaster/libs/xfd/IlScuro", "xfd_User/Libs/xfd/ImploderClone": "xfdMaster/libs/xfd/ImploderClone", "xfd_User/Libs/xfd/Infogrames": "xfdMaster/libs/xfd/Infogrames", "xfd_User/Libs/xfd/JamPacker": "xfdMaster/libs/xfd/JamPacker", "xfd_User/Libs/xfd/JekPacker": "xfdMaster/libs/xfd/JekPacker", "xfd_User/Libs/xfd/JR": "xfdMaster/libs/xfd/JR", "xfd_User/Libs/xfd/KennyGrant": "xfdMaster/libs/xfd/KennyGrant", "xfd_User/Libs/xfd/LeCrunch": "xfdMaster/libs/xfd/LeCrunch", "xfd_User/Libs/xfd/LHA3": "xfdMaster/libs/xfd/LHA3", "xfd_User/Libs/xfd/LhLib": "xfdMaster/libs/xfd/LhLib", "xfd_User/Libs/xfd/LOB": "xfdMaster/libs/xfd/LOB", "xfd_User/Libs/xfd/LZDA": "xfdMaster/libs/xfd/LZDA", "xfd_User/Libs/xfd/LZSS": "xfdMaster/libs/xfd/LZSS", "xfd_User/Libs/xfd/LZW": "xfdMaster/libs/xfd/LZW", "xfd_User/Libs/xfd/LZWH": "xfdMaster/libs/xfd/LZWH", "xfd_User/Libs/xfd/MagneticFieldsCruncher": "xfdMaster/libs/xfd/MagneticFieldsCruncher", "xfd_User/Libs/xfd/MASM": "xfdMaster/libs/xfd/MASM", "xfd_User/Libs/xfd/MASS": "xfdMaster/libs/xfd/MASS", "xfd_User/Libs/xfd/MDCS": "xfdMaster/libs/xfd/MDCS", "xfd_User/Libs/xfd/MentalImage": "xfdMaster/libs/xfd/MentalImage", "xfd_User/Libs/xfd/MMCMP": "xfdMaster/libs/xfd/MMCMP", "xfd_User/Libs/xfd/MTP1_MTPS": "xfdMaster/libs/xfd/MTP1_MTPS", "xfd_User/Libs/xfd/NJMP": "xfdMaster/libs/xfd/NJMP", "xfd_User/Libs/xfd/NTG-Cruncher": "xfdMaster/libs/xfd/NTG-Cruncher", "xfd_User/Libs/xfd/pack": "xfdMaster/libs/xfd/pack", "xfd_User/Libs/xfd/Pack-Ice": "xfdMaster/libs/xfd/Pack-Ice", "xfd_User/Libs/xfd/PacPic": "xfdMaster/libs/xfd/PacPic", "xfd_User/Libs/xfd/PaK0": "xfdMaster/libs/xfd/PaK0", "xfd_User/Libs/xfd/PAL!": "xfdMaster/libs/xfd/PAL!", "xfd_User/Libs/xfd/PCompress": "xfdMaster/libs/xfd/PCompress", "xfd_User/Libs/xfd/PCR4": "xfdMaster/libs/xfd/PCR4", "xfd_User/Libs/xfd/PP2S": "xfdMaster/libs/xfd/PP2S", "xfd_User/Libs/xfd/PseudoPacker": "xfdMaster/libs/xfd/PseudoPacker", "xfd_User/Libs/xfd/RexxExe": "xfdMaster/libs/xfd/RexxExe", "xfd_User/Libs/xfd/RLE": "xfdMaster/libs/xfd/RLE", "xfd_User/Libs/xfd/RMS-More": "xfdMaster/libs/xfd/RMS-More", "xfd_User/Libs/xfd/RPck": "xfdMaster/libs/xfd/RPck", "xfd_User/Libs/xfd/ShellScript": "xfdMaster/libs/xfd/ShellScript", "xfd_User/Libs/xfd/SiCr": "xfdMaster/libs/xfd/SiCr", "xfd_User/Libs/xfd/Silmarils": "xfdMaster/libs/xfd/Silmarils", "xfd_User/Libs/xfd/SOS": "xfdMaster/libs/xfd/SOS", "xfd_User/Libs/xfd/SPv3": "xfdMaster/libs/xfd/SPv3", "xfd_User/Libs/xfd/SQ": "xfdMaster/libs/xfd/SQ", "xfd_User/Libs/xfd/SSUR": "xfdMaster/libs/xfd/SSUR", "xfd_User/Libs/xfd/Switch": "xfdMaster/libs/xfd/Switch", "xfd_User/Libs/xfd/SZDD": "xfdMaster/libs/xfd/SZDD", "xfd_User/Libs/xfd/TheChamp": "xfdMaster/libs/xfd/TheChamp", "xfd_User/Libs/xfd/TimeCruncherData": "xfdMaster/libs/xfd/TimeCruncherData", "xfd_User/Libs/xfd/TPWM": "xfdMaster/libs/xfd/TPWM", "xfd_User/Libs/xfd/TRX": "xfdMaster/libs/xfd/TRX", "xfd_User/Libs/xfd/TTW!": "xfdMaster/libs/xfd/TTW!", "xfd_User/Libs/xfd/TUC": "xfdMaster/libs/xfd/TUC", "xfd_User/Libs/xfd/TurboPackerData": "xfdMaster/libs/xfd/TurboPackerData", "xfd_User/Libs/xfd/UNIX-Compress": "xfdMaster/libs/xfd/UNIX-Compress", "xfd_User/Libs/xfd/Unknown1": "xfdMaster/libs/xfd/Unknown1", "xfd_User/Libs/xfd/Unknown2": "xfdMaster/libs/xfd/Unknown2", "xfd_User/Libs/xfd/VDCO": "xfdMaster/libs/xfd/VDCO", "xfd_User/Libs/xfd/Vic2": "xfdMaster/libs/xfd/Vic2", "xfd_User/Libs/xfd/Vice": "xfdMaster/libs/xfd/Vice", "xfd_User/Libs/xfd/XP10": "xfdMaster/libs/xfd/XP10", "xfd_User/Libs/xfd/XPAC": "xfdMaster/libs/xfd/XPAC", "xfd_User/Libs/xfd/ZbL!": "xfdMaster/libs/xfd/ZbL!", "xfd_User/Libs/xfd/ZeroPacker": "xfdMaster/libs/xfd/ZeroPacker"
             }
         }]
     },
@@ -2701,7 +3213,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.4/lessmsi-v2.10.4.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.6/lessmsi-v2.10.6.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -2710,9 +3222,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1762144303
+            "ts":1763947844
         }],
-        "ts":1762144303
+        "ts":1763947844
     },
     "msix":{
         "p":"MsiX.exe",
