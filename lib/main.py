@@ -523,7 +523,7 @@ def fix_cab(o:str,rem=True):
         ids[id] = x
 
     if not 0 in ids: return
-    from bin.tmd import File
+    from lib.file import File
     i = File(o + '/' + ids[0],endian='<')
     if i.read(4) != b'MSCE': return
     i.skip(0x30)

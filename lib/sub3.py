@@ -570,7 +570,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'Bat2Exe':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i,endian='<')
             f.seek(0x178)
@@ -846,7 +846,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'd0lLZ 1'|'d0lLZ 2':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='>')
 
             f.seek(0x1C)
@@ -1112,5 +1112,39 @@ def extract3(inp:str,out:str,t:str) -> bool:
             of = o + '/' + basename(i)
             vamos(['xfddecrunch',i,of])
             if exists(of) and os.path.getsize(of): return
+        case 'Netcrypt':
+            if db.print_try: print('Trying with custom extractor')
+            import base64
+            try: from Cryptodome.Cipher import AES # type: ignore
+            except ImportError: from Crypto.Cipher import AES # type: ignore
+            from lib.file import EXE
+
+            x = EXE(i)
+            x.seek(x.secs['.text'][0])
+            while x.pos < x.secs['.text'][2]:
+                d = x.read(0x1000)
+                try:idx = d.index(b'System.Security.Cryptography\0')
+                except:pass
+                else:break
+            else: return 1
+
+            x.seek(x.pos - 0x1000 + idx)
+            while x.pos < x.secs['.text'][2]:
+                b = x.reads()
+                if b == b'\0':break
+                while b != b'\0': b = x.read(1)
+            else: return 1
+
+            key = x.read(x.readu16('>')-1)
+            iv = x.read(x.readu16('>')-1)
+            x.skip(2)
+            dat = x.read(x.readu24('>')-1)
+            x.close()
+            key,iv,dat = [base64.b64decode(x.decode('utf-16le')) for x in (key,iv,dat)]
+
+            dat = AES.new(key,AES.MODE_CBC,iv).decrypt(dat)
+            if dat[:2] == b'MZ':
+                open(o + '/' + basename(i),'wb').write(dat[:-dat[-1]])
+                return
 
     return 1

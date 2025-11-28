@@ -1096,5 +1096,9 @@
     ],
     "1nsane Game Archive":[
         "1nsane game data archive"
+    ],
+    "Netcrypt":[
+        "simple packer (netcrypt",
+        "http://github.com/friedkiwi/netcrypt"
     ]
 }

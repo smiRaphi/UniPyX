@@ -415,7 +415,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'CPC Plus IMG':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i)
             f._end = {b'RIFF':'<',b'FFIR':'>'}[f.read(4)]
@@ -435,7 +435,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if cns: return
         case 'GBA ADS Video ROM'|'GBA ADS SFCD':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i,endian='<')
             if t == 'GBA ADS Video ROM': f.seek(0xE38)
@@ -463,7 +463,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if fsc: return
         case 'NES Remix ROM':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             f.skip(8)
@@ -488,7 +488,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             return
         case 'Famicom Disk Image':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             fds = f.read(3) == b'FDS'

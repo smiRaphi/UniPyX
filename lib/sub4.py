@@ -387,7 +387,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'NSMBW Coin World ARC':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
             f.skip(6)
 
@@ -413,7 +413,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'PS3/PSV PUP':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             PUPMAP = {
             1:{
@@ -573,7 +573,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'RPACK':
             if db.print_try: print('Trying with custom extractor') # https://github.com/Qivex/rpack-extract/blob/main/rpack-extract.lua
             raise NotImplementedError
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i,endian='<')
             assert f.read(4) == b'RP6L','Invalid RPACK file'
@@ -589,7 +589,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 s = {'type':f.readu8()}
         case 'Konami LZSS':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i,endian='<')
             l = f.readu32()
@@ -633,7 +633,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'IPS Patch'|'IPS32 Patch':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i)
             i32 = f.read(5) == b'IPS32'
@@ -652,7 +652,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Bunny Pro. Das2 DPK':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i,endian='<')
             assert f.read(2) == b'PA'
@@ -751,7 +751,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Blitz Games Archive': return quickbms('blitz_games')
         case 'Digimon Story Lost Evolution PAK':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             fc = f.readu32()
@@ -854,7 +854,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'XPAC':
             import zlib
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             hshs = {int(x[0],16):x[1][2:] for x in re.findall(r'case 0x([A-F\d]{8}): return "([^"]+)";',open(db.get('sasr_xpac_hashes'),encoding='utf-8').read())}
             hshs |= {0x72E575D5:'Resource/Audio/cars/AIAI.abc'         ,0x28A48754:'Resource/Audio/cars/AVATAR.abc'  ,0x937805F5:'Resource/Audio/cars/BANJO.abc',
@@ -894,7 +894,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'IFF Data':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='>')
 
             assert f.read(4) == b'FORM'
@@ -978,7 +978,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Xbox FArc':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='>')
 
             assert f.read(4) == b'FArc'
@@ -1053,7 +1053,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'Zeebo Resources':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             fs = []
@@ -1091,7 +1091,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'Zeebo FUFS':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             assert f.read(4) == b'FUFS'
@@ -1125,7 +1125,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else: return
         case 'ZLARC':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='>')
 
             fc = f.readu32()
@@ -1201,7 +1201,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             open(o + '/ng.key','wb').write(kf.read(0x40))
             kf.close()
 
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='>')
             noecc = os.path.getsize(i) == 0x20000000
 
@@ -1269,7 +1269,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Coktel Vision STK':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             fc = f.readu16()
@@ -1332,7 +1332,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'SLUDGE Data File':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i)
             assert f.read(7) == b'SLUDGE\0'
             f.skip(0xAD + 2)
@@ -1403,7 +1403,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if offs: return
         case 'Balko UFL Game Archive':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
             assert f.read(8) == b'LiArFi\n\0'
             f.skip(4)
@@ -1434,7 +1434,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Anna-Marie Archive':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             if f.read(12) == b'Anna-Marie\x00\x00':
@@ -1464,7 +1464,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if c: return
         case 'Ion Storm Resource':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             f.seek(0xC8)
@@ -1477,7 +1477,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'MINICAT':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             assert f.read(8) == b'MINICAT\0'
@@ -1527,7 +1527,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if cnt: return
         case 'NeoBook Cartoon':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             assert f.read(4) == b'SN\x0C\x00'
@@ -1538,7 +1538,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if s: return
         case '1nsane Game Archive':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
             f = File(i,endian='<')
 
             assert f.read(4) == b'FFFL'
@@ -1578,7 +1578,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
         case 'Donkey Kong Banana Kingdom':
             if db.print_try: print('Trying with custom extractor')
-            from bin.tmd import File
+            from lib.file import File
 
             f = File(i,endian='<')
             f.seek(0x14)
