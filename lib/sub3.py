@@ -1187,5 +1187,19 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for de in re.findall(r"(?m)^ *mkdir +(?P<q1>['\"]?)(.+)(?P=q1)\n",d): mkdir(o + '/' + de[1])
 
             if os.listdir(o): return
+        case 'Casio BE-300 Package':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            bo = f.readu16()
+            fc = f.readu16()
+            f.seek(bo)
+            for _ in range(fc):
+                f.skip(7)
+                fn = f.read(f.readu8()).decode()
+                f.skip(1)
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+            if fc: return
 
     return 1
