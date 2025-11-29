@@ -244,6 +244,10 @@
         "rs":"Shifted ISO"
     },
     {
+        "d":[["isat","Yay0",32],["isatS","\\0",28,4],["py","f=open(inp,'rb');b=f.read(4);f.seek(0x24);return b==f.read(4)"]],
+        "rs":"WarioWare Mega Party Game PAC","s":1
+    },
+    {
         "rq":null,
         "d":[["isat","\\x53\\xEF",1080],["isat","\\0\\0\\0",1101],["isin",["\\0","\\1"],1100],["str0",1144,16,1],["str0",1160,64,1]],
         "rs":"EXT","s":1

@@ -1780,6 +1780,22 @@ def extract4(inp:str,out:str,t:str) -> bool:
             infp = inf.tell()
             inf.close()
             if len(os.listdir(o)) > 1 or infp != infsp: return
+        case 'Yay0':
+            db.get('n64decompress')
+            if db.print_try: print('Trying with n64decompress')
+            from bin.n64decompress import decompress_yay0 # type: ignore
+
+            of = o + '/' + tbasename(i)
+            open(of,'wb').write(decompress_yay0(open(i,'rb').read()))
+            return
+        case 'WarioWare Mega Party Game PAC':
+            db.get('n64decompress')
+            if db.print_try: print('Trying with n64decompress')
+            from bin.n64decompress import decompress_yay0 # type: ignore
+
+            of = o + '/' + tbasename(i)
+            open(of,'wb').write(decompress_yay0(open(i,'rb').read()[0x20:]))
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
