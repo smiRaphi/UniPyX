@@ -1609,6 +1609,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     lb = b
                 of.close()
             if fs: return
+        case 'Disney Games Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(8) == b'Pod File'
+            f.skip(4)
+            fc = f.readu32()
+            fs = [(f.read(12).strip(b'\0').decode(),f.readu32()) for _ in range(fc)]
+            for fe in fs: xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
