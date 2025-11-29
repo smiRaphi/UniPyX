@@ -1566,6 +1566,25 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 ext = f.read(4)[::-1].decode().lower()
                 open(o + f'/{ix}.{ext}','wb').write(f.read(f.readu32()-8))
             if offs: return
+        case 'Zyclunt Game Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(9) == b'JAM2File\0'
+            fc = f.readu16()
+            fs = []
+            for _ in range(fc):
+                fn = f.read(12)
+                assert f.read(1) == b'\0'
+                fs.append((fn.strip(b'\0').decode(),f.readu32()))
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[1])
+                if len(fs) == ix+1: ln = None
+                else: ln = fs[ix+1][1]-fe[1]
+                xopen(o + '/' + fe[0],'wb',ln).write(f.read(ln))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
