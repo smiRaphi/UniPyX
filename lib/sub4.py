@@ -1585,6 +1585,30 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 else: ln = fs[ix+1][1]-fe[1]
                 xopen(o + '/' + fe[0],'wb',ln).write(f.read(ln))
             if fs: return
+        case 'ZDA Game Archive':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'ZDA\0'
+            fc = f.readu32()
+            bo = f.readu32()
+            fs = []
+            for _ in range(fc): fs.append((f.read(40).strip(b'\0').decode(),f.readu32(),f.readu32(),bo + f.readu32()))
+            for fe in fs:
+                f.seek(fe[3])
+                d = f.read(fe[2])
+                if fe[1] != fe[2]: d = zlib.decompress(d)
+                of = xopen(o + '/' + fe[0],'wb')
+
+                lb = 0xBB
+                for b in d:
+                    b ^= lb
+                    of.write(bytes([b]))
+                    lb = b
+                of.close()
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
