@@ -1,10 +1,11 @@
-import struct
+import struct,io
 
 def align(n:int,blocksize:int): return -n % blocksize
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
         if type(f) == str: f = open(f,mode + 'b')
+        elif type(f) == bytes: f = io.BytesIO(f)
         self._f = f
         self._end = endian
 

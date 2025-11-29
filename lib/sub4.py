@@ -1620,6 +1620,166 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fs = [(f.read(12).strip(b'\0').decode(),f.readu32()) for _ in range(fc)]
             for fe in fs: xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'Dragon UnPACKer 5 Plugin':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib,lzma
+
+            def delzma(i): return lzma.decompress(i[:9] + b'\0'*4 + i[9:],format=lzma.FORMAT_ALONE)
+
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(5) == b'DUPP\x1A'
+            v = f.readu8()
+            f.skip(2)
+
+            inf = open(o + '/' + tbasename(i) + '.ini','w',encoding='utf-8')
+            inf.write(f'[{tbasename(i)}]\nenabled=1\n')
+            infsp = inf.tell()
+
+            if v < 4:
+                f.skip(12)
+                ps = f.reads32()
+                fc = f.reads32()
+
+                for vn in ('name','url','author','comment'): inf.write(f'{vn}={f.read(f.readu8()).decode()}\n')
+                if ps > 0: open(o + '/picture.bmp').write(f.read(ps))
+
+                for _ in range(fc):
+                    s = f.reads32()
+                    f.skip(0x10)
+                    c = f.reads32()
+                    f.skip(8)
+                    fn = f.read(f.readu8()).decode()
+                    fn = o + '/' + os.path.join(f.read(f.readu8()).decode(),fn)
+                    d = f.read(s)
+                    if c == 1: d = zlib.decompress(d)
+                    xopen(fn,'wb').write(d)
+            elif v == 4:
+                offc = f.reads32()
+                offs = []
+                for _ in range(offc):
+                    oe = [f.readu8()]
+                    fls = f.readu8()
+                    if fls & 1: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x20: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x40: oe.append(f.reads32())
+                    else:
+                        f.skip(4)
+                        oe.append(0)
+                    oe += [f.reads64(),f.reads64()]
+                    f.skip(0x28)
+                    offs.append(oe)
+
+                fs = []
+                fnd = {}
+                df = None
+                for oe in offs:
+                    f.seek(oe[4])
+                    d = f.read(oe[5])
+                    if oe[1] == 1: d = zlib.decompress(d)
+                    elif oe[1] == 2: d = delzma(d)
+
+                    b = File(d,endian='<')
+                    if oe[0] == 1:
+                        b.skip(12)
+                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode()}\n')
+                        inf.write(f'comment={b.read(b.readu32()).decode()}\n')
+                    elif oe[0] == 2:
+                        for _ in range(oe[3]):
+                            fe = [b.reads64(),b.reads64()]
+                            b.skip(12)
+                            fls = b.readu8()
+                            if fls & 0x10: fe.append(b.readu8())
+                            else:
+                                b.skip(1)
+                                fe.append(0)
+                            b.skip(1)
+                            fe.append(b.reads32())
+                            b.skip(0x45)
+                            if not fls & 0x40: fs.append(fe)
+                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
+                    elif oe[0] == 20:
+                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode()
+                    elif oe[0] == 21: df = b
+                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
+
+                if fs and not df: return 1
+
+                for fe in fs:
+                    df.seek(fe[0])
+                    d = df.read(fe[1])
+                    if fe[2] == 1: d = zlib.decompress(d)
+                    elif fe[2] == 2: d = delzma(d)
+                    open(o + '/' + fnd.get(fe[3],str(fe[3])),'wb').write(d)
+            elif v == 5:
+                f.skip(2)
+                offc = f.readu32()
+                offs = []
+                for _ in range(offc):
+                    oe = [f.readu8()]
+                    fls = f.readu8()
+                    if fls & 1: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x20: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x40: oe.append(f.readu32())
+                    else:
+                        f.skip(4)
+                        oe.append(0)
+                    oe += [f.reads64(),f.reads64()]
+                    f.skip(0x48)
+                    offs.append(oe)
+
+                fs = []
+                fnd = {}
+                fld = {}
+                df = None
+                for oe in offs:
+                    f.seek(oe[4])
+                    d = f.read(oe[5])
+                    if oe[1] == 1: d = zlib.decompress(d)
+                    #elif oe[1] == 2: d = lzma.decompress(d)
+
+                    b = File(d,endian='<')
+                    if oe[0] == 1:
+                        b.skip(12)
+                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode()}\n')
+                        inf.write(f'comment={b.read(b.readu32()).decode()}\n')
+                    elif oe[0] == 2:
+                        for _ in range(oe[3]):
+                            fe = [b.reads64(),b.reads64()]
+                            b.skip(12)
+                            fls = b.readu32()
+                            if fls & 0x10: fe.append(b.readu8())
+                            else:
+                                b.skip(1)
+                                fe.append(0)
+                            b.skip(5)
+                            fe += [b.readu32(),b.readu32()]
+                            b.skip(0x44)
+                            if not fls & 0x40: fs.append(fe)
+                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
+                    elif oe[0] == 20:
+                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode()
+                    elif oe[0] == 23:
+                        for ix in range(oe[3]): fld[ix] = b.read(b.readu8()).decode()
+                    elif oe[0] == 21: df = b
+                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
+
+            infp = inf.tell()
+            inf.close()
+            if len(os.listdir(o)) > 1 or infp != infsp: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
