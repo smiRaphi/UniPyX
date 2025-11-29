@@ -1201,5 +1201,20 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 f.skip(1)
                 xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
             if fc: return
+        case 'GPEComp':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            for pos in (0xAA48,0xAA70):
+                f.seek(pos)
+                if f.read(8) == b"\x00\xE9\x55\x43\x4C\xFF\x01\x1A": break
+            else: return 1
+            f.seek(-8,1)
+            tf = TmpFile('.ucl')
+            open(tf.p,'wb').write(f.read())
+
+            of = o + '\\' + basename(i) + '.elf'
+            run(['uclpack','-d',tf.p,of])
+            tf.destroy()
+            if exists(of) and os.path.getsize(of): return
 
     return 1
