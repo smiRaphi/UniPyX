@@ -99,7 +99,7 @@ class DLDB:
             os.chdir(cd)
         return exei,up
     def ext(self,p:str,ex:str,xl:dict):
-        if ex == '.zip':
+        if ex in ('.zip','.nupkg'):
             with zipfile.ZipFile(p,'r') as z:
                 for tx in xl:
                     if tx == '*':

@@ -2953,6 +2953,15 @@
             "n64decompress.py"
         ]]
     },
+    "makepri":{
+        "p":"makepri.exe",
+        "fs":[{
+            "u":"https://globalcdn.nuget.org/packages/microsoft.windows.sdk.buildtools.10.0.28000.1-rtm.nupkg",
+            "x":{
+                "bin/10.0.28000.0/x64/makepri.exe":"makepri.exe"
+            }
+        }]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{

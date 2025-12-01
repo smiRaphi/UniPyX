@@ -1796,6 +1796,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             open(of,'wb').write(decompress_yay0(open(i,'rb').read()[0x20:]))
             return
+        case 'Package Resource Index':
+            of = o + '\\' + tbasename(i) + '.xml'
+            run(['makepri','dump','/if',i,'/of',of,'/o','/dt','Detailed'])
+            if exists(of) and os.path.getsize(of): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
