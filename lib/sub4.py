@@ -1800,6 +1800,19 @@ def extract4(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + tbasename(i) + '.xml'
             run(['makepri','dump','/if',i,'/of',of,'/o','/dt','Detailed'])
             if exists(of) and os.path.getsize(of): return
+        case 'DJarc':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(8) == b'DJarc \0\0'
+            fc = f.readu16()
+            fs = [(f.readu32(),f.readu32(),f.read(13).split(b'\0')[0].decode()) for _ in range(fc)]
+            for fe in fs:
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                open(o + '/' + fe[2] + ('.djc' if d.startswith(b'DJcomp\0\0') else ''),'wb').write(d)
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
