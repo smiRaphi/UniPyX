@@ -113,6 +113,12 @@
         "rs":"MSCAB SFX"
     },
     {
+        "rq":null,
+        "rqr":"Win64 Executable (generic)",
+        "d":[["contain","G\\x00o\\x00o\\x00g\\x00l\\x00e\\x00U\\x00p\\x00d\\x00a\\x00t\\x00e\\x00I\\x00s\\x00M\\x00a\\x00c\\x00h\\x00i\\x00n\\x00e\\x00\\x00\\x00",[1024,16384]]],
+        "rs":"Google Update Installer","s":1
+    },
+    {
         "rqr":"Win64 Executable (generic)",
         "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little') >= 8000000\n\telse:f.seek(32,1)"],
         "rs":"Big EXE"

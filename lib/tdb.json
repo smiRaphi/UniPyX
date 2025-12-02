@@ -21,7 +21,8 @@
         "zip installer",
         "squirrel setup",
         "ios application",
-        "mozilla firefox browser extension"
+        "mozilla firefox browser extension",
+        "google chrome extension"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
