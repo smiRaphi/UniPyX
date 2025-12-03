@@ -668,7 +668,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
              'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
              'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive'|\
-             'Dynamix Game Archive'|'Earth And Beyond Game Archive':
+             'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -676,7 +676,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Cosmo Volume Game Archive'|'Dark Ages Map File'|'Build Engine RFF':
             run(['gamearch',i,'-X'],cwd=o)
             if os.listdir(o): return
-        case 'Build Engine Group'|'Descent Game Archive':
+        case 'Build Engine Group'|'Descent Game Archive'|'EPF Game Archive':
             if not extract4(i,o,'Cosmo Volume Game Archive'):return # gamearch
             if not extract4(i,o,'The Sims FAR'):return # gameextractor
         case 'HMM Packfile':

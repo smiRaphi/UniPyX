@@ -402,19 +402,21 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup'|\
+             'EPOC App Info'|'EPOC Install Package':
             od = rldir(o)
             run(["deark","-od",o,'-a',i])
             for x in rldir(o):
                 if x in od: continue
                 xb = basename(x)
-                if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in (3,4,5) and xb.split('.')[1].isdigit(): move(x,dirname(x) + '\\' + xb.split('.',2)[2])
+                if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in (3,4,5) and xb.split('.')[1].isdigit():
+                    rn = xb.split('.',2)[2]
+                    if rn == 'bin':
+                        if '.' in i and i[-1] == '_': mv(o + '/' + fs[0],o + '/' + basename(i[:-1]))
+                        else: mv(o + '/' + fs[0],o + '/' + tbasename(i))
+                    elif len(rn) > 3: move(x,dirname(x) + '\\' + rn)
             fs = os.listdir(o)
-            if fs:
-                if len(fs) == 1 and isfile(o + '/' + fs[0]) and fs[0] == 'bin':
-                    if '.' in i and i[-1] == '_': mv(o + '/bin',o + '/' + basename(i[:-1]))
-                    else: mv(o + '/bin',o + '/' + tbasename(i))
-                return
+            if fs: return
         case 'ZOO':
             if open(i,'rb').read(2) == b'MZ':
                 run(['deark','-od',o,i])

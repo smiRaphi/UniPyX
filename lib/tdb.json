@@ -1182,5 +1182,23 @@
     "EDI Install LZSS":[
         "edi install lzs compressed data",
         "edi install pro lzss2 compressed data"
+    ],
+    "Electronic Arts LIB":[
+        "electronic arts lib container"
+    ],
+    "Empire Earth 1 Game Archive":[
+        "empire earth 1 game data"
+    ],
+    "Ensemble Studios Game Archive":[
+        "ensemble studios data resource"
+    ],
+    "EPF Game Archive":[
+        "epf game data archive"
+    ],
+    "EPOC App Info":[
+        "epoc/symbian application info"
+    ],
+    "EPOC Install Package":[
+        "epoc installation package (rel. 2,3,5)"
     ]
 }
