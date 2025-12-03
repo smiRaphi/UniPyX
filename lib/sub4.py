@@ -667,7 +667,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
              'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
              'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
-             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive':
+             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive'|\
+             'Dynamix Game Archive'|'Earth And Beyond Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
