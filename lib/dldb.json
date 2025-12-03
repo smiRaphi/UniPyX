@@ -2986,6 +2986,15 @@
             }
         }]
     },
+    "ediextract":{
+        "p":"EDIEXTR.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/cica/cica9603/disk1/disc1/util/wramp12.zip",
+            "x":{
+                "EXTRACT.EXE":"EDIEXTR.EXE"
+            }
+        }]
+    },
     "txd":{
         "p":"txd.exe",
         "fs":[{

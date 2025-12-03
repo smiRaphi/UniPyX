@@ -1174,5 +1174,13 @@
     ],
     "Earth And Beyond Game Archive":[
         "earth and beyond game data archive"
+    ],
+    "EDI Install Archive":[
+        "edi install archive",
+        "eschalon setup arcv compressed container"
+    ],
+    "EDI Install LZSS":[
+        "edi install lzs compressed data",
+        "edi install pro lzss2 compressed data"
     ]
 }

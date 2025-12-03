@@ -87,7 +87,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
         if print_try and db.print_try: print('Trying with',scr)
         p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else ''),
-             '-c','MOUNT I "' + dirname(inf).replace('\\','\\\\') + '"','-c','MOUNT C "' + dirname(custs or s).replace('\\','\\\\') + '"','-c','MOUNT O "' + oup.replace('\\','\\\\') + '"','-c','O:'] + xcmds + [
+             '-c','MOUNT I "' + dirname(inf) + '"','-c','MOUNT C "' + dirname(custs or s) + '"','-c','MOUNT O "' + oup + '"','-c','O:'] + xcmds + [
              '-c',subprocess.list2cmdline(['C:\\' + basename(s)] + [('I:\\' + basename(inf) if x == oinf else x) for x in cmd[1:]]) + (' > _OUT.TXT' if nowin else '')] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
 
         while not exists(oup + '/_OUT.TXT'): sleep(0.1)
@@ -1216,5 +1216,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['uclpack','-d',tf.p,of])
             tf.destroy()
             if exists(of) and os.path.getsize(of): return
+        case 'EDI Install Archive':
+            dosbox(['ediextract','/U:.',i])
+            if os.listdir(o): return
+        case 'EDI Install LZSS': return extract(i,o,'ARX') # deark
 
     return 1
