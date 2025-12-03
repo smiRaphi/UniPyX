@@ -1813,9 +1813,39 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 d = f.read(fe[1])
                 open(o + '/' + fe[2] + ('.djc' if d.startswith(b'DJcomp\0\0') else ''),'wb').write(d)
             if fs: return
-        case 'Cosmo Volume Game Archive':
+        case 'Cosmo Volume Game Archive'|'Dark Ages Map File':
             run(['gamearch',i,'-X'],cwd=o)
             if os.listdir(o): return
+        case 'Borland Form':
+            of = o + '\\' + tbasename(i) + '.txt'
+            run(['dfm2txt','bin',i,of])
+            if not (exists(of) and os.path.getsize(of)): return 1
+
+            if db.print_try: print('Trying with custom extractor')
+            d = open(of,encoding='ansi').read()
+
+            for ix,fd in enumerate(re.findall(r'(Picture|Icon)\.Data = \{([^\}]+)\}',d)):
+                ft,fd = fd
+                fd = bytes.fromhex(fd)
+                if ft == 'Icon': ext = 'ico'
+                else:
+                    st = fd[1:fd[0]+1].decode()
+                    fd = fd[fd[0]+1:]
+                    if st == 'TBitmap':
+                        ext = 'bmp'
+                        fd = fd[4:]
+                    elif st == 'TJPEGImage':
+                        ext = 'jpg'
+                        fd = fd[4:]
+                    elif st == 'TGIFImage':
+                        ext = 'gif'
+                        fd = fd[4:]
+                    elif st == 'TIcon':
+                        ext = 'ico'
+                    else: ext = 'unk'
+
+                open(o + f'/{ix}.{ext}','wb').write(fd)
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

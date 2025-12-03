@@ -772,6 +772,11 @@
         "rs":"The Compressor"
     },
     {
+        "rqr":null,
+        "d":[["size",11520],["ext",[".da1",".da2",".da3"]]],
+        "rs":"Dark Ages Map File"
+    },
+    {
         "d":[["size",174848],["ext",".d64"]],
         "rs":"C64 IMG"},{
         "d":[["size",819200],["ext",".d81"]],

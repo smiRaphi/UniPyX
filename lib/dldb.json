@@ -2962,6 +2962,12 @@
             }
         }]
     },
+    "dfm2txt":{
+        "p":"dfm2txt.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/37a7da64dfd630b79046144f0c413f9c2084b122/qemu/win2k/data/app/dfm2txt/dfm2txt.exe"
+        ]
+    },
     "uclpack":{
         "p":"uclpack.exe",
         "fs":[{
