@@ -2986,6 +2986,15 @@
             }
         }]
     },
+    "unecm":{
+        "p":"unecm.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20130616043146if_/http://www.neillcorlett.com/downloads/cmdpack-1.03-win64-x86_64.zip",
+            "x":{
+                "cmdpack-1.03-win64-x86_64/unecm.exe":"unecm.exe"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

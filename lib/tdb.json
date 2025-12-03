@@ -1200,5 +1200,21 @@
     ],
     "EPOC Install Package":[
         "epoc installation package (rel. 2,3,5)"
+    ],
+    "Etherlords 2 Game Archive":[
+        "etherlords 2 game data archive"
+    ],
+    "FALCON Game Archive":[
+        "falcon game data archive"
+    ],
+    "F.E.A.R. Game Archive":[
+        "f.e.a.r. game archive"
+    ],
+    "Final Fantasy Game Archive":[
+        "final fantasy game archive"
+    ],
+    "Holistic Design Game Archive":[
+        "holistic design game data archive (generic)",
+        "final liberation: warhammer epic 40k game data archive"
     ]
 }

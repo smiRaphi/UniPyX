@@ -241,6 +241,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
 
             return extract(i,o,'ISO')
+        case 'Error Code Modeler':
+            tf = TmpFile('.iso',path=o)
+            run(['unecm',i,tf])
+            if not exists(tf.p) or not os.path.getsize(tf.p): return 1
+            if extract1(tf.p,o,'ISO'): mv(tf.p,o + '/' + tbasename(i))
+            tf.destroy()
+            return
         case 'CHD':
             _,inf,_ = run(['chdman','info','-i',i],print_try=False)
 
@@ -578,12 +585,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
             r = extract1(tf.p,o,'DIET')
             tf.destroy()
             return r
-        case 'Compaq QRST IMG'|'CopyQM IMG':
+        case 'Compaq QRST IMG'|'CopyQM IMG'|'FDCOPY CFI IMG':
             tf = TmpFile('.img',path=o)
             run(['dskconv','-otype','raw',i,tf])
-            r = extract1(tf.p,o,'IMG')
+            if not exists(tf.p) or not os.path.getsize(tf.p): return 1
+            if extract1(tf.p,o,'IMG'): mv(tf.p,o + '/' + tbasename(i) + '.img')
             tf.destroy()
-            return r
+            return
         case 'UUencoded':
             if db.print_try: print('Trying with custom extractor')
             import binascii

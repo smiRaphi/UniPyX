@@ -20,6 +20,11 @@
         "rq":["UPX","Install Creator Pro",true],
         "rs":"Install Creator Pro","s":1
     },
+    {
+        "rq":"ISO",
+        "rqr":"Error Code Modeler",
+        "rs":"Error Code Modeler","s":1
+    },
 
     {
         "rq":"ISO",
@@ -826,6 +831,11 @@
         "rqr":null,
         "d":[["isat","\\0\\0",9,false],["isat","\\0\\0",25,false],["n0",4,0,false],["n0",4,4,false],["n0",4,12,false],["ext",".xen"],["ext",".ps2"]],"qq":true,
         "rs":"Blitz Games Archive"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".cfi"],
+        "rs":"FDCOPY CFI IMG"
     },
     {
         "rqr":null,
