@@ -23,6 +23,7 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * self compiled [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp)
 * self compiled [machine68k](https://github.com/cnvogelg/machine68k)
 * self compiled [uclpack](https://www.oberhumer.com/opensource/ucl/)
+* self compiled [ddosutils](https://github.com/pulkomandy/ddosutils)
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
 * [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX

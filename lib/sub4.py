@@ -1846,6 +1846,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
                 open(o + f'/{ix}.{ext}','wb').write(fd)
             return
+        case 'Dragon VDK IMG':
+            run(['dcopy',i,'*',o + '\\'])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

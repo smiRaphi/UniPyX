@@ -1165,5 +1165,8 @@
     ],
     "DOS IMG":[
         "dosimg disk image (80t/18s)"
+    ],
+    "Dragon VDK IMG":[
+        "dragon vdk disk image format"
     ]
 }
