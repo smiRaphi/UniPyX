@@ -136,6 +136,11 @@
     },
     {
         "rqr":null,
+        "d":[["isat","\\xA0\\x0F\\x00\\x00",12],["str0",0,12,4],["py","f=open(inp,'rb')\nfor _ in range(200):\n try:f.read(12).rstrip(b'\\0').decode()\n except:break\n o=int.from_bytes(f.read(4),'little')\n if o<0xFA0 and o:break\n f.seek(4,1)\nelse:return True"]],
+        "rs":"Cosmo Volume Game Archive"
+    },
+    {
+        "rqr":null,
         "d":[["size",32768],["isat","SEGA SEGAKATANA SEGA ENTERPRISES",0],["str",32,224],
              ["str"      ,14084,28],["str"      ,14116,28],["str"      ,14148,28],["isatS"," ",28,14180],
              ["isatS"," ",28,14212],["isatS"," ",28,14244],["isatS"," ",28,14276],["isatS"," ",28,14308],

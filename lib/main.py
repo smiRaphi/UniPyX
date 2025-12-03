@@ -182,8 +182,8 @@ def analyze(inp:str,raw=False):
                     for x in msplit(lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' [ ',' ] ',' stub : ',' Ovl like : ',' - ',' , ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
                         elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown ','*Unknown ','Stub : *Unknown ','EP Token : ','File is corrupted ','EP : ')):
-                            for sp in (' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( '): x = x.split(sp)[0]
-                            for sp in ('Structure : ','use : ','stub : '): x = x.split(sp)[-1]
+                            for sp in (' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( ','*ACM'): x = x.split(sp)[0]
+                            for sp in ('Structure : ','use : ','stub : ','EP Generic : '): x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
                             if x and x.lower() not in ('genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip') and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)

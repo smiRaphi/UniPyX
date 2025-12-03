@@ -1813,6 +1813,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 d = f.read(fe[1])
                 open(o + '/' + fe[2] + ('.djc' if d.startswith(b'DJcomp\0\0') else ''),'wb').write(d)
             if fs: return
+        case 'Cosmo Volume Game Archive':
+            run(['gamearch',i,'-X'],cwd=o)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
