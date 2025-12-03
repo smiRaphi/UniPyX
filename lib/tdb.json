@@ -1147,5 +1147,23 @@
     ],
     "Borland Form":[
         "borland form (generic)"
+    ],
+    "Build Engine RFF":[
+        "build engine rff encrypted container"
+    ],
+    "Descent Game Archive":[
+        "descent game data archive"
+    ],
+    "Destan Game Archive":[
+        "destan game data archive"
+    ],
+    "Digital Illusions Game Archive":[
+        "digital illusions game data package"
+    ],
+    "DOS Backup":[
+        "dos 2.0-3.2 backup"
+    ],
+    "DOS IMG":[
+        "dosimg disk image (80t/18s)"
     ]
 }

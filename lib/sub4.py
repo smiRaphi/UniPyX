@@ -667,14 +667,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
              'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
              'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
-             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive':
+             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
             if os.listdir(o): return
-        case 'Build Engine Group':
+        case 'Cosmo Volume Game Archive'|'Dark Ages Map File'|'Build Engine RFF':
             run(['gamearch',i,'-X'],cwd=o)
             if os.listdir(o): return
+        case 'Build Engine Group'|'Descent Game Archive':
+            if not extract4(i,o,'Cosmo Volume Game Archive'):return # gamearch
+            if not extract4(i,o,'The Sims FAR'):return # gameextractor
         case 'HMM Packfile':
             if db.print_try: print('Trying with hmmunpack')
             db.get('hmmunpack')
@@ -1813,9 +1816,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 d = f.read(fe[1])
                 open(o + '/' + fe[2] + ('.djc' if d.startswith(b'DJcomp\0\0') else ''),'wb').write(d)
             if fs: return
-        case 'Cosmo Volume Game Archive'|'Dark Ages Map File':
-            run(['gamearch',i,'-X'],cwd=o)
-            if os.listdir(o): return
         case 'Borland Form':
             of = o + '\\' + tbasename(i) + '.txt'
             run(['dfm2txt','bin',i,of])

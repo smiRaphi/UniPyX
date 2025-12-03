@@ -148,7 +148,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 remove(td)
                 if ret: return
             remove(td)
-        case 'ISO'|'IMG'|'Floppy Image'|'UDF':
+        case 'ISO'|'IMG'|'Floppy Image'|'UDF'|'DOS IMG':
             _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
             iso_udf = t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e
 
@@ -402,7 +402,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
-        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP':
+        case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup':
             od = rldir(o)
             run(["deark","-od",o,'-a',i])
             for x in rldir(o):
