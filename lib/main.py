@@ -202,6 +202,12 @@ def analyze(inp:str,raw=False):
     if any(x in ts for x in ('Commodore 64 BASIC V2 program',)):
         _,o,_ = db.run(['unp64','-i',inp])
         ts.append(o.strip().split(' : ',1)[1].split(', unpacker=')[0])
+    if not ts and isfile(inp):
+        _,o,_ = db.run(['gamearch',inp,'-l'])
+        ts = re.findall(r'File .+ a .+ \[(.+)\]\n',o.replace('\r',''))
+        for dts in re.findall(r', archive is (?:probably|definitely) not (.+)\n',o.replace('\r','')): ts.remove(dts)
+        if ts: ts = [ts[1]]
+        else: ts = []
 
     nts = checktdb(ts)
     nts = list(set(nts))

@@ -742,6 +742,10 @@
         "rs":"Konami LZSS"
     },
     {
+        "d":[["isin",["\\0\\0","\\0\\1","\\0\\4"],0],["n0",2,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(34);b=f.read(2);return s in (int.from_bytes(b,'little'),int.from_bytes(b,'big'))"]],
+        "rs":"GEM Resource"
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0",256],
              ["str0",0,256,2]],
         "rs":"BBC Micro SSD"

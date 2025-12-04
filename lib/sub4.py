@@ -670,12 +670,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive'|\
              'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive'|\
              'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive'|\
-             'Gabriel Knight 3 Barn Game Archive':
+             'Gabriel Knight 3 Barn Game Archive'|'Haemimont Games AD Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
             if os.listdir(o): return
-        case 'Cosmo Volume Game Archive'|'Dark Ages Map File'|'Build Engine RFF':
+        case 'Cosmo Volume Game Archive'|'Dark Ages Map File'|'Build Engine RFF'|'God of Thunder Game Archive':
             run(['gamearch',i,'-X'],cwd=o)
             if os.listdir(o): return
         case 'Build Engine Group'|'Descent Game Archive'|'EPF Game Archive':

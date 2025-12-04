@@ -280,5 +280,15 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 rename(tf.p,o + '/' + basename(i)[:-4 if i.lower().endswith('.slm') else None])
                 return
             tf.destroy()
+        case 'Hamarsoft HAP':
+            tf = TmpFile(name='TMP.HAP',path=o)
+            tf.link(i)
+            r = msdos(['pah21',tf.p],cwd=o)
+            tf.destroy()
+            if not r:
+                for f in os.listdir(o):
+                    if f[:4] == 'TMP.': mv(o + '/' + f,o + '/' + tbasename(i) + f[3:])
+                return
+            return msdos(['pah3','e',i,'*'],cwd=o)
 
     return 1

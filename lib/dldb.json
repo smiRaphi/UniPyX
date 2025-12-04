@@ -2994,6 +2994,20 @@
             }
         }]
     },
+    "pah21":{
+        "p":"PAH21.EXE",
+        "fs":[[
+            "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/PAH21PD.EXE",
+            "PAH21.EXE"
+        ]]
+    },
+    "pah3":{
+        "p":"PAH3.EXE",
+        "fs":[[
+            "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/PAH3.EXE",
+            "PAH3.EXE"
+        ]]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

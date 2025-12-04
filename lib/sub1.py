@@ -398,7 +398,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             dosbox(['uharcd','x',i])
             if os.listdir(o): return
         case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup'|\
-             'EPOC App Info'|'EPOC Install Package':
+             'EPOC App Info'|'EPOC Install Package'|'GEM Resource':
             od = rldir(o)
             run(["deark","-od",o,'-a',i])
             for x in rldir(o):
