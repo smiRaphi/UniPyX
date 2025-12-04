@@ -517,7 +517,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             r = msdos(['dwc','x',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
             return r
-        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder'|'Compact'|'Crunch-Mania'|'Freeze Compressed':
+        case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder'|'Compact'|'Crunch-Mania'|'Freeze Compressed'|'FVL0 Compressed':
             of = o + '/' + tbasename(i)
             run(['ancient','decompress',i,of])
             if exists(of) and os.path.getsize(of): return

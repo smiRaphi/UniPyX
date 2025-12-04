@@ -888,7 +888,8 @@
         "iff data",
         "blorb interactive fiction package",
         "iff-text document (generic)",
-        "iff flow idea processor format"
+        "iff flow idea processor format",
+        "gamemaker studio game data archive"
     ],
     "Xbox PIRS":[
         "xbox 360 pirs container data file"
@@ -1223,5 +1224,11 @@
     ],
     "FrontPage Theme":[
         "frontpage theme-pack"
+    ],
+    "FVL0 Compressed":[
+        "anc-cruncher"
+    ],
+    "Gabriel Knight 3 Barn Game Archive":[
+        "gabriel knight 3 barn game data"
     ]
 }

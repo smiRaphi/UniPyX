@@ -669,7 +669,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
              'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive'|\
              'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive'|\
-             'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive':
+             'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive'|\
+             'Gabriel Knight 3 Barn Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -971,6 +972,18 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     FDATA['TXT'].write(b'  '*FDATA['INDENT'] + f.read(size) + b'\n')
                 elif name == b'NEST' and BTYPE == b'HEAD' and 'TXT' in FDATA:
                     FDATA['INDENT'] = f.readu16()
+                elif BTYPE == b'AUDO':
+                    f.skip(-8)
+                    size = f.readu32()
+                    epos = pos + size
+                    fc = f.readu32()
+                    fs = []
+                    for _ in range(fc): fs.append(f.readu32())
+                    for off in fs:
+                        f.seek(off)
+                        s = f.readu32()
+                        open(fpath + f'/{cnt}.wav','wb').write(f.read(s))
+                        cnt += 1
 
                 f.seek(epos)
 
