@@ -1291,10 +1291,9 @@
     },
     "ain":{
         "p":"AIN.EXE",
-        "fs":[[
-            "https://www.sac.sk/download/pack/ain232.exe",
-            "AIN.EXE"
-        ]],
+        "fs":[
+        "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/AIN.EXE"
+        ],
         "ts":0
     },
     "ha":{

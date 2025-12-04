@@ -18,7 +18,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
         if os.listdir(o): return
         return 1
-    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
+    def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[],stdin=None):
         scr = cmd[0]
         s = db.get(scr)
         if not exists(s): s = custs
@@ -30,10 +30,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             inf = td + '\\TMP' + extname(inf)
             symlink(oinf,inf)
 
+        if stdin: open(oup + '/_IN.TXT','w',encoding='cp437').write(inp)
+
         if print_try and db.print_try: print('Trying with',scr)
         p = subprocess.Popen([db.get('dosbox'),'-nolog','-nopromptfolder','-savedir','NUL','-defaultconf','-fastlaunch','-nogui',('-silent' if nowin else ''),
              '-c','MOUNT I "' + dirname(inf) + '"','-c','MOUNT C "' + dirname(custs or s) + '"','-c','MOUNT O "' + oup + '"','-c','O:'] + xcmds + [
-             '-c',subprocess.list2cmdline(['C:\\' + basename(s)] + [('I:\\' + basename(inf) if x == oinf else x) for x in cmd[1:]]) + (' > _OUT.TXT' if nowin else '')] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
+             '-c',subprocess.list2cmdline(['C:\\' + basename(s)] + [('I:\\' + basename(inf) if x == oinf else x) for x in cmd[1:]]) + (' > _OUT.TXT' if nowin else '') + (' < _IN.TXT' if stdin else '')] + (sum([['-set',f'{x}={DOSMAX[x]}'] for x in DOSMAX],[]) if max else []),stdout=-3,stderr=-2)
 
         while not exists(oup + '/_OUT.TXT'): sleep(0.1)
         while True:
@@ -52,7 +54,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 break
             sleep(0.1)
         while True:
-            try: remove(oup + '/_OUT.TXT')
+            try:
+                remove(oup + '/_OUT.TXT')
+                if stdin: remove(oup + '/_IN.TXT')
             except PermissionError: sleep(0.1)
             else: break
         p.kill()
@@ -307,7 +311,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'ZPAQ':
             run(['zpaq','x',i,'-f','-to',o])
             if os.listdir(o): return
-        case 'BZIP':
+        case 'BZip':
             _,f,_ = run(['bzip','-dkc',basename(i)],cwd=dirname(i),text=False)
             if f:
                 open(o + '/' + tbasename(i),'wb').write(f)
@@ -362,23 +366,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             except: pass
             else: return
         case 'AIN':
-            if db.print_try: print('Trying with ain')
-            p = subprocess.Popen([db.get('msdos'),'-sc',db.get('ain'),'x',i],cwd=o,stdin=-1)
-
-            for t,v in ((2,b'\n'),(1,b'AIN\n'),(1,b'q')):
-                if p.poll() != None: break
-                sleep(t)
-                try: p.stdin.write(v)
-                except: pass
-
-            for _ in range(25):
-                if os.listdir(o): break
-                sleep(0.1)
-            else: p.kill()
-            while p.poll() == None: sleep(0.05)
-            try:del p
-            except:pass
-
+            dosbox(['ain','x',i],stdin='\n')
             if os.listdir(o): return
         case 'HA': return msdos(['ha','xqy',i],cwd=o)
         case 'AKT': return msdos(['akt','x',i],cwd=o)

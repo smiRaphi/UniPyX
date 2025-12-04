@@ -293,7 +293,7 @@
         "xz compressed container",
         "xz"
     ],
-    "BZIP":[
+    "BZip":[
         "bzip compressed archive"
     ],
     "BZip2":[
