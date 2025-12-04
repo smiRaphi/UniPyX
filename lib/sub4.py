@@ -1851,6 +1851,19 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Dragon VDK IMG':
             run(['dcopy',i,'*',o + '\\'])
             if os.listdir(o): return
+        case 'FrontPage Theme':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.readline()
+            n = int(f.readline().strip())
+            fs = []
+            for _ in range(n):
+                fe = f.readline().strip().decode().rsplit(',',1)
+                fs.append((fe[0],int(fe[1])))
+            for fe in fs:
+                f.seek(14,1)
+                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

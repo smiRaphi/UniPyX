@@ -1216,5 +1216,12 @@
     "Holistic Design Game Archive":[
         "holistic design game data archive (generic)",
         "final liberation: warhammer epic 40k game data archive"
+    ],
+    "Freeze Compressed":[
+        "freeze compressed data (v2.x)",
+        "freeze/melt by leonid a. broukhis"
+    ],
+    "FrontPage Theme":[
+        "frontpage theme-pack"
     ]
 }
