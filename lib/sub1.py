@@ -1,5 +1,60 @@
 from .main import *
 
+CTTR = {
+    'application/octet-stream':'bin',
+    'application/epub+zip':'epub',
+    'application/javascript':'js',
+    'application/java-archive':'jar',
+    'audio/mpeg':'mp3',
+    'audio/vorbis':'ogg',
+    'image/jpeg':'jpg',
+    'image/svg+xml':'svg',
+    'image/vnd.adobe.photoshop':'psd',
+    'image/vnd.microsoft.icon':'ico',
+    'image/dicom-rle':'dcm',
+    'image/heic-sequence':'heic',
+    'image/heif-sequence':'heif',
+    'image/tiff-fx':'tif',
+    'image/tiff':'tif',
+    'model/gltf-binary':'gltf',
+    'model/gltf+json':'gltf',
+    'model/step+xml':'step',
+    'model/step+zip':'step',
+    'model/step-xml+zip':'step',
+    'model/vnd.gs-gdl':'gdl',
+    'model/vnd.moml+xml':'moml',
+    'model/vnd.usdz+zip':'usdz',
+    'model/vnd.valve.source.compiled-map':'bsp',
+    'model/x3d-vrml':'x3d',
+    'model/x3d+xml':'x3d',
+    'model/x3d+fastinfoset':'x3d',
+    'multipart/alternative':'bin',
+    'multipart/appledouble':'_',
+    'multipart/byteranges':'bin',
+    'multipart/digest':'bin',
+    'multipart/encrypted':'bin',
+    'multipart/form-data':'bin',
+    'multipart/header-set':'txt',
+    'multipart/mixed':'bin',
+    'multipart/multilingual':'txt',
+    'multipart/related':'bin',
+    'multipart/report':'bin',
+    'multipart/signed':'bin',
+    'multipart/x-mixed-replace':'bin',
+    'multipart/parallel':'bin',
+    'multipart/voice-message':'vpm',
+    'multipart/vnd.bint.med-plus':'bmed',
+    'text/plain':'txt',
+    'text/javascript':'js',
+    'text/ecmascript':'js',
+    'text/tab-separated-values':'tsv',
+    'video/3gpp':'3gp',
+    'video/matroska':'mkv',
+    'video/matroska-3d':'mkv',
+    'video/mpeg':'mpg',
+    'video/mpeg4-generic':'mp4',
+}
+
 def extract1(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
@@ -597,5 +652,42 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     f.write(dl)
                 f.close()
             if d: return
+        case 'HTTP Response':
+            if db.print_try: print('Trying with custom extractor')
+            from urllib.parse import unquote_to_bytes
+            hd,d = open(i,'rb').read().split(b'\r\n\r\n',1)
+            hd = {x.split(b': ',1)[0].decode('latin-1').lower():x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
 
+            of = o + '/'
+            if 'content-disposition' in hd and\
+               b'attachment' in hd['content-disposition'].lower() and\
+               b'filename'   in hd['content-disposition'].lower():
+                fn = hd['content-disposition'].split(b'; ',1)[1]
+                fn = fn[8:].strip()
+                if fn[:1] == b'*':
+                    enc,fn = fn[2:].strip().split(b"''",1)
+                    fn = fn.strip().split()[0]
+                    of += unquote_to_bytes(fn).decode(enc.decode('latin-1'))
+                else:
+                    fn = fn[1:].strip()
+                    if fn[:1] == b'"':
+                        rfn,fn = fn[1:].split(b'"')[0]
+                        if b'; ' in fn and b'filename' in fn.lower() and b"''" in fn:
+                            enc,fn = fn[2:].strip().split(b"''",1)
+                            fn = fn.strip().split()[0]
+                            of += unquote_to_bytes(fn).decode(enc.decode('latin-1'))
+                        else: of += unquote_to_bytes(rfn).decode('latin-1')
+            elif 'content-type' in hd:
+                of += tbasename(i) + '.'
+                ct = hd['content-type'].decode('latin-1').split(';')[0].lower()
+                if ct in CTTR: ct = CTTR[ct]
+                else:
+                    ct = ct.split('/')[1].split('+')[-1]
+                    if ct.startswith('x-'): ct = ct[2:]
+                    if ct.startswith('vnd.'): ct = ct[4:]
+                of += ct
+            else: of += basename(i)
+
+            open(of,'wb').write(d)
+            return
     return 1

@@ -746,6 +746,10 @@
         "rs":"GEM Resource"
     },
     {
+        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,100]],["py","d=open(inp,'rb').read(0x100).split(b'\\r\\n')[0]\ntry:d=d.decode()\nexcept:return\nreturn d.split()[0].split('/')[1] in ('0.9','1.0','1.1','2','3') and d.split()[1].isdigit()"]],
+        "rs":"HTTP Response"
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0",256],
              ["str0",0,256,2]],
         "rs":"BBC Micro SSD"
