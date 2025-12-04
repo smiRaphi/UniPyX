@@ -290,5 +290,24 @@ def extract5(inp:str,out:str,t:str) -> bool:
                     if f[:4] == 'TMP.': mv(o + '/' + f,o + '/' + tbasename(i) + f[3:])
                 return
             return msdos(['pah3','e',i,'*'],cwd=o)
+        case 'Hammer':
+            db.get('hammer_decomp')
+            if db.print_try: print('Trying with hammer_decomp')
+            of = o + '/' + tbasename(i)
+
+            import inspect
+            class Hack:
+                def __getitem__(self,k):
+                    if k == 1: return i
+                    elif k == 2: return of
+                def __len__(self):
+                    inspect.getouterframes(inspect.currentframe())[1].frame.f_globals['print'] = lambda *a,**k:None
+                    return 3
+
+            bargs = sys.argv.copy()
+            sys.argv = Hack()
+            import bin.hammer_decomp # type: ignore
+            sys.argv = bargs
+            if exists(of) and os.path.getsize(of): return
 
     return 1

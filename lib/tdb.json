@@ -1240,5 +1240,8 @@
     "Hamarsoft HAP":[
         "hamarsoft hap compressed archive (v3.00)",
         "hamarsoft hap compressed archive (v2.10)"
+    ],
+    "Hammer":[
+        "hammer compressed"
     ]
 }
