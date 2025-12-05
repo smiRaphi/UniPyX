@@ -42,7 +42,7 @@ def copy(i:str,o:str):
         else: copytree(i,o,dirs_exist_ok=True)
 cp = copy
 def move(i:str,o:str):
-    if abspath(i)[0].lower() != abspath(o)[0].lower(): rename(i,o)
+    if abspath(i)[0].lower() == abspath(o)[0].lower(): rename(i,o)
     else:
         copy(i,o)
         remove(i)

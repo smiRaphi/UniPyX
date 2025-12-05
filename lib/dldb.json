@@ -3674,6 +3674,14 @@
     "kirbyswitch-decompress":{
         "p":"BMS/KirbySwitch-Decompress.bms"
     },
+    "dr_luigi_wiiu":{
+        "p":"BMS/dr_luigi_wiiu.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/dr_luigi_wiiu.bms",
+            "BMS/dr_luigi_wiiu.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

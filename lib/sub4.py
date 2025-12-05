@@ -5,8 +5,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
-    def quickbms(scr,inf=i,ouf=o):
-        if db.print_try: print('Trying with',scr)
+    def quickbms(scr,inf=i,ouf=o,print_try=True):
+        if db.print_try and print_try: print('Trying with',scr)
         run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
         if os.listdir(ouf): return
         return 1
@@ -1968,6 +1968,54 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if s: return
         case 'HAL Switch CMP': return quickbms('kirbyswitch-decompress')
         case 'HAL YAML': raise NotImplementedError # https://github.com/firubii/KirbyLib/blob/main/KirbyLib/Yaml.cs
+        case 'Dr. Luigi ZALZ':
+            from multiprocessing.pool import ThreadPool
+            f = open(i,'rb')
+            s = f.seek(0,2)
+
+            fs = []
+            lof = 0
+            for ix in range(s//0x80):
+                f.seek(ix*0x80)
+                if f.read(4) == b'ZALZ':
+                    fs.append((lof,(ix*0x80)-lof))
+                    lof = ix*0x80
+            fs.append((lof,s-lof))
+
+            p = ThreadPool()
+            fsl = len(fs)-1
+            for ix,fe in enumerate(fs[1:]):
+                f.seek(fe[0])
+                tf = TmpFile()
+                open(tf.p,'wb').write(f.read(fe[1]))
+
+                def extr(tf,ix):
+                    td = TmpDir()
+                    quickbms('dr_luigi_wiiu',tf.p,td.p,print_try=not ix)
+                    tf.destroy()
+
+                    tfo = td.p + '/' + os.listdir(td.p)[0]
+                    try:
+                        tg = open(tfo,'rb').read(8)
+                        tgf = tg[:4].decode('ascii')
+                        if not tgf.isupper():
+                            if tg == b'@echo of': tg = 'bat'
+                            else: raise
+                        else: tg = tgf.lower()
+                    except: tg = 'bin'
+                    mv(tfo,o + '/' + str(ix) + '.' + tg)
+                    td.destroy()
+                p.apply_async(extr,(tf,ix))
+
+            while len(os.listdir(o)) < fsl: sleep(0.1)
+            for _ in range(50):
+                try: p.join()
+                except ValueError:sleep(0.1)
+                else:break
+            else:p.terminate();p.join()
+            p.close()
+
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

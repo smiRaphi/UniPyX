@@ -349,6 +349,10 @@
         "rs":"HAL YAML","s":1
     },
     {
+        "d":[["s%",128],["isat","ZALZ",0],["n0",4,4]],
+        "rs":"Dr. Luigi ZALZ","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },
