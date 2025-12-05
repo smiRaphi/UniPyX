@@ -353,6 +353,10 @@
         "rs":"Dr. Luigi ZALZ","s":1
     },
     {
+        "d":[["isat","BEZSHAPK\\0\\0\\1\\0",0],["isin",["\\xFF\\xFE","\\xFE\\xFF"],12]],
+        "rs":"Bezel Shader Pack","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },

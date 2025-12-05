@@ -1950,7 +1950,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i)
 
             assert f.read(4) == b'XBIN'
-            f._end = {b'4\x12':'<',b'\x124':'>'}[f.read(2)]
+            f._end = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
             v = f.readu8()
             f.skip(1)
             s = f.readu32() - 0x10
@@ -2015,6 +2015,27 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else:p.terminate();p.join()
             p.close()
 
+            if fs: return
+        case 'Bezel Shader Pack':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+            assert f.read(12) == b'BEZSHAPK\0\0\1\0'
+            f._end = {b'\xFF\xFE':'<',b'\xFE\xFF':'>'}[f.read(2)]
+            f.skip(0x12)
+
+            boff = f.readu64()
+            fc = f.readu64()
+            f.seek(boff)
+            fs = [f.readu64() for _ in range(fc)]
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe + 0x1C)
+                s = f.readu32()
+                f.seek(fe)
+                open(o + '/' + str(ix) + '.bfsha','wb').write(f.read(s))
+
+            f.close()
             if fs: return
 
         case 'Ridge Racer V A':

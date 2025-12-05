@@ -137,7 +137,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 bcd = ['hac2l','-t',{'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t],'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + db.get('titlekeys')]
                 _,e,_ = run(bcd + [i],print_try=False)
                 bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
-                if ' MetaType=Patch ' in e:
+                if ' MetaType=Patch ' in e and not ' MetaType=App ' in e:
                     pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
                     pid,pv = pinf[1],int(pinf[2],16)
                     for x in os.listdir(dirname(i)):
