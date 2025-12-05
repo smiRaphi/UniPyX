@@ -6,14 +6,14 @@
             "x":{
                 "msdos/binary/v30_x64/msdos.exe":"msdos.exe"
             },
-            "ts":1763766000
+            "ts":1764111600
         }],
-        "ts":1763766000
+        "ts":1764111600
     },
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
         "fs":[{
-            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.10.07/dosbox-x-vsbuild-win64-20251007154914.zip",
+            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.12.01/dosbox-x-vsbuild-win64-20251201165421.zip",
             "x":{
                 "bin/x64/Release SDL2/dosbox-x.exe":"DOSBox-X/dosbox-x.exe",
                 "bin/x64/Release SDL2/inpoutx64.dll":"DOSBox-X/inpoutx64.dll"
@@ -298,9 +298,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1763852400
+            "ts":1764716400
         }],
-        "ts":1763852400
+        "ts":1764716400
     },
     "file":{
         "p":"file/file.exe",
@@ -361,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1764025200
+            "ts":1764889200
         }],
-        "ts":1764025200
+        "ts":1764889200
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -756,13 +756,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/e5/ea/dolphin-master-2509-534-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/cf/a4/dolphin-master-2509-572-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1764005930
+            "ts":1764615795
         }],
-        "ts":1764005930
+        "ts":1764615795
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -919,14 +919,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0282/mame0282b_x64.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0283/mame0283b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1761900716
+            "ts":1764349795
         }],
-        "ts":1761900716
+        "ts":1764349795
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -996,14 +996,14 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.6/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.7/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1762544395
+            "ts":1764496846
         }],
-        "ts":1762544395
+        "ts":1764496846
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -2684,23 +2684,24 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45867/SDLVICE-3.9-win64-r45867.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45883/SDLVICE-3.9-win64-r45883.7z",
             "x":{
                 "SDLVICE-3.9-win64-r45867/c1541.exe":"VICE/c1541.exe",
                 "SDLVICE-3.9-win64-r45867/zlib1.dll":"VICE/zlib1.dll",
                 "SDLVICE-3.9-win64-r45867/SDL.dll":"VICE/SDL.dll",
                 "SDLVICE-3.9-win64-r45867/libstdc++-6.dll":"VICE/libstdc++-6.dll",
                 "SDLVICE-3.9-win64-r45867/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.9-win64-r45867/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.9-win64-r45867/libwinpthread-1.dll":"VICE/libwinpthread-1.dll",
+                "SDLVICE-3.9-win64-r45883/SDLVICE-3.9-win64-r45867":"VICE/libwinpthread-1.dll"
             },
-            "ts":1764006734
+            "ts":1764534418
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1764006734
+        "ts":1764534418
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2731,185 +2732,158 @@
             "x":{
                 "nulib2.exe":"nulib2.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "qemu-img":{
         "p":"qemu-img/qemu-img.exe",
-        "fs":[
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-qemu-image-util-10.1.2-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/qemu-img.exe":"qemu-img/qemu-img.exe"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-brotli-1.2.0-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libbrotlicommon.dll":"qemu-img/libbrotlicommon.dll",
-                    "mingw64/bin/libbrotlidec.dll":"qemu-img/libbrotlidec.dll",
-                    "mingw64/bin/libbrotlienc.dll":"qemu-img/libbrotlienc.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libbz2-1.dll":"qemu-img/libbz2-1.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-15.2.0-8-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libgcc_s_seh-1.dll":"qemu-img/libgcc_s_seh-1.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r338.gc1c6b0ff3-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libwinpthread-1.dll":"qemu-img/libwinpthread-1.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-curl-8.17.0-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libcurl-4.dll":"qemu-img/libcurl-4.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libidn2-2.3.8-4-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libidn2-0.dll":"qemu-img/libidn2-0.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gettext-runtime-0.26-2-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libintl-8.dll":"qemu-img/libintl-8.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.18-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libiconv-2.dll":"qemu-img/libiconv-2.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libunistring-1.3-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libunistring-5.dll":"qemu-img/libunistring-5.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libpsl-0.21.5-3-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libpsl-5.dll":"qemu-img/libpsl-5.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libssh2-1.11.1-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libssh2-1.dll":"qemu-img/libssh2-1.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-openssl-3.6.0-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libcrypto-3-x64.dll":"qemu-img/libcrypto-3-x64.dll",
-                    "mingw64/bin/libssl-3-x64.dll":"qemu-img/libssl-3-x64.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.3.1-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/zlib1.dll":"qemu-img/zlib1.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nghttp2-1.68.0-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libnghttp2-14.dll":"qemu-img/libnghttp2-14.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nghttp3-1.13.1-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libnghttp3-9.dll":"qemu-img/libnghttp3-9.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-ngtcp2-1.18.0-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libngtcp2-16.dll":"qemu-img/libngtcp2-16.dll",
-                    "mingw64/bin/libngtcp2_crypto_ossl-0.dll":"qemu-img/libngtcp2_crypto_ossl-0.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gnutls-3.8.11-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libgnutls-30.dll":"qemu-img/libgnutls-30.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gmp-6.3.0-2-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libgmp-10.dll":"qemu-img/libgmp-10.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libtasn1-4.20.0-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libtasn1-6.dll":"qemu-img/libtasn1-6.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nettle-3.10.2-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libhogweed-6.dll":"qemu-img/libhogweed-6.dll",
-                    "mingw64/bin/libnettle-8.dll":"qemu-img/libnettle-8.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-p11-kit-0.25.10-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libp11-kit-0.dll":"qemu-img/libp11-kit-0.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libffi-3.5.2-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libffi-8.dll":"qemu-img/libffi-8.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zstd-1.5.7-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libzstd.dll":"qemu-img/libzstd.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-glib2-2.86.2-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libglib-2.0-0.dll":"qemu-img/libglib-2.0-0.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pcre2-10.47-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libpcre2-8-0.dll":"qemu-img/libpcre2-8-0.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libnfs-5.0.3-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libnfs-14.dll":"qemu-img/libnfs-14.dll"
-                }
-            },
-            {
-                "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libssh-0.11.3-1-any.pkg.tar.zst",
-                "x":{
-                    "mingw64/bin/libssh.dll":"qemu-img/libssh.dll"
-                }
+        "fs":[{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-qemu-image-util-10.1.2-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/qemu-img.exe":"qemu-img/qemu-img.exe"
             }
-        ]
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-brotli-1.2.0-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libbrotlicommon.dll":"qemu-img/libbrotlicommon.dll",
+                "mingw64/bin/libbrotlidec.dll":"qemu-img/libbrotlidec.dll",
+                "mingw64/bin/libbrotlienc.dll":"qemu-img/libbrotlienc.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libbz2-1.dll":"qemu-img/libbz2-1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-15.2.0-8-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libgcc_s_seh-1.dll":"qemu-img/libgcc_s_seh-1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-13.0.0.r338.gc1c6b0ff3-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libwinpthread-1.dll":"qemu-img/libwinpthread-1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-curl-8.17.0-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libcurl-4.dll":"qemu-img/libcurl-4.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libidn2-2.3.8-4-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libidn2-0.dll":"qemu-img/libidn2-0.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gettext-runtime-0.26-2-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libintl-8.dll":"qemu-img/libintl-8.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.18-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libiconv-2.dll":"qemu-img/libiconv-2.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libunistring-1.3-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libunistring-5.dll":"qemu-img/libunistring-5.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libpsl-0.21.5-3-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libpsl-5.dll":"qemu-img/libpsl-5.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libssh2-1.11.1-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libssh2-1.dll":"qemu-img/libssh2-1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-openssl-3.6.0-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libcrypto-3-x64.dll":"qemu-img/libcrypto-3-x64.dll",
+                "mingw64/bin/libssl-3-x64.dll":"qemu-img/libssl-3-x64.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.3.1-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/zlib1.dll":"qemu-img/zlib1.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nghttp2-1.68.0-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libnghttp2-14.dll":"qemu-img/libnghttp2-14.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nghttp3-1.13.1-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libnghttp3-9.dll":"qemu-img/libnghttp3-9.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-ngtcp2-1.18.0-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libngtcp2-16.dll":"qemu-img/libngtcp2-16.dll",
+                "mingw64/bin/libngtcp2_crypto_ossl-0.dll":"qemu-img/libngtcp2_crypto_ossl-0.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gnutls-3.8.11-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libgnutls-30.dll":"qemu-img/libgnutls-30.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gmp-6.3.0-2-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libgmp-10.dll":"qemu-img/libgmp-10.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libtasn1-4.20.0-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libtasn1-6.dll":"qemu-img/libtasn1-6.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-nettle-3.10.2-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libhogweed-6.dll":"qemu-img/libhogweed-6.dll",
+                "mingw64/bin/libnettle-8.dll":"qemu-img/libnettle-8.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-p11-kit-0.25.10-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libp11-kit-0.dll":"qemu-img/libp11-kit-0.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libffi-3.5.2-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libffi-8.dll":"qemu-img/libffi-8.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zstd-1.5.7-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libzstd.dll":"qemu-img/libzstd.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-glib2-2.86.2-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libglib-2.0-0.dll":"qemu-img/libglib-2.0-0.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pcre2-10.47-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libpcre2-8-0.dll":"qemu-img/libpcre2-8-0.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libnfs-5.0.3-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libnfs-14.dll":"qemu-img/libnfs-14.dll"
+            }
+        },{
+            "u":"https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libssh-0.11.3-1-any.pkg.tar.zst",
+            "x":{
+                "mingw64/bin/libssh.dll":"qemu-img/libssh.dll"
+            }
+        }],
+        "ts":0
     },
     "dskconv":{
         "p":"libdsk/dskconv.exe",
@@ -2919,13 +2893,15 @@
                 "dskconv.exe":"libdsk/dskconv.exe",
                 "libdsk.dll":"libdsk/libdsk.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "cwunpack":{
         "p":"CWUNPACK.EXE",
         "fs":[
         "https://raw.githubusercontent.com/geneb/CompressionWorkshop/refs/heads/master/CWUNPACK.EXE"
-        ]
+        ],
+        "ts":0
     },
     "semone":{
         "p":"SEMONE.EXE",
@@ -2934,7 +2910,8 @@
             "x":{
                 "SEMONE06.B02/SEMONE.EXE":"SEMONE.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "slim":{
         "p":"SLIM.EXE",
@@ -2943,14 +2920,16 @@
             "x":{
                 "SLIM.EXE":"SLIM.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "n64decompress":{
         "p":"n64decompress.py",
         "fs":[[
             "https://raw.githubusercontent.com/ethteck/n64decompress/refs/heads/main/Yay0/decompress.py",
             "n64decompress.py"
-        ]]
+        ]],
+        "ts":0
     },
     "makepri":{
         "p":"makepri.exe",
@@ -2959,13 +2938,15 @@
             "x":{
                 "bin/10.0.28000.0/x64/makepri.exe":"makepri.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "dfm2txt":{
         "p":"dfm2txt.exe",
         "fs":[
         "https://raw.githubusercontent.com/Sembiance/dexvert/37a7da64dfd630b79046144f0c413f9c2084b122/qemu/win2k/data/app/dfm2txt/dfm2txt.exe"
-        ]
+        ],
+        "ts":0
     },
     "dcopy":{
         "p":"dcopy.exe",
@@ -2992,27 +2973,31 @@
             "x":{
                 "cmdpack-1.03-win64-x86_64/unecm.exe":"unecm.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "pah21":{
         "p":"PAH21.EXE",
         "fs":[[
             "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/PAH21PD.EXE",
             "PAH21.EXE"
-        ]]
+        ]],
+        "ts":0
     },
     "pah3":{
         "p":"PAH3.EXE",
         "fs":[[
             "https://raw.githubusercontent.com/Sembiance/dexvert/refs/heads/master/dos/PAH3.EXE",
             "PAH3.EXE"
-        ]]
+        ]],
+        "ts":0
     },
     "hammer_decomp":{
         "p":"hammer_decomp.py",
         "fs":[
         "https://raw.githubusercontent.com/Treeki/RandomStuff/refs/heads/master/hammer_decomp.py"
-        ]
+        ],
+        "ts":0
     },
     "hit":{
         "p":"HIT.EXE",
@@ -3021,7 +3006,8 @@
             "x":{
                 "HIT.EXE":"HIT.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "hyper":{
         "p":"HYPER.EXE",
@@ -3030,7 +3016,8 @@
             "x":{
                 "HYPER.EXE":"HYPER.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "ediextract":{
         "p":"EDIEXTR.EXE",
@@ -3039,7 +3026,8 @@
             "x":{
                 "EXTRACT.EXE":"EDIEXTR.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "txd":{
         "p":"txd.exe",
@@ -3070,9 +3058,112 @@
             "x":{
                 "xfd_User/C/xfdDecrunch":"xfdMaster/c/xfdDecrunch",
                 "xfd_User/Libs/xfdmaster.library":"xfdMaster/libs/xfdmaster.library",
-                "xfd_User/Libs/xfd/4GetIt!": "xfdMaster/libs/xfd/4GetIt!", "xfd_User/Libs/xfd/Ace_": "xfdMaster/libs/xfd/Ace_", "xfd_User/Libs/xfd/AddrHeads": "xfdMaster/libs/xfd/AddrHeads", "xfd_User/Libs/xfd/ALC0": "xfdMaster/libs/xfd/ALC0", "xfd_User/Libs/xfd/ArcD": "xfdMaster/libs/xfd/ArcD", "xfd_User/Libs/xfd/ArcR": "xfdMaster/libs/xfd/ArcR", "xfd_User/Libs/xfd/ATM4": "xfdMaster/libs/xfd/ATM4", "xfd_User/Libs/xfd/ATOM": "xfdMaster/libs/xfd/ATOM", "xfd_User/Libs/xfd/B6B2AFCB": "xfdMaster/libs/xfd/B6B2AFCB", "xfd_User/Libs/xfd/B9AB": "xfdMaster/libs/xfd/B9AB", "xfd_User/Libs/xfd/BlueHouseCruncher": "xfdMaster/libs/xfd/BlueHouseCruncher", "xfd_User/Libs/xfd/BRLE": "xfdMaster/libs/xfd/BRLE", "xfd_User/Libs/xfd/ByteKillerClone": "xfdMaster/libs/xfd/ByteKillerClone", "xfd_User/Libs/xfd/ByteKillerData": "xfdMaster/libs/xfd/ByteKillerData", "xfd_User/Libs/xfd/CATC": "xfdMaster/libs/xfd/CATC", "xfd_User/Libs/xfd/CMP1": "xfdMaster/libs/xfd/CMP1", "xfd_User/Libs/xfd/CNC": "xfdMaster/libs/xfd/CNC", "xfd_User/Libs/xfd/COMatic": "xfdMaster/libs/xfd/COMatic", "xfd_User/Libs/xfd/CoMp": "xfdMaster/libs/xfd/CoMp", "xfd_User/Libs/xfd/CP": "xfdMaster/libs/xfd/CP", "xfd_User/Libs/xfd/CPic": "xfdMaster/libs/xfd/CPic", "xfd_User/Libs/xfd/Crunch": "xfdMaster/libs/xfd/Crunch", "xfd_User/Libs/xfd/CRUNCH2A": "xfdMaster/libs/xfd/CRUNCH2A", "xfd_User/Libs/xfd/CSFX": "xfdMaster/libs/xfd/CSFX", "xfd_User/Libs/xfd/D815": "xfdMaster/libs/xfd/D815", "xfd_User/Libs/xfd/Damage": "xfdMaster/libs/xfd/Damage", "xfd_User/Libs/xfd/DHp2": "xfdMaster/libs/xfd/DHp2", "xfd_User/Libs/xfd/DPRa": "xfdMaster/libs/xfd/DPRa", "xfd_User/Libs/xfd/DSC3": "xfdMaster/libs/xfd/DSC3", "xfd_User/Libs/xfd/Dtpk": "xfdMaster/libs/xfd/Dtpk", "xfd_User/Libs/xfd/Dune": "xfdMaster/libs/xfd/Dune", "xfd_User/Libs/xfd/EDP1": "xfdMaster/libs/xfd/EDP1", "xfd_User/Libs/xfd/FIRE": "xfdMaster/libs/xfd/FIRE", "xfd_User/Libs/xfd/FUNGUS": "xfdMaster/libs/xfd/FUNGUS", "xfd_User/Libs/xfd/GK90": "xfdMaster/libs/xfd/GK90", "xfd_User/Libs/xfd/GP": "xfdMaster/libs/xfd/GP", "xfd_User/Libs/xfd/GZip": "xfdMaster/libs/xfd/GZip", "xfd_User/Libs/xfd/HUF": "xfdMaster/libs/xfd/HUF", "xfd_User/Libs/xfd/HUFF": "xfdMaster/libs/xfd/HUFF", "xfd_User/Libs/xfd/IFF-HUFF": "xfdMaster/libs/xfd/IFF-HUFF", "xfd_User/Libs/xfd/IlScuro": "xfdMaster/libs/xfd/IlScuro", "xfd_User/Libs/xfd/ImploderClone": "xfdMaster/libs/xfd/ImploderClone", "xfd_User/Libs/xfd/Infogrames": "xfdMaster/libs/xfd/Infogrames", "xfd_User/Libs/xfd/JamPacker": "xfdMaster/libs/xfd/JamPacker", "xfd_User/Libs/xfd/JekPacker": "xfdMaster/libs/xfd/JekPacker", "xfd_User/Libs/xfd/JR": "xfdMaster/libs/xfd/JR", "xfd_User/Libs/xfd/KennyGrant": "xfdMaster/libs/xfd/KennyGrant", "xfd_User/Libs/xfd/LeCrunch": "xfdMaster/libs/xfd/LeCrunch", "xfd_User/Libs/xfd/LHA3": "xfdMaster/libs/xfd/LHA3", "xfd_User/Libs/xfd/LhLib": "xfdMaster/libs/xfd/LhLib", "xfd_User/Libs/xfd/LOB": "xfdMaster/libs/xfd/LOB", "xfd_User/Libs/xfd/LZDA": "xfdMaster/libs/xfd/LZDA", "xfd_User/Libs/xfd/LZSS": "xfdMaster/libs/xfd/LZSS", "xfd_User/Libs/xfd/LZW": "xfdMaster/libs/xfd/LZW", "xfd_User/Libs/xfd/LZWH": "xfdMaster/libs/xfd/LZWH", "xfd_User/Libs/xfd/MagneticFieldsCruncher": "xfdMaster/libs/xfd/MagneticFieldsCruncher", "xfd_User/Libs/xfd/MASM": "xfdMaster/libs/xfd/MASM", "xfd_User/Libs/xfd/MASS": "xfdMaster/libs/xfd/MASS", "xfd_User/Libs/xfd/MDCS": "xfdMaster/libs/xfd/MDCS", "xfd_User/Libs/xfd/MentalImage": "xfdMaster/libs/xfd/MentalImage", "xfd_User/Libs/xfd/MMCMP": "xfdMaster/libs/xfd/MMCMP", "xfd_User/Libs/xfd/MTP1_MTPS": "xfdMaster/libs/xfd/MTP1_MTPS", "xfd_User/Libs/xfd/NJMP": "xfdMaster/libs/xfd/NJMP", "xfd_User/Libs/xfd/NTG-Cruncher": "xfdMaster/libs/xfd/NTG-Cruncher", "xfd_User/Libs/xfd/pack": "xfdMaster/libs/xfd/pack", "xfd_User/Libs/xfd/Pack-Ice": "xfdMaster/libs/xfd/Pack-Ice", "xfd_User/Libs/xfd/PacPic": "xfdMaster/libs/xfd/PacPic", "xfd_User/Libs/xfd/PaK0": "xfdMaster/libs/xfd/PaK0", "xfd_User/Libs/xfd/PAL!": "xfdMaster/libs/xfd/PAL!", "xfd_User/Libs/xfd/PCompress": "xfdMaster/libs/xfd/PCompress", "xfd_User/Libs/xfd/PCR4": "xfdMaster/libs/xfd/PCR4", "xfd_User/Libs/xfd/PP2S": "xfdMaster/libs/xfd/PP2S", "xfd_User/Libs/xfd/PseudoPacker": "xfdMaster/libs/xfd/PseudoPacker", "xfd_User/Libs/xfd/RexxExe": "xfdMaster/libs/xfd/RexxExe", "xfd_User/Libs/xfd/RLE": "xfdMaster/libs/xfd/RLE", "xfd_User/Libs/xfd/RMS-More": "xfdMaster/libs/xfd/RMS-More", "xfd_User/Libs/xfd/RPck": "xfdMaster/libs/xfd/RPck", "xfd_User/Libs/xfd/ShellScript": "xfdMaster/libs/xfd/ShellScript", "xfd_User/Libs/xfd/SiCr": "xfdMaster/libs/xfd/SiCr", "xfd_User/Libs/xfd/Silmarils": "xfdMaster/libs/xfd/Silmarils", "xfd_User/Libs/xfd/SOS": "xfdMaster/libs/xfd/SOS", "xfd_User/Libs/xfd/SPv3": "xfdMaster/libs/xfd/SPv3", "xfd_User/Libs/xfd/SQ": "xfdMaster/libs/xfd/SQ", "xfd_User/Libs/xfd/SSUR": "xfdMaster/libs/xfd/SSUR", "xfd_User/Libs/xfd/Switch": "xfdMaster/libs/xfd/Switch", "xfd_User/Libs/xfd/SZDD": "xfdMaster/libs/xfd/SZDD", "xfd_User/Libs/xfd/TheChamp": "xfdMaster/libs/xfd/TheChamp", "xfd_User/Libs/xfd/TimeCruncherData": "xfdMaster/libs/xfd/TimeCruncherData", "xfd_User/Libs/xfd/TPWM": "xfdMaster/libs/xfd/TPWM", "xfd_User/Libs/xfd/TRX": "xfdMaster/libs/xfd/TRX", "xfd_User/Libs/xfd/TTW!": "xfdMaster/libs/xfd/TTW!", "xfd_User/Libs/xfd/TUC": "xfdMaster/libs/xfd/TUC", "xfd_User/Libs/xfd/TurboPackerData": "xfdMaster/libs/xfd/TurboPackerData", "xfd_User/Libs/xfd/UNIX-Compress": "xfdMaster/libs/xfd/UNIX-Compress", "xfd_User/Libs/xfd/Unknown1": "xfdMaster/libs/xfd/Unknown1", "xfd_User/Libs/xfd/Unknown2": "xfdMaster/libs/xfd/Unknown2", "xfd_User/Libs/xfd/VDCO": "xfdMaster/libs/xfd/VDCO", "xfd_User/Libs/xfd/Vic2": "xfdMaster/libs/xfd/Vic2", "xfd_User/Libs/xfd/Vice": "xfdMaster/libs/xfd/Vice", "xfd_User/Libs/xfd/XP10": "xfdMaster/libs/xfd/XP10", "xfd_User/Libs/xfd/XPAC": "xfdMaster/libs/xfd/XPAC", "xfd_User/Libs/xfd/ZbL!": "xfdMaster/libs/xfd/ZbL!", "xfd_User/Libs/xfd/ZeroPacker": "xfdMaster/libs/xfd/ZeroPacker"
+                "xfd_User/Libs/xfd/4GetIt!":"xfdMaster/libs/xfd/4GetIt!",
+                "xfd_User/Libs/xfd/Ace_":"xfdMaster/libs/xfd/Ace_",
+                "xfd_User/Libs/xfd/AddrHeads":"xfdMaster/libs/xfd/AddrHeads",
+                "xfd_User/Libs/xfd/ALC0":"xfdMaster/libs/xfd/ALC0",
+                "xfd_User/Libs/xfd/ArcD":"xfdMaster/libs/xfd/ArcD",
+                "xfd_User/Libs/xfd/ArcR":"xfdMaster/libs/xfd/ArcR",
+                "xfd_User/Libs/xfd/ATM4":"xfdMaster/libs/xfd/ATM4",
+                "xfd_User/Libs/xfd/ATOM":"xfdMaster/libs/xfd/ATOM",
+                "xfd_User/Libs/xfd/B6B2AFCB":"xfdMaster/libs/xfd/B6B2AFCB",
+                "xfd_User/Libs/xfd/B9AB":"xfdMaster/libs/xfd/B9AB",
+                "xfd_User/Libs/xfd/BlueHouseCruncher":"xfdMaster/libs/xfd/BlueHouseCruncher",
+                "xfd_User/Libs/xfd/BRLE":"xfdMaster/libs/xfd/BRLE",
+                "xfd_User/Libs/xfd/ByteKillerClone":"xfdMaster/libs/xfd/ByteKillerClone",
+                "xfd_User/Libs/xfd/ByteKillerData":"xfdMaster/libs/xfd/ByteKillerData",
+                "xfd_User/Libs/xfd/CATC":"xfdMaster/libs/xfd/CATC",
+                "xfd_User/Libs/xfd/CMP1":"xfdMaster/libs/xfd/CMP1",
+                "xfd_User/Libs/xfd/CNC":"xfdMaster/libs/xfd/CNC",
+                "xfd_User/Libs/xfd/COMatic":"xfdMaster/libs/xfd/COMatic",
+                "xfd_User/Libs/xfd/CoMp":"xfdMaster/libs/xfd/CoMp",
+                "xfd_User/Libs/xfd/CP":"xfdMaster/libs/xfd/CP",
+                "xfd_User/Libs/xfd/CPic":"xfdMaster/libs/xfd/CPic",
+                "xfd_User/Libs/xfd/Crunch":"xfdMaster/libs/xfd/Crunch",
+                "xfd_User/Libs/xfd/CRUNCH2A":"xfdMaster/libs/xfd/CRUNCH2A",
+                "xfd_User/Libs/xfd/CSFX":"xfdMaster/libs/xfd/CSFX",
+                "xfd_User/Libs/xfd/D815":"xfdMaster/libs/xfd/D815",
+                "xfd_User/Libs/xfd/Damage":"xfdMaster/libs/xfd/Damage",
+                "xfd_User/Libs/xfd/DHp2":"xfdMaster/libs/xfd/DHp2",
+                "xfd_User/Libs/xfd/DPRa":"xfdMaster/libs/xfd/DPRa",
+                "xfd_User/Libs/xfd/DSC3":"xfdMaster/libs/xfd/DSC3",
+                "xfd_User/Libs/xfd/Dtpk":"xfdMaster/libs/xfd/Dtpk",
+                "xfd_User/Libs/xfd/Dune":"xfdMaster/libs/xfd/Dune",
+                "xfd_User/Libs/xfd/EDP1":"xfdMaster/libs/xfd/EDP1",
+                "xfd_User/Libs/xfd/FIRE":"xfdMaster/libs/xfd/FIRE",
+                "xfd_User/Libs/xfd/FUNGUS":"xfdMaster/libs/xfd/FUNGUS",
+                "xfd_User/Libs/xfd/GK90":"xfdMaster/libs/xfd/GK90",
+                "xfd_User/Libs/xfd/GP":"xfdMaster/libs/xfd/GP",
+                "xfd_User/Libs/xfd/GZip":"xfdMaster/libs/xfd/GZip",
+                "xfd_User/Libs/xfd/HUF":"xfdMaster/libs/xfd/HUF",
+                "xfd_User/Libs/xfd/HUFF":"xfdMaster/libs/xfd/HUFF",
+                "xfd_User/Libs/xfd/IFF-HUFF":"xfdMaster/libs/xfd/IFF-HUFF",
+                "xfd_User/Libs/xfd/IlScuro":"xfdMaster/libs/xfd/IlScuro",
+                "xfd_User/Libs/xfd/ImploderClone":"xfdMaster/libs/xfd/ImploderClone",
+                "xfd_User/Libs/xfd/Infogrames":"xfdMaster/libs/xfd/Infogrames",
+                "xfd_User/Libs/xfd/JamPacker":"xfdMaster/libs/xfd/JamPacker",
+                "xfd_User/Libs/xfd/JekPacker":"xfdMaster/libs/xfd/JekPacker",
+                "xfd_User/Libs/xfd/JR":"xfdMaster/libs/xfd/JR",
+                "xfd_User/Libs/xfd/KennyGrant":"xfdMaster/libs/xfd/KennyGrant",
+                "xfd_User/Libs/xfd/LeCrunch":"xfdMaster/libs/xfd/LeCrunch",
+                "xfd_User/Libs/xfd/LHA3":"xfdMaster/libs/xfd/LHA3",
+                "xfd_User/Libs/xfd/LhLib":"xfdMaster/libs/xfd/LhLib",
+                "xfd_User/Libs/xfd/LOB":"xfdMaster/libs/xfd/LOB",
+                "xfd_User/Libs/xfd/LZDA":"xfdMaster/libs/xfd/LZDA",
+                "xfd_User/Libs/xfd/LZSS":"xfdMaster/libs/xfd/LZSS",
+                "xfd_User/Libs/xfd/LZW":"xfdMaster/libs/xfd/LZW",
+                "xfd_User/Libs/xfd/LZWH":"xfdMaster/libs/xfd/LZWH",
+                "xfd_User/Libs/xfd/MagneticFieldsCruncher":"xfdMaster/libs/xfd/MagneticFieldsCruncher",
+                "xfd_User/Libs/xfd/MASM":"xfdMaster/libs/xfd/MASM",
+                "xfd_User/Libs/xfd/MASS":"xfdMaster/libs/xfd/MASS",
+                "xfd_User/Libs/xfd/MDCS":"xfdMaster/libs/xfd/MDCS",
+                "xfd_User/Libs/xfd/MentalImage":"xfdMaster/libs/xfd/MentalImage",
+                "xfd_User/Libs/xfd/MMCMP":"xfdMaster/libs/xfd/MMCMP",
+                "xfd_User/Libs/xfd/MTP1_MTPS":"xfdMaster/libs/xfd/MTP1_MTPS",
+                "xfd_User/Libs/xfd/NJMP":"xfdMaster/libs/xfd/NJMP",
+                "xfd_User/Libs/xfd/NTG-Cruncher":"xfdMaster/libs/xfd/NTG-Cruncher",
+                "xfd_User/Libs/xfd/pack":"xfdMaster/libs/xfd/pack",
+                "xfd_User/Libs/xfd/Pack-Ice":"xfdMaster/libs/xfd/Pack-Ice",
+                "xfd_User/Libs/xfd/PacPic":"xfdMaster/libs/xfd/PacPic",
+                "xfd_User/Libs/xfd/PaK0":"xfdMaster/libs/xfd/PaK0",
+                "xfd_User/Libs/xfd/PAL!":"xfdMaster/libs/xfd/PAL!",
+                "xfd_User/Libs/xfd/PCompress":"xfdMaster/libs/xfd/PCompress",
+                "xfd_User/Libs/xfd/PCR4":"xfdMaster/libs/xfd/PCR4",
+                "xfd_User/Libs/xfd/PP2S":"xfdMaster/libs/xfd/PP2S",
+                "xfd_User/Libs/xfd/PseudoPacker":"xfdMaster/libs/xfd/PseudoPacker",
+                "xfd_User/Libs/xfd/RexxExe":"xfdMaster/libs/xfd/RexxExe",
+                "xfd_User/Libs/xfd/RLE":"xfdMaster/libs/xfd/RLE",
+                "xfd_User/Libs/xfd/RMS-More":"xfdMaster/libs/xfd/RMS-More",
+                "xfd_User/Libs/xfd/RPck":"xfdMaster/libs/xfd/RPck",
+                "xfd_User/Libs/xfd/ShellScript":"xfdMaster/libs/xfd/ShellScript",
+                "xfd_User/Libs/xfd/SiCr":"xfdMaster/libs/xfd/SiCr",
+                "xfd_User/Libs/xfd/Silmarils":"xfdMaster/libs/xfd/Silmarils",
+                "xfd_User/Libs/xfd/SOS":"xfdMaster/libs/xfd/SOS",
+                "xfd_User/Libs/xfd/SPv3":"xfdMaster/libs/xfd/SPv3",
+                "xfd_User/Libs/xfd/SQ":"xfdMaster/libs/xfd/SQ",
+                "xfd_User/Libs/xfd/SSUR":"xfdMaster/libs/xfd/SSUR",
+                "xfd_User/Libs/xfd/Switch":"xfdMaster/libs/xfd/Switch",
+                "xfd_User/Libs/xfd/SZDD":"xfdMaster/libs/xfd/SZDD",
+                "xfd_User/Libs/xfd/TheChamp":"xfdMaster/libs/xfd/TheChamp",
+                "xfd_User/Libs/xfd/TimeCruncherData":"xfdMaster/libs/xfd/TimeCruncherData",
+                "xfd_User/Libs/xfd/TPWM":"xfdMaster/libs/xfd/TPWM",
+                "xfd_User/Libs/xfd/TRX":"xfdMaster/libs/xfd/TRX",
+                "xfd_User/Libs/xfd/TTW!":"xfdMaster/libs/xfd/TTW!",
+                "xfd_User/Libs/xfd/TUC":"xfdMaster/libs/xfd/TUC",
+                "xfd_User/Libs/xfd/TurboPackerData":"xfdMaster/libs/xfd/TurboPackerData",
+                "xfd_User/Libs/xfd/UNIX-Compress":"xfdMaster/libs/xfd/UNIX-Compress",
+                "xfd_User/Libs/xfd/Unknown1":"xfdMaster/libs/xfd/Unknown1",
+                "xfd_User/Libs/xfd/Unknown2":"xfdMaster/libs/xfd/Unknown2",
+                "xfd_User/Libs/xfd/VDCO":"xfdMaster/libs/xfd/VDCO",
+                "xfd_User/Libs/xfd/Vic2":"xfdMaster/libs/xfd/Vic2",
+                "xfd_User/Libs/xfd/Vice":"xfdMaster/libs/xfd/Vice",
+                "xfd_User/Libs/xfd/XP10":"xfdMaster/libs/xfd/XP10",
+                "xfd_User/Libs/xfd/XPAC":"xfdMaster/libs/xfd/XPAC",
+                "xfd_User/Libs/xfd/ZbL!":"xfdMaster/libs/xfd/ZbL!",
+                "xfd_User/Libs/xfd/ZeroPacker":"xfdMaster/libs/xfd/ZeroPacker"
             }
-        }]
+        }],
+        "ts":0
     },
     "upx":{
         "p":"upx.exe",
@@ -3317,7 +3408,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.10.6/lessmsi-v2.10.6.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.0/lessmsi-v2.11.0.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -3326,9 +3417,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1763947844
+            "ts":1764516734
         }],
-        "ts":1763947844
+        "ts":1764516734
     },
     "msix":{
         "p":"MsiX.exe",
@@ -3583,26 +3674,26 @@
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
-            "u":"https://files.prodkeys.net/ProdKeys.net-v20.3.0.zip",
+            "u":"https://files.prodkeys.net/Prodkeys.NET_v21-0-0.zip",
             "x":{
-                "ProdKeys.net-v20.3.0/prod.keys":"prodkeys/prod.keys",
-                "ProdKeys.net-v20.3.0/title.keys":"prodkeys/title.keys"
+                "prod.keys":"prodkeys/prod.keys",
+                "title.keys":"prodkeys/title.keys"
             },
-            "ts":1754702838
+            "ts":1763976235
         }],
-        "ts":1754702838
+        "ts":1763976235
     },
     "titlekeys":{
         "p":"prodkeys/title.keys",
         "fs":[{
-            "u":"https://files.prodkeys.net/ProdKeys.net-v20.3.0.zip",
+            "u":"https://files.prodkeys.net/Prodkeys.NET_v21-0-0.zip",
             "x":{
-                "ProdKeys.net-v20.3.0/prod.keys":"prodkeys/prod.keys",
-                "ProdKeys.net-v20.3.0/title.keys":"prodkeys/title.keys"
+                "prod.keys":"prodkeys/prod.keys",
+                "title.keys":"prodkeys/title.keys"
             },
-            "ts":1754702838
+            "ts":1763976235
         }],
-        "ts":1754702838
+        "ts":1763976235
     },
     "devkeys":{
         "p":"prodkeys/dev.keys"

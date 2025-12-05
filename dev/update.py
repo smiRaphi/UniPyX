@@ -47,7 +47,10 @@ class Cache:
         self._s = {}
     def get(self,u) -> str:
         if u in self._s: return self._s[u]
-        r = self.c.get(u,follow_redirects=True).text
+        for _ in range(5):
+            try:r = self.c.get(u,follow_redirects=True).text
+            except httpx.ReadTimeout:pass
+            else:break
         self._s[u] = r
         return r
     def srch(self,p:str,u:str) -> str:
@@ -164,7 +167,7 @@ def supdate(c:Cache,k:str,inf:dict):
                 s = c.get(re.search(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"',s)[1])
                 ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1].split('+')[0],'%Y-%m-%dT%H:%M:%S')
                 if ts > ots:
-                    nu = re.search(r'href="(https://files\.prodkeys\.net/ProdKeys\.net-v\d+\.\d+\.\d+\.zip)"',s)[1]
+                    nu = re.search(r'(?i)href="(https://files\.prodkeys\.net/ProdKeys\.net(?:-v\d+\.\d+\.|_v\d+\-\d+\-)\d+\.zip)"',s)[1]
                     if nu != u: u = nu
                     else: ts = 0
         elif dom == 'dl.xpdfreader.com':

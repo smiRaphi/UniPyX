@@ -8,7 +8,7 @@ if __name__ == '__main__':
         from shutil import rmtree
         assert os.path.exists('.gitignore'),".gitignore does not exist"
 
-        nr = re.findall(r'!/bin/([^\n]+\.\w+|[^\n/\\]+(?=/\*))',open('.gitignore',encoding='utf-8').read())
+        nr = re.findall(r'!/bin/([^\n]+\.\w+|[^\n/\\]+(?=/\*))',open('.gitignore',encoding='utf-8').read()) + ['prodkeys/dev.keys']
         for x in os.listdir('bin'):
             if x in nr: continue
             p = 'bin/' + x
