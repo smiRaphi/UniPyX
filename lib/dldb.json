@@ -3014,6 +3014,15 @@
         "https://raw.githubusercontent.com/Treeki/RandomStuff/refs/heads/master/hammer_decomp.py"
         ]
     },
+    "hit":{
+        "p":"HIT.EXE",
+        "fs":[{
+            "u":"https://www.sac.sk/download/pack/hit.arj",
+            "x":{
+                "HIT.EXE":"HIT.EXE"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

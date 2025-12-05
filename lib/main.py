@@ -206,7 +206,7 @@ def analyze(inp:str,raw=False):
         _,o,_ = db.run(['gamearch',inp,'-l'])
         ts = re.findall(r'File .+ a .+ \[(.+)\]\n',o.replace('\r',''))
         for dts in re.findall(r', archive is (?:probably|definitely) not (.+)\n',o.replace('\r','')): ts.remove(dts)
-        if ts: ts = [ts[1]]
+        if ts: ts = [ts[0]]
         else: ts = []
 
     nts = checktdb(ts)
