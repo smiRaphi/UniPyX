@@ -495,6 +495,10 @@
         "rs":"Unreal Engine Web Package","s":1
     },
     {
+        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:n.decode()\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:n.decode()\nexcept:return\nreturn True"]],
+        "rs":"Impact Screensaver ILB"
+    },
+    {
         "rqr":"JavaScript source",
         "d":[["contain","var REMOTE_PACKAGE_BASE = ",[0,2480]],["contain","function loadPackage(metadata) {",[0,2480]],["contain","function fetchRemotePackage(packageName, packageSize, callback, errback) {",[0,2480]]],
         "rs":"Unreal Engine Web Package","s":1

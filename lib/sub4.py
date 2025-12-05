@@ -1878,6 +1878,21 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(14,1)
                 open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'Impact Screensaver ILB':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(f.readu32())
+            f.skip(f.readu32())
+
+            while f:
+                nl,fl = f.readu32(),f.readu32()
+                n = f.read(nl).decode().replace('/','-')
+                if n == '..': n = '__'
+                open(o + '/' + n,'wb').write(f.read(fl))
+                f.skip(1)
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
