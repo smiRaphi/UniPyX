@@ -3023,6 +3023,15 @@
             }
         }]
     },
+    "hyper":{
+        "p":"HYPER.EXE",
+        "fs":[{
+            "u":"http://cd.textfiles.com/phoenix2/01d/hyper25.zip",
+            "x":{
+                "HYPER.EXE":"HYPER.EXE"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

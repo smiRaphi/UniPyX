@@ -1256,5 +1256,9 @@
     "HIT":[
         "hit compressed archive",
         "hit archive data"
+    ],
+    "Hyper":[
+        "hyp archive data",
+        "hyper archive (compressed)"
     ]
 }

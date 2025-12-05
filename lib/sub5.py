@@ -310,5 +310,6 @@ def extract5(inp:str,out:str,t:str) -> bool:
             sys.argv = bargs
             if exists(of) and os.path.getsize(of): return
         case 'HIT': return msdos(['hit','x','-o',i],cwd=o)
+        case 'Hyper': return msdos(['hyper','-xoo',i],cwd=o)
 
     return 1
