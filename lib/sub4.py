@@ -1944,6 +1944,28 @@ def extract4(inp:str,out:str,t:str) -> bool:
             of.close()
             f.close()
             return
+        case 'XBIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+
+            assert f.read(4) == b'XBIN'
+            f._end = {b'4\x12':'<',b'\x124':'>'}[f.read(2)]
+            v = f.readu8()
+            f.skip(1)
+            s = f.readu32() - 0x10
+            f.skip(4)
+            if v in (4,5):
+                f.skip(4)
+                s -= 4
+
+            tst = f.read(4)
+            f.skip(-4)
+            try:tst = tst.decode('ascii').lower()
+            except:tst = 'bin'
+            open(o + '/' + tbasename(i) + '.' + tst,'wb').write(f.read(s))
+            f.close()
+            if s: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

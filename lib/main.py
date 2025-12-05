@@ -250,9 +250,10 @@ def analyze(inp:str,raw=False):
                 p = subprocess.Popen(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',x[1]],env=env,stdout=-1)
                 p.wait()
                 ret = p.stdout.read().decode(errors='ignore').strip() == 'True'
-            elif x[0] == 'ext': ret = inp.lower().endswith(x[1])
+            elif x[0] == 'ext': ret = inp.lower().endswith(tuple(x[1]) if type(x[1]) == list else x[1])
             elif x[0] == 'name': ret = basename(inp) == x[1]
             elif x[0] == 'print': print(*x[1:]);continue
+            elif type(x[0]) == bool and x[0] == False: tret = ret = False
             elif os.path.isfile(inp):
                 if x[0] == 'contain':
                     cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
@@ -392,15 +393,14 @@ def analyze(inp:str,raw=False):
                     f.seek(mn)
                     ret = reg.match(f.read(mx-mn)) != None
                     f.close()
-                elif type(x[0]) == bool and x[0] == False: tret = ret = False
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
             if xv.get('qq') and (type(x[-1]) != bool or x[-1]):
                 if ret:
                     tret = True
                     break
-            elif type(x[-1]) == bool and x[-1]: tret = tret or ret
-            else: tret = (tret or type(tret) != bool) and ret
-            if not ((xv.get('noq') or xv.get('qq')) and (type(x[-1]) != bool or x[-1])) and not tret: break
+            else:
+                tret = (tret or type(tret) != bool) and ret
+                if not tret: break
         if tret:
             if xv.get('s'):
                 nts = [xv['rs']]

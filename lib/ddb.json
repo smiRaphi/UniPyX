@@ -323,18 +323,22 @@
     },
     {
         "rqr":null,
-        "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0,true],
-             ["isat","\\x7F\\x43\\x4E\\x54\\x00\\0\\0\\1",0,true]],"noq":true,
+        "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],
+             ["isat","\\x7F\\x43\\x4E\\x54\\x00\\0\\0\\1",0]],"qq":true,
         "rs":"PS4 PKG","s":1
     },
     {
         "rqr":null,
-        "d":[["isat","\\x7F\\x46\\x49\\x48\\x01\\x80\\x03\\0",0,true]],"noq":true,
+        "d":[["isat","\\x7F\\x46\\x49\\x48\\x01\\x80\\x03\\0",0]],"qq":true,
         "rs":"PS5 PKG","s":1
     },
     {
         "d":[["s%",4096],["size",[268435456,null]],["isat","APA\\0",4],["isat","Sony Computer Entertainment Inc.",256],["isatS","\\0",28,100],["str0",16,32,0]],
         "rs":"PlayStation APA IMG","s":1
+    },
+    {
+        "d":[["isat","XBIN",0],["isat","\\0",7],["isin",["4\\x12","\\x124"],4],["isin",["\\2","\\4","\\5"],6]],
+        "rs":"XBIN","s":1
     },
     {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
@@ -576,7 +580,7 @@
         "rs":"SQUID","s":1
     },
     {
-        "d":[["isat","sR\\3",0,true],["isat","sR3",0,true],["isat","sR\\2",0,true]],"noq":true,
+        "d":[["isat","sR\\3",0],["isat","sR3",0],["isat","sR\\2",0]],"qq":true,
         "rs":"SR3"
     },
     {
@@ -841,7 +845,7 @@
     },
     {
         "rqr":null,
-        "d":[["isat","\\0\\0",9,false],["isat","\\0\\0",25,false],["n0",4,0,false],["n0",4,4,false],["n0",4,12,false],["ext",".xen"],["ext",".ps2"]],"qq":true,
+        "d":[["isat","\\0\\0",9],["isat","\\0\\0",25],["n0",4,0],["n0",4,4],["n0",4,12],["ext",[".xen",".ps2"]]],
         "rs":"Blitz Games Archive"
     },
     {
@@ -906,7 +910,7 @@
     },
     {
         "rqr":null,
-        "d":[["ext",".zh",true],["ext",".zhuff",true]],"noq":true,
+        "d":["ext",[".zh",".zhuff"]],
         "rs":"Zhuff"
     },
     {
@@ -934,7 +938,7 @@
         "rs":"XBP"
     },
     {
-        "d":[["ext",".snappy"],["ext",".iwa"]],"qq":true,
+        "d":["ext",[".snappy",".iwa"]],
         "rs":"Snappy"
     },
     {
