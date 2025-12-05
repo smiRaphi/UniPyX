@@ -338,7 +338,15 @@
     },
     {
         "d":[["isat","XBIN",0],["isat","\\0",7],["isin",["4\\x12","\\x124"],4],["isin",["\\2","\\4","\\5"],6]],
-        "rs":"XBIN","s":1
+        "rs":"HAL XBIN","s":1
+    },
+    {
+        "d":[["isin",["\\x04\\x22\\x4D\\x18","\\x28\\xB5\\x2F\\xFD"],4],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');return s>=(f.seek(0,2)-0x14)"]],
+        "rs":"HAL Switch CMP","s":1
+    },
+    {
+        "d":[["isat","YAML",0],["isat","\\0\\0\\0",5],["isat","\\0\\0\\0",9],["isin",["\\2","\\4","\\5"],4]],
+        "rs":"HAL YAML","s":1
     },
     {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],

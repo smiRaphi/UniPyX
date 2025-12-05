@@ -14,6 +14,7 @@ __pycache__
 !/bin/wiiudk.py
 !/bin/xb1key.py
 !/bin/BMS/xbp.bms
+!/bin/BMS/KirbySwitch-Decompress.bms
 !/bin/AssetRipper/client.py
 !/bin/tmd.py
 !/bin/sgkey.py

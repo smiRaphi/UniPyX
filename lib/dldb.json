@@ -3671,6 +3671,9 @@
         ]],
         "ts":0
     },
+    "kirbyswitch-decompress":{
+        "p":"BMS/KirbySwitch-Decompress.bms"
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

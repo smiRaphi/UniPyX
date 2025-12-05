@@ -1944,7 +1944,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             of.close()
             f.close()
             return
-        case 'XBIN':
+        case 'HAL XBIN':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i)
@@ -1966,6 +1966,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             open(o + '/' + tbasename(i) + '.' + tst,'wb').write(f.read(s))
             f.close()
             if s: return
+        case 'HAL Switch CMP': return quickbms('kirbyswitch-decompress')
+        case 'HAL YAML': raise NotImplementedError # https://github.com/firubii/KirbyLib/blob/main/KirbyLib/Yaml.cs
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
