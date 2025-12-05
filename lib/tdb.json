@@ -890,7 +890,9 @@
         "iff-text document (generic)",
         "iff flow idea processor format",
         "gamemaker studio game data archive",
-        "4d write document"
+        "4d write document",
+        "iff document storage",
+        "amiga prowrite/quickwrite document"
     ],
     "Xbox PIRS":[
         "xbox 360 pirs container data file"

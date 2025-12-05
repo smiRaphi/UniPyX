@@ -979,11 +979,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 elif name == b'NEST' and BTYPE == b'HEAD' and 'TXT' in FDATA:
                     FDATA['INDENT'] = f.readu16()
 
-                elif name == b'DOCU' and BTYPE == b'4WRT':
+                elif (name == b'DOCU' and BTYPE == b'4WRT') or (name == b'DOC ' and BTYPE == b'WORD'):
                     FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
                     cnt += 1
-                elif name == b'PARA' and BTYPE == b'4WRT':
+                elif (name == b'PARA' and BTYPE == b'4WRT') or (name in (b'HEAD',b'FOOT',b'PARA') and BTYPE == b'WORD'):
                     FDATA['TXT'].write(b'\r\n')
+
                 elif name == b'TEXT' and BTYPE == b'4WRT':
                     FDATA['TXT'].write(f.read(size))
                 elif name == b'PICT' and BTYPE == b'4WRT':
@@ -991,6 +992,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     open(fpath + '/' + p,'wb').write(f.read(size))
                     cnt += 1
                     FDATA['TXT'].write(f'<{p}>'.encode())
+
+                elif name == b'TABS' and BTYPE == b'WORD':
+                    FDATA['TXT'].write(b'\t')
+                elif name == b'TEXT' and BTYPE == b'WORD':
+                    FDATA['TXT'].write(f.read(size) + b'\r\n')
 
                 elif BTYPE == b'AUDO':
                     f.skip(-8)
