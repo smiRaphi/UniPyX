@@ -925,32 +925,36 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 epos = pos + size
 
                 if name == b'FORM':
-                    typ = f.read(4).strip(b'\0 \t\r\n')
+                    if BTYPE != b'4WRT':
+                        typ = f.read(4).strip(b'\0 \t\r\n')
 
-                    if BTYPE in (b'NSF1',b'NMF1') and typ[3:].isdigit(): typ = typ[:3]
+                        if BTYPE in (b'NSF1',b'NMF1') and typ[3:].isdigit(): typ = typ[:3]
 
-                    try: typ = '.' + typ.decode().lower()
-                    except: typ = '.iff'
-                    f.skip(-12)
+                        try: typ = '.' + typ.decode().lower()
+                        except: typ = '.iff'
+                        f.skip(-12)
 
-                    if not fname and FNAMES: fname = FNAMES.pop(0)
-                    fname = fpath + '/' + (fname or f'{cnt}')
-                    fcnt = 1
-                    while exists(fname + (typ if addext else '')):
-                        if fcnt > 1: fname = fname.rsplit('_',1)[0]
-                        fname += f'_{fcnt}'
-                        fcnt += 1
+                        if not fname and FNAMES: fname = FNAMES.pop(0)
+                        fname = fpath + '/' + (fname or f'{cnt}')
+                        fcnt = 1
+                        while exists(fname + (typ if addext else '')):
+                            if fcnt > 1: fname = fname.rsplit('_',1)[0]
+                            fname += f'_{fcnt}'
+                            fcnt += 1
 
-                    xopen(fname + (typ if addext else ''),'wb').write(f.read(8 + size))
-                    cnt += 1
+                        xopen(fname + (typ if addext else ''),'wb').write(f.read(8 + size))
+                        cnt += 1
+                        spath = fname + '_EXT'
+                    else: spath = fpath
 
                     f.seek(pos + 4)
-                    while f.pos < epos: read_block(fname + '_EXT')
+                    while f.pos < epos: read_block(spath)
                 elif name == b'WRCH' and BTYPE == b'NSF1':
                     f.skip(4)
                     while f.pos < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
                 elif name == b'NETN' and BTYPE in (b'NSF1',b'NMF1'):
                     FNAMES.append(f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
+
                 elif name == b'RIdx' and BTYPE == b'IFRS':
                     fc = f.readu32()
                     fs = []
@@ -965,6 +969,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 elif name == b'CHRS' and BTYPE == b'FTXT':
                     open(fpath + f'/{basename(i)}{cnt}.txt','wb').write(f.read(size).split(b'\0')[0])
                     cnt += 1
+
                 elif name == b'TEXT' and BTYPE == b'HEAD':
                     if not 'TXT' in FDATA:
                         FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
@@ -973,6 +978,20 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     FDATA['TXT'].write(b'  '*FDATA['INDENT'] + f.read(size) + b'\n')
                 elif name == b'NEST' and BTYPE == b'HEAD' and 'TXT' in FDATA:
                     FDATA['INDENT'] = f.readu16()
+
+                elif name == b'DOCU' and BTYPE == b'4WRT':
+                    FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
+                    cnt += 1
+                elif name == b'PARA' and BTYPE == b'4WRT':
+                    FDATA['TXT'].write(b'\r\n')
+                elif name == b'TEXT' and BTYPE == b'4WRT':
+                    FDATA['TXT'].write(f.read(size))
+                elif name == b'PICT' and BTYPE == b'4WRT':
+                    p = f'{basename(i)}{cnt}.pict'
+                    open(fpath + '/' + p,'wb').write(f.read(size))
+                    cnt += 1
+                    FDATA['TXT'].write(f'<{p}>'.encode())
+
                 elif BTYPE == b'AUDO':
                     f.skip(-8)
                     size = f.readu32()
@@ -991,6 +1010,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
             while (f.pos+8) <= f.size:
                 if read_block(o):break
                 if f.pos % 2: f.skip(1)
+            if 'TXT' in FDATA:
+                try: FDATA['TXT'].close()
+                except: pass
             if cnt: return
         case 'Xbox XB Compressed':
             run(['xbdecompress','/Y','/T',i,o])
@@ -1893,6 +1915,29 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + n,'wb').write(f.read(fl))
                 f.skip(1)
             if os.listdir(o): return
+        case 'Across Crossword Puzzle':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(0x2C)
+            w,h = f.readu8(),f.readu8()
+            clus = f.readu16()
+            f.skip(4)
+
+            solv = b'\r\n'.join(f.read(w) for _ in range(h))
+            grid = b'\r\n'.join(f.read(w) for _ in range(h))
+
+            of = open(o + '/' + tbasename(i) + '.txt','wb')
+            of.write(f.read0s() + b'\r\n')
+            at = f.read0s()
+            of.write(at + (b' ' if at and at[-1] != 0x20 else b'') + f.read0s() + b'\r\n\r\n' + grid + b'\r\n\r\n' + solv + b'\r\n\r\n' + b'\r\n'.join(f.read0s() for _ in range(clus)) + b'\r\n\r\n')
+            while f:
+                n = f.read0s()
+                if n: of.write(n + b'\r\n')
+            of.close()
+            f.close()
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

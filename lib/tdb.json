@@ -889,7 +889,8 @@
         "blorb interactive fiction package",
         "iff-text document (generic)",
         "iff flow idea processor format",
-        "gamemaker studio game data archive"
+        "gamemaker studio game data archive",
+        "4d write document"
     ],
     "Xbox PIRS":[
         "xbox 360 pirs container data file"
@@ -1260,5 +1261,11 @@
     "Hyper":[
         "hyp archive data",
         "hyper archive (compressed)"
+    ],
+    "Switch XCI":[
+        "nintendo switch cartridge image (xci)"
+    ],
+    "Across Crossword Puzzle":[
+        "across crossword puzzle"
     ]
 }

@@ -38,6 +38,15 @@ class File:
     def reads64(self,end=None) -> int: return struct.unpack((end or self._end)+'q',self.read(8))[0]
     def readfloat(self,end=None) -> float: return struct.unpack((end or self._end)+'f',self.read(4))[0]
 
+    def read0s(self):
+        r = b''
+        b = b''
+        while True:
+            b = self.reads()
+            if not b or b == b'\0':break
+            r += b
+        return r
+
     def writeu8 (self,data:int): return self.write(struct.pack('B',data))
     def writeu16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'H',data))
     def writeu32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'I',data))
