@@ -357,6 +357,10 @@
         "rs":"Bezel Shader Pack","s":1
     },
     {
+        "d":[["isat","MsgStdBn",0],["isin",["\\xFE\\xFF\\x00\\x00\\x01\\x03","\\xFF\\xFE\\x03\\x01\\x00\\x00"],8]],
+        "rs":"Nintendo MSBT","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },

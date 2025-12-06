@@ -3019,6 +3019,13 @@
         }],
         "ts":0
     },
+    "ce_msbt":{
+        "p":"ce_msbt.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/Treeki/CylindricalEarth/master/msbt.py",
+            "ce_msbt.py"
+        ]]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

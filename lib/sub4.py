@@ -2037,6 +2037,29 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fs: return
+        case 'Nintendo MSBT':
+            db.get('ce_msbt')
+            if db.print_try: print('Trying with ce_msbt')
+            import bin.ce_msbt as msbt # type: ignore
+
+            d = open(i,'rb').read()
+            end = {b'\xFF\xFE':'<',b'\xFE\xFF':'>'}[d[8:10]]
+
+            msbt._unpfr = msbt.struct.unpack_from
+            def punpfr(f,d,o=0):
+                f = f.strip('<>')
+                if f == 'HxxHII': f = 'HxxHHxxI'
+                r = msbt._unpfr(end + f,d,o)
+                if f == 'HxxHHxxI':
+                    r = list(r)
+                    return r[:1] + [0x301] + r[2:]
+                return r
+            msbt.struct.unpack_from = punpfr
+
+            mso = msbt.MSBT()
+            mso.load(d)
+            open(o + '/' + tbasename(i) + '.xml','wb').write(msbt.ET.tostring(mso.generate_xml(),'utf-8'))
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
