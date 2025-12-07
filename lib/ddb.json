@@ -365,6 +365,10 @@
         "rs":"Star Fox DAT"
     },
     {
+        "d":[["s%",16],["isat","\\xFF\\xFF\\xFF\\xFF",20],["n0",4,0],["n0",4,8],["py","f=open(inp,'rb');f.seek(4);xc=int.from_bytes(f.read(4),'big');so=int.from_bytes(f.read(4),'big');xl=12+xc*12;xl+=-xl%8;f.seek(xl);return xl==so and not sum(f.read(8))"]],
+        "rs":"Nintendo Table"
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },

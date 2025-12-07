@@ -49,8 +49,15 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             if os.listdir(o): return
         case 'Yaz0':
-            run(['wszst','DEC',i,'-o','-E$','-d',o + '\\' + tbasename(i)])
-            if exists(o + '\\' + tbasename(i)): return
+            tf = TmpFile('.bin',path=o)
+            run(['wszst','DEC',i,'-o','-E$','-d',tf])
+            if exists(tf.p):
+                tg = open(tf.p,'rb').read(4)
+                if tg == b'RARC': extract4(tf.p,o,'RARC')
+                elif tg == b'SARC': extract4(tf.p,o,'SARC')
+                else: mv(tf.p,o + '\\' + tbasename(i))
+                tf.destroy()
+                return
         case 'LZSS'|'LZ77':
             run(['gbalzss','d',i,o + '\\' + tbasename(i)])
             if exists(o + '\\' + tbasename(i)): return
@@ -2061,6 +2068,28 @@ def extract4(inp:str,out:str,t:str) -> bool:
             open(o + '/' + tbasename(i) + '.xml','wb').write(msbt.ET.tostring(mso.generate_xml(),'utf-8'))
             return
         case 'Star Fox DAT': return quickbms('star_fox_zero_dat')
+        case 'Nintendo Table':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu32()
+            f.skip(4)
+            f.seek(f.readu32())
+            fs = []
+            for _ in range(c): fs.append((f.readu32(),f.readu32()))
+
+            if len(fs) == 1 and not f: return
+            of = open(o + '/' + tbasename(i) + '.txt','wb')
+            bo = f.pos
+            for ix,off in fs:
+                f.seek(bo + off)
+                of.write(str(ix).zfill(3).encode() + b'\n')
+                of.write(f.read0s())
+                of.write(b'\n\n')
+            f.close()
+            of.close()
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
