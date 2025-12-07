@@ -2060,6 +2060,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             mso.load(d)
             open(o + '/' + tbasename(i) + '.xml','wb').write(msbt.ET.tostring(mso.generate_xml(),'utf-8'))
             return
+        case 'Star Fox DAT': return quickbms('star_fox_zero_dat')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

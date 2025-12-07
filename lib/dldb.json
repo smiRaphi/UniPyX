@@ -3689,6 +3689,13 @@
         ]],
         "ts":0
     },
+    "star_fox_zero_dat":{
+        "p":"BMS/star_fox_zero_dat.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/star_fox_zero_dat.bms",
+            "BMS/star_fox_zero_dat.bms"
+        ]]
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
