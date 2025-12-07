@@ -369,11 +369,14 @@
         "rs":"Nintendo Table"
     },
     {
+        "d":[["isat","MESG",0],["isatS","\\0",12,20],["isin",["1gmb","bmg1"],4],["n0",4,8],["n0",4,12]],
+        "rs":"Nintendo Message BMG","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },
     {
-        "rqr":null,
         "d":[["isat","NSO0",0],["isat","\\0\\0\\0\\0\\x3F\\0\\0\\0",8],["isatS","\\0",28,108]],
         "rs":"Compressed Nintendo Switch Executable","s":1
     },
@@ -516,13 +519,13 @@
     },
     {
         "d":["contain","\\xE1\\x12\\x6F\\x5A",[-269,null]],
-        "rs":"Unreal Engine Package"
+        "rs":"UE4 Package"
     },
     {
-        "rq":"Unreal Engine Package",
+        "rq":"UE4 Package",
         "d":[["ext","data"],["py","return exists(inp + '.js')"]],
         "rs":"Unreal Engine Web Package","s":1},{
-        "rq":"Unreal Engine Package",
+        "rq":"UE4 Package",
         "d":[["ext","gz"],["py","return inp.endswith('.data.gz') and exists(inp[:-2] + 'js.gz')"]],
         "rs":"Unreal Engine Web Package","s":1
     },
@@ -835,6 +838,11 @@
         "rqr":null,
         "d":[["ext",".arg"],["isat","\\0",0],["isat","\\1",-1],["str0",1,2,1]],
         "rs":"ARG"
+    },
+    {
+        "rqr":null,
+        "d":[["isatS","\\0",13,-13],["str0e",0,300,1]],
+        "rs":"UE Text Resource"
     },
     {
         "rqr":null,

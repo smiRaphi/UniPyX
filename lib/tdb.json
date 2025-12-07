@@ -1269,5 +1269,15 @@
     ],
     "Across Crossword Puzzle":[
         "across crossword puzzle"
+    ],
+    "UE4 Package":[
+        "unrealengine\\ue4 package"
+    ],
+    "UE3 Package":[
+        "ue3 unreal package (le)",
+        "ue3 unreal package (be)",
+        "unrealengine\\unreal package",
+        "unreal engine package (little-endian)",
+        "unreal engine package (big-endian)"
     ]
 }

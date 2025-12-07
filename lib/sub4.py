@@ -357,15 +357,26 @@ def extract4(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + basename(o) + '_'
             run(['tdedecrypt',i + '_',of])
             if exists(of[:-1]) and (os.path.getsize(of[:-1]) or not os.path.getsize(i)): return
-        case 'Unreal Engine Package':
-            if '/Content/' in i.split()[-1].replace('\\','/'): prgf = dirname(i.replace('\\','/').rsplit('/Content/',1)[0]) + '/Engine/Programs'
-            else: prgf = None
-            run(['unrealpak',i,'-Extract',o])
-            if prgf and exists(prgf): remove(prgf)
-            if os.listdir(o): return
-
+        case 'UE4 Package':
             run(['repak','unpack','-o',o,'-q','-f',i])
             if os.listdir(o): return
+
+            td = TmpDir()
+            tds = td + '\\s\\s'
+            mkdir(tds)
+
+            for v in ('5.6.1','4.27.2','4.26.2','4.25.4','4.24.3','4.22.3','4.21.2','4.20.3','4.19.2','4.12.0','4.27.0','4.25.3'):
+                v = 'unrealpak_' + v
+                std = TmpDir(path=tds)
+                for f in rldir(dirname(db.get(v))): symlink(f,std.p + '\\' + basename(f))
+
+                if db.print_try: print('Trying with',v)
+                print(run([std + '\\UnrealPak.exe',i,'-Extract',o],cwd=std.p,print_try=False))
+                std.destroy()
+                if os.listdir(o):
+                    td.destroy()
+                    return
+            td.destroy()
         case 'Unreal ZenLoader':
             if '/Content/' in i.split()[-1].replace('\\','/'): prgf = dirname(i.replace('\\','/').rsplit('/Content/',1)[0]) + '/Engine/Programs'
             else: prgf = None
@@ -678,7 +689,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive'|\
              'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive'|\
              'Gabriel Knight 3 Barn Game Archive'|'Haemimont Games AD Game Archive'|'Harry Potter: Quidditch World Cup Game Archive'|\
-             'Highway Pursuit Game Archive':
+             'Highway Pursuit Game Archive'|'UE3 Package':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -2089,6 +2100,27 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 of.write(b'\n\n')
             f.close()
             of.close()
+            return
+        case 'Nintendo Message BMG':
+            db.get('ndspy_bmg')
+            if db.print_try: print('Trying with ndspy_bmg')
+            sys.modules['bin._common'] = str
+            from bin.ndspy_bmg import BMG # type: ignore
+
+            bmg = BMG(b'MESGbmg1' + open(i,'rb').read()[8:])
+            assert bmg.messages
+            if bmg.scripts: raise NotImplementedError
+            if bmg.labels: raise NotImplementedError
+            if bmg.instructions: raise NotImplementedError
+
+            open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join([str(m) for m in bmg.messages]) + '\n')
+            return
+        case 'UE Text Resource':
+            if db.print_try: print('Trying with custom extractor')
+            txt = open(i,'rb').read().replace(b'\0',b'\r\n\r\n').rstrip(b'\r\n')
+            try: txt.decode()
+            except: return 1
+            open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
             return
 
         case 'Ridge Racer V A':

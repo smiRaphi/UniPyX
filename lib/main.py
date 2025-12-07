@@ -73,8 +73,8 @@ def rldir(i:str,files=True) -> list[str]:
 TMP = os.getenv('TEMP').strip('\\') + '\\'
 def gtmp(suf=''): return TMP + 'tmp' + os.urandom(8).hex() + suf
 class TmpDir:
-    def __init__(self,mdir=True):
-        self.p = gtmp()
+    def __init__(self,mdir=True,path=TMP):
+        self.p = path.strip('\\/') + '\\' + 'tmp' + os.urandom(8).hex()
         if mdir: self.mkdir()
     def mkdir(self): mkdir(self.p)
     def destroy(self):
@@ -85,7 +85,7 @@ class TmpDir:
     def __radd__(self,i): return i + self.p
     def __del__(self): self.destroy()
 class TmpFile:
-    def __init__(self,suf='',name='',path=TMP): self.p = path + '\\' + (name or ('tmp' + os.urandom(8).hex() + suf))
+    def __init__(self,suf='',name='',path=TMP): self.p = path.strip('\\/') + '\\' + (name or ('tmp' + os.urandom(8).hex() + suf))
     def link(self,i): symlink(i,self.p)
     def copy(self,i): cp(i,self.p)
     def destroy(self):
@@ -407,6 +407,7 @@ def analyze(inp:str,raw=False):
                 nts = [xv['rs']]
                 break
             else: nts.append(xv['rs'])
+    nts = list(set(nts))
     if not raw and not nts: print(ts)
 
     db.print_try = opt
