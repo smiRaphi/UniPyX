@@ -378,6 +378,10 @@
         "rs":"Nintendo Message BMG","s":1
     },
     {
+        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["str0",16,12,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');f.seek(8);return (4+c*0x18)==int.from_bytes(f.read(4),'big')"]],
+        "rs":"Nintend Puzzle Archive"
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },

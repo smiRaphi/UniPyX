@@ -1279,5 +1279,8 @@
         "unrealengine\\unreal package",
         "unreal engine package (little-endian)",
         "unreal engine package (big-endian)"
+    ],
+    "Nintendo Wii WAD":[
+        "nintendo wii data"
     ]
 }

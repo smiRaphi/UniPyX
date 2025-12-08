@@ -2128,6 +2128,18 @@ def extract4(inp:str,out:str,t:str) -> bool:
             open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
             return
         case 'Encrypted Rclone Config': raise NotImplementedError # https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/obscure/obscure.go#L19 https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/crypt.go#L74
+        case 'Nintend Puzzle Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32(),f.read(0x10).strip(b'\0').decode()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                open(o + '/' + fe[2],'wb').write(f.read(fe[0]))
+            f.close()
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
