@@ -108,6 +108,11 @@
         "rs":"EAC Payload","s":1
     },
     {
+        "t":"text",
+        "d":["contain","RCLONE_ENCRYPT_V0:\\n",[0,100]],
+        "rs":"Encrypted Rclone Config"
+    },
+    {
         "rqr":"Generic Win/DOS Executable",
         "d":[["isat","GDPC",-4],["contain","pck\\0\\0\\0\\0\\0",[384,911]]],
         "rs":"Godot Game","s":1
@@ -357,7 +362,7 @@
         "rs":"Bezel Shader Pack","s":1
     },
     {
-        "d":[["isat","MsgStdBn",0],["isin",["\\xFE\\xFF\\x00\\x00\\x01\\x03","\\xFF\\xFE\\x03\\x01\\x00\\x00"],8]],
+        "d":[["isat","MsgStdBn",0],["isat","\\0\\0\\1\\3",10],["isin",["\\xFE\\xFF","\\xFF\\xFE"],8]],
         "rs":"Nintendo MSBT","s":1
     },
     {

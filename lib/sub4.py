@@ -2062,20 +2062,25 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             d = open(i,'rb').read()
             end = {b'\xFF\xFE':'<',b'\xFE\xFF':'>'}[d[8:10]]
+            tbe = {'<':'little','>':'big'}[end]
 
             msbt._unpfr = msbt.struct.unpack_from
             def punpfr(f,d,o=0):
                 f = f.strip('<>')
-                if f == 'HxxHII': f = 'HxxHHxxI'
+                if f == 'HxxHII': return (0,0x301,3,0)
+
                 r = msbt._unpfr(end + f,d,o)
-                if f == 'HxxHHxxI':
-                    r = list(r)
-                    return r[:1] + [0x301] + r[2:]
+                if f == '4sI':
+                    if r[0] == b'TSY1':
+                        d[:] = d[:o+0x10] + (r[1]//4).to_bytes(4,tbe) + (4).to_bytes(4,tbe)\
+                             + d[o+0x10:o+0x10+r[1]] + b'\xAB'*(-(r[1] + 8) % 0x10) + d[o+0x10+r[1]+(-r[1] % 0x10):]
+                        r = (b'ATR1',r[1]+8)
+
                 return r
             msbt.struct.unpack_from = punpfr
 
             mso = msbt.MSBT()
-            mso.load(d)
+            mso.load(bytearray(d))
             open(o + '/' + tbasename(i) + '.xml','wb').write(msbt.ET.tostring(mso.generate_xml(),'utf-8'))
             return
         case 'Star Fox DAT': return quickbms('star_fox_zero_dat')
@@ -2122,6 +2127,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             except: return 1
             open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
             return
+        case 'Encrypted Rclone Config': raise NotImplementedError # https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/obscure/obscure.go#L19 https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/crypt.go#L74
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
