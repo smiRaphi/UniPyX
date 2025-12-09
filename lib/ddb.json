@@ -209,6 +209,10 @@
         "rs":"GC opening.bnr","s":1
     },
     {
+        "d":[["n0",1,-5],["n0",3,-8],["py","f=open(inp,'rb');s=f.seek(-8,2)+8;cs=int.from_bytes(f.read(3),'little');hs=f.read(1)[0]\nif hs<8 or s not in (cs+(-cs%4)+8,cs+(-cs%2)+hs):return\nf.seek(-hs,2);return not f.read(hs-8).strip(b'\\xFF')"]],
+        "rs":"Backward LZ"
+    },
+    {
         "d":["isat","FSYS\\0",0],
         "rs":"Pokemon FSYS","s":1
     },
@@ -389,6 +393,10 @@
     {
         "d":[["isat","NPAC",0],["isat","NPAC\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",-32]],
         "rs":"Soulcalibur Legends NPAC","s":1
+    },
+    {
+        "d":[["isat","NARC\\xFE\\xFF\\x00\\x01",0],["isat","\\x10\\x00\\x03\\x00BTAF",12],["n0",4,8],["n0",4,20],["n0",4,24]],
+        "rs":"NitroARC","s":1
     },
     {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],

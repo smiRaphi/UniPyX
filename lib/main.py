@@ -145,7 +145,7 @@ def analyze(inp:str,raw=False):
 
     for wt in ('plain text','Plain text','ASCII text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch'):
+               'Adobe Photoshop Color swatch','Gazebo model Configuration'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
@@ -381,7 +381,10 @@ def analyze(inp:str,raw=False):
                     f.close()
                 elif x[0] == 'n0':
                     f = open(inp,'rb')
-                    f.seek(x[2])
+                    sp = x[2]
+                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = 0
+                    f.seek(sp)
                     ret = sum(f.read(x[1])) != 0
                     f.close()
                 elif x[0] == 'reg':

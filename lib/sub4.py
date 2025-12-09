@@ -2161,6 +2161,19 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(f'{o}/{id}.bin','wb').write(f.read(s))
                 f.seek(np)
             if os.listdir(o) or np == 0: return
+        case 'Backward LZ':
+            tf = TmpFile(path=o)
+            run(['blz','-d',i,tf])
+            if not exists(tf.p) or not os.path.getsize(tf.p): return 1
+            if open(tf.p,'rb').read(4) == b'NARC' and not extract4(tf.p,o,'NitroARC'):pass
+            else: mv(tf.p,o + '/' + tbasename(i))
+            tf.destroy()
+            return
+        case 'NitroARC':
+            run(['narchive','extract',i,'-o',o])
+            if os.listdir(o): return
+            run(['narchive','extract',i,'-o',o,'-nf'])
+            if os.listdir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

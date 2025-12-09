@@ -125,7 +125,8 @@
     ],
     "VirtualBox Disk Image":[
         "virtualbox disk image (oracle)",
-        "virtualbox disk image (generic)"
+        "virtualbox disk image (generic)",
+        "virtual disk image"
     ],
     "ISO":[
         "iso 9660 cd image",

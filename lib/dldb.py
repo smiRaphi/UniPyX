@@ -177,7 +177,7 @@ class DLDB:
                             if r.headers.get('Content-Length') and not int(r.headers['Content-Length']): continue
                             for c in r.iter_bytes(4096): f.write(c)
                         break
-                    except httpx.ConnectError: pass
+                    except (httpx.ConnectError,httpx.ConnectTimeout): pass
                     except httpx.ReadTimeout: start = f.tell()
                 else: f.write(cl.get(url,follow_redirects=True,**kwargs).content)
         except:

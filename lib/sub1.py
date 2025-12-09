@@ -372,7 +372,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + tbasename(i),'wb').write(f)
                 return
         case 'VirtualBox Disk Image':
-            td = TmpDir()
+            td = TmpDir(path=o)
             run(['7z','x',i,'-o' + td,'-aoa'])
             if os.path.exists(td + '/1.img'):
                 run(['7z','x',td + '/1.img','-o' + o,'-aoa'])

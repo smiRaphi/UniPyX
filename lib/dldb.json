@@ -3002,6 +3002,24 @@
             }
         }]
     },
+    "blz":{
+        "p":"blz.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/blz.exe"
+        ]
+    },
+    "narchive":{
+        "p":"Narchive/Narchive.exe",
+        "fs":[{
+            "u":"https://github.com/nickworonekin/narchive/releases/download/v1.0.2/Narchive-1.0.2.zip",
+            "x":{
+                "Narchive.exe":"Narchive/Narchive.exe",
+                "Narchive.exe.config":"Narchive/Narchive.exe.config",
+                "McMaster.Extensions.CommandLineUtils.dll":"Narchive/McMaster.Extensions.CommandLineUtils.dll",
+                "System.ValueTuple.dll":"Narchive/System.ValueTuple.dll"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

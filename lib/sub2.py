@@ -505,7 +505,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     f.skip(1)
                     disk_pos = f.pos - 0x10
 
-                    name = f.read(4).strip(b' \0').decode()
+                    name = f.read(4).strip(b' \0\xFF').decode('ascii')
                     if name: od = o + '/' + name;mkdir(od)
                     f.skip(0x24)
 
@@ -518,7 +518,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 elif blockt == 2: FC = f.readu8()
                 elif blockt == 3:
                     bname = f'{f.readu8()}_{f.readu8()}'
-                    name = f.read(8).strip(b' \0').decode() or bname
+                    name = f.read(8).strip(b' \0\xFF').decode('ascii') or bname
                     f.skip(2)
                     size = f.readu16()
                     if not '.' in name: name += '.' + ('prg','chr','nam')[f.readu8()]
