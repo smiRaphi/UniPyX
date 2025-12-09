@@ -2993,6 +2993,15 @@
             "ndspy_bmg.py"
         ]]
     },
+    "byml-to-yaml":{
+        "p":"byml-to-yaml.exe",
+        "fs":[{
+            "u":"https://github.com/ArchLeaders/byml_to_yaml/releases/download/1.0.0-rc1/byml-to-yaml-1.0.0-rc1-windows.zip",
+            "x":{
+                "byml-to-yaml.exe":"byml-to-yaml.exe"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{
@@ -3665,18 +3674,6 @@
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
-        "fs":[{
-            "u":"https://files.prodkeys.net/Prodkeys.NET_v21-0-0.zip",
-            "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
-            },
-            "ts":1763976235
-        }],
-        "ts":1763976235
-    },
-    "titlekeys":{
-        "p":"prodkeys/title.keys",
         "fs":[{
             "u":"https://files.prodkeys.net/Prodkeys.NET_v21-0-0.zip",
             "x":{

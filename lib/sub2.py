@@ -134,7 +134,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             return
         case 'Switch NSP'|'Switch NCA'|'Switch XCI':
             for k in ('prod','dev'):
-                bcd = ['hac2l','-t',{'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t],'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + db.get('titlekeys')]
+                bcd = ['hac2l','-t',{'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t],'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + dirname(db.get(k+'keys')) + '\\title.keys']
                 _,e,_ = run(bcd + [i],print_try=False)
                 bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
                 if ' MetaType=Patch ' in e and not ' MetaType=App ' in e:

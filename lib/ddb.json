@@ -382,6 +382,11 @@
         "rs":"Nintend Puzzle Archive"
     },
     {
+        "d":[["isin",["YB\\x01\\0","YB\\x02\\0","YB\\x03\\0","YB\\x04\\0","YB\\x05\\0","YB\\x06\\0","YB\\x07\\0","YB\\x08\\0","YB\\x09\\0","YB\\x0A\\0",
+                      "BY\\0\\x01","BY\\0\\x02","BY\\0\\x03","BY\\0\\x04","BY\\0\\x05","BY\\0\\x06","BY\\0\\x07","BY\\0\\x08","BY\\0\\x09","BY\\0\\x0A"],0]],
+        "rs":"Nintendo Binary YAML"
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },

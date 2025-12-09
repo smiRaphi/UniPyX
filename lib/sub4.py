@@ -2140,6 +2140,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + fe[2],'wb').write(f.read(fe[0]))
             f.close()
             if fs: return
+        case 'The Binding of Isaac Resource': raise NotImplementedError
+        case 'Nintendo Binary YAML':
+            of = o + '\\' + tbasename(i) + '.yml'
+            run(['byml-to-yaml','to-yaml',i,'-o',of])
+            if exists(of) and os.path.getsize(of): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
