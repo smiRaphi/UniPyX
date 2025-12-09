@@ -387,6 +387,10 @@
         "rs":"Nintendo Binary YAML"
     },
     {
+        "d":[["isat","NPAC",0],["isat","NPAC\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",-32]],
+        "rs":"Soulcalibur Legends NPAC","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },
@@ -855,7 +859,7 @@
     },
     {
         "rqr":null,
-        "d":[["isatS","\\0",13,-13],["str0e",0,300,1]],
+        "d":[["isatS","\\0",13,-13],["str0e",0,300,1],["py","f=open(inp,'rb')\ntry:[x.decode() for x in f.read(0x1000).split(b'\\0')]\nexcept:return\nreturn True"]],
         "rs":"UE Text Resource"
     },
     {

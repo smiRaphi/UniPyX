@@ -690,4 +690,5 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             open(of,'wb').write(d)
             return
+
     return 1

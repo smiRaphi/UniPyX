@@ -2145,6 +2145,22 @@ def extract4(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + tbasename(i) + '.yml'
             run(['byml-to-yaml','to-yaml',i,'-o',of])
             if exists(of) and os.path.getsize(of): return
+        case 'Soulcalibur Legends NPAC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            while f:
+                np = f.pos
+                assert f.read(4) == b'NPAC',np
+                np += f.readu32()
+                s = f.readu32()
+                id = f.reads32()
+                if id == -1: break
+                f.skip(0x10)
+                open(f'{o}/{id}.bin','wb').write(f.read(s))
+                f.seek(np)
+            if os.listdir(o) or np == 0: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
