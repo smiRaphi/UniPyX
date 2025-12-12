@@ -15,8 +15,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
                         for sf in os.listdir(o + '/' + sd):
                             if sf in ['$SYS','files']: continue
                             remove(o + '/' + sd + '/' + sf)
-                        copydir(o + '/' + sd + '/files',o + '/' + sd,True)
-                        if sd == 'DATA': copydir(o + '/DATA',o,True)
+                        copydir(o + '/' + sd + '/files',o + '/' + sd,True,reni=True)
+                        if sd == 'DATA': copydir(o + '/DATA',o,True,reni=True)
                         else: rename(o + '/' + sd,o + '/$' + sd)
                 else:
                     rename(o + '/sys',o + '/$SYS')

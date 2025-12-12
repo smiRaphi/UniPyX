@@ -2189,6 +2189,78 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if os.listdir(o): return
             run(['narchive','extract',i,'-o',o,'-nf'])
             if os.listdir(o): return
+        case 'Super Monkey Ball Tip \'n Tilt String Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu32()
+            se = [f.read(f.readu16()) for _ in range(c)]
+            f.close()
+            open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(se) + b'\n')
+            if se: return
+        case 'String16 Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            se = []
+            while f: se.append(f.read(f.readu16()))
+            f.close()
+            open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(se) + b'\n')
+            if se: return
+        case 'Super Monkey Ball Tip \'n Tilt PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu16()
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.readu32()))
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[1])
+
+                fp = o + f'/{ix}'
+                if d[:4] == b'\x89PNG':ex = 'png'
+                elif d[:4] == b'MThd':ex = 'mid'
+                elif d[14:18] == b'\x89PNG':
+                    open(fp + '_ext.png','wb').write(d[14:14+int.from_bytes(d[10:14],'big')])
+                    ex = 'image'
+                else: ex = 'bin'
+
+                open(fp + '.' + ex,'wb').write(d)
+            f.close()
+            if fs: return
+        case 'Super Monkey Ball SPG2':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            assert f.read(4) == b'SPG2'
+            c = 0
+            while f:
+                s = f.readu32()
+                f.skip(5)
+                d = f.read(s)
+
+                fp = o + f'/{c}'
+                fu32 = int.from_bytes(d[:4],'big')
+                if d[:4] == b'\x89PNG':ex = 'png'
+                elif d[:4] == b'MThd':ex = 'mid'
+                elif d[:4] == b'RIFF':ex = 'wav'
+                elif fu32 < len(d) and d[fu32+4:fu32+8] == b'\x89PNG':
+                    open(fp + '_ext.png','wb').write(d[fu32+4:])
+                    ex = 'image'
+                else:ex = 'bin'
+
+                open(fp + '.' + ex,'wb').write(d)
+                c += 1
+            f.close()
+            if c: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

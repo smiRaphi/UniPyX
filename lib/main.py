@@ -47,7 +47,12 @@ def move(i:str,o:str):
         copy(i,o)
         remove(i)
 mv = move
-def copydir(i:str,o:str,delete=False):
+def copydir(i:str,o:str,delete=False,reni=False):
+    if reni:
+        assert delete
+        ni = dirname(i) + '\\tmp' + os.urandom(8).hex()
+        mv(i,ni)
+        i = ni
     mkdir(o)
     cfnc = cp
     if delete and abspath(i)[0].lower() == abspath(o)[0].lower(): cfnc = move
