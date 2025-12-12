@@ -2110,9 +2110,24 @@ def extract4(inp:str,out:str,t:str) -> bool:
             db.get('ndspy_bmg')
             if db.print_try: print('Trying with ndspy_bmg')
             sys.modules['bin._common'] = str
-            from bin.ndspy_bmg import BMG # type: ignore
+            import bin.ndspy_bmg as bmg # type: ignore
 
-            bmg = BMG(b'MESGbmg1' + open(i,'rb').read()[8:])
+            bmg._unpfr = bmg.struct.unpack_from
+            bmg._SKIPB = 0
+            def punpfr(f,d,o=0):
+                r = bmg._unpfr(f,d,o)
+                if f.strip('<>') == '4sI':
+                    if r[0] == b'MID1':
+                        bmg._SKIPB = 1
+                        return (b'FLI1',r[1])
+                elif f.strip('<>') == 'HHI' and bmg._SKIPB:
+                    bmg._SKIPB = 0
+                    return (0,8,0)
+
+                return r
+            bmg.struct.unpack_from = punpfr
+
+            bmg = bmg.BMG(b'MESGbmg1' + open(i,'rb').read()[8:])
             assert bmg.messages
             if bmg.scripts: raise NotImplementedError
             if bmg.labels: raise NotImplementedError
