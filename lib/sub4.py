@@ -2261,6 +2261,40 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 c += 1
             f.close()
             if c: return
+        case 'PlayStation SFO':
+            if db.print_try: print('Trying with custom extractor')
+            import struct
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'\0PSF'
+            f.skip(4)
+            ko,do,ec = f.readu32(),f.readu32(),f.readu32()
+            es = []
+            for _ in range(ec):
+                e = [f.readu16() + ko,f.readu16(),f.readu32()]
+                f.skip(4)
+                es.append(e + [f.readu32() + do])
+
+            oo = {}
+            for e in es:
+                f.seek(e[0])
+                k = f.read0s().decode('utf-8')
+                f.seek(e[3])
+                d = f.read(e[2])
+
+                if e[1] == 0x0204: d = d.strip(b'\0').decode('utf-8')
+                elif e[1] == 0x0304:
+                    if d.endswith(b'\0\0'): d = d[:-2]
+                    d = d.decode('utf-16le')
+                elif e[1] in (0x0004,0x0008,0x0010,0x0020,0x0104,0x0108,0x0110,0x0120,0x0404): d = int.from_bytes(d,'little')
+                elif e[1] == 0x0504: d = struct.unpack('<f',d)[0]
+                elif e[1] in (0x0000,0x0100): d = None
+
+                oo[k] = d
+            if oo:
+                json.dump(oo,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2)
+                return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

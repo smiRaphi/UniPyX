@@ -190,22 +190,29 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 remove(tf.p + '_decrypted.iso')
             if not extract(i,o,'ISO'): return
         case 'PSVita PKG':
-            import zlib,base64
             if exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
             elif exists(noext(i) + '.work.bin'): work = noext(i) + '.work.bin'
-            else: return 1
+            else:
+                f = open(i,'rb')
+                f.seek(0x10)
+                ms = int.from_bytes(f.read(4),'big')
+                f.close()
+                if ms >= 0x140: return 1
+                work = None
 
-            ZRIF_DICT = zlib.decompress(base64.b64decode(b"eNpjYBgFo2AU0AsYAIElGt8MRJiDCAsw3xhEmIAIU4N4AwNdRxcXZ3+/EJCAkW6Ac7C7ARwYgviuQAaIdoPSzlDaBUo7QmknIM3ACIZM78+u7kx3VWYEAGJ9HV0="))
-            rif = open(work,'rb').read()
-            c = zlib.compressobj(level=9,wbits=10,memLevel=8,zdict=ZRIF_DICT)
-            bn = c.compress(rif)
-            bn += c.flush()
-            if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
-            zrif = base64.b64encode(bn).decode()
+            if work:
+                import zlib,base64
+                ZRIF_DICT = zlib.decompress(base64.b64decode(b"eNpjYBgFo2AU0AsYAIElGt8MRJiDCAsw3xhEmIAIU4N4AwNdRxcXZ3+/EJCAkW6Ac7C7ARwYgviuQAaIdoPSzlDaBUo7QmknIM3ACIZM78+u7kx3VWYEAGJ9HV0="))
+                rif = open(work,'rb').read()
+                c = zlib.compressobj(level=9,wbits=10,memLevel=8,zdict=ZRIF_DICT)
+                bn = c.compress(rif)
+                bn += c.flush()
+                if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
+                zrif = base64.b64encode(bn).decode()
 
             osj = OSJump()
             osj.jump(o)
-            run(['pkg2zip','-x',i,zrif])
+            run(['pkg2zip','-x',i] + ([zrif] if work else []))
             if exists('app') and os.listdir('app') and os.listdir('app/' + os.listdir('app')[0]):
                 td = o + '/app/' + os.listdir('app')[0]
                 osj.back()
@@ -214,6 +221,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 rmtree(o + '/app')
 
                 if os.listdir(o): return
+            else: osj.back()
+            if not work and os.listdir(o):
+                if exists(o + '/pspemu/PSP'):
+                    copydir(o + '/pspemu/PSP',o,True,reni=True)
+                    os.rmdir(o + '/pspemu')
+                return
         case 'WUX':
             from bin.wiiudk import DKeys
             kys = DKeys()
@@ -614,5 +627,59 @@ def extract2(inp:str,out:str,t:str) -> bool:
             r = extract(tf.p,o,'TAR')
             tf.destroy()
             return r
+        case 'PlayStation Boot Package':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'\0PBP'
+            f.skip(4)
+            offs = [f.readu32() for _ in range(8)] + [f.size]
+            fs = [(offs[x],offs[x+1]-offs[x]) for x in range(8)]
+
+            f.seek(fs[0][0])
+            open(o + '/PARAM.SFO','wb').write(f.read(fs[0][1]))
+            sfo = File(o + '/PARAM.SFO',endian='<')
+            sfo.skip(8)
+            bko = sfo.readu32()
+            sfo.skip(4)
+            ksc = sfo.readu32()
+
+            kso = []
+            for _ in range(ksc):
+                kso.append(sfo.readu16())
+                sfo.skip(14)
+
+            ks = []
+            for kse in kso:
+                sfo.seek(bko + kse)
+                ks.append(sfo.read0s().decode('ascii'))
+            sfo.close()
+
+            psp = any(x in ks for x in ('DRIVER_PATH','MEMSIZE','UPDATER_VER','TITLE_XX'))
+            ps = 'LICENSE' in ks
+            pspr = not psp and any(x in ks for x in ('APP_VER','HRKGMP_VER'))
+            mini = not psp and 'ATTRIBUTE' in ks
+
+            f.seek(fs[1][0])
+            open(o + '/ICON0.PNG','wb').write(f.read(fs[1][1]))
+            if fs[2][1]:
+                f.seek(fs[2][0])
+                d = f.read(fs[2][1])
+                open(o + '/ICON1.' + ('PNG' if d[:4] == b'\x89PNG' else 'PMF'),'wb').write(d)
+            if fs[2][0] != fs[3][0]:
+                f.seek(fs[3][0])
+                open(o + '/PIC0.PNG','wb').write(f.read(fs[3][1]))
+            f.seek(fs[4][0])
+            open(o + '/PIC' + ('T' if mini or ps else '') + '1.PNG','wb').write(f.read(fs[4][1]))
+            if mini or psp:
+                f.seek(fs[5][0])
+                open(o + '/SND0.AT3','wb').write(f.read(fs[5][1]))
+            f.seek(fs[6][0])
+            open(o + '/DATA.PSP','wb').write(f.read(fs[6][1]))
+            f.seek(fs[7][0])
+            open(o + '/DATA.PSAR','wb').write(f.read(fs[7][1]))
+
+            return
 
     return 1
