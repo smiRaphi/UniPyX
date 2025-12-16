@@ -229,6 +229,11 @@
         "rs":"Xbox FArc"
     },
     {
+        "rqr":"ISO Media",
+        "d":[["size",[3000,null]],["isat","moov",32],["py","f=open(inp,'rb');r32=lambda:int.from_bytes(f.read(4),'big')\ns=8\nfor ix in range(6):\n f.seek(s-8,1)\n s=r32()\n if f.read(4)!=(b'ftyp',b'moov',b'free',b'mdat',b'meta',b'uuid')[ix]:return\nreturn 3500>f.tell()>3000 and s>24"]],
+        "rs":"Data MP4"
+    },
+    {
         "d":[["isat","\\0",0],["isat","\\0\\0",4],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');fc=int.from_bytes(f.read(4),'big');fo=int.from_bytes(f.read(4),'big');return (8+fc*4)==fo"]],
         "rs":"ZLARC"
     },

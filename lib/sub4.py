@@ -2377,6 +2377,20 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + fe[2],'wb').write(f.read(fe[1]))
             f.close()
             if fs: return
+        case 'Data MP4':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            while True:
+                s = f.readu32()
+                t = f.read(4)
+                if not t:break
+                if t == b'uuid':
+                    f.skip(0x10)
+                    open(o + '/' + tbasename(i),'wb').write(f.read())
+                    return
+                f.seek(s-8,1)
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
