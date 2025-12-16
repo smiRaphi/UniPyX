@@ -340,6 +340,10 @@
         "rs":"NCCH CFA","s":1
     },
     {
+        "d":[["isat","PREF\\2\\0\\0\\0",0],["py","f=open(inp,'rb');f.seek(8);c=sum(int.from_bytes(f.read(4),'little') for _ in range(4));so=int.from_bytes(f.read(4),'little');return (28+c*8)==so"]],
+        "rs":"Sky CoTL Preferences","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],
              ["isat","\\x7F\\x43\\x4E\\x54\\x00\\0\\0\\1",0]],"qq":true,

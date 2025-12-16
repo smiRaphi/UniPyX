@@ -2386,11 +2386,43 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 s = f.readu32()
                 t = f.read(4)
                 if not t:break
-                if t == b'uuid':
+                if t == b'uuid' and s > 24:
                     f.skip(0x10)
                     open(o + '/' + tbasename(i),'wb').write(f.read())
                     return
                 f.seek(s-8,1)
+        case 'Sky CoTL Preferences':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(8) == b'PREF\2\0\0\0'
+            bc,ic,fc,sc = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            bso = f.readu32()
+
+            def rs0(off):
+                p = f.pos
+                f.seek(bso+off)
+                r = f.read0s()
+                f.seek(p)
+                return r.decode()
+
+            ob = {}
+            for _ in range(bc):
+                n = rs0(f.readu32())
+                ob[n] = f.readu32() != 0
+            for _ in range(ic):
+                n = rs0(f.readu32())
+                ob[n] = f.readu32()
+            for _ in range(fc):
+                n = rs0(f.readu32())
+                ob[n] = f.readfloat()
+            for _ in range(sc):
+                n = rs0(f.readu32())
+                ob[n] = rs0(f.readu32())
+
+            json.dump(ob,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
