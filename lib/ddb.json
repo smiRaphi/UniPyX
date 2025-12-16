@@ -213,6 +213,10 @@
         "rs":"Backward LZ"
     },
     {
+        "d":[["isat","\\x10",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'little');return ds>f.seek(0,2)"]],
+        "rs":"Nintendo LZ10"
+    },
+    {
         "d":["isat","FSYS\\0",0],
         "rs":"Pokemon FSYS","s":1
     },
@@ -419,6 +423,14 @@
         "rs":"Super Monkey Ball SPG2","s":1
     },
     {
+        "d":[["size",[6,65537]],["isat","\\0",-1],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=f.seek(0,2);f.seek(2);fs=int.from_bytes(f.read(2),'little')\nif s<(2+4*c) or fs!=(2+2*c):return\nfor _ in range(c-1):\n if (int.from_bytes(f.read(2),'little')+2)>s:return\nreturn True"]],
+        "rs":"eSMART String Data"
+    },
+    {
+        "d":[["isat","\\x10\\0\\0\\0",0],["isat","\\0\\0\\0\\xF0",28],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,24]],
+        "rs":"eSMART Data"
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },
@@ -607,6 +619,10 @@
     {
         "d":[["isat","NMZIP",0],["isatS","\\0",11,5]],
         "rs":"NMZIP","s":1
+    },
+    {
+        "d":[["isat","PACK",0],["isatS","\\0",8,8],["isatS","\\0",4,24],["n0",4,4],["str0",16,8,3],["str0",32,64,7]],
+        "rs":"Shin Megami Tensei 9 PACK","s":1
     },
     {
         "d":[["isat","KPX",1],["isin",["\\0","\\1","\\2"],0]],

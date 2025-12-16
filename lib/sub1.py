@@ -351,9 +351,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'ZLIB':
             if db.print_try: print('Trying with zlib')
             import zlib
-            try:open(o + '/' + tbasename(i),'wb').write(zlib.decompress(open(i,'rb').read()))
-            except:pass
-            else:return
+
+            id = open(i,'rb').read()
+            try:d = zlib.decompress(id)
+            except zlib.error:return 1
+
+            open(o + '/' + tbasename(i),'wb').write(d)
         case 'GZIP':
             if db.print_try: print('Trying with gzip')
             import gzip

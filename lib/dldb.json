@@ -3008,6 +3008,13 @@
         "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/blz.exe"
         ]
     },
+    "lz10":{
+        "p":"lz10.exe",
+        "fs":[[
+            "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/lzss.exe",
+            "lz10.exe"
+        ]]
+    },
     "narchive":{
         "p":"Narchive/Narchive.exe",
         "fs":[{

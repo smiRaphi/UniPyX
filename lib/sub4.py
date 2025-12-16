@@ -2184,6 +2184,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else: mv(tf.p,o + '/' + tbasename(i))
             tf.destroy()
             return
+        case 'Nintendo LZ10':
+            of = o + '\\' + tbasename(i)
+            run(['lz10','-d',i,of])
+            if exists(of) and os.path.getsize(of): return
         case 'NitroARC':
             run(['narchive','extract',i,'-o',o])
             if os.listdir(o): return
@@ -2199,6 +2203,63 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.close()
             open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(se) + b'\n')
             if se: return
+        case 'eSMART String Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu16()
+            offs = [f.readu16() for _ in range(c)]
+            se = []
+            for of in offs:
+                f.seek(of)
+                se.append(f.read0s())
+            f.close()
+            open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(se) + b'\n')
+            if se: return
+        case 'eSMART Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            bhs = f.readu32()
+            f.skip(4)
+            doff = f.readu32()
+            f.skip(4)
+            dno = f.readu32() + bhs
+            f.skip(4)
+
+            dirfo = []
+            while f.pos < dno:
+                dirfo.append(f.readu32() + bhs)
+                f.skip(4)
+
+            dirs = {}
+            while True:
+                nl = f.readu8()
+                if not nl: break
+                fn = f.read(nl & 0x7F).decode()
+                dirs[fn] = [dirfo[f.readu8()-1]]
+                f.skip(1)
+
+            for k in dirs:
+                v = dirs[k]
+                f.seek(v[0])
+                while True:
+                    nl = f.readu8()
+                    if not nl: break
+                    v.append(f.read(nl).decode())
+
+            f.seek(doff)
+            fs = []
+            for k,v in dirs.items():
+                for fn in v[1:]: fs.append((k + '/' + fn,f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]-fe[1]))
+
+            if fs: return
         case 'String16 Data':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2295,6 +2356,27 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if oo:
                 json.dump(oo,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2)
                 return
+        case 'Shin Megami Tensei 9 PACK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'PACK'
+            fc = f.readu32()
+            bo = 0x10 + 0x50*fc
+            f.skip(8)
+            fs = []
+            for _ in range(fc):
+                ext = f.read(8).strip(b'\0').decode()
+                fe = [bo + f.readu32(),f.readu32(),f.read(0x40).strip(b'\0').decode()]
+                if not fe[2].endswith(ext): fe[2] += '.' + ext
+                fs.append(fe)
+
+            for fe in fs:
+                f.seek(fe[0])
+                open(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+            f.close()
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

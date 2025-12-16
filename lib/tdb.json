@@ -60,6 +60,7 @@
     "ZLIB":[
         "zlib compressed data (default comp.)",
         "zlib compressed data (best comp.)",
+        "zlib compressed data",
         "zlib data"
     ],
     "MSCAB SFX":[
