@@ -1220,5 +1220,25 @@ def extract3(inp:str,out:str,t:str) -> bool:
             dosbox(['ediextract','/U:.',i])
             if os.listdir(o): return
         case 'EDI Install LZSS': return extract(i,o,'ARX') # deark
+        case '.NET Packer 1':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            ps = f.seek(-0x5000,2)
+            d = f.read(0x5000)
+            f.seek(ps + d.index(b'\6\0\0\0\0\0\0\0') + 8)
+            fc = f.readu32()
+            f.skip(f.readu8() + 8*2*2 + 8)
+
+            fs = []
+            for _ in range(fc):
+                fe = (f.readu64(),f.readu64())
+                f.skip(8+1)
+                fs.append((fe[0],fe[1],f.read(f.readu8()).decode()))
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+            if fc: return
 
     return 1

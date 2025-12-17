@@ -298,6 +298,11 @@
         "rs":"Excel DNA XLL","s":1
     },
     {
+        "rqr":".NET Core",
+        "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
+        "rs":".NET Packer 1"
+    },
+    {
         "d":["isat","koly\\0\\0\\0\\4\\0\\0\\2\\0",-512],
         "rs":"Apple Disk Image","s":1
     },
