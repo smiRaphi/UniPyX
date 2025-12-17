@@ -2423,6 +2423,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             json.dump(ob,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
             return
+        case 'SCS Archive':
+            r = quickbms('scsgames')
+            if not r and (len(os.listdir(o)) != 1 or os.path.getsize(o + '/' + os.listdir(o)[0])): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

@@ -53,6 +53,10 @@
         "rs":"GameCube TGC ISO","s":1
     },
     {
+        "d":[["isat","SCS#",0],["isat","\\0\\0\\0",5]],
+        "rs":"SCS Archive","s":1
+    },
+    {
         "rq":null,
         "d":[["isat","GDPC",0],["n0",1,4],["isat","\\0\\0\\0",5]],
         "rs":"Godot Pack","s":1

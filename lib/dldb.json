@@ -3707,6 +3707,14 @@
         ]],
         "ts":0
     },
+    "scsgames":{
+        "p":"BMS/scsgames.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/scsgames.bms",
+            "BMS/scsgames.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
