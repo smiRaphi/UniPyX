@@ -33,6 +33,9 @@ GFMTS = {
     'unicode-org/icu':lambda tag:f'icu4c-{tag.split("-")[1]}-Win64-MSVC2022.zip',
     'geraldholdsworth/DiscImageManager':lambda tag:f'Disc.Image.Manager.{tag}.Windows.64.bit.Intel.zip',
     'VICE-Team/svn-mirror':lambda tag:f'SDLVICE-3.9-win64-{tag}.7z',
+    'peazip/PeaZip':lambda tag:f'peazip_portable-{tag}.WIN64.zip',
+    'nickworonekin/narchive':lambda tag:f'Narchive-{tag[1:]}.zip',
+    'ArchLeaders/byml_to_yaml':lambda tag:f'byml-to-yaml-{tag}-windows.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -75,11 +78,14 @@ def supdate(c:Cache,k:str,inf:dict):
         ts = ots
         if u == '.': tts = -1
         elif u in ('https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'):
-            ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
-            ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
-            u = 'https://mark0.net/download/trid.zip'
+            try:ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
+            except httpx.ConnectTimeout:pass
+            else:
+                ts = ft(ts,'%d/%m/%' + ('y' if len(ts) == 8 else 'Y'))
+                u = 'https://mark0.net/download/trid.zip'
         elif u == 'https://mark0.net/download/triddefs.zip':
-            ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
+            try:ts = c.srcht(r'\.zip-->(\d\d/\d\d/\d\d)<','%d/%m/%y','https://mark0.net/soft-trid-e.html')
+            except httpx.ConnectTimeout:pass
         elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
             ts = ft(str(time.gmtime().tm_year),'%Y')
         elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
@@ -93,7 +99,7 @@ def supdate(c:Cache,k:str,inf:dict):
         elif dom == 'github.com' and '/releases/download/' in u:
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-            if repo not in ('VirusTotal/yara'):
+            if repo not in ('VirusTotal/yara','allcoolthingsatoneplace/UnrealPakTool'):
                 if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                 elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')

@@ -361,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1764889200
+            "ts":1765926000
         }],
-        "ts":1764889200
+        "ts":1765926000
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -756,13 +756,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/cf/a4/dolphin-master-2509-572-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/11/87/dolphin-master-2509-580-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1764615795
+            "ts":1765832884
         }],
-        "ts":1764615795
+        "ts":1765832884
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -996,14 +996,14 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.7/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.8/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1764496846
+            "ts":1765771750
         }],
-        "ts":1764496846
+        "ts":1765771750
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -1125,13 +1125,13 @@
     "vpkedit":{
         "p":"vpkeditcli.exe",
         "fs":[{
-            "u":"https://github.com/craftablescience/VPKEdit/releases/download/v5.0.0.3/VPKEdit-Windows-Standalone-msvc-Release.zip",
+            "u":"https://github.com/craftablescience/VPKEdit/releases/download/v5.0.0.4/VPKEdit-Windows-Standalone-msvc-Release.zip",
             "x":{
                 "vpkeditcli.exe":"vpkeditcli.exe"
             },
-            "ts":1759388231
+            "ts":1765185788
         }],
-        "ts":1759388231
+        "ts":1765185788
     },
     "unpsarc":{
         "p":"UnPSARC/UnPSARC.exe",
@@ -2333,15 +2333,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.2.0/GDRE_tools-v2.2.0-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.3.2/GDRE_tools-v2.3.2-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1763953914
+            "ts":1765817366
         }],
-        "ts":1763953914
+        "ts":1765817366
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2565,12 +2565,13 @@
     "pea":{
         "p":"pea.exe",
         "fs":[{
-            "u":"https://github.com/peazip/PeaZip/releases/download/10.7.0/peazip_portable-10.7.0.WIN64.zip",
+            "u":"https://github.com/peazip/PeaZip/releases/download/10.8.0/peazip_portable-10.8.0.WIN64.zip",
             "x":{
                 "peazip_portable-10.7.0.WIN64/pea.exe":"pea.exe"
-            }
+            },
+            "ts":1765009954
         }],
-        "ts":0
+        "ts":1765009954
     },
     "icupkg":{
         "p":"icu4c/icupkg.exe",
@@ -2644,7 +2645,7 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45883/SDLVICE-3.9-win64-r45883.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45903/SDLVICE-3.9-win64-r45903.7z",
             "x":{
                 "SDLVICE-3.9-win64-r45867/c1541.exe":"VICE/c1541.exe",
                 "SDLVICE-3.9-win64-r45867/zlib1.dll":"VICE/zlib1.dll",
@@ -2652,16 +2653,18 @@
                 "SDLVICE-3.9-win64-r45867/libstdc++-6.dll":"VICE/libstdc++-6.dll",
                 "SDLVICE-3.9-win64-r45867/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
                 "SDLVICE-3.9-win64-r45867/libwinpthread-1.dll":"VICE/libwinpthread-1.dll",
-                "SDLVICE-3.9-win64-r45883/SDLVICE-3.9-win64-r45867":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.9-win64-r45883/SDLVICE-3.9-win64-r45867":"VICE/libwinpthread-1.dll",
+                "SDLVICE-3.9-win64-r45903/SDLVICE-3.9-win64-r45867":"VICE/libwinpthread-1.dll",
+                "SDLVICE-3.9-win64-r45903/SDLVICE-3.9-win64-r45883":"VICE/libwinpthread-1.dll"
             },
-            "ts":1764534418
+            "ts":1765920799
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1764534418
+        "ts":1765920799
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2984,14 +2987,16 @@
         "fs":[[
             "https://raw.githubusercontent.com/Treeki/CylindricalEarth/master/msbt.py",
             "ce_msbt.py"
-        ]]
+        ]],
+        "ts":0
     },
     "ndspy_bmg":{
         "p":"ndspy_bmg.py",
         "fs":[[
             "https://raw.githubusercontent.com/RoadrunnerWMC/ndspy/master/ndspy/bmg.py",
             "ndspy_bmg.py"
-        ]]
+        ]],
+        "ts":0
     },
     "byml-to-yaml":{
         "p":"byml-to-yaml.exe",
@@ -3000,20 +3005,23 @@
             "x":{
                 "byml-to-yaml.exe":"byml-to-yaml.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "blz":{
         "p":"blz.exe",
         "fs":[
         "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/blz.exe"
-        ]
+        ],
+        "ts":0
     },
     "lz10":{
         "p":"lz10.exe",
         "fs":[[
             "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/lzss.exe",
             "lz10.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "narchive":{
         "p":"Narchive/Narchive.exe",
@@ -3025,7 +3033,8 @@
                 "McMaster.Extensions.CommandLineUtils.dll":"Narchive/McMaster.Extensions.CommandLineUtils.dll",
                 "System.ValueTuple.dll":"Narchive/System.ValueTuple.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "ediextract":{
         "p":"EDIEXTR.EXE",
@@ -3416,7 +3425,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.0/lessmsi-v2.11.0.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.2/lessmsi-v2.11.2.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -3425,9 +3434,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1764516734
+            "ts":1765224250
         }],
-        "ts":1764516734
+        "ts":1765224250
     },
     "msix":{
         "p":"MsiX.exe",
@@ -3695,7 +3704,8 @@
         "fs":[[
             "https://aluigi.altervista.org/bms/star_fox_zero_dat.bms",
             "BMS/star_fox_zero_dat.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
@@ -3821,7 +3831,8 @@
         ],[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v11.27/2/3/UnrealPak-TraceLog.dll",
             "UnrealPak/4.27.2/UnrealPak-TraceLog.dll"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.27.0":{
         "p":"UnrealPak/4.27.0/UnrealPak.exe",
@@ -3843,7 +3854,8 @@
                 "UnrealPakTool/UnrealPak-SSL.dll":"UnrealPak/4.27.0/UnrealPak-SSL.dll",
                 "UnrealPakTool/UnrealPak-TraceLog.dll":"UnrealPak/4.27.0/UnrealPak-TraceLog.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "unrealpak_4.26.2":{
         "p":"UnrealPak/4.26.2/UnrealPak.exe",
@@ -3863,7 +3875,8 @@
                 "UnrealPakTool/UnrealPak-SSL.dll":"UnrealPak/4.26.2/UnrealPak-SSL.dll",
                 "UnrealPakTool/UnrealPak-TraceLog.dll":"UnrealPak/4.26.2/UnrealPak-TraceLog.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "unrealpak_4.25.4":{
         "p":"UnrealPak/4.25.4/UnrealPak.exe",
@@ -3900,7 +3913,8 @@
         ],[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v9/2/3/UnrealPak-TraceLog.dll",
             "UnrealPak/4.25.4/UnrealPak-TraceLog.dll"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.25.3":{
         "p":"UnrealPak/4.25.3/UnrealPak.exe",
@@ -3919,7 +3933,8 @@
                 "UnrealPakTool/UnrealPak-RSA.dll":"UnrealPak/4.25.3/UnrealPak-RSA.dll",
                 "UnrealPakTool/UnrealPak-TraceLog.dll":"UnrealPak/4.25.3/UnrealPak-TraceLog.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "unrealpak_4.24.3":{
         "p":"UnrealPak/4.24.3/UnrealPak.exe",
@@ -3956,7 +3971,8 @@
         ],[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v8.23/2/3/UnrealPak-TraceLog.dll",
             "UnrealPak/4.24.3/UnrealPak-TraceLog.dll"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.22.3":{
         "p":"UnrealPak/4.22.3/UnrealPak.exe",
@@ -3987,7 +4003,8 @@
         ],[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v8/2/3/UnrealPak-RSA.dll",
             "UnrealPak/4.22.3/UnrealPak-RSA.dll"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.21.2":{
         "p":"UnrealPak/4.21.2/UnrealPak.exe",
@@ -4015,27 +4032,31 @@
         ],[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v7/2/3/UnrealPak-Projects.dll",
             "UnrealPak/4.21.2/UnrealPak-Projects.dll"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.20.3":{
         "p":"UnrealPak/4.20.3/UnrealPak.exe",
         "fs":[[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v5/2/3/UnrealPak.exe",
             "UnrealPak/4.20.3/UnrealPak.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.19.2":{
         "p":"UnrealPak/4.19.2/UnrealPak.exe",
         "fs":[[
             "https://raw.githubusercontent.com/binamelato/UnrealPakSwitch/refs/heads/main/v4/2/3/UnrealPak.exe",
             "UnrealPak/4.19.2/UnrealPak.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_4.12.0":{
         "p":"UnrealPak/4.12.0/UnrealPak.exe",
         "fs":[[
             "https://raw.githubusercontent.com/xamarth/unrealpak/refs/heads/main/UnrealPak.exe",
             "UnrealPak/4.12.0/UnrealPak.exe"
-        ]]
+        ]],
+        "ts":0
     }
 }
