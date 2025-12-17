@@ -57,6 +57,10 @@
         "rs":"SCS Archive","s":1
     },
     {
+        "d":[["size",544788480],["py","return exists(dirname(inp) + '/SLES_534.81') or exists(dirname(inp) + '/SLPM_658.26')"]],
+        "rs":"10,000 Bullets FILE.BIN","s":1
+    },
+    {
         "rq":null,
         "d":[["isat","GDPC",0],["n0",1,4],["isat","\\0\\0\\0",5]],
         "rs":"Godot Pack","s":1

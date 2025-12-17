@@ -1,4 +1,4 @@
-import re,json,ast,os,sys,subprocess,hashlib,shutil
+import re,json,ast,os,errno,sys,subprocess,hashlib,shutil
 from time import sleep
 from shutil import rmtree,copytree,copyfile
 from lib.dldb import DLDB
@@ -74,6 +74,23 @@ def rldir(i:str,files=True) -> list[str]:
             if not files: o.append(x)
             o += rldir(x,files=files)
     return o
+def isvalid(p:str,reject_dirs=False):
+    if not isinstance(p,str) or not p: return False
+    if reject_dirs and os.path.sep in p: return False
+
+    _,path = os.path.splitdrive(p)
+    root = os.environ.get('HOMEDRIVE','C:') if sys.platform == 'win32' else os.path.sep
+    assert exists(root)
+
+    root = root.rstrip('\\/') + os.path.sep
+    for pp in path.split(os.path.sep):
+        try: os.lstat(root + pp)
+        except OSError as e:
+            if hasattr(e,'winerror'):
+                if e.winerror == 123: return False
+            elif e.errno in (errno.ENAMETOOLONG,errno.ERANGE): return False
+        except (TypeError,ValueError): return False
+    return True
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'
 def gtmp(suf=''): return TMP + 'tmp' + os.urandom(8).hex() + suf

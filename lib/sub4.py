@@ -2426,6 +2426,31 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'SCS Archive':
             r = quickbms('scsgames')
             if not r and (len(os.listdir(o)) != 1 or os.path.getsize(o + '/' + os.listdir(o)[0])): return
+        case '10,000 Bullets FILE.BIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+
+            dn = dirname(i)
+            if exists(dn + '/SLES_534.81'):
+                inf = File(dn + '/SLES_534.81',endian='<')
+                inf.seek(0x5F45A0)
+            elif exists(dn + '/SLPM_658.26'):
+                inf = File(dn + '/SLPM_658.26',endian='<')
+                inf.seek(0x5DF638)
+            else: return 1
+
+            df = open(i,'rb')
+            for ix in range(0x998):
+                df.seek(inf.readu32())
+                inf.skip(4)
+                d = df.read(inf.readu32())
+                try: ext = d[:4].decode('ascii')
+                except: ext = 'bin'
+                else:
+                    if isvalid(ext,True): ext = ext.lower()
+                    else: ext = 'bin'
+                open(o + f'/{ix}.{ext}','wb').write(d)
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
