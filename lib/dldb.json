@@ -3036,6 +3036,16 @@
         }],
         "ts":0
     },
+    "zre":{
+        "p":"ZRE.exe",
+        "fs":[{
+            "u":"https://shedevr.org.ru/zelda64rus/tools/UoT.90b4.1.7z",
+            "x":{
+                "UoT .90b4.1/ext/ZRE.exe":"ZRE.exe"
+            }
+        }],
+        "ts":0
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{
@@ -3222,13 +3232,9 @@
     },
     "pycdc":{
         "p":"pycdc.exe",
-        "fs":[{
-            "u":"https://nightly.link/zrax/pycdc/workflows/msvc-ci/master/pycdc-release.zip",
-            "x":{
-                "pycdc.exe":"pycdc.exe"
-            },
-            "nightly_run":17346356991
-        }],
+        "fs":[
+        "https://github.com/extremecoders-re/decompyle-builds/releases/download/build-21-Oct-2025-a05ddec/pycdc.exe"
+        ],
         "ts":0
     },
     "snzip":{

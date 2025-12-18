@@ -681,5 +681,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
             open(o + '/DATA.PSAR','wb').write(f.read(fs[7][1]))
 
             return
+        case 'Zelda 64 ROM':
+            run(['zre','-o',o,i])
+            if os.listdir(o): return
 
     return 1
