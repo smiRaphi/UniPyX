@@ -162,30 +162,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
     match t:
         case 'Qt IFW':
-            from signal import SIGTERM
-            from winpty import PtyProcess # type: ignore
-            bk = os.environ.get('__COMPAT_LAYER')
-            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
-            if db.print_try: print('Trying with input')
-
-            p = PtyProcess.spawn(subprocess.list2cmdline([i,'--nf','--ns','--am','--al','--lang','en','--cp',o + '\\$CACHE','-t',o,'-g','ifw.installer.installlog=true','in']))
-            p.write('Yes\r\n')
-            while p.isalive():
-                try: l = p.readline()
-                except EOFError: break
-                if l.split(b']',1)[-1].strip().startswith(b'Installing component'): p.kill(SIGTERM)
-
-            if bk != None: os.environ['__COMPAT_LAYER'] = bk
-            else: del os.environ['__COMPAT_LAYER']
-            fs = os.listdir(o)
-            if fs:
-                if 'InstallationLog.txt' in fs:
-                    remove(o + '/InstallationLog.txt')
-                    fs.remove('InstallationLog.txt')
-                if '$CACHE' in fs: fs.remove('$CACHE')
-                if fs: return
-                remove(o)
-                mkdir(o)
+            run(['qtifw-devtool','dump',i,o])
+            if os.listdir(o): return
         case 'MSCAB SFX':
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o) and not exists(o + '/.rsrc'): return

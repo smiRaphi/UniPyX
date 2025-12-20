@@ -266,7 +266,8 @@
         "jfd disk image (unzipped)"
     ],
     "GZIP":[
-        "gzipped data"
+        "gzipped data",
+        ".gz archive sec.5"
     ],
     "Chrome PAK":[
         "chromium pack resource archive (v5, utf-8)"
