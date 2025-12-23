@@ -202,6 +202,10 @@
         "rs":"Anna-Marie Archive","s":1
     },
     {
+        "d":[["ext",[".bin",".rmdp",".packmeta"],["py","b=splitext(inp)[0]+'.'\nif not (exists(b+'bin') and isfile(b+'bin') and exists(b+'rmdp') and isfile(b+'rmdp')):return\nf=open(b+'bin','rb')\nif f.read(1)[0]!=1:return\n;et=f.read(4);e='little' if int.from_bytes(et,'little')<int.from_bytes(et,'big') else 'big';s=f.seek(0,2);f.seek(13);return int.from_bytes(f.read(4),e)==1 and not sum(f.read(4)) and int.from_bytes(f.read(4),e)<s"]]],
+        "rs":"Remedy BIN+RMDP","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","PAK2\\0\\0\\0\\1",0],
              ["isat","2KAP\\1\\0\\0\\0",0]],"qq":true,
@@ -437,7 +441,7 @@
         "rs":"String16 Data"
     },
     {
-        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'big');f.seek(6)\nif int.from_bytes(f.read(4),'big')!=(2+c*12):return\nf.seek(2+c*12-8)\nfs=int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')\nreturn fs==f.seek(0,2);"]],
+        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'big');f.seek(6)\nif int.from_bytes(f.read(4),'big')!=(2+c*12):return\nf.seek(2+c*12-8)\nfs=int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')\nreturn fs==f.seek(0,2)"]],
         "rs":"Super Monkey Ball Tip 'n Tilt PAK"
     },
     {

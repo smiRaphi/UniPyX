@@ -689,7 +689,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive'|\
              'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive'|\
              'Gabriel Knight 3 Barn Game Archive'|'Haemimont Games AD Game Archive'|'Harry Potter: Quidditch World Cup Game Archive'|\
-             'Highway Pursuit Game Archive'|'UE3 Package':
+             'Highway Pursuit Game Archive'|'UE3 Package'|'Xenonauts Game Archive':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -2451,6 +2451,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     else: ext = 'bin'
                 open(o + f'/{ix}.{ext}','wb').write(d)
             return
+        case 'Remedy BIN+RMDP': return quickbms('remedy_bin_rmdp',noext(i) + '.bin')
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

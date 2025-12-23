@@ -164,6 +164,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Qt IFW':
             run(['qtifw-devtool','dump',i,o])
             if os.listdir(o): return
+
+            run(['7z','x',i,'-o' + o,'-aoa'])
+            if os.listdir(o) and not exists(o + '/.rsrc'): return
         case 'MSCAB SFX':
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o) and not exists(o + '/.rsrc'): return
@@ -210,7 +213,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             else: prc.kill()
         case 'NSIS Installer':
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o): return
+            if os.listdir(o) and not exists(o + '/.rsrc'): return
+            rmtree(o)
+            mkdir(o)
 
             if quickbms('instexpl'):
                 tm = []

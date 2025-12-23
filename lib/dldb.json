@@ -3731,6 +3731,14 @@
         ]],
         "ts":0
     },
+    "remedy_bin_rmdp":{
+        "p":"BMS/remedy_bin_rmdp.bms",
+        "fs":[[
+            "https://aluigi.altervista.org/bms/remedy_bin_rmdp.bms",
+            "BMS/remedy_bin_rmdp.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
