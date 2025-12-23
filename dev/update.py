@@ -194,6 +194,16 @@ def supdate(c:Cache,k:str,inf:dict):
                 nu = f'https://wimlib.net/downloads/{m[1]}-windows-x86_64-bin.zip'
                 if nu != u: u = nu
                 else: ts = 0
+        elif dom == 'renderdoc.org':
+            s = c.srch(r'</a>, (\d{4}-\d\d-\d\d)\s*\([^\)]+\)\s*</td>\s*<td>\s*<a href="([^"]+)">Portable zip</a>','https://renderdoc.org/builds')
+            ts = ft(s[1],'%Y-%m-%d')
+            if ts > ots:
+                nu = s[0]
+                if nu != u:
+                    u = nu
+                    bdir = u.split('/')[-1].rsplit('.',1)[0]
+                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
+                else: ts = 0
 
         if ts > ots:
             print(k,'->',u)

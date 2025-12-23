@@ -3046,6 +3046,16 @@
         }],
         "ts":0
     },
+    "renderdoccmd":{
+        "p":"RenderDoc/renderdoccmd.exe",
+        "fs":[{
+            "u":"https://renderdoc.org/autobuilds/v1.x/2025/RenderDoc_2025_12_22_1b5543e7_32.zip",
+            "x":{
+                "RenderDoc_2025_12_22_1b5543e7_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2025_12_22_1b5543e7_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

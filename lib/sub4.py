@@ -2452,6 +2452,16 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(o + f'/{ix}.{ext}','wb').write(d)
             return
         case 'Remedy BIN+RMDP': return quickbms('remedy_bin_rmdp',noext(i) + '.bin')
+        case 'RenderDoc Capture':
+            _,_,r = run(['renderdoccmd','extract','-f','NUL','-s','-?25"%?1?!?!?1?2?@',i],print_try=False)
+            run(['renderdoccmd','thumb','-o',o + '\\thumb.bmp',i])
+            for s in r.replace('\r','').split('Available sections are:\n',1)[1].split('\n'):
+                s = s.strip()
+                if not s: continue
+                p = o + '\\' + s.strip('/').replace('/','\\')
+                mkdir(dirname(p))
+                run(['renderdoccmd','extract','--file=' + p,'--section=' + s,i],print_try=False)
+            if rldir(o): return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

@@ -206,6 +206,10 @@
         "rs":"Remedy BIN+RMDP","s":1
     },
     {
+        "d":[["isat","RDOC\\0\\0\\0\\0",0]],
+        "rs":"RenderDoc Capture","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","PAK2\\0\\0\\0\\1",0],
              ["isat","2KAP\\1\\0\\0\\0",0]],"qq":true,
