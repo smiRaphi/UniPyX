@@ -36,6 +36,14 @@ GFMTS = {
     'peazip/PeaZip':lambda tag:f'peazip_portable-{tag}.WIN64.zip',
     'nickworonekin/narchive':lambda tag:f'Narchive-{tag[1:]}.zip',
     'ArchLeaders/byml_to_yaml':lambda tag:f'byml-to-yaml-{tag}-windows.zip',
+    'atom0s/Steamless':lambda tag:f'Steamless.{tag}.-.by.atom0s.zip',
+    'samuelgr/Hookshot':lambda tag:f'Hookshot-{tag}.zip',
+    'samuelgr/Pathwinder':lambda tag:f'Pathwinder-{tag}.zip',
+    'kubo/snzip':lambda tag:f'snzip-{tag[1:]}-win64.zip',
+    'roachadam/bytepress':lambda tag:f'bytepress.{tag}.zip',
+    'tobyxdd/android-ota-payload-extractor':lambda tag:f'android-ota-extractor-{tag}-windows-amd64.zip',
+    'augustoproiete/exceldna-unpack':lambda tag:f'exceldna-unpack-{tag[1:]}-win7-x64.zip',
+    'LuigiBlood/mfs_manager':lambda tag:f'mfs_manager_{tag}.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -115,9 +123,9 @@ def supdate(c:Cache,k:str,inf:dict):
                     if u != nu:
                         if c.c.head(nu).status_code == 302:
                             u = nu
-                            if repo == 'VICE-Team/svn-mirror':
+                            if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip'):
                                 bdir = u.split('/')[-1].rsplit('.',1)[0]
-                                for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
+                                for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'][kx]
                         else:
                             print('[!] 404:',u,'!->',nu)
                             ts = ots
@@ -195,14 +203,15 @@ def supdate(c:Cache,k:str,inf:dict):
                 if nu != u: u = nu
                 else: ts = 0
         elif dom == 'renderdoc.org':
-            s = c.srch(r'</a>, (\d{4}-\d\d-\d\d)\s*\([^\)]+\)\s*</td>\s*<td>\s*<a href="([^"]+)">Portable zip</a>','https://renderdoc.org/builds')
+            s = c.get('https://renderdoc.org/builds')
+            s = re.search(r'</a>, (\d{4}-\d\d-\d\d)\s*\([^\)]+\)\s*</td>\s*<td>\s*<a href="([^"]+)">Portable zip</a>',s)
             ts = ft(s[1],'%Y-%m-%d')
             if ts > ots:
-                nu = s[0]
+                nu = s[2]
                 if nu != u:
                     u = nu
                     bdir = u.split('/')[-1].rsplit('.',1)[0]
-                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
+                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'][kx]
                 else: ts = 0
 
         if ts > ots:
