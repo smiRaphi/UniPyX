@@ -5,6 +5,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
+    def quickbms(scr,inf=i,ouf=o,print_try=True):
+        if db.print_try and print_try: print('Trying with',scr)
+        run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
+        if os.listdir(ouf): return
+        return 1
+
     match t:
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -403,18 +409,52 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     tff = open(tf,'rb')
                     nt = None
                     if tff.read(0x50) == b"NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ": nt = 'Monkey Ball A'
+                    else:
+                        tmp = b''
+                        cp = ix = 0
+                        while True:
+                            cp = tff.tell()
+                            tmp = tff.read(0x4000)
+                            if len(tmp) < 0x2200: break
+                            ix = tmp.find(b'SimpleFlashFS')
+                            if ix != -1:
+                                tff.seek(cp + ix + 0x10)
+                                if not tff.read(0x10).split(b'\0',1)[-1].rstrip(b'\xFF'):
+                                    nt = 'SimpleFlashFS'
+                                    tff.seek(-0x20,1)
+                                    tf = f + '.sffs'
+                                    open(tf,'wb').write(tff.read())
+                                    break
                     tff.close()
+
                     if nt:
                         mkdir(od)
-                        extract(tf,od,nt)
+                        extract2(tf,od,nt)
                 elif t == '2':
                     tff = open(tf,'rb')
                     nt = None
                     if tff.read(0x60) == b'Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ': nt = 'Initial D 3 Export A'
+                    else:
+                        tmp = b''
+                        cp = ix = 0
+                        while True:
+                            cp = tff.tell()
+                            tmp = tff.read(0x4000)
+                            if len(tmp) < 0x2200: break
+                            ix = tmp.find(b'SimpleFlashFS')
+                            if ix != -1:
+                                tff.seek(cp + ix + 0x10)
+                                if not tff.read(0x10).split(b'\0',1)[-1].rstrip(b'\xFF'):
+                                    nt = 'SimpleFlashFS'
+                                    tff.seek(-0x20,1)
+                                    tf = f + '.sffs'
+                                    open(tf,'wb').write(tff.read())
+                                    break
                     tff.close()
+
                     if nt:
                         mkdir(od)
-                        extract(tf,od,nt)
+                        extract2(tf,od,nt)
                 if exists(od) and not os.listdir(od): rmdir(od)
             return
         case 'N64DD':
@@ -684,5 +724,92 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'Zelda 64 ROM':
             run(['zre','-o',o,i])
             if os.listdir(o): return
+        case 'SimpleFlashFS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x20 + 0x10 + 8)
+            f.seek(f.readu32())
+
+            while True:
+                cp = f.pos
+                f.skip(4)
+                ln = f.readu32()
+                if ln == 0xFFFFFFFF: break
+                f.skip(4)
+                fs = f.readu32()
+                f.skip(0x70)
+                fn = f.read(0x40).split(b'\0',1)[0].decode('ascii')
+                f.skip(0x40)
+
+                open(o + '/' + fn,'wb').write(f.read(fs))
+                f.seek(cp + ln)
+            if os.listdir(o): return
+
+        case 'Ridge Racer V A':
+            tf = dirname(i) + '\\rrv3vera.ic002'
+            if os.path.exists(tf): remove(tf)
+            symlink(db.get('rrv3va'),tf)
+
+            cfp = dirname(db.get('rrvatool')) + '/RidgeRacerVArchiveTool.exe.config'
+            d = open(cfp).read().replace('<value>True</value>','<value>False</value>')
+            open(cfp,'w').write(d.replace('<setting name="ACV3Achecked" serializeAs="String">\n                <value>False</value>','<setting name="ACV3Achecked" serializeAs="String">\n                <value>True</value>'))
+            if db.print_try: print('Trying with rrvatool')
+            p = subprocess.Popen([db.get('rrvatool'),i],stdout=-1,stderr=-1)
+            sleep(1)
+            
+            while not os.listdir(i + '_extract'): sleep(0.1)
+            while True:
+                try:copydir(i + '_extract',o,True)
+                except:sleep(0.1)
+                else:break
+            p.kill()
+            remove(tf)
+
+            for x in os.listdir(o):
+                if not os.path.getsize(o + '/' + x): remove(o + '/' + x)
+
+            if os.listdir(o): return
+        case 'Donkey Kong Banana Kingdom':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+
+            f = File(i,endian='<')
+            f.seek(0x14)
+            c = f.readu32()
+            f.seek(0x20)
+            fs = []
+            for _ in range(c):
+                fs.append((f.read(0x10).rstrip(b'\0').decode(),f.readu32(),f.readu32() * 0x200))
+                f.skip(8)
+            for fe in fs:
+                f.seek(fe[2])
+                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+
+            lo = max(fe[2] + fe[1] for fe in fs)
+            xo = lo + (-lo % 0x200)
+            if not xo >= f._size:
+                f.seek(xo)
+                open(o + '/_extra.bin','wb').write(f.read(f._size - xo - 0x200 - 0xB8B200 - 0x14C))
+
+            f.close()
+            if fs: return
+        case 'Monkey Ball A':
+            for d in ('CHUNK','DTPK','SPSD'):
+                scn = f'monkey ball {d} extract'
+                if d == 'CHUNK':
+                    scp = db.get(scn)
+                    scc = open(scp,encoding='utf-8').read()
+                    if '\nnext A\n' in scc: open(scp,'w',encoding='utf-8').write(scc.replace('\nnext A\n','\nmath A + 1\n'))
+
+                mkdir(o + '\\' + d)
+                if quickbms(scn,ouf=o + '\\' + d): break
+            else: return
+        case 'Initial D 3 Export A':
+            for d in ('NMZIP','TEX','SPSD'):
+                mkdir(o + '\\' + d)
+                if quickbms(f'initd3e {d} extract',ouf=o + '\\' + d): break
+            else: return
 
     return 1

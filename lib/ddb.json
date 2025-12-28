@@ -216,6 +216,10 @@
         "rs":"Blur PAK","s":1
     },
     {
+        "d":[["isat","SimpleFlashFS",0],["str0",32,0,16],["str0",16,32,0]],
+        "rs":"SimpleFlashFS","s":1
+    },
+    {
         "d":["isat","RSAR\\xFE\\xFF",0],
         "rs":"BRSAR","s":1
     },

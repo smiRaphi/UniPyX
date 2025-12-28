@@ -2454,7 +2454,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Remedy BIN+RMDP': return quickbms('remedy_bin_rmdp',noext(i) + '.bin')
         case 'RenderDoc Capture':
             _,_,r = run(['renderdoccmd','extract','-f','NUL','-s','-?25"%?1?!?!?1?2?@',i],print_try=False)
-            run(['renderdoccmd','thumb','-o',o + '\\thumb.bmp',i])
+            run(['renderdoccmd','thumb','-o',o + '\\thumb.png',i])
             for s in r.replace('\r','').split('Available sections are:\n',1)[1].split('\n'):
                 s = s.strip()
                 if not s: continue
@@ -2462,70 +2462,5 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 mkdir(dirname(p))
                 run(['renderdoccmd','extract','--file=' + p,'--section=' + s,i],print_try=False)
             if rldir(o): return
-
-        case 'Ridge Racer V A':
-            tf = dirname(i) + '\\rrv3vera.ic002'
-            if os.path.exists(tf): remove(tf)
-            symlink(db.get('rrv3va'),tf)
-
-            cfp = dirname(db.get('rrvatool')) + '/RidgeRacerVArchiveTool.exe.config'
-            d = open(cfp).read().replace('<value>True</value>','<value>False</value>')
-            open(cfp,'w').write(d.replace('<setting name="ACV3Achecked" serializeAs="String">\n                <value>False</value>','<setting name="ACV3Achecked" serializeAs="String">\n                <value>True</value>'))
-            if db.print_try: print('Trying with rrvatool')
-            p = subprocess.Popen([db.get('rrvatool'),i],stdout=-1,stderr=-1)
-            sleep(1)
-            
-            while not os.listdir(i + '_extract'): sleep(0.1)
-            while True:
-                try:copydir(i + '_extract',o,True)
-                except:sleep(0.1)
-                else:break
-            p.kill()
-            remove(tf)
-
-            for x in os.listdir(o):
-                if not os.path.getsize(o + '/' + x): remove(o + '/' + x)
-
-            if os.listdir(o): return
-        case 'Donkey Kong Banana Kingdom':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-
-            f = File(i,endian='<')
-            f.seek(0x14)
-            c = f.readu32()
-            f.seek(0x20)
-            fs = []
-            for _ in range(c):
-                fs.append((f.read(0x10).rstrip(b'\0').decode(),f.readu32(),f.readu32() * 0x200))
-                f.skip(8)
-            for fe in fs:
-                f.seek(fe[2])
-                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
-
-            lo = max(fe[2] + fe[1] for fe in fs)
-            xo = lo + (-lo % 0x200)
-            if not xo >= f._size:
-                f.seek(xo)
-                open(o + '/_extra.bin','wb').write(f.read(f._size - xo - 0x200 - 0xB8B200 - 0x14C))
-
-            f.close()
-            if fs: return
-        case 'Monkey Ball A':
-            for d in ('CHUNK','DTPK','SPSD'):
-                scn = f'monkey ball {d} extract'
-                if d == 'CHUNK':
-                    scp = db.get(scn)
-                    scc = open(scp,encoding='utf-8').read()
-                    if '\nnext A\n' in scc: open(scp,'w',encoding='utf-8').write(scc.replace('\nnext A\n','\nmath A + 1\n'))
-
-                mkdir(o + '\\' + d)
-                if quickbms(scn,ouf=o + '\\' + d): break
-            else: return
-        case 'Initial D 3 Export A':
-            for d in ('NMZIP','TEX','SPSD'):
-                mkdir(o + '\\' + d)
-                if quickbms(f'initd3e {d} extract',ouf=o + '\\' + d): break
-            else: return
 
     return 1
