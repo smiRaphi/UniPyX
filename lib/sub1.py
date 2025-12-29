@@ -358,11 +358,41 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             open(o + '/' + tbasename(i),'wb').write(d)
         case 'GZIP':
-            if db.print_try: print('Trying with gzip')
-            import gzip
-            try:open(o + '/' + tbasename(i),'wb').write(gzip.decompress(open(i,'rb').read()))
-            except:pass
-            else:return fix_tar(o)
+            f = open(i,'rb')
+            assert f.read(2) == b'\x1F\x8B'
+            if f.read(1) == b'\x08':
+                flgs = f.read(1)[0]
+
+                fs = f.seek(-8,2)
+                if not sum(f.read(8)):
+                    f.seek(10)
+                    if flgs & 4: f.seek(int.from_bytes(f.read(2),'little'),1)
+                    if flgs & 8:
+                        fn = b''
+                        s = b''
+                        while True:
+                            s = f.read(1)
+                            if not s: return 1
+                            if s == b'\0': break
+                            fn += s
+                        fn = fn.decode('utf-8')
+                    else: fn = tbasename(i)
+                    if flgs & 0x10:
+                        s = b''
+                        while True:
+                            s = f.read(1)
+                            if not s: return 1
+                            if s == b'\0': break
+                    if flgs & 2: f.seek(2,1)
+
+                    if (fs-f.tell()) > 2:
+                        if db.print_try: print('Trying with gzip')
+                        import gzip
+                        f.seek(0)
+                        open(o + '/' + fn,'wb').write(gzip.decompress(f.read()))
+                        f.close()
+                        return
+            f.close()
 
             run(['7z','x',i,'-o' + o,'-aoa'])
             if os.listdir(o): return fix_tar(o)
