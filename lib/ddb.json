@@ -217,6 +217,8 @@
     },
     {
         "d":[["isat","SimpleFlashFS",0],["str0",32,0,16],["str0",16,32,0]],
+        "rs":"SimpleFlashFS","s":1},{
+        "d":[["isat","SimpleFlashFS",8388608],["str0",32,8388608,13],["str0",16,8388640,0]],
         "rs":"SimpleFlashFS","s":1
     },
     {
@@ -643,11 +645,15 @@
         "rs":"BTSPK","s":1
     },
     {
-        "d":[["isat","NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ",0,"hash","EE0D39E8421F9B464A999CCF587C176B7808CC8C",0,1280]],
+        "d":[["isat","NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ",0],["hash","EE0D39E8421F9B464A999CCF587C176B7808CC8C",0,1280]],
         "rs":"Monkey Ball A","s":1
     },
     {
-        "d":[["isat","Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ",0,"hash","9C94430466D7DC2B4E12F4D422D8FD7E86714A5E",0,1280]],
+        "d":[["isat","Naomi2          SEGA ENTERPRISES,LTD.           VIRTUA STRIKER 3",0],["isatS","\\0",192,672]],
+        "rs":"Virtua Striker 3 A","s":1
+    },
+    {
+        "d":[["isat","Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ",0],["hash","9C94430466D7DC2B4E12F4D422D8FD7E86714A5E",0,1280]],
         "rs":"Initial D 3 Export A","s":1
     },
     {

@@ -408,23 +408,15 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 elif t == 'N':
                     tff = open(tf,'rb')
                     nt = None
+
                     if tff.read(0x50) == b"NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ": nt = 'Monkey Ball A'
-                    else:
-                        tmp = b''
-                        cp = ix = 0
-                        while True:
-                            cp = tff.tell()
-                            tmp = tff.read(0x4000)
-                            if len(tmp) < 0x2200: break
-                            ix = tmp.find(b'SimpleFlashFS')
-                            if ix != -1:
-                                tff.seek(cp + ix + 0x10)
-                                if not tff.read(0x10).split(b'\0',1)[-1].rstrip(b'\xFF'):
-                                    nt = 'SimpleFlashFS'
-                                    tff.seek(-0x20,1)
-                                    tf = f + '.sffs'
-                                    open(tf,'wb').write(tff.read())
-                                    break
+                    else: tff.seek(0)
+
+                    if not nt:
+                        if tff.read(13) == b'SimpleFlashFS': nt = 'SimpleFlashFS'
+                        else:
+                            tff.seek(0x800000)
+                            if tff.read(13) == b'SimpleFlashFS': nt = 'SimpleFlashFS'
                     tff.close()
 
                     if nt:
@@ -433,23 +425,17 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 elif t == '2':
                     tff = open(tf,'rb')
                     nt = None
+
                     if tff.read(0x60) == b'Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ': nt = 'Initial D 3 Export A'
-                    else:
-                        tmp = b''
-                        cp = ix = 0
-                        while True:
-                            cp = tff.tell()
-                            tmp = tff.read(0x4000)
-                            if len(tmp) < 0x2200: break
-                            ix = tmp.find(b'SimpleFlashFS')
-                            if ix != -1:
-                                tff.seek(cp + ix + 0x10)
-                                if not tff.read(0x10).split(b'\0',1)[-1].rstrip(b'\xFF'):
-                                    nt = 'SimpleFlashFS'
-                                    tff.seek(-0x20,1)
-                                    tf = f + '.sffs'
-                                    open(tf,'wb').write(tff.read())
-                                    break
+                    else: tff.seek(0)
+                    if tff.read(0x40) == b'Naomi2          SEGA ENTERPRISES,LTD.           VIRTUA STRIKER 3': nt = 'Virtua Striker 3 A'
+                    else: tff.seek(0)
+
+                    if not nt:
+                        if tff.read(13) == b'SimpleFlashFS': nt = 'SimpleFlashFS'
+                        else:
+                            tff.seek(0x800000)
+                            if tff.read(13) == b'SimpleFlashFS': nt = 'SimpleFlashFS'
                     tff.close()
 
                     if nt:
@@ -729,14 +715,20 @@ def extract2(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i,endian='<')
 
-            f.seek(0x20 + 0x10 + 8)
-            f.seek(f.readu32())
+            if f.read(13) != b'SimpleFlashFS':
+                f.seek(0x800000)
+                assert f.read(13) == b'SimpleFlashFS'
+            f.skip(0x23 + 8)
+            f.skip(f.readu32() - 0x3C)
 
             while True:
                 cp = f.pos
-                f.skip(4)
+                skps = f.readu32()
                 ln = f.readu32()
-                if ln == 0xFFFFFFFF: break
+                if ln == 0xFFFFFFFF:
+                    if skps == 0xFFFFFFFF: break
+                    f.seek(cp + skps)
+                    continue
                 f.skip(4)
                 fs = f.readu32()
                 f.skip(0x70)
@@ -811,5 +803,30 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 mkdir(o + '\\' + d)
                 if quickbms(f'initd3e {d} extract',ouf=o + '\\' + d): break
             else: return
+        case 'Virtua Striker 3 A':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x800000)
+            fs = []
+            while True:
+                off1 = f.readu32()
+                if not off1: break
+                siz1 = f.readu32()
+                f.skip(4)
+                off2 = f.readu32()
+                siz2 = f.readu32()
+                if off2: f.skip(8)
+                f.skip(4)
+                fn = f.read(0x10).rstrip(b'\0').decode('ascii')
+                fs.append((fn,off2 or off1,siz2 if off2 else siz1))
+
+            for fe in fs:
+                f.seek(fe[1])
+                open(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+
+            f.close()
+            if fs: return
 
     return 1
