@@ -13,7 +13,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
     match t:
         case 'U8'|'RARC':
-            run(['wszst','X',i,'--max-file-size=2g','-o','-R','-E$','-d',o])
+            run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])
             remove(o + '/wszst-setup.txt')
             if os.listdir(o): return
         case 'SARC':
@@ -2462,5 +2462,27 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 mkdir(dirname(p))
                 run(['renderdoccmd','extract','--file=' + p,'--section=' + s,i],print_try=False)
             if rldir(o): return
+        case 'Nintendo Mario Party Message':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            f.skip(8)
+            fo = f.readu32()
+            f.seek(0)
+
+            ses = []
+            while f.pos < fo:
+                f.skip(8)
+                ses.append((f.readu32(),f.readu32()))
+
+            oc = []
+            for off,idx in ses:
+                f.seek(off)
+                oc.append(f'{idx:04}:\n{f.read0s().decode("shift-jis")}')
+
+            if oc:
+                open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(oc))
+                return
 
     return 1

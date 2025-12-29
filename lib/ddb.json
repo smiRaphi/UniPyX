@@ -202,8 +202,12 @@
         "rs":"Anna-Marie Archive","s":1
     },
     {
-        "d":[["ext",[".bin",".rmdp",".packmeta"],["py","b=splitext(inp)[0]+'.'\nif not (exists(b+'bin') and isfile(b+'bin') and exists(b+'rmdp') and isfile(b+'rmdp')):return\nf=open(b+'bin','rb')\nif f.read(1)[0]!=1:return\n;et=f.read(4);e='little' if int.from_bytes(et,'little')<int.from_bytes(et,'big') else 'big';s=f.seek(0,2);f.seek(13);return int.from_bytes(f.read(4),e)==1 and not sum(f.read(4)) and int.from_bytes(f.read(4),e)<s"]]],
+        "d":[["ext",[".bin",".rmdp",".packmeta"]],["py","b=splitext(inp)[0]+'.'\nif not (exists(b+'bin') and isfile(b+'bin') and exists(b+'rmdp') and isfile(b+'rmdp')):return\nf=open(b+'bin','rb')\nif f.read(1)[0]!=1:return\net=f.read(4);e='little' if int.from_bytes(et,'little')<int.from_bytes(et,'big') else 'big';s=f.seek(0,2);f.seek(13);return int.from_bytes(f.read(4),e)==1 and not sum(f.read(4)) and int.from_bytes(f.read(4),e)<s"]],
         "rs":"Remedy BIN+RMDP","s":1
+    },
+    {
+        "d":[["name","nand.bin"],["py","f=dirname(inp)+'/keys.bin'\nif not exists(f) or os.path.getsize(f)!=0x400:return\nreturn open(f,'rb').read(10)==b'BackupMii '"]],
+        "rs":"BackupMii NAND Image","s":1
     },
     {
         "d":[["isat","RDOC\\0\\0\\0\\0",0]],
@@ -433,6 +437,11 @@
         "d":[["isin",["YB\\x01\\0","YB\\x02\\0","YB\\x03\\0","YB\\x04\\0","YB\\x05\\0","YB\\x06\\0","YB\\x07\\0","YB\\x08\\0","YB\\x09\\0","YB\\x0A\\0",
                       "BY\\0\\x01","BY\\0\\x02","BY\\0\\x03","BY\\0\\x04","BY\\0\\x05","BY\\0\\x06","BY\\0\\x07","BY\\0\\x08","BY\\0\\x09","BY\\0\\x0A"],0]],
         "rs":"Nintendo Binary YAML"
+    },
+    {
+        "d":[["isat","\\0\\0\\0",0],["isat","\\0\\0\\0",4],["isat","\\0\\0\\0\\0",12],["isat","\\0\\0\\0\\0",-4],["isin",["\\x01","\\x02","\\x03","\\x06","\\x07","\\x08","\\x09"],3],["isin",["\\x00","\\x01","\\x02","\\x03","\\x04","\\x05","\\x06","\\x07","\\x08","\\x09"],7],
+             ["py","f=open(inp,'rb');fs=f.seek(0,2);f.seek(8);fo=int.from_bytes(f.read(4),'big')\nif fo%0x10!=0 or (fo+5)>fs:return\nf.seek(fo-8);return (int.from_bytes(f.read(4),'big')+5)<=fs"]],
+        "rs":"Nintendo Mario Party Message"
     },
     {
         "d":[["isat","NPAC",0],["isat","NPAC\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",-32]],
