@@ -738,6 +738,37 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + fn,'wb').write(f.read(fs))
                 f.seek(cp + ln)
             if os.listdir(o): return
+        case 'Konami Python IMG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            assert f.read(4) == b'\xDE\xAD\xBE\xEF'
+            f.skip(2)
+            fc = f.readu16()
+            ss = f.readu16()
+            f.skip(2)
+            infs = f.readu16()
+            open(o + '/$INFO.xml','wb').write(f.read(infs-1))
+
+            f.seek(0x400)
+            fs = []
+            for _ in range(fc):
+                fe = [f.readu32()*ss]
+                xs = f.readu16()
+                f.skip(1)
+                fe.append(f.read(8).rstrip(b'\0').decode('ascii'))
+                f.skip(1)
+                es = f.readu32()
+                f.skip(-4)
+
+                fe.append(((es-1)*ss + xs)-fe[0])
+                fs.append(fe)
+
+            for fe in fs:
+                f.seek(fe[0])
+                open(o + '/' + fe[1],'wb').write(f.read(fe[2]))
+            if fs: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
