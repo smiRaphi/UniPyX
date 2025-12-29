@@ -292,15 +292,15 @@
             "x":{
                 "trid.py":"trid/trid.py"
             },
-            "ts":1762988400
+            "ts":1766876400
         },{
             "u":"https://mark0.net/download/triddefs.zip",
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1766530800
+            "ts":1766790000
         }],
-        "ts":1766530800
+        "ts":1766876400
     },
     "file":{
         "p":"file/file.exe",
@@ -361,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1766530800
+            "ts":1766962800
         }],
-        "ts":1766530800
+        "ts":1766962800
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -647,13 +647,13 @@
     "aaru":{
         "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.16/aaru-6.0.0-alpha.16_windows_x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.17/aaru-6.0.0-alpha.17_windows_x64.zip",
             "x":{
                 "aaru.exe":"aaru.exe"
             },
-            "ts":1766403337
+            "ts":1766744419
         }],
-        "ts":1766403337
+        "ts":1766744419
     },
     "ancient":{
         "p":"Ancient.exe",
@@ -756,13 +756,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/85/9f/dolphin-master-2512-79-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/b4/23/dolphin-master-2512-91-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1766527509
+            "ts":1766957952
         }],
-        "ts":1766527509
+        "ts":1766957952
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2333,15 +2333,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.3.2/GDRE_tools-v2.3.2-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.4.0/GDRE_tools-v2.4.0-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1765817366
+            "ts":1766852237
         }],
-        "ts":1765817366
+        "ts":1766852237
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2645,23 +2645,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45923/SDLVICE-3.10-win64-r45923.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45927/SDLVICE-3.10-win64-r45927.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45923/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45923/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45923/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45923/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45923/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45923/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r45927/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r45927/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r45927/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r45927/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r45927/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r45927/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1765920799
+            "ts":1766769738
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1765920799
+        "ts":1766769738
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -3046,14 +3046,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"/autobuilds/v1.x/2025/RenderDoc_2025_12_23_1b5543e7_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2025/RenderDoc_2025_12_28_f333d08b_32.zip",
             "x":{
-                "RenderDoc_2025_12_22_1b5543e7_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2025_12_22_1b5543e7_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2025_12_28_f333d08b_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2025_12_28_f333d08b_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1766444400
+            "ts":1766876400
         }],
-        "ts":1766444400
+        "ts":1766876400
     },
     "ediextract":{
         "p":"EDIEXTR.EXE",
@@ -3451,7 +3451,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.2/lessmsi-v2.11.2.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.3/lessmsi-v2.11.3.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -3460,9 +3460,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1765224250
+            "ts":1766940221
         }],
-        "ts":1765224250
+        "ts":1766940221
     },
     "msix":{
         "p":"MsiX.exe",

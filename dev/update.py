@@ -32,7 +32,7 @@ GFMTS = {
     'apoloval/mcp':lambda tag:f'mcp-{tag[1:]}_x64.exe',
     'unicode-org/icu':lambda tag:f'icu4c-{tag.split("-")[1]}-Win64-MSVC2022.zip',
     'geraldholdsworth/DiscImageManager':lambda tag:f'Disc.Image.Manager.{tag}.Windows.64.bit.Intel.zip',
-    'VICE-Team/svn-mirror':lambda tag:f'SDLVICE-3.9-win64-{tag}.7z',
+    'VICE-Team/svn-mirror':lambda tag:f'SDLVICE-3.10-win64-{tag}.7z',
     'peazip/PeaZip':lambda tag:f'peazip_portable-{tag}.WIN64.zip',
     'nickworonekin/narchive':lambda tag:f'Narchive-{tag[1:]}.zip',
     'ArchLeaders/byml_to_yaml':lambda tag:f'byml-to-yaml-{tag}-windows.zip',
@@ -125,7 +125,7 @@ def supdate(c:Cache,k:str,inf:dict):
                             u = nu
                             if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip'):
                                 bdir = u.split('/')[-1].rsplit('.',1)[0]
-                                for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'][kx]
+                                for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                         else:
                             print('[!] 404:',u,'!->',nu)
                             ts = ots
@@ -207,11 +207,11 @@ def supdate(c:Cache,k:str,inf:dict):
             s = re.search(r'</a>, (\d{4}-\d\d-\d\d)\s*\([^\)]+\)\s*</td>\s*<td>\s*<a href="([^"]+)">Portable zip</a>',s)
             ts = ft(s[1],'%Y-%m-%d')
             if ts > ots:
-                nu = s[2]
+                nu = 'https://renderdoc.org' + s[2]
                 if nu != u:
                     u = nu
                     bdir = u.split('/')[-1].rsplit('.',1)[0]
-                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'][kx]
+                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                 else: ts = 0
 
         if ts > ots:
