@@ -2484,5 +2484,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if oc:
                 open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(oc))
                 return
+        case 'Golden Tee Fore! BIG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            while f:
+                fn = f.read(f.readu16()).decode().replace(':\\','\\',1)
+                t = f.readu8()
+                assert t in (1,2)
+                if t == 1: mkdir(o + '/' + fn)
+                elif t == 2: xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+            if os.listdir(o): return
 
     return 1

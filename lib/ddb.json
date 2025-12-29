@@ -444,6 +444,10 @@
         "rs":"Nintendo Mario Party Message"
     },
     {
+        "d":[["isat",":",3],["n0",2,0],["str",2,4],["py","f=open(inp,'rb');s=int.from_bytes(f.read(2),'little');s=f.read(s);t=f.read(1)[0]\ntry:s=s.decode('utf-8')\nexcept:return\nif s[-1] in '\\\\/':return t==1\nreturn t==2"]],
+        "rs":"Golden Tee Fore! BIG"
+    },
+    {
         "d":[["isat","NPAC",0],["isat","NPAC\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",-32]],
         "rs":"Soulcalibur Legends NPAC","s":1
     },

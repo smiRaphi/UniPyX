@@ -352,7 +352,7 @@ def analyze(inp:str,raw=False):
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': scnt += 1
                         elif b != b'\0': ret = False;break
                     else: ret = scnt >= x[3]
                     f.close()
@@ -367,7 +367,7 @@ def analyze(inp:str,raw=False):
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': scnt += 1
                         elif b == b'\0': ret = scnt >= x[3];break
                     else: ret = scnt >= x[3]
                     f.close()
@@ -384,7 +384,7 @@ def analyze(inp:str,raw=False):
                         b = f.read(1)
                         if not b: ret = False;break
                         if b == b'\0': end = True
-                        elif not end and b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': scnt += 1
+                        elif not end and b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': scnt += 1
                         else: ret = False;break
                     else: ret = scnt >= x[3]
                     f.close()
@@ -398,7 +398,7 @@ def analyze(inp:str,raw=False):
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/': ret = False;break
+                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': ret = False;break
                     else: ret = True
                     f.close()
                 elif x[0] == 'n0':
