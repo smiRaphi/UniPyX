@@ -881,9 +881,13 @@
         "rs":"Crinkler"
     },
     {
-        "rqr":null,
+        "rq":null,
         "d":[["isat","HEAD",256],["py","f=open(inp,'rb');f.seek(0x130);f.seek(int.from_bytes(f.read(8),'little'));return f.read(4)==b'HFS0'"]],
         "rs":"Switch XCI","s":1
+    },
+    {
+        "d":[["isat","RFRM",0],["isatS","\\0",12,8],["isat","PACK\\1\\0\\0\\0\\1\\0\\0\\0RFRM",20],["isatS","\\0",12,40],["isat","TOCC",52],["n0",4,56],["n0",4,60],["isat","ADIR",64],["n0",4,88]],
+        "rs":"Metroid Prime 4 RFRM PACK","s":1
     },
     {
         "rq":null,
