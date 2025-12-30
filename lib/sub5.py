@@ -80,9 +80,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'NanoZip':
             run(['nz','x','-o' + o,i,'*'])
             if os.listdir(o): return
-        case 'bsc':
+        case 'bsc'|'bsc-m03':
             of = o + '/' + tbasename(i)
-            run(['bsc','d',i,of])
+            run([t,'d',i,of])
             if exists(of) and os.path.getsize(of): return
         case 'LZHAM':
             of = o + '/' + tbasename(i)
@@ -311,5 +311,27 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if exists(of) and os.path.getsize(of): return
         case 'HIT': return msdos(['hit','x','-o',i],cwd=o)
         case 'Hyper': return msdos(['hyper','-xoo',i],cwd=o)
+        case 'mcm':
+            tf = o + '\\tmp' + os.urandom(8).hex() + '.mcm'
+            symlink(i,tf)
+            run(['mcm','d',tf],cwd=o)
+            remove(tf,tf + '.decomp')
+            if os.listdir(o): return
+
+            symlink(i,tf)
+            of = o + '\\' + tbasename(i)
+            run(['mcmsk','d',tf,of])
+            remove(tf,tf + '.decomp')
+            if exists(of) and os.path.getsize(of): return
+        case 'Kanzi':
+            of = o + '/' + tbasename(i)
+            run(['kanzi','-d','-i',i,'-o',of,'-v','0','-f'])
+            if exists(of) and os.path.getsize(of): return
+        case 'PPMd':
+            tf = 'tmp' + os.urandom(4).hex() + '.pmd'
+            symlink(i,o + '/' + tf)
+            run(['ppmd','d',tf],cwd=o)
+            remove(o + '/' + tf)
+            if os.listdir(o): return
 
     return 1

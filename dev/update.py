@@ -27,6 +27,7 @@ GFMTS = {
     'AppleCommander/AppleCommander':lambda tag:f'AppleCommander-acx-{tag}.jar',
     'unsound/hfsexplorer':lambda tag:f'{tag}-bin.zip',
     'IlyaGrebnov/libbsc':lambda tag:f'bsc-{tag[1:]}-x64.zip',
+    'IlyaGrebnov/bsc-m03':lambda tag:f'bsc-m03-{tag[1:]}-win64.zip',
     'GDRETools/gdsdecomp':lambda tag:f'GDRE_tools-{tag}-windows.zip',
     '0CBH0/nsnsotool':lambda tag:f'nsnsotool_{tag}.zip',
     'apoloval/mcp':lambda tag:f'mcp-{tag[1:]}_x64.exe',

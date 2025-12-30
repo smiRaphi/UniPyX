@@ -3055,6 +3055,48 @@
         }],
         "ts":1766876400
     },
+    "bsc-m03":{
+        "p":"bsc-m03.exe",
+        "fs":[{
+            "u":"https://github.com/IlyaGrebnov/bsc-m03/releases/download/v0.5.5/bsc-m03-0.5.5-win64.zip",
+            "x":{
+                "bsc-m03.exe":"bsc-m03.exe"
+            }
+        }]
+    },
+    "mcm":{
+        "p":"mcm.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=3438&d=1428210524",
+            "ex":".7z",
+            "x":{
+                "mcm83/mcm32.exe":"mcm.exe"
+            }
+        }]
+    },
+    "mcmsk":{
+        "p":"mcmsk.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=3743&d=1436746789",
+            "ex":".7z",
+            "x":{
+                "mcm_sk64.exe":"mcmsk.exe"
+            }
+        }]
+    },
+    "kanzi":{
+        "p":"Kanzi.exe",
+        "fs":[[
+            "https://github.com/flanglet/kanzi-cpp/releases/download/2.4.0/Kanzi64.exe",
+            "Kanzi.exe"
+        ]]
+    },
+    "ppmd":{
+        "p":"PPMd.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/PPMd.exe"
+        ]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

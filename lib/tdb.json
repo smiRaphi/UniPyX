@@ -1307,5 +1307,8 @@
     ],
     "Xbox Executable":[
         "xbox executable"
+    ],
+    "mcm":[
+        "mcm compressed archive"
     ]
 }
