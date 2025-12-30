@@ -1223,5 +1223,32 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[0])
                 xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
             if fc: return
+        case 'Xbox Executable':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'XBEH'
+            f.seek(0x104)
+            boff = f.readu32()
+            f.skip(0x14)
+            secs = f.readu32()
+            seco = f.readu32()
+            f.seek(seco-boff)
+
+            fs = []
+            for _ in range(secs):
+                flgs = f.readu32()
+                f.skip(8)
+                fs.append([f.readu32(),f.readu32(),f.readu32()-boff,flgs & 4])
+                f.skip(0x20)
+
+            for fe in fs:
+                f.seek(fe[2])
+                fn = f.read0s().decode()
+                if fe[3]: fn = '$SYS/' + fn
+                f.seek(fe[0])
+                xopen(o + '/' + fn,'wb').write(f.read(fe[1]))
+            if fs: return
 
     return 1

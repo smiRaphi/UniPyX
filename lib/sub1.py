@@ -237,8 +237,28 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if os.listdir(o):
                 for f in os.listdir(o):
                     if f.endswith('.iso'):
+                        nt = None
                         f = o + '\\' + f
-                        if not extract1(f,o,'ISO'): remove(f)
+                        fo = open(f,'rb')
+                        fs = fo.seek(0,2)
+
+                        for off in (0x10000,0xFDA0000,0x18310000):
+                            if off > fs: break
+                            fo.seek(off)
+                            if fo.read(20) == b'MICROSOFT*XBOX*MEDIA': nt = 'XISO';break
+                        if not nt:
+                            for off,chk,typ in (
+                                                (0x0000,b'\xAE\x0F\x38\xA2','GameCube TGC ISO'),
+                                                (0x0018,b'\x5D\x1C\x9E\xA3','Wii ISO'),
+                                                (0x001C,b'\xC2\x33\x9F\x3D','GameCube ISO'),
+                                                (0x0800,b'PlayStation3\0\0\0\0','PS3 ISO'),
+                                                (0x8000,b'\1CD001\1\0','ISO'),):
+                                if off > fs: break
+                                fo.seek(off)
+                                if fo.read(len(chk)) == chk: nt = typ; break
+
+                        fo.close()
+                        if nt and not extract(f,o,nt): remove(f)
                 return
         case 'Shifted ISO':
             if db.print_try: print('Trying with custom extractor')

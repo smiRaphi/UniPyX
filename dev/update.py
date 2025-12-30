@@ -123,7 +123,7 @@ def supdate(c:Cache,k:str,inf:dict):
                     if u != nu:
                         if c.c.head(nu).status_code == 302:
                             u = nu
-                            if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip'):
+                            if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip','upx/upx'):
                                 bdir = u.split('/')[-1].rsplit('.',1)[0]
                                 for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                         else:
