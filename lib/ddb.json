@@ -890,8 +890,12 @@
         "rs":"Metroid Prime 4 RFRM PACK","s":1
     },
     {
-        "d":[["isat","RFRM",0],["isatS","\\0",12,8],["isat","MSBT\\x10\\0\\0\\0\\x10\\0\\0\\0U",20]],
+        "d":[["isat","RFRM",0],["isatS","\\0",12,8],["isat","MSBT\\x10\\0\\0\\0\\x10\\0\\0\\0",20]],
         "rs":"Metroid Prime 4 RFRM MSBT","s":1
+    },
+    {
+        "d":[["isat","RFRM",0],["isatS","\\0",12,8],["isat","ENUM\\x0A\\0\\0\\0\\x0A\\0\\0\\0",20]],
+        "rs":"Metroid Prime 4 RFRM ENUM","s":1
     },
     {
         "rq":null,

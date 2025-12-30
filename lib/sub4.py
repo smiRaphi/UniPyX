@@ -2548,5 +2548,19 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if f.endswith('.msbt'): extract4(o + '\\' + f,o,'Nintendo MSBT')
             db.print_try = bv
             if os.listdir(o): return
+        case 'Metroid Prime 4 RFRM ENUM':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'RFRM'
+            f.skip(0x10)
+            assert f.read(12) == b'ENUM\x0A\0\0\0\x0A\0\0\0'
+
+            fc = f.readu32()
+            of = open(o + '/' + tbasename(i) + '.txt','w')
+            for ix in range(fc): of.write(f'{ix}: {f.read(4).hex().upper()}\n')
+            of.close()
+            if fc: return
 
     return 1
