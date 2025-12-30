@@ -3097,6 +3097,15 @@
         "https://mattmahoney.net/dc/PPMd.exe"
         ]
     },
+    "zxc":{
+        "p":"zxc.exe",
+        "fs":[{
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.3.1/zxc-windows-x64.exe.zip",
+            "x":{
+                "zxc.exe":"zxc.exe"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

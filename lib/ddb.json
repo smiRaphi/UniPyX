@@ -627,6 +627,10 @@
         "rs":"PPMd","s":1
     },
     {
+        "d":[["isat","ZXC\\0\\1\\0\\0\\0",0]],
+        "rs":"ZXC","s":1
+    },
+    {
         "d":[["isat","ER",16],["isat","PM",528],["isat","Apple_partition_map",576]],
         "rs":"Apple Partition Map","s":1},{
         "d":[["isat","ER",0],["isat","PM",512],["isat","Apple_partition_map",560]],

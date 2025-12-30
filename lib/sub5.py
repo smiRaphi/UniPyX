@@ -333,5 +333,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['ppmd','d',tf],cwd=o)
             remove(o + '/' + tf)
             if os.listdir(o): return
+        case 'ZXC':
+            of = o + '/' + tbasename(i)
+            open(of,'wb').write(run(['zxc','-d','-T','0','-k','-c','-f','-q',i],text=False)[1])
+            if exists(of) and os.path.getsize(of): return fix_tar(o)
 
     return 1
