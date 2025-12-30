@@ -2082,6 +2082,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             mso = msbt.MSBT()
             mso.load(bytearray(d))
             open(o + '/' + tbasename(i) + '.xml','wb').write(msbt.ET.tostring(mso.generate_xml(),'utf-8'))
+            msbt.struct.unpack_from = msbt._unpfr
             return
         case 'Star Fox DAT': return quickbms('star_fox_zero_dat')
         case 'Nintendo Table':
@@ -2524,5 +2525,30 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[1])
                 open(fe[0],'wb').write(f.read(fe[2]))
             if fs: return
+        case 'Metroid Prime 4 RFRM MSBT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'RFRM'
+            f.skip(0x10)
+            assert f.read(12) == b'MSBT\x10\0\0\0\x10\0\0\0'
+
+            c = 0
+            while f:
+                f.skip(4)
+                s = f.readu32()
+                f.skip(0x10)
+                d = f.read(s)
+                open(o + f'/{c}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),'wb').write(d)
+                c += 1
+            f.close()
+
+            bv = db.print_try
+            db.print_try = False
+            for f in os.listdir(o):
+                if f.endswith('.msbt'): extract4(o + '\\' + f,o,'Nintendo MSBT')
+            db.print_try = bv
+            if c: return
 
     return 1

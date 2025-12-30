@@ -890,6 +890,10 @@
         "rs":"Metroid Prime 4 RFRM PACK","s":1
     },
     {
+        "d":[["isat","RFRM",0],["isatS","\\0",12,8],["isat","MSBT\\x10\\0\\0\\0\\x10\\0\\0\\0U",20]],
+        "rs":"Metroid Prime 4 RFRM MSBT","s":1
+    },
+    {
         "rq":null,
         "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f=open(inp,'rb');f.seek(11);sl=f.read(1)[0]\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
         "rs":"QuARK","s":1
