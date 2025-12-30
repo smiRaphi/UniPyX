@@ -2562,5 +2562,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for ix in range(fc): of.write(f'{ix}: {f.read(4).hex().upper()}\n')
             of.close()
             if fc: return
+        case 'UMD Data':
+            if db.print_try: print('Trying with custom extractor')
+            open(o + '/' + tbasename(i) + '.txt','wb').write(open(i,'rb').read().replace(b'\0',b' ').replace(b'|',b'\n'))
+            return
 
     return 1

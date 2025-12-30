@@ -898,6 +898,10 @@
         "rs":"Metroid Prime 4 RFRM ENUM","s":1
     },
     {
+        "d":[["size",48],["isat","-",4],["isat","|",10],["isat","|",27],["isat","|",32],["isat","|",47]],
+        "rs":"UMD Data"
+    },
+    {
         "rq":null,
         "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f=open(inp,'rb');f.seek(11);sl=f.read(1)[0]\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
         "rs":"QuARK","s":1
