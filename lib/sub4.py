@@ -2534,14 +2534,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(0x10)
             assert f.read(12) == b'MSBT\x10\0\0\0\x10\0\0\0'
 
-            c = 0
             while f:
-                f.skip(4)
+                n = f.read(4).decode('ascii')
                 s = f.readu32()
                 f.skip(0x10)
                 d = f.read(s)
-                open(o + f'/{c}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),'wb').write(d)
-                c += 1
+                open(o + f'/{n}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),'wb').write(d)
             f.close()
 
             bv = db.print_try
@@ -2549,6 +2547,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for f in os.listdir(o):
                 if f.endswith('.msbt'): extract4(o + '\\' + f,o,'Nintendo MSBT')
             db.print_try = bv
-            if c: return
+            if os.listdir(o): return
 
     return 1
