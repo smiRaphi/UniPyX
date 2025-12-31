@@ -3116,6 +3116,22 @@
             }
         }]
     },
+    "luadec51":{
+        "p":"Luadec51.exe",
+        "fs":[{
+            "u":"https://github.com/sztupy/luadec51/releases/download/v2.0.2/luadec51_2.0.2_win32.zip",
+            "x":{
+                "Luadec51.exe":"Luadec51.exe"
+            }
+        }]
+    },
+    "unluac":{
+        "p":"unluac.jar",
+        "fs":[[
+            "https://netix.dl.sourceforge.net/project/unluac/Unstable/unluac_2025_12_23.jar?viasf=1",
+            "unluac.jar"
+        ]]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{

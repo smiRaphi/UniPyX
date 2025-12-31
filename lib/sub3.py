@@ -1250,5 +1250,20 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[0])
                 xopen(o + '/' + fn,'wb').write(f.read(fe[1]))
             if fs: return
+        case 'Lua Bytecode':
+            f = open(i,'rb')
+            assert f.read(4) == b'\x1bLua'
+            v = f.read(1)[0]
+            f.close()
+            mv,iv = v >> 4,v & 0xF
+
+            of = o + '\\' + tbasename(i) + '.lua'
+            if mv == 5 and iv in (0,1,2,3,4):
+                if db.print_try: print('Trying with unluac')
+                run(['java','-jar',db.get('unluac'),'--output',of,i],print_try=False)
+            if exists(of) and os.path.getsize(of): return
+
+            if mv == 5 and iv == 1: open(of,'wb').write(run(['luadec51','--',i],text=False)[1])
+            if exists(of) and os.path.getsize(of): return
 
     return 1

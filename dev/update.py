@@ -45,6 +45,7 @@ GFMTS = {
     'tobyxdd/android-ota-payload-extractor':lambda tag:f'android-ota-extractor-{tag}-windows-amd64.zip',
     'augustoproiete/exceldna-unpack':lambda tag:f'exceldna-unpack-{tag[1:]}-win7-x64.zip',
     'LuigiBlood/mfs_manager':lambda tag:f'mfs_manager_{tag}.zip',
+    'sztupy/luadec51':lambda tag:f'luadec51_{tag[1:]}_win32.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'

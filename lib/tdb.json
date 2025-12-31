@@ -1310,5 +1310,10 @@
     ],
     "mcm":[
         "mcm compressed archive"
+    ],
+    "Lua Bytecode":[
+        "lua bytecode",
+        "lua bytecode (generic)",
+        "lua 5.1 bytecode"
     ]
 }
