@@ -316,6 +316,10 @@
         "rs":"Excel DNA XLL","s":1
     },
     {
+        "d":[["isin",["\\x58\\x24\\xF3\\xA9","\\xA9\\xF3\\x24\\x58"],0],["isat","\\0",7],["isin",["\\1","\\0"],6]],
+        "rs":"Next Level Games DICT+DATA","s":1
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"
@@ -914,6 +918,10 @@
         "rs":"Metroid Prime 4 RFRM ENUM","s":1
     },
     {
+        "d":[["size",[8,524288]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=int.from_bytes(f.read(4),'little')+8;from zlib import crc32;return (crc32(f.read())^0xFFFFFFFF)==c and s==f.tell()"]],
+        "rs":"Metroid Prime 4 Save","s":1
+    },
+    {
         "d":[["size",48],["isat","-",4],["isat","|",10],["isat","|",27],["isat","|",32],["isat","|",47]],
         "rs":"UMD Data"
     },
@@ -1061,7 +1069,7 @@
     },
     {
         "rqr":null,
-        "d":["ext",".br"],
+        "d":["ext",[".br",".brotli"]],
         "rs":"Brotli"
     },
     {

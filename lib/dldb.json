@@ -3116,6 +3116,33 @@
             }
         }]
     },
+    "nlgfiletool":{
+        "p":"NlgFileTool/FileConverter.exe",
+        "fs":[{
+            "u":"https://github.com/KillzXGaming/NLG-File-Editor-Tool/releases/download/0.1/FileConverterExperimental.zip",
+            "x":{
+                "FileConverter.exe":"NlgFileTool/FileConverter.exe",
+                "FileConverter.dll":"NlgFileTool/FileConverter.dll",
+                "Toolbox.Core.dll":"NlgFileTool/Toolbox.Core.dll",
+                "Syroot.Maths.dll":"NlgFileTool/Syroot.Maths.dll",
+                "Syroot.BinaryData.dll":"NlgFileTool/Syroot.BinaryData.dll",
+                "OpenTK.dll":"NlgFileTool/OpenTK.dll",
+                "Newtonsoft.Json.dll":"NlgFileTool/Newtonsoft.Json.dll",
+                "ICSharpCode.SharpZipLib.dll":"NlgFileTool/ICSharpCode.SharpZipLib.dll",
+                "FileConverter.deps.json":"NlgFileTool/FileConverter.deps.json",
+                "FileConverter.runtimeconfig.json":"NlgFileTool/FileConverter.runtimeconfig.json"
+            }
+        }]
+    },
+    "nlgfiletool-mff":{
+        "p":"NlgFileTool.exe",
+        "fs":[{
+            "u":"https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper/releases/download/v1.0/NlgFileTool-win-64.zip",
+            "x":{
+                "NlgFileTool.exe":"NlgFileTool.exe"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{
@@ -3823,6 +3850,14 @@
         "fs":[[
             "https://mirror.aluigi.org/bms/remedy_bin_rmdp.bms",
             "BMS/remedy_bin_rmdp.bms"
+        ]],
+        "ts":0
+    },
+    "luigi_mansion_dict":{
+        "p":"BMS/luigi_mansion_dict.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/luigi_mansion_dict.bms",
+            "BMS/luigi_mansion_dict.bms"
         ]],
         "ts":0
     },
