@@ -3106,6 +3106,16 @@
             }
         }]
     },
+    "vlaz":{
+        "p":"vlaz.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=12967&d=1765354425",
+            "ex":".7z",
+            "x":{
+                "vlaz-008-5/bin/vlaz_w64.exe":"vlaz.exe"
+            }
+        }]
+    },
     "ediextract":{
         "p":"EDIEXTR.EXE",
         "fs":[{
@@ -3589,7 +3599,7 @@
     "sonic4":{
         "p":"BMS/sonic4.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/sonic4.bms",
+            "https://mirror.aluigi.org/bms/sonic4.bms",
             "BMS/sonic4.bms"
         ]],
         "ts":0
@@ -3597,7 +3607,7 @@
     "cpk":{
         "p":"BMS/cpk.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/cpk.bms",
+            "https://mirror.aluigi.org/bms/cpk.bms",
             "BMS/cpk.bms"
         ]],
         "ts":0
@@ -3605,7 +3615,7 @@
     "nus3_nub2":{
         "p":"BMS/nus3_nub2.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/nus3_nub2.bms",
+            "https://mirror.aluigi.org/bms/nus3_nub2.bms",
             "BMS/nus3_nub2.bms"
         ]],
         "ts":0
@@ -3613,7 +3623,7 @@
     "bea":{
         "p":"BMS/vroom_scne.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/vroom_scne.bms",
+            "https://mirror.aluigi.org/bms/vroom_scne.bms",
             "BMS/vroom_scne.bms"
         ]],
         "ts":0
@@ -3621,7 +3631,7 @@
     "rayman_dcz":{
         "p":"BMS/rayman_dcz.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/rayman_dcz.bms",
+            "https://mirror.aluigi.org/bms/rayman_dcz.bms",
             "BMS/rayman_dcz.bms"
         ]],
         "ts":0
@@ -3632,7 +3642,7 @@
     "legoracer_jam":{
         "p":"BMS/legoracer_jam.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/legoracer_jam.bms",
+            "https://mirror.aluigi.org/bms/legoracer_jam.bms",
             "BMS/legoracer_jam.bms"
         ]],
         "ts":0
@@ -3640,7 +3650,7 @@
     "metroid_sr_3ds":{
         "p":"BMS/metroid_sr_3ds.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/metroid_sr_3ds.bms",
+            "https://mirror.aluigi.org/bms/metroid_sr_3ds.bms",
             "BMS/metroid_sr_3ds.bms"
         ]],
         "ts":0
@@ -3648,7 +3658,7 @@
     "blur":{
         "p":"BMS/blur.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/blur.bms",
+            "https://mirror.aluigi.org/bms/blur.bms",
             "BMS/blur.bms"
         ]],
         "ts":0
@@ -3664,7 +3674,7 @@
     "minecraft_pck":{
         "p":"BMS/minecraft_pck.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/minecraft_x360_pck.bms",
+            "https://mirror.aluigi.org/bms/minecraft_x360_pck.bms",
             "BMS/minecraft_pck.bms"
         ]],
         "ts":0
@@ -3672,7 +3682,7 @@
     "blitz_games":{
         "p":"BMS/blitz_games.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/blitz_games.bms",
+            "https://mirror.aluigi.org/bms/blitz_games.bms",
             "BMS/blitz_games.bms"
         ]],
         "ts":0
@@ -3680,7 +3690,7 @@
     "nfshp2010wii":{
         "p":"BMS/nfshp2010wii.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/nfshp2010wii.bms",
+            "https://mirror.aluigi.org/bms/nfshp2010wii.bms",
             "BMS/nfshp2010wii.bms"
         ]],
         "ts":0
@@ -3688,7 +3698,7 @@
     "angry_birds_go":{
         "p":"BMS/angry_birds_go.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/angry_birds_go.bms",
+            "https://mirror.aluigi.org/bms/angry_birds_go.bms",
             "BMS/angry_birds_go.bms"
         ]],
         "ts":0
@@ -3696,7 +3706,7 @@
     "angry_birds_starwars":{
         "p":"BMS/angry_birds_starwars.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/angry_birds_starwars.bms",
+            "https://mirror.aluigi.org/bms/angry_birds_starwars.bms",
             "BMS/angry_birds_starwars.bms"
         ]],
         "ts":0
@@ -3704,7 +3714,7 @@
     "xpk2":{
         "p":"BMS/xpk2.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/xpk2.bms",
+            "https://mirror.aluigi.org/bms/xpk2.bms",
             "BMS/xpk2.bms"
         ]],
         "ts":0
@@ -3760,7 +3770,7 @@
     "ttgames":{
         "p":"BMS/ttgames.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/ttgames.bms",
+            "https://mirror.aluigi.org/bms/ttgames.bms",
             "BMS/ttgames.bms"
         ]],
         "ts":0
@@ -3771,7 +3781,7 @@
     "dr_luigi_wiiu":{
         "p":"BMS/dr_luigi_wiiu.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/dr_luigi_wiiu.bms",
+            "https://mirror.aluigi.org/bms/dr_luigi_wiiu.bms",
             "BMS/dr_luigi_wiiu.bms"
         ]],
         "ts":0
@@ -3779,7 +3789,7 @@
     "star_fox_zero_dat":{
         "p":"BMS/star_fox_zero_dat.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/star_fox_zero_dat.bms",
+            "https://mirror.aluigi.org/bms/star_fox_zero_dat.bms",
             "BMS/star_fox_zero_dat.bms"
         ]],
         "ts":0
@@ -3787,7 +3797,7 @@
     "scsgames":{
         "p":"BMS/scsgames.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/scsgames.bms",
+            "https://mirror.aluigi.org/bms/scsgames.bms",
             "BMS/scsgames.bms"
         ]],
         "ts":0
@@ -3795,7 +3805,7 @@
     "remedy_bin_rmdp":{
         "p":"BMS/remedy_bin_rmdp.bms",
         "fs":[[
-            "https://aluigi.altervista.org/bms/remedy_bin_rmdp.bms",
+            "https://mirror.aluigi.org/bms/remedy_bin_rmdp.bms",
             "BMS/remedy_bin_rmdp.bms"
         ]],
         "ts":0
