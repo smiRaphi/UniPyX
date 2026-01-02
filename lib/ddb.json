@@ -324,6 +324,14 @@
         "rs":"XNB Dictionary","s":1
     },
     {
+        "d":[["isat","\\x08\\x0F\\x02",0],["n0",2,3],["py","f=open(inp,'rb');f.seek(3);c=int.from_bytes(f.read(2),'little');o=int.from_bytes(f.read(2),'little');return (5+c*2)==o"]],
+        "rs":"1941 Frozen Front Lang","s":1
+    },
+    {
+        "d":[["isat","STY0",0],["n0",1,4],["n0",4,5]],
+        "rs":"1941 Frozen Front Data","s":1
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"

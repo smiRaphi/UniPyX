@@ -2608,9 +2608,44 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 k = f.read(f.readleb128u()).decode('utf-8')
                 f.skip(1)
                 ob[k] = f.read(f.readleb128u()).decode('utf-8')
+            f.close()
 
             if ob:
                 open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8').write(json.dumps(ob,indent=2,ensure_ascii=False))
                 return
+        case '1941 Frozen Front Lang':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(3)
+            c = f.readu16()
+            fs = []
+            for _ in range(c): fs.append(f.readu16()-(c*2+5))
+            fs.append(None)
+            f.skip(2)
+
+            d = f.read()
+            ob = []
+            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode('utf-8'))
+
+            open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
+            if fs: return
+        case '1941 Frozen Front Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'STY0'
+            offs = []
+            for _ in range(2):
+                for _ in range(f.readu8()): offs.append(f.readu32())
+
+            f.seek(0)
+            d = f.read()
+            offs.append(None)
+            for ix in range(len(offs)-1): open(o + f'/{ix}.bin','wb').write(d[offs[ix]:offs[ix+1]])
+
+            if offs: return
 
     return 1
