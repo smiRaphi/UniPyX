@@ -37,6 +37,13 @@ class File:
     def reads32(self,end=None) -> int: return struct.unpack((end or self._end)+'i',self.read(4))[0]
     def reads64(self,end=None) -> int: return struct.unpack((end or self._end)+'q',self.read(8))[0]
     def readfloat(self,end=None) -> float: return struct.unpack((end or self._end)+'f',self.read(4))[0]
+    def readleb128u(self):
+        n = c = b = 0
+        while True:
+            b = self.readu8()
+            n |= (b & 0x7f) << (c * 7)
+            if not b & 0x80: return n
+            c += 1
 
     def read0s(self):
         r = b''

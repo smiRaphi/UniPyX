@@ -1315,5 +1315,11 @@
         "lua bytecode",
         "lua bytecode (generic)",
         "lua 5.1 bytecode"
+    ],
+    "XNB":[
+        "microsoft xna game studio binary package",
+        "xna framework content pipeline binary (windows)",
+        "xna framework content pipeline binary (xbox)",
+        "xna framework content pipeline binary (generic)"
     ]
 }

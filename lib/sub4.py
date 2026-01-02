@@ -6,8 +6,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
     o = out
 
     def quickbms(scr,inf=i,ouf=o,print_try=True):
+        scp = db.get(scr)
         if db.print_try and print_try: print('Trying with',scr)
-        run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
+        run(['quickbms','-Y',scp,inf,ouf],print_try=False)
         if os.listdir(ouf): return
         return 1
 
@@ -2590,5 +2591,26 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     return
 
                 return quickbms('luigi_mansion_dict')
+        case 'XNB': return quickbms('xnb')
+        case 'XNB Dictionary':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(1)
+            f.skip(f.readu8()+1+4)
+            f.skip(f.readu8()+6)
+            c = f.readu32()
+            ob = {}
+
+            for _ in range(c):
+                f.skip(1)
+                k = f.read(f.readleb128u()).decode('utf-8')
+                f.skip(1)
+                ob[k] = f.read(f.readleb128u()).decode('utf-8')
+
+            if ob:
+                open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8').write(json.dumps(ob,indent=2,ensure_ascii=False))
+                return
 
     return 1

@@ -320,6 +320,10 @@
         "rs":"Next Level Games DICT+DATA","s":1
     },
     {
+        "d":[["isat","\\x02",0],["n0",1,1],["isat","Microsoft.Xna.Framework.Content.DictionaryReader`",3]],
+        "rs":"XNB Dictionary","s":1
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"
