@@ -71,7 +71,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
         if tmpi: remove(tf)
 
-        if os.listdir(o): return
+        if listdir(o): return
         return 1
     def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[],stdin=None):
         scr = cmd[0]
@@ -99,12 +99,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             else: break
 
         for _ in range(10):
-            if os.path.getsize(oup + '/_OUT.TXT') > 0: break
+            if getsize(oup + '/_OUT.TXT') > 0: break
             sleep(0.1)
 
         while True:
             r = open(oup + '/_OUT.TXT','rb').read()
-            if len(r) == os.path.getsize(oup + '/_OUT.TXT'):
+            if len(r) == getsize(oup + '/_OUT.TXT'):
                 r = r.decode('utf-8')
                 break
             sleep(0.1)
@@ -131,7 +131,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if opt: print('Trying with input')
                 run([i,'x','-o' + o,'-y'])
                 db.print_try = opt
-            if os.listdir(o) and not exists(o + '/.rsrc'):
+            if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
                 elif t in ('ZSTD','xz','BZip2','LZIP'): return fix_tar(o)
                 else: return
@@ -170,18 +170,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'LHARC':
             run(['lha','xf','--extract-broken-archive','-w=' + o,i])
-            if os.listdir(o): return
+            if listdir(o): return
             run(['7z','x',i,'-o' + o,'-aou'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
             run(['pdfimages','-j',i,o + '\\img'])
             run(['pdftohtml','-embedbackground','-meta','-overwrite','-q',i,o + '\\html'])
-            if os.listdir(o + '/html'): return
+            if listdir(o + '/html'): return
             remove(o + '/html')
         case 'Nero CD IMG':
             run(['7z','x','-tnrg',i,'-o' + o,'-aou'])
-            for ix,f in enumerate(os.listdir(o)):
+            for ix,f in enumerate(listdir(o)):
                 tf = o + f'/{ix:02d}' + extname(f).lower()
                 to = o + f'\\{ix:02d}'
                 os.rename(o + '/' + f,tf)
@@ -189,7 +189,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     mkdir(to)
                     if extract1(tf,to,'ISO'): remove(to)
                     else: remove(tf)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'CDI'|'Aaru'|'ACT Apricot IMG':
             osj = OSJump()
             osj.jump(dirname(i))
@@ -197,12 +197,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             run(['aaru','filesystem','extract',i,td])
             osj.back()
             td = dirname(i) + '\\' + td
-            if exists(td) and os.listdir(td):
+            if exists(td) and listdir(td):
                 ret = False
-                for td1 in os.listdir(td):
+                for td1 in listdir(td):
                     td1 = td + '/' + td1
-                    if os.listdir(td1):
-                        copydir(td1 + '/' + os.listdir(td1)[0],o)
+                    if listdir(td1):
+                        copydir(td1 + '/' + listdir(td1)[0],o)
                         ret = True
                 remove(td)
                 if ret: return
@@ -213,10 +213,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             if not iso_udf and not extract1(i,o,'Aaru'): return
 
-            bd = os.listdir(o)
+            bd = listdir(o)
             run(['7z','x',i,'-o' + o,'-aou'])
             if exists(o):
-                for f in os.listdir(o):
+                for f in listdir(o):
                     if f not in bd: return
         case 'CUE+BIN'|'CDI CUE+BIN':
             osj = OSJump()
@@ -225,17 +225,17 @@ def extract1(inp:str,out:str,t:str) -> bool:
             run(['aaru','filesystem','extract',i,td])
             osj.back()
             td = dirname(i) + '\\' + td
-            if exists(td) and os.listdir(td):
-                td1 = td + '/' + os.listdir(td)[0]
-                copydir(td1 + '/' + os.listdir(td1)[0],o)
+            if exists(td) and listdir(td):
+                td1 = td + '/' + listdir(td)[0]
+                copydir(td1 + '/' + listdir(td1)[0],o)
                 remove(td)
                 return
             remove(o,td)
             mkdir(o)
 
             run(['bin2iso',i,o,'-a'])[1]
-            if os.listdir(o):
-                for f in os.listdir(o):
+            if listdir(o):
+                for f in listdir(o):
                     if f.endswith('.iso'):
                         nt = None
                         f = o + '\\' + f
@@ -283,7 +283,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             _,e,_ = run(['7z','l','-tAPM',i],print_try=False)
             if 'ERRORS:\nUnexpected end of archive' in e and '0.Apple_partition_map' in e:
                 run(['7z','x','-tAPM',i,'-o' + o,'-aou'])
-                fs = os.listdir(o)
+                fs = listdir(o)
                 if len(fs) > 1:
                     for f in fs:
                         f = o + '\\' + f.lower()
@@ -298,7 +298,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             if not extract(f,od,'Apple Disk Image'):
                                 remove(f,od)
                                 assert not exists(od)
-                    if os.listdir(o) != fs: return
+                    if listdir(o) != fs: return
                 remove(o)
                 mkdir(o)
             return extract(i,o,'Apple Disk Image')
@@ -315,15 +315,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 mkdir(cop)
                 _,_,e = run(['java','--enable-native-access=ALL-UNNAMED','-cp',db.get('hfsexplorer'),'org.catacombae.hfsexplorer.tools.UnHFS','-o',cop,'-resforks','APPLEDOUBLE','-sfm-substitutions','-partition',p,'--',i],print_try=False,env=ce)
                 if 'Failed to create directory ' in e: return 1
-                if exists(cop) and not os.listdir(cop): rmdir(cop)
+                if exists(cop) and not listdir(cop): rmdir(cop)
             if not exists(o): mkdir(o)
-            if os.listdir(o): return
+            if listdir(o): return
 
             return extract(i,o,'ISO')
         case 'Error Code Modeler':
             tf = TmpFile('.iso',path=o)
             run(['unecm',i,tf])
-            if not exists(tf.p) or not os.path.getsize(tf.p): return 1
+            if not exists(tf.p) or not getsize(tf.p): return 1
             if extract1(tf.p,o,'ISO'): mv(tf.p,o + '/' + tbasename(i))
             tf.destroy()
             return
@@ -338,7 +338,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     return 1
 
                 if extract(td + '/tmp.cue',o,'GD-ROM CUE+BIN'):
-                    for f in os.listdir(td.p): mv(td + '/' + f,o + '/' + tbasename(i) + extname(f))
+                    for f in listdir(td.p): mv(td + '/' + f,o + '/' + tbasename(i) + extname(f))
                 td.destroy()
             else:
                 tf = TmpFile('.img')
@@ -355,14 +355,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if fix_isinstext(o): return
                 elif os.path.exists(o + '/Disk1/ikernel.ex_'):
                     if fix_isinstext(o,o + '/Disk1'): return
-                elif os.listdir(o): return
+                elif listdir(o): return
                 run(['garbro','x','-o',o,i])
-                if os.listdir(o): return
+                if listdir(o): return
             else:
                 run(['unzip','-q','-o',i,'-d',o])
-                if os.listdir(o): return
+                if listdir(o): return
                 run(['7z','x',i,'-o' + o,'-aoa'])
-                if os.listdir(o): return
+                if listdir(o): return
                 import zipfile
                 try:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
@@ -415,10 +415,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
             f.close()
 
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o): return fix_tar(o)
+            if listdir(o): return fix_tar(o)
         case 'ZPAQ':
             run(['zpaq','x',i,'-f','-to',o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BZip':
             _,f,_ = run(['bzip','-dkc',basename(i)],cwd=dirname(i),text=False)
             if f:
@@ -430,15 +430,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if os.path.exists(td + '/1.img'):
                 run(['7z','x',td + '/1.img','-o' + o,'-aoa'])
                 td.destroy()
-                if os.listdir(o): return
+                if listdir(o): return
             td.destroy()
         case 'RAR':
             cmd = ['unrar','x','-or','-op' + o]
             if i.lower().endswith('-m4ckd0ge_repack.rar'): cmd += ['-pM4CKD0GE']
             run(cmd + [i])
-            if os.listdir(o): return
+            if listdir(o): return
             run(['7z','x',i,'-o' + o,'-aou'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'StuffIt'|'AmiPack':
            e,_,_ = run(['unar','-f','-o',o,i])
            if not e: return
@@ -463,7 +463,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fs and rldir(o): return
         case 'BBC Micro SSD':
             run(['bbccp','-i',i,'.',o + '\\'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ACE':
             db.get('acefile')
             if db.print_try: print('Trying with acefile')
@@ -475,18 +475,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
             else: return
         case 'AIN':
             dosbox(['ain','x',i],stdin='\n')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'HA': return msdos(['ha','xqy',i],cwd=o)
         case 'AKT': return msdos(['akt','x',i],cwd=o)
         case 'AMGC': return msdos(['amgc','x',i],cwd=o)
         case 'CPC IMG':
             if db.print_try: print('Trying with amstradcpcexplorer')
             run([sys.executable,db.get('amstradcpcexplorer'),i,'-dir','-ex'],print_try=False,cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case '2MG'|'Apple DOS IMG':
             td = 'tmp' + os.urandom(8).hex()
             run(['cadius','EXTRACTVOLUME',i,td])
-            if os.listdir(td):
+            if listdir(td):
                 copydir(td,o,True)
                 for f in rldir(o):
                     if f.endswith('\\_FileInformation.txt'): remove(f)
@@ -496,15 +496,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             if db.print_try: print('Trying with acx')
             run(['java','-jar',db.get('acx'),'x','--suggested','-d',i,'-o',o],print_try=False)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'AR':
             run(['ar','x',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ARQ': return msdos(['arq','-x',i,'*',o])
         case 'XX34': return msdos(['xx34','D',i],tmpi=True,cwd=o)
         case 'UHARC':
             dosbox(['uharcd','x',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup'|\
              'EPOC App Info'|'EPOC Install Package'|'GEM Resource':
             od = rldir(o)
@@ -518,7 +518,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if '.' in i and i[-1] == '_': mv(o + '/' + fs[0],o + '/' + basename(i[:-1]))
                         else: mv(o + '/' + fs[0],o + '/' + tbasename(i))
                     elif len(rn) > 3: move(x,dirname(x) + '\\' + rn)
-            fs = os.listdir(o)
+            fs = listdir(o)
             if fs: return
         case 'ZOO':
             if open(i,'rb').read(2) == b'MZ':
@@ -537,35 +537,35 @@ def extract1(inp:str,out:str,t:str) -> bool:
             else: return
 
             run(['unzoo','-x','-o','-j',o + '\\',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'YAC': return msdos(['yac','x',i],cwd=o)
         case 'Yamazaki Zipper':
             run(['yzdec','-d' + o,'-y',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case '777'|'BIX'|'UFA':
             # merge 7z predecessors
             run([t.lower(),'x','-y','-o' + o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Brotli':
             of = o + '/' + tbasename(i)
             run(['brotli','-d','-o',of,i])
-            if exists(of) and os.path.getsize(of): return fix_tar(o)
+            if exists(of) and getsize(of): return fix_tar(o)
         case 'BZip3':
             tf = o + '/' + basename(i)
             symlink(i,tf)
             run(['bzip3','-d','-f','-k',tf])
             remove(tf)
-            if os.listdir(o): return fix_tar(o)
+            if listdir(o): return fix_tar(o)
         case 'Turbo Range Coder':
             of = o + '/' + tbasename(i)
             run(['turborc','-d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'ACB':
             dosbox(['acb','r',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ALZip'|'EGG':
             run(['alzipcon','-x','-oa',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'AR7':
             _,_,r = run(['msdos',db.get('ar7'),'l',i])
             r = re.sub('\n+','\n',r.replace('\r','')).split('----------- ------------- ---- ------\n')[-1].strip().rsplit('\n',1)[0].replace('\n ',' ')
@@ -583,10 +583,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
             f.close()
             run(['asd','x','-y',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BlakHole':
             run(['izarccl','-e','-o','-p' + o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Compact Pro'|'MacBinary'|'Disk Doubler':
             cmd = ['unar','-f','-D','-k','visible']
             try: i.encode('ascii')
@@ -600,15 +600,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if inf['lsarEncoding'] not in ('macintosh','UTF-8'): cmd += ['-e','x-mac-japanese']
 
             run(cmd + ['-o',o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'DAR':
             run(['dar','-x','/cygdrive/' + i.replace('\\','/').replace(':',''),'-q','-qcrypto','-R','/cygdrive/' + o.replace('\\','/').replace(':','')])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'DietDisk':
-            ins = os.path.getsize(i)
+            ins = getsize(i)
             copy(i,o + '/TMP.EXT')
             dosbox(['fatten','O:\\TMP.EXT'],custs=dirname(db.get('dietdisk')) + '\\FATTEN.EXE',tmpi=False,xcmds=['-c','C:','-c','DIETDISK.COM','-c','O:'])
-            if os.path.getsize(o + '/TMP.EXT') != ins:
+            if getsize(o + '/TMP.EXT') != ins:
                 mv(o + '/TMP.EXT',o + '/' + basename(i))
                 return
         case 'DWC':
@@ -628,14 +628,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'Rob Northen Compression'|'Amiga XPK'|'File Imploder'|'Compact'|'Crunch-Mania'|'Freeze Compressed'|'FVL0 Compressed':
             of = o + '/' + tbasename(i)
             run(['ancient','decompress',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'ABE': return msdos(['dabe','-v','+i',i],cwd=o)
         case 'CarComp': return msdos(['car','x',i],cwd=o)
         case 'PeaZip':
             td = o + '\\tmp' + os.urandom(4).hex()
             run(['pea','UNPEA',i,td,'RESETDATE','SETATTR','EXTRACT2DIR','HIDDEN'])
             if exists(td):
-                if os.listdir(td):
+                if listdir(td):
                     copydir(td,o,True)
                     return
                 remove(td)
@@ -684,7 +684,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'Compaq QRST IMG'|'CopyQM IMG'|'FDCOPY CFI IMG':
             tf = TmpFile('.img',path=o)
             run(['dskconv','-otype','raw',i,tf])
-            if not exists(tf.p) or not os.path.getsize(tf.p): return 1
+            if not exists(tf.p) or not getsize(tf.p): return 1
             if extract1(tf.p,o,'IMG'): mv(tf.p,o + '/' + tbasename(i) + '.img')
             tf.destroy()
             return

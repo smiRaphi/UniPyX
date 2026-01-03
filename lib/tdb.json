@@ -1321,5 +1321,8 @@
         "xna framework content pipeline binary (windows)",
         "xna framework content pipeline binary (xbox)",
         "xna framework content pipeline binary (generic)"
+    ],
+    "PS3 Theme":[
+        "playstation 3 theme"
     ]
 }

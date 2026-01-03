@@ -9,14 +9,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
         scp = db.get(scr)
         if db.print_try and print_try: print('Trying with',scr)
         run(['quickbms','-Y',scp,inf,ouf],print_try=False)
-        if os.listdir(ouf): return
+        if listdir(ouf): return
         return 1
 
     match t:
         case 'U8'|'RARC':
             run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])
             remove(o + '/wszst-setup.txt')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'SARC':
             class Stub:
                 def __init__(self,*args,**kwargs):pass
@@ -48,7 +48,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             sys.modules.pop('os')
             os.path.dirname = dirname
 
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Yaz0':
             tf = TmpFile('.bin',path=o)
             run(['wszst','DEC',i,'-o','-E$','-d',tf])
@@ -65,15 +65,15 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'AFS':
             run(['afspacker','-e',i,o])
             if os.path.exists(noext(i) + '.json'): remove(noext(i) + '.json')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'NDS Sound Data':
             td = TmpDir()
             tf = td + '\\' + 'tmp' + os.urandom(8).hex() + '.sdat'
             symlink(i,tf)
             run(['ndssndext','-x',tf])
             remove(tf)
-            if os.listdir(td.p):
-                copydir(td + '/' + os.listdir(td.p)[0],o)
+            if listdir(td.p):
+                copydir(td + '/' + listdir(td.p)[0],o)
                 td.destroy()
                 return
             td.destroy()
@@ -107,13 +107,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
             osj.jump(td)
             run(['gcfsysd',i])
             osj.back()
-            if os.listdir(td.p):
+            if listdir(td.p):
                 copydir(td,o,True)
                 return
             td.destroy()
         case 'BRSAR':
             run(['mrst','extract','-o',o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ROFS Volume':
             tf = TmpFile('.iso')
             run(['cvm_tool','split',i,tf])
@@ -122,15 +122,15 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return r
         case 'RetroStudio PAK':
             run(['paktool','-x',i,'-o',o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'CPK':
             run(['cpkextract',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'CRI CPK': return quickbms('cpk')
         case 'Sonic AMB': return quickbms('sonic4')
         case 'Level5 ARC'|'Level5 XPCK':
             run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Iron Sky GPK':
             fs = []
             for x in re.findall(r'<File((?: \w+="\w{3}: [^"]*")+)\s*/>',open(i,encoding='utf-8').read()):
@@ -152,24 +152,24 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'NUB2': return quickbms('nus3_nub2')
         case 'CTPK':
             run(['ctpktool','-efd',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'XBP': return quickbms('xbp')
         case 'Bezel Archive': return quickbms('bea')
         case 'PlayStation Archive':
             run(['psarc','extract','--input='+i,'--to='+o])
-            if os.listdir(o): return
+            if listdir(o): return
             run(['unpsarc',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Unity Bundle':
             if db.print_try: print('Trying with assetripper')
             run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o],print_try=False)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Unity Assets':
             b = basename(i).lower()
             if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
                 bn = b.rstrip('0123456789')
                 fs = []
-                for x in os.listdir(dirname(i)):
+                for x in listdir(dirname(i)):
                     if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
                 tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
                 with open(tf,'wb') as f:
@@ -181,7 +181,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Rayman DCZ': return quickbms('rayman_dcz')
         case 'iQiyi PAK':
             run(['iqipack',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'LEGO JAM': return quickbms('legoracer_jam')
         case 'Metroid Samus Returns PKG': return quickbms('metroid_sr_3ds')
         case 'DDR DAT':
@@ -285,7 +285,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     #if r <= -8: print('v1',f'0x{cp:X}',f'0x{f.tell()-4:X}',r)
                     f.seek(cp+4)
 
-            ds = os.path.getsize(i)
+            ds = getsize(i)
             for t in tabs:
                 lt = max([x['o'] + x['s'] for x in t])
                 if lt == ds:
@@ -298,29 +298,29 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.close()
         case 'Allegro DAT':
             run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Doom WAD':
             osj = OSJump()
             osj.jump(o)
             run(['wadext',i,'-nogfxconvert','-nosndconvert'])
             osj.back()
-            if os.listdir(o) and os.listdir(o + '/' + os.listdir(o)[0]):
-                td = o + '/' + os.listdir(o)[0]
+            if listdir(o) and listdir(o + '/' + listdir(o)[0]):
+                td = o + '/' + listdir(o)[0]
                 while exists(td):
                     try: copydir(td,o,True)
                     except PermissionError:pass
                 return
         case 'Glacier RPKG':
             run(['rpkg','-extract_from_rpkg',i,'-output_path',o])
-            if os.listdir(o) and os.listdir(o + '/' + os.listdir(o)[0]):
-                td = o + '/' + os.listdir(o)[0]
+            if listdir(o) and listdir(o + '/' + listdir(o)[0]):
+                td = o + '/' + listdir(o)[0]
                 while exists(td):
                     try: copydir(td,o,True)
                     except PermissionError:pass
                 return
         case 'Glacier PKG Def':
             run(['rpkg','-decrypt_packagedefinition_thumbs',i,'-output_path',o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Blur PAK': return quickbms('blur')
         case 'Konami DPG':
             if db.print_try: print('Trying with custom extractor')
@@ -353,14 +353,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 inf.seek(offs[idx] + 4 + skp)
                 tof.write(inf.read(siz))
                 tof.close()
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Teardown Encrypted File':
             of = o + '\\' + basename(o) + '_'
             run(['tdedecrypt',i + '_',of])
-            if exists(of[:-1]) and (os.path.getsize(of[:-1]) or not os.path.getsize(i)): return
+            if exists(of[:-1]) and (getsize(of[:-1]) or not getsize(i)): return
         case 'UE4 Package':
             run(['repak','unpack','-o',o,'-q','-f',i])
-            if os.listdir(o): return
+            if listdir(o): return
 
             td = TmpDir()
             tds = td + '\\s\\s'
@@ -374,7 +374,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if db.print_try: print('Trying with',v)
                 print(run([std + '\\UnrealPak.exe',i,'-Extract',o],cwd=std.p,print_try=False))
                 std.destroy()
-                if os.listdir(o):
+                if listdir(o):
                     td.destroy()
                     return
             td.destroy()
@@ -383,11 +383,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else: prgf = None
             run(['unrealpak',i,'-Extract',o])
             if prgf and exists(prgf): remove(prgf)
-            if os.listdir(o): return
+            if listdir(o): return
 
             run(['zentools','ExtractPackages',dirname(i),o,'-PackageFilter=' + i])[1]
             remove(o + '/PackageStoreManifest.json')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Danganronpa WAD':
             if db.print_try: print('Trying with wad_archiver')
             db.get('wad_archiver')
@@ -397,13 +397,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 output = o
                 silent = True
             Commands.extract_files(Args)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Valve Package':
             run(['vpkedit','-o',o,'--no-progress','-e','/',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Direct Storage Archive':
             run(['unpsarc',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'NSMBW Coin World ARC':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -429,7 +429,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Arc System Works PAC': return quickbms('arcsys')
         case 'Chrome PAK':
             run(['chrome-pak','-u',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'PS3/PSV PUP':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -531,10 +531,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'RPG Maker Archive (XP/VX/VX Ace)':
             run(['rpgmakerdecrypter',i,'-w','-o',o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'RDB':
             run(['cethleann','--rdb','-k','-p','-y','-z',o,dirname(i),'--filelist',basename(i)])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Konami GAME.DAT':
             db.get('ddrutil')
             if db.print_try: print('Trying with ddrutil')
@@ -553,7 +553,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 of.write(d)
                 of.close()
             f.close()
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Hollow Knight Save':
             if db.print_try: print('Trying with custom extractor')
             try: from Cryptodome.Cipher import AES # type: ignore
@@ -570,7 +570,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'Initial D XAF':
             run(['assamunpack',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Safari WebArchive':
             db.get('pywebarchive')
             if db.print_try: print('Trying with pywebarchive')
@@ -582,13 +582,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else: return
         case 'WIM':
             run(['wimlib','apply',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
 
             return extract(i,o,'7z')
         case 'WATCOM Archive':
             if db.print_try: print('Trying with wpack')
             run(['msdos',db.get('wpack'),i],print_try=False,cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'RPACK':
             if db.print_try: print('Trying with custom extractor') # https://github.com/Qivex/rpack-extract/blob/main/rpack-extract.lua
             raise NotImplementedError
@@ -649,7 +649,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Minecraft PCK': return quickbms('minecraft_pck')
         case 'Mo\'PaQ':
             run(['mpqextractor','-e','*','-o',o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'IPS Patch'|'IPS32 Patch':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -668,7 +668,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if s == 0: d = f.readu16()*f.read(1)
                 else: d = f.read(s)
                 open(o + '/' + hex(off)[2:].upper().zfill(8 if i32 else 6) + '.bin','wb').write(d)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Bunny Pro. Das2 DPK':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -694,10 +694,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Cosmo Volume Game Archive'|'Dark Ages Map File'|'Build Engine RFF'|'God of Thunder Game Archive'|'Highway Hunter Game Archive':
             run(['gamearch',i,'-X'],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Build Engine Group'|'Descent Game Archive'|'EPF Game Archive':
             if not extract4(i,o,'Cosmo Volume Game Archive'):return # gamearch
             if not extract4(i,o,'The Sims FAR'):return # gameextractor
@@ -712,10 +712,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             hmmunpack.open = lambda *args,**kwargs:open('NUL' if args[0] == f'extract-report-{i.replace("\\","-").replace("/","-")}.txt' else args[0],*args[1:],**kwargs)
 
             hmmunpack.extract(i)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Compressed File Library':
             run(['uncfl',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ActiveMime':
             afp = db.get('amime')
             af = open(afp).read()
@@ -746,7 +746,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'FATX':
             run(['chextract-fatx',tf,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'QOOB Flash IMG':
             if db.print_try: print('Trying with custom extractor')
             f = open(i,'rb')
@@ -835,7 +835,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             lfmmstr.os.path.join = lambda i1,i2: _join(i1,i2.translate(str.maketrans(REPM)))
 
             lfmmstr.extract_mmstr_archive(i,True)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Exient XPK':
             f = open(i,'rb')
             ver = f.read(1)[0]
@@ -1041,7 +1041,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if cnt: return
         case 'Xbox XB Compressed':
             run(['xbdecompress','/Y','/T',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Xbox FArc':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1208,7 +1208,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'ICU Data':
             run(['icupkg','-x','*','-d',o,'--ignore-deps','--auto_toc_prefix',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Unreal Engine Web Package':
             if inp.endswith('.data'): inp += '.js'
             elif inp.endswith('.data.gz'): inp = inp[:-2] + 'js.gz'
@@ -1238,11 +1238,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
             try: from Cryptodome.Cipher import AES # type: ignore
             except ImportError: from Crypto.Cipher import AES # type: ignore
 
-            if os.path.getsize(i) == 0x400:
+            if getsize(i) == 0x400:
                 i = dirname(i) + '/nand.bin'
                 assert exists(i)
 
-            if os.path.getsize(i) != 0x21000400:
+            if getsize(i) != 0x21000400:
                 kf = open(dirname(i) + '/keys.bin','rb')
             else:
                 kf = open(i,'rb')
@@ -1269,7 +1269,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             from lib.file import File
             f = File(i,endian='>')
-            noecc = os.path.getsize(i) == 0x20000000
+            noecc = getsize(i) == 0x20000000
 
             if noecc: noffs = (0x1FC00000,0x20000000,0x40000)
             else: noffs = (0x20BE0000,0x21000000,0x42000)
@@ -1322,17 +1322,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         fat = f.readu16()
                     of.close()
             get_fst(0,o + '/NAND')
-            if os.listdir(o + '/NAND'): return
+            if listdir(o + '/NAND'): return
         case 'Wallpaper Engine PKG':
             run(['repkg','extract','-o',o,'-n','--no-tex-convert','--overwrite',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'AMOS Memory Bank':
             if db.print_try: print('Trying with custom extractor')
             open(o + '/' + tbasename(i) + '.bin','wb').write(open(i,'rb').read()[20:])
             return
         case 'PS2 Memory Card':
             run(['mymc','-i',i,'extract','*'],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Coktel Vision STK':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1497,7 +1497,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     elif fe[1] == 0x20:
                         xopen(path + '/' + fe[0].decode().strip('\\/'),'wb').write(f.read(fe[3]))
             read_dir(False)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Anna-Marie Archive':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1845,7 +1845,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             infp = inf.tell()
             inf.close()
-            if len(os.listdir(o)) > 1 or infp != infsp: return
+            if len(listdir(o)) > 1 or infp != infsp: return
         case 'Yay0':
             db.get('n64decompress')
             if db.print_try: print('Trying with n64decompress')
@@ -1865,7 +1865,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Package Resource Index':
             of = o + '\\' + tbasename(i) + '.xml'
             run(['makepri','dump','/if',i,'/of',of,'/o','/dt','Detailed'])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'DJarc':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1882,7 +1882,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Borland Form':
             of = o + '\\' + tbasename(i) + '.txt'
             run(['dfm2txt','bin',i,of])
-            if not (exists(of) and os.path.getsize(of)): return 1
+            if not (exists(of) and getsize(of)): return 1
 
             if db.print_try: print('Trying with custom extractor')
             d = open(of,encoding='ansi').read()
@@ -1911,7 +1911,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'Dragon VDK IMG':
             run(['dcopy',i,'*',o + '\\'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'FrontPage Theme':
             if db.print_try: print('Trying with custom extractor')
             f = open(i,'rb')
@@ -1939,7 +1939,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if n == '..': n = '__'
                 open(o + '/' + n,'wb').write(f.read(fl))
                 f.skip(1)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Across Crossword Puzzle':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2013,7 +2013,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     quickbms('dr_luigi_wiiu',tf.p,td.p,print_try=not ix)
                     tf.destroy()
 
-                    tfo = td.p + '/' + os.listdir(td.p)[0]
+                    tfo = td.p + '/' + listdir(td.p)[0]
                     try:
                         tg = open(tfo,'rb').read(8)
                         tgf = tg[:4].decode('ascii')
@@ -2026,7 +2026,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     td.destroy()
                 p.apply_async(extr,(tf,ix))
 
-            while len(os.listdir(o)) < fsl: sleep(0.1)
+            while len(listdir(o)) < fsl: sleep(0.1)
             for _ in range(50):
                 try: p.join()
                 except ValueError:sleep(0.1)
@@ -2161,7 +2161,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Nintendo Binary YAML':
             of = o + '\\' + tbasename(i) + '.yml'
             run(['byml-to-yaml','to-yaml',i,'-o',of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Soulcalibur Legends NPAC':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2177,11 +2177,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.skip(0x10)
                 open(f'{o}/{id}.bin','wb').write(f.read(s))
                 f.seek(np)
-            if os.listdir(o) or np == 0: return
+            if listdir(o) or np == 0: return
         case 'Backward LZ':
             tf = TmpFile(path=o)
             run(['blz','-d',i,tf])
-            if not exists(tf.p) or not os.path.getsize(tf.p): return 1
+            if not exists(tf.p) or not getsize(tf.p): return 1
             if open(tf.p,'rb').read(4) == b'NARC' and not extract4(tf.p,o,'NitroARC'):pass
             else: mv(tf.p,o + '/' + tbasename(i))
             tf.destroy()
@@ -2189,12 +2189,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Nintendo LZ10':
             of = o + '\\' + tbasename(i)
             run(['lz10','-d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'NitroARC':
             run(['narchive','extract',i,'-o',o])
-            if os.listdir(o): return
+            if listdir(o): return
             run(['narchive','extract',i,'-o',o,'-nf'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Super Monkey Ball Tip \'n Tilt String Data':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2427,7 +2427,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'SCS Archive':
             r = quickbms('scsgames')
-            if not r and (len(os.listdir(o)) != 1 or os.path.getsize(o + '/' + os.listdir(o)[0])): return
+            if not r and (len(listdir(o)) != 1 or getsize(o + '/' + listdir(o)[0])): return
         case '10,000 Bullets FILE.BIN':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2497,7 +2497,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 assert t in (1,2)
                 if t == 1: mkdir(o + '/' + fn)
                 elif t == 2: xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Metroid Prime 4 RFRM PACK':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2545,10 +2545,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             bv = db.print_try
             db.print_try = False
-            for f in os.listdir(o):
+            for f in listdir(o):
                 if f.endswith('.msbt'): extract4(o + '\\' + f,o,'Nintendo MSBT')
             db.print_try = bv
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Metroid Prime 4 RFRM ENUM':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2579,14 +2579,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 symlink(noext(i) + '.data',tfd)
 
                 run(['nlgfiletool',i])
-                if exists(tf[:-5]) and isdir(tf[:-5]) and os.listdir(tf[:-5]):
+                if exists(tf[:-5]) and isdir(tf[:-5]) and listdir(tf[:-5]):
                     remove(tf,tfd)
                     copydir(tf[:-5],o,True)
                     return
 
                 run(['nlgfiletool-mff',i])
                 remove(tf,tfd)
-                if exists(tf[:-5]) and isdir(tf[:-5]) and os.listdir(tf[:-5]):
+                if exists(tf[:-5]) and isdir(tf[:-5]) and listdir(tf[:-5]):
                     copydir(tf[:-5],o,True)
                     return
 
@@ -2618,7 +2618,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i,endian='<')
 
-            f.skip(3)
+            f.skip(1)
+            unk = f.readu16()
             c = f.readu16()
             fs = []
             for _ in range(c): fs.append(f.readu16()-(c*2+5))
@@ -2626,8 +2627,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(2)
 
             d = f.read()
+            f.close()
             ob = []
-            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode('utf-8'))
+            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode({17:'latin-1',527:'utf-8',14:'ascii'}[unk]))
 
             open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
             if fs: return
@@ -2643,9 +2645,53 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             f.seek(0)
             d = f.read()
+            f.close()
+
             offs.append(None)
             for ix in range(len(offs)-1): open(o + f'/{ix}.bin','wb').write(d[offs[ix]:offs[ix+1]])
 
             if offs: return
+        case 'PS3 Theme':
+            raise NotADirectoryError() # https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            assert f.read(4) == b'P3TF'
+
+            f.skip(4)
+        case 'Bejeweled And Peggle Combo Data':
+            if db.print_try: print('Trying with custom extractor')
+
+            bn = basename(i)
+            if (len(bn) == 2 and bn[0].isalpha() and bn[1].isdigit()) or (len(bn) == 1 and bn[0].isalpha() and getsize(i) == 0 and exists(bn + '0')):
+                fi = dirname(i) + '/' + bn[0]
+                assert exists(fi + '0'),"Missing first file"
+                d = b''
+                for ix in range(10):
+                    if not exists(fi + str(ix)): break
+                    d += open(fi + str(ix),'rb').read()
+            else: d = open(i,'rb').read()
+
+            from lib.file import File
+            f = File(d,endian='>')
+
+            if f.readu8(): f.skip(1)
+            f.skip(1)
+
+            c = 0
+            while f:
+                u1 = f.readu16()
+                if u1:
+                    f.skip([None,0x10,0x1C,None,0x34][u1])
+                    f.skip(2)
+
+                f.skip(6)
+                if not f: break
+                da = f.read(f.readu16())
+                open(f'{o}/{c}.{guess_ext(da)}','wb').write(da)
+                c += 1
+
+            if c: return
 
     return 1

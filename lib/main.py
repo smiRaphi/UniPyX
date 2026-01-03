@@ -21,6 +21,7 @@ DOSMAX = {
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext,abspath = os.path.basename,os.path.dirname,os.path.splitext,os.path.abspath
 symlink,rename = os.symlink,os.rename
+getsize,listdir = os.path.getsize,os.listdir
 def tbasename(i:str): return splitext(basename(str(i)))[0]
 def extname(i:str): return splitext(str(i))[1]
 def noext(i:str): return splitext(str(i))[0]
@@ -56,18 +57,18 @@ def copydir(i:str,o:str,delete=False,reni=False):
     mkdir(o)
     cfnc = cp
     if delete and abspath(i)[0].lower() == abspath(o)[0].lower(): cfnc = move
-    for x in os.listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
+    for x in listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
 def xopen(f:str,m='r',encoding='utf-8',newline=None):
-    f = os.path.abspath(str(f))
+    f = abspath(str(f))
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding,newline=newline)
 def rldir(i:str,files=True) -> list[str]:
     i = str(i)
     o = []
-    for x in os.listdir(i):
+    for x in listdir(i):
         x = i + '\\' + x
         if isfile(x): o.append(x)
         else:
@@ -138,7 +139,7 @@ def cleanp(i:str):
     while i.endswith('\\.'): i = i[:-1].rstrip('\\')
     while i.startswith('.\\'): i = i[1:].lstrip('\\')
     i = i.replace('\\.\\','\\')
-    return os.path.abspath(i)
+    return abspath(i)
 def checktdb(i:list[str]) -> list[str]:
     o = []
     for x in i:
@@ -162,7 +163,7 @@ def analyze(inp:str,raw=False):
         ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
         _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
         ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
-    _,o,_ = db.run(['file','-bsnNkm',os.path.dirname(db.get('file')) + '\\magic.mgc',inp])
+    _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
     for wt in ('plain text','Plain text','ASCII text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
@@ -185,7 +186,7 @@ def analyze(inp:str,raw=False):
     if 'null bytes' in ts: ts.remove('null bytes')
     if 'directory' in ts: ts.remove('directory')
 
-    if os.path.isfile(inp):
+    if isfile(inp):
         f = open(inp,'rb')
         if f.read(2) == b'MZ':
             f.seek(0x3C)
@@ -195,9 +196,9 @@ def analyze(inp:str,raw=False):
                 log = gtmp('.log')
                 db.run(['exeinfope',inp + '*','/s','/log:' + log])
                 for _ in range(15):
-                    if os.path.exists(log) and os.path.getsize(log): break
+                    if exists(log) and getsize(log): break
                     sleep(0.1)
-                if os.path.exists(log):
+                if exists(log):
                     lg = open(log,encoding='utf-8',errors='ignore').read().strip()
                     os.remove(log)
                     m = EIPER1.search(lg)
@@ -212,7 +213,7 @@ def analyze(inp:str,raw=False):
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
-                yp = os.path.dirname(yrep[0])
+                yp = dirname(yrep[0])
                 if yrep[1]:
                     db.run([yp + '/yarac.exe','-w',yp + '/packers_peid.yar',yp + '/packers_peid.yarc'])
                     remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
@@ -262,7 +263,7 @@ def analyze(inp:str,raw=False):
             if x[0] == 'py':
                 lc = {}
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'splitext':splitext,'isfile':isfile,'exists':exists},locals=lc)
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize},locals=lc)
                     ret = lc['check'](inp)
                 except:
                     print(x[1])
@@ -277,7 +278,7 @@ def analyze(inp:str,raw=False):
             elif x[0] == 'name': ret = basename(inp) == x[1]
             elif x[0] == 'print': print(*x[1:]);continue
             elif type(x[0]) == bool and x[0] == False: tret = ret = False
-            elif os.path.isfile(inp):
+            elif isfile(inp):
                 if x[0] == 'contain':
                     cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
                     f = open(inp,'rb')
@@ -477,7 +478,7 @@ def hookshot(cmd:list,redirect:dict,**kwargs):
 def fix_isinstext(o:str,oi:str=None):
     ret = True
     oi = oi or o
-    fs = os.listdir(oi)
+    fs = listdir(oi)
     if exists(oi + '/_INST32I.EX_'):
         mkdir(o + '/$_INST32I_EX_')
         extract(oi + '/_INST32I.EX_',o + '/$_INST32I_EX_','Stirling Compressed')
@@ -506,7 +507,7 @@ def fix_isinstext(o:str,oi:str=None):
         if oi == o:
             for x in fs: remove(oi + '/' + x)
         else: remove(oi)
-        for x in os.listdir(o):
+        for x in listdir(o):
             if not isdir(o + '/' + x) or x.upper() in ('$_INST32I_EX_','$_INST16_EX_','$ENGINE32'): continue
             while True:
                 try: copydir(o + '/' + x,o,True);break
@@ -535,8 +536,8 @@ def fix_innoinstext(o:str,i:str):
 
     return True
 def fix_tar(o:str,rem=True):
-    if len(os.listdir(o)) == 1:
-        f = o + '/' + os.listdir(o)[0]
+    if len(listdir(o)) == 1:
+        f = o + '/' + listdir(o)[0]
         if open(f,'rb').read(2) == b'MZ': return
         nts,_ = analyze(f,True)
         if nts == ['TAR'] or nts == ['Stripped TAR']:
@@ -547,7 +548,7 @@ def fix_tar(o:str,rem=True):
             return r
 def fix_cab(o:str,rem=True):
     ids = {}
-    for x in os.listdir(o):
+    for x in listdir(o):
         if len(extname(x)) != 4 or not extname(x)[1:].isdigit(): return
         id = int(extname(x)[1:])
         if id in ids: return
@@ -570,7 +571,7 @@ def fix_cab(o:str,rem=True):
         i.skip(8)
         n = i.read(i.readu16())[:-1].decode('ascii')
         if id not in ids: err = True
-        else: os.rename(o + '/' + ids[id],o + '/' + n)
+        else: mv(o + '/' + ids[id],o + '/' + n)
     i.close()
 
     if not err and rem: remove(o + '/' + ids[0])
@@ -585,7 +586,7 @@ def fix_zeebo(f,hint:int=None):
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'PLZP': ext = 'plzp'
     else:
-        f.skip(2)
+        f.seek(2,1)
         if f.read(4) == b'JFIF': ext = 'jpg'
         elif tag[:3] == b'ID3' or\
             (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
@@ -598,6 +599,25 @@ def fix_zeebo(f,hint:int=None):
         if hint == 0 and ext not in ('png','jpg'): ext = 'image'
         elif hint == 1 and ext not in ('wav','mid'): ext = 'audio'
         elif hint == 2: ext = 'txt'
+
+    return ext
+def guess_ext(f):
+    import io
+    if type(f) == bytes: f = io.BytesIO(f)
+
+    tag = f.read(4)
+
+    ext = 'bin'
+    if tag == b'\x89PNG': ext = 'png'
+    elif tag == b'RIFF': ext = 'wav'
+    elif tag == b'MThd': ext = 'mid'
+    else:
+        f.seek(2,1)
+        if f.read(4) == b'JFIF': ext = 'jpg'
+        elif tag[:3] == b'ID3' or\
+            (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
+                ext = 'mp3'
+        elif tag[0] == 0x78: ext = 'zlib'
 
     return ext
 
@@ -617,7 +637,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
         try:
             if not extract(inp,out,x):break
         except:
-            if not os.listdir(out): os.rmdir(out)
+            if not listdir(out): os.rmdir(out)
             raise
         rmtree(out)
     else:

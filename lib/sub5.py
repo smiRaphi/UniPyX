@@ -16,7 +16,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
 
         if tmpi: remove(tf)
 
-        if os.listdir(o): return
+        if listdir(o): return
         return 1
     def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
         scr = cmd[0]
@@ -42,12 +42,12 @@ def extract5(inp:str,out:str,t:str) -> bool:
             else: break
 
         for _ in range(10):
-            if os.path.getsize(oup + '/_OUT.TXT') > 0: break
+            if getsize(oup + '/_OUT.TXT') > 0: break
             sleep(0.1)
 
         while True:
             r = open(oup + '/_OUT.TXT','rb').read()
-            if len(r) == os.path.getsize(oup + '/_OUT.TXT'):
+            if len(r) == getsize(oup + '/_OUT.TXT'):
                 r = r.decode('utf-8')
                 break
             sleep(0.1)
@@ -65,29 +65,29 @@ def extract5(inp:str,out:str,t:str) -> bool:
             # merge some small compressors
             of = o + '/' + tbasename(i)
             run([t.split('(')[0].strip().lower(),'d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'ZCM':
             run(['zcm','x','-t0',i,o],timeout=300)
             if exists('master.tmp'): remove('master.tmp')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BCM':
             of = o + '/' + tbasename(i)
             run(['bcm','-d','-f',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'RAZOR':
             run(['rz','-y','-o',o,'x',i,'*'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'NanoZip':
             run(['nz','x','-o' + o,i,'*'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'bsc'|'bsc-m03':
             of = o + '/' + tbasename(i)
             run([t,'d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'LZHAM':
             of = o + '/' + tbasename(i)
             run(['lzham','-c','-u','d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'YBS':
             YBSR = re.compile(r': Error opening ([^\n]+)')
             if db.print_try: print('Trying with ybs')
@@ -96,35 +96,35 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 fs = YBSR.findall(r)
                 if not fs: break
                 for f in fs: mkdir(o + '/' + dirname(f))
-            if os.listdir(o): return
+            if listdir(o): return
         case 'CSArc':
             run(['csarc','x','-t8','-o',o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'RK':
             run(['rk','-x','-y','-O','-D' + o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'GRZip':
             run(['grzip','e',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BOA Constrictor':
             dosbox(['boa','-x',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Flashzip':
             run(['flashzip','x','-t0',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Dark':
             run(['dark','u',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'SBC':
             run(['sbc','x','-hn','-y','-t' + o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'SZIP':
             of = o + '/' + tbasename(i)
             run(['szip','-d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Zzip':
             run(['zzip','x','-q',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Squeez':
             f = open(i,'rb')
             if f.read(2) == b'MZ':
@@ -158,79 +158,79 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with sqx sfx')
             run([tf],print_try=False)
             remove(tf)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'IMP':
             run(['imp','e','-o' + o,'-y',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ARHANGEL':
             dosbox(['arhangel','x','-oq-',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'JAR':
             run(['jar','x','-y',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Lizard':
             of = o + '/' + tbasename(i)
             run(['lizard','-d','-f','-q',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Zhuff':
             of = o + '/' + tbasename(i)
             run(['zhuff','-d','-s',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'BriefLZ'|'QUAD':
             of = o + '/' + tbasename(i)
             run([t.lower(),'-d',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'UltraCompressor 2': raise NotImplementedError
         case 'LZFSE':
             of = o + '/' + tbasename(i)
             run(['lzfse','-decode','-i',i,'-o',of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'LIMIT':
             dosbox(['limit','e','-y','-p',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Squeeze It': return msdos(['sqz','x',i],cwd=o)
         case 'QuARK': return msdos(['quark','x','/y',i],cwd=o,text=False)
         case 'LZOP':
             run(['lzop','-x','-qf',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'OpenZL':
             of = o + '/' + tbasename(i)
             run(['zli','d','-o',of,'-f',i])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Flash': return msdos(['flash','-E',i,'*.*'],cwd=o)
         case 'Ai':
             run(['ai','e',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'B1':
             if db.print_try: print('Trying with b1-pack')
             run(['java','-jar',db.get('b1-pack'),'x','-o',o,i],print_try=False)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BLINK':
             run(['blink','X',i,'*'],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BSArc':
             dosbox(['bsa','x','-y','-S',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'BTSPK':
             dosbox(['btspk','x','-y','-e',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ChArc': return msdos(['charc','-E',i],cwd=o)
         case 'ChiefLZArchive':
             run(['lza',i,o,'/X'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ChiefLZZ':
             of = o + '/' + tbasename(i)
             run(['lza',i,of,'/U'])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'CMZ':
             run(['uncmz','-d',o,'-e',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Compressia':
             if db.print_try: print('Trying with compressia')
             prc = subprocess.Popen([db.get('compressia'),'e',i,o],stdout=-1,stderr=-1)
             run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',"(New-Object -ComObject WScript.Shell).SendKeys('{ENTER}')"],print_try=False,getexe=False)
             prc.wait()
-            if os.listdir(o): return
+            if listdir(o): return
         case 'CRUSH': return msdos(['uncrush','-qo',i],cwd=o)
         case 'DGCA':
             tf = i
@@ -242,13 +242,13 @@ def extract5(inp:str,out:str,t:str) -> bool:
             f.close()
             run(['dgcac','e',tf,o])
             if hasattr(tf,'destroy'): tf.destroy()
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Dzip':
             run(['dzip','-x',i,'-f'],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ESP':
             dosbox(['unesp','xys',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Snappy':
             _,od,_ = run(['snzip','-d','-k','-c',i],text=False)
             if not od: return 1
@@ -257,26 +257,26 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'TERSE':
             of = o + '/' + (tbasename(i) if i.lower().endswith(('.pack','.spack','.terse')) else basename(i))
             run(['tersedecompress++',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
             run(['tersedecompress++',i,of,'-b'])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'UCL':
             of = o + '/' + tbasename(i)
             run(['uclpack','-d',i,o])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Binary ][ Archive':
             run(['nulib2','-xs',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Compression Workshop': return msdos(['cwunpack',i],cwd=o)
         case 'SEMONE':
             dosbox(['semone','x',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'SLIM':
             tf = TmpFile(name='TMP.SLM',path=o)
             copy(i,tf.p)
-            isz = os.path.getsize(tf.p)
+            isz = getsize(tf.p)
             dosbox(['slim','X','O:\\TMP.SLM'],xcmds=['-c','C:\\SLIM.EXE ON'],tmpi=False)
-            if os.path.getsize(tf.p) != isz:
+            if getsize(tf.p) != isz:
                 rename(tf.p,o + '/' + basename(i)[:-4 if i.lower().endswith('.slm') else None])
                 return
             tf.destroy()
@@ -286,7 +286,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             r = msdos(['pah21',tf.p],cwd=o)
             tf.destroy()
             if not r:
-                for f in os.listdir(o):
+                for f in listdir(o):
                     if f[:4] == 'TMP.': mv(o + '/' + f,o + '/' + tbasename(i) + f[3:])
                 return
             return msdos(['pah3','e',i,'*'],cwd=o)
@@ -308,7 +308,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             sys.argv = Hack()
             import bin.hammer_decomp # type: ignore
             sys.argv = bargs
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'HIT': return msdos(['hit','x','-o',i],cwd=o)
         case 'Hyper': return msdos(['hyper','-xoo',i],cwd=o)
         case 'mcm':
@@ -316,30 +316,30 @@ def extract5(inp:str,out:str,t:str) -> bool:
             symlink(i,tf)
             run(['mcm','d',tf],cwd=o)
             remove(tf,tf + '.decomp')
-            if os.listdir(o): return
+            if listdir(o): return
 
             symlink(i,tf)
             of = o + '\\' + tbasename(i)
             run(['mcmsk','d',tf,of])
             remove(tf,tf + '.decomp')
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Kanzi':
             of = o + '/' + tbasename(i)
             run(['kanzi','-d','-i',i,'-o',of,'-v','0','-f'])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'PPMd':
             tf = 'tmp' + os.urandom(4).hex() + '.pmd'
             symlink(i,o + '/' + tf)
             run(['ppmd','d',tf],cwd=o)
             remove(o + '/' + tf)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ZXC':
             of = o + '/' + tbasename(i)
             open(of,'wb').write(run(['zxc','-d','-T','0','-k','-c','-f','-q',i],text=False)[1])
-            if exists(of) and os.path.getsize(of): return fix_tar(o)
+            if exists(of) and getsize(of): return fix_tar(o)
         case 'Vlaz':
             of = o + '/' + tbasename(i)
             open(of,'wb').write(run(['vlaz','-d','-f','-c',i],text=False)[1])
-            if exists(of) and os.path.getsize(of): return fix_tar(o)
+            if exists(of) and getsize(of): return fix_tar(o)
 
     return 1

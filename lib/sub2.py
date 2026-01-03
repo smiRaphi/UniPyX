@@ -8,17 +8,17 @@ def extract2(inp:str,out:str,t:str) -> bool:
     def quickbms(scr,inf=i,ouf=o,print_try=True):
         if db.print_try and print_try: print('Trying with',scr)
         run(['quickbms','-Y',db.get(scr),inf,ouf],print_try=False)
-        if os.listdir(ouf): return
+        if listdir(ouf): return
         return 1
 
     match t:
         case 'RVZ':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
-            if os.listdir(o):
+            if listdir(o):
                 if exists(o + '/DATA'):
-                    for sd in os.listdir(o):
+                    for sd in listdir(o):
                         rename(o + '/' + sd + '/sys',o + '/' + sd + '/$SYS')
-                        for sf in os.listdir(o + '/' + sd):
+                        for sf in listdir(o + '/' + sd):
                             if sf in ['$SYS','files']: continue
                             remove(o + '/' + sd + '/' + sf)
                         copydir(o + '/' + sd + '/files',o + '/' + sd,True,reni=True)
@@ -33,7 +33,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if exists(tf.p):
                 run(['wit','-q','X',tf,'-p','-o','-E$','-d',o])
                 tf.destroy()
-                fs = os.listdir(o)
+                fs = listdir(o)
                 if len(fs) == 1:
                     try:
                         mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
@@ -44,12 +44,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
             tf.destroy()
         case 'Wii ISO'|'GameCube ISO':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
-            if os.listdir(o):
+            if listdir(o):
                 rename(o + '/sys',o + '/$SYS')
                 copydir(o + '/files',o,True)
                 return
             run(['wit','-q','X',i,'-p','-o','-E$','-d',o])
-            fs = os.listdir(o)
+            fs = listdir(o)
             if len(fs) == 1:
                 try:
                     mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
@@ -113,9 +113,9 @@ def extract2(inp:str,out:str,t:str) -> bool:
             run(['3dstool','-xtf','romfs',o + '\\DecN3DSU.bin','--romfs-dir',o + '\\N3DSUpdate'])
             run(['3dstool','-xtf','romfs',o + '\\DecO3DSU.bin','--romfs-dir',o + '\\O3DSUpdate'])
 
-            for x in os.listdir(o):
+            for x in listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'NCCH CXI':
             e,_,_ = run(['3dstool','-xtf','cxi',i,'--header',o + '\\HNCCH.bin','--exh',o + '\\DecExH.bin','--exh-auto-key','--exefs',o + '\\DExeFS.bin','--exefs-auto-key','--exefs-top-auto-key','--romfs',o + '\\DRomFS.bin','--romfs-auto-key','--logo',o + '\\LogoLZ.bin','--plain',o + '\\PlainRGN.bin'])
             if e: return 1
@@ -124,7 +124,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
             if e: return 1
 
-            for x in os.listdir(o):
+            for x in listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
         case 'NCCH CFA':
@@ -135,7 +135,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             e,_,_ = run(['3dstool','-xtf','romfs',o + '\\DRomFS.bin','--romfs-dir',o + '\\RomFS'])
             if e: return 1
 
-            for x in os.listdir(o):
+            for x in listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
         case 'Switch NSP'|'Switch NCA'|'Switch XCI':
@@ -146,7 +146,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if ' MetaType=Patch ' in e and not ' MetaType=App ' in e:
                     pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
                     pid,pv = pinf[1],int(pinf[2],16)
-                    for x in os.listdir(dirname(i)):
+                    for x in listdir(dirname(i)):
                         if pid in x and x.endswith('.nsp'):
                             try: v = int(re.search(r'v(\d+)(?:\b|_)(?!\.)',x)[1])
                             except: v = 0
@@ -154,18 +154,18 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     else: return 1
                     bcd += ['--basepfs',bf]
                 run(bcd + [i])
-                if os.listdir(o) and os.listdir(o + '/ExeFS') and os.listdir(o + '/RomFS'): return
+                if listdir(o) and listdir(o + '/ExeFS') and listdir(o + '/RomFS'): return
                 rmdir(o)
                 mkdir(o)
         case 'NDS':
             run(['mdnds','e',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'PS4 PKG':
             rtd = TmpDir()
             run(['ps4pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,o])
             rtd.destroy()
-            if os.path.exists(o + '/Image0') and os.listdir(o + '/Image0'):
-                fs = os.listdir(o)
+            if os.path.exists(o + '/Image0') and listdir(o + '/Image0'):
+                fs = listdir(o)
                 copydir(o + '/Image0',o)
                 mv(o + '/Sc0',o + '/sce_sys')
                 for x in fs: remove(o + '/' + x)
@@ -174,9 +174,9 @@ def extract2(inp:str,out:str,t:str) -> bool:
             rtd = TmpDir()
             run(['ps5pkg','img_extract','--passcode','00000000000000000000000000000000','--tmp_path',rtd,i,o])
             rtd.destroy()
-            if os.listdir(o): raise NotImplementedError()
-            if os.path.exists(o + '/Image0') and os.listdir(o + '/Image0'):
-                fs = os.listdir(o)
+            if listdir(o): raise NotImplementedError()
+            if os.path.exists(o + '/Image0') and listdir(o + '/Image0'):
+                fs = listdir(o)
                 copydir(o + '/Image0',o)
                 mv(o + '/Sc0',o + '/sce_sys')
                 for x in fs: remove(o + '/' + x)
@@ -219,16 +219,16 @@ def extract2(inp:str,out:str,t:str) -> bool:
             osj = OSJump()
             osj.jump(o)
             run(['pkg2zip','-x',i] + ([zrif] if work else []))
-            if exists('app') and os.listdir('app') and os.listdir('app/' + os.listdir('app')[0]):
-                td = o + '/app/' + os.listdir('app')[0]
+            if exists('app') and listdir('app') and listdir('app/' + listdir('app')[0]):
+                td = o + '/app/' + listdir('app')[0]
                 osj.back()
 
                 run(['psvpfsparser','-i',td,'-o',o,'-z',zrif])
                 rmtree(o + '/app')
 
-                if os.listdir(o): return
+                if listdir(o): return
             else: osj.back()
-            if not work and os.listdir(o):
+            if not work and listdir(o):
                 if exists(o + '/pspemu/PSP'):
                     copydir(o + '/pspemu/PSP',o,True,reni=True)
                     os.rmdir(o + '/pspemu')
@@ -242,8 +242,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
             else: cmd += ['-titleKey',k]
             if db.print_try: print('Trying with jwudtool')
             run(cmd,print_try=False)
-            if os.listdir(o):
-                for x in os.listdir(o):
+            if listdir(o):
+                for x in listdir(o):
                     try:
                         if not x.startswith('GM'): remove(o + '/' + x);continue
                         if not exists(o + '/' + x + '/content'): remove(o + '/' + x);continue
@@ -252,7 +252,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 return
         case 'XISO':
             run(['xdvdfs','unpack',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Xbox LIVE ROM'|'Xbox PIRS':
             xpt = db.get('py360_stfs')
             xpd = open(xpt,encoding='utf-8').read()
@@ -274,10 +274,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
             stfs.os = os
 
             stfs.extract_all(['',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
-            if os.listdir(o):
+            if listdir(o):
                 from bin.sgkey import SGKeys
                 if exists(o + '/IP.BIN') and SGKeys().get(o): return extract(o + '\\IP.BIN',o,'Encrypted GD-ROM')
                 return
@@ -295,7 +295,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             from bin.tmd import TMD,derive_key,check_sha1,decrypt_content
 
             dr = dirname(i)
-            dls = [x for x in os.listdir(dr) if os.path.isfile(dr + '/' + x)]
+            dls = [x for x in listdir(dr) if os.path.isfile(dr + '/' + x)]
             if 'tmd' in dls: tmd = 'tmd'
             else: tmd = max([x for x in dls if x.startswith('tmd.')],key=lambda x:int(x.split('.')[-1]))
             tmd = TMD(dr + '/' + tmd)
@@ -325,16 +325,16 @@ def extract2(inp:str,out:str,t:str) -> bool:
             return
         case '3DO IMG':
             run(['3dt','unpack','-o',o,i])
-            if os.listdir(o) and os.listdir(o + '/' + basename(i) + '.unpacked'):
+            if listdir(o) and listdir(o + '/' + basename(i) + '.unpacked'):
                 copydir(o + '/' + basename(i) + '.unpacked',o,True)
                 return
         case 'Amiga IMG'|'SPS IPF':
             td = TmpDir()
             run(['uaeunp','-x',i,'**'],cwd=td.p)
-            for f in os.listdir(td.p):
+            for f in listdir(td.p):
                 if isdir(td.p + '/' + f): copydir(td.p + '/' + f,o)
             td.destroy()
-            if os.listdir(o): return
+            if listdir(o): return
 
             bcmd = ['hxcfe','-finput:' + i]
             _,op,_ = run(bcmd + ['-list'])
@@ -355,13 +355,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if rldir(o): return
         case 'Atari ATR':
             run(['atr',i,'x','-a'],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ZArchive':
             run(['zarchive',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'C64 Tape'|'C64 LiBRary':
             run(['dirmaster','/e',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Encrypted GD-ROM':
             from bin.sgkey import SGKeys
 
@@ -370,10 +370,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if not key: return 1
 
             drvs = []
-            for f in os.listdir(id):
+            for f in listdir(id):
                 if len(f) != 7: continue
                 ld = id + '\\' + f
-                if isdir(ld) or os.path.getsize(ld) != 0x100: continue
+                if isdir(ld) or getsize(ld) != 0x100: continue
 
                 lf = open(ld,'rb')
                 if sum(lf.read(8)) == 0 and sum(lf.read(8)) != 0 and sum(lf.read(3)) == 0 and lf.read(1)[0] == 0xFF and sum(lf.read(0x8C)) == 0:
@@ -441,17 +441,17 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     if nt:
                         mkdir(od)
                         extract2(tf,od,nt)
-                if exists(od) and not os.listdir(od): rmdir(od)
+                if exists(od) and not listdir(od): rmdir(od)
             return
         case 'N64DD':
             run(['mfs_manager',i,'-e'],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'MSX Cassette IMG':
             run(['mcp','-x',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'ZX Spectrum Tape IMG':
             run(['tapsplit',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'CPC Plus IMG':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -569,7 +569,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     FC -= 1
                     if not FC: f.seek(disk_pos + 0xFFDC)
                 if not fds: f.skip(2)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'XVD':
             from bin.xb1key import XB1Keys
 
@@ -578,7 +578,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for p in ('../',''):
                 p = dirname(i) + '/' + p + 'Licenses'
                 if exists(p):
-                    for f in os.listdir(p):
+                    for f in listdir(p):
                         if f.endswith('.xml') and f.lower().startswith('license'): xb1k.add_license(p + '/' + f)
                     xb1k.save()
 
@@ -595,19 +595,19 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             run(cmd + [i])
             if tf:
-                if not os.listdir(o):
+                if not listdir(o):
                     copy(i,o + '/' + basename(i) + '.dec.xvd')
                     run(['xvdtool.streaming','decrypt','-c',tf.p,'-n',o + '/' + basename(i) + '.dec.xvd'])
                     remove(tf.p)
                     return
                 remove(tf.p)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Acorn Disc Filing IMG':
             tf = TmpFile('.txt')
             open(tf.p,'w',encoding='utf-8').write(f'insert "{i}"\nextract *\nfree\nexit\n')
             run(['discimagemanager','-c',tf],cwd=o)
             tf.destroy()
-            if os.listdir(o):
+            if listdir(o):
                 from time import strptime,mktime
 
                 for f in rldir(o,False):
@@ -639,7 +639,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             run(['c1541'],stdin=f'attach "{i}"\nextract\nquit\n',cwd=o)
             cd = dirname(db.get('c1541'))
             remove(cd + '/stderr.txt',cd + '/stdout.txt')
-            if os.listdir(o): return
+            if listdir(o): return
 
             if not extract(i,o,'DIET'):return # deark 
 
@@ -709,7 +709,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             return
         case 'Zelda 64 ROM':
             run(['zre','-o',o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'SimpleFlashFS':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -737,7 +737,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
                 open(o + '/' + fn,'wb').write(f.read(fs))
                 f.seek(cp + ln)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Konami Python IMG':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -782,7 +782,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             p = subprocess.Popen([db.get('rrvatool'),i],stdout=-1,stderr=-1)
             sleep(1)
             
-            while not os.listdir(i + '_extract'): sleep(0.1)
+            while not listdir(i + '_extract'): sleep(0.1)
             while True:
                 try:copydir(i + '_extract',o,True)
                 except:sleep(0.1)
@@ -790,10 +790,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
             p.kill()
             remove(tf)
 
-            for x in os.listdir(o):
-                if not os.path.getsize(o + '/' + x): remove(o + '/' + x)
+            for x in listdir(o):
+                if not getsize(o + '/' + x): remove(o + '/' + x)
 
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Donkey Kong Banana Kingdom':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

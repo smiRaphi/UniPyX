@@ -8,7 +8,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
     def quickbms(scr,inf=i,oup=o):
         if db.print_try: print('Trying with',scr)
         run(['quickbms','-Y',db.get(scr),inf,oup],print_try=False)
-        if os.listdir(oup): return
+        if listdir(oup): return
         return 1
     def jsbeautifier(scr,inf=i,oup=o):
         t = scr
@@ -97,12 +97,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
             else: break
 
         for _ in range(10):
-            if os.path.getsize(oup + '/_OUT.TXT') > 0: break
+            if getsize(oup + '/_OUT.TXT') > 0: break
             sleep(0.1)
 
         while True:
             r = open(oup + '/_OUT.TXT','rb').read()
-            if len(r) == os.path.getsize(oup + '/_OUT.TXT'):
+            if len(r) == getsize(oup + '/_OUT.TXT'):
                 r = r.decode('utf-8')
                 break
             sleep(0.1)
@@ -163,13 +163,13 @@ def extract3(inp:str,out:str,t:str) -> bool:
     match t:
         case 'Qt IFW':
             run(['qtifw-devtool','dump',i,o])
-            if os.listdir(o): return
+            if listdir(o): return
 
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o) and not exists(o + '/.rsrc'): return
+            if listdir(o) and not exists(o + '/.rsrc'): return
         case 'MSCAB SFX':
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o) and not exists(o + '/.rsrc'): return
+            if listdir(o) and not exists(o + '/.rsrc'): return
             remove(o)
             mkdir(o)
 
@@ -181,7 +181,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for _ in range(20):
                 if prc.poll() != None:
                     for _ in range(50):
-                        if os.listdir(o): return
+                        if listdir(o): return
                         sleep(0.1)
                     break
                 sleep(0.1)
@@ -192,7 +192,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for _ in range(10):
                 if prc.poll() != None:
                     for _ in range(50):
-                        if os.listdir(o): return
+                        if listdir(o): return
                         sleep(0.1)
                     break
                 sleep(0.1)
@@ -203,8 +203,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for _ in range(10):
                 if prc.poll() != None:
                     for _ in range(50):
-                        if os.listdir(o):
-                            for f in os.listdir(o):
+                        if listdir(o):
+                            for f in listdir(o):
                                 if f.endswith('.msi'): extract(o + '/' + f,o,'MSI')
                             return
                         sleep(0.1)
@@ -213,13 +213,13 @@ def extract3(inp:str,out:str,t:str) -> bool:
             else: prc.kill()
         case 'NSIS Installer':
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o) and not exists(o + '/.rsrc'): return
+            if listdir(o) and not exists(o + '/.rsrc'): return
             rmtree(o)
             mkdir(o)
 
             if quickbms('instexpl'):
                 tm = []
-                for x in os.listdir(o):
+                for x in listdir(o):
                     if isfile(o + '/' + x): tm.append(o + '/' + x)
                 if tm:
                     mkdir(o + '/$INSFILES')
@@ -236,7 +236,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if e: print('BAT returned',e,r)
                 else: remove(o + '/00000000.BAT')
                 return
-            if os.listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
+            if listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
             f = open(i,'rb')
             f.seek(-0x1C76,2)
@@ -254,8 +254,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 else: pwd = []
 
                 run(['innounp-2','-x','-b','-m','-d' + o,'-u','-h','-o','-y'] + pwd + [i])
-                if not os.listdir(o): run(['innounp','-x','-m','-d' + o,'-y'] + pwd + [i])
-                for x in os.listdir(o):
+                if not listdir(o): run(['innounp','-x','-m','-d' + o,'-y'] + pwd + [i])
+                for x in listdir(o):
                     if x != '{app}':
                         try: mv(o + '/' + x,o + '/$INSFILES/')
                         except PermissionError: copy(o + '/' + x,o + '/$INSFILES/')
@@ -271,15 +271,15 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             if pwd: pwd = ['-P',pwd[2:]]
             run(['innoextract','-e','-q','--iss-file','-g'] + pwd + ['-d',o,i])
-            if os.listdir(o):
-                for x in os.listdir(o):
+            if listdir(o):
+                for x in listdir(o):
                     if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
                 if exists(o + '/app'): copydir(o + '/app',o,True)
                 return
         case 'VISE Installer'|'Inno Archive': return quickbms('instexpl')
         case 'MSI':
             run(['lessmsi','x',i,o + '\\'])
-            if exists(o + '/SourceDir') and os.listdir(o + '/SourceDir'):
+            if exists(o + '/SourceDir') and listdir(o + '/SourceDir'):
                 for _ in range(10):
                     try:copydir(o + '/SourceDir',o,True)
                     except PermissionError:pass
@@ -291,18 +291,18 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
             copydir(td,o)
             td.destroy()
-            if os.listdir(o): return
+            if listdir(o): return
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'MSP':
             run(['msix',i,'/out',o,'/ext'])
-            if os.listdir(o): return
+            if listdir(o): return
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Setup Factory Installer':
             if not quickbms('totalobserver'):
-                if os.listdir(o + '/%AppDir%'):
-                    for x in os.listdir(o):
+                if listdir(o + '/%AppDir%'):
+                    for x in listdir(o):
                         if isfile(o + '/' + x): remove(o + '/' + x)
                     copydir(o + '/%AppDir%',o,True)
                 if exists(o + '/%SysDir%'): mv(o + '/%SysDir%',o + '/$SYS')
@@ -364,7 +364,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if exists(o + '/' + tbasename(i) + '_ext.bin'):
                 remove(o)
                 mkdir(o)
-            elif os.listdir(o):
+            elif listdir(o):
                 if exists(o + '/Disk1/setup.exe'):
                     if fix_isinstext(o,o + '\\Disk1'): return
                 return
@@ -377,15 +377,15 @@ def extract3(inp:str,out:str,t:str) -> bool:
             _,po,_ = run(['isxunpack',tf],'\n')
             remove(tf)
             osj.back()
-            if 'All Files are Successfuly Extracted!' in po and len(os.listdir(td.p)) == 1:
-                copydir(td + '/' + os.listdir(td.p)[0],o,True)
+            if 'All Files are Successfuly Extracted!' in po and len(listdir(td.p)) == 1:
+                copydir(td + '/' + listdir(td.p)[0],o,True)
                 if os.path.exists(o + '/_inst32i.ex_'):
                     if fix_isinstext(o): return
                 else: return
 
             quickbms('instexpl')
-            fs = os.listdir(o)
-            if fs == ['install.exe','uninst.exe'] and (os.path.getsize(o + '/install.exe') + os.path.getsize(o + '/uninst.exe')) == 0:
+            fs = listdir(o)
+            if fs == ['install.exe','uninst.exe'] and (getsize(o + '/install.exe') + getsize(o + '/uninst.exe')) == 0:
                 remove(o + '/install.exe',o + '/uninst.exe')
                 fs = []
             if fs:
@@ -406,7 +406,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['icomp','archive.z','*.*','-d','-i'],timeout=2)
             remove('archive.z')
             osj.back()
-            if not os.listdir(td.p): td.destroy()
+            if not listdir(td.p): td.destroy()
             else:
                 copydir(td.p,o)
                 td.destroy()
@@ -417,7 +417,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             osj.jump(td)
             e,_,_ = run(['i6comp','x','-rof',i])
             osj.back()
-            if not e and os.listdir(td.p):
+            if not e and listdir(td.p):
                 copydir(td,o)
                 td.destroy()
                 return
@@ -428,7 +428,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             osj.jump(td)
             e,_,_ = run(['i5comp','x','-rof',i])
             osj.back()
-            if not e and os.listdir(td.p):
+            if not e and listdir(td.p):
                 copydir(td,o)
                 td.destroy()
                 return
@@ -447,9 +447,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             ti.destroy()
         case 'FreeArc':
             run(['unarc','x','-o+','-dp' + o,i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Big EXE':
-            ts = os.path.getsize(i)
+            ts = getsize(i)
             f = open(i,'rb')
             f.seek(64)
             c = 0
@@ -469,7 +469,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 for ix in range(c):
                     try: xr = main_extract(o + f'/{ix}.exe',o + f'/{ix}')
                     except AssertionError: xr = False
-                    if exists(o + f'/{ix}') and not os.listdir(o + f'/{ix}'): remove(o + f'/{ix}')
+                    if exists(o + f'/{ix}') and not listdir(o + f'/{ix}'): remove(o + f'/{ix}')
                     elif xr: remove(o + f'/{ix}.exe')
                 return
         case 'Resource DLL':
@@ -484,7 +484,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run([i,'/s','/nos_ne','/nos_o' + o],print_try=False)
             if bk != None: os.environ['__COMPAT_LAYER'] = bk
             else: del os.environ['__COMPAT_LAYER']
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Advanced Installer':
             if db.print_try: print('Trying with input (/extract)')
             td = TmpDir()
@@ -495,12 +495,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 sleep(0.1)
             else: p.kill()
 
-            if os.listdir(td.p):
-                bp = td.p + '\\' + os.listdir(td.p)[0]
-                for f in os.listdir(bp):
+            if listdir(td.p):
+                bp = td.p + '\\' + listdir(td.p)[0]
+                for f in listdir(bp):
                     if not f.endswith('.msi') or extract(bp + '\\' + f,o,'MSI'): mv(bp + '\\' + f,o + '\\$INSFILES\\' + f)
                 td.destroy()
-                if os.listdir(o): return
+                if listdir(o): return
         case 'CExe':
             err,e,_ = run(['resourceextractor','list',i])
             if err: return 1
@@ -512,19 +512,19 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
                     td = TmpDir()
                     if ('SZDD' in ar and not extract(tf.p,td.p,'SZDD')) or ('ZLIB' in ar and not extract(tf.p,td.p,'ZLIB')):
-                        otf = td.p + '\\' + os.listdir(td.p)[0]
+                        otf = td.p + '\\' + listdir(td.p)[0]
                         if open(otf,'rb').read(8) == b'MZ\x90\0\3\0\0\0': mv(otf,o + '/' + x.split('/')[1] + '.exe')
                         else: mv(otf,o + '/' + x.split('/')[1])
                     else: mv(tf.p,o + '/' + x.split('/')[1])
                     tf.destroy()
                     td.destroy()
 
-            for f in os.listdir(o):
+            for f in listdir(o):
                 f = o + '\\' + f
-                if not f.endswith('.exe') or os.path.getsize(f) < 16384:continue
+                if not f.endswith('.exe') or getsize(f) < 16384:continue
                 main_extract(f,f[:-4])
 
-            if os.listdir(o): return
+            if listdir(o): return
         case 'PyInstaller':
             run(['pyinstxtractor-ng',i],cwd=o)
             if exists(o + '/' + basename(i) + '_extracted'):
@@ -618,9 +618,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case '624'|'4kZIP'|'Amisetup'|'aPACK'|'AVPACK'|'COM RLE Packer'|'Cruncher'|'DexEXE'|'Dn.COM Cruncher'|'Envelope'|'ExeLITE'|'JAM'|'LGLZ'|'Pack Packed'|\
              'PMWLite'|'RDT Compressor'|'RJCrush'|'Shrinker Packed'|'SpaceMaker'|'T-PACK'|'Tenth Planet Soft'|'TSCRUNCH'|'XPACK/LZCOM':
             dosbox(['cup386',i,'OUT.BIN','/1h' + ('x' if open(i,'rb').read(2) == b'MZ' else '')])
-            chks = os.path.getsize(i)-768
+            chks = getsize(i)-768
             if chks < 0x10: chks = 0x10
-            if exists(o + '/OUT.BIN') and os.path.getsize(o + '/OUT.BIN') >= chks:
+            if exists(o + '/OUT.BIN') and getsize(o + '/OUT.BIN') >= chks:
                 on = basename(i)
                 if on.lower().endswith('.exe') and open(o + '/OUT.BIN','rb').read(2) != b'MZ': on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
                 elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
@@ -628,9 +628,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'COMPACK'|'Compress-EXE'|'ICE'|'Optlink'|'PGMPAK'|'TinyProg':
             dosbox(['unp','e',i,'OUT.BIN'])
-            chks = os.path.getsize(i)-768
+            chks = getsize(i)-768
             if chks < 0x10: chks = 0x10
-            if exists(o + '/OUT.BIN') and os.path.getsize(o + '/OUT.BIN') >= chks:
+            if exists(o + '/OUT.BIN') and getsize(o + '/OUT.BIN') >= chks:
                 on = basename(i)
                 if on.lower().endswith('.exe') and open(o + '/OUT.BIN','rb').read(2) != b'MZ': on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
                 elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
@@ -655,7 +655,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Godot Game'|'Godot Pack':
             run(['gdre_tools','--headless','--extract=' + i,'--output=' + o,'--ignore-checksum-errors'])
             if exists(o): remove(o + '/gdre_export.log')
-            if os.listdir(o): return
+            if listdir(o): return
         case 'IRIX IDB':
             if db.print_try: print('Trying with custom extractor')
 
@@ -803,7 +803,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Compressed Nintendo Switch Executable':
             of = o + '/' + tbasename(i) + '.nso'
             run(['nsnsotool',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'GameCube DOLXZ'|'Wii DOLXZ':
             if db.print_try: print('Trying with custom extractor')
             import lzma
@@ -826,7 +826,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             assert exists(tf)
             extract(tf,o,'7z')
             remove(tf)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'd0lLZ 1'|'d0lLZ 2':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1048,12 +1048,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
             symlink(i,tf)
             run(['unp64',tf])
             remove(tf)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'VMProtect': raise NotImplementedError
         case 'Encrypted EAC Payload':
             hookshot(['decrypteacpayload','-e',i],{'C:\\EAC_Dumps':o})
 
-            for f in os.listdir(o):
+            for f in listdir(o):
                 p = o + '\\' + f
                 if f.startswith('Dump_') and isdir(p) and exists(p + '/EAC_Launcher_decrypted.dll'): break
             else: return 1
@@ -1063,13 +1063,13 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if open(o + '/EAC_Launcher_decrypted.dll','rb').read(4) in (b'MZ\x90\x00',b'\x7FELF'): return
         case 'Chromium Delta Update':
             run(['android-ota-extract',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Excel DNA XLL':
             run(["exceldna-unpack",'--xllFile=' + i,'--outFolder=' + o,'--overwrite'])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Nuitka Compiled':
             run(['nuitka-extractor',i],cwd=o)
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Python Compiled Module':
             err,r,_ = run(['pycdc',i],text=False)
             assert not err
@@ -1077,8 +1077,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             return
         case 'Install Creator Pro':
             run(['cicdec','-db',i,o])
-            if os.listdir(o):
-                for f in os.listdir(o):
+            if listdir(o):
+                for f in listdir(o):
                     if f.startswith('Block 0x') and f.endswith('.bin'):
                         mkdir(o + '/$INSFILES')
                         mv(o + '/' + f,o + '/$INSFILES/' + f.rsplit(None,1)[1].replace('UNINSTALLER.bin','UNINSTALLER.exe'))
@@ -1094,7 +1094,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Atomik Cruncher':
             of = o + '/' + basename(i)
             vamos(['xfddecrunch',i,of])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'Netcrypt':
             if db.print_try: print('Trying with custom extractor')
             import base64
@@ -1169,7 +1169,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             db.print_try = pr
             for de in re.findall(r"(?m)^ *mkdir +(?P<q1>['\"]?)(.+)(?P=q1)\n",d): mkdir(o + '/' + de[1])
 
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Casio BE-300 Package':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1198,10 +1198,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + basename(i) + '.elf'
             run(['uclpack','-d',tf.p,of])
             tf.destroy()
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
         case 'EDI Install Archive':
             dosbox(['ediextract','/U:.',i])
-            if os.listdir(o): return
+            if listdir(o): return
         case 'EDI Install LZSS': return extract(i,o,'ARX') # deark
         case '.NET Packer 1':
             if db.print_try: print('Trying with custom extractor')
@@ -1261,9 +1261,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if mv == 5 and iv in (0,1,2,3,4):
                 if db.print_try: print('Trying with unluac')
                 run(['java','-jar',db.get('unluac'),'--output',of,i],print_try=False)
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
 
             if mv == 5 and iv == 1: open(of,'wb').write(run(['luadec51','--',i],text=False)[1])
-            if exists(of) and os.path.getsize(of): return
+            if exists(of) and getsize(of): return
 
     return 1
