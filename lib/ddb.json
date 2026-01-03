@@ -336,6 +336,10 @@
         "rs":"Bejeweled And Peggle Combo Data"
     },
     {
+        "d":[["size",[8,32768]],["n0",2,0],["str",4,2],["str",4,-4],["py","f=open(inp,'rb')\nwhile 1:\n s=f.read(2)\n if not s:break \n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n if len(f.read(s))!=s:return\nreturn True"]],
+        "rs":"Bejeweled And Peggle Combo Strings"
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"

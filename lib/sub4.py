@@ -2693,5 +2693,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 c += 1
 
             if c: return
+        case 'Bejeweled And Peggle Combo Strings':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            ob = []
+            while f: ob.append(f.read(f.readu16()))
+            f.close()
+
+            if ob:
+                open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(ob))
+                return
 
     return 1
