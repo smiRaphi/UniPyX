@@ -332,7 +332,7 @@
         "rs":"1941 Frozen Front Data","s":1
     },
     {
-        "d":[["size",[0,32768],["py","if getsize(i)==0:\n if not exists(i+'0') or not exists(i+'1'):return\n i+='0'\nf=open(i,'rb')\nif f.read(1)[0]:fs=int.from_bytes(f.read(2),'big')\nelif f.read(1)[0]:return\nelse:fs=-1\nif sum(f.read(2))or not sum(f.read(6)):return\ns=int.from_bytes(f.read(2),'big')\nif fs>=0 and s!=fs:return\nf.seek(s,1)\nb=f.read(2)\nreturn b and not b[0]and b[1]in(0,1,2,4)"]]],
+        "d":[["size",[0,32768]],["py","if getsize(inp)==0:\n if not exists(inp+'0') or not exists(inp+'1'):return\n inp+='0'\nf=open(inp,'rb')\nif f.read(1)[0]:fs=int.from_bytes(f.read(2),'big')\nelif f.read(1)[0]:return\nelse:fs=-1\nif sum(f.read(2))or not sum(f.read(6)):return\ns=int.from_bytes(f.read(2),'big')\nif fs>=0 and s!=fs:return\nf.seek(s,1)\nb=f.read(2)\nreturn b and not b[0]and b[1]in(0,1,2,4)"]],
         "rs":"Bejeweled And Peggle Combo Data"
     },
     {
@@ -772,7 +772,7 @@
     },
     {
         "rqr":null,
-        "d":[["isat","2.01",4],["n0",4,0],["isatS","\\0",8,8],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(0x10);return int.from_bytes(f.read(4),'little') == (c * 0x10 + 0x10)"]],
+        "d":[["isat","2.01",4],["n0",4,0],["isatS","\\0",8,8],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(0x10);return int.from_bytes(f.read(4),'little')==(c*0x10+0x10)"]],
         "rs":"Digimon Story Lost Evolution PAK","s":1
     },
     {
@@ -805,7 +805,7 @@
         "rq":null,
         "rqr":null,
         "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],
-             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
+             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0]>1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1]!=0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1]!=0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
         "rs":"ZCM"
     },
     {
