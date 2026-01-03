@@ -168,7 +168,7 @@ def analyze(inp:str,raw=False):
 
     for wt in ('plain text','Plain text','ASCII text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration'):
+               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:

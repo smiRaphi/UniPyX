@@ -2262,10 +2262,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]-fe[1]))
 
             if fs: return
-        case 'String16 Data':
+        case 'String16 Data'|'String16 Count16 Data':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
+
+            if t == 'String16 Count16 Data': f.skip(2)
 
             se = []
             while f: se.append(f.read(f.readu16()))
@@ -2613,97 +2615,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if ob:
                 open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8').write(json.dumps(ob,indent=2,ensure_ascii=False))
                 return
-        case '1941 Frozen Front Lang':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
 
-            f.skip(1)
-            unk = f.readu16()
-            c = f.readu16()
-            fs = []
-            for _ in range(c): fs.append(f.readu16()-(c*2+5))
-            fs.append(None)
-            f.skip(2)
-
-            d = f.read()
-            f.close()
-            ob = []
-            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode({17:'latin-1',527:'utf-8',14:'ascii'}[unk]))
-
-            open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
-            if fs: return
-        case '1941 Frozen Front Data':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            assert f.read(4) == b'STY0'
-            offs = []
-            for _ in range(2):
-                for _ in range(f.readu8()): offs.append(f.readu32())
-
-            f.seek(0)
-            d = f.read()
-            f.close()
-
-            offs.append(None)
-            for ix in range(len(offs)-1): open(o + f'/{ix}.bin','wb').write(d[offs[ix]:offs[ix+1]])
-
-            if offs: return
-        case 'PS3 Theme':
-            raise NotADirectoryError() # https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='>')
-
-            assert f.read(4) == b'P3TF'
-
-            f.skip(4)
-        case 'Bejeweled And Peggle Combo Data':
-            if db.print_try: print('Trying with custom extractor')
-
-            bn = basename(i)
-            if (len(bn) == 2 and bn[0].isalpha() and bn[1].isdigit()) or (len(bn) == 1 and bn[0].isalpha() and getsize(i) == 0 and exists(bn + '0')):
-                fi = dirname(i) + '/' + bn[0]
-                assert exists(fi + '0'),"Missing first file"
-                d = b''
-                for ix in range(10):
-                    if not exists(fi + str(ix)): break
-                    d += open(fi + str(ix),'rb').read()
-            else: d = open(i,'rb').read()
-
-            from lib.file import File
-            f = File(d,endian='>')
-
-            if f.readu8(): f.skip(1)
-            f.skip(1)
-
-            c = 0
-            while f:
-                u1 = f.readu16()
-                if u1:
-                    f.skip([None,0x10,0x1C,None,0x34][u1])
-                    f.skip(2)
-
-                f.skip(6)
-                if not f: break
-                da = f.read(f.readu16())
-                open(f'{o}/{c}.{guess_ext(da)}','wb').write(da)
-                c += 1
-
-            if c: return
-        case 'Bejeweled And Peggle Combo Strings':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='>')
-
-            ob = []
-            while f: ob.append(f.read(f.readu16()))
-            f.close()
-
-            if ob:
-                open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(ob))
-                return
+        case _:
+            from lib.sub4_1 import extract4_1
+            return extract4_1(i,o,t)
 
     return 1
