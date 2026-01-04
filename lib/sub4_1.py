@@ -282,3 +282,19 @@ def extract4_1(inp:str,out:str,t:str):
             if ob:
                 open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
                 return
+        case 'X-Files Resources':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            f.skip(4)
+
+            c = f.readu8()
+            fs = [(f.readu16('<'),f.readu32() + 5 + 10 * c,f.readu32()) for _ in range(c)]
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[2])
+                open(o + f'/{fe[0]:02}.{guess_ext(d)}','wb').write(d)
+            f.close()
+
+            if fs: return

@@ -370,9 +370,9 @@
         "rs":"Taiko no Tatsujin Data 1"
     },
     {
-        "d":[["size",[5,16777215]],["n0",4,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1)\nreturn True"]],
+        "d":[["size",[5,16777215]],["n0",4,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=0\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
         "rs":"Taiko no Tatsujin Data 2"},{
-        "d":[["size",[5,1048575]],["n0",2,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1)\nreturn True"]],
+        "d":[["size",[5,1048575]],["n0",2,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=0\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
         "rs":"Taiko no Tatsujin Data 3"
     },
     {
@@ -382,6 +382,10 @@
     {
         "d":[["size",[19,32768]],["isat","\\0\\1",0],["n0",2,2],["py","f=open(inp,'rb')\nwhile 1:\n c=f.read(2)\n if c==b'\\0\\0':break\nif c!=b'\\0\\1':return\n s=f.read(2)\n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn f.tell()>10"]],
         "rs":"THQ Worms UTF Strings"
+    },
+    {
+        "d":[["size",[19,268435455]],["isat","\\0\\0\\0\\0",7],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nif (int.from_bytes(f.read(4),'big')+4)!=s or f.read(1)[0]<2:return\nf.seek(11);b=f.read(4);f.seek(17);return b==f.read(4)"]],
+        "rs":"X-Files Resources"
     },
     {
         "rqr":".NET Core",
