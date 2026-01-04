@@ -2274,7 +2274,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 d = f.read(f.readu16())
                 try: d = d.decode('utf-8')
                 except UnicodeDecodeError: d = d.decode('latin-1')
-                if not d.isprintable(): return 1
+                if not d.replace('\n','').replace('\r','').replace('\t','').isprintable(): return 1
                 se.append(d)
             f.close()
             open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(se))

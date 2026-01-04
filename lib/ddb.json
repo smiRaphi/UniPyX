@@ -380,6 +380,10 @@
         "rs":"THQ Worms Resources"
     },
     {
+        "d":[["size",[19,32768]],["isat","\\0\\1",0],["n0",2,2],["py","f=open(inp,'rb')\nwhile 1:\n c=f.read(2)\n if c==b'\\0\\0':break\nif c!=b'\\0\\1':return\n s=f.read(2)\n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn f.tell()>10"]],
+        "rs":"THQ Worms UTF Strings"
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"
