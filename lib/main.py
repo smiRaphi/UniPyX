@@ -122,6 +122,10 @@ class OSJump:
     def __init__(self): self.p = os.getcwd()
     def jump(self,i): os.chdir(str(i))
     def back(self): os.chdir(self.p)
+def _neof(f):
+    b = bool(f.read(1))
+    if b: f.seek(-1,1)
+    return b
 
 def msplit(i:str|list[str],seps:list[str]) -> list[str]:
     out = i if type(i) == list else [i]
@@ -168,7 +172,7 @@ def analyze(inp:str,raw=False):
 
     for wt in ('plain text','Plain text','ASCII text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap'):
+               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)'):
         if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
@@ -263,7 +267,7 @@ def analyze(inp:str,raw=False):
             if x[0] == 'py':
                 lc = {}
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize},locals=lc)
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof},locals=lc)
                     ret = lc['check'](inp)
                 except:
                     print(x[1])
@@ -602,6 +606,7 @@ def fix_zeebo(f,hint:int=None):
 
     return ext
 def guess_ext(f):
+    if not f: return 'null'
     import io
     if type(f) == bytes: f = io.BytesIO(f)
 

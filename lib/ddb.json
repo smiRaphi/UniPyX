@@ -333,11 +333,11 @@
     },
     {
         "d":[["size",[0,32768]],["py","if getsize(inp)==0:\n if not exists(inp+'0') or not exists(inp+'1'):return\n inp+='0'\nf=open(inp,'rb')\nif f.read(1)[0]:fs=int.from_bytes(f.read(2),'big')\nelif f.read(1)[0]:return\nelse:fs=-1\nif sum(f.read(2))or not sum(f.read(6)):return\ns=int.from_bytes(f.read(2),'big')\nif fs>=0 and s!=fs:return\nf.seek(s,1)\nb=f.read(2)\nreturn b and not b[0]and b[1]in(0,1,2,4)"]],
-        "rs":"Bejeweled And Peggle Combo Data"
+        "rs":"Peggle Data"
     },
     {
-        "d":[["size",[8,32768]],["n0",2,0],["str",4,2],["str",4,-4],["py","f=open(inp,'rb')\nwhile 1:\n s=f.read(2)\n if not s:break \n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode()\n except:return\nreturn True"]],
-        "rs":"Bejeweled And Peggle Combo Strings"
+        "d":[["size",[8,32768]],["n0",2,0],["n0",1,-1],["n0",1,-2],["py","f=open(inp,'rb')\nwhile 1:\n s=f.read(2)\n if not s:break \n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn True"]],
+        "rs":"String16BE Data"
     },
     {
         "d":[["size",[71,67484]],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');o=int.from_bytes(f.read(2),'little');s=f.seek(0,2)\nif s<(o+2+67):return\nf.seek(o);return (int.from_bytes(f.read(2),'little')+f.tell())==s"]],
@@ -360,6 +360,24 @@
     {
         "d":[["size",[36,32768]],["s%",4],["n0",4,0],["py","f=open(inp,'rb');es=int.from_bytes(f.read(4),'little');return (es+4)==f.seek(0,2) and not es%32"]],
         "rs":"Doom Palettes"
+    },
+    {
+        "d":[["isat","\\0\\0",0],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');return (4+c*4+sum(int.from_bytes(f.read(4),'big')for _ in range(c)))==f.seek(0,2)"]],
+        "rs":"MediaMobile PAK"
+    },
+    {
+        "d":[["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (o+67)>s:return\nf.seek(o-4);return int.from_bytes(f.read(4),'big')==s"]],
+        "rs":"Taiko no Tatsujin Data 1"
+    },
+    {
+        "d":[["size",[5,16777215]],["n0",4,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1)\nreturn True"]],
+        "rs":"Taiko no Tatsujin Data 2"},{
+        "d":[["size",[5,1048575]],["n0",2,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1)\nreturn True"]],
+        "rs":"Taiko no Tatsujin Data 3"
+    },
+    {
+        "d":[["size",[8,65535]],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');o=int.from_bytes(f.read(2),'little');s=f.seek(0,2);f.seek(o-2);return int.from_bytes(f.read(2),'little')==s"]],
+        "rs":"THQ Worms Resources"
     },
     {
         "rqr":".NET Core",

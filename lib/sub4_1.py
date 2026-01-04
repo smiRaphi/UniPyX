@@ -60,7 +60,7 @@ def extract4_1(inp:str,out:str,t:str):
             assert f.read(4) == b'P3TF'
 
             f.skip(4)
-        case 'Bejeweled And Peggle Combo Data':
+        case 'Peggle Data':
             if db.print_try: print('Trying with custom extractor')
 
             bn = basename(i)
@@ -84,7 +84,8 @@ def extract4_1(inp:str,out:str,t:str):
                 u1 = f.readu16()
                 if u1:
                     f.skip(-2)
-                    open(f'{o}/{c}_extra.bin','wb').write(f.read(2+[None,0x10,0x1C,None,0x34][u1]))
+                    assert u1 in (1,2,4,6,9),f'{u1} @ {f.pos//32768}.{f.pos % 32768}'
+                    open(f'{o}/{c}_extra.bin','wb').write(f.read(2+[None,0x10,0x1C,None,0x34,None,0x4C,None,None,0x70][u1]))
                     f.skip(2)
 
                 f.skip(6)
@@ -94,18 +95,6 @@ def extract4_1(inp:str,out:str,t:str):
                 c += 1
 
             if c: return
-        case 'Bejeweled And Peggle Combo Strings':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='>')
-
-            ob = []
-            while f: ob.append(f.read(f.readu16()).decode('utf-8'))
-            f.close()
-
-            if ob:
-                open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
-                return
         case 'Air Adrenaline Data 1'|'Air Adrenaline Data 2':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -172,6 +161,95 @@ def extract4_1(inp:str,out:str,t:str):
 
             c = f.readu32()//0x20
             for ix in range(c): open(o + f'/{ix}.pal','wb').write(f.read(0x20))
+            f.close()
+
+            if c: return
+        case 'MediaMobile PAK':
+            if db.print_try: print('Trying with custom extractor')
+            txt = re.compile(r'^[А-Яа-яЁё0-9\s.,!?"\'-—()]*$')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu32()
+            fs = [f.readu32() for _ in range(c)]
+
+            for ix in range(c):
+                d = bytes(x ^ 0x53 for x in f.read(fs[ix]))
+                if fs[ix] < 0xB0000:
+                    try:
+                        td = d.decode('cp1251')
+                    except: pass
+                    else:
+                        if td.isprintable() and txt.fullmatch(td):
+                            open(o + f'/{ix}.txt','w',encoding='utf-8').write(td)
+                            continue
+                open(o + f'/{ix}.{guess_ext(d)}','wb').write(d)
+            f.close()
+
+            if c: return
+        case 'Taiko no Tatsujin Data 1':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu32()//4
+            f.seek(0)
+            fs = [f.readu32() for _ in range(c)]
+
+            for ix in range(c-1):
+                d = f.read(fs[ix+1]-fs[ix])
+                if not d: continue
+                open(o + f'/{ix}.{guess_ext(d)}','wb').write(d)
+            f.close()
+
+            if c: return
+        case 'Taiko no Tatsujin Data 2'|'Taiko no Tatsujin Data 3':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            if t == 'Taiko no Tatsujin Data 2': readf = f.readu32
+            elif t == 'Taiko no Tatsujin Data 3': readf = f.readu16
+
+            c = 0
+            while f:
+                d = f.read(readf())
+                open(o + f'/{c}.{guess_ext(d)}','wb').write(d)
+                c += 1
+            f.close()
+
+            if c: return
+        case 'THQ Worms Resources':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu16()//2
+            f.seek(0)
+            fs = [f.readu16() for _ in range(c)]
+
+            txt = False
+            if f.size < 0xA000:
+                try: td = f.read().decode('ascii')
+                except: pass
+                else: txt = td.isprintable()
+            f.seek(fs[0])
+
+            if txt:
+                ob = []
+                for ix in range(c-1): ob.append(f.read(fs[ix+1]-fs[ix]))
+                open(o + '/' + tbasename(i) + '.txt','wb').write('\n\n'.join(ob))
+            else:
+                for ix in range(c-1):
+                    d = f.read(fs[ix+1]-fs[ix])
+                    if 3 < len(d) < 0x1000:
+                        try: td = d.decode('ascii')
+                        except: pass
+                        else:
+                            if td.isprintable():
+                                open(o + f'/{ix}.txt','w',encoding='utf-8').write(td)
+                                continue
+                    open(o + f'/{ix}.{guess_ext(d)}','wb').write(d)
             f.close()
 
             if c: return

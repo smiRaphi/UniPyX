@@ -2262,17 +2262,22 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]-fe[1]))
 
             if fs: return
-        case 'String16 Data'|'String16 Count16 Data':
+        case 'String16 Data'|'String16BE Data'|'String16 Count16 Data':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
-            f = File(i,endian='<')
+            f = File(i,endian='>' if 'BE' in t else '<')
 
             if t == 'String16 Count16 Data': f.skip(2)
 
             se = []
-            while f: se.append(f.read(f.readu16()))
+            while f:
+                d = f.read(f.readu16())
+                try: d = d.decode('utf-8')
+                except UnicodeDecodeError: d = d.decode('latin-1')
+                if not d.isprintable(): return 1
+                se.append(d)
             f.close()
-            open(o + '/' + tbasename(i) + '.txt','wb').write(b'\n\n'.join(se) + b'\n')
+            open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(se))
             if se: return
         case 'Super Monkey Ball Tip \'n Tilt PAK':
             if db.print_try: print('Trying with custom extractor')
