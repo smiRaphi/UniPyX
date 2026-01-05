@@ -622,7 +622,7 @@ def guess_ext(f):
         elif tag[:3] == b'ID3' or\
             (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
                 ext = 'mp3'
-        elif tag[0] == 0x78: ext = 'zlib'
+        elif tag[0] == 0x78 and not (tag[0]<<8 | tag[1])%31: ext = 'zlib'
 
     return ext
 

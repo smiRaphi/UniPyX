@@ -298,3 +298,41 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
 
             if fs: return
+        case 'Atari Masterpieces Resources':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+
+            of = f.readu32()
+            c = f.readu16()
+            f.seek(of)
+            fs = [(f.readu32(),f.readu32(),f.read(4).hex().upper()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[0]+4)
+                d = f.read(fe[1]-4)
+                e = guess_ext(d)
+                open(o + f'/{fe[2]}.{e}','wb').write(d)
+                if e == 'zlib':
+                    d = zlib.decompress(d)
+                    open(o + f'/{fe[2]}_ext.{guess_ext(d)}','wb').write(d)
+            f.close()
+
+            if fs: return
+        case 'Atari Masterpieces Strings':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            fs = [f.readu32() for _ in range(c)]
+            ob = []
+            for fe in fs:
+                f.seek(fe+4)
+                ob.append(f.read0s().decode('cp1252'))
+            f.close()
+
+            if ob:
+                open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
+                return
+        case 'Atari Masterpieces VPXH': raise NotImplementedError
