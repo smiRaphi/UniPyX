@@ -336,3 +336,50 @@ def extract4_1(inp:str,out:str,t:str):
                 open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
                 return
         case 'Atari Masterpieces VPXH': raise NotImplementedError
+        case 'Torus Ashen PackFile':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'PMAN'
+            c = f.readu32()
+            f.seek(0x40)
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.readu32()))
+                f.skip(4)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                if d[:2] == b'ZL' and d[5] == 0x78 and not (d[5]<<8|d[6])%31: ext = 'zl'
+                else: ext = 'bin'
+                open(o + f'/{ix}.{ext}','wb').write(d)
+                if ext == 'zl': open(o + f'/{ix}_ext.bin','wb').write(zlib.decompress(d[5:]))
+            f.close()
+
+            if fs: return
+        case 'Torus Ashen ZLib':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+
+            f = open(i,'rb')
+            assert f.read(2) == b'ZL'
+            f.seek(5)
+            open(o + '/' + tbasename(i),'wb').write(zlib.decompress(f.read()))
+            f.close()
+            return
+        case 'Torus Ashen Strings':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            f.seek(4)
+            d = f.read()[:-2]
+            f.close()
+
+            ob = [x.decode('utf-16le') for x in d.rsplit(b'\0\0')]
+
+            if ob:
+                open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
+                return

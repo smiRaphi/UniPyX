@@ -400,6 +400,19 @@
         "rs":"Atari Masterpieces VPXH","s":1
     },
     {
+        "d":[["isat","PMAN",0],["isat","Copyright (c) ",8],["isin",["19","20"],22],["isat"," Torus Games Pty. Ltd.",26],["isatS","\\0",20,48],["isat","\\0\\0\\0\\0",76],["n0",4,4],["n0",4,68],["n0",4,72],
+             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(68);o=int.from_bytes(f.read(4),'little')\nif (64+16*c)!=o:return\nf.seek(o-12);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Torus Ashen PackFile","s":1
+    },
+    {
+        "d":[["isat","ZL",0],["isat","x",5],["py","f=open(inp,'rb');f.seek(5);return not int.from_bytes(f.read(2),'big')%31"]],
+        "rs":"Torus Ashen ZLib","s":1
+    },
+    {
+        "d":[["size",[6,1485759]],["n0",4,0],["isat","\\0\\0",-2],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,-4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');d=f.read()[:-2].rsplit(b'\\0\\0')\nif len(d)!=c:return\ntry:b''.join(d).decode('utf-16le')\nexcept:return\nreturn True"]],
+        "rs":"Torus Ashen Strings"
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"
