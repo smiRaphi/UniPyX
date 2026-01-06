@@ -80,6 +80,7 @@
         "upx wwwupxsourceforgenet",
         "upx 290 lzma",
         "upx",
+        "upx 0.89",
         "packerupx compresorgratuito wwwupxsourceforgenet"
     ],
     "BinHex":[

@@ -413,6 +413,29 @@
         "rs":"Torus Ashen Strings"
     },
     {
+        "rqr":["JSON object (generic)","JSON text data"],
+        "d":["json",{"timeStamp":0,"version":"n0","userSettings":{"advancedUserEnabled":true,"cloudStorageEnabled":true,"uiTheme":"n0","externalLists":"","firewallPaneMinimized":true,"importedLists":[],"popupPanelSections":0,"userFiltersTrusted":true},"selectedFilterLists":[],"hiddenSettings":{},"whitelist":[],"dynamicFilteringString":"","urlFilteringString":"","hostnameSwitchesString":"","userFilters":""}],
+        "rs":"uBlock Origin Config Backup","s":1
+    },
+    {
+        "rqr":["JSON object (generic)","JSON text data"],
+        "d":["json",[{"settings":{"disableAll":true,"exposeIframes":true,"exposeStyleName":true,"keepAlive":0,"keepAliveIdle":true,"newStyleAsUsercss":true,"openEditInWindow":true,"openEditInWindow.popup":true,"patchCsp":true,"show-badge":true,"styleViaASS":true,"styleViaXhr":true,"urlInstaller":true,"windowPosition":{},"compactWidth":0,"config.autosave":true,"schemeSwitcher.enabled":"n0","schemeSwitcher.nightStart":"n0","schemeSwitcher.nightEnd":"n0","popup.enabledFirst":true,"popup.stylesFirst":true,
+                                  "popup.autoResort":true,"popup.borders":true,"popup.findSort":"n0","manage.onlyEnabled":true,"manage.onlyLocal":true,"manage.onlyUsercss":true,"manage.onlyEnabled.invert":true,"manage.onlyLocal.invert":true,"manage.onlyUsercss.invert":true,"manage.actions.expanded":true,"manage.backup.expanded":true,"manage.filters.expanded":true,"manage.links.expanded":true,"manage.minColumnWidth":0,"manage.newUI":true,"manage.newUI.favicons":true,"manage.newUI.faviconsGray":true,"manage.newUI.targets":0,"manage.newUI.sort":"","manage.searchMode":"","editor.options":{},"editor.toc.expanded":true,
+                                  "editor.options.expanded":true,"editor.options.style.expanded":true,"editor.lint.expanded":true,"editor.publish.expanded":true,"editor.lineWrapping":true,"editor.smartIndent":true,"editor.indentWithTabs":true,"editor.tabSize":0,"editor.keyMap":"n0","editor.theme":"n0",
+                                  "editor.beautify":{"selector_separator_newline":true,"newline_before_open_brace":true,"newline_after_open_brace":true,"newline_between_properties":true,"newline_before_close_brace":true,"newline_between_rules":true,"preserve_newlines":true,"end_with_newline":true,"indent_conditional":true,"indent_mozdoc":true,"space_around_combinator":true,"space_around_cmp":true},"editor.beautify.hotkey":"","editor.lintDelay":0,"editor.linter":"n0","editor.lintReportDelay":0,"editor.matchHighlight":"n0",
+                                  "editor.autoCloseBrackets":true,"editor.autocompleteOnTyping":true,"editor.contextDelete":true,"editor.selectByTokens":true,"editor.arrowKeysTraverse":true,"editor.appliesToLineWidget":true,"editor.autosaveDraft":0,"editor.livePreview":true,"editor.livePreview.delay":0.1,"editor.targetsFirst":true,"editor.colorpicker":true,"editor.colorpicker.hexUppercase":true,"editor.colorpicker.hotkey":"","editor.colorpicker.color":"","editor.colorpicker.maxHeight":0,"hotkey._execute_browser_action":"",
+                                  "hotkey.openManage":"","hotkey.styleDisableAll":"","sync.enabled":"n0","iconset":0,"badgeDisabled":"n0","badgeNormal":"n0","headerWidth.edit":0,"headerWidth.install":0,"headerWidth.manage":0,"popup.search.globals":true,"popupWidth":0,"popupWidthMax":0,"updateInterval":0,"updateOnlyEnabled":true,"undefined":null},
+                      "order":{"main":[],"prio":[]},"editorStylelintConfig":{"rules":{}}}]],
+        "rs":"Stylus Config Export","s":1
+    },
+    {
+        "rqr":["JSON object (generic)","JSON text data"],
+        "d":["json",{"scripts":{},"settings":{"isApplied":true,"blacklist":"","blacklistNet":"","popupWidth":0,"updateEnabledScriptsOnly":true,"autoUpdate":0,"lastUpdate":0,"lastModified":0,"showBadge":"n0","badgeColor":"n0","badgeColorBlocked":"n0","exportValues":true,"exportNameTemplate":"n0","expose":{"greasyfork%2Eorg":true,"sleazyfork%2Eorg":true},"closeAfterInstall":true,"editAfterInstall":true,"helpForLocalFile":true,"trackLocalFile":true,"autoReload":true,"features":null,"syncScriptStatus":true,"syncAutomatically":true,"customCSS":"","importScriptData":true,"importSettings":true,"notifyUpdates":true,
+                                              "notifyUpdatesGlobal":true,"version":0,"defaultInjectInto":"n0","ffInject":true,"xhrInject":true,"filters":{"showOrder":true,"showVisit":true,"sort":"n0","viewSingleColumn":true,"viewTable":true},"filtersPopup":{"sort":"n0","enabledFirst":true,"groupRunAt":true,"hideDisabled":""},"editor":{"killTrailingSpaceOnSave":true,"showTrailingSpace":true,"autocompleteOnTyping":0,"lineWrapping":true,"indentWithTabs":true,"indentUnit":0,"tabSize":0,"undoDepth":0},"editorTheme":"n0","editorThemeName":"n0","editorWindow":true,"editorWindowPos":{},"editorWindowSimple":true,
+                                              "scriptTemplate":"","showAdvanced":true,"valueEditor":{"autocompleteOnTyping":0,"lineWrapping":true,"indentWithTabs":true,"indentUnit":0,"tabSize":0,"undoDepth":0},"uiTheme":"n0"},"values":{}}],
+        "rs":"Violentmonkey Config Export","s":1
+    },
+    {
         "rqr":".NET Core",
         "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
         "rs":".NET Packer 1"

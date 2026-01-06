@@ -170,10 +170,6 @@ def analyze(inp:str,raw=False):
     _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
-    for wt in ('plain text','Plain text','ASCII text','XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
-               'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)'):
-        if wt in ts: ts.remove(wt)
     if isdir(inp): typ = 'directory'
     else:
         idt = open(inp,'rb').read(0x4000)
@@ -185,10 +181,11 @@ def analyze(inp:str,raw=False):
             else: typ = 'binary'
         if ('null data' in ts or 'null bytes' in ts) and typ == 'binary' and not isz: typ = 'null'
 
-    if 'data' in ts: ts.remove('data')
-    if 'null data' in ts: ts.remove('null data')
-    if 'null bytes' in ts: ts.remove('null bytes')
-    if 'directory' in ts: ts.remove('directory')
+    for wt in ('plain text','Plain text','ASCII text','data','null data','null bytes','directory',
+               'XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
+               'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
+               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",):
+        if wt in ts: ts.remove(wt)
 
     if isfile(inp):
         f = open(inp,'rb')
@@ -424,6 +421,32 @@ def analyze(inp:str,raw=False):
                     f.seek(mn)
                     ret = reg.match(f.read(mx-mn)) != None
                     f.close()
+                elif x[0] == 'json':
+                    try: js = json.load(open(inp,encoding='utf-8'))
+                    except: ret = False
+                    else:
+                        def chk(j,c):
+                            if type(j) != type(c): return False
+                            if type(j) == dict and len(j) != len(c): return False
+                            elif type(j) == list and len(c) > len(j): return False
+
+                            if type(j) == dict:
+                                for k in c:
+                                    if k not in j: return False
+                                    v = j[k]
+                                    if type(v) != type(c[k]): return False
+                                    if type(v) == dict and c[k] and not chk(v,c[k]): return False
+                                    elif type(v) == list and c[k] and not chk(v,c[k]): return False
+                                    elif type(v) == str and c[k] == 'n0' and not v: return False
+                            elif type(j) == list:
+                                for ix,cv in enumerate(c):
+                                    v = j[ix]
+                                    if type(v) != type(cv): return False
+                                    if type(v) == dict and cv and not chk(v,cv): return False
+                                    elif type(v) == list and cv and not chk(v,cv): return False
+                                    elif type(v) == str and cv == 'n0' and not v: return False
+                            return True
+                        ret = chk(js,x[1])
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
             if xv.get('qq') and (type(x[-1]) != bool or x[-1]):
                 if ret:

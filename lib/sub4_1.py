@@ -383,3 +383,46 @@ def extract4_1(inp:str,out:str,t:str):
             if ob:
                 open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
                 return
+        case 'uBlock Origin Config Backup':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            j = json.load(open(i,encoding='utf-8'))
+
+            open(o + '/externalLists.txt','w',encoding='utf-8').write(j['userSettings']['externalLists'])
+            open(o + '/importedLists.txt','w',encoding='utf-8').write('\n'.join(j['userSettings']['importedLists']))
+            open(o + '/selectedFilterLists.txt','w',encoding='utf-8').write('\n'.join(j['selectedFilterLists']))
+            open(o + '/whitelist.txt','w',encoding='utf-8').write('\n'.join(j['whitelist']))
+            open(o + '/dynamicFiltering.txt','w',encoding='utf-8').write(j['dynamicFilteringString'])
+            open(o + '/urlFiltering.txt','w',encoding='utf-8').write(j['urlFilteringString'])
+            open(o + '/hostnameSwitches.txt','w',encoding='utf-8').write(j['hostnameSwitchesString'])
+            open(o + '/userFilters.txt','w',encoding='utf-8').write(j['userFilters'])
+            return
+        case 'Stylus Config Export':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            j = json.load(open(i,encoding='utf-8'))
+
+            json.dump(j[0]['settings'],open(o + '/settings.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
+
+            for jo in j[1:]:
+                n = f'{jo.get("customName",jo["name"])} v{jo["usercssData"]["version"].lstrip("v")}'
+                if 'author' in jo and not '?' in jo['author']: n = f'{jo["author"]} - {n}'
+                open(o + f'/{n}.css','w',encoding='utf-8').write(jo['sourceCode'])
+                if 'vars' in jo['usercssData']: json.dump(jo['usercssData']['vars'],open(o + f'/{n}_vars.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
+                if 'exclusions' in jo: open(o + f'/{n}_exclusions.txt','w',encoding='utf-8').write('\n'.join(jo['exclusions']))
+            return
+        case 'Violentmonkey Config Export':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            j = json.load(open(i,encoding='utf-8'))
+
+            open(o + '/customCSS.css','w',encoding='utf-8').write(j['settings']['customCSS'])
+            open(o + f'/{j["settings"]["editorThemeName"]}.css','w',encoding='utf-8').write(j['settings']['editorTheme'])
+            open(o + '/template.js','w',encoding='utf-8').write(j['settings']['scriptTemplate'])
+
+            if 'values' in j:
+                for bk,bv in j['values'].items():
+                    for k,v in bv.items():
+                        if v[0] == 's' and v[1] == '{' and v[-1] == '}': ext = 'json'
+                        else: ext = 'txt'
+                        xopen(o + f'/{bk.replace("-20"," ").replace("-0a"," ").strip()}/{k}.{ext}','w').write(v[1:])
