@@ -413,6 +413,18 @@
         "rs":"Torus Ashen Strings"
     },
     {
+        "d":[["isat","StormCE Library VFS 1.0\\0",0],["str0e",20,24,2],["n0",4,44],["n0",4,48]],
+        "rs":"StormCE Library VFS","s":1
+    },
+    {
+        "d":[["isat","iiii",0],["isat","x",20],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little')+20;return f.seek(0,2)in(s,s+1024)"]],
+        "rs":"StormCE IIII","s":1},{
+        "d":[["isat","Yiii",0],["isat","x",12],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);fs=int.from_bytes(f.read(4),'little');return (s-256)<=(fs+12)<=s"]],
+        "rs":"StormCE IIII","s":1},{
+        "d":[["isat","piii",0],["isat","x",16],["n0",4,4],["n0",4,8],["n0",4,12]],
+        "rs":"StormCE IIII","s":1
+    },
+    {
         "rqr":["JSON object (generic)","JSON text data"],
         "d":["json",{"timeStamp":0,"version":"n0","userSettings":{"advancedUserEnabled":true,"cloudStorageEnabled":true,"uiTheme":"n0","externalLists":"","firewallPaneMinimized":true,"importedLists":[],"popupPanelSections":0,"userFiltersTrusted":true},"selectedFilterLists":[],"hiddenSettings":{},"whitelist":[],"dynamicFilteringString":"","urlFilteringString":"","hostnameSwitchesString":"","userFilters":""}],
         "rs":"uBlock Origin Config Backup","s":1
@@ -906,6 +918,12 @@
         "rs":"DGCA","s":1
     },
     {
+        "rqr":null,
+        "t":"text",
+        "d":[["size",[4,65536]],["s%",4],["py","d=open(inp,encoding='ascii').read();np=d.rstrip('=')\nif (len(d)-len(np))>3:return\nfor c in np:\n if c not in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/+':return\nreturn True"]],
+        "rs":"Base64"
+    },
+    {
         "rq":null,
         "rqr":null,
         "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],
@@ -1126,6 +1144,11 @@
         "rqr":null,
         "d":[["isatS","\\0",13,-13],["str0e",0,300,1],["py","f=open(inp,'rb')\ntry:[x.decode() for x in f.read(0x1000).split(b'\\0')]\nexcept:return\nreturn True"]],
         "rs":"UE Text Resource"
+    },
+    {
+        "rq":null,
+        "d":[["size",[265,null]],["isat","\\x80\\0\\0\\0",0],["isat","\\x80\\0\\0\\0",132],["n0",128,4],["n0",128,136]],
+        "rs":"HMM Encrypted Snapshot"
     },
     {
         "rqr":null,

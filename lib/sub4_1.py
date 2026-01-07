@@ -426,3 +426,62 @@ def extract4_1(inp:str,out:str,t:str):
                         if v[0] == 's' and v[1] == '{' and v[-1] == '}': ext = 'json'
                         else: ext = 'txt'
                         xopen(o + f'/{bk.replace("-20"," ").replace("-0a"," ").strip()}/{k}.{ext}','w').write(v[1:])
+        case 'StormCE Library VFS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(0x18)
+            fs = []
+            while True:
+                n = f.read(0x14)
+                if not n[0]: break
+                fs.append((n.rstrip(b'\0').decode('cp1252'),f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[2])
+                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            if fs: return
+        case 'StormCE IIII':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+
+            t = f.read(1).decode('ascii')
+            assert f.read(3) == b'iii' and t in 'Yip'
+
+            if t == 'Y':
+                f.skip(8)
+                open(o + '/' + tbasename(i),'wb').write(zlib.decompress(f.read()))
+            elif t == 'p':
+                f.skip(8)
+                c = 0
+                while f:
+                    s = f.readu32()
+                    if not s: break
+                    open(o + f'/{c}.bin','wb').write(zlib.decompress(f.read(s)));c += 1
+            elif t == 'i':
+                s = f.readu32()
+                f.skip(12)
+                open(o + '/' + tbasename(i),'wb').write(zlib.decompress(f.read(s)))
+                d = f.read()
+                if d: open(o + '/trailer.bin','wb').write(d)
+            return
+        case 'HMM Encrypted Snapshot':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            import zipfile
+            from lib.file import File
+            try:
+                from Cryptodome.PublicKey import RSA # type: ignore
+                from Cryptodome.Cipher import PKCS1_v1_5 # type: ignore
+            except ImportError:
+                from Crypto.PublicKey import RSA # type: ignore
+                from Crypto.Cipher import PKCS1_v1_5 # type: ignore
+
+            rsa = RSA.construct((0xd597f61ca364a25af50832a5e18e855a426532ee9210729cd6555394736da2dd52269c2a096f622a4dedf3498e1a1b2fe107366445f6234c8a9912e6727092017a019dec984e5136c935a3d67238889bf5c7c3d358f88c6439db9635e3eab0088b36c6a08803c7fc6699f20e0a221a4b973b0360869c81eefb22c39731b98015,
+                                 0x10001))
+
+            f = File(i,endian='<')
+            key = PKCS1_v1_5.new()

@@ -743,5 +743,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             open(of,'wb').write(d)
             return
+        case 'Base64':
+            if db.print_try: print('Trying with custom extractor')
+            import base64
+            open(o + '/' + tbasename(i) + '.bin','wb').write(base64.b64decode(open(i,'rb').read()))
+            return
 
     return 1
