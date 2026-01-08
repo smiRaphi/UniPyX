@@ -755,7 +755,7 @@
         "rs":"Unreal ZenLoader","s":1
     },
     {
-        "d":[["isat","KANZ",0],["py","f=open(inp,'rb');f.seek(4);b=int.from_bytes(f.read(2));o=0\nif (b>>12)>=6:\n o=1\n if b>>10&3==3:return\nreturn b>>(11+o)&31<=9"]],
+        "d":[["isat","KANZ",0],["py","f=open(inp,'rb');f.seek(4);b=int.from_bytes(f.read(2),'big');o=0\nif (b>>12)>=6:\n o=1\n if b>>10&3==3:return\nreturn b>>(11+o)&31<=9"]],
         "rs":"Kanzi","s":1
     },
     {
@@ -782,10 +782,10 @@
     },
     {
         "rq":"UE4 Package",
-        "d":[["ext","data"],["py","return exists(inp + '.js')"]],
+        "d":[["ext",".data"],["py","return exists(inp + '.js')"]],
         "rs":"Unreal Engine Web Package","s":1},{
         "rq":"UE4 Package",
-        "d":[["ext","gz"],["py","return inp.endswith('.data.gz') and exists(inp[:-2] + 'js.gz')"]],
+        "d":[["ext",".gz"],["py","return inp.endswith('.data.gz') and exists(inp[:-2] + 'js.gz')"]],
         "rs":"Unreal Engine Web Package","s":1
     },
     {
@@ -1269,6 +1269,16 @@
         "rq":null,
         "d":["ext",".csc"],
         "rs":"CSC"
+    },
+    {
+        "rqr":null,
+        "d":[["s%",16],["size",[128,4096]],["ext",".ejs"],["py","return basename(inp).startswith('subconf_') and '.' in tbasename(inp)"]],
+        "rs":"JDownloader2 Encrypted Subconfig"
+    },
+    {
+        "rqr":null,
+        "d":[["s%",16],["size",[32,1048576]],["name","org.jdownloader.settings.AccountSettings.accounts.ejs"]],
+        "rs":"JDownloader2 Encrypted Accounts"
     },
     {
         "d":["ext",".xbp"],

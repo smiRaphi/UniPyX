@@ -485,3 +485,16 @@ def extract4_1(inp:str,out:str,t:str):
 
             f = File(i,endian='<')
             key = PKCS1_v1_5.new()
+        case 'JDownloader2 Encrypted Subconfig'|'JDownloader2 Encrypted Accounts':
+            if db.print_try: print('Trying with custom extractor')
+            try: from Cryptodome.Cipher import AES # type: ignore
+            except ImportError: from Crypto.Cipher import AES # type: ignore
+
+            if t == 'JDownloader2 Encrypted Subconfig':k = b'\x01\x02\x11\x01\x01T\x01\x01\x01\x01\x12\x01\x01\x01"\x01'
+            elif t == 'JDownloader2 Encrypted Accounts':k = b'\x01\x06\x04\x05\x02\x07\x04\x03\x0c=\x0eK\xfe\xf9\xd4!'
+
+            d = open(i,'rb').read()
+            d = AES.new(k,AES.MODE_CBC,iv=k).decrypt(d)
+            if d.strip()[:1] != b'{': return 1
+            open(o + '/' + tbasename(i) + '.json','wb').write(d[:-d[-1]])
+            return

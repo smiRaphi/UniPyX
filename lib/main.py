@@ -264,7 +264,7 @@ def analyze(inp:str,raw=False):
             if x[0] == 'py':
                 lc = {}
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof},locals=lc)
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof},locals=lc)
                     ret = lc['check'](inp)
                 except:
                     print(x[1])
