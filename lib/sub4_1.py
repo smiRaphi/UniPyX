@@ -498,3 +498,5 @@ def extract4_1(inp:str,out:str,t:str):
             if d.strip()[:1] != b'{': return 1
             open(o + '/' + tbasename(i) + '.json','wb').write(d[:-d[-1]])
             return
+
+    return 1

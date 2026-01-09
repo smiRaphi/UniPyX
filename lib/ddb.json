@@ -1106,6 +1106,11 @@
     },
     {
         "rqr":null,
+        "d":[["size",[12,2147483648]],["isin",["\\x01","\\x02","\\x03","\\x04"],0],["py","f=open(inp,'rb');sl=f.read(1)[0];f.seek(sl)\nif not f.read(1)[0]:return\nf.seek(1);s=int.from_bytes(f.read(sl),'little');fc=int.from_bytes(f.read(2),'little');return s<0x80000000 and s>f.seek(0,2) and fc>8"]],
+        "rs":"Gipfeli"
+    },
+    {
+        "rqr":null,
         "d":[["isatS","\\0",10,16],["isin",["\\0","\\x10","\\x20","\\x30","\\x40"],27],["str0",0,16,0],["py","f=open(inp,'rb');f.seek(0x1C);end=int.from_bytes(f.read(4),'little')\nif end!=f.seek(0,2):return False\nf.seek(32)\nfor _ in range(80):\n\ta=int.from_bytes(f.read(4),'little')\n\tif a!=0 and (a<352 or a>end):return False\nreturn True"]],
         "rs":"Floppy Image"
     },

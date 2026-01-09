@@ -341,5 +341,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             open(of,'wb').write(run(['vlaz','-d','-f','-c',i],text=False)[1])
             if exists(of) and getsize(of): return fix_tar(o)
+        case 'Gipfeli':
+            of = o + '\\' + tbasename(i)
+            run(['gipfeli_tool','-d',i,of])
+            if exists(of) and getsize(of): return
 
     return 1

@@ -3143,6 +3143,16 @@
             }
         }]
     },
+    "gipfeli_tool":{
+        "p":"gipfeli_tool.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=13058&d=1767617319",
+            "ex":".7z",
+            "x":{
+                "gipfeli_tool.exe":"gipfeli_tool.exe"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{
