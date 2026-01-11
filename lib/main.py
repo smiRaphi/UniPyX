@@ -184,7 +184,7 @@ def analyze(inp:str,raw=False):
     for wt in ('plain text','Plain text','ASCII text','data','null data','null bytes','directory',
                'XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files',
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",):
+               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'):
         if wt in ts: ts.remove(wt)
 
     if isfile(inp):

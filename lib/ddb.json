@@ -25,6 +25,10 @@
         "rqr":"Error Code Modeler",
         "rs":"Error Code Modeler","s":1
     },
+    {
+        "rqr":["PACK","MS-DOS executable",true],
+        "rs":"Pack Packed"
+    },
 
     {
         "rq":"ISO",
@@ -241,6 +245,14 @@
     {
         "d":[["isat","\\x10",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'little');return ds>f.seek(0,2)"]],
         "rs":"Nintendo LZ10"
+    },
+    {
+        "d":[["isat","\\x11",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'big');return ds>f.seek(0,2)"]],
+        "rs":"Nintendo LZ11"
+    },
+    {
+        "d":[["isat","\\x40",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'little');return ds>f.seek(0,2)"]],
+        "rs":"Nintendo LZ40"
     },
     {
         "d":["isat","FSYS\\0",0],
@@ -1071,6 +1083,29 @@
         "rq":null,
         "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f=open(inp,'rb');f.seek(11);sl=f.read(1)[0]\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
         "rs":"QuARK","s":1
+    },
+    {
+        "rqr":"Quake archive",
+        "d":[["isat","PACK",0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))<s"]],
+        "rs":"Quake PAK","s":1
+    },
+    {
+        "d":[["isat","PACK_FILE\\0\\0\\0\\0\\0\\0\\0",0],["isin",["\\x11","\\x40"],24],["n0",4,16],["n0",4,20]],
+        "rs":"Azito 3D Pack File"
+    },
+    {
+        "d":[["s%",4],["isat","PACK_MESSAGE\\0\\0\\0\\0",0],["n0",4,16],["n0",4,20]],
+        "rs":"Azito 3D Pack Message"
+    },
+    {
+        "d":[["size",[64,4311744510]],["isat","darc\\xFF\\xFE\\x1C\\0\\0\\0\\0\\x01",0],["isat","\\x1C\\0\\0\\0",16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Nintendo Data ARChive","s":1},{
+        "d":[["size",[64,4311744510]],["isat","darc\\xFE\\xFF\\0\\0\\0\\x1C\\x01\\0",0],["isat","\\0\\0\\0\\x1C",16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return int.from_bytes(f.read(4),'big')==s"]],
+        "rs":"Nintendo Data ARChive","s":1
+    },
+    {
+        "d":[["size",[14,null]],["isat","WZD \\x04\\0\\0\\0\\0\\0\\x01\\0",0]],
+        "rs":"Azada Wizard","s":1
     },
     {
         "rq":null,

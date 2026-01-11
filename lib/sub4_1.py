@@ -498,5 +498,81 @@ def extract4_1(inp:str,out:str,t:str):
             if d.strip()[:1] != b'{': return 1
             open(o + '/' + tbasename(i) + '.json','wb').write(d[:-d[-1]])
             return
+        case 'Azito 3D Pack File':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(0x10) == b'PACK_FILE\0\0\0\0\0\0\0'
+            c = f.readu32()
+            for ix in range(c):
+                d = f.read(f.readu32())
+
+                if d[0] in (0x11,0x40):
+                    tf = TmpFile()
+                    open(tf.p,'wb').write(d)
+                    of = o + f'\\{ix}.bin'
+                    run(['lzx','-d',tf.p,of],print_try=False)
+                    if exists(of) and getsize(of):
+                        tg = open(of,'rb').read(4)
+                        try: tg = tg.decode('ascii')
+                        except: pass
+                        else:
+                            if tg.isalpha(): mv(of,o + f'/{ix}.{tg}')
+                    else: mv(tf.p,of)
+                    tf.destroy()
+                else: open(o + f'/{ix}.bin','wb').write(d)
+            if c: return
+        case 'Nintendo LZ11'|'Nintendo LZ40':
+            of = o + '\\' + tbasename(i)
+            run(['lzx','-d',i,of])
+            if exists(of) and getsize(of): return
+        case 'Azito 3D Pack Message':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(0x10) == b'PACK_MESSAGE\0\0\0\0'
+            ob = []
+            c = f.readu32()
+            for _ in range(c): ob.append(f.read(f.readu32()).rstrip(b'\0').decode('shift-jis'))
+
+            if ob:
+                open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8').write('\n\n'.join(ob))
+                return
+        case 'Nintendo Data ARChive':
+            db.get('darc')
+            class COpen:
+                def __init__(self): pass
+                def __call__(self,p,m):
+                    if m != 'rb': return open(p,m)
+                    self.f = open(p,m)
+                    self.seek = self.f.seek
+                    self.tell = self.f.tell
+                    return self
+                def read(self,n=None):
+                    p = self.tell()
+                    d = self.f.read(n)
+                    if (n == 4 and p == 0) or (n == 2 and p == 4): d = d.decode('latin-1')
+                    return d
+
+            if db.print_try: print('Trying with darc')
+            import bin.darc as darc # type: ignore
+            darc.xrange = range
+            darc.print = lambda *a: None
+            darc.open = COpen()
+
+            d = darc.Darc.load(i)
+            d.extract(o)
+
+            if os.listdir(o): return
+        case 'Azada Wizard':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+
+            assert f.read(4) == b'WZD '
+            f.seek(12)
+            open(o + '/' + tbasename(i) + '.txt','wb').write(f.read())
+            return
 
     return 1

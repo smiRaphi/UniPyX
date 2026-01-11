@@ -3153,6 +3153,18 @@
             }
         }]
     },
+    "lzx":{
+        "p":"lzx.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/lzx.exe"
+        ]
+    },
+    "darc":{
+        "p":"darc.py",
+        "fs":[
+        "https://raw.githubusercontent.com/LITTOMA/darctool/refs/heads/master/darc.py"
+        ]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

@@ -280,9 +280,6 @@
         "tar - tape archive (directory)",
         "tar"
     ],
-    "Quake PAK":[
-        "quake archive"
-    ],
     "RPG Maker Archive (XP/VX/VX Ace)":[
         "rpg maker vx encrypted archive (v2)",
         "rpg maker vx encrypted archive (generic)"
@@ -483,9 +480,6 @@
     ],
     "Optlink":[
         "optlink"
-    ],
-    "Pack Packed":[
-        "pack"
     ],
     "PACKWIN":[
         "16bit dos exe packwin compressed",
