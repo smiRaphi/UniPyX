@@ -769,6 +769,30 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[0])
                 open(o + '/' + fe[1],'wb').write(f.read(fe[2]))
             if fs: return
+        case 'StudyBox IMG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'STBX'
+            f.skip(f.readu32())
+
+            c = 0
+            while f:
+                t = f.read(4).decode('latin-1')
+                s = f.readu32()
+                if t == 'PAGE': ext = 'bin'
+                elif t == 'AUDI':
+                    ext = 'wav'
+                    f.skip(4)
+                    assert f.read(4) == b'RIFF'
+                    f.skip(-4)
+                    s -= 4
+                else: raise NotImplementedError(t)
+
+                open(o + f'/{t}{c:02d}.{ext}','wb').write(f.read(s))
+                c += 1
+            if c: return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
