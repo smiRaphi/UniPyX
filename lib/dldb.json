@@ -3165,6 +3165,21 @@
         "https://raw.githubusercontent.com/LITTOMA/darctool/refs/heads/master/darc.py"
         ]
     },
+    "gzstool":{
+        "p":"GzsTool/GzsTool.exe",
+        "fs":[{
+            "u":"https://github.com/Atvaark/GzsTool/releases/download/v0.6.0/GzsTool.v0.6.0.zip",
+            "x":{
+                "GzsTool.exe":"GzsTool/GzsTool.exe",
+                "GzsTool.Core.dll":"GzsTool/GzsTool.Core.dll",
+                "CityHash.dll":"GzsTool/CityHash.dll",
+                "Zlib.Portable.dll":"GzsTool/Zlib.Portable.dll",
+                "fpk_dictionary.txt":"GzsTool/fpk_dictionary.txt",
+                "qar_dictionary.txt":"GzsTool/qar_dictionary.txt",
+                "GzsTool.exe.config":"GzsTool/GzsTool.exe.config"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

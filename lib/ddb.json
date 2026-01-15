@@ -41,7 +41,7 @@
         "rs":"Wii ISO","s":1
     },
     {
-        "d":[["isat","MICROSOFT*XBOX*MEDIA",65536],["isat","MICROSOFT*XBOX*MEDIA",265945088],["isat","MICROSOFT*XBOX*MEDIA",405864448]],"qq":true,
+        "d":[["isat","MICROSOFT*XBOX*MEDIA",65536],["isat","MICROSOFT*XBOX*MEDIA",34144256],["isat","MICROSOFT*XBOX*MEDIA",265945088],["isat","MICROSOFT*XBOX*MEDIA",405864448],["isat","MICROSOFT*XBOX*MEDIA",6722310144]],"qq":true,
         "rs":"XISO","s":1
     },
     {
@@ -1047,7 +1047,7 @@
         "rq":null,
         "rqr":"Win32 Executable (generic)",
         "d":[["size",[200,1048576]],
-             ["py","f=open(inp,'rb')\nf.seek(60);o=int.from_bytes(f.read(4),'little');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n\tf.seek(2);av,iv=f.read(1)[0],f.read(1)[0]\n\tf.seek(12)\n\tif f.read(1)[0] not in (124,102,185,106,127,15,191,90,141,75,232,190):return\nelif o==12: f.seek(38);av,iv=f.read(1)[0],f.read(1)[0]\nelse:return\nif av not in (48,49,50) or iv<48 or iv>57 or (av==48 and iv>54) or (av==49 and iv>52) or (av==50 and iv>51):return\nreturn True"]],
+             ["py","f=open(inp,'rb');f.seek(60);o=int.from_bytes(f.read(4),'little');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n\tf.seek(2);av,iv=f.read(1)[0],f.read(1)[0];f.seek(12)\n\tif f.read(1)[0] not in (124,102,185,106,127,15,191,90,141,75,232,190):return\nelif o==12: f.seek(38);av,iv=f.read(1)[0],f.read(1)[0]\nelse:return\nif av not in (48,49,50) or iv<48 or iv>57 or (av==48 and iv>54) or (av==49 and iv>52) or (av==50 and iv>51):return\nreturn True"]],
         "rs":"Crinkler"
     },
     {
@@ -1070,6 +1070,17 @@
     {
         "d":[["size",[8,524288]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=int.from_bytes(f.read(4),'little')+8;from zlib import crc32;return (crc32(f.read())^0xFFFFFFFF)==c and s==f.tell()"]],
         "rs":"Metroid Prime 4 Save","s":1
+    },
+    {
+        "d":[["isat","\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');f.seek(16);return o>(16+13*c)and o==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Noita Wizard pAK"
+    },
+    {
+        "d":[["isat","SQAR\\xA3",0],["isat","\\x74\\x41",6],["isin",["\\0","\\1","\\x10","\\x11"],5]],
+        "rs":"Fox Engine QAR","s":1
+    },
+    {
+        "d":[["isat","foxfpk",0],["isin",["d","\\0"],6],["isat"]]
     },
     {
         "d":[["size",48],["isat","-",4],["isat","|",10],["isat","|",27],["isat","|",32],["isat","|",47]],

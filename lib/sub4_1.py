@@ -565,7 +565,7 @@ def extract4_1(inp:str,out:str,t:str):
             d = darc.Darc.load(i)
             d.extract(o)
 
-            if os.listdir(o): return
+            if listdir(o): return
         case 'Azada Wizard':
             if db.print_try: print('Trying with custom extractor')
             f = open(i,'rb')
@@ -574,5 +574,32 @@ def extract4_1(inp:str,out:str,t:str):
             f.seek(12)
             open(o + '/' + tbasename(i) + '.txt','wb').write(f.read())
             return
+        case 'Noita Wizard pAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(4)
+            c = f.readu32()
+            f.skip(8)
+            fs = [(f.readu32(),f.readu32(),f.read(f.readu32()).decode()) for _ in range(c)]
+
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+            if fs: return
+        case 'Fox Engine QAR':
+            tf = TmpFile(suf='.dat',path=o)
+            tf.link(i)
+            run(['gzstool',tf])
+            tf.destroy()
+            tfp = tf.p[:-4] + '_dat'
+            if exists(tfp) and isdir(tfp) and listdir(tfp) and exists(tf.p + '.xml') and getsize(tf.p + '.xml'):
+                remove(tf.p + '.xml')
+                while True:
+                    try: copydir(tfp,o,True)
+                    except PermissionError: sleep(0.1)
+                    else: break
+                return
 
     return 1
