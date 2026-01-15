@@ -588,12 +588,21 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fe[0])
                 xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
             if fs: return
-        case 'Fox Engine QAR':
-            tf = TmpFile(suf='.dat',path=o)
+        case 'Fox Engine QAR'|'Fox Engine FPK'|'Fox Engine PFTXS':
+            if t == 'Fox Engine QAR': ext = 'dat'
+            elif t == 'Fox Engine FPK':
+                f = open(i,'rb')
+                f.seek(6)
+                if f.read(1) == b'd': ext = 'fpkd'
+                else: ext = 'fpk'
+                f.close()
+            elif t == 'Fox Engine PFTXS': ext = 'pftxs'
+
+            tf = TmpFile(suf='.' + ext,path=o)
             tf.link(i)
             run(['gzstool',tf])
             tf.destroy()
-            tfp = tf.p[:-4] + '_dat'
+            tfp = tf.p.rsplit('.',1)[0] + '_' + ext
             if exists(tfp) and isdir(tfp) and listdir(tfp) and exists(tf.p + '.xml') and getsize(tf.p + '.xml'):
                 remove(tf.p + '.xml')
                 while True:

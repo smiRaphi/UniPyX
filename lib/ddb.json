@@ -1080,7 +1080,12 @@
         "rs":"Fox Engine QAR","s":1
     },
     {
-        "d":[["isat","foxfpk",0],["isin",["d","\\0"],6],["isat"]]
+        "d":[["isat","foxfpk",0],["isat","win",7],["isat","\\0\\0",14],["isin",["d","\\0"],6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(10);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Fox Engine FPK","s":1
+    },
+    {
+        "d":[["isat","PFTX",0],["isat","TEXL",16],["isat","FTEX",32]],
+        "rs":"Fox Engine PFTXS","s":1
     },
     {
         "d":[["size",48],["isat","-",4],["isat","|",10],["isat","|",27],["isat","|",32],["isat","|",47]],
