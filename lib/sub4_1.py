@@ -610,6 +610,18 @@ def extract4_1(inp:str,out:str,t:str):
                     except PermissionError: sleep(0.1)
                     else: break
                 return
+        case 'Fox Engine Console QAR':
+            tf = TmpFile(suf='.dat',path=o)
+            tf.link(i)
+            run(['mgsv_qar_tool',tf,'-e2'])
+            tf.destroy()
+            if exists(tf.p[:-4]) and isdir(tf.p[:-4]) and listdir(tf.p[:-4]) and exists(tf.p[:-3] + 'inf'):
+                remove(tf.p[:-3] + 'inf')
+                while True:
+                    try: copydir(tf.p[:-4],o,True)
+                    except PermissionError: sleep(0.1)
+                    else: break
+                return
         case 'Deathloop Resource':
             from lib.file import File
             f = File(i,endian='>')

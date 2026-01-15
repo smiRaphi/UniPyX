@@ -3180,6 +3180,19 @@
             }
         }]
     },
+    "mgsv_qar_tool":{
+        "p":"MGSV_QAR_Tool/MGSV_QAR_Tool.exe",
+        "fs":[{
+            "u":"https://community.pcgamingwiki.com/files/file/1391-metal-gear-solid-v-modding-tools/?do=download&r=5905&confirm=1&t=1",
+            "ex":".zip",
+            "x":{
+                "MGSV_Mod_Tools/MGSV_QAR_Tool/MGSV_QAR_Tool.exe":"MGSV_QAR_Tool/MGSV_QAR_Tool.exe",
+                "MGSV_Mod_Tools/MGSV_QAR_Tool/zlib1.dll":"MGSV_QAR_Tool/zlib1.dll",
+                "MGSV_Mod_Tools/MGSV_QAR_Tool/dictionary.txt":"MGSV_QAR_Tool/dictionary.txt",
+                "MGSV_Mod_Tools/MGSV_QAR_Tool/pathid_list_ps3.bin":"MGSV_QAR_Tool/pathid_list_ps3.bin"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

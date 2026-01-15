@@ -1088,6 +1088,10 @@
         "rs":"Fox Engine QAR","s":1
     },
     {
+        "d":[["isat","\\0\\0\\0\\0\\x24\\0\\0\\0",-8],["isat","\\0\\0\\0\\0aq",-18],["isatS","\\0",12,-32],["n0",4,-12],["n0",2,-20],["n0",4,-36],["py","f=open(inp,'rb');f.seek(0,2);s=f.tell();f.seek(-36,1);s-=int.from_bytes(f.read(4),'little')+36;return not s%2 and s>256 and s<983040"]],
+        "rs":"Fox Engine Console QAR"
+    },
+    {
         "d":[["isat","foxfpk",0],["isat","win",7],["isat","\\0\\0",14],["isin",["d","\\0"],6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(10);return int.from_bytes(f.read(4),'little')==s"]],
         "rs":"Fox Engine FPK","s":1
     },
