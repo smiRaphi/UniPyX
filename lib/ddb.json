@@ -1072,6 +1072,14 @@
         "rs":"Metroid Prime 4 Save","s":1
     },
     {
+        "d":[["isat","\\x05SER",0],["isatS","\\0",24,8],["isat","\\0\\0\\0\\0",36],["n0",4,32],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return s==(int.from_bytes(f.read(4),'big')+32)"]],
+        "rs":"Deathloop Resource","s":1},{
+        "d":[["isat","\\x04SER\\x00\\x03",0],["n0",1,6],["isat","\\0\\0\\0",7],["py","f=open(inp,'rb');f.seek(6)\ntry:s=f.read(f.read(1)[0]).decode('ascii')\nexcept:return\nreturn s.startswith('master')and s.endswith('.index')and exists(dirname(i)+'/'+s)"]],
+        "rs":"Deathloop Resource","s":1},{
+        "d":["isat","\\x04SEROOD\\0\\x08\\0\\0\\0",0],
+        "rs":"Deathloop Resource","s":1
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');f.seek(16);return o>(16+13*c)and o==int.from_bytes(f.read(4),'little')"]],
         "rs":"Noita Wizard pAK"
     },

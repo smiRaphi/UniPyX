@@ -3906,6 +3906,14 @@
         ]],
         "ts":0
     },
+    "deathloop":{
+        "p":"BMS/deathloop.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/deathloop.bms",
+            "BMS/deathloop.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

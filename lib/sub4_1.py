@@ -610,5 +610,45 @@ def extract4_1(inp:str,out:str,t:str):
                     except PermissionError: sleep(0.1)
                     else: break
                 return
+        case 'Deathloop Resource':
+            from lib.file import File
+            f = File(i,endian='>')
+            ft = f.readu8()
+            assert f.read(3) == b'SER'
+
+            if ft == 4:
+                if f.readu16() == 3: mi = i
+                else:
+                    inf = dirname(i) + '\\master_resources.index'
+                    mi = dirname(i) + '/master.index'
+            elif ft == 5:
+                inf = i
+                mi = dirname(i) + '/master.index'
+            else: raise NotImplementedError(ft)
+            f.close()
+
+            rst = []
+            if exists(mi):
+                f = File(mi,endian='<')
+                if f.read(6) == b'\x04SER\0\x03':
+                    inf = dirname(i) + '\\' + f.read(f.readu32()).decode('ascii')
+                    c = f.readu16('>')
+                    for ix in range(c): rst.append((ix,f.read(f.readu32()).decode('ascii')))
+                f.close()
+            if not exists(inf): return 1
+
+            sd,xt = open(db.get('deathloop'),encoding='utf-8').read().split('\nstartfunction BUILD_ARCHIVE_NUM\n')
+            if not rst: rst = re.findall(r'putarray 0 +(\d+) +([^\n]+)',xt)
+
+            if db.print_try: print('Trying with deathloop')
+            tf = TmpFile('.bms')
+            open(tf.p,'w',encoding='utf-8').write(sd.replace('\n    get ARCHIVENUM short\n','\n    get DUMMY2 long\n    get ARCHIVENUM short\n') + '\nstartfunction BUILD_ARCHIVE_NUM\n' + '\n'.join(f'putarray 0 {x[0]} {x[1]}' for x in rst) + '\nendfunction\n')
+            tfi = TmpFile('.index',path=dirname(i))
+            tfi.link(inf)
+            run(['quickbms','-Y',tf,tfi,o],print_try=False)
+            tfi.destroy()
+            tf.destroy()
+
+            if listdir(o): return
 
     return 1
