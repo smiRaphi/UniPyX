@@ -281,46 +281,109 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 from bin.sgkey import SGKeys
                 if exists(o + '/IP.BIN') and SGKeys().get(o): return extract(o + '\\IP.BIN',o,'Encrypted GD-ROM')
                 return
-        case 'Wii TMD':
-            ckey = dirname(db.get('tmd_wii')) + '/'
+        case 'Nintendo TMD':
+            ckeys = db.get('tmd_keys') + '/'
 
-            if not exists(ckey + 'common.key'):
-                s = db.c.get('https://wiki.wiidatabase.de/wiki/Common-Key').text
-                for r,k in [('Normal','common'),
-                            ('Korea' ,'korea' ),
-                            ('Debug' ,'debug' )]:
-                    open(ckey + k + '.key','wb').write(bytes.fromhex(re.search(f'<b>{r}:</b> *<code>([^<]+)</code>',s)[1]))
-
-            if db.print_try: print('Trying with tmd_wii')
-            from bin.tmd import TMD,derive_key,check_sha1,decrypt_content
+            if db.print_try: print('Trying with custom extractor')
+            from bin.tmd import TMD,Ticket,PWDS,derive_key,decrypt_content,unscramble_3ds
 
             dr = dirname(i)
-            dls = [x for x in listdir(dr) if os.path.isfile(dr + '/' + x)]
+            dls = [x for x in listdir(dr) if isfile(dr + '/' + x)]
             if 'tmd' in dls: tmd = 'tmd'
             else: tmd = max([x for x in dls if x.startswith('tmd.')],key=lambda x:int(x.split('.')[-1]))
             tmd = TMD(dr + '/' + tmd)
+
+            if tmd.sigt == 1 and tmd.version == 0: cns = 'w'
+            elif tmd.sigt in (3,4,5) and tmd.version == 1: cns = '3'
+            else: raise NotImplementedError(f'{tmd.signature.type:4X} {tmd.version}')
+
+            if exists(dr + '/cetk'):
+                cetk = Ticket(dr + '/cetk')
+                if cns == 'w':
+                    if not exists(ckeys + 'wii-common.key'):
+                        s = db.c.get('https://wiki.wiidatabase.de/wiki/Common-Key').text
+                        for r,k in [('Normal','common'),
+                                    ('Korea' ,'korea' ),
+                                    ('Debug' ,'debug' )]:
+                            open(ckeys + f'wii-{k}.key','wb').write(bytes.fromhex(re.search(f'<b>{r}:</b> *<code>([^<]+)</code>',s)[1]))
+                    cetk.ckey = open(ckeys + f'wii-{["common","korea","debug"][cetk.ckeyindex]}.key','rb').read()
+                elif cns == '3':
+                    if not exists(ckeys + '3ds-generator.key'):
+                        s = db.c.get('https://raw.githubusercontent.com/Kc57/ntool/refs/heads/master/lib/keys.py').text
+                        open(ckeys + '3ds-generator.key','wb').write(bytes.fromhex(re.search(r'\) *\+ *0x([\da-fA-F]{32}), *87, *128\)',s)[1]))
+
+                        x3d = re.search(r'KeyX0x3D *= *\(0x([\da-fA-F]{32}), *0x([\da-fA-F]{32})\)',s)
+                        open(ckeys + '3ds-3Dx.key','wb').write(bytes.fromhex(x3d[1]))
+                        open(ckeys + '3ds-dev-3D.key','wb').write(bytes.fromhex(x3d[2]))
+
+                        y3d = re.search(r'KeyY0x3D *= *\(\s*((?:\(0x[\da-fA-F]{32}, *0x[\da-fA-F]{32}\),?\s*)+)\)\n',s)[1]
+                        y3dr = []
+                        y3dd = []
+                        for r,d in re.findall(r'\(0x([\da-fA-F]{32}), *0x([\da-fA-F]{32})\)',y3d):
+                            y3dr.append(bytes.fromhex(r))
+                            y3dd.append(bytes.fromhex(d))
+
+                        open(ckeys + '3ds-3Dy.key','wb').write(b''.join(y3dr))
+                        open(ckeys + '3ds-dev-3Dy.key','ab').write(b''.join(y3dd))
+
+                    g3d = open(ckeys + '3ds-generator.key','rb').read()
+                    x3d = open(ckeys + '3ds-3Dx.key','rb').read()
+                    y3d = open(ckeys + '3ds-3Dy.key','rb')
+                    y3d.seek(0x10 * cetk.ckeyindex)
+                    y3d = y3d.read(0x10)
+                    cetk.ckey = unscramble_3ds(x3d,y3d,g3d)
+            else: cetk = None
 
             for c in tmd.contents:
                 fn = hex(c.cid)[2:].zfill(8)
                 odr = o + '/' + fn
                 ifl = dr + '/' + fn
 
-                if not check_sha1(ifl,c.sha1):
+                if c.type & 1:
                     tf = TmpFile()
-                    decrypt_content(ifl,tf,derive_key(tmd.titleid,1),c)
-                    assert check_sha1(tf, c.sha1)
+                    pwids = list(range(len(PWDS)))
+                    if cns == 'w': pwids.insert(0,1)
+                    elif cns == '3': pwids.insert(0,0)
+                    for ix in set([-1] + pwids):
+                        if ix == -1: k = cetk.get_key()
+                        else: k = derive_key(tmd.titleid,ix)
+                        decrypt_content(ifl,tf,k,c)
+                        if tmd.check_file(tf,c.sha): break
+                    else: raise Exception
                     ifl = str(tf)
 
-                if c.type == 2: copy(ifl,o + '/CAFEDEAD.bin')
-                elif c.type == 0x8001:
-                    if extract(ifl,o + '/$SHARED','U8'): copy(ifl,o + '/$SHARED/' + fn + '.bin')
-                elif c.index == 0 and tmd.titleid == b'\0\0\0\1\0\0\0\2': copy(ifl,o + '/build_tag.bin')
-                elif c.index == 0: copy(ifl,o + '/banner.bnr')
-                elif c.index == 1: copy(ifl,o + '/launch.dol')
-                elif tmd.bootindex == c.index: copy(ifl,o + '/boot.dol')
-                else:
-                    if open(ifl,'rb').read(4) == b'U\xAA8\x2D':
-                        if extract(ifl,odr,'U8'): copy(ifl,odr + '.bin')
+                if cns == 'w':
+                    if c.type == 2: copy(ifl,o + '/CAFEDEAD.bin')
+                    elif c.type & 0x8000:
+                        if extract(ifl,o + '/$SHARED','U8'): copy(ifl,o + '/$SHARED/' + fn + '.bin')
+                    elif c.index == 0 and tmd.titleid == b'\0\0\0\1\0\0\0\2': copy(ifl,o + '/build_tag.bin')
+                    elif c.index == 0: copy(ifl,o + '/banner.bnr')
+                    elif c.index == 1: copy(ifl,o + '/launch.dol')
+                    elif tmd.bootindex == c.index: copy(ifl,o + '/boot.dol')
+                    else:
+                        if open(ifl,'rb').read(4) == b'U\xAA8\x2D':
+                            if extract(ifl,odr,'U8'): copy(ifl,odr + '.bin')
+                        else: copy(ifl,odr + '.bin')
+                elif cns == '3':
+                    if c.type & 0x4000: copy(ifl,odr + '.dlc')
+                    elif c.index == 0 and tmd.srl_flag:
+                        if extract2(ifl,odr,'NDS'): copy(ifl,odr + '.srl')
+                    elif c.index == 0:
+                        f = open(ifl,'rb')
+                        f.seek(0x100)
+                        ncch = f.read(4) == b'NCCH'
+                        f.seek(0x208)
+                        cxi = ncch and f.read(4) == b'\0\0\0\0'
+                        f.seek(0x560)
+                        cxi = cxi and f.read(0x10) == (b'\xFF'*0x10)
+                        f.close()
+                        if cxi:
+                            if extract(ifl,odr,'NCCH CXI'): copy(ifl,odr + '.cxi')
+                        elif ncch:
+                            if extract(ifl,odr,'NCCH CFA'): copy(ifl,odr + '.cfa')
+                        else: copy(ifl,odr + '.bin')
+                    elif c.index in (1,2):
+                        if extract2(ifl,odr,'NCCH CFA'): copy(ifl,odr + '.cfa')
                     else: copy(ifl,odr + '.bin')
             return
         case '3DO IMG':

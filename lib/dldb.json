@@ -3952,13 +3952,9 @@
         }],
         "ts":0
     },
-    "tmd_wii":{
-        "p":"tmd_wii/cetk",
-        "fs":[[
-            "http://nus.cdn.shop.wii.com/ccs/download/000000010000003A/cetk",
-            "tmd_wii/cetk"
-        ]],
-        "ts":0
+    "tmd_keys":{
+        "p":"tmd_keys",
+        "fs":null
     },
     "sasr_xpac_hashes":{
         "p":"sasr_xpac_hashes.bt",
