@@ -13,7 +13,7 @@
     "dosbox":{
         "p":"DOSBox-X/dosbox-x.exe",
         "fs":[{
-            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2025.12.01/dosbox-x-vsbuild-win64-20251201165421.zip",
+            "u":"https://github.com/joncampbell123/dosbox-x/releases/download/dosbox-x-v2026.01.02/dosbox-x-vsbuild-win64-20260102233440.zip",
             "x":{
                 "bin/x64/Release SDL2/dosbox-x.exe":"DOSBox-X/dosbox-x.exe",
                 "bin/x64/Release SDL2/inpoutx64.dll":"DOSBox-X/inpoutx64.dll"
@@ -298,9 +298,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1766790000
+            "ts":1768604400
         }],
-        "ts":1766876400
+        "ts":1768604400
     },
     "file":{
         "p":"file/file.exe",
@@ -355,15 +355,15 @@
                 "Qt5Core.dll":"DiE/Qt5Core.dll",
                 "Qt5Script.dll":"DiE/Qt5Script.dll"
             },
-            "ts":1735686000
+            "ts":1767222000
         },{
             "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip",
             "x":{
                 "*":"DiE"
             },
-            "ts":1766962800
+            "ts":1768604400
         }],
-        "ts":1766962800
+        "ts":1768604400
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -478,9 +478,9 @@
                 "lsar.exe":"Unarchiver/lsar.exe",
                 "Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"
             },
-            "ts":1735686000
+            "ts":1767222000
         }],
-        "ts":1735686000
+        "ts":1767222000
     },
     "lsar":{
         "p":"Unarchiver/lsar.exe",
@@ -491,20 +491,20 @@
                 "lsar.exe":"Unarchiver/lsar.exe",
                 "Foundation.1.0.dll":"Unarchiver/Foundation.1.0.dll"
             },
-            "ts":1735686000
+            "ts":1767222000
         }],
-        "ts":1735686000
+        "ts":1767222000
     },
     "deark":{
         "p":"deark.exe",
         "fs":[{
-            "u":"https://entropymine.com/deark/releases/deark-1.7.1.tar.gz",
+            "u":"https://entropymine.com/deark/releases/deark-1.7.2.tar.gz",
             "x":{
-                "deark-1.7.1/x64/deark.exe":"deark.exe"
+                "deark-1.7.2/x64/deark.exe":"deark.exe"
             },
-            "ts":1755919440
+            "ts":1767858720
         }],
-        "ts":1755919440
+        "ts":1767858720
     },
     "quickbms":{
         "p":"quickbms.exe",
@@ -756,13 +756,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/b4/23/dolphin-master-2512-91-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/bb/d0/dolphin-master-2512-148-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1766957952
+            "ts":1768602583
         }],
-        "ts":1766957952
+        "ts":1768602583
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -919,14 +919,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0283/mame0283b_x64.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0284/mame0284b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1764349795
+            "ts":1767134017
         }],
-        "ts":1764349795
+        "ts":1767134017
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -1107,12 +1107,13 @@
     "repak":{
         "p":"repak.exe",
         "fs":[{
-            "u":"https://github.com/trumank/repak/releases/download/v0.2.2/repak_cli-x86_64-pc-windows-msvc.zip",
+            "u":"https://github.com/trumank/repak/releases/download/v0.2.3/repak_cli-x86_64-pc-windows-msvc.zip",
             "x":{
                 "repak.exe":"repak.exe"
-            }
+            },
+            "ts":1767320086
         }],
-        "ts":0
+        "ts":1767320086
     },
     "wad_archiver":{
         "p":"wad_archiver.py",
@@ -2576,16 +2577,17 @@
     "icupkg":{
         "p":"icu4c/icupkg.exe",
         "fs":[{
-            "u":"https://github.com/unicode-org/icu/releases/download/release-78.1/icu4c-78.1-Win64-MSVC2022.zip",
+            "u":"https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-Win64-MSVC2022.zip",
             "x":{
                 "bin64/icupkg.exe":"icu4c/icupkg.exe",
                 "bin64/icutu78.dll":"icu4c/icutu78.dll",
                 "bin64/icuin78.dll":"icu4c/icuin78.dll",
                 "bin64/icuuc78.dll":"icu4c/icuuc78.dll",
                 "bin64/icudt78.dll":"icu4c/icudt78.dll"
-            }
+            },
+            "ts":1767915532
         }],
-        "ts":0
+        "ts":1767915532
     },
     "xvdtool.streaming":{
         "p":"XvdTool.Streaming/XvdTool.Streaming.exe",
@@ -2645,23 +2647,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45927/SDLVICE-3.10-win64-r45927.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45950/SDLVICE-3.10-win64-r45950.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45927/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45927/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45927/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45927/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45927/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45927/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r45950/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r45950/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r45950/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r45950/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r45950/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r45950/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1766769738
+            "ts":1768399198
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1766769738
+        "ts":1768399198
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -3046,14 +3048,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2025/RenderDoc_2025_12_28_f333d08b_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_01_16_ef0d6737_32.zip",
             "x":{
-                "RenderDoc_2025_12_28_f333d08b_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2025_12_28_f333d08b_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_01_16_ef0d6737_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_01_16_ef0d6737_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1766876400
+            "ts":1768518000
         }],
-        "ts":1766876400
+        "ts":1768518000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -3062,7 +3064,8 @@
             "x":{
                 "bsc-m03.exe":"bsc-m03.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "mcm":{
         "p":"mcm.exe",
@@ -3072,7 +3075,8 @@
             "x":{
                 "mcm83/mcm32.exe":"mcm.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "mcmsk":{
         "p":"mcmsk.exe",
@@ -3082,29 +3086,34 @@
             "x":{
                 "mcm_sk64.exe":"mcmsk.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "kanzi":{
         "p":"Kanzi.exe",
         "fs":[[
             "https://github.com/flanglet/kanzi-cpp/releases/download/2.4.0/Kanzi64.exe",
             "Kanzi.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "ppmd":{
         "p":"PPMd.exe",
         "fs":[
         "https://mattmahoney.net/dc/PPMd.exe"
-        ]
+        ],
+        "ts":0
     },
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.3.1/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.4.0/zxc-windows-x64.exe.zip",
             "x":{
                 "zxc.exe":"zxc.exe"
-            }
-        }]
+            },
+            "ts":1767788901
+        }],
+        "ts":1767788901
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -3114,7 +3123,8 @@
             "x":{
                 "vlaz-008-5/bin/vlaz_w64.exe":"vlaz.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "nlgfiletool":{
         "p":"NlgFileTool/FileConverter.exe",
@@ -3132,7 +3142,8 @@
                 "FileConverter.deps.json":"NlgFileTool/FileConverter.deps.json",
                 "FileConverter.runtimeconfig.json":"NlgFileTool/FileConverter.runtimeconfig.json"
             }
-        }]
+        }],
+        "ts":0
     },
     "nlgfiletool-mff":{
         "p":"NlgFileTool.exe",
@@ -3141,7 +3152,8 @@
             "x":{
                 "NlgFileTool.exe":"NlgFileTool.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "gipfeli_tool":{
         "p":"gipfeli_tool.exe",
@@ -3151,19 +3163,22 @@
             "x":{
                 "gipfeli_tool.exe":"gipfeli_tool.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "lzx":{
         "p":"lzx.exe",
         "fs":[
         "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/lzx.exe"
-        ]
+        ],
+        "ts":0
     },
     "darc":{
         "p":"darc.py",
         "fs":[
         "https://raw.githubusercontent.com/LITTOMA/darctool/refs/heads/master/darc.py"
-        ]
+        ],
+        "ts":0
     },
     "gzstool":{
         "p":"GzsTool/GzsTool.exe",
@@ -3178,7 +3193,8 @@
                 "qar_dictionary.txt":"GzsTool/qar_dictionary.txt",
                 "GzsTool.exe.config":"GzsTool/GzsTool.exe.config"
             }
-        }]
+        }],
+        "ts":0
     },
     "mgsv_qar_tool":{
         "p":"MGSV_QAR_Tool/MGSV_QAR_Tool.exe",
@@ -3191,7 +3207,8 @@
                 "MGSV_Mod_Tools/MGSV_QAR_Tool/dictionary.txt":"MGSV_QAR_Tool/dictionary.txt",
                 "MGSV_Mod_Tools/MGSV_QAR_Tool/pathid_list_ps3.bin":"MGSV_QAR_Tool/pathid_list_ps3.bin"
             }
-        }]
+        }],
+        "ts":0
     },
     "luadec51":{
         "p":"Luadec51.exe",
@@ -3200,14 +3217,16 @@
             "x":{
                 "Luadec51.exe":"Luadec51.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "unluac":{
         "p":"unluac.jar",
         "fs":[[
             "https://netix.dl.sourceforge.net/project/unluac/Unstable/unluac_2025_12_23.jar?viasf=1",
             "unluac.jar"
-        ]]
+        ]],
+        "ts":0
     },
     "ediextract":{
         "p":"EDIEXTR.EXE",
@@ -3358,13 +3377,13 @@
     "upx":{
         "p":"upx.exe",
         "fs":[{
-            "u":"https://github.com/upx/upx/releases/download/v5.0.2/upx-5.0.2-win64.zip",
+            "u":"https://github.com/upx/upx/releases/download/v5.1.0/upx-5.1.0-win64.zip",
             "x":{
-                "upx-5.0.2-win64/upx.exe":"upx.exe"
+                "upx-5.1.0-win64/upx.exe":"upx.exe"
             },
-            "ts":1753010702
+            "ts":1767789622
         }],
-        "ts":1753010702
+        "ts":1767789622
     },
     "qtifw-devtool":{
         "p":"qtifw-devtool.exe",
@@ -3605,7 +3624,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.3/lessmsi-v2.11.3.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.6/lessmsi-v2.11.6.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -3614,9 +3633,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1766940221
+            "ts":1767677786
         }],
-        "ts":1766940221
+        "ts":1767677786
     },
     "msix":{
         "p":"MsiX.exe",

@@ -57,11 +57,13 @@ def t(): return int(time.time())
 class Cache:
     def __init__(self):
         self.c = httpx.Client(timeout=10)
+        self.nvc = httpx.Client(timeout=10,verify=False)
         self._s = {}
-    def get(self,u) -> str:
+    def get(self,u,verify=True) -> str:
         if u in self._s: return self._s[u]
+        c = self.nvc if not verify else self.c
         for _ in range(5):
-            try:r = self.c.get(u,follow_redirects=True).text
+            try:r = c.get(u,follow_redirects=True).text
             except httpx.ReadTimeout:pass
             else:break
         self._s[u] = r
@@ -73,6 +75,7 @@ class Cache:
         return ft(self.srch(p,u),f)
 
 def supdate(c:Cache,k:str,inf:dict):
+    if inf['fs'] == None: return
     nfs = []
     tts = inf.get('ts',0)
     for f in inf['fs']:
@@ -109,7 +112,7 @@ def supdate(c:Cache,k:str,inf:dict):
         elif dom == 'github.com' and '/releases/download/' in u:
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-            if repo not in ('VirusTotal/yara','allcoolthingsatoneplace/UnrealPakTool'):
+            if repo not in ('VirusTotal/yara','allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x'):
                 if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                 elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
@@ -163,7 +166,9 @@ def supdate(c:Cache,k:str,inf:dict):
             s = c.get(bu)
             ms = re.findall(r'href="([^"]+)">[^<]+</a> *(\d{4}-\d\d-\d\d \d\d:\d\d)',s)[-1]
             ts = ft(ms[1],'%Y-%m-%d %H:%M')
-            if ts > ots: u = bu + ms[0]
+            if ts > ots:
+                for kx in list(f['x']): f['x'][ms[:-7] + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
+                u = bu + ms[0]
         elif dom == 'dl.dolphin-emu.org':
             s = c.get('https://dolphin-emu.org/download/')
             m = re.search(r'href="/download/dev/[^"]+">[^<]+</a></td>\s*<td class="reldate" title="([^"Z\.]+)[^"]*">[^<]*</td>\s*.+\s*</tr>\s*<tr class="download">\s*.+\s*<td class="download-links".*>\s*<a href="(https://[^"]+-x64\.7z)"',s)
@@ -187,7 +192,7 @@ def supdate(c:Cache,k:str,inf:dict):
                     if nu != u: u = nu
                     else: ts = 0
         elif dom == 'dl.xpdfreader.com':
-            s = c.get('https://www.xpdfreader.com/download.html')
+            s = c.get('https://www.xpdfreader.com/download.html',verify=False)
             ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')
             if ts > ots:
                 nu = re.search(r'href="(https://dl\.xpdfreader\.com/xpdf-tools-win-[^"]+\.zip)">',s)[1]
