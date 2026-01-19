@@ -662,5 +662,23 @@ def extract4_1(inp:str,out:str,t:str):
             tf.destroy()
 
             if listdir(o): return
+        case 'LMPK':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+
+            f = open(i,'rb')
+            assert f.read(4) == b'LMPK'
+            f.seek(8)
+            d = zlib.decompress(f.read())
+            f.close()
+
+            try: e = d[:4].decode('ascii').lower()
+            except UnicodeDecodeError: e = 'bin'
+            else:
+                if not isvalid(e):
+                    if d[:5] == b'<?xml': e = 'xml'
+                    else: e = 'bin'
+            open(o + '/' + tbasename(i) + '.' + e,'wb').write(d)
+            return
 
     return 1
