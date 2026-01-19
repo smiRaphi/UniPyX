@@ -18,3 +18,4 @@ __pycache__
 !/bin/AssetRipper/client.py
 !/bin/tmd.py
 !/bin/sgkey.py
+!/bin/uekey.py

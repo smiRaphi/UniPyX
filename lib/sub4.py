@@ -359,8 +359,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['tdedecrypt',i + '_',of])
             if exists(of[:-1]) and (getsize(of[:-1]) or not getsize(i)): return
         case 'UE4 Package':
-            run(['repak','unpack','-o',o,'-q','-f',i])
+            err = run(['repak','info',i],print_try=False)[2]
+            if 'trying version V11 failed: pak is encrypted but no key was provided' in err:
+                from bin.uekey import UEKeys
+                k = UEKeys().get(i)
+                if not k: return 1
+                k = ['-a',k.hex()]
+            else: k = []
+
+            run(['repak'] + k + ['unpack','-o',o,'-q','-f',i])
             if listdir(o): return
+            if k: return 1
 
             td = TmpDir()
             tds = td + '\\s\\s'
@@ -372,7 +381,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 for f in rldir(dirname(db.get(v))): symlink(f,std.p + '\\' + basename(f))
 
                 if db.print_try: print('Trying with',v)
-                print(run([std + '\\UnrealPak.exe',i,'-Extract',o],cwd=std.p,print_try=False))
+                run([std + '\\UnrealPak.exe',i,'-Extract',o],cwd=std.p,print_try=False)
                 std.destroy()
                 if listdir(o):
                     td.destroy()

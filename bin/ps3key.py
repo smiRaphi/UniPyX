@@ -1,4 +1,4 @@
-import os,re
+import os
 
 __db__ = os.path.join(os.path.dirname(__file__),'ps3keys.bdb')
 
@@ -30,7 +30,7 @@ class PS3Keys:
     def __getitem__(self,key): return self.get(key)
 
 def makedb():
-    import httpx
+    import httpx,re
 
     ks = re.findall(r'">(\w*)</a><TD>.+<TD>([A-Fa-f\d]*)</TR>',httpx.get('https://ps3.aldostools.org/dkey.html',verify=False).text)
 
