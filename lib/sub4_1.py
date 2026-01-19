@@ -680,5 +680,122 @@ def extract4_1(inp:str,out:str,t:str):
                     else: e = 'bin'
             open(o + '/' + tbasename(i) + '.' + e,'wb').write(d)
             return
+        case 'BCH':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            T0S = 8 + 4*5 + 4*7 + 4
+            T1S = 8 + 4*6 + 4*8 + 4
+            FMTS = (
+                ("rgba8888",32),
+                ("rgb888",24),
+                ("rgba5551",16),
+                ("rgb565",16),
+                ("rgba4444",16),
+                ("la88",16),
+                ("hl88",16),
+                ("l8",8),
+                ("a8",8),
+                ("la44",8),
+                ("l4",4),
+                ("a4",4),
+                ("etc1",4),
+                ("etc1_a4",8),
+            )
+
+            assert f.read(4) == b'BCH\0'
+            f.skip(4)
+
+            soff0 = f.readu32()
+            f.skip(-4)
+            if soff0 in (T0S,T0S-4): typ = 0
+            elif soff0 == T1S: typ = 1
+
+            seco = [f.readu32() for _ in range(4 if typ == 0 else 5)]
+            f.skip(4)
+            sec = [(seco[ix],f.readu32()) for ix in range(len(seco))]
+
+            f.seek(sec[0][0])
+            maps = []
+            for _ in range(15):
+                off = f.reads32()
+                if off == -1: break
+                maps.append((off+sec[0][0],f.readu16()))
+                f.skip(6)
+
+            dext = False
+
+            for ix,m in enumerate(maps):
+                if not m[1]: continue
+
+                f.seek(m[0])
+                offs = [f.readu32()+sec[0][0] for _ in range(m[1])]
+                if ix == 3:
+                    for off in offs:
+                        f.seek(off)
+                        ucmds = [(f.readu32()+sec[2][0],f.readu32()) for _ in range(3)]
+                        fmt = f.readu8()
+                        mips = f.readu8()
+                        f.skip(2)
+                        noff = f.readu32()
+                        f.seek(sec[1][0]+noff)
+                        nb1 = f'{o}/texture/{f.read0s().decode()}'
+
+                        w = h = 0
+                        texs = set()
+                        for csoff,csc in ucmds:
+                            f.seek(csoff)
+                            cmds = [f.readu32() for _ in range(csc)]
+
+                            k = 0
+                            while k + 1 < csc:
+                                cmd = cmds[k+1]
+                                addr = cmd & 0xFFFF
+                                size = ((cmd >> 20) & 0xFF) + 2
+                                size += -size % 2
+                                assert (k+size) <= csc
+
+                                v = cmds[k]
+                                if addr in (0x82,0x92,0x9a): w,h = v >> 16,v & 0xFFFF
+                                elif addr in (0x8e,0x96,0x9e): assert v == fmt
+                                elif addr in (0x85,0x86,0x87,0x88,0x89,0x8a,0x95,0x9d): texs.add(v)
+
+                                k += size
+                        assert texs and w and h
+                        nb2 = f'_{w}x{h}.{FMTS[fmt][0]}'
+
+                        for tix,ro in enumerate(sorted(list(texs))):
+                            dext = True
+                            if typ == 1 and fmt in (10,11) and ro < sec[4][1]: ro += sec[4][0]
+                            else: ro += sec[3][0]
+
+                            siz = 0
+                            for _ in range(mips):
+                                siz += (w * h * FMTS[fmt][1]) // 8
+                                w >>= 1
+                                h >>= 1
+                                if w < 1: w = 1
+                                if h < 1: h = 1
+
+                            f.seek(ro)
+                            xopen(nb1 + (f'_{tix}' if len(texs) > 1 else '') + nb2,'wb').write(f.read(siz))
+                elif ix == 6:
+                    for off in offs:
+                        f.seek(off)
+                        id = f.readu32()
+                        f.skip(-4)
+                        xopen(f'{o}/camera/{id:02X}.bin','wb').write(f.read(0x58))
+
+            if not dext:
+                if sec[3][1]:
+                    f.seek(sec[3][0])
+                    open(o + '/RAW.bin','wb').write(f.read(sec[3][1]))
+                if typ == 1 and sec[3] != sec[4] and sec[4][1]:
+                    f.seek(sec[4][0])
+                    open(o + '/RAW_EXT.bin','wb').write(f.read(sec[4][1]))
+            f.close()
+
+            if rldir(o): return
 
     return 1

@@ -284,6 +284,10 @@
         "rs":"LMPK","s":1
     },
     {
+        "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]<=f.read(1)[0]"]],
+        "rs":"BCH","s":1
+    },
+    {
         "d":[["isat",".CC40TAD",4],["isat",".CC4HSERHSER",292],["isat","\\xFF",3,false],["ext",".dat",false],["py","inf=inp[:-3] + 'hdr'\nif not exists(inf):return\nf=open(inf,'rb');f.seek(4);return f.read(8)==b'.CC40TAD'"]],"qq":true,
         "rs":"TTGames DAT","s":1
     },
