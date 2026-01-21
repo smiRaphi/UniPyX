@@ -52,7 +52,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if offs: return
         case 'PS3 Theme':
-            raise NotADirectoryError() # https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php
+            raise NotImplementedError # https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='>')
@@ -176,8 +176,7 @@ def extract4_1(inp:str,out:str,t:str):
             for ix in range(c):
                 d = bytes(x ^ 0x53 for x in f.read(fs[ix]))
                 if fs[ix] < 0xB0000:
-                    try:
-                        td = d.decode('cp1251')
+                    try: td = d.decode('cp1251')
                     except: pass
                     else:
                         if td.isprintable() and txt.fullmatch(td):

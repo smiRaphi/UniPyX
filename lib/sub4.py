@@ -26,11 +26,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
             }[t]])
             if exists(of) and getsize(of):
                 if t in ('Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'):
+                    xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
+
                     tg = open(of,'rb').read(4)
-                    if tg in (b'RARC',b'SARC',b'NARC'):
+                    if tg in xm:
                         tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
                         rename(of,tp)
-                        r = extract(tp,o,{b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC'}[tg])
+                        r = extract(tp,o,xm[tg])
                         if r: rename(tp,of)
                         else: remove(tp)
                 return
@@ -1864,13 +1866,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
             inf.close()
             if len(listdir(o)) > 1 or infp != infsp: return
         case 'WarioWare Mega Party Game PAC':
-            db.get('n64decompress')
-            if db.print_try: print('Trying with n64decompress')
-            from bin.n64decompress import decompress_yay0 # type: ignore
-
-            of = o + '/' + tbasename(i)
-            open(of,'wb').write(decompress_yay0(open(i,'rb').read()[0x20:]))
-            return
+            if db.print_try: print('Trying with custom extractor')
+            tf = TmpFile(name=tbasename(i) + '.yay0')
+            open(tf.p,'wb').write(open(i,'rb').read()[0x20:])
+            r = extract4(tf.p,o,'Nintendo Yay0')
+            tf.destroy()
+            return r
         case 'Package Resource Index':
             of = o + '\\' + tbasename(i) + '.xml'
             run(['makepri','dump','/if',i,'/of',of,'/o','/dt','Detailed'])
