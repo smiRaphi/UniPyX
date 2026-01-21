@@ -729,7 +729,20 @@ def extract4_1(inp:str,out:str,t:str):
 
                 f.seek(m[0])
                 offs = [f.readu32()+sec[0][0] for _ in range(m[1])]
-                if ix == 3:
+                if ix == 2:
+                    fs = []
+                    for off in offs:
+                        f.seek(off)
+                        fe = [f.readu32()+sec[0][0],f.readu32()]
+                        f.skip(0x20)
+                        fs.append(fe + [f.readu32()+sec[1][0]])
+                    dext = bool(fs)
+                    for fe in fs:
+                        f.seek(fe[2])
+                        n = f.read0s().decode()
+                        f.seek(fe[0])
+                        xopen(o + f'/shader/{n}.shbin','wb').write(f.read(fe[1]))
+                elif ix == 3:
                     for off in offs:
                         f.seek(off)
                         ucmds = [(f.readu32()+sec[2][0],f.readu32()) for _ in range(3)]
@@ -763,8 +776,8 @@ def extract4_1(inp:str,out:str,t:str):
                         assert texs and w and h
                         nb2 = f'_{w}x{h}.{FMTS[fmt][0]}'
 
+                        dext = bool(texs)
                         for tix,ro in enumerate(sorted(list(texs))):
-                            dext = True
                             if typ == 1 and fmt in (10,11) and ro < sec[4][1]: ro += sec[4][0]
                             else: ro += sec[3][0]
 
