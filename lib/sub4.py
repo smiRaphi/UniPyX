@@ -34,7 +34,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         rename(of,tp)
                         r = extract(tp,o,xm[tg])
                         if r: rename(tp,of)
-                        else: remove(tp)
+                        else:
+                            while True:
+                                try: remove(tp)
+                                except PermissionError: sleep(0.1)
+                                else: break
                 return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])

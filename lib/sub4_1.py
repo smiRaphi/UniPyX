@@ -550,6 +550,7 @@ def extract4_1(inp:str,out:str,t:str):
                     d = self.f.read(n)
                     if (n == 4 and p == 0) or (n == 2 and p == 4): d = d.decode('latin-1')
                     return d
+                def close(self): self.f.close()
 
             if db.print_try: print('Trying with darc')
             import bin.darc as darc # type: ignore
@@ -559,6 +560,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             d = darc.Darc.load(i)
             d.extract(o)
+            darc.open.close()
 
             if listdir(o): return
         case 'Azada Wizard':
