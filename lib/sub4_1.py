@@ -1,4 +1,5 @@
 from lib.main import *
+from lib.sub4 import denin
 
 def extract4_1(inp:str,out:str,t:str):
     run = db.run
@@ -799,5 +800,75 @@ def extract4_1(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             f = open(inp,'rb')
             assert f.read(4) == b'SDPC'
+        case 'Nintendo 3DS SMDH':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'SMDH' and f.readu32() == 0
+
+            for l in ('JP','EN','FR','DE','IT','ES','CN','KR','NL','PT','RU','TW','U1','U2','U3','U4'):
+                n,d,p = f.read(0x80).rsplit(b'\0\0')[0],f.read(0x100).rsplit(b'\0\0')[0],f.read(0x80).rsplit(b'\0\0')[0]
+                if not (n+d+p): continue
+                open(o + f'/name_{l}.txt','w',encoding='utf-8').write(f'Name: {n.decode('utf-16le')}\nDescription: {d.decode("utf-16le")}\nPublisher: {p.decode("utf-16le")}\n')
+
+            s = open(o + '/settings.txt','w',encoding='utf-8')
+            s.write('Age Ratings:\n')
+            for p in ('CERO','ESRB','UNK1','USK','PEGI GEN','UNK2','PEGI PRT','PEGI BBFC','COB','GRB','CGSRR','UNK3','UNK4','UNK5','UNK6','UNK7'):
+                v = f.readu8()
+                if p[:3] != 'UNK' or v: s.write(f'{p:4}: {v}\n')
+            s.write('\nRegions:\n')
+            rf = f.readu32()
+            if rf == 0x7fffffff: s.write('Region Free\n')
+            else:
+                if rf & 1: s.write('Japan\n')
+                if rf & 2: s.write('North America\n')
+                if rf & 4 and rf & 8: s.write('Europe (EU+AU)\n')
+                elif rf & 4: s.write('Europe (Exclusive)\n')
+                elif rf & 8: s.write('Australia (Exclusive)\n')
+                if rf & 0x10: s.write('China\n')
+                if rf & 0x20: s.write('Korea\n')
+                if rf & 0x40: s.write('Taiwan\n')
+            s.write(f'\nMatch Maker ID: {f.read(4).hex(' ').upper()}\nMatch Maker BIT ID: {f.read(8).hex(" ").upper()}\n\nFlags:\n')
+            fv = f.readu32()
+            for ix,n in enumerate(('Visible','Auto-Boot','3D','Require CTR EULA','Autosave','Extended Banner','Region Rating Required','Uses Savedata','Record Usage','Disable SD Savedata','New 3DS Exclusive','Parental Control Restriction')):
+                s.write(f'{n}: {bool(fv & (1 << ix))}\n')
+            evm = f.readu8()
+            s.write(f'\nEULA Version: {f.readu8()}.{evm}\nOptimal Animation Default Frame: {f.readfloat()}\nCEC ID: {f.read(4).hex(" ").upper()}\n')
+            s.close()
+
+            f.skip(8)
+            open(o + '/small_24x24.rgb565','wb').write(f.read(0x480))
+            open(o + '/large_48x48.rgb565','wb').write(f.read(0x1200))
+            f.close()
+            return
+        case 'Nintendo CTR Banner':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'CBMD'
+            f.skip(4)
+
+            coffs = [(ix,off) for ix,off in enumerate([f.readu32() for _ in range(14)]) if off]
+            f.seek(0x84)
+            bwo = f.readu32()
+            if bwo: coffs.append((0,bwo))
+            else: coffs.append((0,f.size))
+
+            for ix,fe in enumerate(coffs[:-1]):
+                iix,off = fe
+                f.seek(off)
+                d = denin(f.read(coffs[ix+1][1]-off),None,'nintendo-lz11')
+                assert d
+                open(o + '/' + ('common','eur-en','eur-fr','eur-de','eur-it','eur-es','eur-nl','eur-pt','eur-ru','jpn-jp','usa-en','usa-es','usa-pt')[iix] + '.bcmdl','wb').write(d)
+
+            if bwo:
+                f.seek(bwo)
+                assert f.read(4) == b'CWAV'
+                f.skip(8)
+                s = f.readu32()
+                f.seek(bwo)
+                open(o + '/sound.bcwav','wb').write(f.read(s))
+
+            if listdir(o): return
 
     return 1

@@ -186,6 +186,11 @@ def analyze(inp:str,raw=False):
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
                'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'):
         if wt in ts: ts.remove(wt)
+    tst = []
+    for t in ts:
+        if t.startswith('Nintendo 3DS SMDH file: "'): tst.append('Nintendo 3DS SMDH file')
+        else: tst.append(t)
+    ts = tst
 
     if isfile(inp):
         f = open(inp,'rb')

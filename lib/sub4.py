@@ -1,5 +1,24 @@
 from .main import *
 
+def denin(i:bytes|str,o:str|None,t:str):
+    if type(i) == bytes:
+        fi = TmpFile('.bin')
+        open(fi.p,'wb').write(i)
+    else:
+        assert exists(i) and isfile(i)
+        fi = i
+    if o is None: of = TmpFile('.bin')
+    else:
+        assert not exists(o) or isfile(o)
+        of = o
+
+    db.run(['auracomp','-d','-i',fi,'-ou',of,'-o','-a','application/x-' + t],print_try=False)
+    if type(fi) == TmpFile: fi.destroy()
+    if o is None:
+        r = open(of.p,'rb').read()
+        of.destroy()
+        return r
+
 def extract4(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
@@ -15,15 +34,15 @@ def extract4(inp:str,out:str,t:str) -> bool:
     match t:
         case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
             of = o + '\\' + tbasename(i)
-            run(['auracomp','-d','-i',i,'-ou',of,'-o','-a',{
-                "Nintendo LZ10":"application/x-nintendo-lz10",
-                "Nintendo LZ11":"application/x-nintendo-lz11",
-                "Nintendo LZ40":"application/x-nintendo-lz40",
-                "Nintendo LZ60":"application/x-nintendo-lz60",
-                "Nintendo BLZ":"application/x-blz",
-                "Nintendo Yay0":"application/x-nintendo-yay0",
-                "Nintendo Yaz0":"application/x-nintendo-yaz0",
-            }[t]])
+            denin(i,of,{
+                "Nintendo LZ10":"nintendo-lz10",
+                "Nintendo LZ11":"nintendo-lz11",
+                "Nintendo LZ40":"nintendo-lz40",
+                "Nintendo LZ60":"nintendo-lz60",
+                "Nintendo BLZ" :"blz",
+                "Nintendo Yay0":"nintendo-yay0",
+                "Nintendo Yaz0":"nintendo-yaz0",
+            }[t])
             if exists(of) and getsize(of):
                 if t in ('Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'):
                     xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
@@ -1871,11 +1890,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if len(listdir(o)) > 1 or infp != infsp: return
         case 'WarioWare Mega Party Game PAC':
             if db.print_try: print('Trying with custom extractor')
-            tf = TmpFile(name=tbasename(i) + '.yay0')
-            open(tf.p,'wb').write(open(i,'rb').read()[0x20:])
-            r = extract4(tf.p,o,'Nintendo Yay0')
-            tf.destroy()
-            return r
+            d = denin(open(i,'rb').read()[0x20:],None,'nintendo-yay0')
+            if d:
+                open(o + '\\' + tbasename(i),'wb').write(d)
+                return
         case 'Package Resource Index':
             of = o + '\\' + tbasename(i) + '.xml'
             run(['makepri','dump','/if',i,'/of',of,'/o','/dt','Detailed'])
