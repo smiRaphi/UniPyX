@@ -775,19 +775,18 @@ def extract4_1(inp:str,out:str,t:str):
                                 k += size
                         assert texs and w and h
                         nb2 = f'_{w}x{h}.{FMTS[fmt][0]}'
+                        siz = 0
+                        for _ in range(mips):
+                            siz += (w * h * FMTS[fmt][1]) // 8
+                            w >>= 1
+                            h >>= 1
+                            if w < 1: w = 1
+                            if h < 1: h = 1
 
                         dext = bool(texs)
                         for tix,ro in enumerate(sorted(list(texs))):
                             if typ == 1 and fmt in (10,11) and ro < sec[4][1]: ro += sec[4][0]
                             else: ro += sec[3][0]
-
-                            siz = 0
-                            for _ in range(mips):
-                                siz += (w * h * FMTS[fmt][1]) // 8
-                                w >>= 1
-                                h >>= 1
-                                if w < 1: w = 1
-                                if h < 1: h = 1
 
                             f.seek(ro)
                             xopen(nb1 + (f'_{tix}' if len(texs) > 1 else '') + nb2,'wb').write(f.read(siz))
