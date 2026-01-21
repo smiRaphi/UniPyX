@@ -13,6 +13,27 @@ def extract4(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
+        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
+            of = o + '\\' + tbasename(i)
+            run(['auracomp','-d','-i',i,'-ou',of,'-o','-a',{
+                "Nintendo LZ10":"application/x-nintendo-lz10",
+                "Nintendo LZ11":"application/x-nintendo-lz11",
+                "Nintendo LZ40":"application/x-nintendo-lz40",
+                "Nintendo LZ60":"application/x-nintendo-lz60",
+                "Nintendo BLZ":"application/x-blz",
+                "Nintendo Yay0":"application/x-nintendo-yay0",
+                "Nintendo Yaz0":"application/x-nintendo-yaz0",
+            }[t]])
+            if exists(of) and getsize(of):
+                if t in ('Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'):
+                    tg = open(of,'rb').read(4)
+                    if tg in (b'RARC',b'SARC',b'NARC'):
+                        tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
+                        rename(of,tp)
+                        r = extract(tp,o,{b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC'}[tg])
+                        if r: rename(tp,of)
+                        else: remove(tp)
+                return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])
             remove(o + '/wszst-setup.txt')
@@ -49,19 +70,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             os.path.dirname = dirname
 
             if listdir(o): return
-        case 'Yaz0':
-            tf = TmpFile('.bin',path=o)
-            run(['wszst','DEC',i,'-o','-E$','-d',tf])
-            if exists(tf.p):
-                tg = open(tf.p,'rb').read(4)
-                if tg == b'RARC': extract4(tf.p,o,'RARC')
-                elif tg == b'SARC': extract4(tf.p,o,'SARC')
-                else: mv(tf.p,o + '\\' + tbasename(i))
-                tf.destroy()
-                return
-        case 'LZSS'|'LZ77':
-            run(['gbalzss','d',i,o + '\\' + tbasename(i)])
-            if exists(o + '\\' + tbasename(i)): return
         case 'AFS':
             run(['afspacker','-e',i,o])
             if os.path.exists(noext(i) + '.json'): remove(noext(i) + '.json')
@@ -1855,14 +1863,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             infp = inf.tell()
             inf.close()
             if len(listdir(o)) > 1 or infp != infsp: return
-        case 'Yay0':
-            db.get('n64decompress')
-            if db.print_try: print('Trying with n64decompress')
-            from bin.n64decompress import decompress_yay0 # type: ignore
-
-            of = o + '/' + tbasename(i)
-            open(of,'wb').write(decompress_yay0(open(i,'rb').read()))
-            return
         case 'WarioWare Mega Party Game PAC':
             db.get('n64decompress')
             if db.print_try: print('Trying with n64decompress')
@@ -2187,18 +2187,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(f'{o}/{id}.bin','wb').write(f.read(s))
                 f.seek(np)
             if listdir(o) or np == 0: return
-        case 'Backward LZ':
-            tf = TmpFile(path=o)
-            run(['blz','-d',i,tf])
-            if not exists(tf.p) or not getsize(tf.p): return 1
-            if open(tf.p,'rb').read(4) == b'NARC' and not extract4(tf.p,o,'NitroARC'):pass
-            else: mv(tf.p,o + '/' + tbasename(i))
-            tf.destroy()
-            return
-        case 'Nintendo LZ10':
-            of = o + '\\' + tbasename(i)
-            run(['lz10','-d',i,of])
-            if exists(of) and getsize(of): return
         case 'NitroARC':
             run(['narchive','extract',i,'-o',o])
             if listdir(o): return

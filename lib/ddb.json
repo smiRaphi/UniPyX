@@ -240,7 +240,7 @@
     },
     {
         "d":[["n0",1,-5],["n0",3,-8],["py","f=open(inp,'rb');s=f.seek(-8,2)+8;cs=int.from_bytes(f.read(3),'little');hs=f.read(1)[0]\nif hs<8 or s not in (cs+(-cs%4)+8,cs+(-cs%2)+hs):return\nf.seek(-hs,2);return not f.read(hs-8).strip(b'\\xFF')"]],
-        "rs":"Backward LZ"
+        "rs":"Nintendo BLZ"
     },
     {
         "d":[["isat","\\x10",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'little');return ds>f.seek(0,2)"]],
@@ -286,6 +286,10 @@
     {
         "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]<=f.read(1)[0]"]],
         "rs":"BCH","s":1
+    },
+    {
+        "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
+        "rs":"SDPC","s":1
     },
     {
         "d":[["isat",".CC40TAD",4],["isat",".CC4HSERHSER",292],["isat","\\xFF",3,false],["ext",".dat",false],["py","inf=inp[:-3] + 'hdr'\nif not exists(inf):return\nf=open(inf,'rb');f.seek(4);return f.read(8)==b'.CC40TAD'"]],"qq":true,

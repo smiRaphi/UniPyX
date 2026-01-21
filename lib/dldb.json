@@ -795,16 +795,6 @@
         }],
         "ts":1711407600
     },
-    "gbalzss":{
-        "p":"gbalzss.exe",
-        "fs":[{
-            "u":"https://static.wiidatabase.de/U8Tool.zip",
-            "x":{
-                "gbalzss.exe":"gbalzss.exe"
-            }
-        }],
-        "ts":0
-    },
     "gxpand":{
         "p":"gxpand.exe",
         "fs":[{
@@ -2885,14 +2875,6 @@
         }],
         "ts":0
     },
-    "n64decompress":{
-        "p":"n64decompress.py",
-        "fs":[[
-            "https://raw.githubusercontent.com/ethteck/n64decompress/refs/heads/main/Yay0/decompress.py",
-            "n64decompress.py"
-        ]],
-        "ts":0
-    },
     "makepri":{
         "p":"makepri.exe",
         "fs":[{
@@ -3005,21 +2987,6 @@
                 "byml-to-yaml.exe":"byml-to-yaml.exe"
             }
         }],
-        "ts":0
-    },
-    "blz":{
-        "p":"blz.exe",
-        "fs":[
-        "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/blz.exe"
-        ],
-        "ts":0
-    },
-    "lz10":{
-        "p":"lz10.exe",
-        "fs":[[
-            "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/lzss.exe",
-            "lz10.exe"
-        ]],
         "ts":0
     },
     "narchive":{
@@ -3166,13 +3133,6 @@
         }],
         "ts":0
     },
-    "lzx":{
-        "p":"lzx.exe",
-        "fs":[
-        "https://raw.githubusercontent.com/PeterLemon/Nintendo_DS_Compressors/refs/heads/master/lzx.exe"
-        ],
-        "ts":0
-    },
     "darc":{
         "p":"darc.py",
         "fs":[
@@ -3209,6 +3169,27 @@
             }
         }],
         "ts":0
+    },
+    "auracomp":{
+        "p":"auracomp/auracomp.exe",
+        "fs":[{
+            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/1.5.3/auracomp_net472.zip",
+            "x":{
+                "auracomp.exe":"auracomp/auracomp.exe",
+                "auracomp.exe.config":"auracomp/auracomp.exe.config",
+                "AuroraLib.Core.dll":"auracomp/AuroraLib.Core.dll",
+                "AuroraLib.Compression.dll":"auracomp/AuroraLib.Compression.dll",
+                "AuroraLib.Compression-Extended.dll":"auracomp/AuroraLib.Compression-Extended.dll",
+                "AuroraLib.Compression-Extended.xml":"auracomp/AuroraLib.Compression-Extended.xml",
+                "Microsoft.Bcl.AsyncInterfaces.dll":"auracomp/Microsoft.Bcl.AsyncInterfaces.dll",
+                "System.Buffers.dll":"auracomp/System.Buffers.dll",
+                "System.Memory.dll":"auracomp/System.Memory.dll",
+                "System.Numerics.Vectors.dll":"auracomp/System.Numerics.Vectors.dll",
+                "System.Runtime.CompilerServices.Unsafe.dll":"auracomp/System.Runtime.CompilerServices.Unsafe.dll",
+                "System.Threading.Tasks.Extensions.dll":"auracomp/System.Threading.Tasks.Extensions.dll",
+                "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
+            }
+        }]
     },
     "luadec51":{
         "p":"Luadec51.exe",

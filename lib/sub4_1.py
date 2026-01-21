@@ -523,10 +523,6 @@ def extract4_1(inp:str,out:str,t:str):
                     tf.destroy()
                 else: open(o + f'/{ix}.bin','wb').write(d)
             if c: return
-        case 'Nintendo LZ11'|'Nintendo LZ40':
-            of = o + '\\' + tbasename(i)
-            run(['lzx','-d',i,of])
-            if exists(of) and getsize(of): return
         case 'Azito 3D Pack Message':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -797,5 +793,10 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
 
             if rldir(o): return
+        case 'SDPC':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            f = open(inp,'rb')
+            assert f.read(4) == b'SDPC'
 
     return 1

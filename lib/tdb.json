@@ -110,11 +110,8 @@
     "RARC":[
         "nintendo rarc archive"
     ],
-    "Yaz0":[
+    "Nintendo Yaz0":[
         "nintendo yaz0 compressed data"
-    ],
-    "LZSS":[
-        "microids lzs compressed game data (generic)"
     ],
     "AFS":[
         "afs game data archive"
@@ -1138,7 +1135,7 @@
     "Dragon UnPACKer 5 Plugin":[
         "dragon unpacker 5 plugin package"
     ],
-    "Yay0":[
+    "Nintendo Yay0":[
         "nintendo yay0 compressed data"
     ],
     "Package Resource Index":[
