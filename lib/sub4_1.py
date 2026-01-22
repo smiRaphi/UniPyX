@@ -715,28 +715,34 @@ def extract4_1(inp:str,out:str,t:str):
             sec = [(seco[ix],f.readu32()) for ix in range(len(seco))]
 
             f.seek(sec[0][0])
-            maps = []
-            for _ in range(15):
-                off = f.reads32()
-                if off == -1: break
-                maps.append((off+sec[0][0],f.readu16()))
-                f.skip(6)
+            maps = [(f.readu32()+sec[0][0],f.readu32(),f.readu32()+sec[0][0]) for _ in range(15)]
 
-            dext = False
-
+            xall = True
             for ix,m in enumerate(maps):
                 if not m[1]: continue
 
                 f.seek(m[0])
                 offs = [f.readu32()+sec[0][0] for _ in range(m[1])]
-                if ix == 2:
+                f.seek(m[2]+12)
+                nmso = {}
+                for nix in range(m[1]):
+                    f.skip(8)
+                    nmso[offs[nix]] = f.readu32()+sec[1][0]
+
+                if ix == 1:
+                    xall = False
+                    for off in offs:
+                        f.seek(nmso[off])
+                        n = f.read0s().decode()
+                        f.seek(off)
+                        xopen(f'{o}/material/{n}.bin','wb').write(f.read(0x174))
+                elif ix == 2:
                     fs = []
                     for off in offs:
                         f.seek(off)
                         fe = [f.readu32()+sec[0][0],f.readu32()]
                         f.skip(0x20)
                         fs.append(fe + [f.readu32()+sec[1][0]])
-                    dext = bool(fs)
                     for fe in fs:
                         f.seek(fe[2])
                         n = f.read0s().decode()
@@ -783,7 +789,6 @@ def extract4_1(inp:str,out:str,t:str):
                             if w < 1: w = 1
                             if h < 1: h = 1
 
-                        dext = bool(texs)
                         for tix,ro in enumerate(sorted(list(texs))):
                             if typ == 1 and fmt in (10,11) and ro < sec[4][1]: ro += sec[4][0]
                             else: ro += sec[3][0]
@@ -791,13 +796,16 @@ def extract4_1(inp:str,out:str,t:str):
                             f.seek(ro)
                             xopen(nb1 + (f'_{tix}' if len(texs) > 1 else '') + nb2,'wb').write(f.read(siz))
                 elif ix == 6:
+                    xall = False
                     for off in offs:
+                        f.seek(nmso[off])
+                        n = f.read0s().decode()
                         f.seek(off)
-                        id = f.readu32()
-                        f.skip(-4)
-                        xopen(f'{o}/camera/{id:02X}.bin','wb').write(f.read(0x58))
+                        xopen(f'{o}/camera/{n}.bin','wb').write(f.read(0x58))
+                else: xall = False
 
-            if not dext:
+            fs = rldir(o)
+            if not xall:
                 if sec[3][1]:
                     f.seek(sec[3][0])
                     open(o + '/RAW.bin','wb').write(f.read(sec[3][1]))
@@ -806,7 +814,7 @@ def extract4_1(inp:str,out:str,t:str):
                     open(o + '/RAW_EXT.bin','wb').write(f.read(sec[4][1]))
             f.close()
 
-            if rldir(o): return
+            if fs: return
         case 'SDPC':
             raise NotImplementedError
             if db.print_try: print('Trying with custom extractor')
@@ -882,5 +890,85 @@ def extract4_1(inp:str,out:str,t:str):
                 open(o + '/sound.bcwav','wb').write(f.read(s))
 
             if listdir(o): return
+        case 'DBS Database':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'DBS\0'
+            hds = tuple(list(f.read(4)))
+
+            c = f.readu64()
+            f.skip(4)
+            sigo = f.readu32()
+            do = f.readu32()
+            so = f.readu32()
+
+            f.seek(sigo)
+            sig = tuple([f.readu16() for _ in range((do-sigo)//2)])
+            SIGS = {
+                (1,4,1,1):{
+                    (1,4, 0, 0, 0, 0, 0, 0):('x','s','i',1),
+                },
+                (1,5,1,1):{
+                    (1,4, 0, 0, 0, 0, 0, 0):('x','s'),
+                },
+                (1,6,1,1):{
+                    (2,4, 8, 0, 0, 0, 0, 0):('x','s','s',1),
+                    (3,8,12,16, 0, 0, 0, 0):('x','x','s','s','s','t8'),
+                    (4,4, 8,12,16, 0, 0, 0):('x','s','s','s','s','i'),
+                    (5,0, 4, 8,12,16, 0, 0):('s','s','s','s','s'),
+                    (7,4, 8,12,16,20,24,28):('s','s','s','s','s'),
+                },
+                (1,6,1,2):{
+                    (4,4, 8,12,16, 0, 0, 0):('x','s','s','s','s','x','i','i','x'),
+                    (4,0, 4, 8,12, 0, 0, 0):('s','s','s','s','i','i','i','h','h'),
+                },
+            }
+            if hds in SIGS and sig in SIGS[hds]:
+                fmt = SIGS[hds][sig]
+                if fmt[-1] == 1:
+                    fmt = fmt[:-1]
+                    b = {}
+                else: b = []
+            else: raise NotImplementedError(' '.join(str(h).zfill(2) for h in hds) + '|' + ' '.join(str(s).zfill(2) for s in sig))
+
+            ln = sum([int(x[1:]) if x[0] == 't' else (2 if x == 'h' else 4) for x in fmt])*c
+            assert (so-do) == ln
+
+            def reads():
+                p = f.pos+4
+                f.seek(f.readu32())
+
+                s = []
+                utf16 = False
+                while True:
+                    b = f.read(2 if utf16 else 1)
+                    if b in b'\0\0': break
+                    if not utf16 and not (32 <= b[0] <= 126):
+                        utf16 = True
+                        b += f.read(1)
+                    s.append(b)
+                f.seek(p)
+
+                s = b''.join(s)
+                if utf16 and len(s) % 2: s += b'\0'
+                return s.decode('utf-16-le' if utf16 else 'ascii')
+
+            f.seek(do)
+            for _ in range(c):
+                v = []
+                for fm in fmt:
+                    if   fm == 'x': f.skip(4)
+                    elif fm == 's': v.append(reads())
+                    elif fm == 'i': v.append(f.readu32())
+                    elif fm == 'h': v.append(f.readu16())
+                    elif fm[0] == 't': v.append(list(f.read(int(fm[1:]))))
+                if type(b) == dict: b[v[0]] = v[1]
+                else: b.append(v)
+
+            if b:
+                json.dump(b,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
+                return
 
     return 1
