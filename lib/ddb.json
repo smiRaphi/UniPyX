@@ -296,6 +296,18 @@
         "rs":"Dance Layout Script","s":1
     },
     {
+        "d":[["n0",2,0],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=0\nfor _ in range(c):\n while f.read(1)!=b'\\0':pass\n if f.tell()%2:f.seek(1,1)\n s+=int.from_bytes(f.read(2),'little')*32\ns+=f.tell();return s==f.seek(0,2)"]],
+        "rs":"EBAB Animation Data"
+    },
+    {
+        "d":[["isat","STXT\\1\\0\\0\\0",0],["isat","\\x20\\0\\0\\0",16],["isat","\\0",-1],["n0",2,10],["n0",4,20],["n0",4,24]],
+        "rs":"STXT Language Data","s":1
+    },
+    {
+        "d":[["isat","\\xCB\\x32\\x3d\\xB5\\0\\0\\0\\0",0],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Adventure Time VOLume","s":1
+    },
+    {
         "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
         "rs":"SDPC","s":1
     },
@@ -354,6 +366,10 @@
     {
         "d":[["isat","\\x02",0],["n0",1,1],["isat","Microsoft.Xna.Framework.Content.DictionaryReader`",3]],
         "rs":"XNB Dictionary","s":1
+    },
+    {
+        "d":[["n0",1,0],["isat","\\0",1],["isat","\\0",-1],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');b=b''\nfor _ in range(c):\n t=b''\n while 1:\n  b=f.read(1)\n  if not b:return\n  if b==b'\\0':break\n  t+=b\n try:t[1:].decode('ascii')\n except:return\nreturn not f.read(1)"]],
+        "rs":"ID String0 Count8 Data"
     },
     {
         "d":[["n0",3,0],["n0",2,3],["py","f=open(inp,'rb');f.seek(3);c=int.from_bytes(f.read(2),'little');o=int.from_bytes(f.read(2),'little');return (5+c*2)==o"]],
@@ -1157,7 +1173,7 @@
     {
         "rq":null,
         "d":[["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');v1=f.read(1)[0]\nif v1&3!=3 or s<=f.seek(0,2):return\nf.seek(-1,1)\nif f.read(1)[0]==255:return\nf.seek(5)\nif v1==255:f.seek(v1.bit_count()+(8-v1.bit_count())*2,1);return f.read(1)[0].bit_count()>=4\nf.seek(2,1)\nif not v1&4 and f.read(2)!=b'\\0\\0':return\nreturn v1&8"]],
-        "rs":"Konami LZSS"
+        "rs":"Konami FireBeat LZSS"
     },
     {
         "d":[["isin",["\\0\\0","\\0\\1","\\0\\4"],0],["n0",2,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(34);b=f.read(2);return s in (int.from_bytes(b,'little'),int.from_bytes(b,'big'))"]],

@@ -1,6 +1,6 @@
 from .main import *
 
-def denin(i:bytes|str,o:str|None,t:str):
+def auracomp(i:bytes|str,o:str|None,t:str):
     if type(i) == bytes:
         fi = TmpFile('.bin')
         open(fi.p,'wb').write(i)
@@ -34,7 +34,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
     match t:
         case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
             of = o + '\\' + tbasename(i)
-            denin(i,of,{
+            auracomp(i,of,{
                 "Nintendo LZ10":"nintendo-lz10",
                 "Nintendo LZ11":"nintendo-lz11",
                 "Nintendo LZ40":"nintendo-lz40",
@@ -648,7 +648,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             secis = {}
             for _ in range(sc):
                 s = {'type':f.readu8()}
-        case 'Konami LZSS':
+        case 'Konami FireBeat LZSS':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
 
@@ -1890,7 +1890,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if len(listdir(o)) > 1 or infp != infsp: return
         case 'WarioWare Mega Party Game PAC':
             if db.print_try: print('Trying with custom extractor')
-            d = denin(open(i,'rb').read()[0x20:],None,'nintendo-yay0')
+            d = auracomp(open(i,'rb').read()[0x20:],None,'nintendo-yay0')
             if d:
                 open(o + '\\' + tbasename(i),'wb').write(d)
                 return

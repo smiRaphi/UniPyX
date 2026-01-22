@@ -1,5 +1,5 @@
 from lib.main import *
-from lib.sub4 import denin
+from lib.sub4 import auracomp
 
 def extract4_1(inp:str,out:str,t:str):
     run = db.run
@@ -877,7 +877,7 @@ def extract4_1(inp:str,out:str,t:str):
             for ix,fe in enumerate(coffs[:-1]):
                 iix,off = fe
                 f.seek(off)
-                d = denin(f.read(coffs[ix+1][1]-off),None,'nintendo-lz11')
+                d = auracomp(f.read(coffs[ix+1][1]-off),None,'nintendo-lz11')
                 assert d
                 open(o + '/' + ('common','eur-en','eur-fr','eur-de','eur-it','eur-es','eur-nl','eur-pt','eur-ru','jpn-jp','usa-en','usa-es','usa-pt')[iix] + '.bcmdl','wb').write(d)
 
@@ -994,5 +994,71 @@ def extract4_1(inp:str,out:str,t:str):
             if ob:
                 json.dump(ob,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
                 return
+        case 'ID String0 Count8 Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu8()
+            ob = []
+            for _ in range(c): ob.append(f'{f.readu8()}: ' + f.read0s().decode('ascii'))
+            if ob:
+                open(o + f'/{tbasename(i)}.txt','w').write('\n'.join(ob))
+                return
+        case 'EBAB Animation Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu16()
+
+            fs = []
+            for _ in range(c):
+                n = f.read0s().decode()
+                if f.pos%2: f.skip(1)
+                fs.append((n,f.readu16()*0x20))
+            for fe in fs: open(o + f'/{fe[0]}.bin','wb').write(f.read(fe[1]))
+            if fs: return
+        case 'STXT Language Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'STXT'
+
+            f.skip(6)
+            sc = f.readu16()
+            f.skip(8)
+            c = f.readu32()
+            f.seek(f.readu32())
+
+            fs = [(f.read(4),[f.readu32() for _ in range(sc)]) for _ in range(c)]
+            of = open(o + f'/{tbasename(i)}.txt','w',encoding='utf-8')
+            for fe in fs:
+                of.write(f'{fe[0].hex(' ').upper()}:\n')
+                for off in fe[1]:
+                    f.seek(off)
+                    of.write(f.read0s().decode('utf-8') + '\n')
+                of.write('\n')
+
+            of.close()
+            if fs: return
+        case 'Adventure Time VOLume':
+            if db.print_try: print("Trying with custom extractor")
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'\xCB\x32\x3D\xB5'
+            f.skip(0x10)
+
+            c = f.readu32()
+            f.seek(f.readu32())
+            fs = [(f.read(4),f.readu32(),f.readu64(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                if fe[1]:
+                    f.seek(fe[1])
+                    n = f.read0s().decode()
+                else: n = ''
+                if not n: n = fe[0].hex().upper() + '.bin'
+                f.seek(fe[2])
+                open(o + '/' + n,'wb').write(f.read(fe[3]))
+            if fs: return
 
     return 1
