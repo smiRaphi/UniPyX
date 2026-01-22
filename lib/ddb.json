@@ -1152,7 +1152,7 @@
     },
     {
         "rq":null,
-        "d":[["isat","GC",5],["py","f=open(inp,'rb');return sum(f.read(4))>3 and f.read(1)[0]&3==3"]],
+        "d":[["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');v1=f.read(1)[0]\nif v1&3!=3 or s<=f.seek(0,2):return\nf.seek(-1,1)\nif f.read(1)[0]==255:return\nf.seek(5)\nif v1==255:f.seek(v1.bit_count()+(8-v1.bit_count())*2,1);return f.read(1)[0].bit_count()>=4\nf.seek(2,1)\nif not v1&4 and f.read(2)!=b'\\0\\0':return\nreturn v1&8"]],
         "rs":"Konami LZSS"
     },
     {

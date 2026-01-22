@@ -1326,5 +1326,8 @@
     ],
     "Nintendo CTR Banner":[
         "nintendo 3ds banner model data"
+    ],
+    "Motorola S-Record":[
+        "motorola s-record; binary data in text format"
     ]
 }

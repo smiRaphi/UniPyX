@@ -641,7 +641,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 remove(td)
         case 'Intel HEX':
             if db.print_try: print('Trying with custom extractor')
-
             f = open(i,encoding='utf-8')
 
             fs = [[]]
@@ -748,5 +747,45 @@ def extract1(inp:str,out:str,t:str) -> bool:
             import base64
             open(o + '/' + tbasename(i) + '.bin','wb').write(base64.b64decode(open(i,'rb').read()))
             return
+        case 'Motorola S-Record':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i)
+
+            fs = [[]]
+            for l in f.readlines():
+                if l[0] != 'S': continue
+                l = l[1:].rstrip()
+                t = int(l[0])
+                if t in (4,5,6): continue
+
+                if t in (0,7,8,9): fs.append([])
+                if t in (0,1,2,3):
+                    l = l[1:3+int(l[1:3],16)*2]
+                    c,l = l[-2:],l[:-2]
+                    if (0xFF - (sum(bytes.fromhex(l)) & 0xFF)) != int(c,16): print('Checksum error',l)
+                    l = l[2:]
+
+                    if t in (0,1): a,l = l[:4],l[4:]
+                    elif t == 2: a,l = l[:6],l[6:]
+                    elif t == 3: a,l = l[:8],l[8:]
+
+                    d = bytes.fromhex(l)
+                    if t == 0:
+                        try: n = d.rstrip(b'\0').decode('ascii')
+                        except: pass
+                        else: fs[-1].append(n)
+                    fs[-1].append((int(a,16),d))
+            f.close()
+
+            for ix,fe in enumerate(fs):
+                if not fe: continue
+                of = o + f'/{ix}'
+                if type(fe[0]) == str: of += '_' + fe.pop(0)
+                of = open(of + '.bin','wb')
+                for a,d in fe:
+                    if a > of.seek(0,2): of.write(b'\xFF'*(a-of.tell()))
+                    of.write(d)
+                of.close()
+            if fs: return
 
     return 1
