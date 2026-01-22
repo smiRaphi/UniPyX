@@ -970,5 +970,29 @@ def extract4_1(inp:str,out:str,t:str):
             if b:
                 json.dump(b,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
                 return
+        case 'Dance Layout Script':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'DMR\0'
+            f.skip(8)
+
+            ob = {}
+            while f:
+                f.skip(8)
+                k = f.read(0x20).rstrip(b'\0').decode('utf-8')
+                tp = f.read(0x10).rstrip(b'\0').decode('utf-8')
+                c = f.readu32()
+                ob[k] = []
+                for _ in range(c):
+                    if tp == 'int': ob[k].append(f.reads32())
+                    elif tp == 'float': ob[k].append(f.readfloat())
+                    elif tp == 'string': ob[k].append(f.read(0x80).rstrip(b'\0').decode('utf-8'))
+                    elif tp == 'wstring': ob[k].append(f.read(0x80).rsplit(b'\0\0')[0].decode('utf-16-le'))
+
+            if ob:
+                json.dump(ob,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
+                return
 
     return 1
