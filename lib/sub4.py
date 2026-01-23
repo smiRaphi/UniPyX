@@ -32,7 +32,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
+        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0'|'TREVA SDPC'|'Konami FireBeat LZSS':
             of = o + '\\' + tbasename(i)
             auracomp(i,of,{
                 "Nintendo LZ10":"nintendo-lz10",
@@ -42,6 +42,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 "Nintendo BLZ" :"blz",
                 "Nintendo Yay0":"nintendo-yay0",
                 "Nintendo Yaz0":"nintendo-yaz0",
+                "TREVA SDPC":"lzo+sdpc",
+                "Konami FireBeat LZSS":"lzss+gcz",
             }[t])
             if exists(of) and getsize(of):
                 if t in ('Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'):
@@ -648,52 +650,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             secis = {}
             for _ in range(sc):
                 s = {'type':f.readu8()}
-        case 'Konami FireBeat LZSS':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-
-            f = File(i,endian='<')
-            l = f.readu32()
-            if not l: return 1
-            of = open(o + '/' + basename(i)[:(-1 if i[-1] in 'zZ' else None)],'wb')
-
-            ring = [b'\0'] * 0x1000
-            rpos = 0x0FEE
-            ctrlw = 1
-
-            c = b''
-            c1 = c2 = co = cl = 0
-            b = b''
-            while l > 0:
-                if ctrlw == 1: ctrlw = 0x100 | f.readu8()
-
-                if ctrlw & 1:
-                    b = f.read(1)
-                    of.write(b)
-                    ring[rpos] = b
-                    rpos = (rpos + 1) % 0x1000
-                    l -= 1
-                else:
-                    c = f.read(2)
-                    if len(c) != 2:
-                        of.close()
-                        remove(of.name)
-                        return 1
-                    c1,c2 = list(c)
-                    cl = (c2 & 0x0F) + 3
-                    co = ((c2 & 0xF0) << 4) | c1
-
-                    for _ in range(cl):
-                        of.write(ring[co])
-                        ring[rpos] = ring[co]
-                        co = (co + 1) % 0x1000
-                        rpos = (rpos + 1) % 0x1000
-                        l -= 1
-
-                ctrlw >>= 1
-
-            of.close()
-            return
         case 'Minecraft PCK': return quickbms('minecraft_pck')
         case 'Mo\'PaQ':
             run(['mpqextractor','-e','*','-o',o,i])

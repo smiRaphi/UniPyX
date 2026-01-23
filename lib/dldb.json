@@ -3180,7 +3180,6 @@
                 "AuroraLib.Core.dll":"auracomp/AuroraLib.Core.dll",
                 "AuroraLib.Compression.dll":"auracomp/AuroraLib.Compression.dll",
                 "AuroraLib.Compression-Extended.dll":"auracomp/AuroraLib.Compression-Extended.dll",
-                "AuroraLib.Compression-Extended.xml":"auracomp/AuroraLib.Compression-Extended.xml",
                 "Microsoft.Bcl.AsyncInterfaces.dll":"auracomp/Microsoft.Bcl.AsyncInterfaces.dll",
                 "System.Buffers.dll":"auracomp/System.Buffers.dll",
                 "System.Memory.dll":"auracomp/System.Memory.dll",
@@ -3189,7 +3188,8 @@
                 "System.Threading.Tasks.Extensions.dll":"auracomp/System.Threading.Tasks.Extensions.dll",
                 "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
             }
-        }]
+        }],
+        "ts":1769182330
     },
     "luadec51":{
         "p":"Luadec51.exe",

@@ -815,11 +815,6 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
 
             if fs: return
-        case 'SDPC':
-            raise NotImplementedError
-            if db.print_try: print('Trying with custom extractor')
-            f = open(inp,'rb')
-            assert f.read(4) == b'SDPC'
         case 'Nintendo 3DS SMDH':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

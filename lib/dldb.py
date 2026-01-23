@@ -67,7 +67,7 @@ class DLDB:
             os.chdir(BDIR)
             exi = self.db[exe]
             t = int(time())
-            if exe in self.udb and self.udb[exe] < exi.get('ts',0): os.remove('bin/' + exi['p'])
+            if exe in self.udb and self.udb[exe] < exi.get('ts',0) and os.path.exists('bin/' + exi['p']): os.remove('bin/' + exi['p'])
             if exi.get('fs',1) == None: os.makedirs('bin/' + exi['p'],exist_ok=True)
             if not os.path.exists('bin/' + exi['p']):
                 up = True
