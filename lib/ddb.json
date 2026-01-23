@@ -148,8 +148,13 @@
     },
     {
         "rqr":"Win64 Executable (generic)",
-        "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little') >= 8000000\n\telse:f.seek(32,1)"],
+        "d":["py","f=open(inp,'rb');f.seek(0x3C);f.seek(int.from_bytes(f.read(4),'little'));f.seek(6,1);c=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1)\nfor _ in range(c):\n if f.read(8)==b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little')>=8000000\n else:f.seek(32,1)"],
         "rs":"Big EXE"
+    },
+    {
+        "rqr":"Microsoft Visual C/C++",
+        "d":["py","f=open(inp,'rb');f.seek(0x3C);f.seek(int.from_bytes(f.read(4),'little'));f.seek(6,1);c=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1);l=[]\nfor _ in range(c):f.seek(16,1);l.append(int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'));f.seek(16,1)\nf.seek(max(l));return f.read(3)==b'BIK' and f.read(1)in b'fghi'"],
+        "rs":"Bink Video EXE","s":1
     },
     {
         "rqr":"DOS Executable Generic",
@@ -296,7 +301,7 @@
         "rs":"Dance Layout Script","s":1
     },
     {
-        "d":[["n0",2,0],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=0\nfor _ in range(c):\n while f.read(1)!=b'\\0':pass\n if f.tell()%2:f.seek(1,1)\n s+=int.from_bytes(f.read(2),'little')*32\ns+=f.tell();return s==f.seek(0,2)"]],
+        "d":[["n0",2,0],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=0\nfor _ in range(c):\n while f.read(1)not in (b'\\0',b''):pass\n if not f.read(1):return\n f.seek(-1,1)\n if f.tell()%2:f.seek(1,1)\n s+=int.from_bytes(f.read(2),'little')*32\ns+=f.tell();return s==f.seek(0,2)"]],
         "rs":"EBAB Animation Data"
     },
     {
@@ -1394,5 +1399,9 @@
     {
         "d":["ext",".tde"],
         "rs":"Teardown Encrypted File"
+    },
+    {
+        "d":[["size",[5,null]],["isat","\\0",0],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);return (int.from_bytes(f.read(3),'little')+4)==f.seek(0,2)"]],
+        "rs":"0Size24 Data"
     }
 ]

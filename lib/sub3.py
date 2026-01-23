@@ -1265,5 +1265,30 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             if mv == 5 and iv == 1: open(of,'wb').write(run(['luadec51','--',i],text=False)[1])
             if exists(of) and getsize(of): return
+        case 'Bink Video EXE':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import EXE
+            f = EXE(i)
+
+            VS = list(b'fghi')
+
+            if 'BINKDATA' in f.secs:
+                f.seek(f.secs['BINKDATA'][0])
+                for _ in range(0x20):
+                    tg = f.read(4)
+                    if tg[:3] == b'BIK' and tg[3] in VS:
+                        s = f.readu32()+8
+                        f.skip(-8)
+                        open(o + f'/{tbasename(i)}_logo.bik','wb').write(f.read(s))
+                        break
+                    f.skip(12)
+
+            f.seek(max(f.secs.values(),key=lambda x:x[2])[2])
+            if f.read(3) == b'BIK' and f.readu8() in VS:
+                s = f.readu32()+8
+                f.skip(-8)
+                open(o + f'/{tbasename(i)}.bik','wb').write(f.read(s))
+            f.close()
+            if listdir(o): return
 
     return 1

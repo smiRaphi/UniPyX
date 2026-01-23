@@ -1060,5 +1060,12 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fe[2])
                 open(o + '/' + n,'wb').write(f.read(fe[3]))
             if fs: return
+        case '0Size24 Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.seek(1)
+            open(o + '/' + basename(i),'wb').write(f.read(f.readu24()))
+            return
 
     return 1

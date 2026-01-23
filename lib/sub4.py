@@ -661,6 +661,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             rpos = 0x0FEE
             ctrlw = 1
 
+            c = b''
             c1 = c2 = co = cl = 0
             b = b''
             while l > 0:
@@ -673,7 +674,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     rpos = (rpos + 1) % 0x1000
                     l -= 1
                 else:
-                    c1,c2 = f.readu8(),f.readu8()
+                    c = f.read(2)
+                    if len(c) != 2:
+                        of.close()
+                        remove(of.name)
+                        return 1
+                    c1,c2 = list(c)
                     cl = (c2 & 0x0F) + 3
                     co = ((c2 & 0xF0) << 4) | c1
 
