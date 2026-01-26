@@ -770,9 +770,6 @@ def extract2(inp:str,out:str,t:str) -> bool:
             open(o + '/DATA.PSAR','wb').write(f.read(fs[7][1]))
 
             return
-        case 'Zelda 64 ROM':
-            run(['zre','-o',o,i])
-            if listdir(o): return
         case 'SimpleFlashFS':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -946,5 +943,19 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fs: return
+        case 'Zelda N64 ROM':
+            run(['zre','-o',o,i])
+            if listdir(o): return
+        case 'Banjo Kazooie N64 ROM':
+            td = TmpDir(path=o)
+            run(['bk_extract','-p',td,'-r',i])
+            if exists(td.p + '/out') and listdir(td.p + '/out') and (len(listdir(td.p + '/out')) > 1 or listdir(td.p + '/out/' + listdir(td.p + '/out')[0])): raise NotImplementedError
+            if not exists(td.p + '/bin') or not listdir(td.p + '/bin'): return 1
+            if len(listdir(td.p + '/bin')) > 1: raise NotImplementedError
+            copydir(td.p + '/bin/' + listdir(td.p + '/bin')[0],o,True)
+            td.destroy()
+            for f in listdir(o):
+                if f.startswith('unknown_') and f.endswith('.bin') and not getsize(o + '/' + f): remove(o + '/' + f)
+            return
 
     return 1

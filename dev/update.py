@@ -253,5 +253,8 @@ def update():
 
 if __name__ == '__main__':
     from sys import argv
-    if argv[1:] == ['t']: print(t())
+    if len(argv) in (2,3) and argv[1] == 't':
+        if len(argv) == 2: print(t())
+        else:
+            if len(argv[2]) == 20 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == 'Z': print(ft(argv[2],'%Y-%m-%dT%H:%M:%SZ'))
     else: update()

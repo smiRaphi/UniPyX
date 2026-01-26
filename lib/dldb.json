@@ -3189,7 +3189,16 @@
                 "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
             }
         }],
-        "ts":1769182330
+        "ts":1769175304
+    },
+    "bk_extract":{
+        "p":"bk_extract.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "bk_extract.exe":"bk_extract.exe"
+            }
+        }]
     },
     "luadec51":{
         "p":"Luadec51.exe",

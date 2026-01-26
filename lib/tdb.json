@@ -1284,7 +1284,7 @@
     "PlayStation SFO":[
         "psp metadata file"
     ],
-    "Zelda 64 ROM":[
+    "Zelda N64 ROM":[
         "nintendo 64 rom image: \"zelda majora's mask \" (nzse",
         "nintendo 64 rom image: \"zelda majora's mask \" (nzsp",
         "nintendo 64 rom image: \"zelda majora's mask \" (nzsg",
@@ -1332,5 +1332,10 @@
     ],
     "PGNPack":[
         "pgnpack archive (v1.0b)"
+    ],
+    "Banjo Kazooie N64 ROM":[
+        "nintendo 64 rom image: \"banjo-kazooie \" (nbke",
+        "nintendo 64 rom image: \"banjo-kazooie \" (nbkj",
+        "nintendo 64 rom image: \"banjo-kazooie \" (nbkp"
     ]
 }
