@@ -252,4 +252,6 @@ def update():
     open('lib/dldb.json','w',encoding='utf-8').write(out)
 
 if __name__ == '__main__':
-    update()
+    from sys import argv
+    if argv[1:] == ['t']: print(t())
+    else: update()

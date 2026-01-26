@@ -317,6 +317,10 @@
         "rs":"TREVA SDPC","s":1
     },
     {
+        "d":[["isat","FILELINK_____END\\0\\0\\0\\0",8],["n0",4,0],["n0",4,0],["py","f=open(inp,'rb');return not int.from_bytes(f.read(4),'little')%8"]],
+        "rs":"WayForward PAK","s":1
+    },
+    {
         "d":[["isat",".CC40TAD",4],["isat",".CC4HSERHSER",292],["isat","\\xFF",3,false],["ext",".dat",false],["py","inf=inp[:-3] + 'hdr'\nif not exists(inf):return\nf=open(inf,'rb');f.seek(4);return f.read(8)==b'.CC40TAD'"]],"qq":true,
         "rs":"TTGames DAT","s":1
     },

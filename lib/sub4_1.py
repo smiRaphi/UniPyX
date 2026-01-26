@@ -1062,5 +1062,21 @@ def extract4_1(inp:str,out:str,t:str):
             f.seek(1)
             open(o + '/' + basename(i),'wb').write(f.read(f.readu24()))
             return
+        case 'WayForward PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            d = f.readu32()+0x40
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                f.skip(0x10)
+                fs.append((f.readu32()+d,f.readu32(),f.read0s().decode().replace(':','/')))
+                f.skip(-f.pos%8)
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+            if fs: return
 
     return 1
