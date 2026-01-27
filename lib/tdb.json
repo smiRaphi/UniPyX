@@ -1343,5 +1343,16 @@
         "nintendo 64 rom image: \"mariokart64 \" (nktj",
         "nintendo 64 rom image: \"mariokart64 \" (nktg",
         "nintendo 64 rom image: \"mariokart64 \" (nktp"
+    ],
+    "ELI 5750":[
+        "eli 5750 archive data",
+        "eli 5750 compressed archive"
+    ],
+    "Fold FOL":[
+        "fold compressed"
+    ],
+    "Fold ARK":[
+        "fold compressed archive",
+        "16bit dos exe fold sfx compressed (v1.x)"
     ]
 }

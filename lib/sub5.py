@@ -5,14 +5,15 @@ def extract5(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 
-    def msdos(cmd,mscmd=[],tmpi=False,inf=i,**kwargs):
+    def msdos(cmd,mscmd=[],tmpi=False,tmpic=False,inf=i,**kwargs):
         if tmpi:
             mkdir(o)
-            tf = o + '/' + 'TMP' + extname(inf)
+            tn = ('TP' + os.urandom(2).hex() + extname(inf) if not tmpic else basename(inf))
+            tf = o + '/' + tn
             symlink(inf,tf)
 
         if db.print_try: print('Trying with',cmd[0])
-        run(['msdos'] + mscmd + [db.get(cmd[0])] + [(('TMP' + extname(inf)) if tmpi and x == inf else x) for x in cmd[1:]],print_try=False,**kwargs)
+        run(['msdos'] + mscmd + [db.get(cmd[0])] + [(tn if tmpi and x == inf else x) for x in cmd[1:]],print_try=False,**kwargs)
 
         if tmpi: remove(tf)
 
@@ -345,5 +346,23 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + tbasename(i)
             run(['gipfeli_tool','-d',i,of])
             if exists(of) and getsize(of): return
+        case 'ELI 5750': raise NotImplementedError
+        case 'Fold FOL'|'Fold ARK':
+            f = open(i,'rb')
+            if f.read(2) == b'MZ':
+                f.seek(0x2be0)
+                tg = f.read(5)
+                if tg == b'F\xfa\xf6\xfa1': tf = TmpFile(name=tbasename(i) + '.fol',path=o)
+                elif tg == b'FARC1': tf = TmpFile(name=tbasename(i) + '.ark',path=o)
+                else: f.close();return 1
+                f.seek(-5,1)
+                open(tf.p,'wb').write(f.read())
+                f.close()
+                r = msdos(['unfold',basename(tf.p)],cwd=o)
+                tf.destroy()
+            else:
+                f.close()
+                r = msdos(['unfold',i],tmpi=True,tmpic=True,cwd=o)
+            return r
 
     return 1
