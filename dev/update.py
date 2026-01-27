@@ -66,6 +66,7 @@ class Cache:
             try:r = c.get(u,follow_redirects=True).text
             except httpx.ReadTimeout:pass
             else:break
+        else:raise httpx.ReadTimeout('')
         self._s[u] = r
         return r
     def srch(self,p:str,u:str) -> str:
@@ -102,7 +103,10 @@ def supdate(c:Cache,k:str,inf:dict):
         elif u == 'https://cdn.theunarchiver.com/downloads/unarWindows.zip':
             ts = ft(str(time.gmtime().tm_year),'%Y')
         elif u == 'http://takeda-toshiya.my.coocan.jp/msdos/msdos.7z':
-            ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
+            for _ in range(3):
+                try: ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
+                except httpx.ConnectError: time.sleep(0.5)
+            else: ts = 0
         elif u.startswith('https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/'):
             ts = ft(str(time.gmtime().tm_year),'%Y')
         elif u == "https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip":
@@ -257,4 +261,5 @@ if __name__ == '__main__':
         if len(argv) == 2: print(t())
         else:
             if len(argv[2]) == 20 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == 'Z': print(ft(argv[2],'%Y-%m-%dT%H:%M:%SZ'))
+            elif len(argv[2]) == 10 and argv[2][2] == argv[2][5] == '/': print(ft(argv[2],'%m/%d/%Y'))
     else: update()

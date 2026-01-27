@@ -298,9 +298,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1768604400
+            "ts":1769295600
         }],
-        "ts":1768604400
+        "ts":1769295600
     },
     "file":{
         "p":"file/file.exe",
@@ -361,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1768604400
+            "ts":1769468400
         }],
-        "ts":1768604400
+        "ts":1769468400
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -453,21 +453,23 @@
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
         "fs":[{
-            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-81a3a3fc96c5a6cc2fb757ad59475e9591d1286d.zip",
+            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-2366888acdf32ca96edc4896ab0206d408a2793e.zip",
             "x":{
                 "HxCFloppyEmulator_Software_win_x64.zip":{
                     "HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
                     "HxCFloppyEmulator_Software/Windows_x64/libhxcfe.dll":"hxcfe/libhxcfe.dll",
                     "HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
                 }
-            }
+            },
+            "nightly_run":21152944193,
+            "ts":1769537499
         },{
             "u":"https://softpres.org/_media/files:spsdeclib_5.1_windows.zip?id=download&cache=cache",
             "x":{
                 "capsimg_binary/x64/CAPSImg.dll":"hxcfe/CAPSImg.dll"
             }
         }],
-        "ts":0
+        "ts":1769537499
     },
     "unar":{
         "p":"Unarchiver/unar.exe",
@@ -756,13 +758,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/bb/d0/dolphin-master-2512-148-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/dc/6d/dolphin-master-2512-255-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1768602583
+            "ts":1769496004
         }],
-        "ts":1768602583
+        "ts":1769496004
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -986,14 +988,14 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.9/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.10/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1766527775
+            "ts":1769489279
         }],
-        "ts":1766527775
+        "ts":1769489279
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -2637,23 +2639,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45950/SDLVICE-3.10-win64-r45950.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45962/SDLVICE-3.10-win64-r45962.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45950/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45950/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45950/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45950/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45950/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45950/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r45962/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r45962/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r45962/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r45962/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r45962/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r45962/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1768399198
+            "ts":1769438219
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1768399198
+        "ts":1769438219
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -3015,14 +3017,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_01_16_ef0d6737_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_01_26_ab7e8b01_32.zip",
             "x":{
-                "RenderDoc_2026_01_16_ef0d6737_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_01_16_ef0d6737_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_01_26_ab7e8b01_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_01_26_ab7e8b01_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1768518000
+            "ts":1769382000
         }],
-        "ts":1768518000
+        "ts":1769382000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -3074,13 +3076,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.4.0/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.5.1/zxc-windows-x64.exe.zip",
             "x":{
                 "zxc.exe":"zxc.exe"
             },
-            "ts":1767788901
+            "ts":1769067403
         }],
-        "ts":1767788901
+        "ts":1769067403
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -3217,7 +3219,8 @@
             "x":{
                 "UNFOLD.EXE":"UNFOLD.EXE"
             }
-        }]
+        }],
+        "ts":0
     },
     "unluac":{
         "p":"unluac.jar",
@@ -3470,13 +3473,14 @@
     "hookshot":{
         "p":"Hookshot/Hookshot.64.exe",
         "fs":[{
-            "u":"https://github.com/samuelgr/Hookshot/releases/download/v1.3.1/Hookshot-v1.3.1.zip",
+            "u":"https://github.com/samuelgr/Hookshot/releases/download/v2.0.0/Hookshot-v2.0.0.zip",
             "x":{
-                "Hookshot-v1.3.1/Hookshot.64.exe":"Hookshot/Hookshot.64.exe",
-                "Hookshot-v1.3.1/Hookshot.32.exe":"Hookshot/Hookshot.32.exe",
-                "Hookshot-v1.3.1/Hookshot.64.dll":"Hookshot/Hookshot.64.dll",
-                "Hookshot-v1.3.1/Hookshot.32.dll":"Hookshot/Hookshot.32.dll"
-            }
+                "Hookshot-v2.0.0/Hookshot.64.exe":"Hookshot/Hookshot.64.exe",
+                "Hookshot-v2.0.0/Hookshot.32.exe":"Hookshot/Hookshot.32.exe",
+                "Hookshot-v2.0.0/Hookshot.64.dll":"Hookshot/Hookshot.64.dll",
+                "Hookshot-v2.0.0/Hookshot.32.dll":"Hookshot/Hookshot.32.dll"
+            },
+            "ts":1769378295
         },{
             "u":"https://github.com/samuelgr/Pathwinder/releases/download/v1.2.0/Pathwinder-v1.2.0.zip",
             "x":{
@@ -3484,7 +3488,7 @@
                 "Pathwinder-v1.2.0/Win32/Pathwinder.HookModule.32.dll":"Hookshot/Pathwinder.HookModule.32.dll"
             }
         }],
-        "ts":0
+        "ts":1769378295
     },
     "resourceextractor":{
         "p":"ResourceExtractor.exe",
@@ -3623,7 +3627,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.6/lessmsi-v2.11.6.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.8/lessmsi-v2.11.8.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -3632,9 +3636,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1767677786
+            "ts":1769267321
         }],
-        "ts":1767677786
+        "ts":1769267321
     },
     "msix":{
         "p":"MsiX.exe",
