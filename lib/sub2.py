@@ -957,5 +957,6 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for f in listdir(o):
                 if f.startswith('unknown_') and f.endswith('.bin') and not getsize(o + '/' + f): remove(o + '/' + f)
             return
+        case 'Mario Kart 64 N64 ROM': raise NotImplementedError # https://github.com/HarbourMasters/Torch/issues/209
 
     return 1
