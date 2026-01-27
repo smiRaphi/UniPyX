@@ -197,8 +197,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Unity Bundle':
             if db.print_try: print('Trying with assetripper')
-            run([sys.executable,dirname(db.get('assetripper')) + '\\client.py',i,o],print_try=False)
-            if listdir(o): return
+            from bin.AssetRipper.client import extract as AsR_extract
+            r = AsR_extract(i,o)
+            if listdir(o) and r == 0: return
         case 'Unity Assets':
             b = basename(i).lower()
             if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
