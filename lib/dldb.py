@@ -113,7 +113,9 @@ class DLDB:
                         xopen(tf,'wb').write(z.read(tx))
                         self.ext(tf,ex,xl[tx])
                         os.remove(tf)
-                    else: xopen('bin/' + xl[tx],'wb').write(z.read(tx))
+                    else:
+                        d = z.read(tx)
+                        xopen('bin/' + xl[tx],'wb').write(d)
         elif ex in ('.tgz','.tar.gz'):
             with tarfile.open(p,'r:gz') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())

@@ -365,4 +365,132 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 r = msdos(['unfold',i],tmpi=True,tmpic=True,cwd=o)
             return r
 
+        case 'Fast PAQ8':
+            for ix in range(6,0,-1):
+                _,r,_ = run([f'fp8_v{ix}','-l',i],text=False)
+                for x in r.replace(b'\r',b'').strip(b'\n').split(b'\n')[1:]:
+                    if b'\t' in x and x.split(b'\t')[0].isdigit():
+                        try:
+                            if not isvalid(x.split(b'\t')[1].decode('utf-8')):break
+                        except UnicodeDecodeError:break
+                    else:break
+                else:
+                    run([f'fp8_v{ix}','-d',i,o],print_try=False)
+                    if listdir(o): return
+        case 'Fast PAQ8 SK':
+            f = open(i,'rb')
+            f.seek(5)
+            v = f.read(2).rstrip(b'\0').decode('ascii')
+            f.close()
+
+            scr = db.get('fp8sk' + v)
+            if not exists(scr): raise NotImplementedError(v)
+
+            run([scr,'-d',i,o])
+            if listdir(o): return
+        case 'PAQ8GEN':
+            for ix in range(5,0,-1):
+                tf = TmpFile(f'.paq8gen{ix}')
+                tf.link(i)
+                _,r,_ = run([f'paq8gen_v{ix}_speed','-t',tf])
+                if not ' -> differ at ' in r:
+                    run([f'paq8gen_v{ix}_speed','-d',tf,o])
+                    tf.destroy()
+                    if listdir(o): return
+                tf.destroy()
+        case 'PAQ8K':
+            f = open(i,'rb')
+            f.seek(5)
+            v = f.read(1).decode('ascii').strip()
+            f.close()
+
+            scr = db.get('paq8k' + v + ('_lp2' if v in ('','2') else ''))
+            if not exists(scr): raise NotImplementedError(v)
+
+            run([scr,'-d',i,o])
+            if listdir(o): return
+        case 'PAQ8KX':
+            f = open(i,'rb')
+            f.seek(6)
+            old = f.read(1) != b'\0'
+            f.close()
+
+            if old:
+                for ix in range(3,0,-1):
+                    _,r,_ = run([f'paq8kx_v{ix}','-d',i,o])
+                    if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
+                    for f in listdir(o): remove(o + '/' + f)
+            else:
+                for ix in list(range(7,3,-1)) + ['4a','4a2']:
+                    _,r,_ = run([f'paq8kx_v{ix}','-l',i],text=False)
+                    for x in r.replace(b'\r',b'').strip(b'\n').split(b'\n')[1:]:
+                        if b'\t' in x and x.split(b'\t')[0].isdigit():
+                            try:
+                                if not isvalid(x.split(b'\t')[1].decode('utf-8')):break
+                            except UnicodeDecodeError:break
+                        else:break
+                    else:
+                        run([f'paq8kx_v{ix}','-d',i,o])
+                        if listdir(o): return
+        case 'PAQ8F':
+            for ix in range(4,0,-1):
+                _,r,_ = run(['paq8f' if ix == 1 else f'paq8fthis{ix}','-d',i,o])
+                if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
+                for f in listdir(o): remove(o + '/' + f)
+        case 'PAQ8O':
+            f = open(i,'rb')
+            f.seek(5)
+            v = f.read(3).split(b' ')[0].decode('ascii')
+            f.close()
+            if v in ('','1'): v = '2'
+            elif v == '10t': v = '10tlp2'
+
+            scr = db.get('paq8o' + v)
+            if not exists(scr): raise NotImplementedError(v)
+
+            run([scr,'-d',i,o])
+            if listdir(o): return
+        case 'PAQ8N':
+            run(['paq8n','-d',i,o])
+            if listdir(o): return
+            run(['paq8o','-d',i,o]) # version 1 still had the paq8n signature
+            if listdir(o): return
+        case 'PAQ8P':
+            _,r,_ = run(['paq8p_pc','-d',i,o])
+            if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
+            run(['paq8p','-d',i,o])
+            if listdir(o): return
+        case 'PAQ8L'|'PAQ8PF':
+            run([t.lower(),'-d',i,o])
+            if listdir(o): return
+        case 'PAQ8SK':
+            f = open(i,'rb')
+            f.seek(6)
+            v = f.read(3).split(b'\0')[0]
+            if not v or v[0] <= 8: v = '-'
+            else: v = v.decode('ascii')
+            f.close()
+
+            if v == '-':
+                for ix in list(range(38,32,-1)) + [1]:
+                    _,r,_ = run([f'paq8sk{ix}','-l',i],text=False)
+                    for x in r.replace(b'\r',b'').strip(b'\n').split(b'\n')[1:]:
+                        if b'\t' in x and x.split(b'\t')[0].isdigit():
+                            try:
+                                if not isvalid(x.split(b'\t')[1].decode('utf-8')):break
+                            except UnicodeDecodeError:break
+                        else:break
+                    else:
+                        run([f'paq8sk{ix}','-d',i,o])
+                        if listdir(o): return
+            else:
+                scr = db.get('paq8sk' + v)
+                if not exists(scr): raise NotImplementedError(v)
+
+                tf = TmpFile('.paq8sk' + v)
+                tf.link(i)
+                run([scr,'-d',tf,o])
+                tf.destroy()
+                if listdir(o): return
+
     return 1
