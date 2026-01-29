@@ -492,5 +492,44 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 run([scr,'-d',tf,o])
                 tf.destroy()
                 if listdir(o): return
+        case 'PAQ8PX':
+            f = open(i,'rb')
+            f.seek(6)
+            old = f.read(1) != b'\0'
+            f.close()
+
+            if old:
+                for ix in range(67,-1,-1):
+                    scr = db.get('paq8px' + (f'_v{ix}' if ix else ''))
+                    if not exists(scr): continue
+
+                    tf = TmpFile('.paq8px')
+                    tf.link(i)
+                    _,r,_ = run([scr,'-d',tf,o])
+                    tf.destroy()
+                    if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
+                    for f in listdir(o): remove(o + '/' + f)
+            else:
+                for ix in list(range(210,136,-1)) + ['136b'] + list(range(136,80,-1)) + ['80b'] + list(range(80,67,-1)):
+                    scr = db.get(f'paq8px_v{ix}')
+                    if not exists(scr): continue
+
+                    tf = TmpFile('.paq8px' + (str(ix) if (ix if type(x) == int else int(ix[:-1])) > 136 else ''))
+                    tf.link(i)
+                    _,r,_ = run([scr,'-d',tf,o])
+                    tf.destroy()
+                    if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
+                    for f in listdir(o): remove(o + '/' + f)
+        case 'PAQ8P3X':
+            for ix in [20]:
+                tf = TmpFile('.paq8p3x')
+                tf.link(i)
+                _,r,_ = run([f'paq8p3x_v{ix}','-d',tf,o])
+                tf.destroy()
+                if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
+                for f in listdir(o): remove(o + '/' + f)
+        case 'PAQ8PXKZU':
+            run(['paq8pxkzu_v69','-d',i,o])
+            if listdir(o): return
 
     return 1
