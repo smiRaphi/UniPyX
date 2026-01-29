@@ -4578,6 +4578,62 @@
             }
         }]
     },
+    "p5":{
+        "p":"p5.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/p5.exe"
+        ]
+    },
+    "p6":{
+        "p":"p6.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/p6.exe"
+        ]
+    },
+    "p12a":{
+        "p":"p12a.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/p12a.exe"
+        ]
+    },
+    "paq1":{
+        "p":"paq1.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/paq1.exe"
+        ]
+    },
+    "paq2":{
+        "p":"paq2.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/paq2.exe"
+        ]
+    },
+    "paq3c":{
+        "p":"paq3c.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/paq3c.exe"
+        ]
+    },
+    "paq3n":{
+        "p":"paq3n.exe",
+        "fs":[[
+            "https://mattmahoney.net/dc/paq3n_ic8_ml_ipo.exe",
+            "paq3n.exe"
+        ]]
+    },
+    "paq4v2a":{
+        "p":"paq4v2a.exe",
+        "fs":[
+        "https://mattmahoney.net/dc/paq4v2a.exe"
+        ]
+    },
+    "paq5":{
+        "p":"paq5.exe",
+        "fs":[[
+            "https://mattmahoney.net/dc/paq5b.exe",
+            "paq5.exe"
+        ]]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

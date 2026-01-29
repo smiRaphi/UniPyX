@@ -365,6 +365,20 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 r = msdos(['unfold',i],tmpi=True,tmpic=True,cwd=o)
             return r
 
+        case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
+            run([t.lower(),i],cwd=o)
+            if listdir(o): return
+        case 'P12':
+            run(['p12a',i],cwd=o)
+            if listdir(o): return
+        case 'PAQ3':
+            run(['paq3n',i],cwd=o)
+            if listdir(o): return
+            run(['paq3c',i],cwd=o)
+            if listdir(o): return
+        case 'PAQ4':
+            run(['paq4v2a',i],cwd=o)
+            if listdir(o): return
         case 'Fast PAQ8':
             for ix in range(6,0,-1):
                 _,r,_ = run([f'fp8_v{ix}','-l',i],text=False)
