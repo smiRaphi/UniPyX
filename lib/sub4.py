@@ -1875,18 +1875,23 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + fe[2] + ('.djc' if d.startswith(b'DJcomp\0\0') else ''),'wb').write(d)
             if fs: return
         case 'Borland Form':
-            of = o + '\\' + tbasename(i) + '.txt'
-            run(['dfm2txt','bin',i,of])
-            if not (exists(of) and getsize(of)): return 1
+            d = open(i,'rb').read()
+            for x in range(10):
+                if x.to_bytes() in d:
+                    of = o + '\\' + tbasename(i) + '.txt'
+                    run(['dfm2txt','bin',i,of])
+                    if not (exists(of) and getsize(of)): return 1
+
+                    d = open(of,encoding='ansi').read()
+                    break
+            else: d = d.decode('ansi')
 
             if db.print_try: print('Trying with custom extractor')
-            d = open(of,encoding='ansi').read()
-
-            for ix,fd in enumerate(re.findall(r'(Picture|Icon)\.Data = \{([^\}]+)\}',d)):
+            for ix,fd in enumerate(re.findall(r'(Picture\.Data|Icon\.Data|Bitmap) = \{([^\}]+)\}',d)):
                 ft,fd = fd
                 fd = bytes.fromhex(fd)
-                if ft == 'Icon': ext = 'ico'
-                else:
+                if ft == 'Icon.Data': ext = 'ico'
+                elif ft == 'Picture.Data':
                     st = fd[1:fd[0]+1].decode()
                     fd = fd[fd[0]+1:]
                     if st == 'TBitmap':
@@ -1901,6 +1906,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     elif st == 'TIcon':
                         ext = 'ico'
                     else: ext = 'unk'
+                elif ft == 'Bitmap':
+                    ext = 'bmp'
+                    fd = fd[28:]
 
                 open(o + f'/{ix}.{ext}','wb').write(fd)
             return

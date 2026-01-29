@@ -662,6 +662,7 @@
     ],
     "C64 Tape":[
         "c64 tape image format (v1-updated)",
+        "commodore raw tape image (platform c64)",
         "commodore 64 tape container"
     ],
     "C64 LiBRary":[
@@ -1145,7 +1146,11 @@
         "djarc compressed archive"
     ],
     "Borland Form":[
-        "borland form (generic)"
+        "borland form (generic)",
+        "borland delphi - c++ builder form (var.1)",
+        "borland delphi - c++ builder form (var.2)",
+        "borland delphi - c++ builder form (var.3)",
+        "borland delphi - c++ builder form (var.4)"
     ],
     "Build Engine RFF":[
         "build engine rff encrypted container"
