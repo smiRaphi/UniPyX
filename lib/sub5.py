@@ -545,5 +545,19 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'PAQ8PXKZU':
             run(['paq8pxkzu_v69','-d',i,o])
             if listdir(o): return
+        case 'PAQ8PXV':
+            f = open(i,'rb')
+            f.seek(7)
+            v = f.read(2).lstrip(b'v').rstrip(b'\0').decode('ascii')
+            f.close()
 
+            scr = db.get('paq8pxv_v' + v)
+            if not exists(scr): raise NotImplementedError(v)
+
+            tf = TmpFile('.paq8pxv' + v)
+            tf.link(i)
+            run([scr,'-d',tf,o],cwd=dirname(scr))
+            tf.destroy()
+            remove(dirname(scr) + '/pxv.log')
+            if listdir(o): return
     return 1
