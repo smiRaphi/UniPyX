@@ -973,6 +973,10 @@
         "rs":"fxcm","s":1
     },
     {
+        "d":[["isat","PCF\\0",0],["isin",["\\x04\\x04","\\x04\\x05","\\x04\\x06","\\x04\\x07","\\x04\\x08"],4],["isin",["\\x00","\\x01","\\x02"],6]],
+        "rs":"Precomp","s":1
+    },
+    {
         "d":[["isat","\\xFAVlAz\\xFB",0],["n0",1,6],["n0",1,7],["isat","\\xA9\\x93\\xBE\\x85",-4],["py","f=open(inp,'rb');s=f.seek(0,2)-20;f.seek(12);return int.from_bytes(f.read(4),'little')==s"]],
         "rs":"Vlaz","s":1
     },
@@ -1539,6 +1543,12 @@
                      ".cmixv16",".cmix17",".cmix_v17",".cmixv17",".cmix18",".cmix_v18",".cmixv18",".cmix19",".cmix_v19",".cmixv19",".cmix20",".cmix_v20",".cmixv20",".cmix21",".cmix_v21",".cmixv21"]],
              ["py","f=open(inp,'rb');s=int.from_bytes(f.read(5),'big')&0x7fffffffff;return s>f.seek(0,2)"]],
         "rs":"CMIX"
+    },
+    {
+        "rq":null,
+        "d":[["ext",[".gmix",".gmix1",".gmix_v1",".gmixv1"]],
+             ["py","f=open(inp,'rb');s=int.from_bytes(f.read(5),'big');return s>f.seek(0,2)"]],
+        "rs":"GMIX"
     },
     {
         "rqr":null,

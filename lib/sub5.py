@@ -392,6 +392,30 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run([scr,'-d',i,of])
             if exists(of) and getsize(of): return
+        case 'GMIX':
+            of = o + '/' + tbasename(i)
+            run(['gmix_v1','-d',i,of])
+            if exists(of) and getsize(of): return
+        case 'Precomp':
+            f = open(i,'rb')
+            f.seek(3)
+            v = list(f.read(3))
+            f.seek(7)
+            t = []
+            while True:
+                b = f.read(1)
+                if not b:
+                    f.close()
+                    return 1
+                if b == b'\0':break
+                t.append(b)
+            f.close()
+
+            scr = db.get(f'precomp_v{v[0]}.{v[1]}.{v[2]}')
+            if not exists(scr): raise NotImplementedError(v)
+            of = o + '/' + (b''.join(t).decode() or tbasename(i))
+            run([scr,'-r','-o' + of,i])
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

@@ -5404,6 +5404,51 @@
         ],
         "ts":0
     },
+    "gmix_v1":{
+        "p":"gmix_v1.exe",
+        "fs":[{
+            "u":"https://github.com/byronknoll/gmix/releases/download/v1/gmix-v1-windows.zip",
+            "x":{
+                "gmix.exe":"gmix_v1.exe"
+            }
+        }]
+    },
+    "precomp_v0.4.4":{
+        "p":"precomp_v0.4.4.exe",
+        "fs":[{
+            "u":"https://github.com/schnaader/precomp-cpp/releases/download/v0.4.4/precomp.zip",
+            "x":{
+                "windows/precomp.exe":"precomp_v0.4.4.exe"
+            }
+        }]
+    },
+    "precomp_v0.4.5":{
+        "p":"precomp_v0.4.5.exe",
+        "fs":[{
+            "u":"https://github.com/schnaader/precomp-cpp/releases/download/v0.4.5/precomp.zip",
+            "x":{
+                "windows/precomp64.exe":"precomp_v0.4.5.exe"
+            }
+        }]
+    },
+    "precomp_v0.4.6":{
+        "p":"precomp_v0.4.6.exe",
+        "fs":[{
+            "u":"https://github.com/schnaader/precomp-cpp/releases/download/v0.4.6/precomp.zip",
+            "x":{
+                "windows/precomp.exe":"precomp_v0.4.6.exe"
+            }
+        }]
+    },
+    "precomp_v0.4.7":{
+        "p":"precomp_v0.4.7.exe",
+        "fs":[{
+            "u":"https://github.com/schnaader/precomp-cpp/releases/download/v0.4.7/precomp.zip",
+            "x":{
+                "windows/precomp.exe":"precomp_v0.4.7.exe"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{
