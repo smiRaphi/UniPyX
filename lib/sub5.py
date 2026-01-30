@@ -416,6 +416,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + (b''.join(t).decode() or tbasename(i))
             run([scr,'-r','-o' + of,i])
             if exists(of) and getsize(of): return
+        case 'fxv':
+            d = dirname(db.get('fxv'))
+            run(['fxv','-d',i,o],cwd=d)
+            remove(d + '/pxv.log')
+            if listdir(o): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)
