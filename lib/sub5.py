@@ -381,6 +381,17 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run([scr,'-d'] + ([dirname(scr) + '\\english.dic'] if dic else []) + [i,of])
             if exists(of) and getsize(of): return
+        case 'fxcm':
+            f = open(i,'rb')
+            f.seek(2)
+            v = f.read(1)[0]
+            f.close()
+
+            scr = db.get(f'fxcm_v{v}')
+            if not exists(scr): raise NotImplementedError(v)
+            of = o + '/' + tbasename(i)
+            run([scr,'-d',i,of])
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)
