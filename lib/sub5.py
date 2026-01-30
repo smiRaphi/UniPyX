@@ -368,6 +368,19 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['d' + t.lower(),'-f',i,of])
             if exists(of) and getsize(of): return
+        case 'CMIX':
+            f = open(i,'rb')
+            dic = f.read(1)[0] & 0x80
+            f.close()
+            v = i[-2:]
+            if not v.isdigit(): v = v[1:]
+            if not v.isdigit(): v = '21'
+
+            scr = db.get(f'cmix_v{v}')
+            if not exists(scr): raise NotImplementedError(v)
+            of = o + '/' + tbasename(i)
+            run([scr,'-d'] + ([dirname(scr) + '\\english.dic'] if dic else []) + [i,of])
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

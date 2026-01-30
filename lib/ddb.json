@@ -1529,6 +1529,14 @@
         "rs":"CSC"
     },
     {
+        "rq":null,
+        "d":[["ext",[".cmix",".cmix1",".cmix_v1",".cmixv1",".cmix2",".cmix_v2",".cmixv2",".cmix3",".cmix_v3",".cmixv3",".cmix4",".cmix_v4",".cmixv4",".cmix5",".cmix_v5",".cmixv5",".cmix6",".cmix_v6",".cmixv6",".cmix7",".cmix_v7",".cmixv7",".cmix8",".cmix_v8",".cmixv8",
+                     ".cmix9",".cmix_v9",".cmixv9",".cmix10",".cmix_v10",".cmixv10",".cmix11",".cmix_v11",".cmixv11",".cmix12",".cmix_v12",".cmixv12",".cmix13",".cmix_v13",".cmixv13",".cmix14",".cmix_v14",".cmixv14",".cmix15",".cmix_v15",".cmixv15",".cmix16",".cmix_v16",
+                     ".cmixv16",".cmix17",".cmix_v17",".cmixv17",".cmix18",".cmix_v18",".cmixv18",".cmix19",".cmix_v19",".cmixv19",".cmix20",".cmix_v20",".cmixv20",".cmix21",".cmix_v21",".cmixv21"]],
+             ["py","f=open(inp,'rb');s=int.from_bytes(f.read(5),'big')&0x7fffffffff;return s>f.seek(0,2)"]],
+        "rs":"CMIX"
+    },
+    {
         "rqr":null,
         "d":[["s%",16],["size",[128,4096]],["ext",".ejs"],["py","return basename(inp).startswith('subconf_') and '.' in tbasename(inp)"]],
         "rs":"JDownloader2 Encrypted Subconfig"
