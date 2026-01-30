@@ -4845,6 +4845,45 @@
             "paq5.exe"
         ]]
     },
+    "dzx7":{
+        "p":"dzx7.exe",
+        "fs":[{
+            "u":"https://spectrumcomputing.co.uk/zxdb/sinclair/entries/0027996/ZX7_(WindowsExecutable).zip",
+            "x":{
+                "dzx7.exe":"dzx7.exe"
+            }
+        }]
+    },
+    "dzx0":{
+        "p":"dzx0.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/einar-saukas/ZX0/refs/heads/main/win/dzx0.exe"
+        ]
+    },
+    "dzx1":{
+        "p":"dzx1.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/einar-saukas/ZX1/refs/heads/main/win/dzx1.exe"
+        ]
+    },
+    "dzx2":{
+        "p":"dzx2.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/einar-saukas/ZX2/refs/heads/main/win/dzx2.exe"
+        ]
+    },
+    "dzx5":{
+        "p":"dzx5.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/einar-saukas/ZX5/refs/heads/main/win/dzx5.exe"
+        ]
+    },
+    "rcs":{
+        "p":"rcs.exe",
+        "fs":[
+        "https://raw.githubusercontent.com/einar-saukas/RCS/refs/heads/main/win/rcs.exe"
+        ]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

@@ -1078,5 +1078,10 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fe[0])
                 xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'Reverse Computer Screen':
+            of = o + '/' + tbasename(i)
+            if not of.endswith('.scr'): of += '.scr'
+            run(['rcs','-f','-d',i,of])
+            if exists(of) and getsize(of): return
 
     return 1

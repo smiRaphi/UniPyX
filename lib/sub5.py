@@ -364,6 +364,10 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 f.close()
                 r = msdos(['unfold',i],tmpi=True,tmpic=True,cwd=o)
             return r
+        case 'NX7'|'NX0'|'NX1'|'NX2'|'NX5':
+            of = o + '/' + tbasename(i)
+            run(['d' + t.lower(),'-f',i,of])
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)
