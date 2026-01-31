@@ -957,6 +957,21 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for f in listdir(o):
                 if f.startswith('unknown_') and f.endswith('.bin') and not getsize(o + '/' + f): remove(o + '/' + f)
             return
-        case 'Mario Kart 64 N64 ROM': raise NotImplementedError # https://github.com/HarbourMasters/Torch/issues/209
+        case 'Mario Kart 64 N64 ROM':
+            f = open(i,'rb')
+            f.seek(0x3B)
+            tg = f.read(4).decode('ascii')
+            f.close()
+
+            if t == 'Mario Kart 64 N64 ROM' and tg == 'NKTE': scr = 'spaghettikart_yaml'
+            else: raise NotImplementedError(t + ': ' + tg)
+
+            import zipfile
+            run(['torch','o2r','-s',db.get(scr),'-d',o,i])
+            if len(listdir(o)) == 2:
+                remove(o + '/torch.hash.yml')
+                zipfile.ZipFile(o + '/' + listdir(o)[0]).extractall(o)
+                remove(o + '/' + listdir(o)[0])
+                return
 
     return 1

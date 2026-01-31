@@ -298,9 +298,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1769554800
+            "ts":1769727600
         }],
-        "ts":1769554800
+        "ts":1769727600
     },
     "file":{
         "p":"file/file.exe",
@@ -361,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1769727600
+            "ts":1769814000
         }],
-        "ts":1769727600
+        "ts":1769814000
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -758,13 +758,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/01/0e/dolphin-master-2512-257-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/f9/81/dolphin-master-2512-259-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1769556826
+            "ts":1769802924
         }],
-        "ts":1769556826
+        "ts":1769802924
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -3018,14 +3018,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_01_29_a139a9fa_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_01_30_bd78fcc4_32.zip",
             "x":{
-                "RenderDoc_2026_01_29_a139a9fa_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_01_29_a139a9fa_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_01_30_bd78fcc4_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_01_30_bd78fcc4_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1769641200
+            "ts":1769727600
         }],
-        "ts":1769641200
+        "ts":1769727600
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -3176,7 +3176,7 @@
     "auracomp":{
         "p":"auracomp/auracomp.exe",
         "fs":[{
-            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/1.5.3/auracomp_net472.zip",
+            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/1.6.1/auracomp_net472.zip",
             "x":{
                 "auracomp.exe":"auracomp/auracomp.exe",
                 "auracomp.exe.config":"auracomp/auracomp.exe.config",
@@ -3190,9 +3190,10 @@
                 "System.Runtime.CompilerServices.Unsafe.dll":"auracomp/System.Runtime.CompilerServices.Unsafe.dll",
                 "System.Threading.Tasks.Extensions.dll":"auracomp/System.Threading.Tasks.Extensions.dll",
                 "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
-            }
+            },
+            "ts":1769783309
         }],
-        "ts":1769175304
+        "ts":1769783309
     },
     "bk_extract":{
         "p":"bk_extract.exe",
@@ -5411,7 +5412,8 @@
             "x":{
                 "gmix.exe":"gmix_v1.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "precomp_v0.4.4":{
         "p":"precomp_v0.4.4.exe",
@@ -5420,7 +5422,8 @@
             "x":{
                 "windows/precomp.exe":"precomp_v0.4.4.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "precomp_v0.4.5":{
         "p":"precomp_v0.4.5.exe",
@@ -5429,7 +5432,8 @@
             "x":{
                 "windows/precomp64.exe":"precomp_v0.4.5.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "precomp_v0.4.6":{
         "p":"precomp_v0.4.6.exe",
@@ -5438,7 +5442,8 @@
             "x":{
                 "windows/precomp.exe":"precomp_v0.4.6.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "precomp_v0.4.7":{
         "p":"precomp_v0.4.7.exe",
@@ -5447,7 +5452,8 @@
             "x":{
                 "windows/precomp.exe":"precomp_v0.4.7.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "fxv":{
         "p":"fxv/fxv.exe",
@@ -5562,7 +5568,19 @@
         ],[
             "https://raw.githubusercontent.com/kaitz/fxv/refs/heads/main/config/textutf.det",
             "fxv/config/textutf.det"
-        ]]
+        ]],
+        "ts":0
+    },
+    "torch":{
+        "p":"Torch/torch.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "Torch/torch.exe":"Torch/torch.exe",
+                "Torch/libbz2-1.dll":"Torch/libbz2-1.dll",
+                "Torch/zlib1.dll":"Torch/zlib1.dll"
+            }
+        }]
     },
     "luadec51":{
         "p":"Luadec51.exe",
@@ -6336,6 +6354,25 @@
         "https://raw.githubusercontent.com/tge-was-taken/010-Editor-Templates/656453e2b101b9999a72bd6179c95a490e12addf/templates/sasr_xpac_hashes.bt"
         ],
         "ts":0
+    },
+    "spaghettikart_yaml":{
+        "p":"Torch/SpaghettiKart",
+        "fs":[[
+            "https://raw.githubusercontent.com/HarbourMasters/SpaghettiKart/refs/heads/main/include/defines.h",
+            "Torch/SpaghettiKart/include/defines.h"
+        ],[
+            "https://raw.githubusercontent.com/HarbourMasters/SpaghettiKart/refs/heads/main/config.yml",
+            "Torch/SpaghettiKart/config.yml"
+        ],{
+            "u":"https://github.com/HarbourMasters/SpaghettiKart/tree/main/include/assets",
+            "github":"Torch/SpaghettiKart/include/assets",
+            "ts":1765114493
+        },{
+            "u":"https://github.com/HarbourMasters/SpaghettiKart/tree/main/yamls",
+            "github":"Torch/SpaghettiKart/yamls",
+            "ts":1766235156
+        }],
+        "ts":1766235156
     },
     "unrealpak_5.6.1":{
         "p":"UnrealPak/5.6.1/UnrealPak.exe",

@@ -67,7 +67,9 @@ class DLDB:
             os.chdir(BDIR)
             exi = self.db[exe]
             t = int(time())
-            if exe in self.udb and self.udb[exe] < exi.get('ts',0) and os.path.exists('bin/' + exi['p']): os.remove('bin/' + exi['p'])
+            if exe in self.udb and self.udb[exe] < exi.get('ts',0) and os.path.exists('bin/' + exi['p']):
+                if os.path.isdir('bin/' + exi['p']): rmtree('bin/' + exi['p'])
+                else: os.remove('bin/' + exi['p'])
             if exi.get('fs',1) == None: os.makedirs('bin/' + exi['p'],exist_ok=True)
             if not os.path.exists('bin/' + exi['p']):
                 up = True
@@ -80,11 +82,13 @@ class DLDB:
                         if e.get('ex'): ex = e['ex']
                         else:
                             ex = e['u'].split('?')[0].split('/')[-1].lower()
-                            if ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
+                            if not '.' in ex: ex = ''
+                            elif ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
                             else: ex = '.' + ex.split('.')[-1]
                         p = gtmp('.exe' if ex in ('run','inno','nsis') else ex)
 
                     if e['u'] == '.': p,ex = 'bin/bin.7z','.7z'
+                    elif 'github' in e: self.gh_dir(e['u'],'bin/' + e['github'])
                     else: self.dl(e['u'],p,verify=e.get('v',True))
                     if 'x' in e:
                         bk = self.print_try
@@ -186,6 +190,14 @@ class DLDB:
         except:
             if os.path.exists(out): os.remove(out)
             raise
+    def gh_dir(self,url,out):
+        out = out.strip('/')
+        os.makedirs(out,exist_ok=True)
+        d = self.c.get(url,headers={'accept':'application/json','x-requested-with':'XMLHttpRequest'}).json()['payload']
+        b = f'https://github.com/{d["repo"]["ownerLogin"]}/{d["repo"]["name"]}/tree/{d["refInfo"]["name"]}/'
+        for x in d['tree']['items']:
+            if x['contentType'] == 'directory': self.gh_dir(b + x['path'],out + '/' + x['name'])
+            elif x['contentType'] == 'file': self.dl(f'https://raw.githubusercontent.com/{d["repo"]["ownerLogin"]}/{d["repo"]["name"]}/refs/heads/{d["refInfo"]["name"]}/{x["path"]}',out + '/' + x['name'])
 
     def save(self):
         open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))

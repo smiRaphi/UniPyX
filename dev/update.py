@@ -261,5 +261,6 @@ if __name__ == '__main__':
         if len(argv) == 2: print(t())
         else:
             if len(argv[2]) == 20 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == 'Z': print(ft(argv[2],'%Y-%m-%dT%H:%M:%SZ'))
+            elif len(argv[2]) == 24 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == '.' and argv[2][23] == 'Z': print(ft(argv[2].split('.')[0],'%Y-%m-%dT%H:%M:%S'))
             elif len(argv[2]) == 10 and argv[2][2] == argv[2][5] == '/': print(ft(argv[2],'%m/%d/%Y'))
     else: update()
