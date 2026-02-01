@@ -421,6 +421,10 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['fxv','-d',i,o],cwd=d)
             remove(d + '/pxv.log')
             if listdir(o): return
+        case 'Density Chamleon'|'Density Cheetah'|'Density Lion':
+            of = o + '/' + tbasename(i)
+            run(['density-rs','d',t.split()[1].lower(),i,of])
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

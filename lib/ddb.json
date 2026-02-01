@@ -1396,6 +1396,21 @@
     },
     {
         "rqr":null,
+        "d":[["s%",2],["size",[18,16777215]],["isat","\\0",0],["py","f=open(inp,'rb')\nwhile neof(f):\n fs=f.read(6)\n if len(fs)!=6:return\n l=0;fs=int.from_bytes(fs,'little')\n for x in range(16):\n  sf=(fs>>x*3)&7\n  if sf==0:l+=4\n  elif sf in(6,7):l+=2\n if len(f.read(l))!=l:return\nreturn True"]],
+        "rs":"Density Lion"
+    },
+    {
+        "rqr":null,
+        "d":[["s%",2],["size",[18,16777215]],["py","f=open(inp,'rb')\nif f.read(1)[0]&3:return\nf.seek(0)\nwhile neof(f):\n fs=f.read(8)\n if len(fs)!=8:return\n l=0;fs=int.from_bytes(fs,'little')\n for x in range(32):\n  sf=(fs>>x*2)&3\n  if sf==0:l+=4\n  elif sf in(1,2):l+=2\n if len(f.read(l))!=l:return\nreturn True"]],
+        "rs":"Density Cheetah"
+    },
+    {
+        "rqr":null,
+        "d":[["s%",2],["size",[20,16777215]],["py","f=open(inp,'rb')\nif f.read(1)[0]&7:return\nf.seek(0)\nwhile neof(f):\n fs=f.read(8)\n if len(fs)!=8:return\n fs=int.from_bytes(fs,'little');l=fs.bit_count()*2+(64-fs.bit_count())*4\n if len(f.read(l))!=l:return\nreturn True"]],
+        "rs":"Density Chameleon"
+    },
+    {
+        "rqr":null,
         "d":[["size",11520],["ext",[".da1",".da2",".da3"]]],
         "rs":"Dark Ages Map File"
     },

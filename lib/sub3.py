@@ -259,7 +259,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if x != '{app}':
                         try:
                             if isfile(o + '/' + x): mv(o + '/' + x,o + '/$INSFILES/' + x)
-                            else: mv(o + '/' + x,o + '/$INSFILES/')
+                            else:
+                                if exists(o + '/$INSFILES'): copydir(o + '/' + x,o + '/$INSFILES',True)
+                                else: mv(o + '/' + x,o + '/$INSFILES/')
                         except PermissionError: copy(o + '/' + x,o + '/$INSFILES/')
                 if exists(o + '/{app}'):
                     while True:

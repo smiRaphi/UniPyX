@@ -5582,6 +5582,15 @@
             }
         }]
     },
+    "density-rs":{
+        "p":"density-rs.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "density-rs.exe":"density-rs.exe"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{
@@ -5845,10 +5854,10 @@
         "fs":[{
             "u":"https://github.com/samuelgr/Hookshot/releases/download/v2.0.0/Hookshot-v2.0.0.zip",
             "x":{
-                "Hookshot-v2.0.0/Hookshot.64.exe":"Hookshot/Hookshot.64.exe",
-                "Hookshot-v2.0.0/Hookshot.32.exe":"Hookshot/Hookshot.32.exe",
-                "Hookshot-v2.0.0/Hookshot.64.dll":"Hookshot/Hookshot.64.dll",
-                "Hookshot-v2.0.0/Hookshot.32.dll":"Hookshot/Hookshot.32.dll"
+                "Hookshot-v2.0.0/x64/Hookshot.64.exe":"Hookshot/Hookshot.64.exe",
+                "Hookshot-v2.0.0/Win32/Hookshot.32.exe":"Hookshot/Hookshot.32.exe",
+                "Hookshot-v2.0.0/x64/Hookshot.64.dll":"Hookshot/Hookshot.64.dll",
+                "Hookshot-v2.0.0/Win32/Hookshot.32.dll":"Hookshot/Hookshot.32.dll"
             },
             "ts":1769378295
         },{

@@ -489,7 +489,7 @@ def hookshot(cmd:list,redirect:dict,**kwargs):
     if not 'print_try' in kwargs or kwargs.pop('print_try'): print('Trying with',scr)
     scr = db.get(scr)
     hks = scr + '.hookshot'
-    open(hks,'x').close()
+    open(hks,'w').close()
 
     #hkc = dirname(hks) + '/Hookshot.ini'
     #open(hkc,'wb').write(b'LoadHookModulesFromHookshotDirectory = yes\n')
