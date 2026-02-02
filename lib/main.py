@@ -644,6 +644,8 @@ def guess_ext(f):
     if tag == b'\x89PNG': ext = 'png'
     elif tag == b'RIFF': ext = 'wav'
     elif tag == b'MThd': ext = 'mid'
+    elif tag == b'DXBC': ext = 'cso'
+    elif tag == b'NES\x1A': ext = 'nes'
     else:
         f.seek(2,1)
         if f.read(4) == b'JFIF': ext = 'jpg'

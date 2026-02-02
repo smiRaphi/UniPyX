@@ -1,4 +1,5 @@
 from lib.main import *
+from lib.dldb import BDIR
 from lib.sub4 import auracomp
 
 def extract4_1(inp:str,out:str,t:str):
@@ -1083,5 +1084,56 @@ def extract4_1(inp:str,out:str,t:str):
             if not of.endswith('.scr'): of += '.scr'
             run(['rcs','-f','-d',i,of])
             if exists(of) and getsize(of): return
+        case 'Encrypted Arsenal MTC+MDF':
+            DBP = BDIR + '/bin/mtcmdf.bdb'
+            if not exists(DBP):
+                import zipfile,json
+                from io import BytesIO
+
+                dbf = open(DBP,'wb')
+                zf = zipfile.ZipFile(BytesIO(db.c.get('https://github.com/Infinest/Gimmick-ROM-extractor/releases/download/1.21/Gimmick_ROM_extractor.zip',follow_redirects=True).content))
+                for h,p in (('C90971742F35300A94797EC76208462C024FE0C938356B216463FB61ACF6FB4F','config.json'),
+                            ('1D3CE6FCD673E0349C07494687796ADDDF08A30A53B78672C884907B980F47A2','alternate_configs/Streets of Kamurocho (Streets of Rage 2)/config.json'),
+                            ('FE8314DF62A13B63990995722F6F9A083AA5B30A4971E3297B49C241A44241F5','alternate_configs/Abarenbo Tengu & Zombie Nation/config.json'),
+                            ('0'*64,'alternate_configs/F-117A Stealth Fighter/config.json')):
+                    dbf.write(bytes.fromhex(h))
+                    dbf.write(json.loads(zf.read(p).replace(b',\n}',b'}'))['AES_KEY'].encode('ascii').ljust(16,b'\0'))
+                dbf.close()
+            dbf = open(DBP,'rb')
+            bdb = {dbf.read(32):dbf.read(16) for _ in range(4)}
+            dbf.close()
+
+            if db.print_try: print('Trying with custom extractor')
+            import hashlib
+            fd = open(noext(i) + '.mdf','rb')
+            hsh = hashlib.sha256(fd.read(0x1000)).digest()
+            assert hsh in bdb
+            key = bdb[hsh]
+
+            try: from Crypto.Cipher import AES # type: ignore
+            except ImportError: from Cryptodome.Cipher import AES # type: ignore
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(8)
+            c = f.readu64()
+            f.skip(c*4)
+            fs = []
+            for _ in range(c):
+                f.skip(8)
+                fs.append(f.read(4).hex().upper())
+                f.skip(4)
+
+            aes = AES.new(key,AES.MODE_CBC,b'\0'*16)
+            for ix in range(c):
+                f.skip(8)
+                fd.seek(f.readu32())
+                es = f.readu32()
+                s = f.readu64()
+                f.skip(8)
+                d = aes.decrypt(fd.read(es))[:s]
+
+                open(o + f'/{ix}_{fs[ix]}.{"gen" if len(d)>0x200 and d[0x100:0x113] == b"SEGA GENESIS    (C)" else guess_ext(d)}','wb').write(d)
+            if fs: return
 
     return 1

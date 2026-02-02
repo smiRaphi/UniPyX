@@ -5591,6 +5591,15 @@
             }
         }]
     },
+    "yappy":{
+        "p":"yappy.exe",
+        "fs":[{
+            "u":"http://nishi.dreamhosters.com/u/yappy_v0.rar",
+            "x":{
+                "yappy_v0/yappy.exe":"yappy.exe"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{
@@ -5920,9 +5929,9 @@
             "x":{
                 "innounp.exe":"innounp-2.exe"
             },
-            "ts":1762860871
+            "ts":1769958194
         }],
-        "ts":1762860871
+        "ts":1769958194
     },
     "innoextract":{
         "p":"innoextract/innoextract.exe",

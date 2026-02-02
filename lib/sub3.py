@@ -239,8 +239,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
             f = open(i,'rb')
-            f.seek(-0x1C76,2)
-            gog = f.read(15) == b'00#GOGCRCSTRING'
+            for off in (0x1C76,0x1C70):
+                f.seek(-off,2)
+                gog = f.read(15) == b'00#GOGCRCSTRING'
+                if gog: break
             f.close()
 
             if not gog:
@@ -280,7 +282,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
                 if exists(o + '/app'): copydir(o + '/app',o,True)
                 return
-        case 'VISE Installer'|'Inno Archive': return quickbms('instexpl')
+        case 'VISE Installer': return quickbms('instexpl')
         case 'MSI':
             run(['lessmsi','x',i,o + '\\'])
             if exists(o + '/SourceDir') and listdir(o + '/SourceDir'):
@@ -1294,5 +1296,22 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 open(o + f'/{tbasename(i)}.bik','wb').write(f.read(s))
             f.close()
             if listdir(o): return
+        case 'Inno Archive':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'idska32\x1A'
+            f.skip(4)
+            assert f.read(4) == b'zlb\x1A'
+            f.skip(6)
+
+            of = open(o + '/' + basename(i),'wb')
+            z = zlib.decompressobj(wbits=-15)
+            while f: of.write(z.decompress(f.read(0x800)))
+            f.close()
+            p = of.tell()
+            of.close()
+            if p: return
 
     return 1

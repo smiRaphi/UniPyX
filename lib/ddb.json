@@ -697,6 +697,10 @@
         "rs":"eSMART Data"
     },
     {
+        "d":[["s%",4096],["isat","\\x10\\0\\0\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,8],["n0",4,16],["py","if not exists(splitext(inp)[0]+'.mdf'):return\nf=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(8),'little')\nfor _ in range(c):\n if int.from_bytes(f.read(4),'little')&15!=12:return\nreturn True"]],
+        "rs":"Encrypted Arsenal MTC+MDF","s":1
+    },
+    {
         "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
         "rs":"Wallpaper Engine PKG","s":1
     },
@@ -1419,6 +1423,11 @@
         "rs":"C64 IMG"},{
         "d":[["size",819200],["ext",".d81"]],
         "rs":"C64 IMG"
+    },
+    {
+        "rqr":null,
+        "d":[["size",[10,1099511627775]],["ext",".yap"],["isat","\\0\\0\\0",5],["n0",8,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(8),'little');return s>f.seek(0,2)"]],
+        "rs":"Yappy"
     },
     {
         "rqr":null,

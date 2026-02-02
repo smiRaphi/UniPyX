@@ -62,7 +62,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
         return r
 
     match t:
-        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH (I.M.)'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM':
+        case 'qbp'|'TANGELO'|'CSC'|'NLZM'|'GRZipII'|'BALZ'|'SR3'|'SQUID'|'CRUSH (I.M.)'|'LZPX'|'LZPXJ'|'THOR'|'ULZ'|'LZPM'|'Yappy':
             # merge some small compressors
             of = o + '/' + tbasename(i)
             run([t.split('(')[0].strip().lower(),'d',i,of])
