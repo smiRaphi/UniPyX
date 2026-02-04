@@ -1359,5 +1359,10 @@
     "Fold ARK":[
         "fold compressed archive",
         "16bit dos exe fold sfx compressed (v1.x)"
+    ],
+    "iNES ROM":[
+        "nintendo entertainment system rom",
+        "nes rom image (ines)",
+        "nes rom image (ines) (nes 2.0)"
     ]
 }

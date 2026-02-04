@@ -853,6 +853,214 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 open(o + f'/{t}{c:02d}.{ext}','wb').write(f.read(s))
                 c += 1
             if c: return
+        case 'iNES ROM':
+            MAPPERS = {ix:x for ix,x in enumerate(( # 0 - 92
+                "No mapper","Nintendo MMC1B","UxROM","CNROM-32","MMC3","MMC5","Front Fareast Magic Card 1/2M RAM Cartridge",
+                "AxROM","Front Fareast Magic Card 1/2M RAM Cartridge [Initial latch-based banking mode 4]","MMC2","MMC4",
+                "Color Dreams","[Submapper]","CPROM","SL-1632","K-102xx","Bandai FCG","Front Fareast Super Magic Card RAM Cartridge",
+                "Jaleco SS88006","Namco 129/163","Famicom Disk System","Konami VRC4a/VRC4c","Konami VRC2a","Konami VRC4e | VRC2b + VRC4f",
+                "Konami VRC6a","Konami VRC4d | VRC2c + VRC4b","Konami VRC6b","World Hero","InfinteNESLives' Action 53",
+                "RET-CUFROM","UNROM 512","NSF","G-101","Taito TC0190","[Submapper]","J.Y. Company ASIC [8kb WRAM]",
+                "Micro Genius 01-22000-400","SMB + Tetris + NWC","Bit Corp. Crimee Busters","Study & Game 32-in-1","NTDEC 27xx",
+                "Caltron 6-in-1","FDS -> NES Hacks","TONY-I/YS-612","Super Big 7-in-1","GA32C | TC3294","Lite Star's Rumble Station",
+                "Nintendo Super Spike V'Ball + NWC","Taito TC0690","Super HIK 4-in-1","N-32","[Submapper]","Realtec 8213",
+                "Supervision 16-in-1","Novel Diamond 9999999-in-1","QFJxxxx","KS202","GK","WQ","T3H53","Reset based NROM-128 4-in-1",
+                "[Submapper]","Super 700-in-1","[Submapper]","Tengen RAMBO-1","Irem H3001","xxROM","Sunsoft-3","Sunsoft-4",
+                "Sunsoft FME-7/5A/5b","Family Trainer Mat","Camerica","Jaleco JF-17 [16kb PRGROM]","Konami VRC3","860908C",
+                "Konami VRC1","NAMCOT-3446","Napoleon Senki","74HC161/32","Tengen NINA-003/006","X1-005","N715021","X1-017",
+                "Cony & Yoko","PC-SMB2J","Konami VRC7","Jaleco JF-13","JF87","Namco","Sunsoft 2.5","J.Y. Company ASIC [ROM Nametables + Extended Mirroring]",
+                "J.Y. Company Clone Boards","Jaleco JF-17 [16kb PRGROM]",
+            ))} | {
+                124:"Super Game Mega Type III",126:"TEC9719",132:"TXC 05-00002-010",173:"C&E 05-00002-010",187:"Kǎ Shèng A98402",
+                256:"V.R. Technology OneBus",269:"Nice Code Games Xplosion 121-in-1",355:"Jùjīng 3D-BLOCK",419:"Taikee TK-8007 MCU",
+                422:"ING-022",423:"Lexibook Compact Cyber Arcade",424:"Lexibook Retro TV Game Console",425:"Cube Tech Handheld",
+                426:"V.R. Technology OneBus [Serial ROM in GPIO]",534:"ING003C",594:"Rinco FSG2",595:"NES-4MROM-512"
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'NES\x1A'
+
+            prgs = f.readu8()
+            chrs = f.readu8()
+            f6,f7,f8,f9,f10 = [f.readu8() for _ in range(5)]
+            x = sum(f.read(5))
+            f.skip(-9)
+
+            tr = trb = 1 if f6 & 0b1000 else 0
+            if tr and f.size - (0x10 + prgs*1024*16 + chrs*1024*8) < 512: tr = 0
+            ines2 = (f7 & 0b1100) >> 2
+            cons = f7 & 3
+
+            inf = open(o + '/info.txt','w',encoding='utf-8')
+            inf.write(f'PRG: {prgs} * 16kb\nCHR: {chrs} * 8kb\nTrainer: {tr} * 512 (0b{trb})\n\nMirror: {"H" if f6&1 else "V"}\nIgnore Mirror: {bool(f6&2)}\nBattery: {bool(f6&4)}\n')
+            if ines2 in (1,3): v = 0
+            elif ines2 == 2 and (f9 << 8) <= f.size: v = 2
+            elif x: v = 0.7
+            elif f10: v = 1.2
+            elif f8 or f9: v = 1.1
+            else: v = 1
+
+            mapr = f6 >> 4
+            if v >= 0.7: mapr |= f7 & 0xF0
+            if v >= 2: mapr |= (f8 & 0x0F) << 8
+            inf.write(f'Mapper: {MAPPERS[mapr] if mapr in MAPPERS else "?"} ({mapr} 0b{bin(mapr)[2:].zfill((12 if v >= 2 else 8) if v >= 0.7 else 4)})\n')
+            if mapr == 0: inf.write('Designation: NROM\n')
+            elif mapr == 1: inf.write('Designation: SxROM\n')
+            elif mapr == 4:
+                if prgs >= 8 and chrs >= 16:
+                    if (v in (1,1.1,1.2) and f8 != 1) or (v == 2 and f10&0xF0 != 7): inf.write('Designation: TLROM [128-512kb PRGROM]\n')
+                    elif f6&4: inf.write('Designation: TKROM [128-512kb PRGROM, 8kb PRGRAM]\n')
+                    else: inf.write('Designation: TSROM [128-512kb PRGROM, 8kb PRGRAM, no battery]\n')
+                elif prgs == 4: inf.write('Designation: TBROM [64kb PRGROM]\n')
+                else: inf.write('Designation: TxROM\n')
+            if v >= 2:
+                subm = f8 >> 4
+                subn = ''
+                if mapr == 3:
+                    if subm == 0: subn = 'Bus conflict'
+                    elif subm == 1: subn = 'No bus conflict'
+                    elif subm == 2: subn = 'AND-type bus conflict'
+                elif mapr == 12:
+                    if subm == 0: subn = 'Supertone SL-5020B'
+                    elif subm == 1: subn = 'Front Fareast Magic Card 4M RAM Cartridge'
+                elif mapr == 16:
+                    if subm == 0: subn = 'Bandai FCG-1/2 + Bandai LZ93D50'
+                    elif subm == 4: subn = 'Bandai FCG-1/2'
+                    elif subm == 5: subn = 'Bandai LZ93D50'
+                elif mapr == 34:
+                    if subm == 0: subn = 'Tengen NINA-001/002'
+                    elif subm == 1: subn = 'BNROM'
+                elif mapr == 40:
+                    if subm == 0: subn = 'NTDEC 2722'
+                    elif subm == 1: subn = 'NTDEC 2752'
+                elif mapr == 51:
+                    if subm == 1: subn = '11-in-1 Ball Games'
+                elif mapr == 61:
+                    if subm == 0: subn = 'NTDEC 0324'
+                    elif subm == 1: subn = 'NTDEC BS-N032'
+                    else: subn = 'GS-2017'
+                elif mapr == 63:
+                    if subm == 0: subn = 'NTDEC TH2xxx-x'
+                    elif subm == 1: subn = '82-in-1'
+                elif mapr in (256,419):
+                    if subm == 0: subn = 'Normal'
+                    elif subm == 1: subn = 'Waixing VT03'
+                    elif subm == 2: subn = 'Nice Code VT02'
+                    elif subm == 3: subn = 'Hummer Technology'
+                    elif subm == 4: subn = 'Nice Code VT03'
+                    elif subm == 5: subn = 'Waixing VT02'
+                    elif subm == 11: subn = 'Vibes'
+                    elif subm == 12: subn = 'Cheertone'
+                    elif subm == 13: subn = 'Cube Tech'
+                    elif subm == 14: subn = 'Karaoto'
+                    elif subm == 15: subn = 'JungleTac Fuzhou'
+                    if subn: subn += ' wiring'
+                if subm and not subn: subn = '?'
+                if subn: inf.write(f'Submapper: {subn} ({subm} 0b{bin(subm)[2:].zfill(4)})\n')
+
+            vs = {0:"Archaic",0.7:"0.7",1:"1.0",1.1:"1.0 updated",1.2:"1.0 unofficial",2:f"2.0 ({ines2} 0b{bin(ines2)[2:].zfill(2)})"}[v]
+            inf.write(f'iNES: {vs}\n\n')
+            if v >= 0.7: inf.write(f'Console: {["Regular","Vs.","PlayChoice-10","[Extended]"][cons]} ({cons} 0b{bin(cons)[2:].zfill(2)})\n')
+
+            if v == 2:
+                EXPDEV = {ix:x for ix,x in enumerate((
+                    'Unspecified','Standard Controllers','Four Score | Satellite','Famicom 4 Player Adapter',
+                    'Vs. System 1P4016H','Vs. System 1P4017H','MAME Pinball Japan','Vs. Zapper','Zapper',
+                    '2 Zappers','Bandai Hyper Shot Lightgun','Power Pad Side A','Power Pad Side B',
+                    'Family Trainer Side A','Family Trainer Side B',
+                ))} | {0x2A:'Multicart'}
+
+                f11,f12,f13,f14,f15 = [f.readu8() for _ in range(5)]
+                if f9:
+                    prgs |= (f9 & 0x0F) << 8
+                    chrs |= (f9 & 0xF0) << 4
+                    inf.write(f'PRGROM (2.0): {prgs} * 16kb\n')
+                    inf.write(f'CHRROM (2.0): {chrs} * 8kb\n')
+                inf.write(f'PRGRAM Shift: {f10 & 0xF}\n')
+                inf.write(f'EEPROM Shift: {f10 >> 4}\n')
+                inf.write(f'CHRRAM Size Shift: {f11 & 0xF}\n')
+                inf.write(f'CHRNVRAM Size Shift: {f11 >> 4}\n')
+                tim = f12 & 0b11
+                inf.write(f'Timing: {["NTSC","PAL","Multi","Dendy"][tim]} ({tim} 0b{bin(tim)[2:].zfill(2)})\n')
+                if cons == 1:
+                    VSPPU = {
+                        0:"RP2C03/RC2C03 Variant",
+                        2:"RP2C04-0001",
+                        3:"RP2C04-0002",
+                        4:"RP2C04-0003",
+                        5:"RP2C04-0004",
+                        8:"RC2C05-0001",
+                        9:"RC2C05-0002",
+                        10:"RC2C05-0003",
+                        11:"RC2C05-0004",
+                    }
+                    VSHW = {ix:x for ix,x in enumerate((
+                        ("Unisystem","Normal"),
+                        ("Unisystem","RBI Baseball"),
+                        ("Unisystem","TKO Boxing"),
+                        ("Unisystem","Super Xevious"),
+                        ("Unisystem","Vs. Ice Climber Japan"),
+                        ("Dual System","Normal"),
+                        ("Dual System","Raid on Bungeling Bay"),
+                    ))}
+
+                    vsppu = f13 & 0x0F
+                    inf.write(f'Vs. PPU: {VSPPU[vsppu] if vsppu in VSPPU else "?"} ({vsppu} 0b{bin(vsppu)[2:].zfill(4)})\n')
+                    vshw = f13 >> 4
+                    inf.write(f'Vs. Hardware|Protection: {"|".join(VSHW[vshw]) if vshw in VSHW else "?|?"} ({vshw} 0b{bin(vshw)[2:].zfill(4)})\n')
+                elif cons == 3:
+                    EXTCON = {ix:x for ix,x in enumerate((
+                        'Regular','Vs.','PlayChoice-10'
+                        'Famiclone Decimal Mode','NES with EPSM | Plug-Through','V.R. Technology VT01',
+                        'V.R. Technology VT02','V.R. Technology VT03','V.R. Technology VT09','V.R. Technology VT32',
+                        'V.R. Technology VT369','UMC UM6578','Famicom Network System'
+                    ))}
+                    expdev = f13 & 0x0F
+                    inf.write(f'Extended Device: {EXTCON[expdev] if expdev in EXTCON else "?"} ({expdev} 0b{bin(expdev)[2:].zfill(4)})\n')
+                inf.write(f'Miscellaneous ROMs: {f14 & 0b11}\n')
+                inf.write(f'Expansion Device: {EXPDEV[f15] if f15 in EXPDEV else "?"} ({f15} 0b{bin(f15)[2:].zfill(6)})\n')
+            elif v in (1.1,1.2):
+                inf.write(f'PRGRAM: {f8} * 8kb\n')
+                inf.write(f'TV System: {["NTSC","PAL"][f9]}\n')
+                if v == 1.2:
+                    tv2 = f10 & 3
+                    inf.write(f'TV System (unofficial): {["NTSC","NTSC & PAL","PAL","PAL & NTSC"][tv2]} ({tv2} 0b{bin(tv2)[2:].zfill(2)})\n')
+                    inf.write(f'Ignore PRGRAM: {bool(f10 & 0x10)}\n')
+                    inf.write(f'Bus Conflicts: {bool(f10 & 0x20)}\n')
+            elif v <= 0.7:
+                if v == 0.7: f.skip(1)
+                inf.write(f'Ripper: {f.read(16-f.pos).rstrip(b"\0").decode("ascii")}\n')
+            inf.write('\n')
+
+            f.seek(0x10)
+            if tr: open(o + '/trainer.prg','wb').write(f.read(512))
+            for ix in range(prgs):
+                if ix == prgs - 1:
+                    d = f.read(1024*16-6)
+                    inf.write(f'NMI Vector: 0x{f.readu16():4X}\n')
+                    inf.write(f'Reset Vector: 0x{f.readu16():4X}\n')
+                    inf.write(f'IRQ Vector: 0x{f.readu16():4X}\n')
+                else: d = f.read(1024*16)
+                open(o + f'/PRG{ix}.prg','wb').write(d)
+            inf.close()
+
+            for ix in range(chrs):
+                d = f.read(1024*8)
+                open(o + f'/CHR{ix}.chr','wb').write(d)
+
+                td = bytearray(256*128)
+                for t in range(0x200):
+                    to = t*16
+                    tx = (t%0x20)*8
+                    ty = (t//0x20)*8
+                    for y in range(8):
+                        b1,b2 = d[to+y],d[to+y+8]
+                        for x in range(8): td[(ty+y)*256 + tx+x] = ((b1 >> (7-x)) & 1) | (((b2 >> (7-x)) & 1) << 1)
+                open(o + f'/CHR{ix}.pgm','wb').write(b'P5\n256 128\n3\n' + td)
+
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
