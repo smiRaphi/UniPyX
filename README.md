@@ -34,9 +34,6 @@ Usage: `python unipyx.py <input> [<output dir>]`
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX
 * [UNESP v1.92](http://fileformats.archiveteam.org/wiki/ESP_(compressed_archive)) because it's packed in a ESP SFX
 * sqx SFX from [SpeedCommander 22](https://www.speedproject.com/) because it's packed in a sqc SFX
-* ps3key.py & wiiudk.py for managing Wii U & PS3 disc keys
-* sgkey.py for Sega Arcade keys
-* tmd.py for Nintendo TMD files and key generation
 
 ## Notes
 * Extracting Wii U WUD/WUX files and Apple Disk Images (at least properly) requires java to be installed.
