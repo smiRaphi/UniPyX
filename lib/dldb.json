@@ -5600,6 +5600,25 @@
             }
         }]
     },
+    "infbinrepacker":{
+        "p":"InfBinRepacker.exe",
+        "fs":[{
+            "u":"https://github.com/Hinoroni/InfBinRepacker/releases/download/v1.1/win-x64.zip",
+            "x":{
+                "InfBinRepacker.exe":"InfBinRepacker.exe"
+            }
+        }]
+    },
+    "ligru-compress_v0.92":{
+        "p":"ligru-compress_v0.92.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=12847&d=1763227405",
+            "ex":".7z",
+            "x":{
+                "ligru-compress.exe":"ligru-compress_v0.92.exe"
+            }
+        }]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

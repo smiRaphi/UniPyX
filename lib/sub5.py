@@ -425,6 +425,14 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['density-rs','d',t.split()[1].lower(),i,of])
             if exists(of) and getsize(of): return
+        case 'Li-GRU':
+            v = i.rsplit('_v',1)[1].replace('_','.')
+            scr = db.get('ligru-compress_v' + v)
+            if not exists(scr): raise NotImplementedError(v)
+            of = o + '/' + tbasename(i)
+            if db.print_try: print('Trying with','ligru-compress_v' + v)
+            run([scr,'-d'] + (['-cuda'] if v not in ('0.91','0.90') else []) + [i,of],print_try=False)
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

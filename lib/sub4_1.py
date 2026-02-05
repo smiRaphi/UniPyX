@@ -1135,5 +1135,10 @@ def extract4_1(inp:str,out:str,t:str):
 
                 open(o + f'/{ix}_{fs[ix]}.{"gen" if len(d)>0x200 and d[0x100:0x113] == b"SEGA GENESIS    (C)" else guess_ext(d)}','wb').write(d)
             if fs: return
+        case 'Dotemu INF+BIN':
+            run(['infbinrepacker','-e','-if',i,'-bf',noext(i) + '.bin','-od',o])
+            if exists(o + '/uncompressed') and listdir(o + '/uncompressed'):
+                copydir(o + '/uncompressed',o,True,reni=True)
+                return
 
     return 1

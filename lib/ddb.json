@@ -669,6 +669,10 @@
         "rs":"Unknown Konami Compression"
     },
     {
+        "d":[["isat","\\xB8\\xBE\\x9F\\x0D",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.bin'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Dotemu INF+BIN","s":1
+    },
+    {
         "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode()\n except:return\nreturn True"]],
         "rs":"Super Monkey Ball Tip 'n Tilt String Data"
     },
@@ -1587,6 +1591,10 @@
         "rqr":null,
         "d":[["s%",16],["size",[32,1048576]],["name","org.jdownloader.settings.AccountSettings.accounts.ejs"]],
         "rs":"JDownloader2 Encrypted Accounts"
+    },
+    {
+        "d":["ext",[".ligru_v0_90",".ligru_v0_91",".ligru_v0_92"]],
+        "rs":"Li-GRU"
     },
     {
         "d":["ext",".xbp"],
