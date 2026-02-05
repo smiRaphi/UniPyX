@@ -677,6 +677,10 @@
         "rs":"Typing of the Dead HAB","s":1
     },
     {
+        "d":[["isat","RESET\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["isat","ROMDIR\\0\\0\\0\\0",16],["n0",2,10],["n0",2,26]],
+        "rs":"PlayStation 2 IOPRP IMG","s":1
+    },
+    {
         "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode()\n except:return\nreturn True"]],
         "rs":"Super Monkey Ball Tip 'n Tilt String Data"
     },

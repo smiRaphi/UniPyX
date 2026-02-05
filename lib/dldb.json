@@ -5619,6 +5619,13 @@
             }
         }]
     },
+    "romman":{
+        "p":"romman.exe",
+        "fs":[[
+            "https://github.com/israpps/romman/releases/download/develop-49/romman-windows.exe",
+            "romman.exe"
+        ]]
+    },
     "luadec51":{
         "p":"Luadec51.exe",
         "fs":[{

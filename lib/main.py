@@ -109,8 +109,8 @@ class TmpDir:
     def __del__(self): self.destroy()
 class TmpFile:
     def __init__(self,suf='',name='',path=TMP): self.p = path.strip('\\/') + '\\' + (name or ('tmp' + os.urandom(8).hex() + suf))
-    def link(self,i): symlink(i,self.p)
-    def copy(self,i): cp(i,self.p)
+    def link(self,i:str): symlink(i,self.p)
+    def copy(self,i:str): cp(i,self.p)
     def destroy(self):
         try: os.remove(self.p)
         except FileNotFoundError: pass

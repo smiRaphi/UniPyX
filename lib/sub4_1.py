@@ -1163,5 +1163,14 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fe[1])
                 xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
             if fs: return
+        case 'PlayStation 2 IOPRP IMG':
+            tf = TmpFile('.img',path=o)
+            tf.link(i)
+            run(['romman','-x',tf])
+            tf.destroy()
+            if exists(o + '/' + tbasename(tf.p) + '.csv') and listdir(o + '/ext_' + basename(tf.p)):
+                mv(o + '/' + tbasename(tf.p) + '.csv',o + '/$' + tbasename(i) + '.csv')
+                copydir(o + '/ext_' + basename(tf.p),o,True,reni=True)
+                return
 
     return 1
