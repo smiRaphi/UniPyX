@@ -1140,5 +1140,28 @@ def extract4_1(inp:str,out:str,t:str):
             if exists(o + '/uncompressed') and listdir(o + '/uncompressed'):
                 copydir(o + '/uncompressed',o,True,reni=True)
                 return
+        case 'Typing of the Dead HAB':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'HAB0'
+
+            f.skip(4)
+            fs = f.readu32()
+            f.skip(8)
+            c = f.readu16()
+            es = f.readu16()
+            f.skip(4)
+            bo = fs-f.readu32()
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32()+0x20+es*c,f.readu32()+bo,f.readu32()))
+                f.skip(es-12)
+            for fe in fs:
+                f.seek(fe[0])
+                fn = f.read0s().decode().strip()
+                f.seek(fe[1])
+                xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
+            if fs: return
 
     return 1
