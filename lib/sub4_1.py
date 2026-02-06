@@ -1163,15 +1163,6 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fe[1])
                 xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
             if fs: return
-        case 'PlayStation 2 IOPRP IMG':
-            tf = TmpFile('.img',path=o)
-            tf.link(i)
-            run(['romman','-x',tf])
-            tf.destroy()
-            if exists(o + '/' + tbasename(tf.p) + '.csv') and listdir(o + '/ext_' + basename(tf.p)):
-                mv(o + '/' + tbasename(tf.p) + '.csv',o + '/$' + tbasename(i) + '.csv')
-                copydir(o + '/ext_' + basename(tf.p),o,True,reni=True)
-                return
         case 'Advanced V.G. DAT':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1194,5 +1185,23 @@ def extract4_1(inp:str,out:str,t:str):
             open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read()))
             return
         case 'Davilex Games IDX+IMG': return quickbms('davilex_games')
+        case 'DEL CUTSEQ':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'(C) DEL!'
+
+            fs = []
+            while True:
+                off,siz = f.readu32(),f.readu32()
+                if off == 0 or (off+siz) > f.size: break
+                fs.append((off,siz))
+            f.skip(-8)
+            msg = f.read(fs[0][0]-f.pos).rstrip(b'\0')
+            if msg: open(o + '/message.txt','wb').write(msg)
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                open(o + f'/scence{ix:02d}.bin','wb').write(f.read(fe[1]))
+            if fs: return
 
     return 1

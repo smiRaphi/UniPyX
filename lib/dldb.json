@@ -5619,6 +5619,35 @@
             }
         }]
     },
+    "eimgfs":{
+        "p":"eimgfs/eimgfs.exe",
+        "fs":[{
+            "u":"https://github.com/nlitsme/eimgfs/releases/download/v2019.01/eimgfs-win-20190415.zip",
+            "x":{
+                "eimgfs.exe":"eimgfs/eimgfs.exe"
+            }
+        },[
+            "https://raw.githubusercontent.com/nlitsme/eimgfs/refs/heads/master/dlls/CECompress.dll",
+            "eimgfs/CECompress.dll"
+        ],[
+            "https://raw.githubusercontent.com/nlitsme/eimgfs/refs/heads/master/dlls/CECompressv3.dll",
+            "eimgfs/CECompressv3.dll"
+        ],[
+            "https://raw.githubusercontent.com/nlitsme/eimgfs/refs/heads/master/dlls/CECompressv4.dll",
+            "eimgfs/CECompressv4.dll"
+        ],[
+            "https://raw.githubusercontent.com/nlitsme/eimgfs/refs/heads/master/dlls/cecompr_nt-v2.dll",
+            "eimgfs/cecompr_nt-v2.dll"
+        ],[
+            "https://raw.githubusercontent.com/nlitsme/eimgfs/refs/heads/master/dlls/cecompr_nt_xphxpr.dll",
+            "eimgfs/cecompr_nt_xphxpr.dll"
+        ],{
+            "u":"https://indy.fulgan.com/SSL/openssl-1.0.2u-i386-win32.zip",
+            "x":{
+                "libeay32.dll":"eimgfs/libeay32.dll"
+            }
+        }]
+    },
     "romman":{
         "p":"romman.exe",
         "fs":[[

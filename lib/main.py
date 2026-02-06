@@ -582,9 +582,9 @@ def fix_tar(o:str,rem=True):
 def fix_cab(o:str,rem=True):
     ids = {}
     for x in listdir(o):
-        if len(extname(x)) != 4 or not extname(x)[1:].isdigit(): return
+        if len(extname(x)) != 4 or not extname(x)[1:].isdigit(): return fix_cab2(o)
         id = int(extname(x)[1:])
-        if id in ids: return
+        if id in ids: return fix_cab2(o)
         ids[id] = x
 
     if not 0 in ids: return
@@ -608,6 +608,31 @@ def fix_cab(o:str,rem=True):
     i.close()
 
     if not err and rem: remove(o + '/' + ids[0])
+def fix_cab2(o:str):
+    gid = None
+    for x in os.listdir(o):
+        x = extname(x)[1:]
+        if len(x) != 36 or len(x.split('_')) != 5: return
+        id = extname(x)
+        try: bytes.fromhex(x.replace('_',''))
+        except: return
+        if not id: gid = id
+        elif id != gid: return
+
+    for f in os.listdir(o):
+        fn = f[:-37]
+        if fn[1] == '_': fn = fn[2:]
+        elif len(fn.split('.')[0]) > 5 and '_' in fn.split('.')[0] and len(fn.split('.')[0].split('_',1)[1]) == 3 and fn.split('.')[0].split('_',1)[1].isdigit(): fn = fn.split('.',1)[1]
+        fn = fn.replace('_','.')
+        if fn.lower().endswith(('.dll00','.exe00','.h00','.dll01','.exe01','.ini00')): fn = fn[:-2]
+        if exists(o + '/' + fn):
+            c = 0
+            while exists(o + '/' + noext(fn) + '_' + str(c) + extname(fn)): c += 1
+            fn = noext(fn) + '_' + str(c) + extname(fn)
+        while True:
+            try: mv(o + '/' + f,o + '/' + fn)
+            except PermissionError: pass
+            else: break
 def fix_zeebo(f,hint:int=None):
     import io
     if type(f) == bytes: f = io.BytesIO(f)
