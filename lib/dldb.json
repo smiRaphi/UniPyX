@@ -6363,6 +6363,22 @@
         ]],
         "ts":0
     },
+    "london_racer":{
+        "p":"BMS/london_racer.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/london_racer.bms",
+            "BMS/london_racer.bms"
+        ]],
+        "ts":0
+    },
+    "davilex_games":{
+        "p":"BMS/davilex_games.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/davilex_games.bms",
+            "BMS/davilex_games.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

@@ -1185,5 +1185,14 @@ def extract4_1(inp:str,out:str,t:str):
                 d = f.read(fs[ix+1]-fe)
                 open(o + f'/{ix:02d}.{guess_ext_psx(d)}','wb').write(d)
             if fs: return
+        case 'London Racer Destruction Madness WAD': return quickbms('london_racer')
+        case 'Zlib + Uncompressed Size':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            f = open(i,'rb')
+            f.seek(4)
+            open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read()))
+            return
+        case 'Davilex Games IDX+IMG': return quickbms('davilex_games')
 
     return 1
