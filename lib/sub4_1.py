@@ -1172,5 +1172,18 @@ def extract4_1(inp:str,out:str,t:str):
                 mv(o + '/' + tbasename(tf.p) + '.csv',o + '/$' + tbasename(i) + '.csv')
                 copydir(o + '/ext_' + basename(tf.p),o,True,reni=True)
                 return
+        case 'Advanced V.G. DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            fo = f.readu32()
+            fs = [fo] + [f.readu32() for _ in range(fo//4-1)]
+            if fs[-1] < f.size: fs.append(f.size)
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe)
+                d = f.read(fs[ix+1]-fe)
+                open(o + f'/{ix:02d}.{guess_ext_psx(d)}','wb').write(d)
+            if fs: return
 
     return 1

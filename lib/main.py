@@ -656,6 +656,35 @@ def guess_ext(f):
         elif tag[0] == 0x78 and not (tag[0]<<8 | tag[1])%31: ext = 'zlib'
 
     return ext
+def guess_ext_psx(f):
+    if not f: return 'null'
+    import io
+    if type(f) == bytes: f = io.BytesIO(f)
+
+    tag = f.read(4)
+
+    ext = 'bin'
+    if tag == b'\x89PNG': ext = 'png'
+    elif tag == b'RIFF': ext = 'wav'
+    elif tag == b'MThd': ext = 'mid'
+    elif tag == b'pBAV': ext = 'vh'
+    elif tag == b'pQES': ext = 'sep'
+    elif tag == b'\x10\0\0\0' and int.from_bytes(f.read(4),'little') in (2,8,9):
+        fo = int.from_bytes(f.read(4),'little')
+        f.seek(4,1)
+        nc,np = int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')
+        if (nc*np*2+12) == fo: ext = 'tim'
+    elif (tag+f.read(12)) == b'\0'*16:
+        p = f.tell()
+        s = f.seek(0,2)
+        f.seek(p)
+        if not (s-(p-16)) % 0x10:
+            while f.tell() < s:
+                if f.read(1)[0] >> 4 > 5 or f.read(1)[0] > 7: break
+                f.seek(14,1)
+            else: ext = 'vb'
+
+    return ext
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
