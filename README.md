@@ -3,6 +3,8 @@
 ---
 Usage: `python unipyx.py <input> [<output dir>]`
 
+Requires a somewhat new version of python (I've only tested old versions on 3.11 & all current ones on 3.13).
+
 ## Included tools
 * self compiled [file-windows v5.46](https://github.com/ember91/file-windows)
 * xbp.bms by [h3x3r](https://reshax.com/profile/183-h3x3r/) taken from https://reshax.com/topic/18058-ripping-sounds-from-fuzion-frenzy-xbox/
