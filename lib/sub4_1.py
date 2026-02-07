@@ -962,6 +962,7 @@ def extract4_1(inp:str,out:str,t:str):
                     elif fm[0] == 't': v.append(list(f.read(int(fm[1:]))))
                 if type(b) == dict: b[v[0]] = v[1]
                 else: b.append(v)
+            f.close()
 
             if b:
                 json.dump(b,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
@@ -986,6 +987,7 @@ def extract4_1(inp:str,out:str,t:str):
                     elif tp == 'float': ob[k].append(f.readfloat())
                     elif tp == 'string': ob[k].append(f.read(0x80).rstrip(b'\0').decode('utf-8'))
                     elif tp == 'wstring': ob[k].append(f.read(0x80).rsplit(b'\0\0')[0].decode('utf-16-le'))
+            f.close()
 
             if ob:
                 json.dump(ob,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
@@ -998,6 +1000,7 @@ def extract4_1(inp:str,out:str,t:str):
             c = f.readu8()
             ob = []
             for _ in range(c): ob.append(f'{f.readu8()}: ' + f.read0s().decode('ascii'))
+            f.close()
             if ob:
                 open(o + f'/{tbasename(i)}.txt','w').write('\n'.join(ob))
                 return
@@ -1013,6 +1016,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if f.pos%2: f.skip(1)
                 fs.append((n,f.readu16()*0x20))
             for fe in fs: open(o + f'/{fe[0]}.bin','wb').write(f.read(fe[1]))
+            f.close()
             if fs: return
         case 'STXT Language Data':
             if db.print_try: print('Trying with custom extractor')
@@ -1035,6 +1039,7 @@ def extract4_1(inp:str,out:str,t:str):
                     of.write(f.read0s().decode('utf-8') + '\n')
                 of.write('\n')
 
+            f.close()
             of.close()
             if fs: return
         case 'Adventure Time VOLume':
@@ -1055,6 +1060,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if not n: n = fe[0].hex().upper() + '.bin'
                 f.seek(fe[2])
                 open(o + '/' + n,'wb').write(f.read(fe[3]))
+            f.close()
             if fs: return
         case '0Size24 Data':
             if db.print_try: print('Trying with custom extractor')
@@ -1062,6 +1068,7 @@ def extract4_1(inp:str,out:str,t:str):
             f = File(i,endian='<')
             f.seek(1)
             open(o + '/' + basename(i),'wb').write(f.read(f.readu24()))
+            f.close()
             return
         case 'WayForward PAK':
             if db.print_try: print('Trying with custom extractor')
@@ -1078,6 +1085,7 @@ def extract4_1(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[0])
                 xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+            f.close()
             if fs: return
         case 'Reverse Computer Screen':
             of = o + '/' + tbasename(i)
@@ -1134,6 +1142,8 @@ def extract4_1(inp:str,out:str,t:str):
                 d = aes.decrypt(fd.read(es))[:s]
 
                 open(o + f'/{ix}_{fs[ix]}.{"gen" if len(d)>0x200 and d[0x100:0x113] == b"SEGA GENESIS    (C)" else guess_ext(d)}','wb').write(d)
+            f.close()
+            fd.close()
             if fs: return
         case 'Dotemu INF+BIN':
             run(['infbinrepacker','-e','-if',i,'-bf',noext(i) + '.bin','-od',o])
@@ -1162,6 +1172,7 @@ def extract4_1(inp:str,out:str,t:str):
                 fn = f.read0s().decode().strip()
                 f.seek(fe[1])
                 xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
+            f.close()
             if fs: return
         case 'Advanced V.G. DAT':
             if db.print_try: print('Trying with custom extractor')
@@ -1175,6 +1186,7 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fe)
                 d = f.read(fs[ix+1]-fe)
                 open(o + f'/{ix:02d}.{guess_ext_psx(d)}','wb').write(d)
+            f.close()
             if fs: return
         case 'London Racer Destruction Madness WAD': return quickbms('london_racer')
         case 'Zlib + Uncompressed Size':
@@ -1183,6 +1195,7 @@ def extract4_1(inp:str,out:str,t:str):
             f = open(i,'rb')
             f.seek(4)
             open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read()))
+            f.close()
             return
         case 'Davilex Games IDX+IMG': return quickbms('davilex_games')
         case 'DEL CUTSEQ':
@@ -1202,6 +1215,45 @@ def extract4_1(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 open(o + f'/scence{ix:02d}.bin','wb').write(f.read(fe[1]))
+            f.close()
             if fs: return
+        case 'Nippon Ichi PS FS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'PS_FS_V1'
+
+            c = f.readu64()
+            fs = [(f.read(0x30).rstrip(b'\0').decode(),f.readu64(),f.readu64()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[2])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            f.close()
+            if fs: return
+        case 'Papaya Studio Wii VAPS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(4) == b'vaps'
+            f.skip(4)
+
+            c = f.readu32()
+            f.skip(0x10)
+            hs = f.readu32()
+            f.seek(hs)
+
+            for ix in range(c):
+                assert f.read(4) == b'vaps'
+                f.skip(12)
+                ds = f.readu32()
+                f.skip(8)
+                hs = f.readu32()
+                f.skip(-0x20)
+                open(o + f'/{ix:02d}_header.bin','wb').write(f.read(hs))
+                open(o + f'/{ix:02d}.bin','wb').write(f.read(ds))
+                f.skip(-f.pos%0x100)
+            f.close()
+
+            if c: return
 
     return 1
