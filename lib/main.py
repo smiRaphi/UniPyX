@@ -674,20 +674,32 @@ def guess_ext(f):
     if type(f) == bytes: f = io.BytesIO(f)
 
     tag = f.read(4)
+    if len(tag) != 4: return 'bin'
 
-    ext = 'bin'
+    ext = None
     if tag == b'\x89PNG': ext = 'png'
     elif tag == b'RIFF': ext = 'wav'
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'DXBC': ext = 'cso'
     elif tag == b'NES\x1A': ext = 'nes'
-    else:
+    elif tag == b'Crea':
+        if f.read(0x10) == b'tive Voice File\x1A': ext = 'voc'
+        else: f.seek(-0x10,1)
+    if not ext:
+        p = f.tell()
+        s = f.seek(0,2)
+        f.seek(p)
+        if s == int.from_bytes(tag,'little'):
+            if f.read(2) in (b'\x11\xAF',b'\x12\xAF',b'\x30\xAF',b'\x31\xAF',b'\x44\xAF'): ext = 'flc'
+            else: f.seek(-2,1)
+    if not ext:
         f.seek(2,1)
         if f.read(4) == b'JFIF': ext = 'jpg'
         elif tag[:3] == b'ID3' or\
             (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
                 ext = 'mp3'
         elif tag[0] == 0x78 and not (tag[0]<<8 | tag[1])%31: ext = 'zlib'
+        else: ext = 'bin'
 
     return ext
 def guess_ext_psx(f):

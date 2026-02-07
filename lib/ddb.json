@@ -687,6 +687,14 @@
         "rs":"Smiles Fortune Hunters PAK"
     },
     {
+        "d":[["isat","\\xF5\\xEE\\xA6\\xA1",0],["isat","\\xAD\\xA5",8]],
+        "rs":"ODAU Zip","s":1
+    },
+    {
+        "d":[["s%",2],["n0",2,0],["n0",4,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(2);o=int.from_bytes(f.read(4),'little')\nif (o+6)>s:return\nf.seek(o);return f.read(4)==b'\\x06\\0\\0\\0'"]],
+        "rs":"Hell - A Cyberpunk Thriller PL/SL"
+    },
+    {
         "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode()\n except:return\nreturn True"]],
         "rs":"Super Monkey Ball Tip 'n Tilt String Data"
     },

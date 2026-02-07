@@ -168,7 +168,7 @@ def extract4_1(inp:str,out:str,t:str):
             if c: return
         case 'MediaMobile PAK':
             if db.print_try: print('Trying with custom extractor')
-            txt = re.compile(r'^[А-Яа-яЁё0-9\s.,!?"\'-—()]*$')
+            txt = re.compile(r'^[А-Яа-яЁё0-9\s\.,!\?"\'\-—\(\)]*$')
             from lib.file import File
             f = File(i,endian='>')
 
@@ -1329,6 +1329,59 @@ def extract4_1(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 xopen(o + '/' + fe[0],'wb').write(bytes(x ^ 0xA5 for x in f.read(fe[2])))
+            f.close()
+            if fs: return
+        case 'ODAU Zip':
+            if db.print_try: print('Trying with custom extractor')
+            import zipfile,io
+            zipfile.ZipFile(io.BytesIO(bytes(x ^ 0xA5 for x in open(i,'rb').read()))).extractall(o)
+            if listdir(o): return
+        case 'Hell - A Cyberpunk Thriller PL/SL':
+            txt = re.compile(r'^[\w \.,!\?"\'\-\(\)]*$')
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu16()
+            ino = f.readu32()
+            f.seek(ino)
+            fs = []
+            b = b''
+            br = False
+            for _ in range(c):
+                fe = [f.readu32(),'']
+                while True:
+                    b = f.read(2)
+                    if not b: break
+                    try: 
+                        bn = b.decode('ascii')
+                        assert txt.match(bn) and isvalid(bn,True)
+                        fe[1] += bn
+                    except:
+                        try:
+                            bn = b.rstrip(b'\0').decode('ascii')
+                            assert txt.match(bn) and isvalid(bn,True)
+                            fe[1] += bn
+                        except: f.skip(-2)
+                        break
+                if fe[0] > ino: fe[0] = ino
+                fs.append(fe)
+                while True:
+                    b = f.read(1)
+                    if not b:
+                        br = True
+                        break
+                    elif b != b'\0':
+                        f.skip(-1)
+                        break
+                if br: break
+            fs.append((ino,))
+            fs.sort(key=lambda x:x[0])
+
+            for ix in range(len(fs)-1):
+                f.seek(fs[ix][0])
+                d = f.read(fs[ix+1][0]-fs[ix][0])
+                open(o + f'/{fs[ix][1]}.{guess_ext(d)}','wb').write(d)
             f.close()
             if fs: return
 
