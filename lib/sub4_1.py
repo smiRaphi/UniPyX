@@ -1318,5 +1318,18 @@ def extract4_1(inp:str,out:str,t:str):
                 tf.destroy()
                 if listdir(o): return
             else: tf.destroy()
+        case 'Smiles Fortune Hunters PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'Ver 1.0.'
+
+            c = f.readu32()
+            fs = [(f.read(f.readu32()).decode(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(bytes(x ^ 0xA5 for x in f.read(fe[2])))
+            f.close()
+            if fs: return
 
     return 1
