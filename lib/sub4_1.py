@@ -1255,5 +1255,60 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
 
             if c: return
+        case 'Add PAC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+            assert f.read(4) == b'add\0'
+            v = f.readu32('<')
+            off = f.readu32('<')
+            if off > 0xffff:
+                f.skip(-4)
+                f._end = '>'
+                off = f.readu32()
+            else: f._end = '<'
+
+            if v <= 4:
+                f.skip(4)
+                c = f.readu32()
+            else:
+                c = f.readu32()
+                f.skip(4)
+            file_size = f.readu32()
+            if file_size == 0:
+                f.skip(-12)
+                if v <= 4:
+                    c = f.readu32()
+                    f.skip(4)
+                else:
+                    f.skip(4)
+                    c = f.readu32()
+                f.skip(4)
+                v = -1
+
+            f.seek(off)
+            fs = []
+            for ix in range(c):
+                fs.append([f.readu32(),f.readu32()])
+                f.skip(4)
+                fs[-1].append(f.reads32())
+
+                if v == -1: fs[-1].append(f'{ix:02d}.bin')
+                elif v <= 4:
+                    no = f.readu32()
+                    f.skip(12)
+                    p = f.pos
+                    f.seek(no)
+                    fs[-1].append(f.read0s().decode())
+                    f.seek(p)
+                else:
+                    fs[-1].append(f.read0s().decode())
+                    f.skip(-f.pos%4)
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + '/' + fe[3],'wb').write(f.read(fe[1]))
+                set_ctime(o + '/' + fe[3],fe[2])
+            f.close()
+            if fs: return
 
     return 1

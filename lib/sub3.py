@@ -1313,7 +1313,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             p = of.tell()
             of.close()
             if p: return
-        case 'PlayStation 2 IOPRP IMG':
+        case 'PlayStation 2 IOPRP IMG'|'PlayStation 2 BIOS':
             tf = TmpFile('.img',path=o)
             tf.link(i)
             run(['romman','-x',tf])
@@ -1321,6 +1321,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if exists(o + '/' + tbasename(tf.p) + '.csv') and listdir(o + '/ext_' + basename(tf.p)):
                 mv(o + '/' + tbasename(tf.p) + '.csv',o + '/$' + tbasename(i) + '.csv')
                 copydir(o + '/ext_' + basename(tf.p),o,True,reni=True)
+                for f in listdir(o):
+                    if isdir(o + '/' + f):
+                        mv(o + '/' + f,o + '/' + f[4:] + '_ext')
+                        mv(o + '/' + f[4:] + '.csv',o + '/$' + f[4:] + '.csv')
                 return
         case 'Windows CE FW IMG'|'Windows CE Xip':
             run(['eimgfs',i,'-r','-d',o,'-extractall'])
