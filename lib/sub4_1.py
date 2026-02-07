@@ -1310,5 +1310,13 @@ def extract4_1(inp:str,out:str,t:str):
                 set_ctime(o + '/' + fe[3],fe[2])
             f.close()
             if fs: return
+        case 'Level5 Encrypted CRI CPK':
+            tf = TmpFile('.cpk',path=o)
+            run(['viola.cli','-m','decrypt','-i',i,'-o',tf])
+            if exists(tf.p) and getsize(tf.p) and open(tf.p,'rb').read(4) == b'CPK ':
+                quickbms('cpk',inf=tf,ouf=o)
+                tf.destroy()
+                if listdir(o): return
+            else: tf.destroy()
 
     return 1

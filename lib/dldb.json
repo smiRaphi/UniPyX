@@ -5619,6 +5619,13 @@
             }
         }]
     },
+    "viola.cli":{
+        "p":"Viola.CLI.exe",
+        "fs":[[
+            "https://github.com/SuperTavor/Viola/releases/download/1.4.0/Viola.CLI-Portable.exe",
+            "Viola.CLI.exe"
+        ]]
+    },
     "eimgfs":{
         "p":"eimgfs/eimgfs.exe",
         "fs":[{

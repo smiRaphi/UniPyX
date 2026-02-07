@@ -1505,6 +1505,11 @@
     },
     {
         "rqr":null,
+        "d":[["s%",16],["ext",".cpk"],["py","f=tbasename(inp);return len(f)==32 and not f.strip('0123456789abcdef')"]],
+        "rs":"Level5 Encrypted CRI CPK"
+    },
+    {
+        "rqr":null,
         "d":["ext",".zl"],
         "rs":"OpenZL"
     },
