@@ -1551,8 +1551,52 @@ def extract4_1(inp:str,out:str,t:str):
                     f.seek(p)
                     f.alignpos(4)
 
-            GDED(o,f.size)
+            g = GDED(o,f.size)
             f.close()
-            if listdir(o): return
+            if g.fts: return
+        case 'Ultimate Ghosts \'n Goblins DPLK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+            assert f.read(4) == b'DPLK'
+            f.skip(4+8+8)
+
+            root = f.readu64()
+            f.skip(8)
+            data_start = f.readu64()
+
+            fs = []
+            def read_node(p,b):
+                up = f.pos
+                f.seek(p+4)
+                hs = f.readu32()
+                f.skip(8)
+                ts = f.readu64()
+                f.skip(8)
+                bs = f.readu64()
+                f.skip(8)
+                c = f.readu16()
+                f.seek(p + hs)
+
+                for _ in range(c):
+                    ifile = f.readu64()
+                    off = f.readu64()
+                    size = f.readu64()
+                    f.skip(2)
+                    name = b + '/' + f.read(0x66).rstrip(b'\0').decode()
+                    if ifile: fs.append((data_start + bs + off,size,name))
+                    else:
+                        mkdir(name)
+                        read_node(p + ts + off,name)
+                f.seek(up)
+
+            read_node(root,o)
+
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(fe[2],'wb').write(f.read(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1
