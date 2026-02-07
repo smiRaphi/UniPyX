@@ -1251,7 +1251,7 @@ def extract4_1(inp:str,out:str,t:str):
                 f.skip(-0x20)
                 open(o + f'/{ix:02d}_header.bin','wb').write(f.read(hs))
                 open(o + f'/{ix:02d}.bin','wb').write(f.read(ds))
-                f.skip(-f.pos%0x100)
+                f.alignpos(0x100)
             f.close()
 
             if c: return
@@ -1303,7 +1303,7 @@ def extract4_1(inp:str,out:str,t:str):
                     f.seek(p)
                 else:
                     fs[-1].append(f.read0s().decode())
-                    f.skip(-f.pos%4)
+                    f.alignpos(4)
             for fe in fs:
                 f.seek(fe[0])
                 xopen(o + '/' + fe[3],'wb').write(f.read(fe[1]))
@@ -1452,5 +1452,107 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fs[ix][1])
                 open(o + '/' + fn,'wb').write(f.read(fs[ix+1][1]-fs[ix][1]))
             if fs: return
+        case 'GDED Binary Format':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from lib.file import File
+            f = File(i,endian='<')
+
+            class GDED:
+                def __init__(self,o:str,size:int):
+                    self.pos = f.pos
+                    self.size = size
+                    self.o = o
+                    assert f.read(0x12) == b'GDED BINARY FORMAT'
+                    f.skip(-0x12)
+                    self.meta = xopen(o + '/$INFO.txt','w',encoding='utf-8')
+                    self.meta.write('--- Signature ---\n' + f.read0s().decode() + '\n--- --- ---\n\n')
+                    f.alignpos(4)
+                    self.fts = {}
+
+                    while f.pos < (self.pos+self.size):
+                        if self.read_block(): break
+                    self.meta.close()
+
+                def reads(self):
+                    l = f.readu32()
+                    r = f.read(l)[:-1]
+                    f.alignpos(4)
+                    return r.decode()
+                def read_block(self,pr:str=None):
+                    n = f.read(4).decode('ascii')
+                    s = f.readu32()
+                    p = f.pos + s
+
+                    match n:
+                        case 'FSIZ': self.meta.write(f'Reported File Size: {f.readu32()}\n')
+                        case 'VERS': self.meta.write('Version: ' + self.reads() + '\n')
+                        case 'EXBY': self.meta.write('By: ' + self.reads() + '\n')
+                        case 'GNRL': pass # u32 * 2
+                        case 'WDIM': self.meta.write(f'World Dimensions: ({f.readfloat()}x {f.readfloat()}y {f.readfloat()}z) to ({f.readfloat()}x {f.readfloat()}y {f.readfloat()}z) * ({f.readu32()}x {f.readu32()}y {f.readu32()}z)\n')
+                        case 'RSPR': pass # nothing?
+                        case 'SKIP': pass # padding
+                        case 'CLAS':
+                            self.clas = {}
+                            while f.pos < p: self.read_block(n)
+                            if not n in self.fts: self.fts[n] = 0
+                            json.dump(self.clas,xopen(self.o + f'/{n}{self.fts[n]}.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
+                            self.fts[n] += 1
+                        case 'BRCM'|'ACCM'|'CPCM'|'PRCM':
+                            assert pr == 'CLAS'
+                            cn = n
+                            c = 0
+                            while f'{cn}{c}' in self.clas: c += 1
+                            if c: cn += str(c)
+                            self.clas[cn] = []
+                            c = f.readu32()
+                            for _ in range(c): self.clas[cn].append(self.reads())
+                        case 'PRIM':
+                            if pr == 'CLAS':
+                                cn = n
+                                c = 0
+                                while f'{cn}{c}' in self.clas: c += 1
+                                if c: cn += str(c)
+                                self.clas[cn] = {}
+                                c = f.readu32()
+                                for _ in range(c): self.clas[cn][self.reads()] = self.reads()
+                        case 'RSRC'|'BRTR'|'SCRT':
+                            f.skip(12 if n == 'RSRC' else 8)
+                            if not n in self.fts: self.fts[n] = 0
+                            c = 0
+                            while f.pos < p:
+                                tn = f.read(4).decode('ascii')
+                                ts = f.readu32()
+                                f.skip(-8)
+                                xopen(self.o + f'/{n}{self.fts[n]}/{c:03d}.{tn.lower()}','wb').write(f.read(ts+8))
+                                f.alignpos(4)
+                                c += 1
+                            self.fts[n] += 1
+                        case 'BNCH':
+                            f.skip(-8)
+                            if not n in self.fts: self.fts[n] = 0
+                            xopen(self.o + f'/{n}{self.fts[n]}.{n.lower()}','wb').write(f.read(s+8))
+                            self.fts[n] += 1
+                        case 'FDIR':
+                            f.skip(4)
+                            if not n in self.fts: self.fts[n] = 0
+                            c = f.readu32()
+                            fs = [(f.readu32(),f.readu32(),f.read(0x18).rstrip(b'\0').decode()) for _ in range(c)]
+                            for fe in fs:
+                                f.seek(self.pos + fe[0])
+                                xopen(self.o + f'/{n}{self.fts[n]}/{fe[2]}.gde','wb').write(f.read(fe[1]))
+
+                            for fe in fs:
+                                f.seek(self.pos + fe[0])
+                                GDED(self.o + f'/{n}{self.fts[n]}/{fe[2]}',fe[1])
+                        case 'ENDF': return 1
+                        case _: raise NotImplementedError(f'Unknown Block: {n} @ 0x{f.pos-8:04X}')
+ 
+                    f.seek(p)
+                    f.alignpos(4)
+
+            GDED(o,f.size)
+            f.close()
+            if listdir(o): return
 
     return 1

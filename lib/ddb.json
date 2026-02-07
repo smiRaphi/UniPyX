@@ -707,6 +707,10 @@
         "rs":"Siren 2 EVD","s":1
     },
     {
+        "d":["isat","GDED BINARY FORMAT, VERSION 2.6.3.16.\\r\\n\\r\\n\\0\\0\\0",0],
+        "rs":"GDED Binary Format","s":1
+    },
+    {
         "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode()\n except:return\nreturn True"]],
         "rs":"Super Monkey Ball Tip 'n Tilt String Data"
     },
