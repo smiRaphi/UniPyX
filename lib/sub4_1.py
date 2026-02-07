@@ -1384,5 +1384,73 @@ def extract4_1(inp:str,out:str,t:str):
                 open(o + f'/{fs[ix][1]}.{guess_ext(d)}','wb').write(d)
             f.close()
             if fs: return
+        case 'Siren 2 SLPK ROM':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'SLPK'
+            f.skip(4)
+
+            c = f.readu32()
+            fno = f.readu32()
+            def readstr():
+                of = f.readu32()
+                p = f.pos
+                f.seek(fno+of)
+                n = f.read0s()
+                f.seek(p)
+                return n.decode()
+            f.skip(0x10)
+
+            ofs = {}
+            for _ in range(c):
+                fn = readstr()
+                arc = readstr()
+                if not arc in ofs: ofs[arc] = open(dirname(i) + '/' + arc,'rb')
+                ofs[arc].seek(f.readu32())
+                xopen(o + '/' + fn.lstrip('../\\'),'wb').write(ofs[arc].read(f.readu32()))
+            f.close()
+            for f in ofs.values(): f.close()
+            if ofs: return
+        case 'Siren 2 PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'pak\0'
+            f.skip(4)
+
+            no = f.readu32()
+            do = f.readu32()
+            c = f.readu32()
+            f.skip(12)
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(no+fe[0])
+                fn = f.read0s().decode()
+                f.seek(do+fe[1])
+                xopen(o + '/' + fn.lstrip('../\\'),'wb').write(f.read(fe[2]))
+            f.close()
+            if fs: return
+        case 'Siren 2 EVD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'evd\x1A'
+            f.skip(6)
+
+            c = f.readu16()
+            f.skip(4)
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            fs.append((0,f.size))
+            for ix in range(len(fs)-1):
+                f.seek(fs[ix][0])
+                fn = f.read0s().decode()
+                f.seek(fs[ix][1])
+                open(o + '/' + fn,'wb').write(f.read(fs[ix+1][1]-fs[ix][1]))
+            if fs: return
 
     return 1
