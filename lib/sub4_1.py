@@ -1763,5 +1763,122 @@ def extract4_1(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'Alter Echo REMF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            class REMF:
+                def __init__(self,o:str,c:int=None):
+                    self.o = o
+                    self.fts = {}
+                    assert self.readt() == 'REMF'
+                    f.skip(4)
+                    assert self.readt() == 'HEAD'
+                    f.skip(f.readu32())
+
+                    if c:
+                        for _ in range(c): self.read_block()
+                        assert self.readt() == 'ENDC'
+                    else:
+                        while f and not self.read_block():pass
+
+                def readt(self): return f.read(4).decode('ascii')[::-1]
+                def read_block(self):
+                    assert self.readt() == 'ENDC'
+                    if not f: return 1
+                    
+                    n = self.readt()
+                    s = f.readu32()
+                    xoff = s + f.pos
+                    match n:
+                        case 'OSCR'|'SCRP'|'TRIG':
+                            if not n in self.fts: self.fts[n] = 0
+                            c = f.readu32()
+                            for _ in range(c):
+                                fn = f.read0s().decode()
+                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                            self.fts[n] += 1
+                        case 'PTGA':
+                            if not n in self.fts: self.fts[n] = 0
+                            c = f.readu32()
+                            for _ in range(c):
+                                f.skip(1)
+                                fn = f.read0s().decode()
+                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                            self.fts[n] += 1
+                        case 'DBSS':
+                            f.skip(4)
+                            if not n in self.fts: self.fts[n] = 0
+                            c = f.readu32()
+                            for _ in range(c):
+                                f.skip(4)
+                                fn = f.read0s().decode()
+                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                            self.fts[n] += 1
+                        case 'DBPY':
+                            f.skip(8)
+                            if not n in self.fts: self.fts[n] = 0
+                            c = f.readu32()
+                            for _ in range(c):
+                                f.skip(5)
+                                fn = f.read0s().decode()
+                                cc = f.readu32()
+                                cp = f.pos
+                                REMF(o + f'/{n}{self.fts[n]}/{noext(fn)}',c=cc)
+                                lp = f.pos
+                                f.seek(cp)
+                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(lp-cp))
+                                f.seek(lp)
+                            self.fts[n] += 1
+                        case 'BLOK'|'LOD1':
+                            if not n in self.fts: self.fts[n] = 0
+                            c = 0
+                            while f.pos < xoff:
+                                sn = self.readt()
+                                ss = f.readu32()
+                                xopen(o + f'/{n}{self.fts[n]}/{sn}{c}.bin','wb').write(f.read(ss))
+                                if not ss: break
+                                c += 1
+                            c = f.readu32()
+                            for _ in range(c):
+                                fn = f.read0s().decode()
+                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                            self.fts[n] += 1
+                        case 'PATH':
+                            if not n in self.fts: self.fts[n] = 0
+                            c = f.readu32()
+                            for _ in range(c):
+                                fn = f.read0s().decode()
+                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()*0x10))
+                            self.fts[n] += 1
+                        case 'CURV'|'LITE'|'MATC'|'JONT'|'JNAM'|'SGMT'|'BINF'|'SEND'|'PTH+'|'MCAM'|'AICH'|'XPLO'|\
+                             'FRCE'|'ATAK'|'PHYS'|'PSAN'|'LTRL'|'AMAX'|'ACTN'|'DPND'|'ANIM'|'WTRL'|'AFLG'|'ASLT'|'ATTR'|\
+                             'DBOJ'|'OBJS'|'DBSA'|'DBSE'|'ORDR'|'TASK'|'MARK'|'PSFX'|'OCCS'|'SPLS'|'COLL'|'IKCC'|\
+                             'PLFX'|'MLBL'|'MNFO'|'CCFT':
+                            if not n in self.fts: self.fts[n] = 0
+                            xopen(o + f'/{n}{self.fts[n]}.bin','wb').write(f.read(s))
+                            self.fts[n] += 1
+                        case _: raise NotImplementedError(f'Unknown block: {n} at 0x{f.pos-8:04X} of 0x{s:04x} bytes')
+                    f.seek(xoff)
+
+            r = REMF(o)
+            f.close()
+            if r.fts: return
+        case 'Alter Echo RAD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+            f.skip(4)
+            assert f.read(5) == b'\0RAD\0'
+
+            c = f.readu32()
+            for _ in range(c):
+                f.skip(4)
+                fn = f.read0s().decode()
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+            xopen(o + '/$rest.bin','wb').write(f.read())
+            f.close()
+            if c: return
 
     return 1

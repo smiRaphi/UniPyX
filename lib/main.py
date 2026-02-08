@@ -715,6 +715,7 @@ def guess_ext_psx(f):
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'pBAV': ext = 'vh'
     elif tag == b'pQES': ext = 'sep'
+    elif tag in (b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'): ext = 'vag'
     elif tag == b'\x10\0\0\0' and int.from_bytes(f.read(4),'little') in (2,8,9):
         fo = int.from_bytes(f.read(4),'little')
         f.seek(4,1)
@@ -743,6 +744,7 @@ def guess_ext_ps2(f):
     elif tag == b'RIFF': ext = 'wav'
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'TIM2': ext = 'tm2'
+    elif tag in (b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'): ext = 'vag'
     if not ext and tag == b'\x10\0\0\0':
         if int.from_bytes(f.read(4),'little') in (2,8,9):
             fo = int.from_bytes(f.read(4),'little')
