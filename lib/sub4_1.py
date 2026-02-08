@@ -1598,5 +1598,38 @@ def extract4_1(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Sinergy GUT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            msg = b''
+            b = b''
+            while True:
+                b = f.read(1)
+                if not b: return 1
+                if b == b'\x1A': break
+                msg += b
+            open(o + '/$signature.txt','wb').write(msg)
+
+            f.skip(7+4+0x20)
+            bp = f.pos
+            f.skip(8)
+            fo = bp+f.readu32()
+            f.skip(-12)
+            fs = []
+            while f.pos < fo:
+                fnl = f.readu32()
+                s = f.readu32()
+                of = f.readu32()
+                f.skip(8)
+                fs.append((bp+of,s,bytes(x ^ 0xFF for x in f.read(fnl)).rstrip(b'\0').decode()))
+
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + f'/{fe[2]}','wb').write(f.read(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1
