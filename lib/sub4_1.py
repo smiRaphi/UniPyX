@@ -1707,5 +1707,18 @@ def extract4_1(inp:str,out:str,t:str):
             open(o + '/' + tbasename(inp) + '.txt','w',encoding='utf-8').write(d)
 
             if d: return
+        case 'Monsters Inc. Scream Team Training WAD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            while f:
+                s = f.readu32()
+                fn = f.read(40).rstrip(b'\0').decode('ascii')
+                fn = f.read(40).rstrip(b'\0').decode('ascii') + '/' + fn
+                xopen(o + '/' + fn,'wb').write(f.read(s-84))
+
+            f.close()
+            if listdir(o): return
 
     return 1
