@@ -1631,5 +1631,28 @@ def extract4_1(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Resistance Fall Of Man IGHW':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from lib.file import File
+            f = File(inp,endian='>')
+            assert f.read(4) == b'IGHW' and f.readu32() == 2 and f.readu32() == 4 and f.readu32() == 0
+
+            f.seek(0x34)
+            of,s = f.readu32(),f.readu32()
+            f.seek(of)
+
+            ob = {}
+            for _ in range(s//8):
+                id = f.readu32()
+                ob[id] = f.readu32()
+            for x in ob:
+                f.seek(ob[x])
+                ob[x] = f.read0s().replace(b'\xFF',b'').decode('utf-8')
+            f.close()
+
+            if ob:
+                json.dump(ob,open(o + '/' + tbasename(inp) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+                return
 
     return 1
