@@ -731,6 +731,37 @@ def guess_ext_psx(f):
             else: ext = 'vb'
 
     return ext
+def guess_ext_ps2(f):
+    if not f: return 'null'
+    import io
+    if type(f) == bytes: f = io.BytesIO(f)
+
+    tag = f.read(4)
+
+    ext = None
+    if tag == b'\x89PNG': ext = 'png'
+    elif tag == b'RIFF': ext = 'wav'
+    elif tag == b'MThd': ext = 'mid'
+    elif tag == b'TIM2': ext = 'tm2'
+    if not ext and tag == b'\x10\0\0\0':
+        if int.from_bytes(f.read(4),'little') in (2,8,9):
+            fo = int.from_bytes(f.read(4),'little')
+            f.seek(4,1)
+            nc,np = int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')
+            if (nc*np*2+12) == fo: ext = 'tim'
+            else: f.seek(-0x10,1)
+        else: f.seek(-4,1)
+    if not ext and not (tag[0]+tag[2]+tag[3]):
+        p = f.tell()
+        s = f.seek(0,2)
+        f.seek(p)
+        if not (s-(p-4)) % 0x10 and not sum(f.read(12)):
+            while f.tell() < s:
+                if f.read(1)[0] >> 4 > 5: break
+                f.seek(15,1)
+            else: ext = 'psadpcm'
+
+    return ext or 'bin'
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet

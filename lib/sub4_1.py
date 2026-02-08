@@ -1720,5 +1720,48 @@ def extract4_1(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'Unison DAT':
+            d = dirname(inp)
+            for x in ('SLUS_201.73','SLPS_250.10','UNISON.ELF'):
+                if exists(d + '/' + x): ex = x;break
+            else: return 1
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            fd = File(i,endian='<')
+            assert fd.read(8) == b'MCicon\0\0'
+            fd.seek(0x10)
+            fs = fd.readu32()
+            foff = ((fs + 0x7FF)//0x800).to_bytes(4,'little')
+
+            f = File(d + '/' + ex,endian='<')
+            f.seek(0x38)
+            f.seek(f.readu32())
+            b = b''
+            while f:
+                b = f.read(0x10)
+                if b == b'\0\0\0\0\0\0\0\0\0\0\0\0' + foff: break
+            else: return 1
+            f.skip(-8)
+
+            fs = [f.readu32()*0x800]
+            while f:
+                of = f.readu32()
+                if not of: break
+                fs.append(of*0x800)
+            fs.append(fd.size)
+
+            for ix,of in enumerate(fs[:-1]):
+                fd.seek(of)
+                d = fd.read(fs[ix+1]-of)
+                if d[:8] in (b'tgs\0\0\0\0\0',b'dlink128',b'lxdata\0\0',b'MCicon\0\0',b'spotobj\0',b'XMDF_4_0',b'texanm\0\0'):
+                    ext = d[:8].rstrip(b'\0').decode('ascii').lower()
+                    d = d[:int.from_bytes(d[0x10:0x10+4],'little')]
+                elif not sum(d): ext = 'null'
+                else: ext = guess_ext_ps2(d)
+                xopen(o + f'/{ix:03d}.{ext}','wb').write(d)
+
+            f.close()
+            if listdir(o): return
 
     return 1
