@@ -1654,5 +1654,58 @@ def extract4_1(inp:str,out:str,t:str):
             if ob:
                 json.dump(ob,open(o + '/' + tbasename(inp) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
+        case 'Disney Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+            assert f.read(4) == b'res\n'
+            f.skip(8)
+
+            dol = f.readu32('<')
+            f.skip(-4)
+            dob = f.readu32('>')
+            f.skip(-4)
+            if dol > dob: f._end = '>'
+            do = f.readu32()
+            f.skip(4)
+            f.seek(f.readu32())
+
+            c = f.readu32()
+            fs = []
+            for ix in range(c):
+                f.skip(4)
+                x = f.read(4).rstrip(b'\0 ').decode('ascii')
+                fs.append((do+f.readu32(),f.readu32(),f'{ix:02d}.{x}'))
+                f.skip(8)
+
+            for fe in fs:
+                f.seek(fe[0])
+                open(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Disney Raw Strings':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            f.seek(4)
+            hsl = f.readu32('<')
+            f.skip(-4)
+            hsb = f.readu32('>')
+            if hsl > hsb: f._end = '>'
+            f.seek(0)
+            cs = f.readu32()
+            f.skip(f.readu32()-4)
+
+            d = f.read(cs)
+            f.close()
+            if d[:2] == b'\xFF\xFE': d = d[2:].decode('utf-16le')
+            elif d[:2] == b'\xFE\xFF': d = d[2:].decode('utf-16be')
+            else: d = d.decode('utf-8')
+
+            open(o + '/' + tbasename(inp) + '.txt','w',encoding='utf-8').write(d)
+
+            if d: return
 
     return 1
