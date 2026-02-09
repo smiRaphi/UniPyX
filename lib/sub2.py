@@ -184,16 +184,16 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'PS3 ISO':
             from bin.ps3key import PS3Keys
             k = PS3Keys().get(i)
-            tf = TmpFile('.iso')
+            tf = TmpFile('.iso',path=o)
             tf.link(i)
-            run(['ps3dec','--iso',tf,'--dk',k,'--tc','16','--skip'])
-            rmdir('log')
+            run(['ps3dec','-k',k,'-t','16','-s',tf],cwd=TMP)
+            rmdir(TMP + '/log')
             tf.destroy()
             if os.path.exists(tf.p + '_decrypted.iso'):
-                if not extract(tf.p + '_decrypted.iso',o,'ISO'):
-                    remove(tf.p + '_decrypted.iso')
-                    return
+                r = extract(tf.p + '_decrypted.iso',o,'ISO')
                 remove(tf.p + '_decrypted.iso')
+                if r or not listdir(o): return 1
+                return
             if not extract(i,o,'ISO'): return
         case 'PSVita PKG':
             if exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
