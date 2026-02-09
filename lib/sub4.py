@@ -492,6 +492,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 0x202: 'dots.txt',
                 0x203: 'patch_data.pkg',
 
+                0x300: 'update_files.tar',
+
                 0x501: 'spkg_hdr.tar',
 
                 0x601: 'ps3swu2.self',

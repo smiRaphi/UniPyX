@@ -1927,5 +1927,13 @@ def extract4_1(inp:str,out:str,t:str):
                 xopen(o + '/' + fe[0],'wb').write(f.read(f.readu32()))
             f.close()
             if fs: return
+        case 'PlayStation 3 Signed Package':
+            run(['ps3_unpkg',i,o],env={'PS3_KEYS':db.get('ps3oskeys')})
+            if listdir(o):
+                if exists(o + '/content') and exists(o + '/info0') and exists(o + '/info1') and getsize(o + '/info0') == getsize(o + '/info1') == 0x40:
+                    return extract4_1(o + '/content',o + '/OS Core','PlayStation 3 Core OS Package')
+        case 'PlayStation 3 Core OS Package':
+            run(['ps3_cosunpkg',i,o],env={'PS3_KEYS':db.get('ps3oskeys')})
+            if listdir(o): return
 
     return 1

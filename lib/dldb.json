@@ -5640,6 +5640,34 @@
         }],
         "ts":0
     },
+    "ps3_unpkg":{
+        "p":"ps3tools/unpkg.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "ps3tools/unpkg.exe":"ps3tools/unpkg.exe"
+            }
+        }]
+    },
+    "ps3_cosunpkg":{
+        "p":"ps3tools/cosunpkg.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "ps3tools/cosunpkg.exe":"ps3tools/cosunpkg.exe"
+            }
+        }]
+    },
+    "ps3_unself":{
+        "p":"ps3tools/unself.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "ps3tools/unself.exe":"ps3tools/unself.exe"
+            }
+        }],
+        "ts":0
+    },
     "eimgfs":{
         "p":"eimgfs/eimgfs.exe",
         "fs":[{
@@ -6482,6 +6510,21 @@
     "tmd_keys":{
         "p":"tmd_keys",
         "fs":null
+    },
+    "ps3oskeys":{
+        "p":"ps3oskeys",
+        "fs":[{
+            "u":"https://raw.githubusercontent.com/ps3addict/ps3addict.github.io/refs/heads/main/install_ps3tools_4.8.1.exe",
+            "ex":".rar",
+            "x":{
+                "ps3tools/tools/scetool/.ps3":"ps3oskeys"
+            },
+            "del":[
+                "ps3oskeys/README",
+                "ps3oskeys/idps   {put your idps file}",
+                "ps3oskeys/exdata"
+            ]
+        }]
     },
     "sasr_xpac_hashes":{
         "p":"sasr_xpac_hashes.bt",

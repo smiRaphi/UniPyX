@@ -1,5 +1,5 @@
 import json,httpx,os,subprocess,zipfile,tarfile
-from shutil import copyfile,rmtree
+from shutil import copyfile,copytree,rmtree
 from time import sleep,time
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -13,7 +13,8 @@ def xopen(f:str,m='r',encoding='utf-8'):
 def copy(i:str,o:str):
     o = os.path.abspath(o)
     os.makedirs(os.path.dirname(o),exist_ok=True)
-    copyfile(i,o)
+    if os.path.isdir(i): copytree(i,o)
+    else: copyfile(i,o)
 class DLDB:
     def __init__(self):
         self.dbp = 'lib/dldb.json'
@@ -98,6 +99,11 @@ class DLDB:
 
                         self.print_try = bk
                         if e['u'] != '.': os.remove(p)
+                    if 'del' in e:
+                        for d in e['del']:
+                            if os.path.exists('bin/' + d):
+                                if os.path.isdir('bin/' + d): rmtree('bin/' + d)
+                                else: os.remove('bin/' + d)
             exei = os.path.abspath('bin/' + exi['p'])
             self.udb[exe] = t
             self.save()
@@ -136,13 +142,16 @@ class DLDB:
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,'-aoa',p])
             for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
-            try: rmtree(td)
-            except PermissionError: pass
+            for _ in range(5):
+                try: rmtree(td)
+                except PermissionError: sleep(0.1)
         elif ex == '.rar':
             td = gtmp()
             self.run(['unrar','x','-or','-op' + td,p])
             for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
-            rmtree(td)
+            for _ in range(5):
+                try: rmtree(td)
+                except PermissionError: sleep(0.1)
         elif ex == '.msi':
             td = gtmp()
             os.makedirs(td,exist_ok=True)

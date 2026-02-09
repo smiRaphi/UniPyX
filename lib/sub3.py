@@ -1332,5 +1332,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if len(listdir(o)) == 1: copydir(o + '/' + listdir(o)[0],o,True,reni=True)
                 else: return
                 if listdir(o): return
+        case 'PlayStation 3 SELF/SPRX':
+            of = o + '\\' + tbasename(i) + '.elf'
+            _,ro,rr = run(['ps3_unself',i,of],env={'PS3_KEYS':db.get('ps3oskeys')})
+            if not ' (ERROR)' in ro and not ' (ERROR)' in rr and exists(of) and getsize(of): return
 
     return 1
