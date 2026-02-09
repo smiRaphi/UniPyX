@@ -773,6 +773,11 @@
         "rs":"PlayStation 3 Core OS Package","s":1
     },
     {
+        "d":[["isat","\\xDC\\xA2\\x4D\\0",0],["isat","\\0\\0\\0\\x40",20],["isin",["\\0\\0\\0\\x01","\\0\\0\\0\\x02","\\0\\0\\0\\x03"],4],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1"],24],["n0",8,8],["n0",4,16],
+             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);h=(0,64,64,48)[int.from_bytes(f.read(4),'big')]\nif int.from_bytes(f.read(8),'big')!=s:return\no=int.from_bytes(f.read(4),'big')*int.from_bytes(f.read(4),'big')+h;f.seek(h+32);return o==int.from_bytes(f.read(8),'big')"]],
+        "rs":"PlayStation Trophy File","s":1
+    },
+    {
         "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=s or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],
         "rs":"Disney Raw Strings"
     },

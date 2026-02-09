@@ -2356,7 +2356,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
                 oo[k] = d
             if oo:
-                json.dump(oo,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2)
+                json.dump(oo,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
         case 'Shin Megami Tensei 9 PACK':
             if db.print_try: print('Trying with custom extractor')

@@ -1935,5 +1935,30 @@ def extract4_1(inp:str,out:str,t:str):
         case 'PlayStation 3 Core OS Package':
             run(['ps3_cosunpkg',i,o],env={'PS3_KEYS':db.get('ps3oskeys')})
             if listdir(o): return
+        case 'PlayStation Trophy File':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='>')
+            assert f.read(4) == b'\xDC\xA2\x4D\x00'
+
+            v = f.readu32()
+            if v not in (1,2,3): raise NotImplementedError(f'Version: {v}')
+            f.skip(8)
+            c = f.readu32()
+            s = f.readu32()
+            if s != 0x40: raise NotImplementedError(f'Entry Size: {s}')
+            if v < 3: f.skip(0x28)
+            else: f.skip(0x18)
+
+            fs = []
+            for _ in range(c):
+                fs.append((f.read(0x20).rstrip(b'\0').decode(),f.readu64(),f.readu64()))
+                f.skip(0x10)
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+            f.close()
+            if fs: return
 
     return 1
