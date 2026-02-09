@@ -37,6 +37,7 @@ Requires a somewhat new version of python (I've only tested old versions on 3.11
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX
 * [UNESP v1.92](http://fileformats.archiveteam.org/wiki/ESP_(compressed_archive)) because it's packed in a ESP SFX
 * sqx SFX from [SpeedCommander 22](https://www.speedproject.com/) because it's packed in a sqc SFX
+* RazbSbor ([1](https://www.moddb.com/downloads/gob-globald3tfull-unpacker), [2](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) because of cloudflare
 
 ## Notes
 * Extracting Wii U WUD/WUX files and Apple Disk Images (at least properly) requires java to be installed.

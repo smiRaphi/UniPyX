@@ -1895,5 +1895,24 @@ def extract4_1(inp:str,out:str,t:str):
                     else: ext = guess_ext(d)
                     mv(o + '/' + f,o + f'/{x:03d}.{ext}')
                 return
+        case 'Vicarious Visions GFC+GOB': return quickbms('over_the_hedge')
+        case 'Doom 3 Xbox GFC+GOB':
+            t1,t2 = TmpFile('.gfc',path=o),TmpFile('.gob',path=o)
+            t1.link(i)
+            t2.link(noext(i) + '.gob')
+            run(['razbsbor',basename(t1.p),basename(t2.p)],cwd=o)
+            t1.destroy()
+            t2.destroy()
+            if exists(o + '/_' + basename(t2.p)) and listdir(o + '/_' + basename(t2.p)):
+                copydir(o + '/_' + basename(t2.p),o,delete=True)
+                return
+        case 'Doom 3 Xbox Graph':
+            tf = TmpFile('.d3tfull',path=o)
+            tf.link(i)
+            run(['razbsbor',basename(tf.p)],cwd=o)
+            tf.destroy()
+            if exists(o + '/_' + basename(tf.p)) and listdir(o + '/_' + basename(tf.p)):
+                copydir(o + '/_' + basename(tf.p),o,delete=True)
+                return
 
     return 1

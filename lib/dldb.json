@@ -298,9 +298,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1769727600
+            "ts":1770505200
         }],
-        "ts":1769727600
+        "ts":1770505200
     },
     "file":{
         "p":"file/file.exe",
@@ -312,25 +312,25 @@
             },
             "ts":1762090000
         },{
-            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5build1_i386.deb",
+            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5build2_i386.deb",
             "x":{
                 "usr/share/file/magic.mgc":"file/magic.mgc"
             },
-            "ts":1756929540
+            "ts":1770068820
         }],
-        "ts":1762090000
+        "ts":1770068820
     },
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
         "fs":[{
-            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.3/exeinfope.zip",
+            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.4/exeinfope.zip",
             "x":{
                 "ExeinfoPe/exeinfope.exe":"ExeinfoPe/exeinfope.exe",
                 "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll"
             },
-            "ts":1762290350
+            "ts":1769968939
         }],
-        "ts":1762290350
+        "ts":1769968939
     },
     "yara":{
         "p":"yara/yara.exe",
@@ -361,9 +361,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1769814000
+            "ts":1770591600
         }],
-        "ts":1769814000
+        "ts":1770591600
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -453,7 +453,7 @@
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
         "fs":[{
-            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-2366888acdf32ca96edc4896ab0206d408a2793e.zip",
+            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-5b9f03a585c8e74c65308e62b80f64f59b8d9e20.zip",
             "x":{
                 "HxCFloppyEmulator_Software_win_x64.zip":{
                     "HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
@@ -461,15 +461,15 @@
                     "HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
                 }
             },
-            "nightly_run":21152944193,
-            "ts":1769537499
+            "nightly_run":21805854472,
+            "ts":1770634941
         },{
             "u":"https://softpres.org/_media/files:spsdeclib_5.1_windows.zip?id=download&cache=cache",
             "x":{
                 "capsimg_binary/x64/CAPSImg.dll":"hxcfe/CAPSImg.dll"
             }
         }],
-        "ts":1769537499
+        "ts":1770634941
     },
     "unar":{
         "p":"Unarchiver/unar.exe",
@@ -758,13 +758,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/f9/81/dolphin-master-2512-259-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/29/0f/dolphin-master-2512-293-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1769802924
+            "ts":1770580848
         }],
-        "ts":1769802924
+        "ts":1770580848
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2559,13 +2559,13 @@
     "pea":{
         "p":"pea.exe",
         "fs":[{
-            "u":"https://github.com/peazip/PeaZip/releases/download/10.8.0/peazip_portable-10.8.0.WIN64.zip",
+            "u":"https://github.com/peazip/PeaZip/releases/download/10.9.0/peazip_portable-10.9.0.WIN64.zip",
             "x":{
-                "peazip_portable-10.8.0.WIN64/pea.exe":"pea.exe"
+                "peazip_portable-10.9.0.WIN64/pea.exe":"pea.exe"
             },
-            "ts":1765009954
+            "ts":1770445938
         }],
-        "ts":1765009954
+        "ts":1770445938
     },
     "icupkg":{
         "p":"icu4c/icupkg.exe",
@@ -2640,23 +2640,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45962/SDLVICE-3.10-win64-r45962.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45965/SDLVICE-3.10-win64-r45965.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45962/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45962/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45962/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45962/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45962/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45962/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r45965/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r45965/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r45965/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r45965/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r45965/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r45965/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1769438219
+            "ts":1770228964
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1769438219
+        "ts":1770228964
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -3018,14 +3018,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_01_30_bd78fcc4_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_02_08_cd62b87f_32.zip",
             "x":{
-                "RenderDoc_2026_01_30_bd78fcc4_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_01_30_bd78fcc4_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_02_08_cd62b87f_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_02_08_cd62b87f_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1769727600
+            "ts":1770505200
         }],
-        "ts":1769727600
+        "ts":1770505200
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -3077,13 +3077,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.5.1/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.6.2/zxc-windows-x64.exe.zip",
             "x":{
                 "zxc.exe":"zxc.exe"
             },
-            "ts":1769067403
+            "ts":1770625629
         }],
-        "ts":1769067403
+        "ts":1770625629
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -5598,7 +5598,8 @@
             "x":{
                 "yappy_v0/yappy.exe":"yappy.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "infbinrepacker":{
         "p":"InfBinRepacker.exe",
@@ -5607,7 +5608,8 @@
             "x":{
                 "InfBinRepacker.exe":"InfBinRepacker.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "ligru-compress_v0.92":{
         "p":"ligru-compress_v0.92.exe",
@@ -5617,14 +5619,26 @@
             "x":{
                 "ligru-compress.exe":"ligru-compress_v0.92.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "viola.cli":{
         "p":"Viola.CLI.exe",
         "fs":[[
             "https://github.com/SuperTavor/Viola/releases/download/1.4.0/Viola.CLI-Portable.exe",
             "Viola.CLI.exe"
-        ]]
+        ]],
+        "ts":0
+    },
+    "razbsbor":{
+        "p":"RazbSbor.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "RazbSbor.exe":"RazbSbor.exe"
+            }
+        }],
+        "ts":0
     },
     "eimgfs":{
         "p":"eimgfs/eimgfs.exe",
@@ -5653,14 +5667,16 @@
             "x":{
                 "libeay32.dll":"eimgfs/libeay32.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "romman":{
         "p":"romman.exe",
         "fs":[[
             "https://github.com/israpps/romman/releases/download/develop-49/romman-windows.exe",
             "romman.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "luadec51":{
         "p":"Luadec51.exe",
@@ -6077,7 +6093,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.8/lessmsi-v2.11.8.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.10/lessmsi-v2.11.10.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -6086,9 +6102,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1769267321
+            "ts":1770533372
         }],
-        "ts":1769267321
+        "ts":1770533372
     },
     "msix":{
         "p":"MsiX.exe",
@@ -6429,6 +6445,14 @@
                 "BMS/sinemora.bms":"BMS/sinemora.bms"
             }
         }]
+    },
+    "over_the_hedge":{
+        "p":"BMS/over_the_hedge.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/over_the_hedge.bms",
+            "BMS/over_the_hedge.bms"
+        ]],
+        "ts":0
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
