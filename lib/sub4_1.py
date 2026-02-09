@@ -86,7 +86,8 @@ def extract4_1(inp:str,out:str,t:str):
                 u1 = f.readu16()
                 if u1:
                     f.skip(-2)
-                    assert u1 in (1,2,4,6,9),f'{u1} @ {f.pos//32768}.{f.pos % 32768}'
+                    if not u1 in (1,2,4,6,9): return 1
+                    #assert u1 in (1,2,4,6,9),f'{u1} @ {f.pos//32768}.{f.pos % 32768}'
                     open(f'{o}/{c}_extra.bin','wb').write(f.read(2+[None,0x10,0x1C,None,0x34,None,0x4C,None,None,0x70][u1]))
                     f.skip(2)
 
@@ -1960,5 +1961,89 @@ def extract4_1(inp:str,out:str,t:str):
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
             f.close()
             if fs: return
+        case 'Phineas And Ferb WAD':
+            if db.print_try: print('Trying with custom extractor') # WIP
+            import json
+            from lib.file import File
+            f:File = File(inp,endian='>')
+            assert f.read(8) == b'\0\0\0\0\0\x03\0\0'
+
+            dicc = f.readu32()
+            dico = f.readu32()
+            cntc = f.readu32()
+            cnto = f.readu32()
+            f.skip(8)
+            sdbc = f.readu32()
+            sdbo = f.readu32()
+
+            f.seek(sdbo)
+            sdb = {}
+            for _ in range(sdbc):
+                h = f.readu32()
+                sdb[h] = f.readu32()
+            for h in sdb:
+                f.seek(sdb[h])
+                sdb[h] = f.read0s().decode()
+
+            f.seek(dico)
+            dic = {}
+            for _ in range(dicc):
+                nh = f.readu32()
+                dic[sdb[nh]] = (f.readu32(),f.readu32())
+            f.seek(cnto)
+            cnt = {}
+            for _ in range(cntc):
+                c = (f.readu32(),f.readu32())
+                f.skip(8)
+                cnt[sdb[f.readu32()]] = c
+                f.skip(4)
+
+            ob = {}
+            cc = None
+            for tn in dic:
+                f.seek(dic[tn][1])
+                ob[tn] = {}
+                for ix in range(dic[tn][0]):
+                    nh = f.readu32()
+                    if nh:
+                        f.skip(1)
+                        tp = f.readu8()
+                        f.skip(2+4)
+                        of = f.readu32()
+                        if tp == 11: cc = (sdb[nh],of)
+                        else: ob[tn][sdb[nh]] = (tp,of)
+                    elif cc:
+                        f.skip(1)
+                        st = f.readu8()
+                        f.skip(2)
+                        if st == 14: cn = -1
+                        else: cn = sdb[f.readu32()]
+                        ob[tn][cc[0]] = (cn,cc[1])
+                    else: raise ValueError(f.pos-4)
+            for cn in cnt:
+                f.seek(cnt[cn][1])
+                if cn == 'WadFile':
+                    if cn in ob: ob.pop(cn)
+                    c = f.readu32()
+                    f.seek(f.readu32())
+                    fs = []
+                    for _ in range(c): fs.append((sdb[f.readu32()],f.readu32(),f.readu32()))
+                    for fe in fs:
+                        f.seek(fe[2])
+                        xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+                elif cn in ob:
+                    for tn in ob[cn]:
+                        f.seek(cnt[cn][1] + ob[cn][tn][1])
+                        match ob[cn][tn][0]:
+                            case 1: v = f.readu8() != 0
+                            case 2: v = f.readfloat()
+                            case 8: v = f.readu8()
+                            case 11: raise ValueError('Unparsed class type')
+                            case 12: v = f.readu32()
+                            case _: raise NotImplementedError(cn + '/' + tn + ': ' + str(ob[cn][tn][0]))
+                        ob[cn][tn] = v
+
+            if ob: json.dump(ob,xopen(o + '/$' + tbasename(inp) + '.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
+            if listdir(o): return
 
     return 1

@@ -778,6 +778,10 @@
         "rs":"PlayStation Trophy File","s":1
     },
     {
+        "d":[["isat","\\0\\0\\0\\0\\0\\x03\\0\\0",0],["isat","\\0\\0\\0\\x30",12],["isatS","\\0",8,40],["n0",4,8],["n0",4,32],["n0",4,36]],
+        "rs":"Phineas And Ferb WAD"
+    },
+    {
         "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=s or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],
         "rs":"Disney Raw Strings"
     },

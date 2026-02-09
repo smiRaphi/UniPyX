@@ -36,7 +36,9 @@ class File:
     def reads16(self,end=None) -> int: return struct.unpack((end or self._end)+'h',self.read(2))[0]
     def reads32(self,end=None) -> int: return struct.unpack((end or self._end)+'i',self.read(4))[0]
     def reads64(self,end=None) -> int: return struct.unpack((end or self._end)+'q',self.read(8))[0]
-    def readfloat(self,end=None) -> float: return struct.unpack((end or self._end)+'f',self.read(4))[0]
+    def readfloat(self,end=None):
+        v = struct.unpack((end or self._end)+'f',self.read(4))[0]
+        return float(f'{v:.7g}') # clamp precision to that of a float32
     def readleb128u(self):
         n = c = b = 0
         while True:
