@@ -755,6 +755,10 @@
         "rs":"Doom 3 Xbox Graph"
     },
     {
+        "d":[["isat","SFS1",0],["n0",2,4],["n0",2,6],["str0e",8,64,10]],
+        "rs":"Culpa Innata SFS","s":1
+    },
+    {
         "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=s or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],
         "rs":"Disney Raw Strings"
     },

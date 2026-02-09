@@ -1914,5 +1914,18 @@ def extract4_1(inp:str,out:str,t:str):
             if exists(o + '/_' + basename(tf.p)) and listdir(o + '/_' + basename(tf.p)):
                 copydir(o + '/_' + basename(tf.p),o,delete=True)
                 return
+        case 'Culpa Innata SFS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+            assert f.read(4) == b'SFS1'
+
+            c = f.readu16()
+            fs = [(f.read(f.readu16()).rstrip(b'\0').decode(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.read(f.readu32()))
+            f.close()
+            if fs: return
 
     return 1

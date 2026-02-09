@@ -1364,5 +1364,8 @@
         "nintendo entertainment system rom",
         "nes rom image (ines)",
         "nes rom image (ines) (nes 2.0)"
+    ],
+    "LithTech Resource":[
+        "lithtech resource data"
     ]
 }
