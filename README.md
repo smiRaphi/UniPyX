@@ -32,6 +32,7 @@ Requires a somewhat new version of python (I've only tested old versions on 3.11
 * self compiled [paq8k3](https://github.com/JohannesBuchner/paq/tree/master/paq8k3)
 * self compiled [Torch](https://github.com/HarbourMasters/Torch)
 * self compiled [density](https://github.com/g1mv/density)
+* self compiled [ps3tools](https://github.com/wargio/ps3tools)
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
 * [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX
