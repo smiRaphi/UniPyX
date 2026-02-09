@@ -7,8 +7,9 @@ Requires a somewhat new version of python (I've only tested old versions on 3.11
 
 ## Included tools
 * self compiled [file-windows v5.46](https://github.com/ember91/file-windows)
-* xbp.bms by [h3x3r](https://reshax.com/profile/183-h3x3r/) taken from https://reshax.com/topic/18058-ripping-sounds-from-fuzion-frenzy-xbox/
-* KirbySwitch-Decompress.bms by Random Talking Bush taken from https://gamebanana.com/questions/25367
+* xbp.bms by [h3x3r](https://reshax.com/profile/183-h3x3r/) taken from https://reshax.com/topic/18058-ripping-sounds-from-fuzion-frenzy-xbox/ because it's not a file and cloudflare
+* KirbySwitch-Decompress.bms by Random Talking Bush taken from https://gamebanana.com/questions/25367 because it's a mega.nz link
+* sinemore.bms by [DKDave](https://reshax.com/profile/70-dkdave/) taken from https://reshax.com/topic/18788-sine-mora-ex-pc-bin/#findComment-102758 (sinemore.zip/sinemore.txt) because of cloudflare
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
 * self compiled [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt)

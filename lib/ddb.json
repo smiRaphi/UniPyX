@@ -735,6 +735,14 @@
         "rs":"Alter Echo RAD","s":1
     },
     {
+        "d":[["isat","FSM_v1.",8],["isin",["1","2"],15],["n0",8,0],["n0",4,16],["n0",4,20]],
+        "rs":"One Piece Battle Adventure APF FSM","s":1
+    },
+    {
+        "d":[["isin",["\\x4D\\xB5\\x5A\\x5E","\\xE0\\x62\\xFF\\x93","\\x83\\xBA\\xF3\\x71"],8],["n0",4,0],["n0",4,4],["n0",4,12],["n0",4,16]],
+        "rs":"Sine Mora EX BIN","s":1
+    },
+    {
         "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=s or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],
         "rs":"Disney Raw Strings"
     },

@@ -6202,7 +6202,13 @@
         "ts":0
     },
     "xbp":{
-        "p":"BMS/xbp.bms"
+        "p":"BMS/xbp.bms",
+        "fs":[{
+            "u":".",
+            "x":{
+                "BMS/xbp.bms":"BMS/xbp.bms"
+            }
+        }]
     },
     "legoracer_jam":{
         "p":"BMS/legoracer_jam.bms",
@@ -6414,6 +6420,15 @@
             "BMS/davilex_games.bms"
         ]],
         "ts":0
+    },
+    "sinemora":{
+        "p":"BMS/sinemora.bms",
+        "fs":[{
+            "u":".",
+            "x":{
+                "BMS/sinemora.bms":"BMS/sinemora.bms"
+            }
+        }]
     },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
