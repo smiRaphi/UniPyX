@@ -2043,6 +2043,7 @@ def extract4_1(inp:str,out:str,t:str):
                             case _: raise NotImplementedError(cn + '/' + tn + ': ' + str(ob[cn][tn][0]))
                         ob[cn][tn] = v
 
+            f.close()
             if ob: json.dump(ob,xopen(o + '/$' + tbasename(inp) + '.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
             if listdir(o): return
         case 'NCAA Gamebreaker PG':
@@ -2059,6 +2060,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if d[:4] == b'INDX': ext = 'indx'
                 else: ext = guess_ext_ps2(d)
                 open(o + f'/{ix:02d}.{ext}','wb').write(d)
+            f.close()
             if fs: return
         case 'Orange Juice Encrypted':
             of = o + '\\' + basename(inp)
@@ -2077,6 +2079,7 @@ def extract4_1(inp:str,out:str,t:str):
                 fmt = f.readu32()
                 if not fmt in (1,2): raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
                 xopen(o + f'/{fn}_{w}x{h}.{(0,"rgba8","argb16")[fmt]}','wb').write(f.read(f.readu32()))
+            f.close()
             if listdir(o): return
         case 'Destruction Derby 2 DirInfo':
             if db.print_try: print('Trying with custom extractor')
@@ -2092,6 +2095,43 @@ def extract4_1(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+            f.close()
             if fs: return
+        case 'One Piece Straw Wars Pirate Defense Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='>')
+            f.skip(8)
+
+            c = f.readu32()
+            fs = [(f.read(f.readu32()).rstrip(b'\0').decode(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+            f.close()
+            if fs: return
+        case 'D1 Grand Prix Series 2005 BIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            c = f.readu32() - 1
+            so = f.readu32()
+            f.seek(so)
+            sos = [f.readu32()+so for _ in range(c)]
+
+            f.seek(12)
+            fs = [(sos[ix],f.readu32(),f.readu32()) for ix in range(c)]
+            for fe in fs:
+                f.seek(fe[0])
+                n = f.read0s().decode()
+                f.seek(fe[1])
+                xopen(o + '/' + n,'wb').write(f.read(fe[2]))
+            f.close()
+            if fs: return
+        case 'RenderWare Texture Dictionary':
+            mkdir(o)
+            run(['rwexporter','-txd',i,o])
+            if listdir(o): return
 
     return 1

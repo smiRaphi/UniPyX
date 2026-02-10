@@ -818,6 +818,15 @@
         "rs":"eSMART Data"
     },
     {
+        "d":[["isat","\\0\\0\\0\\x20",0],["n0",4,4],["n0",4,8],["n0",4,12],["str0e",16,52,5],["py","f=open(inp,'rb');f.seek(4);o=f.read(4);f.seek(12);f.seek(int.from_bytes(f.read(4),'big'),1);return o==f.read(4)"]],
+        "rs":"One Piece Straw Wars Pirate Defense Resource"
+    },
+    {
+        "d":[["size",[128,2147483648]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],
+             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');cc=c*8+4;so=int.from_bytes(f.read(4),'little');ss=int.from_bytes(f.read(4),'little')+so;o=int.from_bytes(f.read(4),'little')\nif not(((cc+(-cc%64))==so and (ss+(-ss%64))==o)or((cc+(-cc%0x800))==so and (ss+(-ss%0x800))==o)):return\nf.seek(so);return int.from_bytes(f.read(4),'little')==(c*4-4)"]],
+        "rs":"D1 Grand Prix Series 2005 BIN"
+    },
+    {
         "d":[["s%",4096],["isat","\\x10\\0\\0\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,8],["n0",4,16],["py","if not exists(splitext(inp)[0]+'.mdf'):return\nf=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(8),'little')\nfor _ in range(c):\n if int.from_bytes(f.read(4),'little')&15!=12:return\nreturn True"]],
         "rs":"Encrypted Arsenal MTC+MDF","s":1
     },
@@ -898,7 +907,7 @@
         "rs":"Add PAC","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2)\nif o>=s:return\nf.seek(o-4);return int.from_bytes(f.read(4),'little')in(s,s-160)"]],
+        "d":[["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2)\nif o>=s or o<8:return\nf.seek(o-4);return int.from_bytes(f.read(4),'little')in(s,s-160)"]],
         "rs":"Advanced V.G. DAT"
     },
     {

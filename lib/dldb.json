@@ -5667,6 +5667,12 @@
             }
         }]
     },
+    "rwexporter":{
+        "p":"rwexporter.exe",
+        "fs":[
+        "https://github.com/AmyrAhmady/rwexporter/releases/download/v1.0/rwexporter.exe"
+        ]
+    },
     "ps3_unself":{
         "p":"ps3tools/unself.exe",
         "fs":[{
