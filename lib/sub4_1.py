@@ -2133,5 +2133,22 @@ def extract4_1(inp:str,out:str,t:str):
             mkdir(o)
             run(['rwexporter','-txd',i,o])
             if listdir(o): return
+        case 'Groove World Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='>')
+            f.skip(12)
+
+            rt = f.read0s().decode()
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.readu32(),f.read0s().decode()))
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(f'{o}/{rt}/{fe[2]}','wb').write(f.read(fe[1]))
+            f.close()
+            if fs: return
 
     return 1
