@@ -5658,6 +5658,15 @@
             }
         }]
     },
+    "qpcrypt":{
+        "p":"qpcrypt.exe",
+        "fs":[{
+            "u":"https://github.com/jwilins/qptk/releases/download/v1.0.0/qptk.zip",
+            "x":{
+                "qpcrypt.exe":"qpcrypt.exe"
+            }
+        }]
+    },
     "ps3_unself":{
         "p":"ps3tools/unself.exe",
         "fs":[{

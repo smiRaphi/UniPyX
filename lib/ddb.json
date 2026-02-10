@@ -890,6 +890,10 @@
         "rs":"Papaya Studio Wii VAPS","s":1
     },
     {
+        "d":[["isat","LAG\\0\\0\\0\\0\\0",0],["str0",8,16,4],["isin",["\\x01\\0\\0\\0","\\x02\\0\\0\\0"],32],["n0",4,24],["n0",4,28],["n0",4,36]],
+        "rs":"Orange Juice LAG","s":1
+    },
+    {
         "d":[["isat","add\\0",0],["isat","\\0\\0\\0",5],["n0",1,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);d=f.read(4);return s in(int.from_bytes(d,'little'),int.from_bytes(d,'big'))or not sum(d)"]],
         "rs":"Add PAC","s":1
     },
@@ -1609,6 +1613,14 @@
         "rq":null,
         "d":[["size",[265,null]],["isat","\\x80\\0\\0\\0",0],["isat","\\x80\\0\\0\\0",132],["n0",128,4],["n0",128,136]],
         "rs":"HMM Encrypted Snapshot"
+    },
+    {
+        "d":[["s%",16],["size",[16,4294967295]],["ext",".pg"],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little')*4+4\nif (c+(-c%16))!=int.from_bytes(f.read(4),'little'):return\nf.seek(c);return not sum(f.read(-c%16))"]],
+        "rs":"NCAA Gamebreaker PG"
+    },
+    {
+        "d":[["ext",".dat"],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')+4;return s==f.seek(0,2)"]],
+        "rs":"Orange Juice Encrypted"
     },
     {
         "rqr":null,

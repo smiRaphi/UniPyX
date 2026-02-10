@@ -2045,5 +2045,38 @@ def extract4_1(inp:str,out:str,t:str):
 
             if ob: json.dump(ob,xopen(o + '/$' + tbasename(inp) + '.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
             if listdir(o): return
+        case 'NCAA Gamebreaker PG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            c = f.readu32()
+            fs = [f.readu32() for _ in range(c)]
+            fs.append(f.size)
+            for ix in range(len(fs)-1):
+                f.seek(fs[ix])
+                d = f.read(fs[ix+1]-fs[ix])
+                if d[:4] == b'INDX': ext = 'indx'
+                else: ext = guess_ext_ps2(d)
+                open(o + f'/{ix:02d}.{ext}','wb').write(d)
+            if fs: return
+        case 'Orange Juice Encrypted':
+            of = o + '\\' + basename(inp)
+            run(['qpcrypt','decrypt',i,of])
+            if exists(of) and getsize(of): return
+        case 'Orange Juice LAG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+            assert f.read(4) == b'LAG\0'
+            f.skip(4)
+
+            while f:
+                fn = f.read(0x10).rstrip(b'\0').decode()
+                w,h = f.readu32(),f.readu32()
+                fmt = f.readu32()
+                if not fmt in (1,2): raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
+                xopen(o + f'/{fn}_{w}x{h}.{(0,"rgba8","argb16")[fmt]}','wb').write(f.read(f.readu32()))
+            if listdir(o): return
 
     return 1
