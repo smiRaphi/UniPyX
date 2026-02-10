@@ -294,6 +294,7 @@ def analyze(inp:str,raw=False):
                 ret = p.stdout.read().decode(errors='ignore').strip() == 'True'
             elif x[0] == 'ext': ret = inp.lower().endswith(tuple(x[1]) if type(x[1]) == list else x[1])
             elif x[0] == 'name': ret = basename(inp) == x[1]
+            elif x[0] == 'namei': ret = basename(inp).lower() == x[1]
             elif x[0] == 'print': print(*x[1:]);continue
             elif type(x[0]) == bool and x[0] == False: tret = ret = False
             elif isfile(inp):

@@ -2078,5 +2078,20 @@ def extract4_1(inp:str,out:str,t:str):
                 if not fmt in (1,2): raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
                 xopen(o + f'/{fn}_{w}x{h}.{(0,"rgba8","argb16")[fmt]}','wb').write(f.read(f.readu32()))
             if listdir(o): return
+        case 'Destruction Derby 2 DirInfo':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='<')
+
+            fs = []
+            while f:
+                fn = f.read(0x12).split(b'\0',1)[0]
+                if not fn: break
+                fs.append((fn.decode('ascii'),f.readu16()*0x800,f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+            if fs: return
 
     return 1

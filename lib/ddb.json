@@ -1615,6 +1615,10 @@
         "rs":"HMM Encrypted Snapshot"
     },
     {
+        "d":[["size",[4096,134215680]],["namei","dirinfo"],["isat","\\0",17],["isat","\\0",19],["str0e",0,18,5],["n0",2,18],["n0",4,20],["str0e",24,18,5],["n0",2,42],["n0",4,44]],
+        "rs":"Destruction Derby 2 DirInfo"
+    },
+    {
         "d":[["s%",16],["size",[16,4294967295]],["ext",".pg"],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little')*4+4\nif (c+(-c%16))!=int.from_bytes(f.read(4),'little'):return\nf.seek(c);return not sum(f.read(-c%16))"]],
         "rs":"NCAA Gamebreaker PG"
     },
