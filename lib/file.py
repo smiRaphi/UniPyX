@@ -3,15 +3,16 @@ import struct,io
 def align(n:int,blocksize:int): return -n % blocksize
 
 class File:
-    def __init__(self,f,mode='r',endian='>'):
+    def __init__(self,f,mode='r',endian='>',middle_u24_little=True):
+        if 'w' in mode and endian == '-': raise NotImplementedError('Middle endian not implemented for writing')
         if type(f) == str: f = open(f,mode.rstrip('b') + 'b')
         elif type(f) == bytes: f = io.BytesIO(f)
         self._f = f
         self._end = endian
+        self._mend_u24_le = middle_u24_little
 
         self._start_pos = self._f.tell()
-        self.seek(0,2)
-        self._size = self.tell()
+        self._size = self.seek(0,2)
         self.seek(0)
 
     def read(self,n:int=None) -> bytes: return self._f.read(n)
@@ -20,25 +21,46 @@ class File:
     def tell(self) -> int: return self._f.tell() - self._start_pos
     def close(self): self._f.close()
 
-    def skip(self,n:int): self.seek(n,1)
+    def skip(self,n:int): return self.seek(n,1)
+    def back(self,n:int): return self.skip(-n)
     def reads(self): return self.read(1)
 
-    def readu8 (self) -> int: return self.read(1)[0]
-    def readu16(self,end=None) -> int: return struct.unpack((end or self._end)+'H',self.read(2))[0]
+    def middle_scramble(self,d:bytes):
+        o = bytearray()
+        for i in range(len(d)//2):
+            o[i*2] = d[i*2+1]
+            o[i*2+1] = d[i*2]
+        if len(d) % 2: o.append(d[-1])
+        return bytes(o)
+    def unpack(self,fmt:str,end=None):
+        d = self.read(struct.calcsize(fmt))
+        end = end or self._end
+        if end == '-':
+            d = self.middle_scramble(d)
+            end = '>'
+        return struct.unpack(end + fmt,d)[0]
+
+    def readu8 (self) -> int: return self.unpack('B')
+    def readu16(self,end=None) -> int: return self.unpack('H',end)
     def readu24(self,end=None) -> int:
+        end = end or self._end
         d = self.read(3)
-        if (end or self._end) == '<': d = d + b'\0'
+        if end == '-':
+            if not self._mend_u24_le: d = self.middle_scramble(d)
+            end = '>'
+        if end == '<': d = d + b'\0'
         else: d = b'\0' + d
-        return struct.unpack((end or self._end)+'I',d)[0]
-    def readu32(self,end=None) -> int: return struct.unpack((end or self._end)+'I',self.read(4))[0]
-    def readu64(self,end=None) -> int: return struct.unpack((end or self._end)+'Q',self.read(8))[0]
-    def reads8 (self) -> int: return struct.unpack('b',self.read(1))[0]
-    def reads16(self,end=None) -> int: return struct.unpack((end or self._end)+'h',self.read(2))[0]
-    def reads32(self,end=None) -> int: return struct.unpack((end or self._end)+'i',self.read(4))[0]
-    def reads64(self,end=None) -> int: return struct.unpack((end or self._end)+'q',self.read(8))[0]
-    def readfloat(self,end=None):
-        v = struct.unpack((end or self._end)+'f',self.read(4))[0]
+        return struct.unpack(end+'I',d)[0]
+    def readu32(self,end=None) -> int: return self.unpack('I',end)
+    def readu64(self,end=None) -> int: return self.unpack('Q',end)
+    def reads8 (self) -> int: return self.unpack('b')
+    def reads16(self,end=None) -> int: return self.unpack('h',end)
+    def reads32(self,end=None) -> int: return self.unpack('i',end)
+    def reads64(self,end=None) -> int: return self.unpack('q',end)
+    def readf32(self,end=None):
+        v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
+    def readf64(self,end=None) -> float: return self.unpack('d',end)
     def readleb128u(self):
         n = c = b = 0
         while True:

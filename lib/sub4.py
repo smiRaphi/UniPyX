@@ -697,7 +697,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive'|\
              'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive'|\
              'Gabriel Knight 3 Barn Game Archive'|'Haemimont Games AD Game Archive'|'Harry Potter: Quidditch World Cup Game Archive'|\
-             'Highway Pursuit Game Archive'|'UE3 Package'|'Xenonauts Game Archive'|'LithTech Resource':
+             'Highway Pursuit Game Archive'|'UE3 Package'|'Xenonauts Game Archive'|'LithTech Resource'|'Novalogic PFF':
             if db.print_try: print('Trying with gameextractor')
             run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
             remove(dirname(db.get('gameextractor')) + '/logs')
@@ -1449,8 +1449,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             opts.write('chrRender_max_readIni=' + ('Y' if f.readu8() else 'N') + '\n')
             opts.write('chrRender_max_enabled=' + ('Y' if f.readu8() else 'N') + '\n')
-            opts.write('chrRender_max_softX=' + str(f.readfloat('<') * 16) + '\n')
-            opts.write('chrRender_max_softY=' + str(f.readfloat('<') * 16) + '\n')
+            opts.write('chrRender_max_softX=' + str(f.readf32('<') * 16) + '\n')
+            opts.write('chrRender_max_softY=' + str(f.readf32('<') * 16) + '\n')
 
             assert dec_str(f.read(f.readu16('>'))) == 'okSoFar'
 
@@ -2418,7 +2418,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 ob[n] = f.readu32()
             for _ in range(fc):
                 n = rs0(f.readu32())
-                ob[n] = f.readfloat()
+                ob[n] = f.readf32()
             for _ in range(sc):
                 n = rs0(f.readu32())
                 ob[n] = rs0(f.readu32())
