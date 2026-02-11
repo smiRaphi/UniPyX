@@ -645,7 +645,7 @@
     },
     {
         "d":[["isat","\\0\\0\\0",0],["isat","\\0\\0\\0",4],["isat","\\0\\0\\0\\0",12],["isat","\\0\\0\\0\\0",-4],["isin",["\\x01","\\x02","\\x03","\\x06","\\x07","\\x08","\\x09"],3],["isin",["\\x00","\\x01","\\x02","\\x03","\\x04","\\x05","\\x06","\\x07","\\x08","\\x09"],7],
-             ["py","f=open(inp,'rb');fs=f.seek(0,2);f.seek(8);fo=int.from_bytes(f.read(4),'big')\nif fo%0x10!=0 or (fo+5)>fs:return\nf.seek(fo-8);return (int.from_bytes(f.read(4),'big')+5)<=fs"]],
+             ["py","f=open(inp,'rb');fs=f.seek(0,2);f.seek(8);fo=int.from_bytes(f.read(4),'big')\nif fo<8 or fo%0x10!=0 or (fo+5)>fs:return\nf.seek(fo-8);return (int.from_bytes(f.read(4),'big')+5)<=fs"]],
         "rs":"Nintendo Mario Party Message"
     },
     {
@@ -780,6 +780,10 @@
     {
         "d":[["isat","\\0\\0\\0\\0\\0\\x03\\0\\0",0],["isat","\\0\\0\\0\\x30",12],["isatS","\\0",8,40],["n0",4,8],["n0",4,32],["n0",4,36]],
         "rs":"Phineas And Ferb WAD"
+    },
+    {
+        "d":[["isat","\\0\\0\\0",0],["isatS","\\0",28,4],["isatS","\\0",20,44],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1"],52],["n0",4,0],["n0",4,40],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2);f.seek(32)\nfor _ in range(c):f.seek(8,1);f.seek(int.from_bytes(f.read(4),'big')+20,1)\nc=int.from_bytes(f.read(4),'big')\nif not c:return\nreturn (f.tell()+28+c*32)==s"]],
+        "rs":"Ludia Dir"
     },
     {
         "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=s or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],

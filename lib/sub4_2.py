@@ -405,5 +405,49 @@ def extract4_2(inp:str,out:str,t:str):
                 xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
             f.close()
             if listdir(o): return
+        case 'Ludia Dir':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='>')
+
+            co = f.readu32()
+            f.skip(0x1C)
+            omp = {}
+            for _ in range(co):
+                op = f.readu32()
+                vop = f.readu32()
+                if vop == 1: omp[op] = f.pos + 0x18
+                elif vop != 0: print('Unknown offset map bool:',vop,op,f.pos-8)
+                f.skip(f.readu32()+0x14)
+
+            c = f.readu32()
+            f.skip(0x1C)
+            fs = []
+            for _ in range(c):
+                fn = f.read(4)[::-1].hex().upper()
+                fn = f.read(4)[::-1].hex().upper() + '/' + fn
+                off = f.readu32()
+                if off == 0: off = 0x40
+                else: off = omp[off]
+                fs.append((off+f.readu32(),f.readu32(),fn))
+                f.skip(12)
+
+            for fe in fs:
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                if d[:6] == b'<root>' and (d[-7:] == b'</root>' or d[-8:] == b'</root>\t' or d[-9:] == b'</root>\r\n'): ext = 'xml'
+                elif d[:4] == b'\x00\x20\xAF\x30': ext = 'tpl'
+                elif len(d) == 0x38 and d[:4] == b'\x02\0\0\x02' and d[0x20:0x24] == b'\0\0\0\x02' and d[0x28:0x34] == b'\x3F\x80\0\0\x3F\x80\0\0\0\0\0\x01': ext = 'mat'
+                elif len(d) == 0x1C and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x84\xDF\x2E\x3D': ext = 'spt'
+                elif len(d) in (0x3C,0x20) and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x9E\x44\xEB\xDC' and d[0x14:0x18] == b'\0\0\0\0' and d[0x1C:0x1F] == b'\0\0\0' and d[0x1F] in (0,1): ext = 'txs'
+                elif len(d) == 0x70 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x11\xB7\x85\xc4': ext = 'mdl'
+                elif len(d) == 0x6C and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x8A\xDE\x4F\xA6': ext = 'cam'
+                elif len(d) >= 0x2C and not len(d)%4 and len(d) <= 0x100 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x12\x0D\x26\x3D': ext = 'scn'
+                elif not len(d)%8 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x75\xBF\xBD\xE6': ext = 'vtx'
+                elif not len(d)%2 and d[:8] == b'\0\0\0\x02\0\0\0\x02' and d[11] and d[8:12] == d[12:16] == d[20:24]: ext = 'msh'
+                else: ext = 'bin'
+                xopen(o + f'/{fe[2]}.{ext}','wb').write(d)
+            f.close()
+            if fs: return
 
     return 1
