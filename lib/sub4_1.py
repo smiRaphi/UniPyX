@@ -2150,5 +2150,22 @@ def extract4_1(inp:str,out:str,t:str):
                 xopen(f'{o}/{rt}/{fe[2]}','wb').write(f.read(fe[1]))
             f.close()
             if fs: return
+        case 'Metal Slug 3D PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) in (b'DATA',b'MENU',b'SEDT',b'STRD')
+            f.skip(8)
+
+            c = f.readu32()
+            fs = [f.readu32() for _ in range(c+1)]
+            for ix in range(c):
+                f.seek(fs[ix])
+                d = f.read(fs[ix+1]-fs[ix])
+                if d[:4] == b'PK\0\x02': ext = 'pk'
+                elif d[:4] in (b'DATA',b'MENU',b'SEDT',b'STRD'): ext = 'pak'
+                else: ext = guess_ext_ps2(d)
+                open(o + f'/{ix:02d}.{ext}','wb').write(d)
+            if fs: return
 
     return 1

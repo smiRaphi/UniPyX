@@ -145,6 +145,7 @@ class DLDB:
             for _ in range(5):
                 try: rmtree(td)
                 except PermissionError: sleep(0.1)
+                else: break
         elif ex == '.rar':
             td = gtmp()
             self.run(['unrar','x','-or','-op' + td,p])
@@ -152,6 +153,7 @@ class DLDB:
             for _ in range(5):
                 try: rmtree(td)
                 except PermissionError: sleep(0.1)
+                else: break
         elif ex == '.msi':
             td = gtmp()
             os.makedirs(td,exist_ok=True)

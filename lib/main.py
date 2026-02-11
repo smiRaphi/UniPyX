@@ -752,6 +752,9 @@ def guess_ext_ps2(f):
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'TIM2': ext = 'tm2'
     elif tag in (b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'): ext = 'vag'
+    if not ext and tag == b'IECS':
+        if f.read(4) == b'sreV': ext = 'hd'
+        else: f.seek(-4,1)
     if not ext and tag == b'\x10\0\0\0':
         if int.from_bytes(f.read(4),'little') in (2,8,9):
             fo = int.from_bytes(f.read(4),'little')

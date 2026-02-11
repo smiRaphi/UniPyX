@@ -239,10 +239,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
             f = open(i,'rb')
-            for off in (0x1C76,0x1C70):
-                f.seek(-off,2)
-                gog = f.read(15) == b'00#GOGCRCSTRING'
-                if gog: break
+            f.seek(-0x1800,2)
+            gog = b'00#GOGCRCSTRING' in f.read()
             f.close()
 
             if not gog:
@@ -263,7 +261,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             if isfile(o + '/' + x): mv(o + '/' + x,o + '/$INSFILES/' + x)
                             else:
                                 if exists(o + '/$INSFILES'): copydir(o + '/' + x,o + '/$INSFILES',True)
-                                else: mv(o + '/' + x,o + '/$INSFILES/')
+                                else: mv(o + '/' + x,o + '/$INSFILES')
                         except PermissionError: copy(o + '/' + x,o + '/$INSFILES/')
                 if exists(o + '/{app}'):
                     while True:
@@ -278,9 +276,24 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if pwd: pwd = ['-P',pwd[2:]]
             run(['innoextract','-e','-q','--iss-file','-g'] + pwd + ['-d',o,i])
             if listdir(o):
-                for x in listdir(o):
-                    if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
-                if exists(o + '/app'): copydir(o + '/app',o,True)
+                if gog:
+                    for x in listdir(o):
+                        p = o + '/' + x
+                        if (isfile(p) and (x.startswith('goggame-') or x == 'install_script.iss')) or\
+                           (isdir(p)  and (x in ('tmp','embedded','__redist'))): mv(p,o + '/$INSFILES/' + x)
+                        elif isdir(p) and x in ('commonappdata','app'): copydir(p,o + '/$INSFILES',True)
+                        elif isdir(p) and x == '__support':
+                            for xf in listdir(p):
+                                if xf == 'app': copydir(p + '/' + xf,o,True)
+                                else: mv(p + '/' + xf,o + '/$INSFILES/' + xf)
+                            rmdir(p)
+                else:
+                    for x in listdir(o):
+                        if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
+                    if exists(o + '/app'): copydir(o + '/app',o,True)
+                    if listdir(o) == ['$INSFILES']:
+                        if fix_innoinstext(o,i): return
+                        else: return 1
                 return
         case 'VISE Installer': return quickbms('instexpl')
         case 'MSI':

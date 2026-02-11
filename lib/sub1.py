@@ -787,5 +787,60 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     of.write(d)
                 of.close()
             if fs: return
+        case 'Bootable FAT16 IMG':
+            if db.print_try: print('Trying with custom extractor')
+            from datetime import datetime
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0xA0B)
+            assert f.readu8() == 8
+            f.skip(0x14)
+
+            fs = []
+            while f:
+                fn = f.read(8)
+                if not fn[0]: break
+                if fn[0] in (5,0xE5): fn = fn[1:]
+                fn = fn.decode('ascii').rstrip()
+                ex = f.read(3).decode('ascii').rstrip()
+                if ex: fn += '.' + ex
+
+                atr = f.readu8()
+                if not fn.strip('.'):
+                    if atr & 0x10:
+                        f.skip(0x14)
+                        continue
+                    else: fn = f'_{fn}_'
+                if atr & 0x10: raise NotImplementedError(f'Directory @ 0x{f.pos-12:4X}')
+                elif atr & 0x40: raise NotImplementedError(f'Device @ 0x{f.pos-12:4X}')
+                f.skip(1)
+
+                rcd = f.read(5)
+                f.skip(4)
+                if sum(rcd):
+                    f.skip(4)
+                    ct = int.from_bytes(rcd[1:3],'little')
+                    cd = int.from_bytes(rcd[3:5],'little')
+                else:
+                    ct = f.readu16()
+                    cd = f.readu16()
+                tm = datetime(1980 + ((cd >> 9) & 0x7F),(cd >> 5) & 0xF,cd & 0x1F,(ct >> 11) & 0x1F,(ct >> 5) & 0x3F,(ct & 0x1F) * 2)
+                if sum(rcd): tm = tm.replace(microsecond=rcd[0] * 1000000)
+
+                fs.append((fn,f.readu16(),f.readu32(),tm.timestamp()))
+
+            csf = []
+            for fe in fs:
+                if fe[2]: csf.append(fe)
+            sorted(csf,key=lambda x:x[1])
+            if len(csf) < 2: cs = 0x200
+            else: cs = 1 << (csf[0][2] // (csf[1][1] - csf[0][1])).bit_length()
+
+            for fe in fs:
+                f.seek((fe[1]+1) * cs)
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+                if fe[3]: set_ctime(o + '/' + fe[0],fe[3])
+            if fs: return
 
     return 1
