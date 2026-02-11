@@ -424,8 +424,8 @@ def extract4_2(inp:str,out:str,t:str):
             f.skip(0x1C)
             fs = []
             for _ in range(c):
-                fn = f.read(4)[::-1].hex().upper()
-                fn = f.read(4)[::-1].hex().upper() + '/' + fn
+                fn = f.read(4).hex().upper()
+                fn = f.read(4).hex().upper() + '/' + fn
                 off = f.readu32()
                 if off == 0: off = 0x40
                 else: off = omp[off]
@@ -459,6 +459,26 @@ def extract4_2(inp:str,out:str,t:str):
             for ix in range(c-1):
                 f.seek(fs[ix])
                 open(o + f'/{ix:02d}.bin','wb').write(f.read(fs[ix+1]-fs[ix]))
+            f.close()
+            if fs: return
+        case 'Blade Runner TLK/MIX':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu16()
+            bo = f.size-f.readu32()
+
+            fs = [(f.read(4)[::-1].hex().upper(),f.readu32()+bo,f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[2])
+                if d[:2] == b'\x22\x56': ext = 'audio'
+                elif d[:4] == b'FORM' and d[8:12] == b'WVQA': ext = 'wvqa'
+                elif d[:3] == b'Set' and d[3:4].isdigit(): ext = 'set'
+                else: ext = 'bin'
+                open(o + f'/{fe[0]}.{ext}','wb').write(d)
+            f.close()
             if fs: return
 
     return 1
