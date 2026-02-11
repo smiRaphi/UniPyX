@@ -28,8 +28,8 @@ class File:
     def middle_scramble(self,d:bytes):
         o = bytearray()
         for i in range(len(d)//2):
-            o[i*2] = d[i*2+1]
-            o[i*2+1] = d[i*2]
+            o.append(d[i*2+1])
+            o.append(d[i*2])
         if len(d) % 2: o.append(d[-1])
         return bytes(o)
     def unpack(self,fmt:str,end=None):

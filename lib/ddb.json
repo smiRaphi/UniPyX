@@ -907,6 +907,10 @@
         "rs":"Metal Slug 3D PAK"
     },
     {
+        "d":[["size",[16,104857600]],["str0e",0,32,5],["py","f=open(inp,'rb')\nwhile neof(f):\n for _ in range(256):\n  b=f.read(1)\n  if not b:return\n  if not b[0]:break\n  try:b.decode()\n  except:return\n else:return\n s=int.from_bytes(f.read(2)[::-1]+f.read(2)[::-1],'big')\n if len(f.read(s))!=s:return\nreturn True"]],
+        "rs":"OHRRPGCE RPG"
+    },
+    {
         "d":[["isat","add\\0",0],["isat","\\0\\0\\0",5],["n0",1,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);d=f.read(4);return s in(int.from_bytes(d,'little'),int.from_bytes(d,'big'))or not sum(d)"]],
         "rs":"Add PAC","s":1
     },

@@ -394,5 +394,16 @@ def extract4_2(inp:str,out:str,t:str):
                 else: ext = guess_ext_ps2(d)
                 open(o + f'/{ix:02d}.{ext}','wb').write(d)
             if fs: return
+        case 'OHRRPGCE RPG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(inp,endian='-')
+
+            while f:
+                fn = f.read0s().decode()
+                while fn.startswith(('../','..\\')): fn = fn[3:] 
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+            f.close()
+            if listdir(o): return
 
     return 1

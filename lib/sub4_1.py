@@ -1782,6 +1782,6 @@ def extract4_1(inp:str,out:str,t:str):
 
         case _:
             from lib.sub4_2 import extract4_2
-            return extract4_2(inp,o)
+            return extract4_2(inp,o,t)
 
     return 1
