@@ -449,5 +449,16 @@ def extract4_2(inp:str,out:str,t:str):
                 xopen(o + f'/{fe[2]}.{ext}','wb').write(d)
             f.close()
             if fs: return
+        case 'Mission Impossible 3 Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu16()
+            fs = [f.readu32()+2+c*4 for _ in range(c)]
+            for ix in range(c-1):
+                f.seek(fs[ix])
+                open(o + f'/{ix:02d}.bin','wb').write(f.read(fs[ix+1]-fs[ix]))
+            if fs: return
 
     return 1

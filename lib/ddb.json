@@ -814,6 +814,10 @@
         "rs":"Super Monkey Ball SPG2","s":1
     },
     {
+        "d":[["isat","\\0\\0\\0\\0",2],["n0",2,0],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');f.seek(c*4-2);s=int.from_bytes(f.read(4),'little');return (2+c*4+s)==f.seek(0,2)"]],
+        "rs":"Mission Impossible 3 Data"
+    },
+    {
         "d":[["size",[6,65537]],["isat","\\0",-1],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=f.seek(0,2);f.seek(2);fs=int.from_bytes(f.read(2),'little')\nif s<(2+4*c) or fs!=(2+2*c):return\nfor _ in range(c-1):\n if (int.from_bytes(f.read(2),'little')+2)>s:return\nreturn True"]],
         "rs":"eSMART String Data"
     },
