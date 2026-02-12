@@ -778,6 +778,12 @@
         "rs":"PlayStation Trophy File","s":1
     },
     {
+        "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix') or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')+12)==s"]],
+        "rs":"Nintendo HARC+HIDX","s":1},{
+        "d":[["isat","HIDX",0],["n0",4,4],["py","if not exists(splitext(inp)[0]+'.har'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*17+8)==s"]],
+        "rs":"Nintendo HARC+HIDX","s":1
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0\\0\\x03\\0\\0",0],["isat","\\0\\0\\0\\x30",12],["isatS","\\0",8,40],["n0",4,8],["n0",4,32],["n0",4,36]],
         "rs":"Phineas And Ferb WAD"
     },

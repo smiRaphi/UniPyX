@@ -480,5 +480,23 @@ def extract4_2(inp:str,out:str,t:str):
                 open(o + f'/{fe[0]}.{ext}','wb').write(d)
             f.close()
             if fs: return
+        case 'Nintendo HARC+HIDX':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            fd = open(noext(i) + '.har','rb')
+            f = File(noext(i) + '.hix',endian='<')
+            assert f.read(4) == b'HIDX' and fd.read(4) == b'HARC'
+
+            c = f.readu32()
+            fs = [(f.read(9).hex().upper(),f.readu32(),f.readu32()) for _ in range(c)]
+            f.close()
+            for fe in fs:
+                fd.seek(fe[1]+12)
+                d = fd.read(fe[2])
+                if d[:4] == b'\x89PNG': ext = 'png'
+                else: ext = 'bin'
+                open(o + f'/{fe[0]}.{ext}','wb').write(d)
+            fd.close()
+            if fs: return
 
     return 1
