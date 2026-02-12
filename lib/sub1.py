@@ -133,7 +133,24 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in ('ZSTD','xz','BZip2','LZIP'): return fix_tar(o)
+                elif t in ('ZSTD','xz','BZip2','LZIP'):
+                    if t == 'ZSTD':
+                        xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
+
+                        of = o + '\\' + listdir(o)[0]
+                        tg = open(of,'rb').read(4)
+                        if tg in xm:
+                            tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
+                            rename(of,tp)
+                            r = extract(tp,o,xm[tg])
+                            if r: rename(tp,of)
+                            else:
+                                while True:
+                                    try: remove(tp)
+                                    except PermissionError: sleep(0.1)
+                                    else: break
+                            return
+                    return fix_tar(o)
                 else: return
         case 'Stripped TAR':
             if db.print_try: print('Trying with custom extractor')

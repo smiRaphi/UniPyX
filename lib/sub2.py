@@ -139,10 +139,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
         case 'Switch NSP'|'Switch NCA'|'Switch XCI':
+            st = {'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t]
             for k in ('prod','dev'):
-                bcd = ['hac2l','-t',{'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t],'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + dirname(db.get(k+'keys')) + '\\title.keys']
+                bcd = ['hac2l','-t',st,'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + dirname(db.get(k+'keys')) + '\\title.keys']
                 _,e,_ = run(bcd + [i],print_try=False)
-                bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS']
+                bcd += ['--exefsdir=' + o + '\\ExeFS','--romfsdir=' + o + '\\RomFS','--outdir=' + o]
+                if st == 'nca': bcd.append('--baseappfs=' + dirname(i))
+
                 if ' MetaType=Patch ' in e and not ' MetaType=App ' in e:
                     pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
                     pid,pv = pinf[1],int(pinf[2],16)
@@ -152,7 +155,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
                             except: v = 0
                             if v < pv: bf = dirname(i) + '\\' + x;break
                     else: return 1
-                    bcd += ['--basepfs',bf]
+                    bcd.append('--base' + st + '=' + bf)
+
                 run(bcd + [i])
                 if listdir(o) and listdir(o + '/ExeFS') and listdir(o + '/RomFS'): return
                 rmdir(o)
