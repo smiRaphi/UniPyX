@@ -1,4 +1,5 @@
 from lib.main import *
+from lib.dldb import BDIR
 
 def extract4_2(inp:str,out:str,t:str):
     run = db.run
@@ -498,5 +499,133 @@ def extract4_2(inp:str,out:str,t:str):
                 open(o + f'/{fe[0]}.{ext}','wb').write(d)
             fd.close()
             if fs: return
+        case 'Petroglyph MEG':
+            if db.print_try: print('Trying with custom extractor')
+            from zlib import crc32
+            from lib.file import File
+            f = File(i,endian='<')
+
+            fnc = f.readu32()
+            fc = f.readu32()
+            if fnc == fc: v = 1
+            else:
+                assert fc == 0x3F7D70A4
+                assert fnc in (0x8FFFFFFF,0xFFFFFFFF)
+                AES = fnc == 0x8FFFFFFF
+                ds = f.readu32()
+                fnc = f.readu32()
+                fc = f.readu32()
+                if AES:
+                    try: from Cryptodome.Cipher import AES # type: ignore
+                    except ImportError: from Crypto.Cipher import AES # type: ignore
+                    v = 3
+
+                    fns = f.readu32()
+                    fns += -fns%0x10
+                    f.skip(fns)
+                    for _ in range(fc):
+                        if f.readu16(): break
+                        f.skip(0x12)
+                    else: raise NotImplementedError('Encrypted archive without encrypted file entries, can\'t get/verify key')
+                    ent = f.read(0x20)
+
+                    DB = BDIR + '/bin/pet_megkeys.bdb'
+                    if not exists(DB):
+                        import re
+                        bdb = open(DB,'wb')
+                        for k in re.findall(r'Key: *([\dA-Fa-f]{32}).*<br */>\s*IV: *([\dA-Fa-f]{32})',db.c.get('https://modtools.petrolution.net/docs/MegFileFormat').text): bdb.write(bytes.fromhex(k[0] + k[1]))
+                        bdb.close()
+                    bdb = open(DB,'rb')
+                    kdb = []
+                    while True:
+                        kiv = bdb.read(0x20)
+                        if not kiv: break
+                        kdb.append((kiv[:0x10],kiv[0x10:]))
+
+                    for k,iv in kdb:
+                        def aes(i:bytes): return AES.new(key=k,mode=AES.MODE_CBC,IV=iv).decrypt(i)
+                        dent = aes(ent)
+                        if not sum(dent[4:8]) and int.from_bytes(dent[12:16],'little') == ds:break
+                    else: raise NotImplementedError('Key not found')
+                else:
+                    fns = f.readu32()
+                    if (0x18+fns+fc*0x14) == ds:
+                        aes = None
+                        v = 3
+                    else: v = 2
+
+            f.seek([8,0x14,0x18][v-1])
+            sdb = {}
+            if v < 3 or not aes:
+                for _ in range(fnc):
+                    fn = f.read(f.readu16())
+                    sdb[crc32(fn) & 0xFFFFFFFF] = fn.decode('ascii')
+                if v == 3: f.seek(0x18+fns)
+            else:
+                fnd = aes(f.read(fns))
+                for _ in range(fnc):
+                    fnl = int.from_bytes(fnd[:2],'little')
+                    fn,fnd = fnd[2:fnl+2],fnd[fnl+2:]
+                    sdb[crc32(fn) & 0xFFFFFFFF] = fn.decode('ascii')
+
+            fs = []
+            dn = {}
+            for _ in range(fc):
+                if v == 3:
+                    if f.readu16():
+                        assert aes
+                        fe = aes(f.read(0x20))
+                        crc = int.from_bytes(fe[:4],'little')
+                        fidx = int.from_bytes(fe[0x10:0x12],'little')
+                        fe = [int.from_bytes(fe[8:12],'little'),int.from_bytes(fe[12:16],'little')]
+                    else:
+                        crc = f.readu32()
+                        f.skip(4)
+                        fe = [f.readu32(),f.readu32()]
+                        fidx = f.readu16()
+                else:
+                    crc = f.readu32()
+                    f.skip(4)
+                    fe = [f.readu32(),f.readu32()]
+                    fidx = f.readu32()
+
+                icrc = list(sdb)[fidx-1]
+                if not crc in sdb or (crc in dn and not icrc in dn): crc = icrc
+                if not crc in dn: dn[crc] = 0
+                fs.append([sdb[crc] + (f'.{dn[crc]}' if dn[crc] else '')] + fe)
+                dn[crc] += 1
+
+            for fe in fs:
+                f.seek(fe[2])
+                d = f.read(fe[1])
+                if v == 3 and aes: d = aes(d + f.read(-fe[1]%0x10))[:fe[1]]
+                xopen(o + '/' + fe[0],'wb').write(d)
+            if fs: return
+        case 'Petroglyph Zlib CH':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='>')
+            f.skip(0x10)
+            s = f.readu32()
+            f.skip(0x10)
+            open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read(s)))
+            if s: return
+        case 'Petroglyph CHK List':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            f.skip(6)
+            c = f.readu16()
+
+            of = open(o + '/' + tbasename(i) + '.txt','w')
+            for _ in range(c):
+                assert f.readu32() == 0
+                f.skip(2)
+                nxp = f.readu16() + f.pos
+                of.write(f.read(f.readu16()).decode() + '\n')
+                f.seek(nxp)
+            of.close()
+            if c: return
 
     return 1
