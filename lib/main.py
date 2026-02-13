@@ -688,13 +688,24 @@ def guess_ext(f):
     ext = None
     if tag == b'\x89PNG': ext = 'png'
     elif tag == b'RIFF': ext = 'wav'
+    elif tag == b'OggS': ext = 'ogg'
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'DXBC': ext = 'cso'
     elif tag == b'NES\x1A': ext = 'nes'
     elif tag == b'DDS ': ext = 'dds'
-    elif tag == b'Crea':
+    if not ext and tag == b'Crea':
         if f.read(0x10) == b'tive Voice File\x1A': ext = 'voc'
         else: f.seek(-0x10,1)
+    if not ext and tag == b'Kayd':
+        if f.read(0x13) == b'ara FBX Binary  \0\x1A\0': ext = 'fbx'
+        else: f.seek(-0x13,1)
+    if not ext and tag == b'<?xm':
+        if f.read(15) == b'l version="1.0"': ext = 'xml'
+        else: f.seek(-15,1)
+    if not ext and tag == b'# Bl':
+        hd = f.read(0x16)
+        if hd[:6] == b'ender ' and hd[11:] == b' MTL File: ' and (hd[6:7]+hd[8:9]+hd[10:11]).isdigit() and hd[7] == hd[9] == 0x2E: ext = 'blend'
+        else: f.seek(-0x16,1)
     if not ext:
         if s == int.from_bytes(tag,'little'):
             if f.read(2) in (b'\x11\xAF',b'\x12\xAF',b'\x30\xAF',b'\x31\xAF',b'\x44\xAF'): ext = 'flc'

@@ -6548,6 +6548,13 @@
         ],
         "ts":0
     },
+    "hatch/sonic_galactic_demo2.txt":{
+        "p":"hatch/sonic_galactic_demo2.txt",
+        "fs":[[
+            "https://raw.githubusercontent.com/bartlomiejduda/Tools/refs/heads/master/NEW%20Tools/Hatch%20Engine/Hatch%20Engine%20Archive%20Tool/filelists/sonic_galactic_demo2_filenames.txt",
+            "hatch/sonic_galactic_demo2.txt"
+        ]]
+    },
     "spaghettikart_yaml":{
         "p":"Torch/SpaghettiKart",
         "fs":[[

@@ -1377,5 +1377,9 @@
     "Novalogic PFF":[
         "novalogic game data archive (pff3)",
         "novalogic game data archive (pff0)"
+    ],
+    "Tiled TMX/TSX":[
+        "tiled tiles map xml",
+        "tiled tiles set xml"
     ]
 }

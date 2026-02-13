@@ -610,6 +610,7 @@ def extract4_2(inp:str,out:str,t:str):
             s = f.readu32()
             f.skip(0x10)
             open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read(s)))
+            f.close()
             if s: return
         case 'Petroglyph CHK List':
             if db.print_try: print('Trying with custom extractor')
@@ -625,7 +626,166 @@ def extract4_2(inp:str,out:str,t:str):
                 nxp = f.readu16() + f.pos
                 of.write(f.read(f.readu16()).decode() + '\n')
                 f.seek(nxp)
+            f.close()
             of.close()
             if c: return
+        case 'Hatch Game Engine HATCH':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(5) == b'HATCH' and f.readu24() == 1
+            c = f.readu16()
+
+            sdb = open(db.get('hatch/sonic_galactic_demo2.txt')).read().replace('../','').replace('..\\','').split('\n')
+            sdb += [
+                "Music/Pause.ogg",
+                "Music/Bonus.ogg",
+                "Scenes/BonusStage/0.tmx",
+                "Scenes/BonusStage/8.tmx",
+                "Scenes/URZ/TileConfig.bin",
+                "Scenes/Menus/LevelSelect.tmx",
+                "Scenes/Menus/SpecialStageResults.tmx",
+                "Sprites/CGZ/robocutscene/WhaleWaterDrip.bin",
+                "Models/SpecialStage/Prism.mtl",
+                "Objects/00D71C4D.ibc","Objects/031EE258.ibc","Objects/0346F6B3.ibc","Objects/064D6CFE.ibc","Objects/0A6E196B.ibc","Objects/13073F4D.ibc","Objects/14788EAA.ibc","Objects/171E1A4F.ibc","Objects/176FF6D0.ibc","Objects/195CC741.ibc","Objects/1F0F32D3.ibc","Objects/23F493FF.ibc","Objects/257B075B.ibc","Objects/2933F80F.ibc","Objects/2B6CE206.ibc","Objects/2B8DC6F8.ibc","Objects/2C73DA4E.ibc","Objects/2FB3F065.ibc","Objects/313D8216.ibc","Objects/3957C884.ibc","Objects/39F5D55A.ibc","Objects/3C0C7D95.ibc","Objects/3F1EE089.ibc","Objects/424A46AD.ibc","Objects/45E5BEB7.ibc","Objects/46C51724.ibc","Objects/470FBA93.ibc","Objects/47ABABD7.ibc","Objects/54A9000E.ibc","Objects/54B60127.ibc","Objects/59813EB6.ibc","Objects/5A21748A.ibc","Objects/5B950600.ibc","Objects/5CD8D231.ibc","Objects/619009F4.ibc","Objects/63259C4D.ibc","Objects/6469B94A.ibc","Objects/65A3AB98.ibc","Objects/662212AD.ibc","Objects/69D6F0D1.ibc","Objects/6AC70B8E.ibc","Objects/6CC0DFC4.ibc","Objects/7006C23B.ibc","Objects/700E6286.ibc","Objects/72A3605F.ibc","Objects/72B75E8B.ibc","Objects/74DC46AA.ibc","Objects/76B4E577.ibc","Objects/782C6CBB.ibc","Objects/78AA940F.ibc","Objects/795137D2.ibc","Objects/7967014D.ibc","Objects/7B85D0B3.ibc","Objects/7BF78CCB.ibc","Objects/7E855216.ibc","Objects/83159BB7.ibc","Objects/839DBFD7.ibc","Objects/859241D1.ibc","Objects/85A03876.ibc","Objects/87F2E47B.ibc","Objects/8F6881EB.ibc","Objects/9643FE12.ibc","Objects/A8BF5D29.ibc","Objects/AAEF9CF0.ibc","Objects/AC3BF2A9.ibc","Objects/B0BF217B.ibc","Objects/B320A756.ibc","Objects/B4531A19.ibc","Objects/B73D2477.ibc","Objects/BB0D7D0A.ibc","Objects/BBCBEFC8.ibc","Objects/BC0AEBD7.ibc","Objects/C0E8F4FB.ibc","Objects/C13D30D5.ibc","Objects/C3053FA6.ibc","Objects/C6F46193.ibc","Objects/C87BD4F5.ibc","Objects/CC00CC0C.ibc","Objects/CC98E906.ibc","Objects/CF6650EA.ibc","Objects/D1853F83.ibc","Objects/D20E5DD9.ibc","Objects/D2190C24.ibc","Objects/D23D0EF1.ibc","Objects/DAEA4D68.ibc","Objects/DB281BB8.ibc","Objects/DB7AF940.ibc","Objects/E018F13B.ibc","Objects/E1E8A679.ibc","Objects/E5F16295.ibc","Objects/E89B8F94.ibc","Objects/EB62E8A4.ibc","Objects/ECFD2F78.ibc","Objects/EF11E0C3.ibc","Objects/F0BBFC4A.ibc","Objects/F3FB47D5.ibc","Objects/F462DB66.ibc","Objects/F4F906AE.ibc","Objects/FA58AFC8.ibc",
+                "Sprites/HPZ/SparkKino.png",
+                "Sprites/CGZ/Teleporter.png",
+                "Sprites/Global/Tornado.bin",
+                "Sprites/Global/SelectionArrow.bin",
+                "Sprites/HPZ/GreenFuse.bin",
+                "Sprites/Menu/Options/ControllerKeys.bin",
+                "SoundFX/Announcer/Sonic.wav",
+                "SoundFX/Announcer/Knuckles.wav",
+                "SoundFX/Announcer/Mighty.wav",
+                "SoundFX/Announcer/ItsADraw.wav",
+                "SoundFX/Announcer/Ray.wav",
+                "SoundFX/Announcer/Tails.wav",
+                "SoundFX/Announcer/Player4.wav",
+                "SoundFX/Announcer/TailsWins.wav",
+                "SoundFX/Announcer/SonicWins.wav",
+                "SoundFX/Announcer/RayWins.wav",
+                "SoundFX/Announcer/MightyWins.wav",
+            ]
+            sdb = {zlib.crc32(x.encode()):x for x in sdb}
+            sdb |= {
+                0x2A84DBA6:"$Unknown/unk_green_2A84DBA6.png",
+                0x2E8D1037:"$Unknown/waterfall_anim1_2E8D1037.png",
+                0x4A9387E1:"$Unknown/unk_yellow_4A9387E1.png",
+                0x08DD0A7D:"$Unknown/CGZ_below_9.5_08DD0A7D.png",
+                0x8DCA6B9E:"$Unknown/thank_you_for_playing_8DCA6B9E.png",
+                0x13ED3987:"$Unknown/waterfall_anim2_flower_13ED3987.png",
+                0x31EF6B33:"$Unknown/CGZ_act1bg_31EF6B33.png",
+                0x122B55F1:"$Unknown/VIZ_VIZ2bg_122B55F1.png",
+                0x77F3AE51:"$Unknown/bubble_77F3AE51.png",
+                0x133C3367:"$Unknown/sonic_3d_tex_133C3367.png",
+                0x692D6AE7:"$Unknown/waterfall_anim3_692D6AE7.png",
+                0x730F0253:"$Unknown/act_screen_730F0253.png",
+                0x3321A2AA:"$Unknown/whale_fire_3321A2AA.png",
+                0x558B2F21:"$Unknown/island_558B2F21.png",
+                0xE0304E8F:"$Unknown/sonic_3d_E0304E8F.fbx",
+                0xEEFE54BA:"$Unknown/EEFE54BA.dae",
+                0x54B5C58C:"$Unknown/URZ_54B5C58C.tmx",
+            }
+
+            fs = []
+            for _ in range(c):
+                crc = f.readu32()
+                off = f.readu64()
+                us = f.readu64()
+                enc = f.readu32() & 2
+                s = f.readu64()
+
+                if crc in sdb:
+                    fn = sdb[crc]
+                    assert fn[:2] != '..'
+                    #while fn.startswith(('../','..\\')): fn = fn[3:]
+                else: fn = f'\0{crc:08X}.'
+
+                fs.append([fn,off,s,us,(crc.to_bytes(4,'little')*4,zlib.crc32(us.to_bytes(8,'little')).to_bytes(4,'little')*4,(us >> 2) & 0x7F) if enc else ()])
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[2])
+                if fe[2] != fe[3]: d = zlib.decompress(d)
+                if fe[4]:
+                    d = bytearray(d)
+                    swp = idx1 = 0
+                    idx2 = 8
+                    xr = fe[4][2]
+                    for ix in range(fe[3]):
+                        v = d[ix]
+                        v ^= xr ^ fe[4][1][idx2];idx2 += 1
+                        if swp: v = ((v & 0x0F) << 4) | (v >> 4)
+                        v ^= fe[4][0][idx1];idx1 += 1
+                        d[ix] = v
+
+                        if idx1 < 16:
+                            if idx2 > 12:
+                                idx2 = 0
+                                swp = not swp
+                        elif idx2 <= 8:
+                            idx1 = 0
+                            swp = not swp
+                        else:
+                            xr = (xr + 2) & 0x7F
+                            if swp:
+                                swp = 0
+                                idx1 = xr % 7
+                                idx2 = (xr % 12) +2
+                            else:
+                                swp = 1
+                                idx1 = (xr % 12) + 3
+                                idx2 = xr % 7
+                    d = bytes(d)
+                if fe[0][0] == '\0':
+                    fn = fe[0][1:]
+                    if d[:4] == b'SPR\0': fn += 'spr'
+                    elif d[:4] == b'TCOL': fn += 'tcol'
+                    elif d[:4] == b'HTVM': fn += 'ibc'
+                    elif d[:4] == b'HMAP': fn += 'hcm'
+                    elif d[:4] == b'HMDL': fn += 'hmdl'
+                    else: fn += guess_ext(d)
+                else: fn = fe[0]
+                xopen(o + '/' + fn,'wb').write(d)
+            f.close()
+
+            if fs: return
+        case 'Hatch Game Engine HMAP':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'HMAP\x00\x01\x02\x03'
+            c = f.readu32()
+
+            ob = {}
+            for _ in range(c):
+                k = f.read(4)[::-1].hex().upper()
+                sc = f.readu32()
+                ob[k] = []
+                for _ in range(sc): ob[k].append(f.read(4)[::-1].hex().upper())
+
+            f.close()
+            if ob:
+                json.dump(ob,open(o + f'/{tbasename(i)}.json','w'),indent=2)
+                return
+        case 'Tiled TMX/TSX':
+            if db.print_try: print('Trying with custom extractor')
+            import base64,zlib
+            import xml.etree.ElementTree as ET
+
+            tr = ET.parse(i)
+            rt = tr.getroot()
+            for l in rt.findall('layer'):
+                n = l.get('name')
+                for ix,d in enumerate(l.findall('data')):
+                    rd = d.text
+                    if d.get('encoding') == 'base64': rd = base64.b64decode(rd)
+                    if d.get('compression') == 'zlib': rd = zlib.decompress(rd)
+                    if type(rd) != bytes: rd = rd.encode()
+                    xopen(o + f'/{n}/{ix}.bin','wb').write(rd)
+            del tr
+            if listdir(o): return
 
     return 1
