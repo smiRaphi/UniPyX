@@ -5673,6 +5673,13 @@
         "https://github.com/AmyrAhmady/rwexporter/releases/download/v1.0/rwexporter.exe"
         ]
     },
+    "tjzip_dump":{
+        "p":"tjzip_dump.py",
+        "fs":[
+        "https://raw.githubusercontent.com/electrogecko/UYA_pyTools/refs/heads/main/SM/tjzip_dump.py"
+        ],
+        "ts":1768118137
+    },
     "ps3_unself":{
         "p":"ps3tools/unself.exe",
         "fs":[{

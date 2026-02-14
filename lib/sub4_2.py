@@ -862,5 +862,50 @@ def extract4_2(inp:str,out:str,t:str):
                 set_ctime(o + f'/{dn}{fe[1]}',tm)
             f.close()
             if fs: return
+        case 'High Impact Games WAD':
+            if db.print_try: print('Trying with tjzip_dump')
+            db.get('tjzip_dump')
+            from bin.tjzip_dump import parse_hig_wad,tjzip_decompress,TJZIPError # type: ignore
+
+            inp = open(i,'rb').read()
+            try:
+                _,coff,dsiz = parse_hig_wad(inp)
+                r,_ = tjzip_decompress(inp[coff:],dsiz,crc_table=None,limit_out=None,history_size=0x10000)
+            except TJZIPError: return 1
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(r,endian='<')
+            f.skip(13)
+
+            while f:
+                if not sum(f.read(4)):
+                    f.skip(12)
+                    continue
+                p = f.read(0x60)
+                f.back(0x60)
+                if len(p.rstrip(b'\0')) >= 0x10:
+                    try:d = p.rstrip(b'\0').decode('ascii')
+                    except:f.skip(12)
+                    else:
+                        if d.isprintable():break
+            else:
+                f.close()
+                open(o + '/' + basename(i) + '.bin','wb').write(r)
+                return
+
+            f.back(4)
+            while f:
+                while f and not sum(f.read(4)):f.skip(12)
+                p = f.read(0x60)
+                if len(p) != 0x60: break
+                p = p.rstrip(b'\0').decode('ascii').replace(':','_')
+                f.skip(4)
+                s = f.readu32()
+                f.skip(0x54)
+                xopen(o + '/' + p,'wb').write(f.read(s))
+                f.skip(-s%0x10)
+            f.close()
+            if listdir(o): return
 
     return 1
