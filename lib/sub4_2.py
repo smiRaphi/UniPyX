@@ -787,5 +787,80 @@ def extract4_2(inp:str,out:str,t:str):
                     xopen(o + f'/{n}/{ix}.bin','wb').write(rd)
             del tr
             if listdir(o): return
+        case 'Pixelbite BAR':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'CRAB'
+            f.seek(-8,2)
+            f.seek(f.readu32())
+            c = f.readu32()
+
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32(),f.readu32(),f.readu8(),f.read(f.readu16())[:-1].decode()))
+                assert fs[-1][2] in (0,1)
+                f.skip(4)
+
+            for fe in fs:
+                f.seek(fe[0])
+                if fe[2]:
+                    assert f.read(4) == b'PxZP'
+                    f.skip(4)
+                    d = zlib.decompress(f.read(f.readu32()))
+                else: d = f.read(fe[1])
+                xopen(o + '/' + fe[3],'wb').write(d)
+            f.close()
+            if fs: return
+        case 'Pixelbite ZIP':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PxZP'
+            f.skip(4)
+            open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read(f.readu32())))
+            f.close()
+            return
+        case 'Codename Kids Next Door JAM2/FSTA':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            ty = f.read(4)
+            assert ty in (b'FSTA',b'JAM2')
+
+            tm = f.readu32()
+            fo = f.readu32()
+            dn = f.read(0x10).rstrip(b'\0').decode('ascii')
+            if dn: dn += '/'
+            fnc = f.readu16()
+            exc = f.readu16()
+
+            fndb = [f.read(8).rstrip(b'\0').decode('ascii') for _ in range(fnc)]
+            exdb = [f.read(4).rstrip(b'\0').decode('ascii') for _ in range(exc)]
+            f.skip(4)
+            fs = []
+            while f.pos < fo:
+                fid = f.readu16()
+                eid = f.readu16()
+                off = f.readu32()
+                if off >= fo:
+                    fe = [off,(fndb[fid] + '.' + exdb[eid]).rstrip('.')]
+                    if ty == b'FSTA': fe.append(f.readu32())
+                    fs.append(fe)
+
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe[0])
+                if ty == b'FSTA': d = f.read(fe[2])
+                else:
+                    s = f.readu32()
+                    assert s == f.readu32()
+                    f.skip(0x18)
+                    d = f.read(s)
+                xopen(o + f'/{dn}{fe[1]}','wb').write(d)
+                set_ctime(o + f'/{dn}{fe[1]}',tm)
+            f.close()
+            if fs: return
 
     return 1

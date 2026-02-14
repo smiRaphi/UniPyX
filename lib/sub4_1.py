@@ -1779,6 +1779,7 @@ def extract4_1(inp:str,out:str,t:str):
                     mv(o + '/' + f,o + f'/{x:03d}.{ext}')
                 return
         case 'Vicarious Visions GFC+GOB': return quickbms('over_the_hedge')
+        case 'GIANTS Archive': return quickbms('gar')
 
         case _:
             from lib.sub4_2 import extract4_2

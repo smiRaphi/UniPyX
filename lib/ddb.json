@@ -388,6 +388,18 @@
         "rs":"EXT","s":1
     },
     {
+        "d":[["isat","CRAB\\1\\0\\0\\0",0],["isat","CAOE",-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(-8,2);f.seek(int.from_bytes(f.read(4),'little'));return sum(f.read(4))and f.read(4)==b'\\x08\\0\\0\\0'"]],
+        "rs":"Pixelbite BAR","s":1
+    },
+    {
+        "d":[["isat","PxZP",0],["isat","x",12],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);z=int.from_bytes(f.read(4),'little');rs=int.from_bytes(f.read(4),'little');return z>rs and (rs+12)==s and not int.from_bytes(f.read(2),'big')%31"]],
+        "rs":"Pixelbite ZIP","s":1
+    },
+    {
+        "d":[["isin",["JAM2","FSTA"],0],["n0",4,4],["n0",4,8],["str0",12,16,4],["n0",2,28],["n0",2,30],["str0",32,8,3]],
+        "rs":"Codename Kids Next Door JAM2/FSTA","s":1
+    },
+    {
         "rqr":"DLL",
         "d":["contain","U\\0n\\0m\\0a\\0n\\0a\\0g\\0e\\0d\\0 \\0l\\0o\\0a\\0d\\0e\\0r\\0 \\0s\\0h\\0i\\0m\\0 \\0f\\0o\\0r\\0 \\0E\\0x\\0c\\0e\\0l\\0-\\0D\\0N\\0A\\0 \\0A\\0d\\0d\\0-\\0I\\0n\\0s\\0\\0\\0",[-27000,null]],
         "rs":"Excel DNA XLL","s":1
@@ -451,9 +463,9 @@
         "rs":"Taiko no Tatsujin Data 1"
     },
     {
-        "d":[["size",[5,16777215]],["n0",4,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=0\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
+        "d":[["size",[5,16777215]],["n0",4,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=z=0\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
         "rs":"Taiko no Tatsujin Data 2"},{
-        "d":[["size",[5,1048575]],["n0",2,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=0\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
+        "d":[["size",[5,1048575]],["n0",2,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=z=0\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if not d:zs+=1\n else:zs=0\n if zs>2 or(f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
         "rs":"Taiko no Tatsujin Data 3"
     },
     {
@@ -790,6 +802,10 @@
     {
         "d":[["isat","HMAP\\x00\\x01\\x02\\x03",0],["n0",4,8],["n0",4,12]],
         "rs":"Hatch Game Engine HMAP","s":1
+    },
+    {
+        "d":[["isat","Copyright (C) GIANTS Software GmbH, All Rights Reserved.\\r\\n\\r\\n",0],["isat","GAR ",96]],
+        "rs":"GIANTS Archive","s":1
     },
     {
         "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","f=open(inp,'rb');c=f.read(4)\nif c!=f.read(4):return\nc=int.from_bytes(c,'little')\nfor _ in range(c):f.seek(int.from_bytes(f.read(2),'little'),1)\nf.seek(4,1);return f.read(8)[:4]==b'\\0\\0\\0\\0' and int.from_bytes(f.read(4),'little')==(f.tell()-16+c*20)"]],
