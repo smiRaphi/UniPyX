@@ -920,5 +920,63 @@ def extract4_2(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if c: return
+        case 'PSX PFW':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PFW2'
+            c = f.readu16()
+            f.skip(10)
+
+            fs = [((f.read(8).rstrip(b'\0').decode('ascii') + '.' + f.read(3).rstrip(b'\0').decode('ascii')).rstrip('.'),f.readu24(),f.readu16()*0x800) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[2])
+                xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+            f.close()
+            if fs: return
+        case 'Lucas Arts Bundle':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            doff = None
+            fs = []
+            def readb():
+                nonlocal doff
+                n = f.read(4).decode('ascii')
+                s = f.readu32()
+                p = f.pos + s
+
+                match n:
+                    case 'BUND':
+                        while f.pos < p: readb()
+                    case 'BNHD':
+                        f.skip(6)
+                        pd = f.readu32('<')
+                        c = f.readu32('<')
+                        k = f.read(1)
+                        kv = k[0]
+                        f.skip(0x13)
+
+                        f.skip(pd*2)
+                        for _ in range(c):
+                            n = bytes(x ^ kv for x in f.read(0xC8).split(k)[0]).decode('ascii')
+                            fs.append((n,f.readu32('<'),f.readu32('<'))) # le
+                            f.skip(0x2C)
+                    case 'BNDT':
+                        assert not doff
+                        doff = f.pos
+
+                f.seek(p)
+            readb()
+            if not doff:
+                print('Data chunk not found, correct full file may be on a different disc')
+                return 1
+
+            for fe in fs:
+                f.seek(doff + fe[2])
+                xopen(o + '/' + fe[0].lstrip('/\\'),'wb').write(f.read(fe[1]))
+            f.close()
+            if fs: return
 
     return 1
