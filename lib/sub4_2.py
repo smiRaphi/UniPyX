@@ -907,5 +907,18 @@ def extract4_2(inp:str,out:str,t:str):
                 f.skip(-s%0x10)
             f.close()
             if listdir(o): return
+        case 'Lucky Chicken TOC+HFF':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,encoding='utf-8')
+            fd = open(noext(i) + '.hff','rb')
+
+            c = int(f.readline().strip())
+            for _ in range(c):
+                l = f.readline().strip().split('|')
+                fd.seek(int(l[3]))
+                xopen(o + '/' + l[1].strip('/') + '/' + l[0],'wb').write(fd.read(int(l[2])))
+            f.close()
+            fd.close()
+            if c: return
 
     return 1

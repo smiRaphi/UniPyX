@@ -404,6 +404,12 @@
         "rs":"High Impact Games WAD","s":1
     },
     {
+        "rq":null,
+        "t":"text",
+        "d":[["contain","\\r\\n",[1,8]],["contain","/|",[8,128]],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\nf=open(inp)\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split('|')\nif len(l)!=4 or l[1][-1]!='/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
+        "rs":"Lucky Chicken TOC+HFF"
+    },
+    {
         "rqr":"DLL",
         "d":["contain","U\\0n\\0m\\0a\\0n\\0a\\0g\\0e\\0d\\0 \\0l\\0o\\0a\\0d\\0e\\0r\\0 \\0s\\0h\\0i\\0m\\0 \\0f\\0o\\0r\\0 \\0E\\0x\\0c\\0e\\0l\\0-\\0D\\0N\\0A\\0 \\0A\\0d\\0d\\0-\\0I\\0n\\0s\\0\\0\\0",[-27000,null]],
         "rs":"Excel DNA XLL","s":1
