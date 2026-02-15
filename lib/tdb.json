@@ -857,7 +857,7 @@
     "CPC Plus IMG":[
         "cpc plus cartridge image"
     ],
-    "WAD":[
+    "Quake 3D WAD":[
         "wad3 game data"
     ],
     "Snappy":[
@@ -997,13 +997,13 @@
     "Aldus Zip":[
         "aldus zip compressed installation data"
     ],
-    "Alien Vs Predator Game Data":[
+    "Alien Vs Predator FFL":[
         "alien vs predator game data container"
     ],
-    "Allods 2 Rage Of Mages Game Archive":[
+    "Allods 2 Rage Of Mages Resource":[
         "allods 2 rage of mages game data archive"
     ],
-    "American Conquest 2 Game Archive":[
+    "American Conquest 2 GSC":[
         "american conquest 2 game data archive",
         "american conquest 2 game data archvie"
     ],
@@ -1013,7 +1013,7 @@
     "ARX":[
         "arx compressed archive"
     ],
-    "ASCARON Entertainment Game Archive":[
+    "ASCARON Entertainment CPR":[
         "ascaron entertainment game data archive"
     ],
     "Atomik Cruncher":[
@@ -1022,11 +1022,11 @@
     "Balko UFL Game Archive":[
         "balko ufl game data archive"
     ],
-    "Bank Game Archive":[
+    "Halloween Harry Bank":[
         "bank game data archive",
         "halloween harry bank game data container"
     ],
-    "Battlezone 2 Game Archive":[
+    "Battlezone 2 PAK":[
         "battlezone 2 game data package"
     ],
     "Binary ][ Archive":[
@@ -1035,13 +1035,13 @@
     "BioWare Entity Resource":[
         "bioware entity resource file"
     ],
-    "Bloodrayne Game Archive":[
+    "Bloodrayne POD":[
         "bloodrayne game data archive"
     ],
-    "BOLT Game Archive":[
+    "Gizmo Studios BOLT":[
         "bolt game data archive"
     ],
-    "Broderbund Mohawk Game Archive":[
+    "Broderbund Mohawk MHK":[
         "broderbund mohawk game data archive"
     ],
     "Compressed ISO":[
@@ -1058,10 +1058,10 @@
     "CAZIP":[
         "cazip compressed file"
     ],
-    "Chasm Game Archive":[
+    "Chasm BIN":[
         "chasm bin archive"
     ],
-    "CI Games Archive":[
+    "CI Games DPK":[
         "ci games game data archive"
     ],
     "Compression Workshop":[
@@ -1075,7 +1075,7 @@
         "cramfs rom filesystem package (little endian)",
         "cramfs rom filesystem package (big endian)"
     ],
-    "Creative Assembly Game Data":[
+    "Creative Assembly PFH0":[
         "creative assembly game resource data"
     ],
     "CrLZH":[
@@ -1088,9 +1088,11 @@
         "crunch-mania by thomas schwarz",
         "crunch-mania compressed data (lzh)"
     ],
-    "Dark Reign Game Archive":[
-        "dark reign 2 game data archive",
+    "Dark Reign FTG":[
         "dark reign game data archive"
+    ],
+    "Dark Reign 2 ZWP":[
+        "dark reign 2 game data archive"
     ],
     "Ion Storm Resource":[
         "ion storm resource data file"
@@ -1155,13 +1157,13 @@
     "Build Engine RFF":[
         "build engine rff encrypted container"
     ],
-    "Descent Game Archive":[
+    "Descent HOG":[
         "descent game data archive"
     ],
-    "Destan Game Archive":[
+    "Destan 3DN":[
         "destan game data archive"
     ],
-    "Digital Illusions Game Archive":[
+    "Digital Illusions PDT":[
         "digital illusions game data package"
     ],
     "DOS Backup":[
@@ -1173,10 +1175,10 @@
     "Dragon VDK IMG":[
         "dragon vdk disk image format"
     ],
-    "Dynamix Game Archive":[
+    "Dynamix DYN":[
         "dynamix game data archive"
     ],
-    "Earth And Beyond Game Archive":[
+    "Earth And Beyond MIX":[
         "earth and beyond game data archive"
     ],
     "EDI Install Archive":[
@@ -1190,13 +1192,13 @@
     "Electronic Arts LIB":[
         "electronic arts lib container"
     ],
-    "Empire Earth 1 Game Archive":[
+    "Empire Earth 1 SSA":[
         "empire earth 1 game data"
     ],
-    "Ensemble Studios Game Archive":[
+    "Ensemble Studios DRS":[
         "ensemble studios data resource"
     ],
-    "EPF Game Archive":[
+    "Team17 EPF":[
         "epf game data archive"
     ],
     "EPOC App Info":[
@@ -1205,19 +1207,19 @@
     "EPOC Install Package":[
         "epoc installation package (rel. 2,3,5)"
     ],
-    "Etherlords 2 Game Archive":[
+    "Etherlords 2 Resource":[
         "etherlords 2 game data archive"
     ],
     "FALCON Game Archive":[
         "falcon game data archive"
     ],
-    "F.E.A.R. Game Archive":[
+    "F.E.A.R. LTAR":[
         "f.e.a.r. game archive"
     ],
-    "Final Fantasy Game Archive":[
+    "Final Fantasy 7 LGP":[
         "final fantasy game archive"
     ],
-    "Holistic Design Game Archive":[
+    "Holistic Design MUK":[
         "holistic design game data archive (generic)",
         "final liberation: warhammer epic 40k game data archive"
     ],
@@ -1231,13 +1233,13 @@
     "FVL0 Compressed":[
         "anc-cruncher"
     ],
-    "Gabriel Knight 3 Barn Game Archive":[
+    "Gabriel Knight 3 Barn":[
         "gabriel knight 3 barn game data"
     ],
     "God of Thunder Game Archive":[
         "dat-got"
     ],
-    "Haemimont Games AD Game Archive":[
+    "Haemimont Games HPK":[
         "haemimont games ad game data archive"
     ],
     "Hamarsoft HAP":[
@@ -1247,13 +1249,13 @@
     "Hammer":[
         "hammer compressed"
     ],
-    "Harry Potter: Quidditch World Cup Game Archive":[
+    "Harry Potter: Quidditch World Cup CCD":[
         "harry potter: quidditch world cup game data archive"
     ],
     "Highway Hunter Game Archive":[
         "dat-highway"
     ],
-    "Highway Pursuit Game Archive":[
+    "Highway Pursuit HPDT":[
         "highway pursuit game data archive"
     ],
     "HIT":[
@@ -1299,7 +1301,7 @@
         "nintendo 64 rom image: \"the legend of zelda \" (nzlp",
         "nintendo 64 rom image: \"the legend of zelda \" (nzlg"
     ],
-    "Xenonauts Game Archive":[
+    "Xenonauts PFP":[
         "xenonauts game data archive"
     ],
     "Xbox Executable":[
@@ -1381,5 +1383,9 @@
     "Tiled TMX/TSX":[
         "tiled tiles map xml",
         "tiled tiles set xml"
+    ],
+    "Doom Engine WAD":[
+        "doom patch pwad data",
+        "id software's doom patch-wad"
     ]
 }

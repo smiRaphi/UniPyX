@@ -375,7 +375,7 @@
     },
     {
         "rqr":null,
-        "d":["contain","\\x01CD001\\x01\\0",[32769,33024]],
+        "d":["contain","\\x01CD001\\x01\\0",[32769,255]],
         "rs":"Shifted ISO"
     },
     {
@@ -406,7 +406,7 @@
     {
         "rq":null,
         "t":"text",
-        "d":[["contain","\\r\\n",[1,8]],["contain","/|",[8,128]],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\nf=open(inp)\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split('|')\nif len(l)!=4 or l[1][-1]!='/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
+        "d":[["contain","\\r\\n",[1,7]],["contain","/|",[8,120]],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\nf=open(inp)\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split('|')\nif len(l)!=4 or l[1][-1]!='/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
         "rs":"Lucky Chicken TOC+HFF"
     },
     {
@@ -416,6 +416,10 @@
     {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'big')+8)==s"]],
         "rs":"Lucas Arts Bundle"
+    },
+    {
+        "d":[["isatS","\\0",24,-28],["n0",4,-32],["n0",4,-4],["contain","END \\0\\0\\0\\0\\0\\0\\0\\0",[-64,32]],["py","f=open(inp,'rb');f.seek(0,2);f.seek(-4,1);b=f.read(4);f.seek(-32,1)\nif b!=f.read(4):return\nf.seek(int.from_bytes(b,'little'));return f.read(4)==b'STR ' and sum(f.read(4))"]],
+        "rs":"7 Studios FS"
     },
     {
         "rqr":"DLL",
@@ -745,7 +749,7 @@
         "rs":"Ultimate Ghosts 'n Goblins DPLK","s":1
     },
     {
-        "d":[["isat","**************************************************************\\r\\n** Sinergy GUT File\\r\\n**\\r\\n** [",0],["contain","\\0",[272,512]]],
+        "d":[["isat","**************************************************************\\r\\n** Sinergy GUT File\\r\\n**\\r\\n** [",0],["contain","\\0",[272,240]]],
         "rs":"Sinergy GUT","s":1
     },
     {
@@ -1020,7 +1024,7 @@
     },
     {
         "rqr":"GLIBC",
-        "d":[["contain","GPEComp ",[30928,40975],false],
+        "d":[["contain","GPEComp ",[30928,10047],false],
              ["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43592],["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43632]],"qq":true,
         "rs":"GPEComp","s":1
     },
@@ -1384,12 +1388,12 @@
     },
     {
         "rq":"UCEXE",
-        "d":[["size",[12992,null]],["contain","UC2SFX Header",[12976,14592]]],
+        "d":[["size",[12992,null]],["contain","UC2SFX Header",[12976,1616]]],
         "rs":"UltraCompressor 2","s":1
     },
     {
         "rq":"PKLITE",
-        "d":[["size",[16400,null]],["contain","HLSQZ1",[16384,24576]]],
+        "d":[["size",[16400,null]],["contain","HLSQZ1",[16384,8192]]],
         "rs":"Squeeze It","s":1
     },
     {
@@ -1472,7 +1476,7 @@
         "rs":"d0lLZ 3","s":1
     },
     {
-        "d":[["isat","\\0\\0\\1\\0",0],["isat","\\0\\0\\x06\\x40",28],["isat","DLZ\\x02",1600],["contain","*www.tehskeen.net!",[1536,1600]]],
+        "d":[["isat","\\0\\0\\1\\0",0],["isat","\\0\\0\\x06\\x40",28],["isat","DLZ\\x02",1600],["contain","*www.tehskeen.net!",[1536,64]]],
         "rs":"d0lLZ 2","s":1
     },
     {
@@ -1613,7 +1617,7 @@
         "rs":"GEM Resource"
     },
     {
-        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,100]],["py","d=open(inp,'rb').read(0x100).split(b'\\r\\n')[0]\ntry:d=d.decode()\nexcept:return\nreturn d.split()[0].split('/')[1] in ('0.9','1.0','1.1','2','3') and d.split()[1].isdigit()"]],
+        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,90]],["py","d=open(inp,'rb').read(0x100).split(b'\\r\\n')[0]\ntry:d=d.decode()\nexcept:return\nreturn d.split()[0].split('/')[1] in ('0.9','1.0','1.1','2','3') and d.split()[1].isdigit()"]],
         "rs":"HTTP Response"
     },
     {

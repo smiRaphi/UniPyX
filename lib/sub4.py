@@ -690,24 +690,61 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.close()
 
             if fs: return
-        case 'The Sims FAR'|'Quake PAK'|'WAD'|'Agon Game Archive'|'Alien Vs Predator Game Data'|'Allods 2 Rage Of Mages Game Archive'|\
-             'American Conquest 2 Game Archive'|'ASCARON Entertainment Game Archive'|'Bank Game Archive'|'Battlezone 2 Game Archive'|\
-             'BioWare Entity Resource'|'Bloodrayne Game Archive'|'BOLT Game Archive'|'Broderbund Mohawk Game Archive'|'Chasm Game Archive'|\
-             'CI Games Archive'|'Creative Assembly Game Data'|'Dark Reign Game Archive'|'Destan Game Archive'|'Digital Illusions Game Archive'|\
-             'Dynamix Game Archive'|'Earth And Beyond Game Archive'|'Electronic Arts LIB'|'Empire Earth 1 Game Archive'|'Ensemble Studios Game Archive'|\
-             'Etherlords 2 Game Archive'|'F.E.A.R. Game Archive'|'Final Fantasy Game Archive'|'Holistic Design Game Archive'|\
-             'Gabriel Knight 3 Barn Game Archive'|'Haemimont Games AD Game Archive'|'Harry Potter: Quidditch World Cup Game Archive'|\
-             'Highway Pursuit Game Archive'|'UE3 Package'|'Xenonauts Game Archive'|'LithTech Resource'|'Novalogic PFF':
+        case 'The Sims FAR'|'Quake PAK'|'Quake 3D WAD'|'Agon Game Archive'|'Alien Vs Predator FFL'|'Allods 2 Rage Of Mages Resource'|\
+             'American Conquest 2 GSC'|'ASCARON Entertainment CPR'|'Halloween Harry Bank'|'Battlezone 2 PAK'|'Dark Reign 2 ZWP'|\
+             'BioWare Entity Resource'|'Bloodrayne POD'|'Gizmo Studios BOLT'|'Broderbund Mohawk MHK'|'Chasm BIN'|'Novalogic PFF'|\
+             'CI Games DPK'|'Creative Assembly PFH0'|'Dark Reign FTG'|'Destan 3DN'|'Digital Illusions PDT'|'7 Studios FS'|\
+             'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
+             'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
+             'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
+             'LithTech Resource'|'Doom Engine WAD'|\
+             'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF':
             if db.print_try: print('Trying with gameextractor')
-            run(['java','-jar',db.get('gameextractor'),'-extract','-input',i,'-output',o],print_try=False,cwd=dirname(db.get('gameextractor')))
-            remove(dirname(db.get('gameextractor')) + '/logs')
-            if listdir(o): return
+            import subprocess,httpx
+
+            p = subprocess.Popen([db.get('java'),'-jar',db.get('gameextractorserver')],stdout=-1,stderr=-1)
+            while p.poll() is None:
+                l = p.stdout.readline().decode()
+                if 'Server listening on port' in l:
+                    port = int(l.strip().split()[-1])
+                    break
+            else:
+                p.kill()
+                print(p.stdout.read().decode())
+                print(p.stderr.read().decode())
+                raise Exception('gameextractor server failed to start')
+            try:
+                if httpx.get(f'http://127.0.0.1:{port}/status').text != 'a-ok':
+                    p.kill()
+                    print(p.stdout.read().decode())
+                    print(p.stderr.read().decode())
+                    raise Exception('gameextractor server failed to start')
+                r = httpx.post(f'http://127.0.0.1:{port}/extract',timeout=60*3,json={'inputFilePath':i,'outputDirPath':o,'codes':{
+                    'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
+                    'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
+                    'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
+                    'Gizmo Studios BOLT':'BLT_BOLT','Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
+                    'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Digital Illusions PDT':'PDT_PDT1','Dynamix DYN':'DYN_DYNAMIX',
+                    'Earth And Beyond MIX':'MIX_MIX1','Electronic Arts LIB':'LIB_EALIB','Empire Earth 1 SSA':'SSA_RASS','Ensemble Studios DRS':'DRS',
+                    'Etherlords 2 Resource':'RES_8|RES','F.E.A.R. LTAR':'ARCH00_LTAR','Final Fantasy 7 LGP':'LGP','Holistic Design MUK':'MUK_MUKFILE',
+                    'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',
+                    'Highway Pursuit HPDT':'HD_HPDT','Xenonauts PFP':'PFP_PFPK','LithTech Resource':'LPS_LITHTECH','Doom Engine WAD':'WAD_IWAD',
+                    'UE3 Package':'UE3_727|UE3_648|UE3_607|UE3_584|UE3_576|UE3_575|UE3_564|UE3_547|UE3_539|UE3_512|UE3_507|UE3_871|UE3_868|UE3_807|UE3_805|UE3_451|UE3_Generic|UE3_Texture2D_Generic|UE3_Texture2D_547|UE3_Texture2D_539|UE3_Texture2D_512|UE3_Texture2D_451|UE3_Texture2D_507|UE3_Texture2D_871|UE3_Texture2D_868|UE3_Texture2D_807|UE3_Texture2D_648|UE3_Texture2D_584|UE3_Texture2D_576|UE3_Texture2D_575',
+                    'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3',
+                    'GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
+                }[t].split('|')})
+                p.kill()
+                if r.status_code == 200 and r.json().get('files'): return
+            except httpx.ReadTimeout: p.kill()
+            except:
+                p.kill()
+                raise
         case 'Cosmo Volume Game Archive'|'Dark Ages Map File'|'Build Engine RFF'|'God of Thunder Game Archive'|'Highway Hunter Game Archive':
             run(['gamearch',i,'-X'],cwd=o)
             if listdir(o): return
-        case 'Build Engine Group'|'Descent Game Archive'|'EPF Game Archive':
+        case 'Build Engine Group'|'Descent HOG'|'Team17 EPF':
             if not extract4(i,o,'Cosmo Volume Game Archive'):return # gamearch
-            if not extract4(i,o,'The Sims FAR'):return # gameextractor
+            if not extract4(i,o,'GE:' + t):return # gameextractor
         case 'HMM Packfile':
             if db.print_try: print('Trying with hmmunpack')
             db.get('hmmunpack')
