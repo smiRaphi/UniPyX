@@ -1387,5 +1387,8 @@
     "Doom Engine WAD":[
         "doom patch pwad data",
         "id software's doom patch-wad"
+    ],
+    "SharkPortSave":[
+        "sharkport file"
     ]
 }

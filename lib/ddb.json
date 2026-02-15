@@ -1278,7 +1278,7 @@
         "rs":"Unreal Engine Web Package","s":1
     },
     {
-        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:n.decode()\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:n.decode()\nexcept:return\nreturn True"]],
+        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:assert n.decode().isprintable()\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:assert n.decode().isprintable()\nexcept:return\nreturn True"]],
         "rs":"Impact Screensaver ILB"
     },
     {
@@ -1624,6 +1624,10 @@
         "d":[["isat","\\0\\0\\0\\0",256],
              ["str0",0,256,2]],
         "rs":"BBC Micro SSD"
+    },
+    {
+        "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');s+=o;f.seek(o);return b'\\xA1'*4==f.read(4)and(s+-s%2048)==f.seek(0,2)"]],
+        "rs":"Action Replay RAM Disk","s":1
     },
     {
         "d":[["s%",2048],["ext",".dat"],["isat","MCicon\\0\\0",0],

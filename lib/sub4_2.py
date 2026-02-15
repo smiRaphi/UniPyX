@@ -870,6 +870,7 @@ def extract4_2(inp:str,out:str,t:str):
             inp = open(i,'rb').read()
             try:
                 _,coff,dsiz = parse_hig_wad(inp)
+                coff = 0xC0 # force header size to 0xC0
                 r,_ = tjzip_decompress(inp[coff:],dsiz,crc_table=None,limit_out=None,history_size=0x10000)
             except TJZIPError: return 1
 
@@ -978,5 +979,76 @@ def extract4_2(inp:str,out:str,t:str):
                 xopen(o + '/' + fe[0].lstrip('/\\'),'wb').write(f.read(fe[1]))
             f.close()
             if fs: return
+        case 'Action Replay RAM Disk':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu32()
+            f.skip(4)
+
+            fs = [f.readu32() for _ in range(c)]
+            for fe in fs:
+                f.seek(fe)
+                assert f.read(4) == b'\xA1'*4
+                s = f.readu32()
+                n = f.read0s().decode('ascii').replace(':','_').strip('/\\')
+                f.read0s()
+                f.alignpos(4)
+                xopen(o + '/' + n,'wb').write(f.read(s))
+            f.close()
+            if fs: return
+        case 'SharkPortSave':
+            PLAT = {
+                0x000:'PS2',
+                0xF00:'GBA',
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from datetime import datetime
+            from lib.file import File
+            f = File(i,endian='<')
+            def reads(): return f.read(f.readu32()).decode('utf-8')
+            inf = open(o + '/$saves.txt','w',encoding='utf-8')
+
+            c = 0
+            while f:
+                if reads() != 'SharkPortSave':break
+                inf.write(f'{c}:\n')
+                p = f.readu32()
+                inf.write(f'Platform: {PLAT[p] if p in PLAT else "?"} [0x{p:08X}]\n')
+                inf.write(f'Game: {reads()}\nSave/Date: {reads()}\nComment: {reads()}\n')
+                s = f.readu32()
+                inf.write(f'Size: 0x{s:X}\n')
+                ep = f.pos + s
+
+                if p == 0:
+                    def reade(pn):
+                        hs = f.readu16()
+                        p = f.pos + hs - 2
+                        n = f.read(0x40).rstrip(b'\0').decode('utf-8')
+                        s = f.readu32()
+                        f.skip(8)
+                        m = f.readu16('>') # be
+                        f.skip(2)
+                        dr = m & 0x20
+                        if not dr:
+                            f.skip(1)
+                            tm = datetime(second=f.readu8(),minute=f.readu8(),hour=f.readu8(),day=f.readu8(),month=f.readu8(),year=f.readu16()).timestamp()
+
+                        f.seek(p)
+                        if dr: [reade(pn + '/' + n) for _ in range(s-2)]
+                        else:
+                            xopen(pn + '/' + n,'wb').write(f.read(s))
+                            set_ctime(pn + '/' + n,tm)
+                    reade(o)
+                else: raise NotImplementedError(f'Platform: 0x{p:08X}')
+
+                f.seek(ep)
+                inf.write(f'CRC: {f.readu32():08X}\n\n')
+                c += 1
+                f.alignpos(0x800)
+            inf.close()
+            f.close()
+            if len(listdir(o)) > 1: return
 
     return 1
