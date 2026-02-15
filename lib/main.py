@@ -763,10 +763,14 @@ def guess_ext_ps2(f):
     elif tag == b'RIFF': ext = 'wav'
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'TIM2': ext = 'tm2'
+    elif tag == b'\x7FELF': ext = 'elf'
     elif tag in (b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'): ext = 'vag'
     if not ext and tag == b'IECS':
         if f.read(4) == b'sreV': ext = 'hd'
         else: f.seek(-4,1)
+    if not ext and tag == b'RESE':
+        if f.read(20) == b'T\0\0\0\0\0\x08\0\0\0\0\0ROMDIR\0\0': ext = 'img'
+        else: f.seek(-20,1)
     if not ext and tag == b'\x10\0\0\0':
         if int.from_bytes(f.read(4),'little') in (2,8,9):
             fo = int.from_bytes(f.read(4),'little')
@@ -775,6 +779,9 @@ def guess_ext_ps2(f):
             if (nc*np*2+12) == fo: ext = 'tim'
             else: f.seek(-0x10,1)
         else: f.seek(-4,1)
+    if not ext and tag == b'BOOT':
+        if f.read(12) == b'2 = cdrom0:\\': ext = 'cnf'
+        else: f.seek(-12,1)
     if not ext and not (tag[0]+tag[2]+tag[3]):
         p = f.tell()
         s = f.seek(0,2)

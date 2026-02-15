@@ -1185,5 +1185,31 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 zipfile.ZipFile(o + '/' + listdir(o)[0]).extractall(o)
                 remove(o + '/' + listdir(o)[0])
                 return
+        case 'Final Fantasy X 2 ISO':
+            run(['7z','x',i,'-o' + o + '\\$ISO'])
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x8C000)
+            fs = []
+            while f:
+                of = f.readu32()
+                if not of: break
+                if of & 0x7FFFFF: fs.append(((of & 0x3FFFFF) * 0x800,(of >> 23) * 4))
+            fs = sorted(fs,key=lambda x:x[0])
+            fs.append((f.size,))
+
+            for ix in range(len(fs)-1):
+                if not fs[ix+1][0] - fs[ix][0]: continue
+                f.seek(fs[ix][0])
+                d = f.read((fs[ix+1][0] - fs[ix][0]) - fs[ix][1])
+                if d[:4] == b'VS\0\0': ext = 'vs'
+                elif d[6:9] in (b'BGM',b'EV0',b'MAP'): ext = d[6:9].decode('ascii').lower()
+                else: ext = guess_ext_ps2(d)
+                open(o + f'/{ix:04d}.{ext}','wb').write(d)
+
+            f.close()
+            if fs: return
 
     return 1

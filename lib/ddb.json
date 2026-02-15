@@ -29,6 +29,11 @@
         "rqr":["PACK","MS-DOS executable",true],
         "rs":"Pack Packed"
     },
+    {
+        "rq":"ISO",
+        "rqr":"ISO 9660 CD-ROM filesystem data 'FINAL_FANTASY_X_2' + UDF filesystem data (version 1.x)",
+        "rs":"Final Fantasy X 2 ISO","s":1
+    },
 
     {
         "rq":"ISO",
@@ -830,7 +835,7 @@
         "rs":"GIANTS Archive","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","f=open(inp,'rb');c=f.read(4)\nif c!=f.read(4):return\nc=int.from_bytes(c,'little')\nfor _ in range(c):f.seek(int.from_bytes(f.read(2),'little'),1)\nf.seek(4,1);return f.read(8)[:4]==b'\\0\\0\\0\\0' and int.from_bytes(f.read(4),'little')==(f.tell()-16+c*20)"]],
+        "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","f=open(inp,'rb');c=f.read(4)\nif c!=f.read(4) or c==f.read(4):return\nc=int.from_bytes(c,'little');f.seek(8)\nfor _ in range(c):f.seek(int.from_bytes(f.read(2),'little'),1)\nf.seek(4,1);return f.read(8)[:4]==b'\\0\\0\\0\\0' and int.from_bytes(f.read(4),'little')==(f.tell()-16+c*20)"]],
         "rs":"Petroglyph MEG"},{
         "d":[["isat","\\xFF\\xFF\\xFF\\xFF\\xA4\\x70\\x7D\\x3F",0],["n0",4,8],["n0",4,12],["n0",4,16],["n0",2,20],["py","f=open(inp,'rb');f.seek(12);return f.read(4)==f.read(4)"]],
         "rs":"Petroglyph MEG","s":1},{
