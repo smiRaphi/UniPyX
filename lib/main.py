@@ -202,6 +202,7 @@ def analyze(inp:str,raw=False):
         if t.startswith('Nintendo 3DS SMDH file: "'): tst.append('Nintendo 3DS SMDH file')
         elif t.startswith(('NES ROM image (iNES): ','NES ROM image (iNES) ')): tst.append('NES ROM image (iNES)')
         elif t.startswith('doom patch PWAD data containing'): tst.append('doom patch PWAD data')
+        elif t.startswith('cannot open ') and t.endswith(' (No such file or directory)'): pass
         else: tst.append(t)
     ts = tst
 

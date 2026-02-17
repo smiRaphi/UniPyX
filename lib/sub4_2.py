@@ -6,6 +6,13 @@ def extract4_2(inp:str,out:str,t:str):
     i = inp
     o = out
 
+    def quickbms(scr,inf=i,ouf=o,print_try=True):
+        scp = db.get(scr)
+        if db.print_try and print_try: print('Trying with',scr)
+        run(['quickbms','-Y',scp,inf,ouf],print_try=False)
+        if listdir(ouf): return
+        return 1
+
     match t:
         case 'Alter Echo REMF':
             if db.print_try: print('Trying with custom extractor')
@@ -600,6 +607,7 @@ def extract4_2(inp:str,out:str,t:str):
                 d = f.read(fe[1])
                 if v == 3 and aes: d = aes(d + f.read(-fe[1]%0x10))[:fe[1]]
                 xopen(o + '/' + fe[0],'wb').write(d)
+            f.close()
             if fs: return
         case 'Petroglyph Zlib CH':
             if db.print_try: print('Trying with custom extractor')
@@ -1050,5 +1058,45 @@ def extract4_2(inp:str,out:str,t:str):
             inf.close()
             f.close()
             if len(listdir(o)) > 1: return
+        case 'Favorite Dear LKF': return quickbms('favorite_dear_lkf_script')
+        case 'Favorite Dear MSG 1':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu16()//2
+            f.seek(0)
+
+            ofs = [f.readu16() for _ in range(c)]
+            of = open(o + f'/{tbasename(i)}.txt','w',encoding='utf-8')
+            for off in ofs:
+                f.seek(off)
+                s = f.readu16()
+                s1 = f.readu16()
+                if s1 < 0xA00: s = s1
+                else: f.back(2)
+                of.write(f.read(s).decode('shift-jis') + '\n\n')
+            of.close()
+            f.close()
+            if ofs: return
+        case 'Favorite Dear MSG 2':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu16()
+
+            fs = [(f.readu16(),f.readu16()) for _ in range(c)]
+            of = open(o + f'/{tbasename(i)}.txt','w',encoding='utf-8')
+            for fe in fs:
+                f.seek(fe[1])
+                of.write(f'{fe[0]}:\n')
+                for ix in [ix for ix in range(0x12) if sum(f.read(2))]:
+                    of.write(f'{ix}:\n')
+                    s = f.readu16()
+                    of.write('\n'.join(x.decode('shift-jis') for x in f.read(s).split(b'\0')) + '\n')
+                    f.skip(2)
+                of.write('\n')
+            of.close()
+            f.close()
+            if fs: return
 
     return 1

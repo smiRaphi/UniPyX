@@ -67,9 +67,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1770505200
+            "ts":1771196400
         }],
-        "ts":1770505200
+        "ts":1771196400
     },
     "file":{
         "p":"file/file.exe",
@@ -130,19 +130,19 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1770591600
+            "ts":1771282800
         }],
-        "ts":1770591600
+        "ts":1771282800
     },
     "7z":{
         "p":"7z/7z.exe",
         "fs":[{
-            "u":"https://github.com/ip7z/7zip/releases/download/25.01/7z2501-x64.msi",
+            "u":"https://github.com/ip7z/7zip/releases/download/26.00/7z2600-x64.msi",
             "x":{
                 "Files/7-Zip/7z.exe":"7z/7z.exe",
                 "Files/7-Zip/7z.dll":"7z/7z.dll"
             },
-            "ts":1754212738
+            "ts":1770896713
         },{
             "u":"https://www.tc4shell.com/binary/eDecoder.zip",
             "x":{
@@ -164,7 +164,7 @@
                 "Asar.64.dll":"7z/Formats/Asar.64.dll"
             }
         }],
-        "ts":1754212738
+        "ts":1770896713
     },
     "garbro":{
         "p":"GARbro/GARbro.Console.exe",
@@ -222,7 +222,7 @@
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
         "fs":[{
-            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-5b9f03a585c8e74c65308e62b80f64f59b8d9e20.zip",
+            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-b98f731bb0db30acb7a7886da6c25f6f1a64439c.zip",
             "x":{
                 "HxCFloppyEmulator_Software_win_x64.zip":{
                     "HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
@@ -230,15 +230,15 @@
                     "HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
                 }
             },
-            "nightly_run":21805854472,
-            "ts":1770634941
+            "nightly_run":22036378349,
+            "ts":1771321809
         },{
             "u":"https://softpres.org/_media/files:spsdeclib_5.1_windows.zip?id=download&cache=cache",
             "x":{
                 "capsimg_binary/x64/CAPSImg.dll":"hxcfe/CAPSImg.dll"
             }
         }],
-        "ts":1770634941
+        "ts":1771321809
     },
     "unar":{
         "p":"Unarchiver/unar.exe",
@@ -418,13 +418,13 @@
     "aaru":{
         "p":"aaru.exe",
         "fs":[{
-            "u":"https://github.com/aaru-dps/Aaru/releases/download/v6.0.0-alpha.17/aaru-6.0.0-alpha.17_windows_x64.zip",
+            "u":"https://github.com/aaru-dps/Aaru/releases/download/v5.4.2/aaru-5.4.2_windows_x64.zip",
             "x":{
                 "aaru.exe":"aaru.exe"
             },
-            "ts":1766744419
+            "ts":1771033899
         }],
-        "ts":1766744419
+        "ts":1771033899
     },
     "ancient":{
         "p":"Ancient.exe",
@@ -517,13 +517,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/29/0f/dolphin-master-2512-293-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/a3/80/dolphin-master-2512-397-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1770580848
+            "ts":1771292773
         }],
-        "ts":1770580848
+        "ts":1771292773
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2399,23 +2399,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45965/SDLVICE-3.10-win64-r45965.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45972/SDLVICE-3.10-win64-r45972.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45965/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45965/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45965/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45965/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45965/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45965/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r45972/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r45972/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r45972/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r45972/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r45972/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r45972/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1770228964
+            "ts":1771266026
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1770228964
+        "ts":1771266026
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2777,14 +2777,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_02_08_cd62b87f_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_02_16_6cc38286_32.zip",
             "x":{
-                "RenderDoc_2026_02_08_cd62b87f_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_02_08_cd62b87f_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_02_16_6cc38286_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_02_16_6cc38286_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1770505200
+            "ts":1771196400
         }],
-        "ts":1770505200
+        "ts":1771196400
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2836,13 +2836,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.6.2/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.7.2/zxc-windows-x64.exe.zip",
             "x":{
                 "zxc.exe":"zxc.exe"
             },
-            "ts":1770625629
+            "ts":1771216149
         }],
-        "ts":1770625629
+        "ts":1771216149
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -5424,13 +5424,15 @@
             "x":{
                 "qpcrypt.exe":"qpcrypt.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "rwexporter":{
         "p":"rwexporter.exe",
         "fs":[
         "https://github.com/AmyrAhmady/rwexporter/releases/download/v1.0/rwexporter.exe"
-        ]
+        ],
+        "ts":0
     },
     "tjzip_dump":{
         "p":"tjzip_dump.py",
@@ -5902,7 +5904,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.11.10/lessmsi-v2.11.10.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.0/lessmsi-v2.12.0.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -5911,9 +5913,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1770533372
+            "ts":1771180326
         }],
-        "ts":1770533372
+        "ts":1771180326
     },
     "msix":{
         "p":"MsiX.exe",
@@ -6260,13 +6262,22 @@
         "fs":[[
             "https://raw.githubusercontent.com/TheMorc/LS09-things/refs/heads/main/gar.bms",
             "BMS/gar.bms"
-        ]]
+        ]],
+        "ts":0
     },
     "over_the_hedge":{
         "p":"BMS/over_the_hedge.bms",
         "fs":[[
             "https://mirror.aluigi.org/bms/over_the_hedge.bms",
             "BMS/over_the_hedge.bms"
+        ]],
+        "ts":0
+    },
+    "favorite_dear_lkf_script":{
+        "p":"BMS/Favorite_Dear_LKF_script.bms",
+        "fs":[[
+            "https://raw.githubusercontent.com/bartlomiejduda/Tools/refs/heads/master/NEW%20Tools/Favourite%20Dear/Favorite_Dear_LKF_script.bms",
+            "BMS/Favorite_Dear_LKF_script.bms"
         ]],
         "ts":0
     },
@@ -6312,7 +6323,8 @@
                 "ps3oskeys/idps   {put your idps file}",
                 "ps3oskeys/exdata"
             ]
-        }]
+        }],
+        "ts":0
     },
     "sasr_xpac_hashes":{
         "p":"sasr_xpac_hashes.bt",
@@ -6326,7 +6338,8 @@
         "fs":[[
             "https://raw.githubusercontent.com/bartlomiejduda/Tools/refs/heads/master/NEW%20Tools/Hatch%20Engine/Hatch%20Engine%20Archive%20Tool/filelists/sonic_galactic_demo2_filenames.txt",
             "hatch/sonic_galactic_demo2.txt"
-        ]]
+        ]],
+        "ts":0
     },
     "spaghettikart_yaml":{
         "p":"Torch/SpaghettiKart",

@@ -342,6 +342,18 @@
         "rs":"Adventure Time VOLume","s":1
     },
     {
+        "d":[["size",[1024,4294967295]],["isat","+LKF",0],["isat","\\0\\0\\0\\0",48],["isatS","\\0",16,16],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,56],["n0",4,60],["str0",32,16,4],["py","f=open(inp,'rb');f.seek(8);b=f.read(4);f.seek(56);return b==f.read(4)"]],
+        "rs":"Favorite Dear LKF","s":1
+    },
+    {
+        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')//2;f.seek(0);o=[int.from_bytes(f.read(2),'little')for _ in range(c)]\nif any(x%2 for x in o):return\nfor of in o:\n f.seek(of);s=int.from_bytes(f.read(2),'little');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:b.decode('shift-jis')\n except:return\nreturn True"]],
+        "rs":"Favorite Dear MSG 1"
+    },
+    {
+        "d":[["size",[50,106534]],["n0",2,0],["n0",2,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')\nif c>16382:return\nf.seek(4)\nif (c*4+6)!=int.from_bytes(f.read(2),'little'):return\nf.seek(c*4+2);return f.read(4)==(b'\\xFF'*4)"]],
+        "rs":"Favorite Dear MSG 2"
+    },
+    {
         "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
         "rs":"TREVA SDPC","s":1
     },
