@@ -67,9 +67,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1771196400
+            "ts":1771801200
         }],
-        "ts":1771196400
+        "ts":1771801200
     },
     "file":{
         "p":"file/file.exe",
@@ -92,14 +92,14 @@
     "exeinfope":{
         "p":"ExeinfoPe/exeinfope.exe",
         "fs":[{
-            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.4/exeinfope.zip",
+            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.5/exeinfope.zip",
             "x":{
                 "ExeinfoPe/exeinfope.exe":"ExeinfoPe/exeinfope.exe",
                 "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll"
             },
-            "ts":1769968939
+            "ts":1771755567
         }],
-        "ts":1769968939
+        "ts":1771755567
     },
     "yara":{
         "p":"yara/yara.exe",
@@ -130,9 +130,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1771282800
+            "ts":1771887600
         }],
-        "ts":1771282800
+        "ts":1771887600
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -451,7 +451,7 @@
         "fs":[
         "https://raw.githubusercontent.com/Sembiance/dexvert/1f806db5feffcd9d55ba2496c4e97d3b3b7ceec2/bin/GameExtractorServer.jar"
         ],
-        "ts":1770933127
+        "ts":1771893591
     },
     "buildgdi":{
         "p":"buildgdi.exe",
@@ -517,13 +517,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/a3/80/dolphin-master-2512-397-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/6f/0f/dolphin-master-2512-430-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1771292773
+            "ts":1771900623
         }],
-        "ts":1771292773
+        "ts":1771900623
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2399,23 +2399,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45972/SDLVICE-3.10-win64-r45972.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45988/SDLVICE-3.10-win64-r45988.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45972/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45972/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45972/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45972/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45972/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45972/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r45988/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r45988/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r45988/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r45988/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r45988/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r45988/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1771266026
+            "ts":1771927567
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1771266026
+        "ts":1771927567
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2777,14 +2777,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_02_16_6cc38286_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_02_23_7bd3fe38_32.zip",
             "x":{
-                "RenderDoc_2026_02_16_6cc38286_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_02_16_6cc38286_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_02_23_7bd3fe38_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_02_23_7bd3fe38_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1771196400
+            "ts":1771801200
         }],
-        "ts":1771196400
+        "ts":1771801200
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2836,13 +2836,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.7.2/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.7.3/zxc-windows-x64.exe.zip",
             "x":{
                 "zxc.exe":"zxc.exe"
             },
-            "ts":1771216149
+            "ts":1771404604
         }],
-        "ts":1771216149
+        "ts":1771404604
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -5726,9 +5726,9 @@
             "x":{
                 "innounp.exe":"innounp-2.exe"
             },
-            "ts":1769958194
+            "ts":1771512290
         }],
-        "ts":1769958194
+        "ts":1771512290
     },
     "innoextract":{
         "p":"innoextract/innoextract.exe",
@@ -5812,7 +5812,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.0/lessmsi-v2.12.0.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.5/lessmsi-v2.12.5.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -5821,9 +5821,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1771180326
+            "ts":1771696899
         }],
-        "ts":1771180326
+        "ts":1771696899
     },
     "msix":{
         "p":"MsiX.exe",
