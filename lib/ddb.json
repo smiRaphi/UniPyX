@@ -354,6 +354,11 @@
         "rs":"Favorite Dear MSG 2"
     },
     {
+        "rqr":"Win16 NE executable (generic)",
+        "d":[["isat","\\x01\\x83",140],["contain","\\x1ABatman AC Resource Library\\0\\0\\0",[272,2048]]],
+        "rs":"Batman AC Resource","s":1
+    },
+    {
         "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
         "rs":"TREVA SDPC","s":1
     },
@@ -403,6 +408,14 @@
         "rq":null,
         "d":[["isat","\\x53\\xEF",1080],["isat","\\0\\0\\0",1101],["isin",["\\0","\\1"],1100],["str0",1144,16,1],["str0",1160,64,1]],
         "rs":"EXT","s":1
+    },
+    {
+        "d":[["isat","\\x05\\0\\0\\0",-16],["n0",4,-4],["n0",4,-8],["n0",4,-12],["py","f=open(inp,'rb');f.seek(-12);s1=int.from_bytes(f.read(4),'little');s2=int.from_bytes(f.read(4),'little');s1+=int.from_bytes(f.read(4),'little');return s2 in(s1,s1+4)"]],
+        "rs":"Metropolis Software ZAP"
+    },
+    {
+        "d":[["isat","PAKN",0],["isat","\\0\\0\\0\\0",68],["n0",4,4],["n0",4,8],["str0",12,56,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*64)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Def Jam Fight For NY: The Takeover PAKN","s":1
     },
     {
         "d":[["isat","CRAB\\1\\0\\0\\0",0],["isat","CAOE",-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(-8,2);f.seek(int.from_bytes(f.read(4),'little'));return sum(f.read(4))and f.read(4)==b'\\x08\\0\\0\\0'"]],
@@ -934,6 +947,14 @@
     {
         "d":[["isat","NSO0",0],["isat","\\0\\0\\0\\0\\x3F\\0\\0\\0",8],["isatS","\\0",28,108]],
         "rs":"Compressed Nintendo Switch Executable","s":1
+    },
+    {
+        "d":[["isat","x",2048],["isatS","\\0",2040,8],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb')\nif int.from_bytes(f.read(4),'little')>int.from_bytes(f.read(4),'little'):return\nf.seek(2048);return not int.from_bytes(f.read(2),'big')%31"]],
+        "rs":"Pseudo Interactive PIX"
+    },
+    {
+        "d":[["size",[2048,4294967294]],["s%",2048],["n0",4,0],["n0",1,4],["str0e",5,64,6],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2)\nif o%4 or 41>o or o>s:return\nf.seek(o-8);o=int.from_bytes(f.read(8).split(b'\\0',1)[1][:4],'little');return (o+(-o%2048))==s"]],
+        "rs":"Pseudo Interactive SmallF"
     },
     {
         "d":[["isat","NERO",-8],["isat","NER5",-12]],"qq":true,
@@ -1760,6 +1781,10 @@
         "rqr":null,
         "d":[["s%",16],["ext",".cpk"],["py","f=tbasename(inp);return len(f)==32 and not f.strip('0123456789abcdef')"]],
         "rs":"Level5 Encrypted CRI CPK"
+    },
+    {
+        "d":[["size",[5,367001600]],["ext",".bytes"],["n0",4,0],["py","f=open(inp,'rb')\nwhile neof(f):\n s=int.from_bytes(f.read(4),'little')\n if not s or len(f.read(s))!=s:return\nreturn True"]],
+        "rs":"Mini Metro Sound Bytes"
     },
     {
         "rqr":null,

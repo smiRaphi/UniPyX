@@ -1098,5 +1098,87 @@ def extract4_2(inp:str,out:str,t:str):
             of.close()
             f.close()
             if fs: return
+        case 'Batman AC Resource':
+            raise NotImplementedError
+            # https://wiki.osdev.org/NE
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import EXE
+            f = EXE(i)
+            f.seek(f.reco)
+        case 'Mini Metro Sound Bytes':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = 0
+            while f:
+                s = f.readu32()
+                d = f.read(s)
+                open(f'{o}/{c:03d}.{guess_ext(d)}','wb').write(d)
+                c += 1
+            f.close()
+            if c: return
+        case 'Metropolis Software ZAP': raise NotImplementedError
+        case 'Def Jam Fight For NY: The Takeover PAKN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PAKN'
+            c = f.readu32()
+            ds = f.readu32() + 12
+
+            fs = [(f.read(0x38).rstrip(b'\0').decode(),ds+f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                n = fe[0]
+                while n.startswith(('./','../')): n = n.split('/',1)[1]
+                xopen(f'{o}/{n}','wb').write(f.read(fe[2]))
+            if fs: return
+        case 'Pseudo Interactive PIX':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            if exists(dirname(i) + '/textures.pit'): fd = open(dirname(i) + '/textures.pit','rb')
+            else: fd = None
+
+            while f:
+                s = f.readu32()
+                if not s: break
+                f.alignpos(0x800)
+                sf = File(zlib.decompress(f.read(s)),endian='<')
+                c = sf.readu32()
+
+                for _ in range(c):
+                    ss = sf.readu32()
+                    n = sf.read0s().decode()
+                    d = sf.read(ss)
+                    xopen(f'{o}/{n}','wb').write(d)
+
+                    if n.endswith('.x2m') and sum(d[0x18:0x1C]) and fd:
+                        fd.seek(int.from_bytes(d[0x1C:0x20],'little'))
+                        xopen(f'{o}/{n[:-4]}_big.x2m','wb').write(d[:0x20] + fd.read(int.from_bytes(d[0x18:0x1C],'little')))
+                sf.close()
+
+            if fd: fd.close()
+            f.close()
+            if listdir(o): return
+        case 'Pseudo Interactive SmallF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            off = f.readu32()
+            fs = []
+            while (f.pos+6) < off:
+                fe = [f.read(f.readu8()).decode()]
+                f.skip(1)
+                fe.append(f.readu32())
+                fs.append(fe)
+
+            f.seek(off)
+            for fe in fs: xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[1]-f.pos))
+            f.close()
+            if fs: return
 
     return 1

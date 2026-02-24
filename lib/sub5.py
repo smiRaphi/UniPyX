@@ -593,7 +593,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                     if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
                     for f in listdir(o): remove(o + '/' + f)
             else:
-                for ix in list(range(210,136,-1)) + ['136b'] + list(range(136,80,-1)) + ['80b'] + list(range(80,67,-1)):
+                for ix in list(range(211,136,-1)) + ['136b'] + list(range(136,80,-1)) + ['80b'] + list(range(80,67,-1)):
                     scr = db.get(f'paq8px_v{ix}')
                     if not exists(scr): continue
 

@@ -122,16 +122,33 @@ class EXE(File):
         self.seek(0x3C)
         self.coff_off = self.readu32()
         self.seek(self.coff_off)
-        assert self.read(4) == b'PE\0\0'
-        self.skip(2)
-        secs = self.readu16()
-        self.skip(12)
-        self.skip(self.readu16() + 2)
-
         self.secs = {}
-        for _ in range(secs):
-            n = self.read(8).strip(b'\0').decode(errors='ignore')
-            self.skip(8)
-            s,o = self.readu32(),self.readu32()
-            self.secs[n] = (o,s,o+s)
-            self.skip(0x10)
+        pe = self.read(4)
+        if pe == b'PE\0\0':
+            self.skip(2)
+            secs = self.readu16()
+            self.skip(12)
+            self.skip(self.readu16() + 2)
+
+            for _ in range(secs):
+                n = self.read(8).strip(b'\0').decode(errors='ignore')
+                self.skip(8)
+                s,o = self.readu32(),self.readu32()
+                self.secs[n] = (o,s,o+s)
+                self.skip(0x10)
+        elif pe[:2] == b'NE':
+            self.skip(0x18)
+            secs = self.readu16()
+            self.skip(4)
+            seco = self.readu16()
+            self.reco = self.readu16()
+            blcks = 1 << self.readu16()
+            self.skip()
+            self.recs = self.readu16()
+
+            self.seek(self.coff_off + seco)
+            for x in range(secs):
+                s,o = self.readu16()*blcks,self.readu16()
+                self.secs[x] = (o,s,o+s)
+                self.skip(4)
+        else: raise NotImplementedError(pe)

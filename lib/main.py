@@ -691,6 +691,7 @@ def guess_ext(f):
     if tag == b'\x89PNG': ext = 'png'
     elif tag == b'RIFF': ext = 'wav'
     elif tag == b'OggS': ext = 'ogg'
+    elif tag == b'fLaC': ext = 'flac'
     elif tag == b'MThd': ext = 'mid'
     elif tag == b'DXBC': ext = 'cso'
     elif tag == b'NES\x1A': ext = 'nes'
