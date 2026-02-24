@@ -1180,5 +1180,30 @@ def extract4_2(inp:str,out:str,t:str):
             for fe in fs: xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[1]-f.pos))
             f.close()
             if fs: return
+        case 'Novalogic Resource':
+            KEYS = {b'\xAD\xDE\xED\xAC',b'\x2D\xDE\xED\xAC\xAD\xDE\xED\xAC\xAD\xDE\xED\xAC'}
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(12) == b'RESOURCE2xxx'
+            c = f.readu32()
+
+            fs = []
+            for _ in range(c):
+                rn = f.read(12)
+                for k in KEYS:
+                    try:
+                        n = bytes(rn[x] ^ k[x%len(k)] for x in range(len(rn))).rstrip(b'\0').decode('ascii')
+                        assert n and n.isprintable()
+                    except:pass
+                    else:break
+                else: raise ValueError('File name with unknown key: ' + repr(rn) + ' ' + rn.hex())
+                fs.append((n,f.readu32()+0x14,f.readu32())) 
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[2]))
+            f.close()
+            if fs: return
 
     return 1

@@ -734,7 +734,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     'GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
                 }[t].split('|')})
                 p.kill()
-                if r.status_code == 200 and r.json().get('files'): return
+                if r.status_code == 200 and r.json().get('files'):
+                    if exists(noext(i) + '_ge_decompressed' + extname(i)): remove(noext(i) + '_ge_decompressed' + extname(i))
+                    return
             except httpx.ReadTimeout: p.kill()
             except:
                 p.kill()
