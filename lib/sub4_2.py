@@ -1205,5 +1205,15 @@ def extract4_2(inp:str,out:str,t:str):
                 xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[2]))
             f.close()
             if fs: return
+        case 'Specnaz UFF/BFS': raise NotImplementedError
+        case 'Nicktoons Gravjet Racing LIN':
+            if db.print_try: print('Trying with custom extractor')
+            d = open(i,'rb').read()
+
+            for fd in d.split(b'\xC0\xDE\0\1')[1:]:
+                nl = int.from_bytes(fd[:4],'big')
+                xopen(f'{o}/{fd[4+5:4+nl].decode().replace('://','/')}','wb').write(fd[4+nl:])
+
+            if listdir(o): return
 
     return 1

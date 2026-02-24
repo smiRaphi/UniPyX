@@ -111,6 +111,8 @@ class DLDB:
         return exei,up
     def ext(self,p:str,ex:str,xl:dict):
         if ex in ('.zip','.nupkg'):
+            xall = False
+            td = gtmp()
             with zipfile.ZipFile(p,'r') as z:
                 for tx in xl:
                     if tx == '*':
@@ -123,9 +125,16 @@ class DLDB:
                         xopen(tf,'wb').write(z.read(tx))
                         self.ext(tf,ex,xl[tx])
                         os.remove(tf)
+                    elif tx[-1] == '/':
+                        if not xall:
+                            os.makedirs(td,exist_ok=True)
+                            z.extractall(td)
+                            xall = True
+                        copy(td + '/' + tx,'bin/' + xl[tx])
                     else:
                         d = z.read(tx)
                         xopen('bin/' + xl[tx],'wb').write(d)
+            if xall: rmtree(td)
         elif ex in ('.tgz','.tar.gz'):
             with tarfile.open(p,'r:gz') as z:
                 for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())

@@ -444,6 +444,14 @@
         "rs":"PSX PFW","s":1
     },
     {
+        "d":[["isat","UFF 1.0\\n",0],["n0",4,-4]],
+        "rs":"Specnaz UFF/BFS"
+    },
+    {
+        "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],
+        "rs":"Nicktoons Gravjet Racing LIN","s":1
+    },
+    {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'big')+8)==s"]],
         "rs":"Lucas Arts Bundle"
     },

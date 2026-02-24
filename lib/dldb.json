@@ -41,7 +41,7 @@
         "fs":[{
             "u":"https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-25.0.2/graalvm-community-jdk-25.0.2_windows-x64_bin.zip",
             "x":{
-                "graalvm-community-openjdk-25.0.2+10.1":"graalvm"
+                "graalvm-community-openjdk-25.0.2+10.1/":"graalvm"
             },
             "del":[
                 "graalvm/legal",
