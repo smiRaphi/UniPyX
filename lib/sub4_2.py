@@ -1215,5 +1215,50 @@ def extract4_2(inp:str,out:str,t:str):
                 xopen(f'{o}/{fd[4+5:4+nl].decode().replace('://','/')}','wb').write(fd[4+nl:])
 
             if listdir(o): return
+        case 'AmusementMakers Project B.G. Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,BitReader
+            f = File(i,endian='<')
+            assert f.read(4) == b'PBG\x1A'
+            f.skip(4)
+            c = f.readu32()
+
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32(),f.readu32()))
+                f.skip(4)
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,f.size))
+
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe[1])
+                d = BitReader(f.read(fs[ix+1][1]-fe[1]))
+
+                ob = bytearray()
+                win = bytearray(8192)
+                winp = 1
+                while True:
+                    flg = d.get_bit()
+                    if flg is None: break
+                    if flg:
+                        b = d.get_bits(8)
+                        ob.append(b)
+                        win[winp] = b
+                        winp = (winp + 1) & 0x1FFF
+                    else:
+                        of = d.get_bits(13)
+                        if of == 0: break
+                        l = d.get_bits(4) + 2
+                        for x in range(l + 1):
+                            b = win[(of + x) & 0x1FFF]
+                            ob.append(b)
+                            win[winp] = b
+                            winp = (winp + 1) & 0x1FFF
+
+                d = bytes(ob)[:fe[0]]
+                open(f'{o}/{ix:02d}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
+            if fs: return
 
     return 1

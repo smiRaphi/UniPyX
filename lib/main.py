@@ -702,6 +702,11 @@ def guess_ext(f):
     if not ext and tag == b'Kayd':
         if f.read(0x13) == b'ara FBX Binary  \0\x1A\0': ext = 'fbx'
         else: f.seek(-0x13,1)
+    if not ext and tag[:2] == b'BM':
+        f.seek(1,1)
+        t1 = f.read(1)[0]
+        if not sum(f.read(4)) or not t1: ext = 'bmp'
+        else: f.seek(-6,1)
     if not ext and tag == b'<?xm':
         if f.read(15) == b'l version="1.0"': ext = 'xml'
         else: f.seek(-15,1)

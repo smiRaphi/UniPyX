@@ -152,3 +152,27 @@ class EXE(File):
                 self.secs[x] = (o,s,o+s)
                 self.skip(4)
         else: raise NotImplementedError(pe)
+
+class BitReader:
+    def __init__(self,d:bytes):
+        self.d = d
+        self.p = 0
+        self.b = 0
+        self.m = 0
+
+    def get_bit(self):
+        if not self.m:
+            if self.p >= len(self.d): return None
+            self.b = self.d[self.p]
+            self.p += 1
+            self.m = 0x80
+        bit = 1 if self.b & self.m else 0
+        self.m >>= 1
+        return bit
+    def get_bits(self,n) -> int:
+        v = 0
+        for i in range(n):
+            b = self.get_bit()
+            if b is None: break
+            if b: v |= 1 << (n - 1 - i)
+        return v
