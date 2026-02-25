@@ -14,7 +14,7 @@
     {
         "rqr":["TERSE compressed data (PACK, U)","TERSE compressed data (PACK, V)","TERSE compressed data (SPACK, U)","TERSE compressed data (SPACK, V)"],
         "d":["py","f=open(inp,'rb');v=f.read(1)[0]\nif v in (1,7):return True\nif not v in (2,5):return False\nf.seek(2);r1=int.from_bytes(f.read(2),'big');f.seek(8);r2=int.from_bytes(f.read(4),'big')\nreturn r1+r2!=0 and (r1==0 or r2==0 or r1==r2)"],
-        "rs":"TERSE","s":1
+        "rs":"TERSE"
     },
     {
         "rq":["UPX","Install Creator Pro",true],
@@ -346,7 +346,7 @@
         "rs":"Favorite Dear LKF","s":1
     },
     {
-        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')//2;f.seek(0);o=[int.from_bytes(f.read(2),'little')for _ in range(c)]\nif any(x%2 for x in o):return\nfor of in o:\n f.seek(of);s=int.from_bytes(f.read(2),'little');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:b.decode('shift-jis')\n except:return\nreturn True"]],
+        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')//2;f.seek(0);o=[int.from_bytes(f.read(2),'little')for _ in range(c)]\nif any(x%2 for x in o):return\nfor of in o:\n f.seek(of);s=int.from_bytes(f.read(2),'little');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:assert b.decode('shift-jis').isprintable()\n except:return\nreturn True"]],
         "rs":"Favorite Dear MSG 1"
     },
     {
@@ -454,6 +454,19 @@
     {
         "d":[["isat","PBG\\x1A",0],["n0",4,8],["n0",4,16],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');f.seek(16);return (12+c*12)==int.from_bytes(f.read(4),'little')"]],
         "rs":"AmusementMakers Project B.G. Archive","s":1
+    },
+    {
+        "d":[["isin",["LTAR\\x04\\0\\0\\0","LTAR\\x03\\0\\0\\0",
+                      "RATL\\0\\0\\0\\x04","RATL\\0\\0\\0\\x03"],0],["isatS","\\0",8,24],["n0",4,8],["n0",4,12]],
+        "rs":"Monolith Productions LTAR","s":1
+    },
+    {
+        "d":[["s%",2048],["isat","LF",0],["n0",2,2],["n0",4,4],["py","f=open(inp,'rb');f.seek(2);c=4+int.from_bytes(f.read(2),'little')*8;return (c+2047)//2048==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Michigan: Report From Hell LF"
+    },
+    {
+        "d":[["s%",16],["size",[32,16777215]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');s=4+int.from_bytes(f.read(4),'little')*8;o=int.from_bytes(f.read(4),'little')\nif (s+(-s%16))!=o:return\nfs=int.from_bytes(f.read(4),'little')\nif (o+fs)!=int.from_bytes(f.read(4),'little'):return\nf.seek(s);return not sum(f.read(-s%16))"]],
+        "rs":"Michigan: Report From Hell BIN"
     },
     {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'big')+8)==s"]],

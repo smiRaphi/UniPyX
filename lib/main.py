@@ -663,7 +663,7 @@ def fix_zeebo(f,hint:int=None):
         elif tag[:3] == b'ID3' or\
             (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
                 ext = 'mp3'
-        elif tag[0] == 0x78: ext = 'zlib'
+        elif tag[0] == 0x78 and not (tag[0]<<8 | tag[1])%31: ext = 'zlib'
         elif not hint is None and hint <= 3: ext = ('image','audio','txt','bin')[hint]
         else: ext = None
 
@@ -702,6 +702,28 @@ def guess_ext(f):
     if not ext and tag == b'Kayd':
         if f.read(0x13) == b'ara FBX Binary  \0\x1A\0': ext = 'fbx'
         else: f.seek(-0x13,1)
+    if not ext and tag == b'\0\0\1\xBA':
+        b = f.read(1)[0]
+        if b >> 6 == 0b01 and b & 4:
+            f.seek(1,1)
+            b = f.read(1)[0]
+            if b & 4:
+                f.seek(1,1)
+                b = f.read(1)[0]
+                if b & 4:
+                    b = f.read(1)[0]
+                    if b & 1:
+                        f.seek(2,1)
+                        b = f.read(1)[0]
+                        if b & 3 == 3:
+                            b = f.read(1)[0]
+                            if not b & 0xF8: ext = 'mpeg2'
+                            f.seek(-1,1)
+                        f.seek(-3,1)
+                    f.seek(-1,1)
+                f.seek(-2,1)
+            f.seek(-2,1)
+        f.seek(-1,1)
     if not ext and tag[:2] == b'BM':
         f.seek(1,1)
         t1 = f.read(1)[0]
@@ -778,6 +800,28 @@ def guess_ext_ps2(f):
     if not ext and tag == b'RESE':
         if f.read(20) == b'T\0\0\0\0\0\x08\0\0\0\0\0ROMDIR\0\0': ext = 'img'
         else: f.seek(-20,1)
+    if not ext and tag == b'\0\0\1\xBA':
+        b = f.read(1)[0]
+        if b >> 6 == 0b01 and b & 4:
+            f.seek(1,1)
+            b = f.read(1)[0]
+            if b & 4:
+                f.seek(1,1)
+                b = f.read(1)[0]
+                if b & 4:
+                    b = f.read(1)[0]
+                    if b & 1:
+                        f.seek(2,1)
+                        b = f.read(1)[0]
+                        if b & 3 == 3:
+                            b = f.read(1)[0]
+                            if b & 0xF8 in (0,0xF8): ext = 'mpeg2'
+                            f.seek(-1,1)
+                        f.seek(-3,1)
+                    f.seek(-1,1)
+                f.seek(-2,1)
+            f.seek(-2,1)
+        f.seek(-1,1)
     if not ext and tag == b'\x10\0\0\0':
         if int.from_bytes(f.read(4),'little') in (2,8,9):
             fo = int.from_bytes(f.read(4),'little')

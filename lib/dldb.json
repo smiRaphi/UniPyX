@@ -6189,6 +6189,30 @@
         ]],
         "ts":0
     },
+    "f.e.a.r.":{
+        "p":"BMS/fear.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/fear.bms",
+            "BMS/fear.bms"
+        ]],
+        "ts":0
+    },
+    "shadow_of_mordor":{
+        "p":"BMS/shadow_of_mordor.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/shadow_of_mordor.bms",
+            "BMS/shadow_of_mordor.bms"
+        ]],
+        "ts":0
+    },
+    "condemned2":{
+        "p":"BMS/condemned2.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/condemned2.bms",
+            "BMS/condemned2.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

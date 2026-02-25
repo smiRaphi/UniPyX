@@ -6,7 +6,7 @@ def extract4_2(inp:str,out:str,t:str):
     i = inp
     o = out
 
-    def quickbms(scr,inf=i,ouf=o,print_try=True):
+    def quickbms(scr:str,inf=i,ouf=o,print_try=True):
         scp = db.get(scr)
         if db.print_try and print_try: print('Trying with',scr)
         run(['quickbms','-Y',scp,inf,ouf],print_try=False)
@@ -1257,6 +1257,67 @@ def extract4_2(inp:str,out:str,t:str):
 
                 d = bytes(ob)[:fe[0]]
                 open(f'{o}/{ix:02d}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
+            if fs: return
+        case 'Monolith Productions LTAR':
+            from lib.file import File
+            f = File(i)
+            f._end = {b'LTAR':'<',b'RATL':'>'}[f.read(4)]
+
+            v = f.readu32()
+            f.skip(12)
+            u1 = f.readu32()
+            f.skip(8)
+            u2 = sum(f.read(0x10))
+            f.close()
+            if v == 4 and u1 == 1 and not u2: s = 'shadow_of_mordor'
+            elif v == 3 and u1 == 0 and u2: s = 'condemned2'
+            elif v == 3 and u1 == 1 and u2: s = 'f.e.a.r.'
+            else: raise NotImplementedError(f'Unknown LTAR Signature\nEndian: {f._end} Version: {v} u1: {u1} u2: {u2}')
+
+            return quickbms(s)
+        case 'Michigan: Report From Hell LF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(2) == b'LF'
+            c = f.readu16()
+
+            bck = db.print_try
+            db.print_try = False
+
+            fs = [(f.readu32()*0x800,f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                if d[:4] in (b'GMDF',b'GMOF',b'GCIF','NPVS',b'UV\0\0',b'SCR\0'): ext = d[:4].rstrip(b'\0').decode('ascii').lower()
+                elif d == b'dummy': ext = 'dummy'
+                elif not fe[1]%0x10 and (4+int.from_bytes(d[:4],'little')*8+(-(4+int.from_bytes(d[:4],'little')*8)%0x10)) == int.from_bytes(d[4:8],'little'): ext = 'bin.pck'
+                elif d[0]+d[1] and not d[2] and d[3] == d[8] == 0x20 and not sum(d[4:8]) and d[9] == 2 and d[10] and d[11] and d[12] and d[13] and not d[14] and d[15].bit_count() == 1: ext = 'mdl'
+                else: ext = guess_ext_ps2(d)
+                fn = f'{o}/{ix:03d}.{ext}'
+                xopen(fn,'wb').write(d)
+                if ext == 'bin.pck': extract4_2(fn,fn[:-8] + '_ext','Michigan: Report From Hell BIN')
+
+            db.print_try = bck
+            f.close()
+            if fs: return
+        case 'Michigan: Report From Hell BIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu32()
+
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                if d[:4] in (b'GMDF',b'GMOF',b'GCIF','NPVS',b'UV\0\0',b'SCR\0'): ext = d[:4].rstrip(b'\0').decode('ascii').lower()
+                elif d == b'dummy': ext = 'dummy'
+                elif d[0]+d[1] and not d[2] and d[3] == d[8] == 0x20 and not sum(d[4:8]) and d[9] == 2 and d[10] and d[11] and d[12] and d[13] and not d[14] and d[15].bit_count() == 1: ext = 'mdl'
+                else: ext = guess_ext_ps2(d)
+                xopen(f'{o}/{ix:02d}.{ext}','wb').write(d)
 
             f.close()
             if fs: return
