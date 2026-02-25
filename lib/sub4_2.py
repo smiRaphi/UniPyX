@@ -1321,5 +1321,71 @@ def extract4_2(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Metroid Prime 4 RFRM PACK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'RFRM'
+            f.skip(0x10)
+            assert f.read(4) == b'PACK' and f.readu32() == f.readu32() == 1 and f.read(4) == b'RFRM'
+            f.skip(0x10)
+            assert f.read(4) == b'TOCC' and f.readu32() == f.readu32() != 0 and f.read(4) == b'ADIR'
+            f.skip(0x14)
+
+            fc = f.readu32()
+            fs = []
+            for ix in range(fc):
+                fe = [f'{o}/{ix}.' + f.read(4).decode('ascii').strip().lower() or 'bin']
+                f.skip(0x18)
+                fe.append(f.readu64())
+                f.skip(8)
+                fe.append(f.readu64())
+                ec = f.readu64()
+                if ec != 0: fe[0] += f'.enc{ec}'
+                fs.append(fe)
+
+            for fe in fs:
+                f.seek(fe[1])
+                open(fe[0],'wb').write(f.read(fe[2]))
+            if fs: return
+        case 'Metroid Prime 4 RFRM MSBT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'RFRM'
+            f.skip(0x10)
+            assert f.read(12) == b'MSBT\x10\0\0\0\x10\0\0\0'
+
+            while f:
+                n = f.read(4).decode('ascii')
+                s = f.readu32()
+                f.skip(0x10)
+                d = f.read(s)
+                open(o + f'/{n}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),'wb').write(d)
+            f.close()
+
+            bv = db.print_try
+            db.print_try = False
+            for f in listdir(o):
+                if f.endswith('.msbt'): extract(o + '\\' + f,o,'Nintendo MSBT')
+            db.print_try = bv
+            if listdir(o): return
+        case 'Metroid Prime 4 RFRM ENUM':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(4) == b'RFRM'
+            f.skip(0x10)
+            assert f.read(12) == b'ENUM\x0A\0\0\0\x0A\0\0\0'
+
+            fc = f.readu32()
+            of = open(o + '/' + tbasename(i) + '.txt','w')
+            for ix in range(fc): of.write(f'{ix}: {f.read(4).hex().upper()}\n')
+            of.close()
+            if fc: return
+        case 'Metroid Prime 4 Save': raise NotImplementedError()
 
     return 1

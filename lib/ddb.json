@@ -448,6 +448,10 @@
         "rs":"Specnaz UFF/BFS"
     },
     {
+        "d":[["isat","\\xFF\\x0A\\x00DELPHIXPICTURECOLLECTION\\x00\\x30\\x10",0],["isat","TPF0",34],["n0",4,30],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(30);return (34+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"DelphiX Picture Collection","s":1
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },

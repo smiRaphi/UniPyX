@@ -1928,31 +1928,72 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else: d = d.decode('ansi')
 
             if db.print_try: print('Trying with custom extractor')
-            for ix,fd in enumerate(re.findall(r'(Picture\.Data|Icon\.Data|Bitmap) = \{([^\}]+)\}',d)):
+            import hashlib
+            def prcd(d:bytes):
+                t = d[1:d[0]+1].decode()
+                d = d[d[0]+1:]
+                if t == 'TBitmap':
+                    ext = 'bmp'
+                    d = d[4:]
+                elif t == 'TJPEGImage':
+                    ext = 'jpg'
+                    d = d[4:]
+                elif t == 'TGIFImage':
+                    ext = 'gif'
+                    d = d[4:]
+                elif t == 'TIcon':
+                    ext = 'ico'
+                elif t == 'TDIB':
+                    hds = 14 + int.from_bytes(d[:4],'little')
+                    bitc = int.from_bytes(d[14:0x10],'little')
+                    clrs = int.from_bytes(d[0x20:0x24],'little')
+                    if clrs == 0 and bitc <= 8: hds += 4 * (1 << bitc)
+                    else: hds += 4 * clrs
+
+                    w = int.from_bytes(d[4:8],'little')
+                    h = int.from_bytes(d[8:12],'little')
+
+                    ext = 'bmp'
+                    d = b'BM' + (14+len(d)).to_bytes(4,'little') + b'\0'*4 + hds.to_bytes(4,'little') + d
+                else: ext = 'image'
+                return d,ext
+
+            dn = []
+            for ix,fd in enumerate(re.findall(r'(?s)(?P<tab>(?:  )+)item\n(?P=tab)  (.+?)(?P=tab)end>?\n',d)):
+                fd = fd[1]
+                if not '    Picture.Data = {' in fd: continue
+                n = re.search(r"Name = '(.+)'\n",fd)
+                fd = bytes.fromhex(re.search(r'Picture\.Data = \{([^\}]+)\}',fd)[1])
+                dn.append(hashlib.sha256(fd).digest())
+                fd,ext = prcd(fd)
+                open(o + f'/{n[1] if n else ix}{"" if n else "_pic"}.{ext}','wb').write(fd)
+                
+            for ix,fd in enumerate(re.findall(r'(Icon\.Data|Bitmap) = \{([^\}]+)\}',d)):
                 ft,fd = fd
                 fd = bytes.fromhex(fd)
                 if ft == 'Icon.Data': ext = 'ico'
                 elif ft == 'Picture.Data':
-                    st = fd[1:fd[0]+1].decode()
-                    fd = fd[fd[0]+1:]
-                    if st == 'TBitmap':
-                        ext = 'bmp'
-                        fd = fd[4:]
-                    elif st == 'TJPEGImage':
-                        ext = 'jpg'
-                        fd = fd[4:]
-                    elif st == 'TGIFImage':
-                        ext = 'gif'
-                        fd = fd[4:]
-                    elif st == 'TIcon':
-                        ext = 'ico'
-                    else: ext = 'unk'
+                    h = hashlib.sha256(fd).digest()
+                    if h in dn: continue
+                    dn.append(h)
+                    fd,ext = prcd(fd)
                 elif ft == 'Bitmap':
                     ext = 'bmp'
                     fd = fd[28:]
 
                 open(o + f'/{ix}.{ext}','wb').write(fd)
             return
+        case 'DelphiX Picture Collection':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,'rb')
+            assert f.read(0x1E) == b'\xFF\x0A\0DELPHIXPICTURECOLLECTION\0\x30\x10'
+            s = int.from_bytes(f.read(4),'little')
+            tf = TmpFile(name=tbasename(i) + '.dfm')
+            open(tf.p,'wb').write(f.read(s))
+            f.close()
+            r = extract4(tf.p,o,'Borland Form')
+            tf.destroy()
+            return r
         case 'Dragon VDK IMG':
             run(['dcopy',i,'*',o + '\\'])
             if listdir(o): return
@@ -2537,76 +2578,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if t == 1: mkdir(o + '/' + fn)
                 elif t == 2: xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
             if listdir(o): return
-        case 'Metroid Prime 4 RFRM PACK':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            assert f.read(4) == b'RFRM'
-            f.skip(0x10)
-            assert f.read(4) == b'PACK' and f.readu32() == f.readu32() == 1 and f.read(4) == b'RFRM'
-            f.skip(0x10)
-            assert f.read(4) == b'TOCC' and f.readu32() == f.readu32() != 0 and f.read(4) == b'ADIR'
-            f.skip(0x14)
-
-            fc = f.readu32()
-            fs = []
-            for ix in range(fc):
-                fe = [f'{o}/{ix}.' + f.read(4).decode('ascii').strip().lower() or 'bin']
-                f.skip(0x18)
-                fe.append(f.readu64())
-                f.skip(8)
-                fe.append(f.readu64())
-                ec = f.readu64()
-                if ec != 0: fe[0] += f'.enc{ec}'
-                fs.append(fe)
-
-            for fe in fs:
-                f.seek(fe[1])
-                open(fe[0],'wb').write(f.read(fe[2]))
-            if fs: return
-        case 'Metroid Prime 4 RFRM MSBT':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            assert f.read(4) == b'RFRM'
-            f.skip(0x10)
-            assert f.read(12) == b'MSBT\x10\0\0\0\x10\0\0\0'
-
-            while f:
-                n = f.read(4).decode('ascii')
-                s = f.readu32()
-                f.skip(0x10)
-                d = f.read(s)
-                open(o + f'/{n}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),'wb').write(d)
-            f.close()
-
-            bv = db.print_try
-            db.print_try = False
-            for f in listdir(o):
-                if f.endswith('.msbt'): extract4(o + '\\' + f,o,'Nintendo MSBT')
-            db.print_try = bv
-            if listdir(o): return
-        case 'Metroid Prime 4 RFRM ENUM':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            assert f.read(4) == b'RFRM'
-            f.skip(0x10)
-            assert f.read(12) == b'ENUM\x0A\0\0\0\x0A\0\0\0'
-
-            fc = f.readu32()
-            of = open(o + '/' + tbasename(i) + '.txt','w')
-            for ix in range(fc): of.write(f'{ix}: {f.read(4).hex().upper()}\n')
-            of.close()
-            if fc: return
         case 'UMD Data':
             if db.print_try: print('Trying with custom extractor')
             open(o + '/' + tbasename(i) + '.txt','wb').write(open(i,'rb').read().replace(b'\0',b' ').replace(b'|',b'\n'))
             return
-        case 'Metroid Prime 4 Save': raise NotImplementedError()
         case 'Next Level Games DICT+DATA':
             be = open(i,'rb').read(4) == b'\xA9\xF3\x24\x58'
 

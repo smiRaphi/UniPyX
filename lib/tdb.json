@@ -1152,7 +1152,8 @@
         "borland delphi - c++ builder form (var.1)",
         "borland delphi - c++ builder form (var.2)",
         "borland delphi - c++ builder form (var.3)",
-        "borland delphi - c++ builder form (var.4)"
+        "borland delphi - c++ builder form (var.4)",
+        "delphi compiled form"
     ],
     "Build Engine RFF":[
         "build engine rff encrypted container"
