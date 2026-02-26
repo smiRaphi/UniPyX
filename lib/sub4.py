@@ -1950,9 +1950,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if clrs == 0 and bitc <= 8: hds += 4 * (1 << bitc)
                     else: hds += 4 * clrs
 
-                    w = int.from_bytes(d[4:8],'little')
-                    h = int.from_bytes(d[8:12],'little')
-
                     ext = 'bmp'
                     d = b'BM' + (14+len(d)).to_bytes(4,'little') + b'\0'*4 + hds.to_bytes(4,'little') + d
                 else: ext = 'image'

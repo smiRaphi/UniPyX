@@ -452,6 +452,10 @@
         "rs":"DelphiX Picture Collection","s":1
     },
     {
+        "d":[["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o);return f.read(4)==b'\\0\\x10\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Star Wars Early Learning DAT"
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },
