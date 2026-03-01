@@ -6292,6 +6292,13 @@
         }],
         "ts":1766235156
     },
+    "vulkan_gpuinfo.json":{
+        "p":"vulkan_gpuinfo.json",
+        "fs":[[
+            "https://vulkan.gpuinfo.org/api/v2/drivercoverage/extension?extension=VK_KHR_swapchain",
+            "vulkan_gpuinfo.json"
+        ]]
+    },
     "unrealpak_5.6.1":{
         "p":"UnrealPak/5.6.1/UnrealPak.exe",
         "fs":[{

@@ -120,7 +120,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         return r
 
     match t:
-        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'ZSTD'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
+        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
              'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer':
             _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
@@ -133,25 +133,30 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in ('ZSTD','xz','BZip2','LZIP'):
-                    if t == 'ZSTD':
-                        xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
-
-                        of = o + '\\' + listdir(o)[0]
-                        tg = open(of,'rb').read(4)
-                        if tg in xm:
-                            tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
-                            rename(of,tp)
-                            r = extract(tp,o,xm[tg])
-                            if r: rename(tp,of)
-                            else:
-                                while True:
-                                    try: remove(tp)
-                                    except PermissionError: sleep(0.1)
-                                    else: break
-                            return
-                    return fix_tar(o)
+                elif t in ('xz','BZip2','LZIP'): return fix_tar(o)
                 else: return
+        case 'ZSTD':
+            if db.print_try: print('Trying with compression.zstd')
+            if sys.version_info >= (3,14): from compression import zstd # type: ignore
+            else: from backports import zstd # type: ignore
+            of = o + '\\' + tbasename(i)
+            d = zstd.decompress(open(i,'rb').read())
+            xopen(of,'wb').write(d)
+
+            xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
+            tg = d[:4]
+            if tg in xm:
+                tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
+                rename(of,tp)
+                r = extract(tp,o,xm[tg])
+                if r: rename(tp,of)
+                else:
+                    while True:
+                        try: remove(tp)
+                        except PermissionError: sleep(0.1)
+                        else: break
+                return
+            return fix_tar(o)
         case 'Stripped TAR':
             if db.print_try: print('Trying with custom extractor')
             f = open(i,'rb')

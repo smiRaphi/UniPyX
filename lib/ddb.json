@@ -453,7 +453,20 @@
     },
     {
         "d":[["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o);return f.read(4)==b'\\0\\x10\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s"]],
-        "rs":"Star Wars Early Learning DAT"
+        "rs":"Star Wars Early Learning Activity Center DAT"
+    },
+    {
+        "d":[["isat","yuzuvkch",0],["isat","\\x20\\0\\0\\0\\x01\\0\\0\\0",12]],
+        "rs":"Yuzu Vulkan Pipeline Cache","s":1
+    },
+    {
+        "d":[["isat","\\x20\\0\\0\\0\\x01\\0\\0\\0",0],["isin",["\\0\\0\\0\\0","ACOM","\\x43\\x51\\0\\0","\\x86\\x80\\0\\0","\\x02\\x10\\0\\0","\\x10\\x10\\0\\0","\\x6B\\x10\\0\\0","\\xDE\\x10\\0\\0","\\xB5\\x13\\0\\0","\\x14\\x14\\0\\0","\\x4D\\x14\\0\\0","\\xE4\\x14\\0\\0","\\xD8\\xF4\\0\\0","\\x02\\x00\\x01\\0","\\xe5\\x19\\0\\0","\\xd5\\x1e\\0\\0","\\x21\\x20\\0\\0","\\x42\\x4c\\x40\\x05"],8],
+             ["py","f=open(inp,'rb');f.seek(8);v=sum(f.read(4));return (sum(f.read(4))and sum(f.read(16)))if v else (not sum(f.read(4))and not sum(f.read(16)))"]],
+        "rs":"Vulkan Pipeline Cache"
+    },
+    {
+        "d":[["isat","yuzucach",0],["n0",4,8],["n0",4,12],["n0",8,16]],
+        "rs":"Yuzu Cache","s":1
     },
     {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],

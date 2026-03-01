@@ -1387,7 +1387,7 @@ def extract4_2(inp:str,out:str,t:str):
             of.close()
             if fc: return
         case 'Metroid Prime 4 Save': raise NotImplementedError()
-        case 'Star Wars Early Learning DAT':
+        case 'Star Wars Early Learning Activity Center DAT':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
@@ -1410,5 +1410,161 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(fe[0])
                 xopen(fe[2],'wb').write(f.read(fe[1]))
             if fs: return
+        case 'Vulkan Pipeline Cache':
+            import json
+            DB = db.get('vulkan_gpuinfo.json')
+            gdb = json.load(open(DB,encoding='utf-8'),strict=False)
+            if 'query' in gdb:
+                import re
+                ddb = gdb['devices']
+                gdb = {}
+
+                def fmt(i:str): return re.sub(' +',' ',''.join(x for x in i.replace('\n',' ') if x.isprintable()))
+
+                for d in ddb:
+                    vid = d['vendorid']
+                    if vid[:2].lower() == '0x': vid = int(vid[2:],16)
+                    else: vid = int(vid)
+                    vid = str(vid)
+                    if vid not in gdb: gdb[vid] = {'name':fmt(d['vendor'])}
+
+                    did = d['deviceid']
+                    if did[:2].lower() == '0x': did = int(did[2:],16)
+                    else: did = int(did)
+                    gdb[vid][str(did)] = fmt(d['device'])
+                del ddb
+                json.dump(gdb,open(DB,'w',encoding='utf-8'),sort_keys=True,ensure_ascii=False,separators=(',',':'))
+
+            if db.print_try: print('Trying with custom extractor')
+            import uuid
+            from lib.file import File
+            if sys.version_info >= (3,14): from compression import zstd # type: ignore
+            else: from backports import zstd # type: ignore
+            f = File(i,endian='<')
+
+            hs = f.readu32()
+            assert f.readu32() == 1
+            vid = f.readu32()
+            did = f.readu32()
+            uid = f.read(0x10)
+            f.skip(hs-0x20)
+
+            xopen(o + '/$device_info.txt','w').write(f'Vendor: {gdb.get(str(vid),{"name":"?"})["name"]} (0x{vid:04X})\nDevice: {gdb.get(str(vid),{}).get(str(did),"?")} (0x{did:04X})\nUUID: {uuid.UUID(bytes=uid)}\n')
+
+            if vid == 0x10DE: # nvidia
+                # https://github.com/a2flo/floor/blob/dca53f78f03a261136e5580740503f0f76b4f351/src/device/vulkan/internal/vulkan_disassembly.cpp#L135
+                c = f.readu32()
+                zdct = None
+                fs = []
+                for _ in range(c):
+                    hsh = f.read(8)
+                    unh = f.read(8)
+                    f.skip(4)
+                    assert f.read(4) == b'CPKV'
+                    f.skip(4)
+                    assert hsh == f.read(8) and unh == f.read(8)
+                    f.skip(8)
+
+                    s = f.readu32()
+                    f.skip(4)
+
+                    if unh == b'_NVDICT_':
+                        assert f.read(4) == b'\x37\xA4\x30\xEC'
+                        f.back(4)
+                        zdct = zstd.ZstdDict(f.read(s))
+                    else:
+                        us = f.readu32()
+                        assert f.read(4) == b'\x28\xB5\x2F\xFD'
+                        f.back(4)
+                        fs.append((o + f'/{hsh.hex().upper()}.nvbin',f.read(s-4),us))
+
+                for fe in fs: xopen(fe[0],'wb').write(zstd.decompress(fe[1],zstd_dict=zdct)[:fe[2]])
+            elif vid == 0x1002: # amd
+                f.skip(0x14)
+                while f:
+                    hsh = f.read(0x10)
+                    xopen(o + f'/{hsh.hex().upper()}.elf','wb').write(f.read(f.readu64()))
+            else: raise NotImplementedError()
+
+            return
+        case 'Yuzu Vulkan Pipeline Cache':
+            if db.print_try: print('Trying with custom extractor')
+            of = o + '/' + tbasename(i) + '.bin'
+            d = open(i,'rb').read()
+            xopen(of,'wb').write(d[12:])
+            open(o + '/$yuzu_version.txt','w').write(str(int.from_bytes(d[8:12],'little')))
+
+            extract4_2(of,o,'Vulkan Pipeline Cache')
+            if len(d) >= 48: return
+        case 'Yuzu Cache':
+            STGS = ("VertexB","TessellationControl","TessellationEval","Geometry","Fragment","Compute","VertexA")
+            TEXTYS = ("Color1D","ColorArray1D","Color2D","ColorArray2D","Color3D","ColorCube","ColorArrayCube","Buffer","Color2DRect")
+            TEXPXFS = (
+                "A8B8G8R8_UNORM","A8B8G8R8_SNORM","A8B8G8R8_SINT","A8B8G8R8_UINT","R5G6B5_UNORM","B5G6R5_UNORM","A1R5G5B5_UNORM","A2B10G10R10_UNORM","A2B10G10R10_UINT","A2R10G10B10_UNORM",
+                "A1B5G5R5_UNORM","A5B5G5R1_UNORM","R8_UNORM","R8_SNORM","R8_SINT","R8_UINT","R16G16B16A16_FLOAT","R16G16B16A16_UNORM","R16G16B16A16_SNORM","R16G16B16A16_SINT","R16G16B16A16_UINT",
+                "B10G11R11_FLOAT","R32G32B32A32_UINT","BC1_RGBA_UNORM","BC2_UNORM","BC3_UNORM","BC4_UNORM","BC4_SNORM","BC5_UNORM","BC5_SNORM","BC7_UNORM","BC6H_UFLOAT","BC6H_SFLOAT",
+                "ASTC_2D_4X4_UNORM","B8G8R8A8_UNORM","R32G32B32A32_FLOAT","R32G32B32A32_SINT","R32G32_FLOAT","R32G32_SINT","R32_FLOAT","R16_FLOAT","R16_UNORM","R16_SNORM","R16_UINT","R16_SINT",
+                "R16G16_UNORM","R16G16_FLOAT","R16G16_UINT","R16G16_SINT","R16G16_SNORM","R32G32B32_FLOAT","A8B8G8R8_SRGB","R8G8_UNORM","R8G8_SNORM","R8G8_SINT","R8G8_UINT","R32G32_UINT",
+                "R16G16B16X16_FLOAT","R32_UINT","R32_SINT","ASTC_2D_8X8_UNORM","ASTC_2D_8X5_UNORM","ASTC_2D_5X4_UNORM","B8G8R8A8_SRGB","BC1_RGBA_SRGB","BC2_SRGB","BC3_SRGB","BC7_SRGB",
+                "A4B4G4R4_UNORM","G4R4_UNORM","ASTC_2D_4X4_SRGB","ASTC_2D_8X8_SRGB","ASTC_2D_8X5_SRGB","ASTC_2D_5X4_SRGB","ASTC_2D_5X5_UNORM","ASTC_2D_5X5_SRGB","ASTC_2D_10X8_UNORM",
+                "ASTC_2D_10X8_SRGB","ASTC_2D_6X6_UNORM","ASTC_2D_6X6_SRGB","ASTC_2D_10X6_UNORM","ASTC_2D_10X6_SRGB","ASTC_2D_10X5_UNORM","ASTC_2D_10X5_SRGB","ASTC_2D_10X10_UNORM",
+                "ASTC_2D_10X10_SRGB","ASTC_2D_12X10_UNORM","ASTC_2D_12X10_SRGB","ASTC_2D_12X12_UNORM","ASTC_2D_12X12_SRGB","ASTC_2D_8X6_UNORM","ASTC_2D_8X6_SRGB","ASTC_2D_6X5_UNORM",
+                "ASTC_2D_6X5_SRGB","E5B9G9R9_FLOAT","D32_FLOAT","D16_UNORM","X8_D24_UNORM","S8_UINT","D24_UNORM_S8_UINT","S8_UINT_D24_UNORM","D32_FLOAT_S8_UINT",
+            )
+            CBUFRS = ("BaseInstance","BaseVertex","DrawID")
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'yuzucach'
+            f.skip(4)
+
+            c = 0
+            while f:
+                ec = f.readu32()
+                fstg = None
+                for ix in range(ec):
+                    cs = f.readu64()
+                    txtyc = f.readu64()
+                    txpxc = f.readu64()
+                    cbufc = f.readu64()
+                    cbufrc = f.readu64()
+
+                    inf = xopen(f'{o}/{c}/{ix}_info.txt','w')
+                    inf.write(f'Local Memory Size: 0x{f.readu32():08X}\nTextures Bound: {f.readu32()}\nStart Address: 0x{f.readu32():08X}\nCached Lowest: 0x{f.readu32():08X}\nCached Highest: 0x{f.readu32():08X}\nViewform Transport State: {f.readu32()}\n')
+                    stg = f.readu32()
+                    if ix == 0: fstg = stg
+                    inf.write(f'Stage: {STGS[stg]} ({stg})\n\n')
+                    xopen(f'{o}/{c}/{ix}_code.bin','wb').write(f.read(cs))
+
+                    inf.write('Texture Types:\n')
+                    for _ in range(txtyc):
+                        inf.write(f'0x{f.readu32():08X}: ')
+                        v = f.readu32()
+                        inf.write(f'{TEXTYS[v]} ({v})\n')
+                    inf.write('\nTexture Pixel Formats:\n')
+                    for _ in range(txpxc):
+                        inf.write(f'0x{f.readu32():08X}: ')
+                        v = f.readu32()
+                        inf.write(f'{TEXPXFS[v]} ({v})\n')
+                    inf.write('\nCBUF Values:\n')
+                    for _ in range(cbufc): inf.write(f'0x{f.readu32():08X} 0x{f.readu32():08X}: 0x{f.readu32():08X}\n')
+                    inf.write('\nCBUF Replacment Constants:\n')
+                    for _ in range(cbufrc):
+                        inf.write(f'0x{f.readu32():08X} 0x{f.readu32():08X}: ')
+                        v = f.readu32()
+                        inf.write(f'{CBUFRS[v]} ({v})\n')
+                    inf.write('\n')
+
+                    if stg == 5: inf.write(f'Workgroup Size X: {f.readu32()}\nWorkgroup Size Y: {f.readu32()}\nWorkgroup Size Z: {f.readu32()}\nShared Memory Size: 0x{f.readu32():08X}\n')
+                    else:
+                        xopen(f'{o}/{c}/{ix}_SPH.bin','wb').write(f.read(80))
+                        if stg == 3:
+                            inf.write(f'GP Passthrough Mask:\n')
+                            for _ in range(4): inf.write(f'0x{f.readu32():08X} 0x{f.readu32():08X}\n')
+                    inf.close()
+                xopen(f'{o}/{c}_{"compute" if fstg == 5 else "graphics"}_key.bin','wb').write(f.read(0x18 if fstg == 5 else 0x418))
+                c += 1
+            if c: return
 
     return 1
