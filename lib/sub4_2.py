@@ -1438,8 +1438,6 @@ def extract4_2(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             import uuid
             from lib.file import File
-            if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: from backports import zstd # type: ignore
             f = File(i,endian='<')
 
             hs = f.readu32()
@@ -1452,6 +1450,8 @@ def extract4_2(inp:str,out:str,t:str):
             xopen(o + '/$device_info.txt','w').write(f'Vendor: {gdb.get(str(vid),{"name":"?"})["name"]} (0x{vid:04X})\nDevice: {gdb.get(str(vid),{}).get(str(did),"?")} (0x{did:04X})\nUUID: {uuid.UUID(bytes=uid)}\n')
 
             if vid == 0x10DE: # nvidia
+                if sys.version_info >= (3,14): from compression import zstd # type: ignore
+                else: from backports import zstd # type: ignore
                 # https://github.com/a2flo/floor/blob/dca53f78f03a261136e5580740503f0f76b4f351/src/device/vulkan/internal/vulkan_disassembly.cpp#L135
                 c = f.readu32()
                 zdct = None
@@ -1565,6 +1565,297 @@ def extract4_2(inp:str,out:str,t:str):
                     inf.close()
                 xopen(f'{o}/{c}_{"compute" if fstg == 5 else "graphics"}_key.bin','wb').write(f.read(0x18 if fstg == 5 else 0x418))
                 c += 1
+            if c: return
+        case 'Super Smash Bros Ultimate ARC':
+            raise NotImplementedError
+            REGS = {
+                0x087b3c2f:"jp",
+                0x9372c64c:"jp_ja",
+                0x34b5009c:"us",
+                0xa89412b4:"us_en",
+                0x32fea967:"us_fr",
+                0xf95a0bb1:"us_es",
+                0x11da64c2:"eu",
+                0xd849ea67:"eu_en",
+                0xcb4686a3:"eu_fr",
+                0xcbf41e08:"eu_es",
+                0xb068c886:"eu_de",
+                0x95501e00:"eu_nl",
+                0x8ca541fb:"eu_it",
+                0x7a89866f:"eu_ru",
+                0xc6351721:"kr",
+                0x17f046f7:"kr_ko",
+                0x22cc84c9:"zh",
+                0xfb809f55:"zh_cn",
+                0x4cf4768f:"zh_tw",
+            }
+
+            from zlib import crc32
+            FSHM = {crc32(x.rstrip(b'\n')) & 0xFFFFFFFF:x.rstrip(b'\n').decode() for x in open(db.get('ssbu_hashes_all'),'rb').readlines()}
+
+            if db.print_try: print('Trying with custom extractor')
+            if sys.version_info >= (3,14): from compression import zstd # type: ignore
+            else: from backports import zstd # type: ignore
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu64() == 0xABCDEF9876543210
+            stream_seco = f.readu64()
+            file_seco = f.readu64()
+            shared_seco = f.readu64()
+            file_syso = f.readu64()
+            f.seek(file_syso)
+
+            dao = f.readu32()
+            if dao > 0x10:
+                f.back(4)
+                tb = f.read(dao)
+                v = 3
+            else:
+                decs = f.readu32()
+                coms = f.readu32()
+                secs = f.readu32()
+                if dao < 0x10: tb = f.read(coms)
+                else: tb = zstd.decompress(f.read(coms))[:decs]
+                f.seek(file_syso+secs)
+                v = 5
+
+            tb = File(tb,endian='<')
+            tb.skip(4)
+            cs = [tb.readu32() for _ in range(9)]
+            tc = (tb.readu32(),tb.readu32())
+            if v < 5 and tc[0] == tc[1] == 0x10 and cs[8]: v = 1
+            else:
+                cs.append(tc[0])
+                assert not tc[1] and tb.readu32() == tb.readu32() == 0x10
+            rc = (tb.readu8(),tb.readu8())
+            assert not tb.readu16()
+
+            fs = []
+            rgm = []
+            if v == 1:
+                # cs: DirC, FiC1, FiNmC, SuFiC1, LasTabC, HsDirC, FiInfC, FiC2, SuFiC2
+                # c1: mov, p1, p2, mus
+                c1 = [tb.readu32() for _ in range(4)]
+
+                tb.skip(12 * c1[0]+
+                        8  * c1[1])
+
+                # path, idx, flgs
+                Sn2h = set((tb.readu32(),tb.readu32(),tb.readu32()) for _ in range(c1[1]))
+                tb.skip(4 * c1[2] + 0x10 * c1[3])
+
+                for ix in range(rc[0]):
+                    rgm.append(REGS.get(tb.readu32(),f'unk_{ix}'))
+                    tb.skip(8)
+
+                dil = []
+                for _ in range(cs[0]):
+                    tb.skip(4)
+                    dil.append(tb.readu32() >> 8)
+                    tb.skip(4*11)
+                dil = tuple(dil)
+
+                dofs = []
+                for _ in range(cs[1]+cs[7]):
+                    dofs.append(tb.reads64())
+                    tb.skip(4*5)
+                dofs = tuple(dofs)
+                tb.skip(8 * cs[5])
+
+                finf = []
+                for _ in range(cs[6]):
+                    # path, didx, ftf, sfidx
+                    fe = [tb.readu32(),tb.readu32() >> 8]
+                    tb.skip(4)
+                    fe.append(tb.readu32() >> 8)
+                    tb.skip(0x10)
+                    fe.append(tb.readu32())
+                    if tb.readu32() & 0x00300000 == 0x00300000: continue
+                    finf.append(tuple(fe))
+                finf = set(finf)
+
+                # off, zsize, usize, flags
+                sfinf = tuple([(tb.readu32() << 2,tb.readu32(),tb.readu32(),tb.readu32() >> 24) for _ in range(cs[3] + cs[8])])
+
+                for fe in finf:
+                    didx = dil[fe[1]]
+                    n = FSHM.get(fe[0],'$unk/' + fe[0].to_bytes(4,'big').hex().upper() + '.bin').replace(':/','/').replace(':','_')
+                    if fe[2]:
+                        for rix in range(rc[1]):
+                            sf = sfinf[fe[2] + rix]
+                            do = dofs[didx + 1 + rix]
+                            fs.append(('$' + rgm[rix] + '/' + n,file_seco + do + sf[0],sf[1],sf[2],sf[3]))
+                    else:
+                        sf = sfinf[fe[2]]
+                        do = dofs[didx]
+                        fs.append((n,file_seco + do + sf[0],sf[1],sf[2],sf[3]))
+
+            else: v = tb.readu32()
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[2])
+                print(f'{fe[0]}: {fe[2]}/{len(d)} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
+                print(d[:16].hex(' ').upper())
+                if input(': '): open(o + '/test.bin','wb').write(d)
+                if fe[4] & 1:
+                    if fe[4] & 2: d = zstd.decompress(d)
+                    else: raise NotImplementedError(bin(fe[4])[2:].zfill(32) + '\n' + d[:8].hex(' ').upper())
+                xopen(o + '/' + fe[0],'wb').write(d[:fe[3]])
+            if fs: return
+
+            if dao == 0x10: run(['smash_arc_cli',db.get('ssbu_hashes_all'),i,o])
+            else: raise NotImplementedError
+            if listdir(o): return
+        case 'Feral Header Library':
+            if db.print_try: print('Trying with custom extractor')
+            from hashlib import md5
+            from lib.file import File
+            f = File(i)
+            assert f.read(4) == b'BILH'
+            f.skip(0x14)
+
+            def reads():
+                l = f.readu32()
+                if l & 0x40000000: return b''
+                return f.read(l & 0x3FFFFFFF).rstrip(b'\0')
+            def getfn(n:str):
+                n = n.lower()
+                ex = n.rsplit('.',1)[1]
+                return md5(n[:-len(ex)].encode()).hexdigest().upper() + '.' + ex
+
+            rc = f.readu32('<')
+            f.skip(12)
+            for _ in range(rc): f.read0s()
+            assert f.read(3) == b'BIN'
+            v = f.readu8()-48
+
+            bvl = db.print_try
+            db.print_try = False
+            if v == 2:
+                if f.readu8(): f._end = '>'
+                else: f._end = '<'
+                f.skip(1)
+                secc = f.readu8()
+                f.skip(1)
+                dl = f.readu32('>')
+                f.skip(4)
+
+                osp = f.pos + dl
+                for _ in range(secc):
+                    sp = osp
+                    op = p = f.pos
+                    f.seek(sp)
+                    tp = f.readu32()
+                    ss = f.readu32()
+                    if tp != 0x12EBA5ED:
+                        osp += ss
+                        continue
+
+                    ro = 0
+                    lc = f.readu32();sp += 12
+                    rlvs = {}
+                    for _ in range(lc):
+                        f.seek(sp)
+                        ro += f.reads32();sp += 4
+                        p = op + ro
+                        f.seek(p)
+                        v = f.reads32() + ro
+                        if v != -1: rlvs[p] = v + op - 4
+                        else: rlvs[p] = None
+                    rl = tuple(rlvs)
+
+                    rp = 0
+                    f.seek(rlvs[rl[rp]]);rp += 1
+                    rc = f.readu32()
+                    rp += 5
+                    tofs = []
+                    for _ in range(rc):
+                        # resource file, unk, lang, map, start
+                        tofs.append(tuple([rlvs[x] for x in (rl[rp],rl[rp+1],rl[rp+2],rl[rp+7],rl[rp+8])]));rp += 3+1+3+3+6
+
+                    ofs = {}
+                    for x in tofs:
+                        f.seek(x[0])
+                        bf = reads().decode()
+                        ebf = dirname(i) + '/' + getfn(bf)
+                        if not ebf in ofs:
+                            if not exists(ebf):
+                                print('WARNING:',ebf,f'({bf})',"doesn't exist, skipping")
+                                continue
+                            ofs[ebf] = File(ebf,endian=f._end)
+                            ofs[ebf].count = 0
+                            assert ofs[ebf].read(4) == b'BILR'
+                            ofs[ebf].skip(0x14)
+
+                        f.seek(x[2] + 4)
+                        lang = reads().decode()
+                        dr = o + '/' + lang + '/' + bf.split(']',1)[0].split(':',1)[1].strip('/') + '/' + bf.rsplit('](',1)[1].split(')')[0]
+                        mkdir(dr)
+
+                        f.seek(x[3])
+                        sc = f.readu32()
+                        scs = []
+                        for _ in range(sc):
+                            scs.append(rlvs[f.pos])
+                            f.skip(12)
+                        for s in scs:
+                            f.seek(s)
+                            sss = f.readu32()
+                            n = f.read(4)[::-1].decode('ascii')
+                            fn = f'{dr}/{ofs[ebf].count:03d}.{n.lower()}'
+
+                            v1,v2 = f.readu32(),f.readu32()
+                            if (0x18+v1) == sss and not v2:
+                                fs = f.readu32()
+                                assert xopen(fn,'wb').write(ofs[ebf].read(fs)) == fs,f'{n}: {sss} @ 0x{f.pos-16:04X}'
+                                if n in ('LOCM','FSBF','TELI'): extract4_2(fn,dr,'Feral ' + n)
+                            else: raise NotImplementedError(f'{n}: {sss} ({v1}|{v2}) @ 0x{f.pos-4:04X}')
+
+                            ofs[ebf].count += 1
+                    osp += ss
+            else: raise NotImplementedError(v)
+            f.close()
+            db.print_try = bvl
+            if listdir(o): return
+        case 'Feral LOCM':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.skip(1)
+
+            ob = []
+            while f:
+                n = f.read(4).rstrip(b'\0').decode('ascii')
+                id = f.readu32()
+                if len(ob) == 1:
+                    f.back(4)
+                    id2 = f.readu32('>')
+                    if id > id2:
+                        f._end = '>'
+                        id = id2
+                ob.append(f'{id}: {n}')
+            f.close()
+            if ob:
+                xopen(o + '/' + tbasename(i) + '.txt','w').write('\n'.join(ob))
+                return
+        case 'Feral FSBF':
+            if db.print_try: print('Trying with custom extractor')
+            d = open(i,'rb').read()[16:]
+            assert d[:3] == b'FSB'
+            xopen(o + '/' + tbasename(i) + '.fsb','wb').write(d)
+            return
+        case 'Feral TELI':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu32()
+            of = open(o + '/' + tbasename(i) + '.txt','w',encoding='utf-8')
+            for _ in range(c):
+                of.write(f.read(4)[::-1].hex().upper() + ':\n' + f.read(f.readu32()).decode('utf-8') + '\n\n')
+                f.skip(1)
+            f.close()
+            of.close()
             if c: return
 
     return 1

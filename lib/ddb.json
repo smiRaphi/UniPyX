@@ -469,6 +469,26 @@
         "rs":"Yuzu Cache","s":1
     },
     {
+        "d":[["isat","\\x10\\x32\\x54\\x76\\x98\\xEF\\xCD\\xAB",0],["isatS","\\0",8,48],["n0",8,8],["n0",8,16],["n0",8,24],["n0",8,32],["n0",8,40]],
+        "rs":"Super Smash Bros Ultimate ARC","s":1
+    },
+    {
+        "d":[["isat","BILH",0],["isat","\\0\\0\\0\\0",8],["isatS","\\xFF",8,16],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Feral Header Library","s":1
+    },
+    {
+        "d":[["size",[9,161]],["isat","\\1",0],["isatS","\\0",6,3],["isat","\\0\\0\\1\\0\\0\\0",11],["str",1,2],["str",9,2],["py","return not(getsize(inp)-1)%8"]],
+        "rs":"Feral LOCM"
+    },
+    {
+        "d":[["isatS","\\0",16,0],["isat","FSB5",16]],
+        "rs":"Feral FSBF"
+    },
+    {
+        "d":[["size",[14,10485760]],["isat","\\0",-1],["n0",1,-2],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little')\nfor _ in range(c):\n f.seek(4,1);l=int.from_bytes(f.read(4),'little');d=f.read(l)\n if len(d)!=l:return\n try:d.decode('utf-8')\n except:return\n if f.read(1)!=b'\\0':return\nreturn f.read(1)==b''"]],
+        "rs":"Feral TELI"
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },
