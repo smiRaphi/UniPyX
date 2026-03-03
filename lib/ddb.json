@@ -489,6 +489,14 @@
         "rs":"Feral TELI"
     },
     {
+        "d":[["isat","EDIV",0],["isatS","\\0",8,4],["isatS","\\xFF",8,16],["isat","BIK",24],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return (24+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Feral Bink Video","s":1
+    },
+    {
+        "d":[["size",[32,2147483648]],["isat","\\xAA\\xAA",6],["n0",4,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');l=int.from_bytes(f.read(4),'little')^0xAAAAAAAA;return len(f.read(l))==l and(int.from_bytes(f.read(4),'little')^0xAAAAAAAA)>(4+c*20)and f.read(4)==b'\\xAA\\xAA\\xAA\\xAA'"]],
+        "rs":"Motocross Mania DAT"
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },

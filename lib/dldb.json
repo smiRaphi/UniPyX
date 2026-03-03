@@ -6213,6 +6213,14 @@
         ]],
         "ts":0
     },
+    "e_biker":{
+        "p":"BMS/e_biker.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/e_biker.bms",
+            "BMS/e_biker.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{

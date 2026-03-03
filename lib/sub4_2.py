@@ -960,12 +960,14 @@ def extract4_2(inp:str,out:str,t:str):
                     case 'BUND':
                         while f.pos < p: readb()
                     case 'BNHD':
-                        f.skip(6)
+                        unk = f.readu32('<')
+                        f.skip(2)
                         pd = f.readu32('<')
                         c = f.readu32('<')
                         k = f.read(1)
                         kv = k[0]
                         f.skip(0x13)
+                        if unk > 0x10: f.skip(0xC8)
 
                         f.skip(pd*2)
                         for _ in range(c):
@@ -1810,6 +1812,7 @@ def extract4_2(inp:str,out:str,t:str):
                                 fs = f.readu32()
                                 assert xopen(fn,'wb').write(ofs[ebf].read(fs)) == fs,f'{n}: {sss} @ 0x{f.pos-16:04X}'
                                 if n in ('LOCM','FSBF','TELI'): extract4_2(fn,dr,'Feral ' + n)
+                                elif n == 'LOCR': extract4_2(fn,dr,'Feral LOCM')
                             else: raise NotImplementedError(f'{n}: {sss} ({v1}|{v2}) @ 0x{f.pos-4:04X}')
 
                             ofs[ebf].count += 1
@@ -1857,5 +1860,11 @@ def extract4_2(inp:str,out:str,t:str):
             f.close()
             of.close()
             if c: return
+        case 'Feral Bink Video':
+            if db.print_try: print('Trying with custom extractor')
+            d = open(i,'rb').read()[0x18:]
+            assert d[:3] == b'BIK'
+            xopen(o + '/' + tbasename(i) + '.bik','wb').write(d)
+        case 'Motocross Mania DAT': return quickbms('e_biker')
 
     return 1
