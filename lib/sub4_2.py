@@ -1868,5 +1868,61 @@ def extract4_2(inp:str,out:str,t:str):
             assert d[:3] == b'BIK'
             xopen(o + '/' + tbasename(i) + '.bik','wb').write(d)
         case 'Motocross Mania DAT': return quickbms('e_biker')
+        case 'ASDG SPLiT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+
+            def readb(f:File):
+                n = f.read(4)
+                s = f.readu32()
+                ep = f.pos + s
+
+                if n == b'INFO':
+                    f.skip(8)
+                    f.splt['p'] = f.readu32()
+                    f.splt['c'] = f.readu32()
+                    f.splt['t'] = f.readu32()
+                    f.skip(4)
+                    assert f.readu32() == 0,"Unknown compression"
+                elif n == b'EOF ': f.splt['eof'] = bool(f.readu32())
+                elif n == b'NAME': f.splt['n'] = f.read(s).split(b'\0')[0].decode()
+                elif n == b'BODY': f.splt['d'] = (f.pos,s)
+
+                f.seek(ep)
+                f.alignpos(4)
+
+            bn = noext(i)
+            id = dirname(i)
+            fsl = []
+            for p in listdir(id):
+                p = id + '\\' + p
+                if not p.startswith(bn) or p[-4] != '.' or not p[-3:].isdigit(): continue
+                fsl.append(p)
+            fsd = {}
+            for p in fsl:
+                f = File(p,endian='>')
+                if f.read(4) != b'FORM': f.close();continue
+                f.skip(4)
+                if f.read(4) != b'SPLT': f.close();continue
+                f.splt = {}
+                while f: readb(f)
+                if not 'c' in f.splt: f.close();continue
+                fsd[f.splt['c']] = f
+            if not fsd: return 1
+
+            fc = sorted(fsd.keys())[0]
+
+            of = open(o + '/' + (fsd[fc].splt.get('n') or tbasename(i)),'wb')
+            for c in sorted(fsd.keys()):
+                f = fsd[c]
+                if 'd' in f.splt:
+                    if of.seek(f.splt['p']) != f.splt['p']: of.write(b'\0' * (f.splt['p'] - of.tell()))
+                    f.seek(f.splt['d'][0])
+                    of.write(f.read(f.splt['d'][1]))
+                if f.splt.get('eof'): break
+            of.close()
+            for f in fsd.values(): f.close()
+            if fsd[fc].splt.get('t'): set_ctime(of.name,fsd[fc].splt['t'])
+            return
 
     return 1

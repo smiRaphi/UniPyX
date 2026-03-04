@@ -244,9 +244,10 @@ def analyze(inp:str,raw=False):
         else: f.close()
 
     ts = [MSPCR.sub(' ',x.strip()) for x in ts if x.strip()]
-    if any(x in ts for x in ('Commodore 64 BASIC V2 program',)):
+    if any(x in ts for x in ('Commodore 64 BASIC V2 program','Commodore C64 program')):
         _,o,_ = db.run(['unp64','-i',inp])
-        ts.append(o.strip().split(' : ',1)[1].split(', unpacker=')[0])
+        ts.append(o.strip().split(' : ',1)[1].split(', unpacker=')[0].strip())
+        if ts[-1] == '(Unknown)': ts.pop(-1)
     if not ts and isfile(inp):
         _,o,_ = db.run(['gamearch',inp,'-l'])
         ts = re.findall(r'File .+ a .+ \[(.+)\]\n',o.replace('\r',''))

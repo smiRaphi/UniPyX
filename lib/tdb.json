@@ -1394,5 +1394,8 @@
     ],
     "Novalogic Resource":[
         "novalogic resource / game data (v2)"
+    ],
+    "ASDG SPLiT":[
+        "asdg's file splitting system"
     ]
 }
