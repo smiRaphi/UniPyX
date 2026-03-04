@@ -28,6 +28,7 @@ if __name__ == '__main__':
 
     inp = os.path.abspath(argv[1])
     assert os.path.exists(inp),'Input file does not exist'
+    assert os.path.isfile(inp),'Input is not a file'
 
     if len(argv) > 2: out = os.path.abspath(argv[2])
     else:
