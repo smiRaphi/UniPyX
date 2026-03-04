@@ -452,8 +452,8 @@
         "rs":"DelphiX Picture Collection","s":1
     },
     {
-        "d":[["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o);return f.read(4)==b'\\0\\x10\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s"]],
-        "rs":"Star Wars Early Learning Activity Center DAT"
+        "d":[["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o);b=f.read(2)\nif b==b'\\0\\x10':return f.read(2)==b'\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s\nreturn b==b'\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Lucas Learning DAT"
     },
     {
         "d":[["isat","yuzuvkch",0],["isat","\\x20\\0\\0\\0\\x01\\0\\0\\0",12]],

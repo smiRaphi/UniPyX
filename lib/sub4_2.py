@@ -1389,14 +1389,16 @@ def extract4_2(inp:str,out:str,t:str):
             of.close()
             if fc: return
         case 'Metroid Prime 4 Save': raise NotImplementedError()
-        case 'Star Wars Early Learning Activity Center DAT':
+        case 'Lucas Learning DAT':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
 
             off = f.readu32()
             f.seek(off)
-            f.skip(8)
+            v = f.readu16()
+            if v == 0: f.skip(4)
+            else: f.skip(6)
             tc = f.readu32()
             fs = []
             for _ in range(tc):
@@ -1406,7 +1408,7 @@ def extract4_2(inp:str,out:str,t:str):
                 c = f.readu32()
                 for _ in range(c):
                     fs.append((f.readu32(),f.readu32(),n + '/' + f.read(f.readu8()).decode('ascii')))
-                    f.skip(-(f.pos-off)%4)
+                    f.skip(-(f.pos-off)%(2 if v == 0 else 4))
 
             for fe in fs:
                 f.seek(fe[0])
