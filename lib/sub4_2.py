@@ -1924,5 +1924,114 @@ def extract4_2(inp:str,out:str,t:str):
             for f in fsd.values(): f.close()
             if fsd[fc].splt.get('t'): set_ctime(of.name,fsd[fc].splt['t'])
             return
+        case 'Palm MemoPad Archive':
+            TYPS = ('none','int','float','date','alpha','cstr','bool','bitFlags','repeatEvent')
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            v = f.read(4)[::-1]
+
+            def reads():
+                l = f.readu8()
+                if l == 0xFF: l = f.readu16()
+                return f.read(l).decode('palmos')
+
+            inf = open(o + '/$info.txt','w',encoding='utf-8')
+            inf.write(f'File: {reads()}\nCustom Header: {reads()}\nNext free category: {f.readu32()}\n\nCategories:\n')
+            cc = f.readu32()
+            for _ in range(cc): inf.write(f'{f.readu32()}-{f.readu32()}{" (Dirty)" if f.readu32() else ""}: {reads()} ({reads()})\n')
+            inf.write('\n')
+            f.skip(0x14)
+
+            fc = f.readu16()
+            fi = tuple(f.readu16() for _ in range(fc))
+            inf.write('Format:')
+            for tv in fi:
+                inf.write(' ')
+                if tv in TYPS: inf.write(TYPS[tv])
+                else: inf.write(str(tv))
+            inf.write('\n')
+            inf.close()
+            ec = f.readu32()//fc
+
+            ob = []
+            for _ in range(ec):
+                b = []
+                for _ in range(fc):
+                    tv = f.readu32()
+                    if tv == 0: b.append(None);f.skip(4)
+                    elif tv == 1: b.append(f.readu32())
+                    elif tv == 2: b.append(f.readfloat())
+                    elif tv == 5: f.skip(4);b.append(reads())
+                    elif tv == 6: b.append(bool(f.readu32()))
+                    else: raise NotImplementedError(f'{tv} = 0x{f.readu32():08X}')
+                ob.append(b)
+
+            if ob:
+                if v == b'MP\1\0' and fi == (1,1,1,5,6,1):
+                    for ix,x in enumerate(ob): open(f'{o}/{ix}.txt','w',newline='',encoding='utf-8').write(x[3].replace('\n\r\n\r','\n\r'))
+                else:
+                    of = open(f'{o}/{tbasename(i)}.csv','w',newline='',encoding='utf-8')
+                    of.write(','.join(str(x) for x in fi) + '\n')
+                    for x in ob: of.write(','.join(str(x) for x in x) + '\n')
+                    of.close()
+                return
+        case 'Little Witch Parfait RLPK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'KPLR'
+            c = f.readu32()
+            f.skip(8)
+
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32(),f.readu32()))
+                f.skip(8)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[1])
+                d = f.read(fe[0])
+                open(f'{o}/{ix:03d}.{guess_ext(d)}','wb').write(d)
+            if fs: return
+        case 'Jikan de Fantasia JRZ':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(0x18) == b'__DEFLATE_ARCHIVE_S_01__'
+            f.skip(0x10)
+
+            fs = []
+            def readf(p):
+                dir = f.readu16()
+                nl = f.readu16()
+
+                if dir:
+                    f.skip(4)
+                    fc = f.readu32()
+                    f.skip(0x10)
+                else:
+                    f.skip(0x14)
+                    off = f.readu32()
+                p = p + '/' + f.read(nl).rstrip(b'\0').decode('shift-jis')
+                if dir:
+                    for _ in range(fc): readf(p)
+                else: fs.append((off,p))
+
+            c = f.readu32()
+            for _ in range(c): readf(o)
+
+            for fe in fs:
+                f.seek(fe[0])
+                hs = f.readu32()
+                f.skip(hs-4)
+                d = []
+                for _ in range(hs//4): d.append(zlib.decompress(f.read(f.readu32())))
+                xopen(fe[1],'wb').write(b''.join(d))
+
+            f.close()
+            if fs:return
 
     return 1

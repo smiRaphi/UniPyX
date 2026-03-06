@@ -698,6 +698,7 @@ def guess_ext(f):
     elif tag == b'DXBC': ext = 'cso'
     elif tag == b'NES\x1A': ext = 'nes'
     elif tag == b'DDS ': ext = 'dds'
+    elif tag == b'\x1BLua': ext = 'luac'
     if not ext and tag == b'Crea':
         if f.read(0x10) == b'tive Voice File\x1A': ext = 'voc'
         else: f.seek(-0x10,1)

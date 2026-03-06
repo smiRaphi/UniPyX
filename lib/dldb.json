@@ -663,7 +663,7 @@
     "3ds-xfsatool":{
         "p":"3ds-xfsatool.exe",
         "fs":[
-        "https://raw.githubusercontent.com/MeltyPlayer/FinModelUtility/refs/heads/main/cli/tools/3ds-xfsatool/3ds-xfsatool.exe"
+        "https://raw.githubusercontent.com/MeltyPlayer/MeltyTool/refs/heads/main/cli/tools/3ds-xfsatool/3ds-xfsatool.exe"
         ],
         "ts":0
     },
