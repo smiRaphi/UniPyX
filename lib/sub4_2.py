@@ -1949,7 +1949,7 @@ def extract4_2(inp:str,out:str,t:str):
             inf.write('Format:')
             for tv in fi:
                 inf.write(' ')
-                if tv in TYPS: inf.write(TYPS[tv])
+                if len(TYPS) > tv: inf.write(TYPS[tv])
                 else: inf.write(str(tv))
             inf.write('\n')
             inf.close()
@@ -1973,7 +1973,7 @@ def extract4_2(inp:str,out:str,t:str):
                     for ix,x in enumerate(ob): open(f'{o}/{ix}.txt','w',newline='',encoding='utf-8').write(x[3].replace('\n\r\n\r','\n\r'))
                 else:
                     of = open(f'{o}/{tbasename(i)}.csv','w',newline='',encoding='utf-8')
-                    of.write(','.join(str(x) for x in fi) + '\n')
+                    of.write(','.join(TYPS[x] if len(TYPS) > x else str(x) for x in fi) + '\n')
                     for x in ob: of.write(','.join(str(x) for x in x) + '\n')
                     of.close()
                 return
@@ -2033,5 +2033,6 @@ def extract4_2(inp:str,out:str,t:str):
 
             f.close()
             if fs:return
+        case 'Vietcong Compressed Big File': return quickbms('cbf')
 
     return 1

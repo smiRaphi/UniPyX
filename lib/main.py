@@ -95,10 +95,11 @@ def isvalid(p:str,reject_dirs=False):
             elif e.errno in (errno.ENAMETOOLONG,errno.ERANGE): return False
         except (TypeError,ValueError): return False
     return True
-def set_ctime(p:str,t:int):
+def set_ctime(p:str,t:int,unix=True):
     try:
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)
-        wt = int((t * 10000000) + 116444736000000000)
+        if unix: wt = int((t * 10000000) + 116444736000000000)
+        else: wt = t
         ft = wintypes.FILETIME(wt & 0xFFFFFFFF,wt >> 32)
         ctypes.windll.kernel32.SetFileTime(h,ctypes.byref(ft),None,None)
         ctypes.windll.kernel32.CloseHandle(h)

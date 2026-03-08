@@ -1349,5 +1349,15 @@ def extract3(inp:str,out:str,t:str) -> bool:
             of = o + '\\' + tbasename(i) + '.elf'
             _,ro,rr = run(['ps3_unself',i,of],env={'PS3_KEYS':db.get('ps3oskeys')})
             if not ' (ERROR)' in ro and not ' (ERROR)' in rr and exists(of) and getsize(of): return
+        case 'AMI Aptio Capsule':
+            tf = TmpFile(suf=extname(i),path=o)
+            tf.link(i)
+            run(['uefiextract',tf,'all'])
+            tf.destroy()
+            if exists(tf.p + '.dump') and isdir(tf.p + '.dump') and listdir(tf.p + '.dump') and exists(tf.p + '.report.txt') and exists(tf.p + '.guids.csv'):
+                mv(tf.p + '.report.txt',o + '/$report.txt')
+                mv(tf.p + '.guids.csv',o + '/$GUIDs.csv')
+                copydir(tf.p + '.dump',o,True,reni=True)
+                return
 
     return 1

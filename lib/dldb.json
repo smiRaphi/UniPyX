@@ -67,9 +67,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1771801200
+            "ts":1772665200
         }],
-        "ts":1771801200
+        "ts":1772665200
     },
     "file":{
         "p":"file/file.exe",
@@ -130,9 +130,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1771887600
+            "ts":1772924400
         }],
-        "ts":1771887600
+        "ts":1772924400
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -408,6 +408,16 @@
         ]],
         "ts":0
     },
+    "cbf":{
+        "p":"CBF.wcx",
+        "fs":[{
+            "u":"http://www.vietcong-coop.net/files/6/WCXplugin.rar",
+            "x":{
+                "CBF.wcx":"CBF.wcx"
+            }
+        }],
+        "ts":0
+    },
     "bin2iso":{
         "p":"bin2iso.exe",
         "fs":[
@@ -517,13 +527,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/6f/0f/dolphin-master-2512-430-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/e2/34/dolphin-master-2512-464-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1771900623
+            "ts":1772678017
         }],
-        "ts":1771900623
+        "ts":1772678017
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -670,14 +680,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0285/mame0285b_x64.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0286/mame0286b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1769710590
+            "ts":1772033594
         }],
-        "ts":1769710590
+        "ts":1772033594
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -747,14 +757,14 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.10/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.11/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1769489279
+            "ts":1772175640
         }],
-        "ts":1769489279
+        "ts":1772175640
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -2086,15 +2096,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.4.0/GDRE_tools-v2.4.0-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.1/GDRE_tools-v2.5.0-beta.1-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1766852237
+            "ts":1772667621
         }],
-        "ts":1766852237
+        "ts":1772667621
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2399,23 +2409,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r45988/SDLVICE-3.10-win64-r45988.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46014/SDLVICE-3.10-win64-r46014.7z",
             "x":{
-                "SDLVICE-3.10-win64-r45988/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r45988/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r45988/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r45988/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r45988/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r45988/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46014/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46014/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46014/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46014/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46014/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46014/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1771927567
+            "ts":1772931752
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1771927567
+        "ts":1772931752
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2777,14 +2787,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_02_23_7bd3fe38_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_07_eeb4bf9f_32.zip",
             "x":{
-                "RenderDoc_2026_02_23_7bd3fe38_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_02_23_7bd3fe38_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_07_eeb4bf9f_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_07_eeb4bf9f_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1771801200
+            "ts":1772838000
         }],
-        "ts":1771801200
+        "ts":1772838000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2821,10 +2831,10 @@
     "kanzi":{
         "p":"Kanzi.exe",
         "fs":[[
-            "https://github.com/flanglet/kanzi-cpp/releases/download/2.4.0/Kanzi64.exe",
+            "https://github.com/flanglet/kanzi-cpp/releases/download/2.5.1/Kanzi64.exe",
             "Kanzi.exe"
         ]],
-        "ts":0
+        "ts":1772993575
     },
     "ppmd":{
         "p":"PPMd.exe",
@@ -2836,13 +2846,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.7.3/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.8.3/zxc-windows-x64.exe.zip",
             "x":{
                 "zxc.exe":"zxc.exe"
             },
-            "ts":1771404604
+            "ts":1772780774
         }],
-        "ts":1771404604
+        "ts":1772780774
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -2935,7 +2945,7 @@
     "auracomp":{
         "p":"auracomp/auracomp.exe",
         "fs":[{
-            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/1.6.1/auracomp_net472.zip",
+            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/1.6.4/auracomp_net472.zip",
             "x":{
                 "auracomp.exe":"auracomp/auracomp.exe",
                 "auracomp.exe.config":"auracomp/auracomp.exe.config",
@@ -2950,9 +2960,9 @@
                 "System.Threading.Tasks.Extensions.dll":"auracomp/System.Threading.Tasks.Extensions.dll",
                 "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
             },
-            "ts":1769783309
+            "ts":1772621604
         }],
-        "ts":1769783309
+        "ts":1772621604
     },
     "bk_extract":{
         "p":"bk_extract.exe",
@@ -5452,6 +5462,16 @@
         ],
         "ts":1768118137
     },
+    "uefiextract":{
+        "p":"UEFIExtract.exe",
+        "fs":[{
+            "u":"https://github.com/LongSoft/UEFITool/releases/download/A73/UEFIExtract_NE_A73_win64.zip",
+            "x":{
+                "UEFIExtract.exe":"UEFIExtract.exe"
+            }
+        }],
+        "ts":0
+    },
     "ps3_unself":{
         "p":"ps3tools/unself.exe",
         "fs":[{
@@ -5564,13 +5584,13 @@
     "upx":{
         "p":"upx.exe",
         "fs":[{
-            "u":"https://github.com/upx/upx/releases/download/v5.1.0/upx-5.1.0-win64.zip",
+            "u":"https://github.com/upx/upx/releases/download/v5.1.1/upx-5.1.1-win64.zip",
             "x":{
-                "upx-5.1.0-win64/upx.exe":"upx.exe"
+                "upx-5.1.1-win64/upx.exe":"upx.exe"
             },
-            "ts":1767789622
+            "ts":1772720175
         }],
-        "ts":1767789622
+        "ts":1772720175
     },
     "qtifw-devtool":{
         "p":"qtifw-devtool.exe",
@@ -6281,6 +6301,14 @@
         ]],
         "ts":0
     },
+    "ssbu_hashes_all":{
+        "p":"ssbu_hashes_all.txt",
+        "fs":[[
+            "https://raw.githubusercontent.com/ultimate-research/archive-hashes/refs/heads/master/Hashes_all",
+            "ssbu_hashes_all.txt"
+        ]],
+        "ts":0
+    },
     "spaghettikart_yaml":{
         "p":"Torch/SpaghettiKart",
         "fs":[[
@@ -6305,7 +6333,8 @@
         "fs":[[
             "https://vulkan.gpuinfo.org/api/v2/drivercoverage/extension?extension=VK_KHR_swapchain",
             "vulkan_gpuinfo.json"
-        ]]
+        ]],
+        "ts":0
     },
     "unrealpak_5.6.1":{
         "p":"UnrealPak/5.6.1/UnrealPak.exe",
