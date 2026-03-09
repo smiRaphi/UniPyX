@@ -2034,5 +2034,42 @@ def extract4_2(inp:str,out:str,t:str):
             f.close()
             if fs:return
         case 'Vietcong Compressed Big File': return quickbms('cbf')
+        case 'Shrek Smash n\' Crash Racing Pack':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PAK\0'
+
+            iefs = f.readu32()
+            f.skip(4)
+            ps = []
+            while f.pos < iefs:
+                nxo = f.readu32()
+                ps.append((f.readu32(),f.read0s().decode()))
+                if not nxo: break
+                f.seek(nxo)
+
+            fs = []
+            for pe in ps:
+                f.seek(pe[0])
+                while f.pos < iefs:
+                    nxo = f.readu32()
+                    fs.append((f.readu32(),f.readu32(),f.readu32(),pe[1] + '/' + f.read0s().decode()))
+                    if not nxo: break
+                    f.seek(nxo)
+
+            for fe in fs:
+                f.seek(fe[2])
+                f.seek(f.readu32())
+                d = f.read(fe[0])
+                if d[:4] == b'!CMP': d = zlib.decompress(d[8:])
+                xopen(f'{o}/{fe[3]}','wb').write(d)
+            if fs: return
+        case 'Shrek Smash n\' Crash Racing CMP':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            open(f'{o}/{basename(i)}','wb').write(zlib.decompress(open(i,'rb').read()[8:]))
+            return
 
     return 1
