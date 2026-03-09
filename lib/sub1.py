@@ -177,10 +177,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             break
 
                 if len(fn) != 100: break
-                fn = fn.rstrip(b'\0').decode()
+                fn = fn.rstrip(b'\0').decode('utf-8')
 
                 assert f.read(8*3) == (b'0000000\0'*3)
-                fs = int(f.read(11).decode(),8)
+                fs = int(f.read(11).decode('utf-8'),8)
 
                 assert f.read(22) == (b'\0' + b'0'*11 + b'\0' + b'0'*7 + b'\0 ')
                 f.seek(0xAC,1)

@@ -168,7 +168,7 @@
     },
     {
         "rqr":"vol-cosmo",
-        "d":[["isat","\\xA0\\x0F\\x00\\x00",12],["str0",0,12,4],["py","f=open(inp,'rb')\nfor _ in range(200):\n try:f.read(12).rstrip(b'\\0').decode()\n except:break\n o=int.from_bytes(f.read(4),'little')\n if o<0xFA0 and o:break\n f.seek(4,1)\nelse:return True"]],
+        "d":[["isat","\\xA0\\x0F\\x00\\x00",12],["str0",0,12,4],["py","f=open(inp,'rb')\nfor _ in range(200):\n try:f.read(12).rstrip(b'\\0').decode('utf-8')\n except:break\n o=int.from_bytes(f.read(4),'little')\n if o<0xFA0 and o:break\n f.seek(4,1)\nelse:return True"]],
         "rs":"Cosmo Volume Game Archive"
     },
     {
@@ -970,7 +970,7 @@
         "rs":"Monsters Inc. Scream Team Training WAD"
     },
     {
-        "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode()\n except:return\nreturn True"]],
+        "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode('utf-8')\n except:return\nreturn True"]],
         "rs":"Super Monkey Ball Tip 'n Tilt String Data"
     },
     {
@@ -1067,6 +1067,10 @@
         "rs":"Shrek Smash n' Crash Racing CMP"
     },
     {
+        "d":[["size",[136,null]],["isat","\\x58\\0\\0\\0",0],["isat","{\"applicationSettings\":{",92],["isat","}}",-2],["str",4,88]],
+        "rs":"Roblox Flag Cache","s":1
+    },
+    {
         "d":[["s%",4096],["isat","\\xAA\\x55\\xAA\\x55",8192],["n0",16,0],["n0",4,16],["n0",4,24],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(24);return int.from_bytes(f.read(4),'little')==s"]],
         "rs":"AMI Aptio Capsule"
     },
@@ -1123,7 +1127,7 @@
         "rs":"Metal Slug 3D PAK"
     },
     {
-        "d":[["size",[16,104857600]],["str0e",0,32,5],["py","f=open(inp,'rb')\nwhile neof(f):\n for _ in range(256):\n  b=f.read(1)\n  if not b:return\n  if not b[0]:break\n  try:b.decode()\n  except:return\n else:return\n s=int.from_bytes(f.read(2)[::-1]+f.read(2)[::-1],'big')\n if len(f.read(s))!=s:return\nreturn True"]],
+        "d":[["size",[16,104857600]],["str0e",0,32,5],["py","f=open(inp,'rb')\nwhile neof(f):\n for _ in range(256):\n  b=f.read(1)\n  if not b:return\n  if not b[0]:break\n  try:b.decode('utf-8')\n  except:return\n else:return\n s=int.from_bytes(f.read(2)[::-1]+f.read(2)[::-1],'big')\n if len(f.read(s))!=s:return\nreturn True"]],
         "rs":"OHRRPGCE RPG"
     },
     {
@@ -1414,7 +1418,7 @@
         "rs":"Unreal Engine Web Package","s":1
     },
     {
-        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:assert n.decode().isprintable()\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:assert n.decode().isprintable()\nexcept:return\nreturn True"]],
+        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:assert n.decode('utf-8').isprintable()\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:assert n.decode('utf-8').isprintable()\nexcept:return\nreturn True"]],
         "rs":"Impact Screensaver ILB"
     },
     {
@@ -1753,7 +1757,7 @@
         "rs":"GEM Resource"
     },
     {
-        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,90]],["py","d=open(inp,'rb').read(0x100).split(b'\\r\\n')[0]\ntry:d=d.decode()\nexcept:return\nreturn d.split()[0].split('/')[1] in ('0.9','1.0','1.1','2','3') and d.split()[1].isdigit()"]],
+        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,90]],["py","d=open(inp,'rb').read(0x100).split(b'\\r\\n')[0]\ntry:d=d.decode('utf-8')\nexcept:return\nreturn d.split()[0].split('/')[1] in ('0.9','1.0','1.1','2','3') and d.split()[1].isdigit()"]],
         "rs":"HTTP Response"
     },
     {
@@ -1844,13 +1848,17 @@
         "rs":"Yappy"
     },
     {
+        "d":[["ext",".kix"],["str0",0,32,3],["n0",4,32],["isin",["\\0","\\1"],36],["n0",4,37],["py","return exists(splitext(inp)[0]+'.kbf')"]],
+        "rs":"New York Race KIX+KBF"
+    },
+    {
         "rqr":null,
         "d":[["ext",".arg"],["isat","\\0",0],["isat","\\1",-1],["str0",1,2,1]],
         "rs":"ARG"
     },
     {
         "rqr":null,
-        "d":[["isatS","\\0",13,-13],["str0e",0,300,1],["py","f=open(inp,'rb')\ntry:[x.decode() for x in f.read(0x1000).split(b'\\0')]\nexcept:return\nreturn True"]],
+        "d":[["isatS","\\0",13,-13],["str0e",0,300,1],["py","f=open(inp,'rb')\ntry:[x.decode('utf-8') for x in f.read(0x1000).split(b'\\0')]\nexcept:return\nreturn True"]],
         "rs":"UE Text Resource"
     },
     {

@@ -413,7 +413,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
 
             scr = db.get(f'precomp_v{v[0]}.{v[1]}.{v[2]}')
             if not exists(scr): raise NotImplementedError(v)
-            of = o + '/' + (b''.join(t).decode() or tbasename(i))
+            of = o + '/' + (b''.join(t).decode('utf-8') or tbasename(i))
             run([scr,'-r','-o' + of,i])
             if exists(of) and getsize(of): return
         case 'fxv':

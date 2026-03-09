@@ -268,7 +268,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     'assert data in ("CON ",','assert data.decode() in ("CON ",').replace(
                     "'\\x00'","b'\\0'").replace(
                     '"%s\\x00"',"b'%s\\0'").replace(
-                    "data[:0x28].strip(b'\\0')","data[:0x28].strip(b'\\0').decode()").replace(
+                    "data[:0x28].strip(b'\\0')","data[:0x28].strip(b'\\0').decode('utf-8')").replace(
                     "self.filename != ''","self.filename"))
 
             if db.print_try: print('Trying with py360_stfs')
@@ -447,7 +447,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     lf.seek(0xC0)
                     drv = lf.read(0x20).strip(b'\0')
                     if drv:
-                        try:drv = id + '\\' + drv.decode()
+                        try:drv = id + '\\' + drv.decode('utf-8')
                         except:pass
                         else:
                             if exists(drv): drvs.append(drv)
@@ -559,7 +559,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     b = f.read(1)
                     if not b: raise EOFError
                     if b == b'\0': break
-                    name += b.decode()
+                    name += b.decode('utf-8')
                 cp = f.pos + -(f.pos-aoff) % 4
                 f.seek(off)
                 of = open(o + '/' + name,'wb')
@@ -576,7 +576,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             start = f.readu32()
             size = f.readu32() - start
             f.skip(0x10)
-            name = f.read(0x10).strip(b'\0').decode()
+            name = f.read(0x10).strip(b'\0').decode('utf-8')
 
             f.seek(start)
             tag = f.read(3)
@@ -584,7 +584,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if not name: name = tbasename(i)
                 name += '.' + tag.decode().lower()
             elif (tag+f.read(13)) == b'\x01*NINTENDO-HVC*\x01':
-                if not name: name = f.read(4).strip(b' \0').decode()
+                if not name: name = f.read(4).strip(b' \0').decode('utf-8')
                 name += '.qd'
             else:
                 if not name: name = tbasename(i)
@@ -682,7 +682,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     if exists(f + '.inf'):
                         finf = open(f + '.inf','rb').read()
                         if b'\n' in finf or b'\r' in finf: continue
-                        try: finf = finf.decode()
+                        try: finf = finf.decode('utf-8')
                         except: continue
                         remove(f + '.inf')
 
@@ -1100,7 +1100,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             f.seek(0x20)
             fs = []
             for _ in range(c):
-                fs.append((f.read(0x10).rstrip(b'\0').decode(),f.readu32(),f.readu32() * 0x200))
+                fs.append((f.read(0x10).rstrip(b'\0').decode('utf-8'),f.readu32(),f.readu32() * 0x200))
                 f.skip(8)
             for fe in fs:
                 f.seek(fe[2])

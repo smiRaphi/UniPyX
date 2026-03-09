@@ -122,7 +122,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             f.skip(8)
             ob = []
-            while f: ob.append(f.read(f.readu8())[:-1].decode())
+            while f: ob.append(f.read(f.readu8())[:-1].decode('utf-8'))
             f.close()
 
             if ob:
@@ -582,7 +582,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.skip(4)
             c = f.readu32()
             f.skip(8)
-            fs = [(f.readu32(),f.readu32(),f.read(f.readu32()).decode()) for _ in range(c)]
+            fs = [(f.readu32(),f.readu32(),f.read(f.readu32()).decode('utf-8')) for _ in range(c)]
 
             for fe in fs:
                 f.seek(fe[0])
@@ -735,7 +735,7 @@ def extract4_1(inp:str,out:str,t:str):
                     xall = False
                     for off in offs:
                         f.seek(nmso[off])
-                        n = f.read0s().decode()
+                        n = f.read0s().decode('utf-8')
                         f.seek(off)
                         xopen(f'{o}/material/{n}.bin','wb').write(f.read(0x174))
                 elif ix == 2:
@@ -747,7 +747,7 @@ def extract4_1(inp:str,out:str,t:str):
                         fs.append(fe + [f.readu32()+sec[1][0]])
                     for fe in fs:
                         f.seek(fe[2])
-                        n = f.read0s().decode()
+                        n = f.read0s().decode('utf-8')
                         f.seek(fe[0])
                         xopen(o + f'/shader/{n}.shbin','wb').write(f.read(fe[1]))
                 elif ix == 3:
@@ -759,7 +759,7 @@ def extract4_1(inp:str,out:str,t:str):
                         f.skip(2)
                         noff = f.readu32()
                         f.seek(sec[1][0]+noff)
-                        nb1 = f'{o}/texture/{f.read0s().decode()}'
+                        nb1 = f'{o}/texture/{f.read0s().decode("utf-8")}'
 
                         w = h = 0
                         texs = set()
@@ -801,7 +801,7 @@ def extract4_1(inp:str,out:str,t:str):
                     xall = False
                     for off in offs:
                         f.seek(nmso[off])
-                        n = f.read0s().decode()
+                        n = f.read0s().decode('utf-8')
                         f.seek(off)
                         xopen(f'{o}/camera/{n}.bin','wb').write(f.read(0x58))
                 else: xall = False
@@ -1013,7 +1013,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             fs = []
             for _ in range(c):
-                n = f.read0s().decode()
+                n = f.read0s().decode('utf-8')
                 if f.pos%2: f.skip(1)
                 fs.append((n,f.readu16()*0x20))
             for fe in fs: open(o + f'/{fe[0]}.bin','wb').write(f.read(fe[1]))
@@ -1056,7 +1056,7 @@ def extract4_1(inp:str,out:str,t:str):
             for fe in fs:
                 if fe[1]:
                     f.seek(fe[1])
-                    n = f.read0s().decode()
+                    n = f.read0s().decode('utf-8')
                 else: n = ''
                 if not n: n = fe[0].hex().upper() + '.bin'
                 f.seek(fe[2])
@@ -1081,7 +1081,7 @@ def extract4_1(inp:str,out:str,t:str):
             fs = []
             for _ in range(c):
                 f.skip(0x10)
-                fs.append((f.readu32()+d,f.readu32(),f.read0s().decode().replace(':','/')))
+                fs.append((f.readu32()+d,f.readu32(),f.read0s().decode('utf-8').replace(':','/')))
                 f.skip(-f.pos%8)
             for fe in fs:
                 f.seek(fe[0])
@@ -1170,7 +1170,7 @@ def extract4_1(inp:str,out:str,t:str):
                 f.skip(es-12)
             for fe in fs:
                 f.seek(fe[0])
-                fn = f.read0s().decode().strip()
+                fn = f.read0s().decode('utf-8').strip()
                 f.seek(fe[1])
                 xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
             f.close()
@@ -1225,7 +1225,7 @@ def extract4_1(inp:str,out:str,t:str):
             assert f.read(8) == b'PS_FS_V1'
 
             c = f.readu64()
-            fs = [(f.read(0x30).rstrip(b'\0').decode(),f.readu64(),f.readu64()) for _ in range(c)]
+            fs = [(f.read(0x30).rstrip(b'\0').decode('utf-8'),f.readu64(),f.readu64()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[2])
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
@@ -1300,10 +1300,10 @@ def extract4_1(inp:str,out:str,t:str):
                     f.skip(12)
                     p = f.pos
                     f.seek(no)
-                    fs[-1].append(f.read0s().decode())
+                    fs[-1].append(f.read0s().decode('utf-8'))
                     f.seek(p)
                 else:
-                    fs[-1].append(f.read0s().decode())
+                    fs[-1].append(f.read0s().decode('utf-8'))
                     f.alignpos(4)
             for fe in fs:
                 f.seek(fe[0])
@@ -1326,7 +1326,7 @@ def extract4_1(inp:str,out:str,t:str):
             assert f.read(8) == b'Ver 1.0.'
 
             c = f.readu32()
-            fs = [(f.read(f.readu32()).decode(),f.readu32(),f.readu32()) for _ in range(c)]
+            fs = [(f.read(f.readu32()).decode('utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
                 xopen(o + '/' + fe[0],'wb').write(bytes(x ^ 0xA5 for x in f.read(fe[2])))
@@ -1400,7 +1400,7 @@ def extract4_1(inp:str,out:str,t:str):
                 f.seek(fno+of)
                 n = f.read0s()
                 f.seek(p)
-                return n.decode()
+                return n.decode('utf-8')
             f.skip(0x10)
 
             ofs = {}
@@ -1431,7 +1431,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(no+fe[0])
-                fn = f.read0s().decode()
+                fn = f.read0s().decode('utf-8')
                 f.seek(do+fe[1])
                 xopen(o + '/' + fn.lstrip('../\\'),'wb').write(f.read(fe[2]))
             f.close()
@@ -1449,7 +1449,7 @@ def extract4_1(inp:str,out:str,t:str):
             fs.append((0,f.size))
             for ix in range(len(fs)-1):
                 f.seek(fs[ix][0])
-                fn = f.read0s().decode()
+                fn = f.read0s().decode('utf-8')
                 f.seek(fs[ix][1])
                 open(o + '/' + fn,'wb').write(f.read(fs[ix+1][1]-fs[ix][1]))
             if fs: return
@@ -1467,7 +1467,7 @@ def extract4_1(inp:str,out:str,t:str):
                     assert f.read(0x12) == b'GDED BINARY FORMAT'
                     f.skip(-0x12)
                     self.meta = xopen(o + '/$INFO.txt','w',encoding='utf-8')
-                    self.meta.write('--- Signature ---\n' + f.read0s().decode() + '\n--- --- ---\n\n')
+                    self.meta.write('--- Signature ---\n' + f.read0s().decode('utf-8') + '\n--- --- ---\n\n')
                     f.alignpos(4)
                     self.fts = {}
 
@@ -1479,7 +1479,7 @@ def extract4_1(inp:str,out:str,t:str):
                     l = f.readu32()
                     r = f.read(l)[:-1]
                     f.alignpos(4)
-                    return r.decode()
+                    return r.decode('utf-8')
                 def read_block(self,pr:str=None):
                     n = f.read(4).decode('ascii')
                     s = f.readu32()
@@ -1538,7 +1538,7 @@ def extract4_1(inp:str,out:str,t:str):
                             f.skip(4)
                             if not n in self.fts: self.fts[n] = 0
                             c = f.readu32()
-                            fs = [(f.readu32(),f.readu32(),f.read(0x18).rstrip(b'\0').decode()) for _ in range(c)]
+                            fs = [(f.readu32(),f.readu32(),f.read(0x18).rstrip(b'\0').decode('utf-8')) for _ in range(c)]
                             for fe in fs:
                                 f.seek(self.pos + fe[0])
                                 xopen(self.o + f'/{n}{self.fts[n]}/{fe[2]}.gde','wb').write(f.read(fe[1]))
@@ -1584,7 +1584,7 @@ def extract4_1(inp:str,out:str,t:str):
                     off = f.readu64()
                     size = f.readu64()
                     f.skip(2)
-                    name = b + '/' + f.read(0x66).rstrip(b'\0').decode()
+                    name = b + '/' + f.read(0x66).rstrip(b'\0').decode('utf-8')
                     if ifile: fs.append((data_start + bs + off,size,name))
                     else:
                         mkdir(name)
@@ -1624,7 +1624,7 @@ def extract4_1(inp:str,out:str,t:str):
                 s = f.readu32()
                 of = f.readu32()
                 f.skip(8)
-                fs.append((bp+of,s,bytes(x ^ 0xFF for x in f.read(fnl)).rstrip(b'\0').decode()))
+                fs.append((bp+of,s,bytes(x ^ 0xFF for x in f.read(fnl)).rstrip(b'\0').decode('utf-8')))
 
             for fe in fs:
                 f.seek(fe[0])

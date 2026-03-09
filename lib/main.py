@@ -52,6 +52,8 @@ def move(i:str,o:str):
         remove(i)
 mv = move
 def copydir(i:str,o:str,delete=False,reni=False):
+    i = str(i)
+    o = str(o)
     if reni:
         assert delete
         ni = dirname(i) + '\\tmp' + os.urandom(8).hex()

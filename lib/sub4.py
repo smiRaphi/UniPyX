@@ -368,7 +368,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     b = inf.read(1)
                     if b == b'\x00': break
                     t += b
-                return t.decode()
+                return t.decode('utf-8')
             assert inf.read(8) == b'DP2\x1A0001'
             inf.seek(4,1)
             nfs = int.from_bytes(inf.read(4),byteorder='little')
@@ -458,7 +458,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fc = f.readu16()
             fs = []
             for _ in range(fc):
-                fm = [f.read(0x40).strip(b'\0').decode()]
+                fm = [f.read(0x40).strip(b'\0').decode('utf-8')]
                 f.skip(4)
                 fm.append(f.readu32())
                 f.skip(4)
@@ -1106,7 +1106,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     nm += b
                 off = f.readu32()
                 if not foff: foff = off
-                fs.append((nm.decode(),off,f.readu32()))
+                fs.append((nm.decode('utf-8'),off,f.readu32()))
 
             for fe in fs:
                 f.seek(fe[1])
@@ -1195,7 +1195,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(0)
                 fc = f.readu32()
                 boff = 4 + fc * 0x48
-                for _ in range(fc): fs.append((f.read(0x40).strip(b'\0').decode(),boff + f.readu32(),f.readu32()))
+                for _ in range(fc): fs.append((f.read(0x40).strip(b'\0').decode('utf-8'),boff + f.readu32(),f.readu32()))
                 for fe in fs:
                     f.seek(fe[1])
                     open(o + '/' + fe[0],'wb').write(f.read(fe[2]))
@@ -1247,7 +1247,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fs = []
             for fo in fso:
                 f.seek(fo)
-                fs.append((boff + f.readu32(),f.readu32(),f.read(f.readu32()-1).decode()))
+                fs.append((boff + f.readu32(),f.readu32(),f.read(f.readu32()-1).decode('utf-8')))
             for fe in fs:
                 f.seek(fe[0])
                 open(o + '/' + fe[2],'wb').write(f.read(fe[1]))
@@ -1524,7 +1524,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             def read_dir(normal=True):
                 f.skip(8)
                 fc = f.readu32()
-                if normal: path = o + '/' + f.read(f.readu16()+1).decode().strip('\\/')
+                if normal: path = o + '/' + f.read(f.readu16()+1).decode('utf-8').strip('\\/')
                 else: path = o
 
                 fs = []
@@ -1541,7 +1541,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.seek(fe[2])
                     if fe[1] == 0x10: read_dir()
                     elif fe[1] == 0x20:
-                        xopen(path + '/' + fe[0].decode().strip('\\/'),'wb').write(f.read(fe[3]))
+                        xopen(path + '/' + fe[0].decode('utf-8').strip('\\/'),'wb').write(f.read(fe[3]))
             read_dir(False)
             if listdir(o): return
         case 'Anna-Marie Archive':
@@ -1553,7 +1553,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(0x66)
                 fs = []
                 for _ in range(f.readu32()):
-                    fe = [f.read(10).split(b'\0')[0].decode()]
+                    fe = [f.read(10).split(b'\0')[0].decode('utf-8')]
                     f.skip(6)
                     fe.append(f.readu32())
                     fs.append(fe)
@@ -1582,7 +1582,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.seek(0xC8)
             f.seek(f.readu32())
             fs = []
-            while f: fs.append([f.read(0x78).split(b'\0')[0].decode(),f.readu32(),f.readu32()])
+            while f: fs.append([f.read(0x78).split(b'\0')[0].decode('utf-8'),f.readu32(),f.readu32()])
             for fe in fs:
                 f.seek(fe[2])
                 open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
@@ -1658,7 +1658,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.seek(f.readu32())
             fc = f.readu32()
             fs = []
-            for _ in range(fc): fs.append((f.read(0x38).split(b'\0')[0].decode(),f.readu32(),f.readu32()))
+            for _ in range(fc): fs.append((f.read(0x38).split(b'\0')[0].decode('utf-8'),f.readu32(),f.readu32()))
             for fe in fs:
                 f.seek(fe[2])
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
@@ -1689,7 +1689,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for _ in range(fc):
                 fn = f.read(12)
                 assert f.read(1) == b'\0'
-                fs.append((fn.strip(b'\0').decode(),f.readu32()))
+                fs.append((fn.strip(b'\0').decode('utf-8'),f.readu32()))
 
             for ix,fe in enumerate(fs):
                 f.seek(fe[1])
@@ -1707,7 +1707,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fc = f.readu32()
             bo = f.readu32()
             fs = []
-            for _ in range(fc): fs.append((f.read(40).strip(b'\0').decode(),f.readu32(),f.readu32(),bo + f.readu32()))
+            for _ in range(fc): fs.append((f.read(40).strip(b'\0').decode('utf-8'),f.readu32(),f.readu32(),bo + f.readu32()))
             for fe in fs:
                 f.seek(fe[3])
                 d = f.read(fe[2])
@@ -1729,7 +1729,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             assert f.read(8) == b'Pod File'
             f.skip(4)
             fc = f.readu32()
-            fs = [(f.read(12).strip(b'\0').decode(),f.readu32()) for _ in range(fc)]
+            fs = [(f.read(12).strip(b'\0').decode('utf-8'),f.readu32()) for _ in range(fc)]
             for fe in fs: xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
             if fs: return
         case 'Dragon UnPACKer 5 Plugin':
@@ -1754,7 +1754,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 ps = f.reads32()
                 fc = f.reads32()
 
-                for vn in ('name','url','author','comment'): inf.write(f'{vn}={f.read(f.readu8()).decode()}\n')
+                for vn in ('name','url','author','comment'): inf.write(f'{vn}={f.read(f.readu8()).decode("utf-8")}\n')
                 if ps > 0: open(o + '/picture.bmp').write(f.read(ps))
 
                 for _ in range(fc):
@@ -1762,8 +1762,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.skip(0x10)
                     c = f.reads32()
                     f.skip(8)
-                    fn = f.read(f.readu8()).decode()
-                    fn = o + '/' + os.path.join(f.read(f.readu8()).decode(),fn)
+                    fn = f.read(f.readu8()).decode('utf-8')
+                    fn = o + '/' + os.path.join(f.read(f.readu8()).decode('utf-8'),fn)
                     d = f.read(s)
                     if c == 1: d = zlib.decompress(d)
                     xopen(fn,'wb').write(d)
@@ -1801,8 +1801,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     b = File(d,endian='<')
                     if oe[0] == 1:
                         b.skip(12)
-                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode()}\n')
-                        inf.write(f'comment={b.read(b.readu32()).decode()}\n')
+                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode("utf-8")}\n')
+                        inf.write(f'comment={b.read(b.readu32()).decode("utf-8")}\n')
                     elif oe[0] == 2:
                         for _ in range(oe[3]):
                             fe = [b.reads64(),b.reads64()]
@@ -1818,7 +1818,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                             if not fls & 0x40: fs.append(fe)
                     elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
                     elif oe[0] == 20:
-                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode()
+                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
                     elif oe[0] == 21: df = b
                     else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
 
@@ -1861,13 +1861,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.seek(oe[4])
                     d = f.read(oe[5])
                     if oe[1] == 1: d = zlib.decompress(d)
-                    #elif oe[1] == 2: d = lzma.decompress(d)
+                    elif oe[1] == 2: d = delzma(d)
 
                     b = File(d,endian='<')
                     if oe[0] == 1:
                         b.skip(12)
-                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode()}\n')
-                        inf.write(f'comment={b.read(b.readu32()).decode()}\n')
+                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode("utf-8")}\n')
+                        inf.write(f'comment={b.read(b.readu32()).decode("utf-8")}\n')
                     elif oe[0] == 2:
                         for _ in range(oe[3]):
                             fe = [b.reads64(),b.reads64()]
@@ -1883,9 +1883,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                             if not fls & 0x40: fs.append(fe)
                     elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
                     elif oe[0] == 20:
-                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode()
+                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
                     elif oe[0] == 23:
-                        for ix in range(oe[3]): fld[ix] = b.read(b.readu8()).decode()
+                        for ix in range(oe[3]): fld[ix] = b.read(b.readu8()).decode('utf-8')
                     elif oe[0] == 21: df = b
                     else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
 
@@ -1909,7 +1909,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             assert f.read(8) == b'DJarc \0\0'
             fc = f.readu16()
-            fs = [(f.readu32(),f.readu32(),f.read(13).split(b'\0')[0].decode()) for _ in range(fc)]
+            fs = [(f.readu32(),f.readu32(),f.read(13).split(b'\0')[0].decode('utf-8')) for _ in range(fc)]
             for fe in fs:
                 f.seek(fe[0])
                 d = f.read(fe[1])
@@ -2001,7 +2001,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             n = int(f.readline().strip())
             fs = []
             for _ in range(n):
-                fe = f.readline().strip().decode().rsplit(',',1)
+                fe = f.readline().strip().decode('utf-8').rsplit(',',1)
                 fs.append((fe[0],int(fe[1])))
             for fe in fs:
                 f.seek(14,1)
@@ -2017,7 +2017,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             while f:
                 nl,fl = f.readu32(),f.readu32()
-                n = f.read(nl).decode().replace('/','-')
+                n = f.read(nl).decode('utf-8').replace('/','-')
                 if n == '..': n = '__'
                 open(o + '/' + n,'wb').write(f.read(fl))
                 f.skip(1)
@@ -2222,7 +2222,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'UE Text Resource':
             if db.print_try: print('Trying with custom extractor')
             txt = open(i,'rb').read().replace(b'\0',b'\r\n\r\n').rstrip(b'\r\n')
-            try: txt.decode()
+            try: txt.decode('utf-8')
             except: return 1
             open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
             return
@@ -2233,7 +2233,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='>')
 
             c = f.readu32()
-            fs = [(f.readu32(),f.readu32(),f.read(0x10).strip(b'\0').decode()) for _ in range(c)]
+            fs = [(f.readu32(),f.readu32(),f.read(0x10).strip(b'\0').decode('utf-8')) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
                 open(o + '/' + fe[2],'wb').write(f.read(fe[0]))
@@ -2310,7 +2310,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             while True:
                 nl = f.readu8()
                 if not nl: break
-                fn = f.read(nl & 0x7F).decode()
+                fn = f.read(nl & 0x7F).decode('utf-8')
                 dirs[fn] = [dirfo[f.readu8()-1]]
                 f.skip(1)
 
@@ -2320,7 +2320,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 while True:
                     nl = f.readu8()
                     if not nl: break
-                    v.append(f.read(nl).decode())
+                    v.append(f.read(nl).decode('utf-8'))
 
             f.seek(doff)
             fs = []
@@ -2446,8 +2446,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(8)
             fs = []
             for _ in range(fc):
-                ext = f.read(8).strip(b'\0').decode()
-                fe = [bo + f.readu32(),f.readu32(),f.read(0x40).strip(b'\0').decode()]
+                ext = f.read(8).strip(b'\0').decode('utf-8')
+                fe = [bo + f.readu32(),f.readu32(),f.read(0x40).strip(b'\0').decode('utf-8')]
                 if not fe[2].endswith(ext): fe[2] += '.' + ext
                 fs.append(fe)
 
@@ -2484,7 +2484,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.seek(bso+off)
                 r = f.read0s()
                 f.seek(p)
-                return r.decode()
+                return r.decode('utf-8')
 
             ob = {}
             for _ in range(bc):
@@ -2569,7 +2569,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='<')
 
             while f:
-                fn = f.read(f.readu16()).decode().replace(':\\','\\',1)
+                fn = f.read(f.readu16()).decode('utf-8').replace(':\\','\\',1)
                 t = f.readu8()
                 assert t in (1,2)
                 if t == 1: mkdir(o + '/' + fn)

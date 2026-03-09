@@ -47,7 +47,7 @@ def extract4_2(inp:str,out:str,t:str):
                             if not n in self.fts: self.fts[n] = 0
                             c = f.readu32()
                             for _ in range(c):
-                                fn = f.read0s().decode()
+                                fn = f.read0s().decode('utf-8')
                                 xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'PTGA':
@@ -55,7 +55,7 @@ def extract4_2(inp:str,out:str,t:str):
                             c = f.readu32()
                             for _ in range(c):
                                 f.skip(1)
-                                fn = f.read0s().decode()
+                                fn = f.read0s().decode('utf-8')
                                 xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'DBSS':
@@ -64,7 +64,7 @@ def extract4_2(inp:str,out:str,t:str):
                             c = f.readu32()
                             for _ in range(c):
                                 f.skip(4)
-                                fn = f.read0s().decode()
+                                fn = f.read0s().decode('utf-8')
                                 xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'DBPY':
@@ -73,7 +73,7 @@ def extract4_2(inp:str,out:str,t:str):
                             c = f.readu32()
                             for _ in range(c):
                                 f.skip(5)
-                                fn = f.read0s().decode()
+                                fn = f.read0s().decode('utf-8')
                                 cc = f.readu32()
                                 cp = f.pos
                                 REMF(o + f'/{n}{self.fts[n]}/{noext(fn)}',c=cc)
@@ -93,14 +93,14 @@ def extract4_2(inp:str,out:str,t:str):
                                 c += 1
                             c = f.readu32()
                             for _ in range(c):
-                                fn = f.read0s().decode()
+                                fn = f.read0s().decode('utf-8')
                                 xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'PATH':
                             if not n in self.fts: self.fts[n] = 0
                             c = f.readu32()
                             for _ in range(c):
-                                fn = f.read0s().decode()
+                                fn = f.read0s().decode('utf-8')
                                 xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()*0x10))
                             self.fts[n] += 1
                         case 'CURV'|'LITE'|'MATC'|'JONT'|'JNAM'|'SGMT'|'BINF'|'SEND'|'PTH+'|'MCAM'|'AICH'|'XPLO'|\
@@ -126,7 +126,7 @@ def extract4_2(inp:str,out:str,t:str):
             c = f.readu32()
             for _ in range(c):
                 f.skip(4)
-                fn = f.read0s().decode()
+                fn = f.read0s().decode('utf-8')
                 xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
             xopen(o + '/$rest.bin','wb').write(f.read())
             f.close()
@@ -157,7 +157,7 @@ def extract4_2(inp:str,out:str,t:str):
             assert f.read(4) == b'SFS1'
 
             c = f.readu16()
-            fs = [(f.read(f.readu16()).rstrip(b'\0').decode(),f.readu32()) for _ in range(c)]
+            fs = [(f.read(f.readu16()).rstrip(b'\0').decode('utf-8'),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
                 xopen(o + '/' + fe[0],'wb').write(f.read(f.readu32()))
@@ -188,7 +188,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             fs = []
             for _ in range(c):
-                fs.append((f.read(0x20).rstrip(b'\0').decode(),f.readu64(),f.readu64()))
+                fs.append((f.read(0x20).rstrip(b'\0').decode('utf-8'),f.readu64(),f.readu64()))
                 f.skip(0x10)
 
             for fe in fs:
@@ -218,7 +218,7 @@ def extract4_2(inp:str,out:str,t:str):
                 sdb[h] = f.readu32()
             for h in sdb:
                 f.seek(sdb[h])
-                sdb[h] = f.read0s().decode()
+                sdb[h] = f.read0s().decode('utf-8')
 
             f.seek(dico)
             dic = {}
@@ -309,7 +309,7 @@ def extract4_2(inp:str,out:str,t:str):
             f.skip(4)
 
             while f:
-                fn = f.read(0x10).rstrip(b'\0').decode()
+                fn = f.read(0x10).rstrip(b'\0').decode('utf-8')
                 w,h = f.readu32(),f.readu32()
                 fmt = f.readu32()
                 if not fmt in (1,2): raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
@@ -339,7 +339,7 @@ def extract4_2(inp:str,out:str,t:str):
             f.skip(8)
 
             c = f.readu32()
-            fs = [(f.read(f.readu32()).rstrip(b'\0').decode(),f.readu32(),f.readu32()) for _ in range(c)]
+            fs = [(f.read(f.readu32()).rstrip(b'\0').decode('utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
@@ -359,7 +359,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = [(sos[ix],f.readu32(),f.readu32()) for ix in range(c)]
             for fe in fs:
                 f.seek(fe[0])
-                n = f.read0s().decode()
+                n = f.read0s().decode('utf-8')
                 f.seek(fe[1])
                 xopen(o + '/' + n,'wb').write(f.read(fe[2]))
             f.close()
@@ -374,12 +374,12 @@ def extract4_2(inp:str,out:str,t:str):
             f = File(inp,endian='>')
             f.skip(12)
 
-            rt = f.read0s().decode()
+            rt = f.read0s().decode('utf-8')
             c = f.readu32()
             fs = []
             for _ in range(c):
                 f.skip(4)
-                fs.append((f.readu32(),f.readu32(),f.read0s().decode()))
+                fs.append((f.readu32(),f.readu32(),f.read0s().decode('utf-8')))
             for fe in fs:
                 f.seek(fe[0])
                 xopen(f'{o}/{rt}/{fe[2]}','wb').write(f.read(fe[1]))
@@ -408,7 +408,7 @@ def extract4_2(inp:str,out:str,t:str):
             f = File(inp,endian='-')
 
             while f:
-                fn = f.read0s().decode()
+                fn = f.read0s().decode('utf-8')
                 while fn.startswith(('../','..\\')): fn = fn[3:] 
                 xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
             f.close()
@@ -632,7 +632,7 @@ def extract4_2(inp:str,out:str,t:str):
                 assert f.readu32() == 0
                 f.skip(2)
                 nxp = f.readu16() + f.pos
-                of.write(f.read(f.readu16()).decode() + '\n')
+                of.write(f.read(f.readu16()).decode('utf-8') + '\n')
                 f.seek(nxp)
             f.close()
             of.close()
@@ -807,7 +807,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             fs = []
             for _ in range(c):
-                fs.append((f.readu32(),f.readu32(),f.readu8(),f.read(f.readu16())[:-1].decode()))
+                fs.append((f.readu32(),f.readu32(),f.readu8(),f.read(f.readu16())[:-1].decode('utf-8')))
                 assert fs[-1][2] in (0,1)
                 f.skip(4)
 
@@ -1129,7 +1129,7 @@ def extract4_2(inp:str,out:str,t:str):
             c = f.readu32()
             ds = f.readu32() + 12
 
-            fs = [(f.read(0x38).rstrip(b'\0').decode(),ds+f.readu32(),f.readu32()) for _ in range(c)]
+            fs = [(f.read(0x38).rstrip(b'\0').decode('utf-8'),ds+f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
                 n = fe[0]
@@ -1153,7 +1153,7 @@ def extract4_2(inp:str,out:str,t:str):
 
                 for _ in range(c):
                     ss = sf.readu32()
-                    n = sf.read0s().decode()
+                    n = sf.read0s().decode('utf-8')
                     d = sf.read(ss)
                     xopen(f'{o}/{n}','wb').write(d)
 
@@ -1173,7 +1173,7 @@ def extract4_2(inp:str,out:str,t:str):
             off = f.readu32()
             fs = []
             while (f.pos+6) < off:
-                fe = [f.read(f.readu8()).decode()]
+                fe = [f.read(f.readu8()).decode('utf-8')]
                 f.skip(1)
                 fe.append(f.readu32())
                 fs.append(fe)
@@ -1214,7 +1214,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fd in d.split(b'\xC0\xDE\0\1')[1:]:
                 nl = int.from_bytes(fd[:4],'big')
-                xopen(f'{o}/{fd[4+5:4+nl].decode().replace('://','/')}','wb').write(fd[4+nl:])
+                xopen(f'{o}/{fd[4+5:4+nl].decode('utf-8').replace('://','/')}','wb').write(fd[4+nl:])
 
             if listdir(o): return
         case 'AmusementMakers Project B.G. Archive':
@@ -1595,7 +1595,7 @@ def extract4_2(inp:str,out:str,t:str):
             }
 
             from zlib import crc32
-            FSHM = {crc32(x.rstrip(b'\n')) & 0xFFFFFFFF:x.rstrip(b'\n').decode() for x in open(db.get('ssbu_hashes_all'),'rb').readlines()}
+            FSHM = {crc32(x.rstrip(b'\n')) & 0xFFFFFFFF:x.rstrip(b'\n').decode('utf-8') for x in open(db.get('ssbu_hashes_all'),'rb').readlines()}
 
             if db.print_try: print('Trying with custom extractor')
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
@@ -1781,7 +1781,7 @@ def extract4_2(inp:str,out:str,t:str):
                     ofs = {}
                     for x in tofs:
                         f.seek(x[0])
-                        bf = reads().decode()
+                        bf = reads().decode('utf-8')
                         ebf = dirname(i) + '/' + getfn(bf)
                         if not ebf in ofs:
                             if not exists(ebf):
@@ -1793,7 +1793,7 @@ def extract4_2(inp:str,out:str,t:str):
                             ofs[ebf].skip(0x14)
 
                         f.seek(x[2] + 4)
-                        lang = reads().decode()
+                        lang = reads().decode('utf-8')
                         dr = o + '/' + lang + '/' + bf.split(']',1)[0].split(':',1)[1].strip('/') + '/' + bf.rsplit('](',1)[1].split(')')[0]
                         mkdir(dr)
 
@@ -1885,7 +1885,7 @@ def extract4_2(inp:str,out:str,t:str):
                     f.skip(4)
                     assert f.readu32() == 0,"Unknown compression"
                 elif n == b'EOF ': f.splt['eof'] = bool(f.readu32())
-                elif n == b'NAME': f.splt['n'] = f.read(s).split(b'\0')[0].decode()
+                elif n == b'NAME': f.splt['n'] = f.read(s).split(b'\0')[0].decode('utf-8')
                 elif n == b'BODY': f.splt['d'] = (f.pos,s)
 
                 f.seek(ep)
@@ -2046,7 +2046,7 @@ def extract4_2(inp:str,out:str,t:str):
             ps = []
             while f.pos < iefs:
                 nxo = f.readu32()
-                ps.append((f.readu32(),f.read0s().decode()))
+                ps.append((f.readu32(),f.read0s().decode('utf-8')))
                 if not nxo: break
                 f.seek(nxo)
 
@@ -2055,7 +2055,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(pe[0])
                 while f.pos < iefs:
                     nxo = f.readu32()
-                    fs.append((f.readu32(),f.readu32(),f.readu32(),pe[1] + '/' + f.read0s().decode()))
+                    fs.append((f.readu32(),f.readu32(),f.readu32(),pe[1] + '/' + f.read0s().decode('utf-8')))
                     if not nxo: break
                     f.seek(nxo)
 
@@ -2071,5 +2071,48 @@ def extract4_2(inp:str,out:str,t:str):
             import zlib
             open(f'{o}/{basename(i)}','wb').write(zlib.decompress(open(i,'rb').read()[8:]))
             return
+        case 'Roblox Flag Cache':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from base64 import b64decode
+            from lib.file import File
+            f = File(i,endian='<')
+
+            open(o + '/signature.bin','wb').write(b64decode(f.read(f.readu32())))
+            json.dump(json.loads(f.read().decode('utf-8')),open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+            return
+        case 'New York Race KIX+KBF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(noext(i) + '.kix',endian='<')
+            fd = open(noext(i) + '.kbf','rb')
+
+            def readd(p):
+                n = p + f.read(0x20).rstrip(b'\0').decode('latin-1') + '/'
+                mkdir(o + '/' + n)
+                c = f.readu32()
+                for _ in range(c):
+                    ty = f.readu8()
+                    assert ty in (0,1)
+                    f.skip(4)
+                    of = f.readu32()
+
+                    if ty == 0:
+                        p = f.pos
+                        f.seek(of)
+                        readd(n)
+                        f.seek(p+4)
+                    elif ty == 1:
+                        s = f.readu32()
+                        fd.seek(of)
+                        fn = n + fd.read(0x20).rstrip(b'\0').decode('latin-1')
+                        cms = f.readu8()
+                        if cms: fn += '.' + f.read(cms).decode('latin-1')
+                        xopen(o + '/' + fn,'wb').write(fd.read(s))
+            readd('')
+
+            f.close()
+            fd.close()
+            if listdir(o): return
 
     return 1

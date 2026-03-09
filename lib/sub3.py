@@ -306,9 +306,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     else:break
                 return
 
-            td = TmpDir()
+            td = TmpDir(path=o)
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
-            copydir(td,o)
+            copydir(td,o,True)
             td.destroy()
             if listdir(o): return
             run(['7z','x',i,'-o' + o,'-aoa'])
@@ -351,7 +351,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             of.write(f.read(2))
                             fn = f.read(fnl)
                             of.write(fn)
-                            ofs.append((of.name,fn.decode()))
+                            ofs.append((of.name,fn.decode('utf-8')))
                             of.write(f.read(cs))
 
                             chhd = f.read(4)
@@ -388,19 +388,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if fix_isinstext(o,o + '\\Disk1'): return
                 return
 
-            td = TmpDir()
-            tf = td + '\\' + basename(i)
-            symlink(i,tf)
-            osj = OSJump()
-            osj.jump(td)
-            _,po,_ = run(['isxunpack',tf],'\n')
-            remove(tf)
-            osj.back()
+            td = TmpDir(path=o)
+            tf = TmpFile(name=basename(i),path=td.p)
+            _,po,_ = run(['isxunpack',tf],stdin='\n',cwd=td.p)
+            tf.destroy()
             if 'All Files are Successfuly Extracted!' in po and len(listdir(td.p)) == 1:
                 copydir(td + '/' + listdir(td.p)[0],o,True)
+                td.destroy()
                 if os.path.exists(o + '/_inst32i.ex_'):
                     if fix_isinstext(o): return
                 else: return
+            else: td.destroy()
 
             quickbms('instexpl')
             fs = listdir(o)
@@ -418,47 +416,35 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if not ret: return
                 elif fix_isinstext(o): return
         case 'InstallShield Z':
-            td = TmpDir()
-            osj = OSJump()
-            osj.jump(td)
-            symlink(i,'archive.z')
-            run(['icomp','archive.z','*.*','-d','-i'],timeout=2)
-            remove('archive.z')
-            osj.back()
+            td = TmpDir(path=o)
+            tf = TmpFile(suf='.z',path=td.p)
+            tf.link(i)
+            run(['icomp',basename(tf.p),'*.*','-d','-i'],cwd=td.p)
+            tf.destroy()
             if not listdir(td.p): td.destroy()
             else:
-                copydir(td.p,o)
+                copydir(td,o,True)
                 td.destroy()
                 return
         case 'InstallShield Archive':
-            td = TmpDir()
-            osj = OSJump()
-            osj.jump(td)
-            e,_,_ = run(['i6comp','x','-rof',i])
-            osj.back()
+            td = TmpDir(path=o)
+            e,_,_ = run(['i6comp','x','-rof',i],cwd=td.p)
             if not e and listdir(td.p):
-                copydir(td,o)
+                copydir(td,o,True)
                 td.destroy()
                 return
             td.destroy()
 
-            td = TmpDir()
-            osj = OSJump()
-            osj.jump(td)
-            e,_,_ = run(['i5comp','x','-rof',i])
-            osj.back()
+            td = TmpDir(path=o)
+            e,_,_ = run(['i5comp','x','-rof',i],cwd=td.p)
             if not e and listdir(td.p):
-                copydir(td,o)
+                copydir(td,o,True)
                 td.destroy()
                 return
             td.destroy()
 
-            bk = os.environ.get('__COMPAT_LAYER')
-            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
             ti = TmpFile('.ini')
-            e,_,_ = run(['iscab',i,'-i"' + ti + '"','-lx'])
-            if bk != None: os.environ['__COMPAT_LAYER'] = bk
-            else: del os.environ['__COMPAT_LAYER']
+            e,_,_ = run(['iscab',i,'-i"' + ti + '"','-lx'],env=os.environ.copy() | {'__COMPAT_LAYER':'RUNASINVOKER'})
             if not e:
                 print('INI:\n' + xopen(ti).read())
                 ti.destroy()
@@ -754,7 +740,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                                 d.seek(fpos)
                                 lng = int.from_bytes(d.read(2),'big')
                                 if lng <= 8 or lng > 0xFF: continue
-                                try: p1 = d.read(lng).decode()
+                                try: p1 = d.read(lng).decode('utf-8')
                                 except: continue
                                 if not p1: raise EOFError
                                 if '\r' in p1.strip() or '\n' in p1.strip() or ' ' in p1 or '\t' in p1 or '\\' in p1 or '"' in p1 or "'" in p1 or '?' in p1 or '*' in p1: continue
@@ -1199,7 +1185,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.seek(bo)
             for _ in range(fc):
                 f.skip(7)
-                fn = f.read(f.readu8()).decode()
+                fn = f.read(f.readu8()).decode('utf-8')
                 f.skip(1)
                 xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
             if fc: return
@@ -1237,7 +1223,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for _ in range(fc):
                 fe = (f.readu64(),f.readu64())
                 f.skip(8+1)
-                fs.append((fe[0],fe[1],f.read(f.readu8()).decode()))
+                fs.append((fe[0],fe[1],f.read(f.readu8()).decode('utf-8')))
             for fe in fs:
                 f.seek(fe[0])
                 xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
@@ -1264,7 +1250,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek(fe[2])
-                fn = f.read0s().decode()
+                fn = f.read0s().decode('ansi')
                 if fe[3]: fn = '$SYS/' + fn
                 f.seek(fe[0])
                 xopen(o + '/' + fn,'wb').write(f.read(fe[1]))
