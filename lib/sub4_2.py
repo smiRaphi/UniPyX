@@ -2145,5 +2145,56 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
 
             return quickbms('trine2')
+        case 'Snoopy Vs. The Red Baron X':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.skip(8)
+            gpl = f.readu32() & 3
+            c = f.readu32()
+            gbo = 0x10 + c*0x18
+
+            dn = []
+            fs = []
+            for ix in range(c):
+                pl = f.readu32() & 3
+                xc = f.readu32()
+                id = str(f.readu32())
+                if id in dn: id += '.' + str(ix)
+                dn.append(id)
+                f.skip(4)
+                fs.append((pl,xc,f.readu32(),gbo+f.readu32(),o + '/' + id))
+            f.seek(max(x[2]+x[3] for x in fs))
+            if gpl == 1: f.alignpos(0x800)
+            cm = f.read(0x80).decode('utf-8').strip()
+            if cm: open(o + '/$comment.txt','w',encoding='utf-8').write(cm)
+
+            for x in fs:
+                f.seek(x[3])
+                f.skip(4)
+                ds = f.readu32()
+                c = f.readu32()
+                f.skip(0x10)
+                u1 = f.readu32()
+                f.skip(0x60)
+                if x[0] == 1: f.alignpos(0x800)
+
+                bo = f.pos + c*4 + -c%4*4 + (0x10 if c and u1 != 5 else 0)
+                ofs = [bo+f.readu32() for _ in range(c)]
+                mkdir(x[4])
+
+                sfs = []
+                for ix,of in enumerate(ofs):
+                    f.seek(of)
+                    fof,s = f.readu32(),f.readu32()
+                    f.seek(fof)
+                    open(x[4] + f'/m{ix:02d}.bin','wb').write(f.read(s))
+                f.seek(bo + ds)
+                if x[0] == 1: f.alignpos(0x800)
+
+                if x[1]: open(x[4] + f'/x{x[1]}.bin','wb').write(f.read((x[2]+x[3]) - f.pos))
+
+            f.close()
+            if fs: return
 
     return 1
