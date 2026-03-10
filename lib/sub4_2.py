@@ -2114,5 +2114,36 @@ def extract4_2(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if listdir(o): return
+        case 'Trine FBQ':
+            if db.print_try: print('Trying with custom extractor')
+            if sys.version_info >= (3,14): from compression import zstd # type: ignore
+            else: from backports import zstd # type: ignore
+            from lib.file import File
+            f = File(i,endian='<')
+
+            fs = []
+            v = f.readu32()
+            if v == 3:
+                c = f.readu32()
+                bo = 12 + f.readu32()
+                for _ in range(c):
+                    fe = (f.read0s().decode('utf-8'),bo+f.readu32(),f.readu8(),f.readu32(),f.readu32())
+                    f.skip(4)
+                    if fe[2] not in (1,4):
+                        assert fe[2] == 0,"Unknown compression"
+                        fs = []
+                        break
+                    fs.append(fe)
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[4])
+                if fe[2] == 4: d = zstd.decompress(d)
+                xopen(o + '/' + fe[0],'wb').write(d[:fe[3]])
+
+            f.close()
+            if fs: return
+
+            return quickbms('trine2')
 
     return 1

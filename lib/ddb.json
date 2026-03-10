@@ -718,6 +718,10 @@
         "rs":"Sky CoTL Preferences","s":1
     },
     {
+        "d":[["isat","\\0\\0\\0",1],["isin",["\\1","\\2","\\3"],0],["n0",4,4],["n0",4,8],["str0e",12,64,10],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);d=int.from_bytes(f.read(4),'little');f.seek(d-5);o=int.from_bytes(f.read(4),'little');f.seek(5,1);return 12+d+o+int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Trine FBQ","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],
              ["isat","\\x7F\\x43\\x4E\\x54\\x00\\0\\0\\1",0]],"qq":true,

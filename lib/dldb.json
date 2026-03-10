@@ -6241,6 +6241,14 @@
         ]],
         "ts":0
     },
+    "trine2":{
+        "p":"BMS/trine2.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/trine2.bms",
+            "BMS/trine2.bms"
+        ]],
+        "ts":0
+    },
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
