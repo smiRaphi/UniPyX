@@ -2196,5 +2196,89 @@ def extract4_2(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Wangan Midnight TOC+DAT':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            fd = open(noext(i) + '.dat','rb')
+            assert f.read(4) == b'BLDh' and f.readu32() == 0
+
+            fc = bs = 0
+            fs = []
+            while f:
+                n = f.read(4)
+                ep = f.readu32() + f.pos
+
+                if n == b'def ':
+                    f.skip(4)
+                    fc = f.readu32()
+                    f.skip(8)
+                    bs = f.readu64()
+                elif n == b'inf ':
+                    assert fc and bs
+                    for _ in range(fc):
+                        fs.append([f.readu32()*bs,f.readu32(),f.readu32()])
+                        f.skip(0x1C)
+                elif n == b'tbl ':
+                    assert fs
+                    for fe in fs: fe.append(f.read0s().decode('utf-8').lstrip('/'))
+
+                f.seek(ep)
+            f.close()
+
+            for fe in fs:
+                fd.seek(fe[0])
+                d = fd.read(fe[1])
+                if fe[2]:
+                    assert d[:4] == b'GARC',d[:4]
+                    assert d[8:12] == b'zlib',d[8:12]
+                    d = File(d,endian=f._end)
+                    d.skip(0x10)
+
+                    while d:
+                        n = d.read(4)
+                        ep = d.readu32() + d.pos
+
+                        if n == b'dat ':
+                            ob = []
+                            z = zlib.decompressobj()
+                            while (d.pos+0x11) < ep: ob.append(z.decompress(d.read(d.readu64())))
+                        d.seek(ep)
+                    del d
+                    assert ob,fe[0]
+                    d = b''.join(ob)
+                xopen(o + '/' + fe[3],'wb').write(d)
+            if fs: return
+        case 'Import Tuner Challenge TOC+DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            fd = open(noext(i) + '.dat','rb')
+
+            c = f.readu32()
+            f.skip(12)
+            for ix in range(c):
+                fn = f'{o}\\{ix:03d}.bin'
+                fd.seek(f.readu32()*0x800)
+                d = fd.read(f.readu32())
+                us = f.readu32()
+                if us and us != len(d):
+                    assert d[:8] == b'\x00\xE9UCL\xFF\x01\x1A',ix
+                    tf = TmpFile('.ucl')
+                    open(tf.p,'wb').write(d[:0x1A] + d[0x1E:] + b'\0'*4) # strip unflagged crc and add EOF (?)
+                    run(['uclpack','-d',tf,fn],print_try=False,print_out=True)
+                    tf.destroy()
+                    assert exists(fn) and getsize(fn) == us,ix
+                else: open(fn,'wb').write(d)
+                f.skip(4)
+
+            f.close()
+            fd.close()
+            if c: return
+
+        case _:
+            from lib.sub4_3 import extract4_3
+            return extract4_3(inp,o,t)
 
     return 1

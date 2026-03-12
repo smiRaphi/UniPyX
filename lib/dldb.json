@@ -5462,6 +5462,48 @@
         ],
         "ts":1768118137
     },
+    "xbxdetool":{
+        "p":"XbxDeTool/XbxDeTool.exe",
+        "fs":[{
+            "u":"https://github.com/Nenkai/XbxDeTool/releases/download/1.0.10/XbxDeTool.exe.zip",
+            "x":{
+                "win-x64/runtimes/win-x64/native/libzstd.dll":"XbxDeTool/libzstd.dll",
+                "win-x64/Filelists/hash_list.txt":"XbxDeTool/Filelists/hash_list.txt",
+                "win-x64/Filelists/XCX_JPN_base.txt":"XbxDeTool/Filelists/XCX_JPN_base.txt",
+                "win-x64/Filelists/XCX_USA_base.txt":"XbxDeTool/Filelists/XCX_USA_base.txt",
+                "win-x64/Filelists/XCX_USA_DLC.txt":"XbxDeTool/Filelists/XCX_USA_DLC.txt",
+                "win-x64/Filelists/XCX_JPN_DLC.txt":"XbxDeTool/Filelists/XCX_JPN_DLC.txt",
+                "win-x64/Filelists/XCX_JPN_v48.txt":"XbxDeTool/Filelists/XCX_JPN_v48.txt",
+                "win-x64/Filelists/XCX_USA_v48.txt":"XbxDeTool/Filelists/XCX_USA_v48.txt",
+                "win-x64/CommunityToolkit.HighPerformance.dll":"XbxDeTool/CommunityToolkit.HighPerformance.dll",
+                "win-x64/ImpromptuNinjas.ZStd.dll":"XbxDeTool/ImpromptuNinjas.ZStd.dll",
+                "win-x64/Microsoft.Extensions.Configuration.Abstractions.dll":"XbxDeTool/Microsoft.Extensions.Configuration.Abstractions.dll",
+                "win-x64/Microsoft.Extensions.Configuration.Binder.dll":"XbxDeTool/Microsoft.Extensions.Configuration.Binder.dll",
+                "win-x64/Microsoft.Extensions.Configuration.dll":"XbxDeTool/Microsoft.Extensions.Configuration.dll",
+                "win-x64/Microsoft.Extensions.DependencyInjection.Abstractions.dll":"XbxDeTool/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+                "win-x64/Microsoft.Extensions.DependencyInjection.dll":"XbxDeTool/Microsoft.Extensions.DependencyInjection.dll",
+                "win-x64/Microsoft.Extensions.Logging.Abstractions.dll":"XbxDeTool/Microsoft.Extensions.Logging.Abstractions.dll",
+                "win-x64/Microsoft.Extensions.Logging.Configuration.dll":"XbxDeTool/Microsoft.Extensions.Logging.Configuration.dll",
+                "win-x64/Microsoft.Extensions.Logging.Console.dll":"XbxDeTool/Microsoft.Extensions.Logging.Console.dll",
+                "win-x64/Microsoft.Extensions.Logging.dll":"XbxDeTool/Microsoft.Extensions.Logging.dll",
+                "win-x64/Microsoft.Extensions.Options.ConfigurationExtensions.dll":"XbxDeTool/Microsoft.Extensions.Options.ConfigurationExtensions.dll",
+                "win-x64/Microsoft.Extensions.Options.dll":"XbxDeTool/Microsoft.Extensions.Options.dll",
+                "win-x64/Microsoft.Extensions.Primitives.dll":"XbxDeTool/Microsoft.Extensions.Primitives.dll",
+                "win-x64/Microsoft.IO.RecyclableMemoryStream.dll":"XbxDeTool/Microsoft.IO.RecyclableMemoryStream.dll",
+                "win-x64/NLog.config":"XbxDeTool/NLog.config",
+                "win-x64/NLog.dll":"XbxDeTool/NLog.dll",
+                "win-x64/NLog.Extensions.Logging.dll":"XbxDeTool/NLog.Extensions.Logging.dll",
+                "win-x64/Syroot.BinaryData.Core.dll":"XbxDeTool/Syroot.BinaryData.Core.dll",
+                "win-x64/Syroot.BinaryData.dll":"XbxDeTool/Syroot.BinaryData.dll",
+                "win-x64/System.CommandLine.dll":"XbxDeTool/System.CommandLine.dll",
+                "win-x64/System.IO.Hashing.dll":"XbxDeTool/System.IO.Hashing.dll",
+                "win-x64/XbxDeTool.deps.json":"XbxDeTool/XbxDeTool.deps.json",
+                "win-x64/XbxDeTool.dll":"XbxDeTool/XbxDeTool.dll",
+                "win-x64/XbxDeTool.exe":"XbxDeTool/XbxDeTool.exe",
+                "win-x64/XbxDeTool.runtimeconfig.json":"XbxDeTool/XbxDeTool.runtimeconfig.json"
+            }
+        }]
+    },
     "uefiextract":{
         "p":"UEFIExtract.exe",
         "fs":[{

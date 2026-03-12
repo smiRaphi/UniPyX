@@ -1,0 +1,66 @@
+from lib.main import *
+
+def extract4_3(inp:str,out:str,t:str):
+    run = db.run
+    i = inp
+    o = out
+
+    match t:
+        case 'Xenoblade Chronicles X DE ARH2':
+            scr = db.get('xbxdetool')
+            fl = dirname(scr) + '/Filelists'
+            if exists(fl + '/hash_list.txt'):
+                hl = [x.split('|',1)[1] for x in open(fl + '/hash_list.txt').read().strip('\r\n').split('\n') if x]
+                remove(fl + '/hash_list.txt')
+                for hf in listdir(fl):
+                    hf = fl + '/' + hf
+                    if isfile(hf) and hf.lower().endswith('.txt'):
+                        hl += open(hf).read().strip('\r\n').split('\n')
+                        remove(hf)
+                hl.extend([
+                    '/chr/oj/qsten010901.ces','/chr/oj/qsten011101.ces','/chr/oj/qsten011104.ces','/chr/oj/qsten011108.ces','/chr/oj/qsten011305.ces','/chr/oj/qsten011501.ces','/chr/oj/qsten011503.ces',
+
+                    '/ev/motion/ptcs/xs00010100/xs00010100_c03_cm_xs00010100_c03.eva','/ev/motion/ptcs/xs00010100/xs00010100_c01_cm_xs00010100_c01.eva','/ev/motion/ptcs/xs00010100/xs00010100_c03_evr_oj010006.anm','/ev/motion/ptcs/xs11020100_1/xs11020100_1_c08_kee002_ev_cmn_500_019_pcefb.eva',
+                    '/ev/motion/ptcs/xs11020100_1/xs11020100_1_c09_evr1_model_en013101.eva','/ev/motion/ptcs/xs00010100/xs00010100_c01_evr_oj010006.anm','/ev/motion/ptcs/xs00010100/xs00010100_c03_evr_oj010006.eva','/ev/motion/ptcs/xs08110100_1/xs08110100_1_c12_evr_oj210004.anm',
+                    '/ev/motion/ptcs/xs11020100_1/xs11020100_1_c08_evr1_model_en013101.anm','/ev/motion/ptcs/xs00010100/xs00010100_c01_evr_oj010006.eva','/ev/motion/ptcs/xs11020100_1/xs11020100_1_c08_kee001_ev_cmn_500_020_pcefb.eva','/ev/motion/ptcs/xs11020100_1/xs11020100_1_c08_evr1_model_en013101.eva',
+                    '/ev/motion/ptcs/xs08110100_1/xs08110100_1_c12_evr_oj210004.eva',
+
+                    '/ev/title/title3_c01_evr8_model_np009001.anm','/ev/title/title2_c01_evr25_oj490036.anm',
+
+                    '/chr/en/sound_dl779100.ces',
+                    '/ev/motion/en/en010301/509008m_sp_7_anm.anm','/ev/motion/en/en010501/509008m_sp_7_ed_anm.anm','/ev/motion/dl/dl080100/509012m_sp_11_anm.anm','/ev/motion/en/en011101/509009m_sp_8_anm.anm','/ev/motion/en/en011101/509008m_sp_7_ed_anm.anm','/ev/motion/en/en010601/509002m_sp_2_lp_anm.anm',
+                    '/ev/motion/en/en050201/509011m_sp_10_anm.anm',
+                    '/ev/motion/oj/ws121101r/509001m_sp_2_st_anm.anm','/ev/motion/oj/ws121101r/509002m_sp_2_lp_anm.anm',
+                ])
+                open(fl + '/list.txt','w').write('\n'.join(sorted(list(set(hl)))))
+
+            run([scr,'extract-all','-i',i,'-o',o],cwd=dirname(scr))
+            if listdir(o): return
+        case 'CSI NY GRF':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(8) == b'GRF\x05\x01FRG'
+
+            f.seek(f.readu32())
+            ft = File(zlib.decompress(f.read()),endian=f._end)
+            ft.skip(6)
+            c = ft.readu32()
+            fs = []
+            for _ in range(c):
+                ft.skip(13)
+                fs.append((ft.read(ft.readu32()).decode('utf-8'),ft.readu32(),ft.readu32(),ft.readu8()))
+            del ft
+
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,f.size))
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe[1])
+                d = f.read(fs[ix+1][1]-fe[1]) # don't trust file size fe[2]
+                assert fe[3] == 1,f'{fe[3]}: {d[:8].hex()}'
+                xopen(o + '/' + fe[0],'wb').write(zlib.decompress(d))
+
+            if fs: return
+
+    return 1

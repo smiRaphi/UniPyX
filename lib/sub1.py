@@ -399,6 +399,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             except zlib.error:return 1
 
             open(o + '/' + tbasename(i),'wb').write(d)
+            return
         case 'GZIP':
             f = open(i,'rb')
             assert f.read(2) == b'\x1F\x8B'

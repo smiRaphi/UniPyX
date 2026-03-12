@@ -726,6 +726,22 @@
         "rs":"Snoopy Vs. The Red Baron X","s":1
     },
     {
+        "d":[["isat","BLDh\\0\\0\\0\\0def \\x18\\0\\0\\0",0],["isat","inf ",40],["n0",4,16],["n0",4,20],["py","return exists(splitext(inp)[0]+'.dat')"]],
+        "rs":"Wangan Midnight TOC+DAT","s":1
+    },
+    {
+        "d":[["s%",16],["isat","\\0\\0\\0\\0",16],["isat","\\0\\0\\0\\0",28],["n0",4,0],["n0",4,12],["n0",4,20],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');f.seek(8,1);s=int.from_bytes(f.read(4),'big');return (16+c*16)==f.seek(0,2)and exists(splitext(inp)[0]+'.dat')and getsize(splitext(inp)[0]+'.dat')==s"]],
+        "rs":"Import Tuner Challenge TOC+DAT","s":1
+    },
+    {
+        "d":[["s%",16],["isat","arh2",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",8,16],["py","if not exists(splitext(inp)[0]+'.ard'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*16+16)==s"]],
+        "rs":"Xenoblade Chronicles X DE ARH2","s":1
+    },
+    {
+        "d":[["isat","GRF\\x05\\x01FRG",0],["n0",4,8]],
+        "rs":"CSI NY GRF","s":1
+    },
+    {
         "rqr":null,
         "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],
              ["isat","\\x7F\\x43\\x4E\\x54\\x00\\0\\0\\1",0]],"qq":true,
