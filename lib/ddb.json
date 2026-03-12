@@ -738,7 +738,7 @@
         "rs":"Xenoblade Chronicles X DE ARH2","s":1
     },
     {
-        "d":[["isat","GRF\\x05\\x01FRG",0],["n0",4,8]],
+        "d":[["isat","GRF\\x05",0],["isin",["\\x01FRG","GRF\\x01"],4],["n0",4,8]],
         "rs":"CSI NY GRF","s":1
     },
     {

@@ -40,24 +40,34 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             import zlib
             from lib.file import File
-            f = File(i,endian='>')
-            assert f.read(8) == b'GRF\x05\x01FRG'
+            f = File(i)
+            assert f.read(4) == b'GRF\x05'
+
+            v = (b'\x01FRG',b'GRF\x01').index(f.read(4))
+            if v == 0: f._end = '>'
+            elif v == 1: f._end = '<'
 
             f.seek(f.readu32())
             ft = File(zlib.decompress(f.read()),endian=f._end)
-            ft.skip(6)
-            c = ft.readu32()
             fs = []
-            for _ in range(c):
-                ft.skip(13)
-                fs.append((ft.read(ft.readu32()).decode('utf-8'),ft.readu32(),ft.readu32(),ft.readu8()))
+            if v == 0:
+                ft.skip(6)
+                c = ft.readu32()
+                for _ in range(c):
+                    ft.skip(13)
+                    fs.append((ft.read(ft.readu32()).decode('utf-8'),ft.readu32(),ft.readu32(),ft.readu8()))
+            elif v == 1:
+                ft.skip(5)
+                while ft:
+                    ft.skip(10)
+                    fs.append((ft.read(ft.readu8()).decode('utf-8'),ft.readu32(),ft.readu32(),ft.readu8()))
             del ft
 
             fs.sort(key=lambda x:x[1])
             fs.append((0,f.size))
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
-                d = f.read(fs[ix+1][1]-fe[1]) # don't trust file size fe[2]
+                d = f.read(max(fs[ix+1][1]-fe[1],fe[2])) # don't trust file size fe[2]
                 assert fe[3] == 1,f'{fe[3]}: {d[:8].hex()}'
                 xopen(o + '/' + fe[0],'wb').write(zlib.decompress(d))
 
