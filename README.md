@@ -34,6 +34,7 @@ If you're on a python version below 3.14 you'll have to install the ZSTD backpor
 * self compiled [Torch](https://github.com/HarbourMasters/Torch)
 * self compiled [density](https://github.com/g1mv/density)
 * self compiled [ps3tools](https://github.com/wargio/ps3tools)
+* self compiled [luadec5 1-3](https://github.com/viruscamp/luadec)
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
 * [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX

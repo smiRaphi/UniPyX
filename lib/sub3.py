@@ -1268,7 +1268,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 run(['java','-jar',db.get('unluac'),'--output',of,i],print_try=False)
             if exists(of) and getsize(of): return
 
-            if mav == 5 and miv == 1: open(of,'wb').write(run(['luadec51','--',i],text=False)[1])
+            if mav == 5 and miv in (1,2,3): open(of,'wb').write(run([f'luadec{mav}{miv}','--',i],text=False)[1])
             if exists(of) and getsize(of): return
         case 'Bink Video EXE':
             if db.print_try: print('Trying with custom extractor')

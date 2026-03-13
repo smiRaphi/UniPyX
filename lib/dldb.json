@@ -5563,11 +5563,31 @@
         "ts":0
     },
     "luadec51":{
-        "p":"Luadec51.exe",
+        "p":"luadec51.exe",
         "fs":[{
-            "u":"https://github.com/sztupy/luadec51/releases/download/v2.0.2/luadec51_2.0.2_win32.zip",
+            "u":".",
             "x":{
-                "Luadec51.exe":"Luadec51.exe"
+                "luadec51.exe":"luadec51.exe"
+            }
+        }],
+        "ts":0
+    },
+    "luadec52":{
+        "p":"luadec52.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "luadec52.exe":"luadec52.exe"
+            }
+        }],
+        "ts":0
+    },
+    "luadec53":{
+        "p":"luadec53.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "luadec53.exe":"luadec53.exe"
             }
         }],
         "ts":0
