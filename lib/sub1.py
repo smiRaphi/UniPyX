@@ -765,11 +765,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             open(of,'wb').write(d)
             return
-        case 'Base64':
-            if db.print_try: print('Trying with custom extractor')
-            import base64
-            open(o + '/' + tbasename(i) + '.bin','wb').write(base64.b64decode(open(i,'rb').read()))
-            return
         case 'Motorola S-Record':
             if db.print_try: print('Trying with custom extractor')
             f = open(i)
@@ -865,5 +860,16 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
                 if fe[3]: set_ctime(o + '/' + fe[0],fe[3])
             if fs: return
+        case 'Base64':
+            if db.print_try: print('Trying with base64')
+            from base64 import b64decode
+            d = b64decode(open(i).read().strip().strip('=') + '===')
+            try: assert '\0' not in d.decode('utf-8')
+            except: ext = 'bin'
+            else:
+                if d.strip().startswith(b'{"') and d.strip().endswith(b'}'): ext = 'json'
+                else: ext = 'txt'
+            open(f'{o}/{tbasename(i)}.{ext}','wb').write(d)
+            return
 
     return 1

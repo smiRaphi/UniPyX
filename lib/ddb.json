@@ -1123,6 +1123,10 @@
         "rs":"Davilex Games IDX+IMG","s":1
     },
     {
+        "d":[["isat","Artech\\0\\0\\x02\\0\\x03\\0\\x01\\0\\0\\0\\0\\0\\0\\0",0],["n0",4,20],["n0",4,28],["py","f=open(inp,'rb');f.seek(20);c=int.from_bytes(f.read(4),'little');f.seek(28);return (28+c*16)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Artech DAT","s":1
+    },
+    {
         "d":[["isat","B000FF\\n",0],["n0",4,7],["n0",4,11]],
         "rs":"Windows CE FW IMG","s":1
     },

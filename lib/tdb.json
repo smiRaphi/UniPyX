@@ -1403,5 +1403,8 @@
     ],
     "Palm MemoPad Archive":[
         "palm memo pad archive"
+    ],
+    "Base64":[
+        "base64 encoded json object (generic)"
     ]
 }

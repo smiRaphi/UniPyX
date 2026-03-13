@@ -33,6 +33,7 @@ def extract4_3(inp:str,out:str,t:str):
                     '/ev/motion/oj/ws121101r/509001m_sp_2_st_anm.anm','/ev/motion/oj/ws121101r/509002m_sp_2_lp_anm.anm',
                 ])
                 open(fl + '/list.txt','w').write('\n'.join(sorted(list(set(hl)))))
+                del hl
 
             run([scr,'extract-all','-i',i,'-o',o],cwd=dirname(scr))
             if listdir(o): return
@@ -71,6 +72,30 @@ def extract4_3(inp:str,out:str,t:str):
                 assert fe[3] == 1,f'{fe[3]}: {d[:8].hex()}'
                 xopen(o + '/' + fe[0],'wb').write(zlib.decompress(d))
 
+            f.close()
+            if fs: return
+        case 'Artech DAT':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'Artech\0\0' and f.readu16() == 2 and f.readu16() == 3 and f.readu64() == 1
+
+            c = f.readu32()
+            f.skip(4)
+            fs = []
+            for _ in range(c):
+                fe = [f.readu32(),f.readu32()]
+                f.skip(4)
+                fs.append(fe + [f.readu32()])
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[2] or fe[1])
+                if fe[2] and fe[2] != fe[1]: d = zlib.decompress(d)
+                open(f'{o}/{ix:04d}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
             if fs: return
 
     return 1

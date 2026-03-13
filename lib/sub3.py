@@ -1259,16 +1259,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f = open(i,'rb')
             assert f.read(4) == b'\x1bLua'
             v = f.read(1)[0]
+            fv = f.read(1)[0]
             f.close()
             mav,miv = v >> 4,v & 0xF
 
             of = o + '\\' + tbasename(i) + '.lua'
-            if mav == 5 and miv in (0,1,2,3,4):
+            if mav == 5:
                 if db.print_try: print('Trying with unluac')
                 run(['java','-jar',db.get('unluac'),'--output',of,i],print_try=False)
             if exists(of) and getsize(of): return
 
-            if mav == 5 and miv in (1,2,3): open(of,'wb').write(run([f'luadec{mav}{miv}','--',i],text=False)[1])
+            if fv == 0 and mav == 5 and miv in (1,2,3): open(of,'wb').write(run([f'luadec{mav}{miv}','--',i],text=False)[1])
             if exists(of) and getsize(of): return
         case 'Bink Video EXE':
             if db.print_try: print('Trying with custom extractor')
