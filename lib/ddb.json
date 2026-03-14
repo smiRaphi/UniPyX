@@ -1091,6 +1091,14 @@
         "rs":"Shrek Smash n' Crash Racing CMP"
     },
     {
+        "d":[["isat","\\1\\0\\0\\0",4],["isat","\\0",-1],["n0",4,0],["str0e",-5,5,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little')-8;f.seek(o-4);return (8*int.from_bytes(f.read(4),'little'))==o and not sum(f.read(8))"]],
+        "rs":"Harry Potter and Prisoner of Azkaban IDS"
+    },
+    {
+        "d":[["s%",128],["size",[256,2684354560]],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')*8+4;o=int.from_bytes(f.read(4),'little')\nif o%128 or(s+-s%128)!=o:return\nf.seek(s);return not sum(f.read(-s%128))and f.read(4)==b'SCHl'"]],
+        "rs":"Harry Potter and Prisoner of Azkaban SDT"
+    },
+    {
         "d":[["size",[136,null]],["isat","\\x58\\0\\0\\0",0],["isat","{\"applicationSettings\":{",92],["isat","}}",-2],["str",4,88]],
         "rs":"Roblox Flag Cache","s":1
     },

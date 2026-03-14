@@ -1,3 +1,5 @@
+from tkinter import W
+
 from lib.main import *
 
 def extract4_3(inp:str,out:str,t:str):
@@ -113,5 +115,57 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if listdir(o): return
+        case 'Harry Potter and Prisoner of Azkaban IDS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            fo = f.readu32()
+            f.back(4)
+
+            fs = []
+            while f.pos < fo:
+                fe = (f.readu32(),f.readu32())
+                if not fe[0]: break
+                fs.append(fe)
+
+            ob = []
+            for fe in fs:
+                f.seek(fe[0])
+                ob.append(f'{fe[1]:03d}: {f.read0s().decode()}')
+            f.close()
+            if ob:
+                open(o + '/' + tbasename(i) + '.txt','w').write('\n'.join(ob))
+                return
+        case 'Harry Potter and Prisoner of Azkaban SDT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu32()
+
+            fs = []
+            for _ in range(c):
+                fs.append(f.readu32())
+                f.skip(4)
+            fs.append(f.size)
+
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe)
+                d = []
+                tg = f.read(4)
+                f.back(4)
+                while (f.pos+8) < fs[ix+1]:
+                    f.skip(4)
+                    s = f.readu32()
+                    if not s: break
+                    f.back(8)
+                    d.append(f.read(s))
+
+                try: tg = tg.decode('ascii');assert tg.isprintable()
+                except: ex = 'bin'
+                else: ex = tg.lower()
+                xopen(f'{o}/{ix:03d}.{ex}','wb').write(b''.join(d))
+
+            f.close()
+            if fs: return
 
     return 1
