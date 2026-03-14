@@ -26,7 +26,6 @@ If you're on a python version below 3.14 you'll have to install the ZSTD backpor
 * self compiled [ZLI](https://github.com/facebook/openzl)
 * self compiled [lha](https://github.com/jca02266/lha)
 * self compiled [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp)
-* self compiled [machine68k](https://github.com/cnvogelg/machine68k)
 * self compiled [uclpack](https://www.oberhumer.com/opensource/ucl/)
 * self compiled [ddosutils](https://github.com/pulkomandy/ddosutils)
 * self compiled [bk_tools](https://github.com/MittenzHugg/bk_tools)

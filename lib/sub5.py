@@ -433,6 +433,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with','ligru-compress_v' + v)
             run([scr,'-d'] + (['-cuda'] if v not in ('0.91','0.90') else []) + [i,of],print_try=False)
             if exists(of) and getsize(of): return
+        case '6pack':
+            run(['6unpack',i],cwd=o)
+            if listdir(o): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

@@ -22,20 +22,6 @@
         }],
         "ts":0
     },
-    "vamos":{
-        "p":"amitools/vamos/main.py",
-        "fs":[{
-            "u":"https://github.com/cnvogelg/amitools/archive/refs/heads/master.zip",
-            "x":{
-                "amitools-master/amitools":"amitools"
-            }
-        },{
-            "u":".",
-            "x":{
-                "amitools/machine68k.pyd":"amitools/machine68k.pyd"
-            }
-        }]
-    },
     "java":{
         "p":"graalvm/bin/java.exe",
         "fs":[{
@@ -5504,6 +5490,34 @@
             }
         }]
     },
+    "lz4":{
+        "p":"lz4.exe",
+        "fs":[{
+            "u":"https://github.com/lz4/lz4/releases/download/v1.10.0/lz4_win64_v1_10_0.zip",
+            "x":{
+                "lz4.exe":"lz4.exe"
+            }
+        }],
+        "ts":1722662579
+    },
+    "fastlz_tool":{
+        "p":"fastlz_tool.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "fastlz_tool.exe":"fastlz_tool.exe"
+            }
+        }]
+    },
+    "6unpack":{
+        "p":"6unpack.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "6unpack.exe":"6unpack.exe"
+            }
+        }]
+    },
     "uefiextract":{
         "p":"UEFIExtract.exe",
         "fs":[{
@@ -5628,17 +5642,6 @@
                 "cicdec.exe":"cicdec/cicdec.exe",
                 "Bio.cs.dll":"cicdec/Bio.cs.dll",
                 "ICSharpCode.SharpZipLib.dll":"cicdec/ICSharpCode.SharpZipLib.dll"
-            }
-        }],
-        "ts":0
-    },
-    "xfddecrunch":{
-        "p":"xfdMaster/c/xfdDecrunch",
-        "fs":[{
-            "u":"https://ftp.uni-erlangen.de/aminet/util/pack/xfdmaster.lha",
-            "x":{
-                "xfd_User/C/xfdDecrunch":"xfdMaster/c/xfdDecrunch",
-                "xfd_User/Libs":"xfdMaster/libs"
             }
         }],
         "ts":0

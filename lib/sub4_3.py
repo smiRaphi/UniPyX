@@ -97,5 +97,21 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Quantum3 DIR+WAD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(noext(i) + '.dir',endian='<')
+            fd = open(noext(i) + '.wad','rb')
+
+            c = f.readu32()
+            for _ in range(c):
+                n = f.read(0x40).rstrip(b'\0').decode('utf-8')
+                s = f.readu32()
+                fd.seek(f.readu32() * 0x800)
+                xopen(o + '/' + n,'wb').write(fd.read(s))
+
+            f.close()
+            fd.close()
+            if listdir(o): return
 
     return 1

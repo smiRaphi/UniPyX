@@ -157,6 +157,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         else: break
                 return
             return fix_tar(o)
+        case 'LZ4':
+            of = o + '\\' + tbasename(i)
+            run(['lz4','-d','-k','-f','-q',i,of])
+            if exists(of) and getsize(of): return
+        case 'FastLZ':
+            of = o + '\\' + tbasename(i)
+            run(['fastlz','d',i,of])
+            if exists(of) and getsize(of): return
         case 'Stripped TAR':
             if db.print_try: print('Trying with custom extractor')
             f = open(i,'rb')

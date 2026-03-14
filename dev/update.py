@@ -47,6 +47,7 @@ GFMTS = {
     'LuigiBlood/mfs_manager':lambda tag:f'mfs_manager_{tag}.zip',
     'sztupy/luadec51':lambda tag:f'luadec51_{tag[1:]}_win32.zip',
     'LongSoft/UEFITool':lambda tag:f'UEFIExtract_NE_{tag}_win64.zip',
+    'lz4/lz4':lambda tag:f'lz4_win64_{tag.replace(".","_")}.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
