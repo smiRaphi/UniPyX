@@ -5518,6 +5518,16 @@
             }
         }]
     },
+    "bfs2pack":{
+        "p":"bfs2pack/bfs2pack_con.exe",
+        "fs":[{
+            "u":"https://twds.dl.sourceforge.net/project/bfs2pack/bfs2pack/bfs2pack1.2/bfs2pack1.2-bin.zip?viasf=1",
+            "x":{
+                "bfspack1.2-bin/bfs2pack_con.exe":"bfs2pack/bfs2pack_con.exe",
+                "bfspack1.2-bin/zlib1.dll":"bfs2pack/zlib1.dll"
+            }
+        }]
+    },
     "uefiextract":{
         "p":"UEFIExtract.exe",
         "fs":[{

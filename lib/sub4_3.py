@@ -203,5 +203,12 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'FlatOut BFS':
+            td = TmpDir(path=o)
+            run(['bfs2pack','x',i,'-q'],cwd=td.p)
+            remove(td + '/memleaks.log',td + '/memory.log')
+            copydir(td,o,True)
+            td.destroy()
+            if listdir(o): return
 
     return 1
