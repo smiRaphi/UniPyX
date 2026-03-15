@@ -167,5 +167,41 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Red Baron VOL':
+            if not extract(i,o,'GE:Red Baron VOL'): return
+            BMSK = 0x7FFFFFFF
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'VOL '
+            ep = (f.readu32() & BMSK) + 8
+
+            soff = 0
+            fs = []
+            while f.pos < ep:
+                n = f.read(4).decode('ascii')
+                bep = (f.readu32() & BMSK) + f.pos
+                match n:
+                    case 'vols':
+                        if f.readu32(): soff = f.pos
+                    case 'voli':
+                        while f.pos < bep:
+                            fo = f.readu32()
+                            if fo != 0xFFFFFFFF: fs.append((fo,f.readu32()))
+                            else: f.skip(4)
+                            f.skip(6)
+                f.seek(bep)
+
+            for ix,fe in enumerate(fs):
+                if soff:
+                    f.seek(soff + fe[0])
+                    fn = f.read0s().decode('ascii') + '.enc'
+                else: fn = f'{ix:03d}.bin'
+                f.seek(fe[1])
+                assert f.read(4) == b'VBLK'
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32() & BMSK))
+
+            f.close()
+            if fs: return
 
     return 1

@@ -697,7 +697,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
-             'LithTech Resource'|'Doom Engine WAD'|\
+             'LithTech Resource'|'Doom Engine WAD'|'GE:Red Baron VOL'|\
              'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF':
             if db.print_try: print('Trying with gameextractor')
             import subprocess,httpx
@@ -719,7 +719,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     print(p.stdout.read().decode())
                     print(p.stderr.read().decode())
                     raise Exception('gameextractor server failed to start')
-                r = httpx.post(f'http://127.0.0.1:{port}/extract',timeout=60*3,json={'inputFilePath':i,'outputDirPath':o,'codes':{
+                r = httpx.post(f'http://127.0.0.1:{port}/extract',timeout=30 if t == 'GE:Red Baron VOL' else (60*3),json={'inputFilePath':i,'outputDirPath':o,'codes':{
                     'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
                     'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
                     'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
@@ -730,7 +730,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',
                     'Highway Pursuit HPDT':'HD_HPDT','Xenonauts PFP':'PFP_PFPK','LithTech Resource':'LPS_LITHTECH','Doom Engine WAD':'WAD_IWAD',
                     'UE3 Package':'UE3_727|UE3_648|UE3_607|UE3_584|UE3_576|UE3_575|UE3_564|UE3_547|UE3_539|UE3_512|UE3_507|UE3_871|UE3_868|UE3_807|UE3_805|UE3_451|UE3_Generic|UE3_Texture2D_Generic|UE3_Texture2D_547|UE3_Texture2D_539|UE3_Texture2D_512|UE3_Texture2D_451|UE3_Texture2D_507|UE3_Texture2D_871|UE3_Texture2D_868|UE3_Texture2D_807|UE3_Texture2D_648|UE3_Texture2D_584|UE3_Texture2D_576|UE3_Texture2D_575',
-                    'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3',
+                    'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3','GE:Red Baron VOL':'VOL_VOL',
                     'GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
                 }[t].split('|')})
                 p.kill()
