@@ -5529,6 +5529,15 @@
         }],
         "ts":0
     },
+    "amitools":{
+        "p":"amitools/__init__.py",
+        "fs":[{
+            "u":"https://github.com/cnvogelg/amitools/tree/main/amitools",
+            "github":"amitools",
+            "ts":1767126108
+        }],
+        "ts":1767126108
+    },
     "uefiextract":{
         "p":"UEFIExtract.exe",
         "fs":[{
@@ -6409,6 +6418,28 @@
             "vulkan_gpuinfo.json"
         ]],
         "ts":0
+    },
+    "ami_ks_rom_splitdata":{
+        "p":"AmiKsRomSplitData",
+        "fs":[{
+            "u":"https://web.archive.org/web/20211226154955if_/http://www.doobreynet.co.uk/files/remus/ROMsplit_1.30.lha",
+            "x":{
+                "Remus/SplitData/CD32_Ext.dat":"AmiKsRomSplitData/CD32_Ext.dat",
+                "Remus/SplitData/CD32_FMV.dat":"AmiKsRomSplitData/CD32_FMV.dat",
+                "Remus/SplitData/CDTV_Ext.dat":"AmiKsRomSplitData/CDTV_Ext.dat",
+                "Remus/SplitData/Exec44b4.dat":"AmiKsRomSplitData/Exec44b4.dat",
+                "Remus/SplitData/KS31.dat":"AmiKsRomSplitData/KS31.dat",
+                "Remus/SplitData/KS33.dat":"AmiKsRomSplitData/KS33.dat",
+                "Remus/SplitData/KS34.dat":"AmiKsRomSplitData/KS34.dat",
+                "Remus/SplitData/KS36.dat":"AmiKsRomSplitData/KS36.dat",
+                "Remus/SplitData/KS37.dat":"AmiKsRomSplitData/KS37.dat",
+                "Remus/SplitData/KS39.dat":"AmiKsRomSplitData/KS39.dat",
+                "Remus/SplitData/KS40.dat":"AmiKsRomSplitData/KS40.dat",
+                "Remus/SplitData/KS46.dat":"AmiKsRomSplitData/KS46.dat",
+                "Remus/SplitData/KS47.dat":"AmiKsRomSplitData/KS47.dat",
+                "Remus/SplitData/OSROMUpdates.dat":"AmiKsRomSplitData/OSROMUpdates.dat"
+            }
+        }]
     },
     "unrealpak_5.6.1":{
         "p":"UnrealPak/5.6.1/UnrealPak.exe",

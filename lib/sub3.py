@@ -1301,5 +1301,44 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 mv(tf.p + '.guids.csv',o + '/$GUIDs.csv')
                 copydir(tf.p + '.dump',o,True,reni=True)
                 return
+        case 'Amiga Kickstart ROM':
+            db.get('amitools')
+
+            import importlib,importlib.util
+            class RedSpec:
+                @classmethod
+                def find_spec(cls,fullname,path,target=None):
+                    if fullname.startswith('amitools.') or fullname == 'amitools':
+                        rename = 'bin.' + fullname
+                        spec = importlib.util.find_spec(rename)
+                        spec.name = fullname
+                        spec.fake = rename
+                        spec.loader = cls
+                        return spec
+                @staticmethod
+                def create_module(spec):return importlib.import_module(spec.fake) if hasattr(spec,'fake') else None
+                @staticmethod
+                def exec_module(spec):pass
+            sys.meta_path.append(RedSpec)
+
+            if db.print_try: print('Trying with amitools')
+            from bin.amitools.rom.romsplitter import RomSplitter # type: ignore
+            from bin.amitools.binfmt.hunk.BinFmtHunk import BinFmtHunk # type: ignore
+            rs = RomSplitter(db.get('ami_ks_rom_splitdata'))
+            if not rs.find_rom(i):
+                del rs
+                return 1
+            bfm = BinFmtHunk()
+
+            for e in rs.get_all_entries():
+                for opt in ((0,0,''),(1,0,'$FIX/'),(0,1,'$PTC/'),(1,1,'$FIX+PTC/')):
+                    if opt[0] and not e.extra.fixes: continue
+                    if opt[1] and not e.extra.patches: continue
+                    mkdir(o + '/' + opt[2])
+                    bfm.save_image(f'{o}/{opt[2]}{e.name}',rs.extract_bin_img(e,opt[0],opt[1]))
+
+            del rs
+            del bfm
+            if listdir(o): return
 
     return 1

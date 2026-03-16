@@ -1,6 +1,7 @@
 import json,httpx,os,subprocess,zipfile,tarfile
 from shutil import copyfile,copytree,rmtree
 from time import sleep,time
+from multiprocessing.pool import ThreadPool
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -210,14 +211,34 @@ class DLDB:
         except:
             if os.path.exists(out): os.remove(out)
             raise
-    def gh_dir(self,url,out):
+    def gh_dir(self,url,out,_first=True):
+        if _first:
+            self.ghthp = ThreadPool()
+            self.ghq = []
+
         out = out.strip('/')
         os.makedirs(out,exist_ok=True)
-        d = self.c.get(url,headers={'accept':'application/json','x-requested-with':'XMLHttpRequest'}).json()['payload']
+        d = self.c.get(url,headers={'accept':'application/json','x-requested-with':'XMLHttpRequest'}).json()
+        if 'meta' in d and 'title' in d['meta']: tit = d['meta']['title']
+        d = d['payload']
+        if not 'refInfo' in d:
+            assert 'codeViewTreeRoute' in d
+            d = d['codeViewTreeRoute']
+        if not 'repo' in d:
+            assert ' · ' in tit
+            tit = tit.rsplit(' · ',1)[1]
+            d['repo'] = {'ownerLogin':tit.split('/')[0],'name':tit.split('/')[1]}
         b = f'https://github.com/{d["repo"]["ownerLogin"]}/{d["repo"]["name"]}/tree/{d["refInfo"]["name"]}/'
         for x in d['tree']['items']:
-            if x['contentType'] == 'directory': self.gh_dir(b + x['path'],out + '/' + x['name'])
-            elif x['contentType'] == 'file': self.dl(f'https://raw.githubusercontent.com/{d["repo"]["ownerLogin"]}/{d["repo"]["name"]}/refs/heads/{d["refInfo"]["name"]}/{x["path"]}',out + '/' + x['name'])
+            if x['contentType'] == 'directory':
+                self.ghq.append(self.ghthp.apply_async(self.gh_dir,(b + x['path'],out + '/' + x['name'],False)))
+            elif x['contentType'] == 'file':
+                self.dl(f'https://raw.githubusercontent.com/{d["repo"]["ownerLogin"]}/{d["repo"]["name"]}/refs/heads/{d["refInfo"]["name"]}/{x["path"]}',out + '/' + x['name'])
+
+        if _first:
+            for x in self.ghq: x.get()
+            self.ghthp.close()
+            self.ghthp.join()
 
     def save(self):
         open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))

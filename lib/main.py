@@ -179,8 +179,6 @@ def analyze(inp:str,raw=False):
         trid.print = lambda *_,**__:None
         if not TRDB: TRDB = trid.trdpkg2defs(dirname(db.get('trid')) + '\\triddefs.trd',usecache=True)
         ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
-        _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
-        ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
     _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
@@ -194,21 +192,6 @@ def analyze(inp:str,raw=False):
             if isz: typ = 'text'
             else: typ = 'binary'
         if ('null data' in ts or 'null bytes' in ts) and typ == 'binary' and not isz: typ = 'null'
-
-    for wt in ('plain text','Plain text','ASCII text','data','null data','null bytes','directory',
-               'XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files','LLVM Bitcode (generic)','PC Paint/Pictor bitmap'
-               'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'):
-        if wt in ts: ts.remove(wt)
-    tst = []
-    for t in ts:
-        if t.startswith('Nintendo 3DS SMDH file: "'): tst.append('Nintendo 3DS SMDH file')
-        elif t.startswith(('NES ROM image (iNES): ','NES ROM image (iNES) ')): tst.append('NES ROM image (iNES)')
-        elif t.startswith('doom patch PWAD data containing'): tst.append('doom patch PWAD data')
-        elif t.startswith('Delphi compiled form \''): tst.append('Delphi compiled form')
-        elif t.startswith('cannot open ') and t.endswith(' (No such file or directory)'): pass
-        else: tst.append(t)
-    ts = tst
 
     if isfile(inp):
         f = open(inp,'rb')
@@ -244,7 +227,25 @@ def analyze(inp:str,raw=False):
                 err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
                 if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
             else: f.close()
+
+            _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
+            ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
         else: f.close()
+
+    for wt in ('plain text','Plain text','ASCII text','data','null data','null bytes','directory',
+               'XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files','LLVM Bitcode (generic)','PC Paint/Pictor bitmap'
+               'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
+               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'):
+        if wt in ts: ts.remove(wt)
+    tst = []
+    for t in ts:
+        if t.startswith('Nintendo 3DS SMDH file: "'): tst.append('Nintendo 3DS SMDH file')
+        elif t.startswith(('NES ROM image (iNES): ','NES ROM image (iNES) ')): tst.append('NES ROM image (iNES)')
+        elif t.startswith('doom patch PWAD data containing'): tst.append('doom patch PWAD data')
+        elif t.startswith('Delphi compiled form \''): tst.append('Delphi compiled form')
+        elif t.startswith('cannot open ') and t.endswith(' (No such file or directory)'): pass
+        else: tst.append(t)
+    ts = tst
 
     ts = [MSPCR.sub(' ',x.strip()) for x in ts if x.strip()]
     if any(x in ts for x in ('Commodore 64 BASIC V2 program','Commodore C64 program')):
