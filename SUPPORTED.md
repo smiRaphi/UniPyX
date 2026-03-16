@@ -1,7 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-!!!WIP!!!
-# Supported Formats: 662
+# Supported Formats: 781
 
 ## "Common" Archives/Compressors/Encodings (132)
 Name | Extension(s) | Extractor(s) | Comment
@@ -681,9 +680,10 @@ ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | * | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats ()
+## Compression Enthusiasts/One-Off Formats (119)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
+6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
 Ai | .ai | [ai](https://www.sac.sk/download/pack/ai11.zip) |
 ARHANGEL | .arh | [ARHANGEL](https://www.sac.sk/download/pack/arh140.zip) |
 B1 | .b1 | [b1-pack-tool](http://dev.b1.org/) |
@@ -697,9 +697,13 @@ BSArc | .bsa | [BSA](https://www.sac.sk/download/pack/bsa.zip) |
 bsc | .bsc | [bsc](https://github.com/IlyaGrebnov/libbsc) |
 bsc-m03 | .bsc | [bsc-m03](https://github.com/IlyaGrebnov/bsc-m03) |
 BTSPK | ??? | [BTSPK](https://www.sac.sk/download/pack/btspk.arj) |
+Density Chamleon | ??? | [density-rs](https://github.com/g1mv/density) |
+Density Cheetah | ??? | [density-rs](https://github.com/g1mv/density) |
+Density Lion | ??? | [density-rs](https://github.com/g1mv/density) |
 ChArc | ??? | [ChArc](https://www.sac.sk/download/pack/cha1-2.exe) |
 ChiefLZArchive | ??? | [LZA](https://www.sac.sk/download/pack/lza101.zip) |
 ChiefLZZ | ??? | [LZA](https://www.sac.sk/download/pack/lza101.zip) |
+CMIX | .cmix | [cmix](https://www.byronknoll.com/cmix.html) |
 CMZ | .cmz | [uncmz](https://github.com/sourcekris/uncmz) |
 Compressia | ??? | [compcl](https://web.archive.org/web/20021210174357/http://www.compressia.com:80/compcl.exe) |
 Compression Workshop | .cw | [CWUNPACK](https://github.com/geneb/CompressionWorkshop) |
@@ -711,11 +715,16 @@ Dark | ??? | [dark](https://darchiver.narod.ru/dark/dark-0.51-win.zip) |
 DGCA | ??? | [dgcac](https://web.archive.org/web/20190306080212/http://www.emit.jp/dgca/dgca_v110.zip) |
 Dzip | .dzip | [dzip](https://quake.speeddemosarchive.com/quake/downloads/dzip31.zip) |
 ESP | .esp .exe | [UNESP](https://www.sac.sk/download/pack/esp_v192.exe) |
+Fast PAQ8 | .fp8 | [fp8](https://encode.su/threads/613-FP8-(-Fast-PAQ8)) |
+Fast PAQ8 SK | .fp8sk | [fp8sk](https://encode.su/threads/3432-Fp8sk) |
 Flash | ??? | [FLASH](https://www.sac.sk/download/pack/flash100.zip) |
 Flashzip | ??? | [flashzip](https://web.archive.org/web/20250505230415/http://heartofcomp.altervista.org/flashzip.zip) |
 Fold ARK | .ark | [unfold](http://ftp.lip6.fr/pub/pc/garbo/pc/arcers/hold116e.zip) |
 Fold FOL | .fol | [unfold](http://ftp.lip6.fr/pub/pc/garbo/pc/arcers/hold116e.zip) |
+fxcm | .fxcm | [fxcm](https://github.com/kaitz/fxcm) |
+fxv | .fxv | [fxv](https://github.com/kaitz/fxv) |
 Gipfeli | .gipfeli | [gipfeli_tool](https://encode.su/threads/1609-gipfeli) |
+GMIX | .gmix | [gmix](https://github.com/byronknoll/gmix) |
 GRZip | ??? | [GRZip](https://www.sac.sk/download/pack/grzip.zip) |
 GRZipII | ??? | [GRZipII](https://www.sac.sk/download/pack/grzipiiw.zip) |
 Hamarsoft HAP | .hap | [PAH21](https://github.com/Sembiance/dexvert/blob/master/dos/PAH21PD.EXE)(src?), [PAH3](https://github.com/Sembiance/dexvert/blob/master/dos/PAH3.EXE)(src?) |
@@ -725,6 +734,7 @@ Hyper | .hyp | [HYPER](http://cd.textfiles.com/phoenix2/01d/hyper25.zip) |
 IMP | .imp | [IMP](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/imp/imp112.zip)(src?) |
 JAR | .jar | [JAR](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/j/jar102x.zip)(src?) |
 Kanzi | .knz .kanz .kanzi | [Kanzi](https://github.com/flanglet/kanzi-cpp) |
+Li-GRU | .ligru_v0_90 .ligru_v0_91 .ligru_v0_92 | [ligru-compress](https://encode.su/threads/4370-The-new-kid-on-the-block-ligru-compress-an-experimental-file-compressor) |
 LIMIT | .limit .lim | [LIMIT](http://cd.textfiles.com/nightowl/nopv13/014A/LIMIT12.ZIP) |
 Lizard | .lz .liz | [Lizard](https://github.com/inikep/lizard) |
 LZFSE | ??? | [lzfse](https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe)(src?) |
@@ -737,7 +747,30 @@ mcm | .mcm | [mcm](https://encode.su/threads/2127-MCM-LZP), [mcmsk](https://enco
 NanoZip | .nz .nzip | [nz](https://web.archive.org/web/20160304180916/http://nanozip.net/) |
 NLZM | .nlzm | [NLZM](https://github.com/nauful/NLZM) |
 OpenZL | .zli | [zli](https://github.com/facebook/openzl) |
+P5 | .p5 | [p5](https://mattmahoney.net/dc/paq.html#neural) |
+P6 | .p6 | [p6](https://mattmahoney.net/dc/paq.html#neural) |
+P12 | .p12 | [p12a](https://mattmahoney.net/dc/paq.html#neural) |
+PAQ1 | .pq1 | [PAQ1](https://mattmahoney.net/dc/paq.html#paq1) |
+PAQ2 | .pq2 | [PAQ2](https://mattmahoney.net/dc/paq.html#paq2) |
+PAQ3 | .pq3 | [PAQ3](https://mattmahoney.net/dc/paq.html#paq3) |
+PAQ4 | .pq4 | [PAQ4](https://mattmahoney.net/dc/paq.html#paq4) |
+PAQ5 | .pq5 | [PAQ5](https://mattmahoney.net/dc/paq.html#paq5) |
+PAQ8F | .paq8f | [PAQ8F](https://mattmahoney.net/dc/paq.html#paq8) |
+PAQ8GEN | .paq8gen | [PAQ8GEN](https://github.com/GotthardtZ/paq8gen) |
+PAQ8K | .paq8k | [PAQ8K](https://encode.su/threads/296-PAQ8K) |
+PAQ8KX | .paq8kx | [PAQ8KX](https://encode.su/threads/296-PAQ8K?p=8370&viewfull=1#post8370) |
+PAQ8L | .paq8l | [PAQ8L](https://mattmahoney.net/dc/#paq) |
+PAQ8N | .paq8n | [PAQ8N](https://mattmahoney.net/dc/#paq) |
+PAQ8O | .paq8o | [PAQ8O](https://mattmahoney.net/dc/#paq) |
+PAQ8P | .paq8p | [PAQ8P](https://mattmahoney.net/dc/#paq) |
+PAQ8P3X | .paq8p3x | [PAQ8P3X](https://encode.su/threads/342-paq8px/page5) |
+PAQ8PF | .paq8pf | [PAQ8PF](https://encode.su/threads/457-PAQ8PF) |
+PAQ8PX | .paq8px | [PAQ8PX](https://encode.su/threads/342-paq8px) |
+PAQ8PXKZU | .paq8pxkzu | [PAQ8PXKZU](https://encode.su/threads/1382-paq8px_v69kzu) |
+PAQ8PXV | .paq8pxv | [PAQ8PXV](https://github.com/kaitz/paq8pxv) |
+PAQ8SK | .paq8sk | [PAQ8SK](https://encode.su/threads/3371-Paq8sk) |
 PPMd | .pmd | [ppmd](https://mattmahoney.net/dc/PPMd.exe) |
+Precomp | ??? | [precomp](https://github.com/schnaader/precomp-cpp) |
 qbp | .qbp | [qbp](https://github.com/asimba/qbp) |
 QUAD | .quad | [QUAD](https://sourceforge.net/project/quad/) |
 QuARK | ??? | [QUARK](http://old-dos.ru/dl.php?id=488)(src?) |
@@ -762,5 +795,10 @@ Yappy | .yap | [yappy](http://nishi.dreamhosters.com/u/yappy_v0.rar)(src?) |
 YBS | .ybs | [ybs](https://compression.ru/compression.ru/ybs/ybs003fw.zip)(src?) |
 ZCM | .zcm | [ZCM](https://web.archive.org/web/20250219173903/http://heartofcomp.altervista.org/zcm093.zip) |
 Zhuff | .zh .zhuff | [Zhuff](https://web.archive.org/web/20161227114805/https://dl.dropboxusercontent.com/u/59565338/Zhuff/Zhuffv099beta.zip)(src?) |
+ZX0 | .zx0 | [dzx0](https://github.com/einar-saukas/ZX0) |
+ZX1 | .zx1 | [dzx1](https://github.com/einar-saukas/ZX1) |
+ZX2 | .zx2 | [dzx2](https://github.com/einar-saukas/ZX2) |
+ZX5 | .zx5 | [dzx5](https://github.com/einar-saukas/ZX5) |
+ZX7 | .zx7 | [dzx7](https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7) |
 ZXC | .zxc | [zxc](https://github.com/hellobertrand/zxc) |
 Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives.damiendebin.net/zzip/files/zzip-win32.zip) |
