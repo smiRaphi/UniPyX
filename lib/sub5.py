@@ -177,9 +177,13 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['zhuff','-d','-s',i,of])
             if exists(of) and getsize(of): return
-        case 'BriefLZ'|'QUAD':
+        case 'BriefLZ':
             of = o + '/' + tbasename(i)
-            run([t.lower(),'-d',i,of])
+            run(['blzpack','-d',i,of])
+            if exists(of) and getsize(of): return
+        case 'QUAD':
+            of = o + '/' + tbasename(i)
+            run(['quad','-d',i,of])
             if exists(of) and getsize(of): return
         case 'UltraCompressor 2': raise NotImplementedError
         case 'LZFSE':

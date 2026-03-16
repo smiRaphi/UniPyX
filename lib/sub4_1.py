@@ -54,7 +54,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if offs: return
         case 'PS3 Theme':
-            raise NotImplementedError # https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php
+            raise NotImplementedError
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='>')

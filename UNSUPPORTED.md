@@ -23,6 +23,11 @@ Specnaz UFF/BFS | ? | ? | ? | ? | already detected
 Metroid Prime 4 Save | ? | MP4 | ? | ? | already detected
 One Piece Battle Adventure APF FSM | .apf | One Piece Battle Adventure | ? | ? | already detected
 Import Tuner Challenge TOC+DAT | .toc+.dat | Import Tuner Challenge Xbox 360 | ? | ? | already detected, custom, need to figure out UCL diviation
+PS3 Theme | .p3t | ? | ? | https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php | already detected
+HMM Encrypted Snapshot | ? | ? | https://github.com/thesupersonic16/HedgeModManager | https://github.com/thesupersonic16/HedgeModManager/blob/rewrite/HedgeModManager/CLI/Commands/CliCommandDecrypt.cs<br>https://github.com/thesupersonic16/HedgeModManager/blob/rewrite/HedgeModManager/CryptoProvider.cs#L76 | already detected, needs private key
+Batman AC Resource | .exe | Batman AC | https://wiki.osdev.org/NE | ? | already detected
+UltraCompressor 2 | .uc2 | ? | ? | ? | already detected
+ELI 5750 | ? | ? | ? | ? | already detected
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

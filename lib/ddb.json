@@ -798,7 +798,7 @@
     },
     {
         "d":[["n0",4,0],["n0",4,4],["n0",4,8],["str0",16,12,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');f.seek(8);return (4+c*0x18)==int.from_bytes(f.read(4),'big')"]],
-        "rs":"Nintend Puzzle Archive"
+        "rs":"Nintendo Puzzle Archive"
     },
     {
         "d":[["isin",["YB\\x01\\0","YB\\x02\\0","YB\\x03\\0","YB\\x04\\0","YB\\x05\\0","YB\\x06\\0","YB\\x07\\0","YB\\x08\\0","YB\\x09\\0","YB\\x0A\\0",

@@ -1102,7 +1102,6 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Batman AC Resource':
             raise NotImplementedError
-            # https://wiki.osdev.org/NE
             if db.print_try: print('Trying with custom extractor')
             from lib.file import EXE
             f = EXE(i)

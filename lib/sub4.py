@@ -2227,7 +2227,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
             return
         case 'Encrypted Rclone Config': raise NotImplementedError
-        case 'Nintend Puzzle Archive':
+        case 'Nintendo Puzzle Archive':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='>')
