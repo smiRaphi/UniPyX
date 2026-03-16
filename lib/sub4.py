@@ -112,7 +112,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 td.destroy()
                 return
             td.destroy()
-        case 'F-Zero G/AX .lz':
+        case 'F-Zero G/AX LZ':
             td = TmpDir()
             tf = td + '/file.lz'
             symlink(i,tf)
@@ -189,7 +189,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['ctpktool','-efd',i,o])
             if listdir(o): return
         case 'XBP': return quickbms('xbp')
-        case 'Bezel Archive': return quickbms('bea')
+        case 'Bezel Archive': return quickbms('vroom_scne')
         case 'PlayStation Archive':
             run(['psarc','extract','--input='+i,'--to='+o])
             if listdir(o): return
@@ -335,17 +335,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Allegro DAT':
             run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
             if listdir(o): return
-        case 'Doom WAD':
-            osj = OSJump()
-            osj.jump(o)
-            run(['wadext',i,'-nogfxconvert','-nosndconvert'])
-            osj.back()
-            if listdir(o) and listdir(o + '/' + listdir(o)[0]):
-                td = o + '/' + listdir(o)[0]
-                while exists(td):
-                    try: copydir(td,o,True)
-                    except PermissionError:pass
-                return
         case 'Glacier RPKG':
             run(['rpkg','-extract_from_rpkg',i,'-output_path',o])
             if listdir(o) and listdir(o + '/' + listdir(o)[0]):
@@ -424,11 +413,22 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     return
             td.destroy()
         case 'Unreal ZenLoader':
-            if '/Content/' in i.split()[-1].replace('\\','/'): prgf = dirname(i.replace('\\','/').rsplit('/Content/',1)[0]) + '/Engine/Programs'
-            else: prgf = None
-            run(['unrealpak',i,'-Extract',o])
-            if prgf and exists(prgf): remove(prgf)
-            if listdir(o): return
+            td = TmpDir()
+            tds = td + '\\s\\s'
+            mkdir(tds)
+
+            for v in ('5.6.1','4.27.2','4.26.2','4.25.4','4.24.3','4.22.3','4.21.2','4.20.3','4.19.2','4.12.0','4.27.0','4.25.3'):
+                v = 'unrealpak_' + v
+                std = TmpDir(path=tds)
+                for f in rldir(dirname(db.get(v))): symlink(f,std.p + '\\' + basename(f))
+
+                if db.print_try: print('Trying with',v)
+                run([std + '\\UnrealPak.exe',i,'-Extract',o],cwd=std.p,print_try=False)
+                std.destroy()
+                if listdir(o):
+                    td.destroy()
+                    return
+            td.destroy()
 
             run(['zentools','ExtractPackages',dirname(i),o,'-PackageFilter=' + i])[1]
             remove(o + '/PackageStoreManifest.json')
@@ -637,7 +637,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['msdos',db.get('wpack'),i],print_try=False,cwd=o)
             if listdir(o): return
         case 'RPACK':
-            if db.print_try: print('Trying with custom extractor') # https://github.com/Qivex/rpack-extract/blob/main/rpack-extract.lua
+            if db.print_try: print('Trying with custom extractor')
             raise NotImplementedError
             from lib.file import File
 
@@ -2068,7 +2068,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.close()
             if s: return
         case 'HAL Switch CMP': return quickbms('kirbyswitch-decompress')
-        case 'HAL YAML': raise NotImplementedError # https://github.com/firubii/KirbyLib/blob/main/KirbyLib/Yaml.cs
+        case 'HAL YAML': raise NotImplementedError
         case 'Dr. Luigi ZALZ':
             from multiprocessing.pool import ThreadPool
             f = open(i,'rb')
@@ -2226,7 +2226,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             except: return 1
             open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
             return
-        case 'Encrypted Rclone Config': raise NotImplementedError # https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/obscure/obscure.go#L19 https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/crypt.go#L74
+        case 'Encrypted Rclone Config': raise NotImplementedError
         case 'Nintend Puzzle Archive':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

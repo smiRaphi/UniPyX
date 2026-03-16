@@ -708,7 +708,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'BinSCII':
             tf = TmpFile('.bsc')
             open(tf.p,'wb').write(b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + open(i,'rb').read().split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
-            r = extract1(tf.p,o,'DIET')
+            r = extract1(tf.p,o,'DIET') # deark
             tf.destroy()
             return r
         case 'Compaq QRST IMG'|'CopyQM IMG'|'FDCOPY CFI IMG':

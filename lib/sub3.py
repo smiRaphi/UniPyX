@@ -25,7 +25,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             jsm._smartsplit = jsm.smartsplit
             jsm.smartsplit = lambda x: [ast.literal_eval('"' + x.replace('"','\\"') + '"') for x in jsm._smartsplit(x)]
 
-        d = open(i,encoding='utf-8').read()
+        d = open(inf,encoding='utf-8').read()
         jsm.detect(d)
         try: d = jsm.unpack(d)
         except Exception as e:
@@ -71,7 +71,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
             d = '\n'.join(d)
 
-        open(o + '/' + tbasename(i) + '.js','w',encoding='utf-8').write(d)
+        open(oup + '/' + tbasename(inf) + '.js','w',encoding='utf-8').write(d)
         if d: return
     def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
         scr = cmd[0]
@@ -598,12 +598,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK'|\
              'PKTINY':
-            r = extract(i,o,'624')
+            r = extract(i,o,'624') # cup386
             if not r: return r
             remove(o)
             mkdir(i)
 
-            r = extract(i,o,'COMPACK')
+            r = extract(i,o,'COMPACK') # unp
             if not r: return r
         case 'PKLITE'|'LZEXE'|'EXEPACK':
             od = rldir(o)
@@ -832,9 +832,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'd0lLZ 3': raise NotImplementedError
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
-            import lz4.block # type: ignore
-            open(o + '/' + basename(i),'wb').write(lz4.block.decompress(open(i,'rb').read()[8:]))
-            return
+            tf = TmpFile('.lz4',path=o)
+            open(tf.p,'wb').write(open(i,'rb').read()[8:])
+            of = o + '\\' + basename(i)
+            run(['lz4','-d','-k','-f','-q',tf,of])
+            tf.destroy()
+            if exists(of) and getsize(of): return
         case 'JS P.A.C.K.E.R.': return jsbeautifier('packer')
         case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
         case 'JavaScriptObfuscator': return jsbeautifier('jsobfuscator')

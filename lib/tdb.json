@@ -247,9 +247,6 @@
     "LEGO JAM":[
         "lego racers game data archive"
     ],
-    "Doom WAD":[
-        "id software's doom internal-wad"
-    ],
     "SARC":[
         "mii maker data archive"
     ],
@@ -1390,7 +1387,8 @@
     ],
     "Doom Engine WAD":[
         "doom patch pwad data",
-        "id software's doom patch-wad"
+        "id software's doom patch-wad",
+        "id software's doom internal-wad"
     ],
     "SharkPortSave":[
         "sharkport file"

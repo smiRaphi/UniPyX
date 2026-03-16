@@ -711,8 +711,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if not extract(i,o,'DIET'):return # deark 
 
             return extract2(i,o,'C64 Tape')
-        case 'Playdate Container':
-            raise NotImplementedError # https://github.com/rarenight/pdx-decrypt/blob/main/pdx-decrypt.py
+        case 'Playdate Container': raise NotImplementedError
         case 'PlayStation APA IMG':
             tf = TmpFile('.tar',path=o)
             run(['pfs2tar','--backup',i,tf])

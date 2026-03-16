@@ -19,7 +19,6 @@ GFMTS = {
     'mamedev/mame':lambda tag:f'{tag}b_x64.exe',
     'Maschell/JWUDTool':lambda tag:f'JWUDTool-{tag}.jar',
     'ch-mcl/PS2_RidgeRacerV_ArchiveTool':lambda tag:f'{tag}.zip',
-    'ZDoom/wadext':lambda tag:f'wadext_win32_{tag}.zip',
     'glacier-modding/RPKG-Tool':lambda tag:f'rpkg_{tag}-cli.zip',
     'lifenjoiner/ISx':lambda tag:f'ISx-{tag}.7z',
     'activescott/lessmsi':lambda tag:f'lessmsi-{tag}.zip',
@@ -266,4 +265,5 @@ if __name__ == '__main__':
             elif len(argv[2]) == 23 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == ' ' and argv[2][13] == argv[2][16] == ':' and argv[2][19:] == ' UTC': print(ft(argv[2],'%Y-%m-%d %H:%M:%S UTC'))
             elif len(argv[2]) == 24 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == '.' and argv[2][23] == 'Z': print(ft(argv[2].split('.')[0],'%Y-%m-%dT%H:%M:%S'))
             elif len(argv[2]) == 10 and argv[2][2] == argv[2][5] == '/': print(ft(argv[2],'%m/%d/%Y'))
+            elif len(argv[2]) == 10 and argv[2][4] == argv[2][7] == '-': print(ft(argv[2],'%Y-%m-%d'))
     else: update()

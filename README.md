@@ -3,8 +3,12 @@
 ---
 Usage: `python unipyx.py <input> [<output dir>]`
 
-Requires a somewhat new version of python (I've only tested old versions on 3.11, newer ones on 3.13 & current ones on 3.14 and everything on windows).
+Requires a somewhat new version (3.10+) of python (I've only tested old versions on 3.11, newer ones on 3.13 & current ones on 3.14 and everything on windows).
 If you're on a python version below 3.14 you'll have to install the ZSTD backport library: `pip install backports.zstd`
+
+!!!WIP!!!: [Supported Formats](./SUPPORTED.md) (298)
+
+[Unsupported Formats/TODOs](./UNSUPPORTED.md)
 
 ## Included tools
 * self compiled [file-windows v5.46](https://github.com/ember91/file-windows)

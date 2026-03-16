@@ -1388,7 +1388,7 @@ def extract4_2(inp:str,out:str,t:str):
             for ix in range(fc): of.write(f'{ix}: {f.read(4).hex().upper()}\n')
             of.close()
             if fc: return
-        case 'Metroid Prime 4 Save': raise NotImplementedError()
+        case 'Metroid Prime 4 Save': raise NotImplementedError
         case 'Lucas Learning DAT':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
