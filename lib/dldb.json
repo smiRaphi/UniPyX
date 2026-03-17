@@ -5529,6 +5529,24 @@
         }],
         "ts":0
     },
+    "pefile":{
+        "p":"pefile/pefile.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/erocarrera/pefile/refs/heads/master/pefile.py",
+            "pefile/pefile.py"
+        ],{
+            "u":"https://github.com/erocarrera/pefile/tree/master/ordlookup",
+            "github":"pefile/ordlookup"
+        }],
+        "ts":1773693165
+    },
+    "dnfile":{
+        "p":"dnfile/__init__.py",
+        "fs":[{
+            "u":"https://github.com/malwarefrank/dnfile/tree/master/src/dnfile",
+            "github":"dnfile"
+        }]
+    },
     "amitools":{
         "p":"amitools/__init__.py",
         "fs":[{

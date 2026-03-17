@@ -1340,5 +1340,42 @@ def extract3(inp:str,out:str,t:str) -> bool:
             del rs
             del bfm
             if listdir(o): return
+        case '.NETZ':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File,ext_exe
+            e = ext_exe(i,db,dotnet=True)
+            assert len(e.net.resources) == 1 and e.net.resources[0].name == 'app.resources'
+
+            ffn = e.FileInfo[0][1].StringTable[0].entries[b'OriginalFilename'].decode('utf-8')
+            # dnfile's resource parser seems to be broken?
+            f = File(e.net.resources[0].data._data,endian='<')
+            e.close()
+
+            assert f.read(4) == b'\xCE\xCA\xEF\xBE'
+            f.skip(4)
+            f.skip(f.readu32())
+            f.skip(4)
+            c = f.readu32()
+            assert f.readu32() == 0
+            f.alignpos(8)
+            f.skip(4*c)
+            nos = [f.readu32() for _ in range(c)]
+            bo = f.readu32()
+            sbo = f.pos
+
+            fs = []
+            for no in nos:
+                f.seek(sbo + no)
+                fs.append((f.read(f.readleb128u()).decode('utf-16le'),f.readu32()))
+
+            for ix,fe in enumerate(fs):
+                f.seek(bo + fe[1] + 1)
+                d = f.read(f.readu32())
+                xopen(o + '/' + (ffn if ix == 0 else fe[0].replace('!1',' ').replace('!2',',').replace('!3','.Resources').replace('!4','Culture').split(',')[0] + '.dll'),
+                      'wb').write(zlib.decompress(d))
+
+            del f
+            if listdir(o): return
 
     return 1
