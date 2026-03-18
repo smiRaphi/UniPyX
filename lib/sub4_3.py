@@ -260,5 +260,45 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case '3D Ultra Cool TBVolume':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(9) == b'TBVolume\0'
+
+            f.skip(2)
+            c = f.readu16()
+            f.skip(4)
+            open(o + '/$description.txt','w',encoding='utf-8').write(f.read(0x18).rstrip(b'\0').decode('ascii'))
+
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append(f.readu32())
+            for of in fs:
+                f.seek(of)
+                fn = f.read(0x18).rstrip(b'\0').decode('ascii')
+                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+
+            f.close()
+            if fs: return
+        case '3D Ultra Cool PKX':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PKX:'
+
+            f.skip(8)
+            ct = f.readu32()
+            s = f.readu32()
+            ds = f.readu32()
+
+            if ct in (0x101,0x102):
+                db.get('lzo')
+                import bin.lzo as lzo # type: ignore
+                d = lzo.decompress(f.read(s),False,ds,algorithm=(0,'LZO1X','LZO1Y')[ct & 0xFF]) # header, buflen
+            else: raise NotImplementedError(hex(ct))
+            xopen(o + '/' + basename(i),'wb').write(d)
+            return
 
     return 1

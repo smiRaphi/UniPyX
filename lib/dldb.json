@@ -5498,6 +5498,15 @@
         "name":"backports.zstd",
         "old":true
     },
+    "lzo":{
+        "p":"lzo.cp314-win_amd64.pyd",
+        "fs":[{
+            "u":".",
+            "x":{
+                "lzo.cp314-win_amd64.pyd":"lzo.cp314-win_amd64.pyd"
+            }
+        }]
+    },
     "pefile":{
         "pip":"pefile"
     },

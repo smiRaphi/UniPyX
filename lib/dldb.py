@@ -4,7 +4,7 @@ BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.makedirs(BDIR + '\\bin\\pip',exist_ok=True)
 sys.path.insert(0,BDIR + '\\bin\\pip')
 def pip(*pkgs):
-    subprocess.run([sys.executable,'-m','pip','install'] + list(pkgs) + ['-U','-t',BDIR + '\\bin\\pip'],stdout=-3,stderr=-2)
+    return subprocess.run([sys.executable,'-m','pip','install'] + list(pkgs) + ['-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2).stdout.decode()
 
 try: import httpx
 except ImportError:
@@ -42,11 +42,16 @@ class DLDB:
         else: self.udb = {}
         if not 'httpx' in self.udb: self.udb['httpx'] = int(time())
 
+        self.piptries = {}
         class DLDBPip:
             @classmethod
             def find_spec(cls,fullname,path,target=None):
                 n = fullname.split('.')[0]
-                if n in self.pdb: return importlib.util.find_spec(self.pip(n,True).get('name',n))
+                if n in self.pdb:
+                    if n in self.piptries:
+                        print(self.piptries[n])
+                        raise Exception('pip Import Error')
+                    return importlib.util.find_spec(self.pip(n,True).get('name',n))
         class DLDBPipUpdate:
             @classmethod
             def find_spec(cls,fullname,path,target=None):
@@ -272,8 +277,9 @@ class DLDB:
     def pip(self,n:str,install=False) -> dict:
         e = self.pdb[n]
         if n in self.udb and self.udb[n] > e.get('ts',0) and not install: return e
+        print('Downloading',n)
         t = int(time())
-        pip(e['pip'])
+        self.piptries[n] = pip(e['pip'])
         self.udb[n] = t
         self.save()
         return e

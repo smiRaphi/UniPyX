@@ -324,6 +324,8 @@ Name | Extension(s) | Extractor(s) | Comment
 1941 Frozen Front Data | ??? | Custom |
 1941 Frozen Front Lang | ??? | Custom |
 1nsane Game Archive | ??? | Custom |
+3D Ultra Cool TBVolume | .tbv | Custom |
+3D Ultra Cool PKX | * | Custom |
 7 Studios FS | .fs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Across Crossword Puzzle | .puz | Custom |
 Action Replay RAM Disk | ??? | Custom |

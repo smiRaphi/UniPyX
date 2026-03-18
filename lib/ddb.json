@@ -1119,6 +1119,14 @@
         "rs":"NSMBW Coin World ARC","s":1
     },
     {
+        "d":[["isat","TBVolume\\0",0],["isat","RichRayl@CUC",17],["isatS","\\0",12,29],["n0",2,10]],
+        "rs":"3D Ultra Cool TBVolume","s":1
+    },
+    {
+        "d":[["isat","PKX:",0],["isin",["\\x01\\x01\\0\\0","\\x02\\x01\\0\\0"],12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);return (int.from_bytes(f.read(4),'little')+24)==s"]],
+        "rs":"3D Ultra Cool PKX","s":1
+    },
+    {
         "d":[["isat","\\x34\\x12\\x00\\x02",0],["isat","\\0\\0\\0",5],["isat",":\\0",13],["n0",4,8]],
         "rs":"London Racer Destruction Madness WAD","s":1
     },
