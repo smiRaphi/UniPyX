@@ -138,7 +138,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'ZSTD':
             if db.print_try: print('Trying with compression.zstd')
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: from backports import zstd # type: ignore
+            else: import backports_zstd as zstd # type: ignore
             of = o + '\\' + tbasename(i)
             d = zstd.decompress(open(i,'rb').read())
             xopen(of,'wb').write(d)
@@ -165,9 +165,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
             xopen(of,'wb').write(d)
             if d: return
         case 'LZ4':
-            of = o + '\\' + tbasename(i)
-            run(['lz4','-d','-k','-f','-q',i,of])
-            if exists(of) and getsize(of): return
+            import lz4.block
+            try: d = lz4.block.decompress(open(i,'rb').read())
+            except: return 1
+            xopen(o + '/' + tbasename(i),'wb').write(d)
+            return
         case 'FastLZ':
             of = o + '\\' + tbasename(i)
             run(['fastlz','d',i,of])

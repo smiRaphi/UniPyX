@@ -1,7 +1,7 @@
 import os
 if __name__ == '__main__':
     print('UniPyX')
-    from sys import argv
+    from sys import argv,exit
 
     if argv[1:] == ['-clean']:
         import re
@@ -21,6 +21,12 @@ if __name__ == '__main__':
                     else: rmtree(p + '/' + y)
                 if not os.listdir(p): os.rmdir(p)
 
+        exit()
+    elif argv[1:] == ['-pip']:
+        from lib.dldb import DLDB
+        db = DLDB()
+        for x in db.pdb:
+            if not db.pdb[x].get('old'): db.pip(x)
         exit()
 
     scan = '-os' in argv

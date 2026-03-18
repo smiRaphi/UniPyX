@@ -600,8 +600,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Hollow Knight Save':
             if db.print_try: print('Trying with custom extractor')
-            try: from Cryptodome.Cipher import AES # type: ignore
-            except ImportError: from Crypto.Cipher import AES # type: ignore
+            from Cryptodome.Cipher import AES
             from base64 import b64decode
 
             f = open(i,'rb')
@@ -616,13 +615,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['assamunpack',i],cwd=o)
             if listdir(o): return
         case 'Safari WebArchive':
-            db.get('pywebarchive')
             if db.print_try: print('Trying with pywebarchive')
-            import bin.webarchive # type: ignore
+            import webarchive # type: ignore
 
             try:
-                with bin.webarchive.open(i) as f: f.extract(o + '/' + tbasename(i) + '.html',False)
-            except bin.webarchive.WebArchiveError: pass
+                with webarchive.open(i) as f: f.extract(o + '/' + tbasename(i) + '.html',False)
+            except webarchive.WebArchiveError: pass
             else: return
         case 'WIM':
             run(['wimlib','apply',i,o])
@@ -1110,43 +1108,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
             if fs: return
         case 'RouterOS Package':
-            db.get('npkpy')
-
-            import importlib,importlib.util,zlib
-            class RedSpec:
-                @classmethod
-                def find_spec(cls,fullname,path,target=None):
-                    if '.npk.' in fullname: rename = fullname.replace('.npk.','.')
-                    elif fullname == 'npkpy.npk': rename = 'npkpy'
-                    elif fullname == 'bin.npkpy._npk': rename = 'bin.npkpy.npk'
-                    elif fullname.startswith('npkpy'): rename = fullname
-                    else: rename = None
-                    if rename:
-                        if rename.startswith('npkpy.') or rename == 'npkpy': rename = 'bin.' + rename
-                        spec = importlib.util.find_spec(rename)
-                        spec.name = fullname
-                        spec.fake = rename
-                        spec.loader = cls
-                        return spec
-                @staticmethod
-                def create_module(spec):return importlib.import_module(spec.fake) if hasattr(spec,'fake') else None
-                @staticmethod
-                def exec_module(spec):pass
-            sys.meta_path.append(RedSpec)
-
-            class Empty:pass
-            com = Empty()
-            com.sha1_sum_from_file = lambda x: hashlib.sha1(open(x,'rb').read()).digest()
-            com.sha1_sum_from_binary = lambda x: hashlib.sha1(x).digest()
-            for e in ('','Id','MagicBytes'): setattr(com,f'NPK{e}Error',Exception)
-
-            sys.modules['npkpy.npk'] = __import__('bin.npkpy')
-            sys.modules['npkpy.common'] = com
-
             from pathlib import Path
-
             if db.print_try: print('Trying with npkpy')
-            from bin.npkpy._npk import Npk # type: ignore
+            from npkpy.npk import Npk
 
             try: npk = Npk(Path(i))
             except: return 1
@@ -1278,8 +1242,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'BackupMii NAND Image':
             if db.print_try: print('Trying with custom extractor')
-            try: from Cryptodome.Cipher import AES # type: ignore
-            except ImportError: from Crypto.Cipher import AES # type: ignore
+            from Cryptodome.Cipher import AES
 
             if getsize(i) == 0x400:
                 i = dirname(i) + '/nand.bin'

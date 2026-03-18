@@ -475,12 +475,8 @@ def extract4_1(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             import zipfile
             from lib.file import File
-            try:
-                from Cryptodome.PublicKey import RSA # type: ignore
-                from Cryptodome.Cipher import PKCS1_v1_5 # type: ignore
-            except ImportError:
-                from Crypto.PublicKey import RSA # type: ignore
-                from Crypto.Cipher import PKCS1_v1_5 # type: ignore
+            from Cryptodome.PublicKey import RSA
+            from Cryptodome.Cipher import PKCS1_v1_5
 
             rsa = RSA.construct((0xd597f61ca364a25af50832a5e18e855a426532ee9210729cd6555394736da2dd52269c2a096f622a4dedf3498e1a1b2fe107366445f6234c8a9912e6727092017a019dec984e5136c935a3d67238889bf5c7c3d358f88c6439db9635e3eab0088b36c6a08803c7fc6699f20e0a221a4b973b0360869c81eefb22c39731b98015,
                                  0x10001))
@@ -489,9 +485,7 @@ def extract4_1(inp:str,out:str,t:str):
             key = PKCS1_v1_5.new()
         case 'JDownloader2 Encrypted Subconfig'|'JDownloader2 Encrypted Accounts':
             if db.print_try: print('Trying with custom extractor')
-            try: from Cryptodome.Cipher import AES # type: ignore
-            except ImportError: from Crypto.Cipher import AES # type: ignore
-
+            from Cryptodome.Cipher import AES
             if t == 'JDownloader2 Encrypted Subconfig':k = b'\x01\x02\x11\x01\x01T\x01\x01\x01\x01\x12\x01\x01\x01"\x01'
             elif t == 'JDownloader2 Encrypted Accounts':k = b'\x01\x06\x04\x05\x02\x07\x04\x03\x0c=\x0eK\xfe\xf9\xd4!'
 
@@ -1119,8 +1113,7 @@ def extract4_1(inp:str,out:str,t:str):
             assert hsh in bdb
             key = bdb[hsh]
 
-            try: from Crypto.Cipher import AES # type: ignore
-            except ImportError: from Cryptodome.Cipher import AES # type: ignore
+            from Cryptodome.Cipher import AES
             from lib.file import File
             f = File(i,endian='<')
 

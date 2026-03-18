@@ -1,9 +1,20 @@
-import json,httpx,os,subprocess,zipfile,tarfile
+import sys,os,subprocess
+
+BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.makedirs(BDIR + '\\bin\\pip',exist_ok=True)
+sys.path.insert(0,BDIR + '\\bin\\pip')
+def pip(*pkgs):
+    subprocess.run([sys.executable,'-m','pip','install'] + list(pkgs) + ['-U','-t',BDIR + '\\bin\\pip'],stdout=-3,stderr=-2)
+
+try: import httpx
+except ImportError:
+    pip('httpx')
+    import httpx
+
+import json,zipfile,tarfile,importlib.util
 from shutil import copyfile,copytree,rmtree
 from time import sleep,time
 from multiprocessing.pool import ThreadPool
-
-BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def gtmp(suf=''): return os.getenv('TEMP').strip('\\') + '\\tmp' + os.urandom(8).hex() + suf
 def xopen(f:str,m='r',encoding='utf-8'):
@@ -22,9 +33,28 @@ class DLDB:
         self.udbp = 'bin/updb.json'
         self.c = httpx.Client()
         self.print_try = False
+
         self.db = json.load(xopen(self.dbp))
+        self.pdb = {x:self.db[x] for x in self.db if 'pip' in self.db[x]}
+        for x in self.pdb: self.db.pop(x)
+
         if os.path.exists(self.udbp): self.udb = json.load(xopen(self.udbp))
         else: self.udb = {}
+        if not 'httpx' in self.udb: self.udb['httpx'] = int(time())
+
+        class DLDBPip:
+            @classmethod
+            def find_spec(cls,fullname,path,target=None):
+                n = fullname.split('.')[0]
+                if n in self.pdb: return importlib.util.find_spec(self.pip(n,True).get('name',n))
+        class DLDBPipUpdate:
+            @classmethod
+            def find_spec(cls,fullname,path,target=None):
+                n = fullname.split('.')[0]
+                if n in self.udb and n in self.pdb and self.udb[n] < self.pdb[n].get('ts',0): self.pip(n)
+
+        sys.meta_path.append(DLDBPip)
+        sys.meta_path.insert(1,DLDBPipUpdate)
 
     def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,print_out=False,**kwargs) -> tuple[int,str|bytes,str|bytes]:
         if print_try and self.print_try: print('Trying with',cmd[0])
@@ -68,12 +98,12 @@ class DLDB:
             cd = os.getcwd()
             os.chdir(BDIR)
             exi = self.db[exe]
-            t = int(time())
             if exe in self.udb and self.udb[exe] < exi.get('ts',0) and os.path.exists('bin/' + exi['p']):
                 if os.path.isdir('bin/' + exi['p']): rmtree('bin/' + exi['p'])
                 else: os.remove('bin/' + exi['p'])
             if exi.get('fs',1) == None: os.makedirs('bin/' + exi['p'],exist_ok=True)
             if not os.path.exists('bin/' + exi['p']):
+                t = int(time())
                 up = True
                 print('Downloading',exe)
                 for e in exi['fs']:
@@ -105,8 +135,8 @@ class DLDB:
                             if os.path.exists('bin/' + d):
                                 if os.path.isdir('bin/' + d): rmtree('bin/' + d)
                                 else: os.remove('bin/' + d)
+                self.udb[exe] = t
             exei = os.path.abspath('bin/' + exi['p'])
-            self.udb[exe] = t
             self.save()
             os.chdir(cd)
         return exei,up
@@ -239,6 +269,14 @@ class DLDB:
             for x in self.ghq: x.get()
             self.ghthp.close()
             self.ghthp.join()
+    def pip(self,n:str,install=False) -> dict:
+        e = self.pdb[n]
+        if n in self.udb and self.udb[n] > e.get('ts',0) and not install: return e
+        t = int(time())
+        pip(e['pip'])
+        self.udb[n] = t
+        self.save()
+        return e
 
     def save(self):
         open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))

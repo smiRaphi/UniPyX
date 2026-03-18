@@ -832,12 +832,11 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'd0lLZ 3': raise NotImplementedError
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
-            tf = TmpFile('.lz4',path=o)
-            open(tf.p,'wb').write(open(i,'rb').read()[8:])
-            of = o + '\\' + basename(i)
-            run(['lz4','-d','-k','-f','-q',tf,of])
-            tf.destroy()
-            if exists(of) and getsize(of): return
+            import lz4.block
+            try: d = lz4.block.decompress(open(i,'rb').read()[8:])
+            except: return 1
+            xopen(o + '/' + basename(i),'wb').write(d)
+            return
         case 'JS P.A.C.K.E.R.': return jsbeautifier('packer')
         case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
         case 'JavaScriptObfuscator': return jsbeautifier('jsobfuscator')
@@ -1058,8 +1057,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Netcrypt':
             if db.print_try: print('Trying with custom extractor')
             import base64
-            try: from Cryptodome.Cipher import AES # type: ignore
-            except ImportError: from Crypto.Cipher import AES # type: ignore
+            from Cryptodome.Cipher import AES
             from lib.file import EXE
 
             x = EXE(i)
@@ -1344,7 +1342,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             import zlib
             from lib.file import File,ext_exe
-            e = ext_exe(i,db,dotnet=True)
+            e = ext_exe(i,dotnet=True)
             assert len(e.net.resources) == 1 and e.net.resources[0].name == 'app.resources'
 
             ffn = e.FileInfo[0][1].StringTable[0].entries[b'OriginalFilename'].decode('utf-8')

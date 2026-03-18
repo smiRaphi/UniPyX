@@ -523,8 +523,7 @@ def extract4_2(inp:str,out:str,t:str):
                 fnc = f.readu32()
                 fc = f.readu32()
                 if AES:
-                    try: from Cryptodome.Cipher import AES # type: ignore
-                    except ImportError: from Crypto.Cipher import AES # type: ignore
+                    from Cryptodome.Cipher import AES
                     v = 3
 
                     fns = f.readu32()
@@ -1454,7 +1453,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             if vid == 0x10DE: # nvidia
                 if sys.version_info >= (3,14): from compression import zstd # type: ignore
-                else: from backports import zstd # type: ignore
+                else: import backports_zstd as zstd # type: ignore
                 # https://github.com/a2flo/floor/blob/dca53f78f03a261136e5580740503f0f76b4f351/src/device/vulkan/internal/vulkan_disassembly.cpp#L135
                 c = f.readu32()
                 zdct = None
@@ -1598,7 +1597,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             if db.print_try: print('Trying with custom extractor')
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: from backports import zstd # type: ignore
+            else: import backports_zstd as zstd # type: ignore
             from lib.file import File
             f = File(i,endian='<')
             assert f.readu64() == 0xABCDEF9876543210
@@ -2116,7 +2115,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Trine FBQ':
             if db.print_try: print('Trying with custom extractor')
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: from backports import zstd # type: ignore
+            else: import backports_zstd as zstd # type: ignore
             from lib.file import File
             f = File(i,endian='<')
 

@@ -4,7 +4,6 @@
 Usage: `python unipyx.py <input> [<output dir>]`
 
 Requires a somewhat new version (3.10+) of python (I've only tested old versions on 3.11, newer ones on 3.13 & current ones on 3.14 and everything on windows).
-If you're on a python version below 3.14 you'll have to install the ZSTD backport library: `pip install backports.zstd`
 
 [Supported Formats](./SUPPORTED.md)
 

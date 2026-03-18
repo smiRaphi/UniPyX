@@ -3,8 +3,7 @@ from hashlib import pbkdf2_hmac,md5,sha1,sha256
 from lib.file import File,align
 _File = File
 
-try: from Cryptodome.Cipher import AES # type: ignore
-except ImportError: from Crypto.Cipher import AES # type: ignore
+from Cryptodome.Cipher import AES
 
 BASED = os.path.dirname(os.path.abspath(__file__)) + '/tmd_'
 

@@ -96,7 +96,7 @@ ISO | .iso | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org
 KryoFlux | .bin | [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 JFD IMG | ??? | [7-Zip](https://7-zip.org/) |
 LHARC | .lha | [LHa](https://github.com/jca02266/lha), [7-Zip](https://7-zip.org/) |
-LZ4 | .lz4 | [lz4](https://github.com/lz4/lz4) |
+LZ4 | .lz4 | [lz4](https://pypi.org/project/lz4/) |
 LZIP | .lz | [7-Zip](https://7-zip.org/) + [Lzip7z](https://www.tc4shell.com/en/7zip/lzip/) |
 LZMA | .lzma | [lzma](https://docs.python.org/3/library/lzma.html) |
 MacBinary | ??? | [unar](https://theunarchiver.com/command-line) |
@@ -594,9 +594,9 @@ RetroStudio PAK | .pak | [PakTool](https://www.dropbox.com/scl/fi/exp8xazcfiqlmf
 Reverse Computer Screen | .rcs | [RCS](https://github.com/einar-saukas/RCS) |
 Roblox Flag Cache | .cache | Custom |
 ROFS Volume | .cvm | [cvm_tool](https://github.com/mchubby/RE-games-attic/tree/master/sega-nextech/cvm_tool%20%5Broxfan%5D) -> ISO |
-RouterOS Package | .npk | [npkpy](https://github.com/botlabsDev/npkpy) |
+RouterOS Package | .npk | [npkpy](https://pypi.org/project/npkPy/) |
 RPG Maker Archive | ??? | Custom |
-Safari WebArchive | ??? | [pywebarchive](https://github.com/bmjcode/pywebarchive) |
+Safari WebArchive | ??? | [pywebarchive](https://pypi.org/project/pywebarchive/) |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
 SharkPortSave | ??? | Custom |

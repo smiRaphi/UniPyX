@@ -177,33 +177,12 @@ class BitReader:
             if b: v |= 1 << (n - 1 - i)
         return v
 
-def ext_exe(i:str,db,dotnet=False):
-    import sys,importlib,importlib.util
-    class RedSpec:
-        @classmethod
-        def find_spec(cls,fullname,path,target=None):
-            if fullname.startswith(('dnfile.','ordlookup')) or fullname in ('pefile','dnfile','ordlookup'):
-                if fullname == 'pefile': rename = 'bin.pefile.pefile'
-                elif fullname.startswith('ordlookup.') or fullname == 'ordlookup': rename = 'bin.pefile.' + fullname
-                else: rename = 'bin.' + fullname
-                spec = importlib.util.find_spec(rename)
-                spec.name = fullname
-                spec.fake = rename
-                spec.loader = cls
-                return spec
-        @staticmethod
-        def create_module(spec):return importlib.import_module(spec.fake) if hasattr(spec,'fake') else None
-        @staticmethod
-        def exec_module(spec):pass
-    sys.meta_path.append(RedSpec)
-
-    db.get('pefile')
+def ext_exe(i:str,dotnet=False):
     if dotnet:
-        db.get('dnfile')
-        import dnfile # type: ignore
+        import dnfile
         return dnfile.dnPE(i)
     else:
-        import pefile # type: ignore
+        import pefile
         return pefile.PE(i)
 
 N64CHM = (

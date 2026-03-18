@@ -1,0 +1,6 @@
+{
+    "extraPaths": [
+        "./bin/pip"
+    ],
+    "typeCheckingMode": "off"
+}
