@@ -205,3 +205,32 @@ def ext_exe(i:str,db,dotnet=False):
     else:
         import pefile # type: ignore
         return pefile.PE(i)
+
+N64CHM = (
+    '\0' + '\0'*14 + ' '
+    '0123456789ABCDEF'
+    'GHIJKLMNOPQRSTUV'
+    'WXYZ!"#\'*+,-./:='
+    '?@。゛゜ァィゥェォッャュョヲン'
+    'アイウエオカキクケコサシスセソタ'
+    'チツテトナニヌネノハヒフヘホマミ'
+    'ムメモヤユヨラリルレロワガギグゲ'
+    'ゴザジズゼゾダヂヅデドバビブベボ'
+    'パピプペポ'
+)
+def dec_n64_mpak(i:bytes):
+    o = []
+    for b in i:
+        assert b < len(N64CHM) and (b >= 0x0F or b == 0)
+        o.append(N64CHM[b])
+    return ''.join(o)
+
+def crc16(i:bytes,poly:int,init=0) -> int:
+    crc = init
+    for b in i:
+        crc ^= b << 8
+        for _ in range(8):
+            if crc & 0x8000: crc = (crc << 1) ^ poly
+            else: crc <<= 1
+            crc &= 0xFFFF
+    return crc

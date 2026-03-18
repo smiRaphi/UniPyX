@@ -1,5 +1,3 @@
-from tkinter import W
-
 from lib.main import *
 
 def extract4_3(inp:str,out:str,t:str):
@@ -209,6 +207,17 @@ def extract4_3(inp:str,out:str,t:str):
             remove(td + '/memleaks.log',td + '/memory.log')
             copydir(td,o,True)
             td.destroy()
+            if listdir(o): return
+        case 'Package Resource Index XML':
+            if db.print_try: print('Trying with custom extractor')
+            import base64
+            import xml.etree.ElementTree as ET
+
+            tr = ET.parse(i)
+            for r in tr.getroot().find('ResourceMap').iter('NamedResource'):
+                cdt = r.find('Candidate')
+                if cdt.get('type') == 'EmbeddedData': xopen(o + '/' + r.get('uri').split('://',1)[1],'wb').write(base64.b64decode(cdt.find('Base64Value').text))
+            del tr
             if listdir(o): return
 
     return 1

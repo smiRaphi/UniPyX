@@ -1064,6 +1064,54 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 open(o + f'/CHR{ix}.pgm','wb').write(b'P5\n256 128\n3\n' + td)
 
             return
+        case 'N64 Memory Pak':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,dec_n64_mpak,crc16
+            f = File(i,endian='>')
+            big = f.size >= 0x80000
+            f.seek(0x100)
+
+            pgs = []
+            for _ in range(16 if big else 1):
+                f.skip(2)
+                pgs.extend([f.readu16() for _ in range(0x7F)])
+
+            f.skip((16 if big else 1) * 0x100)
+            fs = []
+            for _ in range(0x10):
+                gnr = f.read(6)
+                sp = f.readu16()
+                if not f.readu8() & 2:
+                    f.skip(0x17)
+                    continue
+                try: gn = gnr.decode('ascii');assert gn.isprintable()
+                except: gn = (gnr[:4].rstrip(b'\0') + gnr[4:].rstrip(b'\0')).hex().upper()
+
+                ppd = f.readu8()
+                ldrgcrc = f.readu16()
+
+                ext = dec_n64_mpak(f.read(4).split(b'\0')[0]).strip()
+                fn = f"{o}/{gn}/{dec_n64_mpak(f.read(0x10).split(b'\0')[0]).strip()}{('.' + ext) if ext else ''}"
+                f.back(0x20)
+                rd = bytearray(f.read(0x20))
+                rd[9:11] = b'\0\0'
+                if crc16(rd,0x5935) != ldrgcrc: ppd = 0
+
+                pp = sp
+                ps = 0
+                while pp < len(pgs):
+                    cp = pgs[pp];pp += 1
+                    assert cp not in (0,2,3,4)
+                    ps += 1
+                    if cp == 1: break
+                    pp = cp
+
+                fs.append((fn.replace(':','﹕').replace('?','﹖').replace('"',"''").replace('*','﹡'),sp * 0x100,ps * 0x100 - ppd))
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(fe[0],'wb').write(f.read(fe[2]))
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

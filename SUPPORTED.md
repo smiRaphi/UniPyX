@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 782
+# Supported Formats: 784
 
 ## "Common" Archives/Compressors/Encodings (132)
 Name | Extension(s) | Extractor(s) | Comment
@@ -138,7 +138,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | [compression.zstd](https://docs.python.org/3/library/compression.zstd.html)/[backports.zstd](https://pypi.org/project/backports.zstd/) |
 
-## ROM Formats (56)
+## ROM Formats (57)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -166,6 +166,7 @@ Konami Python IMG | .img | Custom |
 Mario Kart 64 N64 ROM | .z64 | [Torch](https://github.com/HarbourMasters/Torch) + [Spaghettikart YAML](https://github.com/HarbourMasters/SpaghettiKart/tree/main/yamls) |
 Monkey Ball A | ??? | [Naomi Monkey Ball](https://github.com/NaomiMod/games-ExtractTools/tree/main/Naomi_MonkeyBall)
 MSX Cassette IMG | .cas | [mcp](https://github.com/apoloval/mcp) |
+N64 Memory Pak | .mpk | Custom |
 N64DD | .ndd | [mfs_manager](https://github.com/LuigiBlood/mfs_manager) |
 NCCH CFA | .cfa | [3dstool](https://github.com/dnasdw/3dstool) |
 NCCH CXI | .cxi | [3dstool](https://github.com/dnasdw/3dstool) |
@@ -314,7 +315,7 @@ Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 
-## Game/Various Archives (363)
+## Various (364)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 0Size24 Data | * | Custom |
@@ -555,6 +556,7 @@ One Piece Straw Wars Pirate Defense Resource | ??? | Custom |
 Orange Juice Encrypted | .dat | [qpcrypt](https://github.com/jwilins/qptk) |
 Orange Juice LAG | .lag | Custom |
 Package Resource Index | .pri | [makepri](https://www.nuget.org/packages/Microsoft.Windows.SDK.BuildTools/) |
+Package Resource Index XML | .xml | Custom |
 Palm MemoPad Archive | .mpa | Custom |
 Papaya Studio Wii VAPS | .vaps | Custom |
 Peggle Data | ` ` | Custom |
