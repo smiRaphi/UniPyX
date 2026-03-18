@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 785
+# Supported Formats: 786
 
-## "Common" Archives/Compressors/Encodings (132)
+## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -98,6 +98,7 @@ JFD IMG | ??? | [7-Zip](https://7-zip.org/) |
 LHARC | .lha | [LHa](https://github.com/jca02266/lha), [7-Zip](https://7-zip.org/) |
 LZ4 | .lz4 | [lz4](https://github.com/lz4/lz4) |
 LZIP | .lz | [7-Zip](https://7-zip.org/) + [Lzip7z](https://www.tc4shell.com/en/7zip/lzip/) |
+LZMA | .lzma | [lzma](https://docs.python.org/3/library/lzma.html) |
 MacBinary | ??? | [unar](https://theunarchiver.com/command-line) |
 Motorola S-Record | .srec | Custom |
 MSCAB | .cab | [7-Zip](https://7-zip.org/) + file name correction |

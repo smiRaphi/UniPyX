@@ -157,6 +157,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         else: break
                 return
             return fix_tar(o)
+        case 'LZMA':
+            if db.print_try: print('Trying with lzma')
+            import lzma
+            of = o + '\\' + tbasename(i)
+            d = lzma.decompress(open(i,'rb').read())
+            xopen(of,'wb').write(d)
+            if d: return
         case 'LZ4':
             of = o + '\\' + tbasename(i)
             run(['lz4','-d','-k','-f','-q',i,of])

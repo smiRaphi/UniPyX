@@ -1419,5 +1419,9 @@
     ],
     "N64 Memory Pak":[
         "project64 memory pack"
+    ],
+    "LZMA":[
+        "lzma compressed data",
+        "lzma compressed archive"
     ]
 }
