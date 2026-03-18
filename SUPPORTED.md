@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 784
+# Supported Formats: 785
 
 ## "Common" Archives/Compressors/Encodings (132)
 Name | Extension(s) | Extractor(s) | Comment
@@ -315,7 +315,7 @@ Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 
-## Various (364)
+## Various (365)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 0Size24 Data | * | Custom |
@@ -594,7 +594,7 @@ Reverse Computer Screen | .rcs | [RCS](https://github.com/einar-saukas/RCS) |
 Roblox Flag Cache | .cache | Custom |
 ROFS Volume | .cvm | [cvm_tool](https://github.com/mchubby/RE-games-attic/tree/master/sega-nextech/cvm_tool%20%5Broxfan%5D) -> ISO |
 RouterOS Package | .npk | [npkpy](https://github.com/botlabsDev/npkpy) |
-RPG Maker Archive (XP/VX/VX Ace) | ??? | [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter) |
+RPG Maker Archive | ??? | Custom |
 Safari WebArchive | ??? | [pywebarchive](https://github.com/bmjcode/pywebarchive) |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
@@ -627,6 +627,7 @@ Super Monkey Ball Tip 'n Tilt String Data | ??? | Custom |
 Taiko no Tatsujin Data 1 | ??? | Custom |
 Taiko no Tatsujin Data 2 | ??? | Custom |
 Taiko no Tatsujin Data 3 | ??? | Custom |
+Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Teardown Encrypted File | .tde | [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt) |
 The Sims FAR | .far | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |

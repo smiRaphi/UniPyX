@@ -576,9 +576,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 tof.write(f.read(of[2]))
                 tof.close()
             if fs: return
-        case 'RPG Maker Archive (XP/VX/VX Ace)':
-            run(['rpgmakerdecrypter',i,'-w','-o',o])
-            if listdir(o): return
         case 'RDB':
             run(['cethleann','--rdb','-k','-p','-y','-z',o,dirname(i),'--filelist',basename(i)])
             if listdir(o): return

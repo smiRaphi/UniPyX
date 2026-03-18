@@ -219,5 +219,46 @@ def extract4_3(inp:str,out:str,t:str):
                 if cdt.get('type') == 'EmbeddedData': xopen(o + '/' + r.get('uri').split('://',1)[1],'wb').write(base64.b64decode(cdt.find('Base64Value').text))
             del tr
             if listdir(o): return
+        case 'Team Ari Encrypted RGSSAD'|'RPG Maker Archive':
+            KEYS = {
+                b'\x9e\x83\x42\x0e\x4e\xbd\xdc\x6d':0x2b804be2,
+                b'\x31\xac\x3e\x2d\x9b\x23\xda\x11':0xdeadcafe,
+                b'RGSSAD\0\1':0xdeadcafe,
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            sig = f.read(8)
+            key = KEYS[sig]
+
+            def rot(key): return (key * 7 + 3) & 0xFFFFFFFF
+            def rotk():
+                nonlocal key
+                key = rot(key)
+            def readu32():
+                r = f.readu32() ^ key
+                rotk()
+                return r
+            def read_name(n:int):
+                ob = []
+                for b in f.read(n):
+                    ob.append(b ^ (key & 0xFF))
+                    rotk()
+                return bytes(ob)
+            def read_data(n:int):
+                tmpk = key
+                ob = []
+                for ix,b in enumerate(f.read(n)):
+                    if ix != 0 and ix%4 == 0: tmpk = rot(tmpk)
+                    ob.append(b ^ ((tmpk >> ((ix%4) * 8)) & 0xFF))
+                return bytes(ob)
+
+            while f:
+                fn = read_name(readu32()).decode()
+                xopen(o + '/' + fn,'wb').write(read_data(readu32()))
+
+            f.close()
+            if listdir(o): return
 
     return 1
