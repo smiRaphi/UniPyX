@@ -298,7 +298,75 @@ def extract4_3(inp:str,out:str,t:str):
                 import bin.lzo as lzo # type: ignore
                 d = lzo.decompress(f.read(s),False,ds,algorithm=(0,'LZO1X','LZO1Y')[ct & 0xFF]) # header, buflen
             else: raise NotImplementedError(hex(ct))
+            f.close()
+
             xopen(o + '/' + basename(i),'wb').write(d)
             return
+        case 'Disney\'s Tarzan FSD':
+            def thash(i:bytes):
+                o = 0
+                shft = 0
+                lng =  0
+
+                for b in i:
+                    o += b << shft
+                    shft += 8
+                    if shft > 24: shft = 0
+                    lng += 1
+                return (o + lng) & 0xFFFFFFFF
+            MP = {thash(x[:1022].encode('ascii')):x.replace(':','') for x in open('bin/tarzan.hsh').read().split('\n')}
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            ep = f.size
+            fs = []
+            while f.pos < ep:
+                fe = (f.readu32(),f.readu32(),f.readu32())
+                if not fe[0]: break
+                fs.append(fe)
+                ep = min(ep,fe[1])
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[2])
+                if fe[0] in MP: fn = MP[fe[0]]
+                else:
+                    if d.startswith(b'ESF'): ext = 'esf'
+                    elif d.startswith(b'EGF'): ext = 'egf'
+                    else: ext = 'bin'
+                    fn = f'{fe[0]:08X}.{ext}'
+                xopen(o + '/' + fn,'wb').write(d)
+            f.close()
+            if fs: return
+        case 'Transformers: Devastation DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'DAT\0'
+            c = f.readu32()
+
+            oof = f.readu32()
+            f.skip(4)
+            nof = f.readu32()
+            sof = f.readu32()
+
+            fs = [[] for _ in range(c)]
+            f.seek(oof)
+            for fe in fs: fe.append(f.readu32())
+            f.seek(sof)
+            for fe in fs: fe.append(f.readu32())
+            f.seek(nof)
+            ns = f.readu32()
+            for fe in fs: fe.append(f.read(ns).rstrip(b'\0').decode('ascii'))
+
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Transformers: Devastation BXM': raise NotImplementedError
 
     return 1

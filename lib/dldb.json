@@ -82,12 +82,12 @@
         "ts":1770068820
     },
     "exeinfope":{
-        "p":"ExeinfoPe/exeinfope.exe",
+        "p":"ExeinfoPE/exeinfope.exe",
         "fs":[{
             "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.5/exeinfope.zip",
             "x":{
-                "ExeinfoPe/exeinfope.exe":"ExeinfoPe/exeinfope.exe",
-                "ExeinfoPe/Ext_Detector.dll":"ExeinfoPe/Ext_Detector.dll"
+                "ExeinfoPE/exeinfope.exe":"ExeinfoPE/exeinfope.exe",
+                "ExeinfoPE/Ext_Detector.dll":"ExeinfoPE/Ext_Detector.dll"
             },
             "ts":1771755567
         }],

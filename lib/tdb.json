@@ -1423,5 +1423,11 @@
     "LZMA":[
         "lzma compressed data",
         "lzma compressed archive"
+    ],
+    "Wise Installer":[
+        "wise installer",
+        "wise installer stub",
+        "wise.com",
+        "Wise Installation System! ver. ?.? (c) Wise Solutions Inc."
     ]
 }

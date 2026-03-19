@@ -91,11 +91,6 @@
         "rs":"InstallShield Setup","s":1
     },
     {
-        "rqr":"Win32 Executable MS Visual C++ (generic)",
-        "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.data\\0\\0\\0':f.seek(8,1);sz,of = int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');break\n\tf.seek(32,1)\nelse: return\nf.seek(of)\nd = f.read(sz)\nf.close()\nreturn b'\\0WiseMain\\0' in d and b'\\0GLBSInstall\\0' in d"],
-        "rs":"Wise Installer","s":1
-    },
-    {
         "rqr":"Win64 Executable (generic)",
         "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.qtmimed':return True\n\telse:f.seek(32,1)"],
         "rs":"Qt IFW","s":1
@@ -785,7 +780,7 @@
         "rs":"Nintendo MSBT","s":1
     },
     {
-        "d":[["isat","DAT\\0",0],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24]],
+        "d":[["isat","DAT\\0",0],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nfor _ in range(5):\n b=int.from_bytes(f.read(4),'big')\n if b<32 or b>=s:return\nreturn True"]],
         "rs":"Star Fox DAT"
     },
     {
@@ -821,6 +816,14 @@
     {
         "d":[["isat","NARC\\xFE\\xFF\\x00\\x01",0],["isat","\\x10\\x00\\x03\\x00BTAF",12],["n0",4,8],["n0",4,20],["n0",4,24]],
         "rs":"NitroARC","s":1
+    },
+    {
+        "d":[["isat","DAT\\0",0],["isat","\\x20\\0\\0\\0",8],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,32],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');return(o+c*4)==int.from_bytes(f.read(4),'little')and(o+c*8)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Transformers: Devastation DAT"
+    },
+    {
+        "d":[["isat","BXM\\0\\0\\0\\0\\0",0]],
+        "rs":"Transformers: Devastation BXM"
     },
     {
         "d":[["isat","\\xDE\\xAD\\xBE\\xEF",0],["isat","<?xml version=",14]],
@@ -1915,6 +1918,10 @@
         "rqr":null,
         "d":[["ext",".arg"],["isat","\\0",0],["isat","\\1",-1],["str0",1,2,1]],
         "rs":"ARG"
+    },
+    {
+        "d":[["namei","tarzan.fsd"],["n0",4,0],["n0",4,4],["isatS","\\0",16,24560]],
+        "rs":"Disney's Tarzan FSD"
     },
     {
         "rqr":null,

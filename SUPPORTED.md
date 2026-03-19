@@ -410,6 +410,7 @@ Direct Storage Archive | .psarc | [UnPSARC](https://github.com/rm-NoobInCoding/U
 Disney Games Archive | .pod | Custom |
 Disney Raw Strings | ??? | Custom |
 Disney Resource | ??? | Custom |
+Disney's Tarzan FSD | .fsd | Custom |
 DJarc | .dja | Custom |
 Doom 3 Xbox GFC+GOB | .gfc+.gob | [RazbSbor](https://www.moddb.com/downloads/gob-globald3tfull-unpacker)([src](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) |
 Doom 3 Xbox Graph | .d3tfull | [RazbSbor](https://www.moddb.com/downloads/gob-globald3tfull-unpacker)([src](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) |
@@ -630,6 +631,7 @@ Super Monkey Ball Tip 'n Tilt String Data | ??? | Custom |
 Taiko no Tatsujin Data 1 | ??? | Custom |
 Taiko no Tatsujin Data 2 | ??? | Custom |
 Taiko no Tatsujin Data 3 | ??? | Custom |
+Transformers: Devastation DAT | .dat .dtt | Custom |
 Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Teardown Encrypted File | .tde | [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt) |
