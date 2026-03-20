@@ -34,6 +34,11 @@
         "rqr":"ISO 9660 CD-ROM filesystem data 'FINAL_FANTASY_X_2' + UDF filesystem data (version 1.x)",
         "rs":"Final Fantasy X 2 ISO","s":1
     },
+    {
+        "rq":"IFF Data",
+        "rqr":["GameMaker game data archive","GameMaker Studio game data archive"],
+        "rs":"GameMaker Archive","s":1
+    },
 
     {
         "rq":"ISO",
@@ -1784,6 +1789,7 @@
         "rs":"UMD Data"
     },
     {
+        "rq":["IFF Data",false],
         "d":[["n0",4,0],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little');return s==(f.seek(0,2)-8)"]],
         "rs":"bsc-m03"
     },

@@ -4,6 +4,8 @@ __pycache__
 /bin/*
 !/bin/AssetRipper
 /bin/AssetRipper/*
+!/bin/UTMT_CLI
+/bin/UTMT_CLI/*
 /out
 *.exe
 
@@ -16,3 +18,4 @@ __pycache__
 !/bin/sgkey.py
 !/bin/uekey.py
 !/bin/tarzan.hsh
+!/bin/UTMT_CLI/ExportAll.csx

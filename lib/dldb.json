@@ -122,9 +122,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1773788400
+            "ts":1773961200
         }],
-        "ts":1773788400
+        "ts":1773961200
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -522,13 +522,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/3a/47/dolphin-master-2603-81-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/8f/9d/dolphin-master-2603-86-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1773812251
+            "ts":1773871081
         }],
-        "ts":1773812251
+        "ts":1773871081
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -752,14 +752,14 @@
     "assetripper":{
         "p":"AssetRipper/AssetRipper.GUI.Free.exe",
         "fs":[{
-            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.11/AssetRipper_win_x64.zip",
+            "u":"https://github.com/AssetRipper/AssetRipper/releases/download/1.3.12/AssetRipper_win_x64.zip",
             "x":{
                 "AssetRipper.GUI.Free.exe":"AssetRipper/AssetRipper.GUI.Free.exe",
                 "capstone.dll":"AssetRipper/capstone.dll"
             },
-            "ts":1772175640
+            "ts":1773903087
         }],
-        "ts":1772175640
+        "ts":1773903087
     },
     "rrvatool":{
         "p":"RRVArcTool/RidgeRacerVArchiveTool.exe",
@@ -2355,23 +2355,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46028/SDLVICE-3.10-win64-r46028.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46029/SDLVICE-3.10-win64-r46029.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46028/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46028/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46028/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46028/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46028/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46028/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46029/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46029/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46029/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46029/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46029/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46029/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1773667770
+            "ts":1773957593
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1773667770
+        "ts":1773957593
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2733,14 +2733,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_17_d02d3de0_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_19_f77ab6bd_32.zip",
             "x":{
-                "RenderDoc_2026_03_17_d02d3de0_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_17_d02d3de0_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_19_f77ab6bd_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_19_f77ab6bd_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1773702000
+            "ts":1773874800
         }],
-        "ts":1773702000
+        "ts":1773874800
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5507,6 +5507,99 @@
             }
         }]
     },
+    "undertalemodcli":{
+        "p":"UTMT_CLI/UndertaleModCli.exe",
+        "fs":[{
+            "u":"https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.8.4.1/UTMT_CLI_v0.8.4.1-Windows.zip",
+            "x":{
+                "GameSpecificData/Definitions/deltarune.json":"UTMT_CLI/GameSpecificData/Definitions/deltarune.json",
+                "GameSpecificData/Definitions/gamemaker.json":"UTMT_CLI/GameSpecificData/Definitions/gamemaker.json",
+                "GameSpecificData/Definitions/undertale.json":"UTMT_CLI/GameSpecificData/Definitions/undertale.json",
+                "GameSpecificData/Underanalyzer/deltarune.json":"UTMT_CLI/GameSpecificData/Underanalyzer/deltarune.json",
+                "GameSpecificData/Underanalyzer/gamemaker.json":"UTMT_CLI/GameSpecificData/Underanalyzer/gamemaker.json",
+                "GameSpecificData/Underanalyzer/undertale.json":"UTMT_CLI/GameSpecificData/Underanalyzer/undertale.json",
+                "UndertaleModCli.deps.json":"UTMT_CLI/UndertaleModCli.deps.json",
+                "UndertaleModCli.runtimeconfig.json":"UTMT_CLI/UndertaleModCli.runtimeconfig.json",
+                "UndertaleModCli.dll":"UTMT_CLI/UndertaleModCli.dll",
+                "UndertaleModCli.exe":"UTMT_CLI/UndertaleModCli.exe",
+                "UndertaleModLib.dll":"UTMT_CLI/UndertaleModLib.dll",
+                "Underanalyzer.dll":"UTMT_CLI/Underanalyzer.dll",
+                "Magick.NET.Core.dll":"UTMT_CLI/Magick.NET.Core.dll",
+                "Magick.Native-Q8-x64.dll":"UTMT_CLI/Magick.Native-Q8-x64.dll",
+                "Magick.NET-Q8-AnyCPU.dll":"UTMT_CLI/Magick.NET-Q8-AnyCPU.dll",
+                "System.Threading.dll":"UTMT_CLI/System.Threading.dll",
+                "System.Threading.Tasks.Parallel.dll":"UTMT_CLI/System.Threading.Tasks.Parallel.dll",
+                "System.Text.Encodings.Web.dll":"UTMT_CLI/System.Text.Encodings.Web.dll",
+                "System.Text.Json.dll":"UTMT_CLI/System.Text.Json.dll",
+                "System.Text.RegularExpressions.dll":"UTMT_CLI/System.Text.RegularExpressions.dll",
+                "System.Runtime.InteropServices.dll":"UTMT_CLI/System.Runtime.InteropServices.dll",
+                "System.Security.Cryptography.dll":"UTMT_CLI/System.Security.Cryptography.dll",
+                "System.Reflection.Metadata.dll":"UTMT_CLI/System.Reflection.Metadata.dll",
+                "System.Private.Uri.dll":"UTMT_CLI/System.Private.Uri.dll",
+                "System.ObjectModel.dll":"UTMT_CLI/System.ObjectModel.dll",
+                "System.Memory.dll":"UTMT_CLI/System.Memory.dll",
+                "System.Linq.dll":"UTMT_CLI/System.Linq.dll",
+                "System.IO.MemoryMappedFiles.dll":"UTMT_CLI/System.IO.MemoryMappedFiles.dll",
+                "System.Console.dll":"UTMT_CLI/System.Console.dll",
+                "System.Collections.dll":"UTMT_CLI/System.Collections.dll",
+                "System.Collections.Immutable.dll":"UTMT_CLI/System.Collections.Immutable.dll",
+                "System.Collections.Concurrent.dll":"UTMT_CLI/System.Collections.Concurrent.dll",
+                "System.Reflection.Emit.ILGeneration.dll":"UTMT_CLI/System.Reflection.Emit.ILGeneration.dll",
+                "System.Reflection.Emit.Lightweight.dll":"UTMT_CLI/System.Reflection.Emit.Lightweight.dll",
+                "System.Text.Encoding.Extensions.dll":"UTMT_CLI/System.Text.Encoding.Extensions.dll",
+                "System.Reflection.Primitives.dll":"UTMT_CLI/System.Reflection.Primitives.dll",
+                "System.Runtime.Loader.dll":"UTMT_CLI/System.Runtime.Loader.dll",
+                "System.Diagnostics.Tracing.dll":"UTMT_CLI/System.Diagnostics.Tracing.dll",
+                "System.Numerics.Vectors.dll":"UTMT_CLI/System.Numerics.Vectors.dll",
+                "System.Runtime.dll":"UTMT_CLI/System.Runtime.dll",
+                "hostpolicy.dll":"UTMT_CLI/hostpolicy.dll",
+                "hostfxr.dll":"UTMT_CLI/hostfxr.dll",
+                "System.Private.CoreLib.dll":"UTMT_CLI/System.Private.CoreLib.dll",
+                "coreclr.dll":"UTMT_CLI/coreclr.dll",
+                "clrjit.dll":"UTMT_CLI/clrjit.dll",
+                "System.CommandLine.dll":"UTMT_CLI/System.CommandLine.dll",
+                "Microsoft.CodeAnalysis.CSharp.dll":"UTMT_CLI/Microsoft.CodeAnalysis.CSharp.dll",
+                "Microsoft.CodeAnalysis.CSharp.Scripting.dll":"UTMT_CLI/Microsoft.CodeAnalysis.CSharp.Scripting.dll",
+                "Microsoft.CodeAnalysis.Scripting.dll":"UTMT_CLI/Microsoft.CodeAnalysis.Scripting.dll",
+                "Microsoft.CodeAnalysis.dll":"UTMT_CLI/Microsoft.CodeAnalysis.dll",
+                "Newtonsoft.Json.dll":"UTMT_CLI/Newtonsoft.Json.dll",
+                "ICSharpCode.SharpZipLib.dll":"UTMT_CLI/ICSharpCode.SharpZipLib.dll"
+            }
+        }],
+        "ts":0
+    },
+    "wasm2c":{
+        "p":"wasm2c.exe",
+        "fs":[{
+            "u":"https://github.com/user-attachments/files/20533267/wasm2c.zip",
+            "x":{
+                "wasm2c.exe":"wasm2c.exe"
+            }
+        }],
+        "ts":0
+    },
+    "wasm2wat":{
+        "p":"wasm2wat.exe",
+        "fs":[{
+            "u":"https://github.com/WebAssembly/wabt/releases/download/1.0.40/wabt-1.0.40-windows-x64.tar.gz",
+            "x":{
+                "wabt-1.0.40/bin/wasm2wat.exe":"wasm2wat.exe",
+                "wabt-1.0.40/bin/wasm-decompile.exe":"wasm-decompile.exe"
+            }
+        }],
+        "ts":0
+    },
+    "wasm-decompile":{
+        "p":"wasm-decompile.exe",
+        "fs":[{
+            "u":"https://github.com/WebAssembly/wabt/releases/download/1.0.40/wabt-1.0.40-windows-x64.tar.gz",
+            "x":{
+                "wabt-1.0.40/bin/wasm2wat.exe":"wasm2wat.exe",
+                "wabt-1.0.40/bin/wasm-decompile.exe":"wasm-decompile.exe"
+            }
+        }],
+        "ts":0
+    },
     "isd":{
         "p":"isd/PSUI.exe",
         "fs":[{
@@ -5529,7 +5622,8 @@
                 "Mono.Cecil.Rocks.dll":"isd/Mono.Cecil.Rocks.dll",
                 "ICSharpCode.Decompiler.dll":"isd/ICSharpCode.Decompiler.dll"
             }
-        }]
+        }],
+        "ts":0
     },
     "pefile":{
         "pip":"pefile"

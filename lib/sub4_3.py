@@ -514,5 +514,8 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'GameMaker Archive':
+            run(['undertalemodcli','load',i,'-s',dirname(db.get('undertalemodcli')) + '\\ExportAll.csx'],cwd=o)
+            if listdir(o): return
 
     return 1

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 792
+# Supported Formats: 794
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -200,7 +200,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (113)
+## Executables/Packers/Installers (114)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -309,6 +309,7 @@ TinyProg | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/do
 TSCRUNCH | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 UCEXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 UPX | .exe | [upx](https://github.com/upx/upx) |
+WebAssembly | .wasm | [wasm2c/wasm2wat/wasm-decompiler](https://github.com/WebAssembly/wabt) |
 Wii DOLXZ | .dol | Custom |
 Windows CE FW IMG | .img | [eimgfs](https://github.com/nlitsme/eimgfs) |
 Windows CE Xip | .img .xip | [eimgfs](https://github.com/nlitsme/eimgfs) |
@@ -317,7 +318,7 @@ Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 
-## Various (370)
+## Various (371)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 0Size24 Data | * | Custom |
@@ -453,6 +454,7 @@ Fox Engine PFTXS | .pftxs | [GzsTool](https://github.com/Atvaark/GzsTool) |
 Fox Engine QAR | .dat .qar | [GzsTool](https://github.com/Atvaark/GzsTool) |
 FrontPage Theme | ??? | Custom |
 Gabriel Knight 3 Barn | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+GameMaker Archive | .win .unx .ios .droid .psp .3ds .symbian | [UndertaleModTool](https://github.com/UnderminersTeam/UndertaleModTool) + [Scripts/Resource Exporters/ExportAll*.csx](https://github.com/UnderminersTeam/UndertaleModTool/tree/master/UndertaleModTool/Scripts/Resource%20Exporters) |
 GBA ADS MMSTR | .mmstr | [load_from_mmstr.py](https://github.com/Matt-Hurd/GBAVideoDecomp/blob/master/InternalELF/research_scripts/load_from_mmstr.py) |
 GC opening.bnr | .bnr | [bnrtool](https://github.com/xchellx/bnrtool) |
 GDED Binary Format | .gde | Custom |

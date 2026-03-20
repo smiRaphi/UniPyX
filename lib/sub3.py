@@ -1396,5 +1396,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             p.kill()
             td.destroy()
             return
+        case 'WebAssembly':
+            run(['wasm2c',i,'--enable-exceptions','--enable-tail-call','--enable-memory64','--enable-multi-memory','--enable-extended-const','--enable-custom-page-sizes','-o',o + '\\' + tbasename(i) + '.c'])
+            run(['wasm2wat',i,'--enable-all','-o',o + '\\' + tbasename(i) + '.wat'])
+            run(['wasm-decompile',i,'--enable-all','-o',o + '\\' + tbasename(i) + '.txt'])
+            return
 
     return 1

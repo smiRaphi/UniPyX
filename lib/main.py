@@ -275,14 +275,18 @@ def analyze(inp:str,raw=False):
             else:
                 rq = xv['rq'] if type(xv['rq']) == list else [xv['rq']]
                 chf = all if type(rq[-1]) == bool and rq[-1] else any
-                if not chf(y in nts for y in rq if type(y) == str): continue
+                chf = chf(y in nts for y in rq if type(y) == str)
+                if type(rq[-1]) == bool and not rq[-1]: chf = not chf
+                if not chf: continue
         if 'rqr' in xv:
             if xv['rqr'] == None:
                 if ts: continue
             else:
                 rqr = xv['rqr'] if type(xv['rqr']) == list else [xv['rqr']]
                 chf = all if type(rqr[-1]) == bool and rqr[-1] else any
-                if not chf(y in ts for y in rqr if type(y) == str): continue
+                chf = chf(y in ts for y in rqr if type(y) == str)
+                if type(rqr[-1]) == bool and not rqr[-1]: chf = not chf
+                if not chf: continue
 
         tret = 0
         if not 'd' in xv or not xv['d']:

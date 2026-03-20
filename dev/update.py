@@ -57,6 +57,8 @@ GFMTS = {
     'LuigiBlood/mfs_manager':lambda tag:f'mfs_manager_{tag}.zip',
     'sztupy/luadec51':lambda tag:f'luadec51_{tag[1:]}_win32.zip',
     'LongSoft/UEFITool':lambda tag:f'UEFIExtract_NE_{tag}_win64.zip',
+    'UnderminersTeam/UndertaleModTool':lambda tag:f'UTMT_CLI_v{tag}-Windows.zip',
+    'WebAssembly/wabt':lambda tag:f'wabt-{tag}-windows-x64.tar.gz',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -143,8 +145,9 @@ def supdate(c:Cache,k:str,inf:dict):
                     if u != nu:
                         if c.c.head(nu).status_code == 302:
                             u = nu
-                            if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip','upx/upx'):
+                            if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip','upx/upx','WebAssembly/wabt'):
                                 bdir = u.split('/')[-1].rsplit('.',1)[0]
+                                if repo == 'WebAssembly/wabt': bdir = '-'.join(bdir.split('-')[:2])
                                 for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                         else:
                             print('[!] 404:',u,'!->',nu)

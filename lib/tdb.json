@@ -882,7 +882,6 @@
         "blorb interactive fiction package",
         "iff-text document (generic)",
         "iff flow idea processor format",
-        "gamemaker studio game data archive",
         "4d write document",
         "iff document storage",
         "amiga prowrite/quickwrite document"
@@ -1435,5 +1434,9 @@
     ],
     "Asura Engine Resource":[
         "asura engine resources package (generic)"
+    ],
+    "WebAssembly":[
+        "webassembly (wasm) binary module version 0x1 (mvp)",
+        "webassembly module (binary)"
     ]
 }
