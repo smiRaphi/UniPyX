@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 794
+# Supported Formats: 795
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -318,7 +318,7 @@ Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 
-## Various (371)
+## Various (372)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 0Size24 Data | * | Custom |
@@ -531,6 +531,7 @@ NCAA Gamebreaker PG | .pg | Custom |
 NDS Sound Data | .sdat | [ndssntext](https://gbatemp.net/download/nds-sound-extractor.28818/) |
 NeoBook Cartoon | .nbc | Custom |
 New York Race KIX+KBF | .kix+.kbf | Custom |
+Nexar New PAC | .pac | Custom |
 Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/KillzXGaming/NLG-File-Editor-Tool), [NlgFileTool MFF](https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper), [luigi_mansion_dict.bms](https://mirror.aluigi.org/bms/luigi_mansion_dict.bms) |
 Nicktoons Gravjet Racing LIN | .lin | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |

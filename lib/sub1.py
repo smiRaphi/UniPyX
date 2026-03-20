@@ -137,10 +137,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else: return
         case 'ZSTD':
             if db.print_try: print('Trying with compression.zstd')
-            if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: import backports_zstd as zstd # type: ignore
+            from lib.file import decompress
             of = o + '\\' + tbasename(i)
-            d = zstd.decompress(open(i,'rb').read())
+            d = decompress(open(i,'rb').read(),'zstd')
             xopen(of,'wb').write(d)
 
             xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
@@ -159,14 +158,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return fix_tar(o)
         case 'LZMA':
             if db.print_try: print('Trying with lzma')
-            import lzma
+            from lib.file import decompress
             of = o + '\\' + tbasename(i)
-            d = lzma.decompress(open(i,'rb').read())
+            d = decompress(open(i,'rb').read(),'lzma')
             xopen(of,'wb').write(d)
             if d: return
         case 'LZ4':
-            import lz4.block
-            try: d = lz4.block.decompress(open(i,'rb').read())
+            if db.print_try: print('Trying with lz4')
+            from lib.file import decompress
+            try: d = decompress(open(i,'rb').read(),'lz4')
             except: return 1
             xopen(o + '/' + tbasename(i),'wb').write(d)
             return

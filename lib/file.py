@@ -1,4 +1,4 @@
-import struct,io
+import struct,io,sys
 
 def align(n:int,blocksize:int): return -n % blocksize
 
@@ -100,6 +100,8 @@ class File:
             if not p: break
             self.write(p)
 
+    def decompress(self,size:int,algo:str,*args,**kwargs): return decompress(self.read(size),algo,*args,**kwargs)
+
     @property
     def pos(self): return self.tell()
     @property
@@ -115,6 +117,33 @@ class File:
         b = self.reads()
         self.skip(-1)
         return bool(b)
+class BitReader:
+    def __init__(self,d:bytes):
+        self.d = d
+        self.p = 0
+        self.b = 0
+        self.m = 0
+
+    def get_bit(self):
+        if not self.m:
+            if self.p >= len(self.d): return None
+            self.b = self.d[self.p]
+            self.p += 1
+            self.m = 0x80
+        bit = 1 if self.b & self.m else 0
+        self.m >>= 1
+        return bit
+    def get_bits(self,n,ret_none=False) -> int|None:
+        v = 0
+        for i in range(n):
+            b = self.get_bit()
+            if b is None:
+                if ret_none: return None
+                break
+            v |= b << (n - 1 - i)
+        return v
+    @property
+    def eof(self): return self.p >= len(self.d) and not self.m
 
 class EXE(File):
     def __init__(self,f):
@@ -154,31 +183,6 @@ class EXE(File):
                 self.secs[x] = (o,s,o+s)
                 self.skip(4)
         else: raise NotImplementedError(pe)
-
-class BitReader:
-    def __init__(self,d:bytes):
-        self.d = d
-        self.p = 0
-        self.b = 0
-        self.m = 0
-
-    def get_bit(self):
-        if not self.m:
-            if self.p >= len(self.d): return None
-            self.b = self.d[self.p]
-            self.p += 1
-            self.m = 0x80
-        bit = 1 if self.b & self.m else 0
-        self.m >>= 1
-        return bit
-    def get_bits(self,n) -> int:
-        v = 0
-        for i in range(n):
-            b = self.get_bit()
-            if b is None: break
-            if b: v |= 1 << (n - 1 - i)
-        return v
-
 def ext_exe(i:str,dotnet=False):
     if dotnet:
         import dnfile
@@ -186,6 +190,122 @@ def ext_exe(i:str,dotnet=False):
     else:
         import pefile
         return pefile.PE(i)
+
+def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
+    match algo:
+        case 'none': return i
+        case 'zlib':
+            import zlib
+            fnc = zlib.decompress
+        case 'gzip':
+            import gzip
+            fnc = gzip.decompress
+        case 'lzma':
+            import lzma
+            fnc = lzma.decompress
+        case 'zstd':
+            if sys.version_info >= (3,14): from compression import zstd # type: ignore
+            else:
+                try: import backports_zstd as zstd # type: ignore
+                except: from backports import zstd # type: ignore
+            if 'zstd_dict' in kwargs and type(kwargs['zstd_dict']) == bytes: kwargs['zstd_dict'] = zstd.ZstdDict(kwargs['zstd_dict'])
+            fnc = zstd.decompress
+        case 'lz4'|'lz4_block':
+            import lz4.block
+            fnc = lz4.block.decompress
+        case 'lz4_frame':
+            import lz4.frame
+            fnc = lz4.frame.decompress
+        case 'lzo'|'lzo1x':
+            if 'db' in kwargs: kwargs['db'].get('lzo')
+            import bin.lzo # type: ignore
+            return bin.lzo.decompress(i,False,kwargs.get('usize',args[0]),algorithm='LZO1X')
+        case 'lzo1y':
+            if 'db' in kwargs: kwargs['db'].get('lzo')
+            import bin.lzo # type: ignore
+            return bin.lzo.decompress(i,False,kwargs.get('usize',args[0]),algorithm='LZO1Y')
+        case 'huffman': fnc = huffman_decompress
+        case 'lzss': fnc = lzss_decompress
+        case _: raise NotImplementedError(algo)
+    return fnc(i,*args,**kwargs)
+def crc_hash(i:bytes,algo:str,*args,**kwargs):
+    match algo:
+        case 'crc32':
+            import zlib
+            return zlib.crc32(i,*args,**kwargs) & 0xFFFFFFFF
+        case 'crc16': fnc = crc16
+        case 'tarzan': fnc = tarzan_hash
+        case _: raise NotImplementedError(algo)
+    return fnc(i,*args,**kwargs)
+
+class Huffman:
+    TREE_SIZE = 512
+
+    def __init__(self,inp:BitReader):
+        self.inp = inp
+        self.lhs = [0] * self.TREE_SIZE
+        self.rhs = [0] * self.TREE_SIZE
+        self.token = 256
+
+    def create_tree(self):
+        bit = self.inp.get_bit()
+        
+        if bit is None: raise EOFError("Unexpected EOF in compressed stream")
+        elif bit != 0:
+            v = self.token
+            self.token += 1
+            if v >= self.TREE_SIZE: raise ValueError("Invalid stream, tree size exceeded")
+
+            self.lhs[v] = self.create_tree()
+            self.rhs[v] = self.create_tree()
+            return v
+        else:
+            v = self.inp.get_bits(8,True)
+            if v is None: raise EOFError("Unexpected EOF while reading leaf")
+            return v
+
+    def unpack(self,usize:int):
+        self.token = 256
+        root = self.create_tree()
+        out = bytearray()
+
+        for _ in range(usize):
+            sym = root
+            while sym >= 0x100:
+                bit = self.inp.get_bit()
+                if bit is None: return bytes(out)
+                if bit != 0: sym = self.rhs[sym]
+                else: sym = self.lhs[sym]
+            out.append(sym)
+
+        return bytes(out)
+def huffman_decompress(i:bytes,usize:int): return Huffman(BitReader(i)).unpack(usize)
+def lzss_decompress(i:bytes,usize:int=None):
+    d = BitReader(i)
+    ob = bytearray()
+    win = bytearray(0x2000)
+    winp = 1
+    while True:
+        flg = d.get_bit()
+        if flg is None: break
+        if flg:
+            b = d.get_bits(8)
+            ob.append(b)
+            win[winp] = b
+            winp = (winp + 1) & 0x1FFF
+        else:
+            of = d.get_bits(13)
+            if of == 0: break
+            l = d.get_bits(4) + 2
+            for x in range(l + 1):
+                b = win[(of + x) & 0x1FFF]
+                ob.append(b)
+                win[winp] = b
+                winp = (winp + 1) & 0x1FFF
+    return bytes(ob)[:usize]
+
+def xor(i:bytes,k:bytes): return bytes(i[x] ^ k[x % len(k)] for x in range(len(i)))
+def inv(i:bytes): return bytes(x ^ 0xFF for x in i)
 
 N64CHM = (
     '\0' + '\0'*14 + ' '
@@ -199,7 +319,7 @@ N64CHM = (
     'ゴザジズゼゾダヂヅデドバビブベボ'
     'パピプペポ'
 )
-def dec_n64_mpak(i:bytes):
+def decode_n64_mpak(i:bytes):
     o = []
     for b in i:
         assert b < len(N64CHM) and (b >= 0x0F or b == 0)
@@ -215,3 +335,14 @@ def crc16(i:bytes,poly:int,init=0) -> int:
             else: crc <<= 1
             crc &= 0xFFFF
     return crc
+def tarzan_hash(i:bytes):
+    o = 0
+    shft = 0
+    lng =  0
+
+    for b in i:
+        o += b << shft
+        shft += 8
+        if shft > 24: shft = 0
+        lng += 1
+    return (o + lng) & 0xFFFFFFFF

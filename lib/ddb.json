@@ -831,8 +831,8 @@
         "rs":"Transformers: Devastation BXM"
     },
     {
-        "d":[["isat","PACu",0],["isin",["\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4]],
-        "rs":"Softpal ADV PAC"
+        "d":[["isat","PACu",0],["isin",["\\0\\0\\0\\0","\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0","\\x04\\0\\0\\0","\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(s-4);i=int.from_bytes(f.read(4),'little');return (76*c*2)>=i and (i+16)<s"]],
+        "rs":"Nexar New PAC","s":true
     },
     {
         "d":[["isat","\\xDE\\xAD\\xBE\\xEF",0],["isat","<?xml version=",14]],

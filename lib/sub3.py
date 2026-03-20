@@ -834,8 +834,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'd0lLZ 3': raise NotImplementedError
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
-            import lz4.block
-            try: d = lz4.block.decompress(open(i,'rb').read()[8:])
+            from lib.file import decompress
+            try: d = decompress(open(i,'rb').read()[8:],'lz4')
             except: return 1
             xopen(o + '/' + basename(i),'wb').write(d)
             return

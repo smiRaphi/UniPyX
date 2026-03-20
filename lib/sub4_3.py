@@ -6,6 +6,86 @@ def extract4_3(inp:str,out:str,t:str):
     o = out
 
     match t:
+        case 'Wangan Midnight TOC+DAT':
+            if db.print_try: print('Trying with custom extractor')
+            import zlib
+            from lib.file import File
+            f = File(i,endian='<')
+            fd = open(noext(i) + '.dat','rb')
+            assert f.read(4) == b'BLDh' and f.readu32() == 0
+
+            fc = bs = 0
+            fs = []
+            while f:
+                n = f.read(4)
+                ep = f.readu32() + f.pos
+
+                if n == b'def ':
+                    f.skip(4)
+                    fc = f.readu32()
+                    f.skip(8)
+                    bs = f.readu64()
+                elif n == b'inf ':
+                    assert fc and bs
+                    for _ in range(fc):
+                        fs.append([f.readu32()*bs,f.readu32(),f.readu32()])
+                        f.skip(0x1C)
+                elif n == b'tbl ':
+                    assert fs
+                    for fe in fs: fe.append(f.read0s().decode('utf-8').lstrip('/'))
+
+                f.seek(ep)
+            f.close()
+
+            for fe in fs:
+                fd.seek(fe[0])
+                d = fd.read(fe[1])
+                if fe[2]:
+                    assert d[:4] == b'GARC',d[:4]
+                    assert d[8:12] == b'zlib',d[8:12]
+                    d = File(d,endian=f._end)
+                    d.skip(0x10)
+
+                    while d:
+                        n = d.read(4)
+                        ep = d.readu32() + d.pos
+
+                        if n == b'dat ':
+                            ob = []
+                            z = zlib.decompressobj()
+                            while (d.pos+0x11) < ep: ob.append(z.decompress(d.read(d.readu64())))
+                        d.seek(ep)
+                    del d
+                    assert ob,fe[0]
+                    d = b''.join(ob)
+                xopen(o + '/' + fe[3],'wb').write(d)
+            if fs: return
+        case 'Import Tuner Challenge TOC+DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            fd = open(noext(i) + '.dat','rb')
+
+            c = f.readu32()
+            f.skip(12)
+            for ix in range(c):
+                fn = f'{o}\\{ix:03d}.bin'
+                fd.seek(f.readu32()*0x800)
+                d = fd.read(f.readu32())
+                us = f.readu32()
+                if us and us != len(d):
+                    assert d[:8] == b'\x00\xE9UCL\xFF\x01\x1A',ix
+                    tf = TmpFile('.ucl')
+                    open(tf.p,'wb').write(d[:0x1A] + d[0x1E:] + b'\0'*4) # strip unflagged crc and add EOF (?)
+                    run(['uclpack','-d',tf,fn],print_try=False,print_out=True)
+                    tf.destroy()
+                    assert exists(fn) and getsize(fn) == us,ix
+                else: open(fn,'wb').write(d)
+                f.skip(4)
+
+            f.close()
+            fd.close()
+            if c: return
         case 'Xenoblade Chronicles X DE ARH2':
             scr = db.get('xbxdetool')
             fl = dirname(scr) + '/Filelists'
@@ -39,7 +119,6 @@ def extract4_3(inp:str,out:str,t:str):
             if listdir(o): return
         case 'CSI NY GRF':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i)
             assert f.read(4) == b'GRF\x05'
@@ -49,7 +128,7 @@ def extract4_3(inp:str,out:str,t:str):
             elif v == 1: f._end = '<'
 
             f.seek(f.readu32())
-            ft = File(zlib.decompress(f.read()),endian=f._end)
+            ft = File(f.decompress(None,'zlib'),endian=f._end)
             fs = []
             if v == 0:
                 ft.skip(6)
@@ -68,15 +147,14 @@ def extract4_3(inp:str,out:str,t:str):
             fs.append((0,f.size))
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
-                d = f.read(max(fs[ix+1][1]-fe[1],fe[2])) # don't trust file size fe[2]
+                s = max(fs[ix+1][1]-fe[1],fe[2]) # don't trust file size fe[2]
                 assert fe[3] == 1,f'{fe[3]}: {d[:8].hex()}'
-                xopen(o + '/' + fe[0],'wb').write(zlib.decompress(d))
+                xopen(o + '/' + fe[0],'wb').write(f.decompress(s,'zlib'))
 
             f.close()
             if fs: return
         case 'Artech DAT':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
             assert f.read(8) == b'Artech\0\0' and f.readu16() == 2 and f.readu16() == 3 and f.readu64() == 1
@@ -91,8 +169,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
-                d = f.read(fe[2] or fe[1])
-                if fe[2] and fe[2] != fe[1]: d = zlib.decompress(d)
+                d = f.decompress(fe[2] or fe[1],'zlib' if fe[2] and fe[2] != fe[1] else 'none')
                 open(f'{o}/{ix:04d}.{guess_ext(d)}','wb').write(d)
 
             f.close()
@@ -284,7 +361,7 @@ def extract4_3(inp:str,out:str,t:str):
             if fs: return
         case '3D Ultra Cool PKX':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
             assert f.read(4) == b'PKX:'
 
@@ -293,31 +370,17 @@ def extract4_3(inp:str,out:str,t:str):
             s = f.readu32()
             ds = f.readu32()
 
-            if ct in (0x101,0x102):
-                db.get('lzo')
-                import bin.lzo as lzo # type: ignore
-                d = lzo.decompress(f.read(s),False,ds,algorithm=(0,'LZO1X','LZO1Y')[ct & 0xFF]) # header, buflen
+            if ct in (0x101,0x102): d = decompress(f.read(s),{0x101:'lzo1x',0x102:'lzo1y'}[ct],usize=ds,db=db)
             else: raise NotImplementedError(hex(ct))
             f.close()
 
             xopen(o + '/' + basename(i),'wb').write(d)
             return
         case 'Disney\'s Tarzan FSD':
-            def thash(i:bytes):
-                o = 0
-                shft = 0
-                lng =  0
-
-                for b in i:
-                    o += b << shft
-                    shft += 8
-                    if shft > 24: shft = 0
-                    lng += 1
-                return (o + lng) & 0xFFFFFFFF
-            MP = {thash(x[:1022].encode('ascii')):x.replace(':','') for x in open('bin/tarzan.hsh').read().split('\n')}
+            from lib.file import File,crc_hash
+            MP = {crc_hash(x[:1022].encode('ascii'),'tarzan'):x.replace(':','') for x in open('bin/tarzan.hsh').read().split('\n')}
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
             f = File(i,endian='<')
 
             ep = f.size
@@ -368,13 +431,33 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Transformers: Devastation BXM': raise NotImplementedError
-        case 'Softpal ADV PAC':
-            raise NotImplementedError
+        case 'Nexar New PAC':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,inv,decompress
             f = File(i,endian='<')
             assert f.read(4) == b'PACu'
+
             c = f.readu32()
+            fmtv = f.readu32()
+            fmt = ('none','lzss','huffman','zlib','zlib_or_none','unknown 1','unknown 2','zstd_or_none')[fmtv]
+            f.seek(f.size - 4)
+            idxs = f.readu32()
+            f.seek(f.size - 4 - idxs)
+            inf = File(decompress(inv(f.read(idxs)),'huffman',usize=0x4C*c),endian=f._end)
+
+            for _ in range(c):
+                fn = inf.read(0x40).rstrip(b'\0').decode('shift-jis' if fmtv < 7 else 'utf-8')
+                f.seek(inf.readu32())
+                us,s = inf.readu32(),inf.readu32()
+                if fmt == 'zlib_or_none': d = f.decompress(s,'zlib' if s != us else 'none')
+                elif fmt == 'zstd_or_none': d = f.decompress(s,'zstd' if s != us else 'none')
+                elif fmt in ('lzss','huffman'): d = f.decompress(s,fmt,usize=us)
+                else: d = f.decompress(s,fmt)
+                xopen(o + '/' + fn,'wb').write(d)
+
+            f.close()
+            del inf
+            if c: return
         case 'Asura Engine Resource':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

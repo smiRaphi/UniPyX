@@ -29,7 +29,6 @@ Batman AC Resource | .exe | Batman AC | https://wiki.osdev.org/NE | ? | detected
 UltraCompressor 2 | .uc2 | ? | ? | ? | detected
 ELI 5750 | ? | ? | ? | ? | detected
 Transformers: Devastation BXM | .bxm | Transformers: Devastation | ? | ? | detected, json like
-Softpal ADV PAC | .pac | AQUARIUM - The Hololive VN | ? | https://github.com/morkt/GARbro/blob/master/ArcFormats/MyAdv/ArcPAC.cs (doesn't work) | detected
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

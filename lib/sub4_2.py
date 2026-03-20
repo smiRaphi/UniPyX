@@ -610,13 +610,12 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Petroglyph Zlib CH':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='>')
             f.skip(0x10)
             s = f.readu32()
             f.skip(0x10)
-            open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read(s)))
+            open(o + '/' + basename(i),'wb').write(f.decompress(s,'zlib'))
             f.close()
             if s: return
         case 'Petroglyph CHK List':
@@ -638,8 +637,7 @@ def extract4_2(inp:str,out:str,t:str):
             if c: return
         case 'Hatch Game Engine HATCH':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
-            from lib.file import File
+            from lib.file import File,crc_hash
             f = File(i,endian='<')
             assert f.read(5) == b'HATCH' and f.readu24() == 1
             c = f.readu16()
@@ -674,7 +672,7 @@ def extract4_2(inp:str,out:str,t:str):
                 "SoundFX/Announcer/RayWins.wav",
                 "SoundFX/Announcer/MightyWins.wav",
             ]
-            sdb = {zlib.crc32(x.encode()):x for x in sdb}
+            sdb = {crc_hash(x.encode(),'crc32'):x for x in sdb}
             sdb |= {
                 0x2A84DBA6:"$Unknown/unk_green_2A84DBA6.png",
                 0x2E8D1037:"$Unknown/waterfall_anim1_2E8D1037.png",
@@ -713,8 +711,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                d = f.read(fe[2])
-                if fe[2] != fe[3]: d = zlib.decompress(d)
+                d = f.decompress(fe[2],'zlib' if fe[2] != fe[3] else 'none')
                 if fe[4]:
                     d = bytearray(d)
                     swp = idx1 = 0
@@ -796,7 +793,6 @@ def extract4_2(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Pixelbite BAR':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
             assert f.read(4) == b'CRAB'
@@ -815,19 +811,18 @@ def extract4_2(inp:str,out:str,t:str):
                 if fe[2]:
                     assert f.read(4) == b'PxZP'
                     f.skip(4)
-                    d = zlib.decompress(f.read(f.readu32()))
+                    d = f.decompress(f.readu32(),'zlib')
                 else: d = f.read(fe[1])
                 xopen(o + '/' + fe[3],'wb').write(d)
             f.close()
             if fs: return
         case 'Pixelbite ZIP':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
             assert f.read(4) == b'PxZP'
             f.skip(4)
-            open(o + '/' + basename(i),'wb').write(zlib.decompress(f.read(f.readu32())))
+            open(o + '/' + basename(i),'wb').write(f.decompress(f.readu32(),'zlib'))
             f.close()
             return
         case 'Codename Kids Next Door JAM2/FSTA':
@@ -1002,7 +997,7 @@ def extract4_2(inp:str,out:str,t:str):
                 s = f.readu32()
                 n = f.read0s().decode('ascii').replace(':','_').strip('/\\')
                 f.read0s()
-                f.alignpos(4)
+                f.align(4)
                 xopen(o + '/' + n,'wb').write(f.read(s))
             f.close()
             if fs: return
@@ -1055,7 +1050,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(ep)
                 inf.write(f'CRC: {f.readu32():08X}\n\n')
                 c += 1
-                f.alignpos(0x800)
+                f.align(0x800)
             inf.close()
             f.close()
             if len(listdir(o)) > 1: return
@@ -1136,7 +1131,6 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Pseudo Interactive PIX':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
             if exists(dirname(i) + '/textures.pit'): fd = open(dirname(i) + '/textures.pit','rb')
@@ -1145,8 +1139,8 @@ def extract4_2(inp:str,out:str,t:str):
             while f:
                 s = f.readu32()
                 if not s: break
-                f.alignpos(0x800)
-                sf = File(zlib.decompress(f.read(s)),endian='<')
+                f.align(0x800)
+                sf = File(f.decompress(s,'zlib'),endian=f._end)
                 c = sf.readu32()
 
                 for _ in range(c):
@@ -1183,7 +1177,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Novalogic Resource':
             KEYS = {b'\xAD\xDE\xED\xAC',b'\x2D\xDE\xED\xAC\xAD\xDE\xED\xAC\xAD\xDE\xED\xAC'}
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,xor
             f = File(i,endian='<')
             assert f.read(12) == b'RESOURCE2xxx'
             c = f.readu32()
@@ -1193,7 +1187,7 @@ def extract4_2(inp:str,out:str,t:str):
                 rn = f.read(12)
                 for k in KEYS:
                     try:
-                        n = bytes(rn[x] ^ k[x%len(k)] for x in range(len(rn))).rstrip(b'\0').decode('ascii')
+                        n = xor(rn,k).rstrip(b'\0').decode('ascii')
                         assert n and n.isprintable()
                     except:pass
                     else:break
@@ -1217,7 +1211,7 @@ def extract4_2(inp:str,out:str,t:str):
             if listdir(o): return
         case 'AmusementMakers Project B.G. Archive':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,BitReader
+            from lib.file import File,decompress
             f = File(i,endian='<')
             assert f.read(4) == b'PBG\x1A'
             f.skip(4)
@@ -1232,30 +1226,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
-                d = BitReader(f.read(fs[ix+1][1]-fe[1]))
-
-                ob = bytearray()
-                win = bytearray(8192)
-                winp = 1
-                while True:
-                    flg = d.get_bit()
-                    if flg is None: break
-                    if flg:
-                        b = d.get_bits(8)
-                        ob.append(b)
-                        win[winp] = b
-                        winp = (winp + 1) & 0x1FFF
-                    else:
-                        of = d.get_bits(13)
-                        if of == 0: break
-                        l = d.get_bits(4) + 2
-                        for x in range(l + 1):
-                            b = win[(of + x) & 0x1FFF]
-                            ob.append(b)
-                            win[winp] = b
-                            winp = (winp + 1) & 0x1FFF
-
-                d = bytes(ob)[:fe[0]]
+                d = decompress(f.read(fs[ix+1][1]-fe[1]),'lzss',usize=fe[0])
                 open(f'{o}/{ix:02d}.{guess_ext(d)}','wb').write(d)
 
             f.close()
@@ -1439,7 +1410,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             if db.print_try: print('Trying with custom extractor')
             import uuid
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
 
             hs = f.readu32()
@@ -1452,8 +1423,6 @@ def extract4_2(inp:str,out:str,t:str):
             xopen(o + '/$device_info.txt','w').write(f'Vendor: {gdb.get(str(vid),{"name":"?"})["name"]} (0x{vid:04X})\nDevice: {gdb.get(str(vid),{}).get(str(did),"?")} (0x{did:04X})\nUUID: {uuid.UUID(bytes=uid)}\n')
 
             if vid == 0x10DE: # nvidia
-                if sys.version_info >= (3,14): from compression import zstd # type: ignore
-                else: import backports_zstd as zstd # type: ignore
                 # https://github.com/a2flo/floor/blob/dca53f78f03a261136e5580740503f0f76b4f351/src/device/vulkan/internal/vulkan_disassembly.cpp#L135
                 c = f.readu32()
                 zdct = None
@@ -1473,14 +1442,14 @@ def extract4_2(inp:str,out:str,t:str):
                     if unh == b'_NVDICT_':
                         assert f.read(4) == b'\x37\xA4\x30\xEC'
                         f.back(4)
-                        zdct = zstd.ZstdDict(f.read(s))
+                        zdct = f.read(s)
                     else:
                         us = f.readu32()
                         assert f.read(4) == b'\x28\xB5\x2F\xFD'
                         f.back(4)
                         fs.append((o + f'/{hsh.hex().upper()}.nvbin',f.read(s-4),us))
 
-                for fe in fs: xopen(fe[0],'wb').write(zstd.decompress(fe[1],zstd_dict=zdct)[:fe[2]])
+                for fe in fs: xopen(fe[0],'wb').write(decompress(fe[1],'zstd',zstd_dict=zdct)[:fe[2]])
             elif vid == 0x1002: # amd
                 f.skip(0x14)
                 while f:
@@ -1596,8 +1565,6 @@ def extract4_2(inp:str,out:str,t:str):
             FSHM = {crc32(x.rstrip(b'\n')) & 0xFFFFFFFF:x.rstrip(b'\n').decode('utf-8') for x in open(db.get('ssbu_hashes_all'),'rb').readlines()}
 
             if db.print_try: print('Trying with custom extractor')
-            if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: import backports_zstd as zstd # type: ignore
             from lib.file import File
             f = File(i,endian='<')
             assert f.readu64() == 0xABCDEF9876543210
@@ -1617,7 +1584,7 @@ def extract4_2(inp:str,out:str,t:str):
                 coms = f.readu32()
                 secs = f.readu32()
                 if dao < 0x10: tb = f.read(coms)
-                else: tb = zstd.decompress(f.read(coms))[:decs]
+                else: tb = f.decompress(coms,'zstd')[:decs]
                 f.seek(file_syso+secs)
                 v = 5
 
@@ -1696,13 +1663,13 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                d = f.read(fe[2])
-                print(f'{fe[0]}: {fe[2]}/{len(d)} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
-                print(d[:16].hex(' ').upper())
+                print(f'{fe[0]}: {fe[2]} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
+                print(f.read(0x10).hex(' ').upper());f.back(0x10)
                 if input(': '): open(o + '/test.bin','wb').write(d)
                 if fe[4] & 1:
-                    if fe[4] & 2: d = zstd.decompress(d)
+                    if fe[4] & 2: d = f.decompress(fe[2],'zstd')
                     else: raise NotImplementedError(bin(fe[4])[2:].zfill(32) + '\n' + d[:8].hex(' ').upper())
+                else: d = f.read(fe[2])
                 xopen(o + '/' + fe[0],'wb').write(d[:fe[3]])
             if fs: return
 
@@ -2114,8 +2081,6 @@ def extract4_2(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Trine FBQ':
             if db.print_try: print('Trying with custom extractor')
-            if sys.version_info >= (3,14): from compression import zstd # type: ignore
-            else: import backports_zstd as zstd # type: ignore
             from lib.file import File
             f = File(i,endian='<')
 
@@ -2135,8 +2100,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                d = f.read(fe[4])
-                if fe[2] == 4: d = zstd.decompress(d)
+                d = f.decompress(fe[4],(0,'none',0,0,'zstd'),fe[2])
                 xopen(o + '/' + fe[0],'wb').write(d[:fe[3]])
 
             f.close()
@@ -2163,7 +2127,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.skip(4)
                 fs.append((pl,xc,f.readu32(),gbo+f.readu32(),o + '/' + id))
             f.seek(max(x[2]+x[3] for x in fs))
-            if gpl == 1: f.alignpos(0x800)
+            if gpl == 1: f.align(0x800)
             cm = f.read(0x80).decode('utf-8').strip()
             if cm: open(o + '/$comment.txt','w',encoding='utf-8').write(cm)
 
@@ -2175,7 +2139,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.skip(0x10)
                 u1 = f.readu32()
                 f.skip(0x60)
-                if x[0] == 1: f.alignpos(0x800)
+                if x[0] == 1: f.align(0x800)
 
                 bo = f.pos + c*4 + -c%4*4 + (0x10 if c and u1 != 5 else 0)
                 ofs = [bo+f.readu32() for _ in range(c)]
@@ -2188,92 +2152,12 @@ def extract4_2(inp:str,out:str,t:str):
                     f.seek(fof)
                     open(x[4] + f'/m{ix:02d}.bin','wb').write(f.read(s))
                 f.seek(bo + ds)
-                if x[0] == 1: f.alignpos(0x800)
+                if x[0] == 1: f.align(0x800)
 
                 if x[1]: open(x[4] + f'/x{x[1]}.bin','wb').write(f.read((x[2]+x[3]) - f.pos))
 
             f.close()
             if fs: return
-        case 'Wangan Midnight TOC+DAT':
-            if db.print_try: print('Trying with custom extractor')
-            import zlib
-            from lib.file import File
-            f = File(i,endian='<')
-            fd = open(noext(i) + '.dat','rb')
-            assert f.read(4) == b'BLDh' and f.readu32() == 0
-
-            fc = bs = 0
-            fs = []
-            while f:
-                n = f.read(4)
-                ep = f.readu32() + f.pos
-
-                if n == b'def ':
-                    f.skip(4)
-                    fc = f.readu32()
-                    f.skip(8)
-                    bs = f.readu64()
-                elif n == b'inf ':
-                    assert fc and bs
-                    for _ in range(fc):
-                        fs.append([f.readu32()*bs,f.readu32(),f.readu32()])
-                        f.skip(0x1C)
-                elif n == b'tbl ':
-                    assert fs
-                    for fe in fs: fe.append(f.read0s().decode('utf-8').lstrip('/'))
-
-                f.seek(ep)
-            f.close()
-
-            for fe in fs:
-                fd.seek(fe[0])
-                d = fd.read(fe[1])
-                if fe[2]:
-                    assert d[:4] == b'GARC',d[:4]
-                    assert d[8:12] == b'zlib',d[8:12]
-                    d = File(d,endian=f._end)
-                    d.skip(0x10)
-
-                    while d:
-                        n = d.read(4)
-                        ep = d.readu32() + d.pos
-
-                        if n == b'dat ':
-                            ob = []
-                            z = zlib.decompressobj()
-                            while (d.pos+0x11) < ep: ob.append(z.decompress(d.read(d.readu64())))
-                        d.seek(ep)
-                    del d
-                    assert ob,fe[0]
-                    d = b''.join(ob)
-                xopen(o + '/' + fe[3],'wb').write(d)
-            if fs: return
-        case 'Import Tuner Challenge TOC+DAT':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='>')
-            fd = open(noext(i) + '.dat','rb')
-
-            c = f.readu32()
-            f.skip(12)
-            for ix in range(c):
-                fn = f'{o}\\{ix:03d}.bin'
-                fd.seek(f.readu32()*0x800)
-                d = fd.read(f.readu32())
-                us = f.readu32()
-                if us and us != len(d):
-                    assert d[:8] == b'\x00\xE9UCL\xFF\x01\x1A',ix
-                    tf = TmpFile('.ucl')
-                    open(tf.p,'wb').write(d[:0x1A] + d[0x1E:] + b'\0'*4) # strip unflagged crc and add EOF (?)
-                    run(['uclpack','-d',tf,fn],print_try=False,print_out=True)
-                    tf.destroy()
-                    assert exists(fn) and getsize(fn) == us,ix
-                else: open(fn,'wb').write(d)
-                f.skip(4)
-
-            f.close()
-            fd.close()
-            if c: return
 
         case _:
             from lib.sub4_3 import extract4_3
