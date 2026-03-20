@@ -1429,5 +1429,11 @@
         "wise installer stub",
         "wise.com",
         "Wise Installation System! ver. ?.? (c) Wise Solutions Inc."
+    ],
+    "Pascal Script Binary":[
+        "pascal script binary"
+    ],
+    "Asura Engine Resource":[
+        "asura engine resources package (generic)"
     ]
 }

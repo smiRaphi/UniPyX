@@ -368,5 +368,151 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Transformers: Devastation BXM': raise NotImplementedError
+        case 'Softpal ADV PAC':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PACu'
+            c = f.readu32()
+        case 'Asura Engine Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'Asura   '
+
+            cs = {}
+            while f:
+                p = f.pos
+                n = f.read(4).decode('latin-1')
+                if n == '\0\0\0\0': break
+                ep = f.readu32() + p
+                f.skip(8)
+
+                match n:
+                    case 'RSCF':
+                        f.skip(8)
+                        s = f.readu32()
+                        fn = f.read(ep - f.pos - s).split(b'\0',1)[0].decode('ascii').strip(' \\/')
+                        f.seek(ep - s)
+                        xopen(o + '/' + fn,'wb').write(f.read(s))
+                    case 'FONT':
+                        u1 = f.readf32()
+                        u2 = f.read(4).split(b'\0',1)
+                        w = f.readf32()
+                        h = f.readf32()
+                        fnr = f.read(0x100).split(b'\0',1)
+
+                        fn = o + f'/${n}/' + fnr[0].decode('ascii').strip(' \\/')
+                        xopen(fn,'wb').write(f.read(ep - f.pos))
+                        try: u2[1] = u2[1].rstrip(b'\0').decode('ascii')
+                        except: u2[1] = u2[1].rstrip(b'\0').hex(' ').upper()
+                        try: fnr[1] = fnr[1].rstrip(b'\0').decode('ascii')
+                        except: fnr[1] = fnr[1].rstrip(b'\0').hex(' ').upper()
+                        xopen(fn + '.txt','w').write(f'Unknown 1: {u1}\nUnknown 2: {u2[0].decode('ascii')}\nUnknown 2 Leftover: {u2[1]}\nWidth: {w}\nHeight: {h}\nFilename Leftover: {fnr[1]}\n')
+                    case 'HANM':
+                        f.back(8)
+                        unk = f.readu32()
+                        f.skip(4)
+                        if unk == 5:
+                            fn1 = f.read(0x80).split(b'\0',1)
+                            fn2 = f.read(0x80).split(b'\0',1)
+                            fn = o + f'/${n}/' + fn2[0].decode('ascii').strip(' \\/')
+                            xopen(fn,'wb').write(f.read(ep - f.pos))
+                            try: fn1[1] = fn1[1].rstrip(b'\0').decode('ascii')
+                            except: fn1[1] = fn1[1].rstrip(b'\0').hex(' ').upper()
+                            try: fn2[1] = fn2[1].rstrip(b'\0').decode('ascii')
+                            except: fn2[1] = fn2[1].rstrip(b'\0').hex(' ').upper()
+                            xopen(fn + '.txt','w').write(f'Name 1: {fn1[0].decode("ascii")}\nName 1 Leftover: {fn1[1]}\nName 2: {fn2[0].decode("ascii")}\nName 2 Leftover: {fn2[1]}\n')
+                        elif unk == 6:
+                            f.skip(4)
+                            sp = f.readf32()
+                            fn = o + f'/${n}/' + f.read0s().decode('ascii').strip(' \\/')
+                            f.align(4,p)
+                            xopen(fn,'wb').write(f.read(ep - f.pos))
+                            xopen(fn + '.txt','w').write(f'Speed(?): {sp}\n')
+                        else: raise NotImplementedError(f'Unknown: {n} {unk} @ 0x{p:X}')
+                    case 'TEXT':
+                        if not n in cs: cs[n] = 0
+
+                        c = f.readu32()
+                        of = xopen(o + f'/${n}/{cs[n]}.txt','w')
+                        for _ in range(c):
+                            of.write(f.read0s().decode('utf-8') + '\n')
+                            f.align(4,p)
+                        of.close()
+                        cs[n] += 1
+                    case 'TXFL'|'LITE'|'PHON'|'SHSN'|'NAV1'|'MLIN'|'SHAP'|'SMSG'|'CUTS'|'ENTI'|'npcc'|'HBPT'|'STPS'|'CTEV'|'FRAG'|'CTAT'|'PCLT':
+                        if not n in cs: cs[n] = 0
+                        xopen(o + f'/${n}/{cs[n]}.bin','wb').write(f.read(ep - f.pos))
+                        cs[n] += 1
+                    case 'MSHV'|'NORM'|'MTXT'|'MSPF'|'EMOD'|'HMPT'|'CTTR':
+                        f.skip(4)
+                        fn = o + f'/${n}/' + f.read0s().decode('ascii').strip(' \\/')
+                        f.align(4,p)
+                        xopen(fn,'wb').write(f.read(ep - f.pos))
+                    case 'MSHP'|'HSKN'|'CTAC':
+                        f.skip(8)
+                        fn = o + f'/${n}/' + f.read0s().decode('ascii').strip(' \\/')
+                        f.align(4,p)
+                        xopen(fn,'wb').write(f.read(ep - f.pos))
+                    case 'SKYB':
+                        if not n in cs: cs[n] = 0
+                        xyz = (f.readf32(),f.readf32(),f.readf32())
+                        f.skip(4)
+                        skyfl = []
+                        while f.pos < (ep-4):
+                            skyfl.append(f.read0s().decode('ascii'))
+                            f.align(4,p)
+                        xopen(o + f'/${n}/{cs[n]}.txt','w').write(f'XYZ: {xyz[0]} {xyz[1]} {xyz[2]}\nUnknown: {f.readu32()}\nFile list:\n' + '\n'.join(skyfl))
+                        cs[n] += 1
+                    case 'FNFO':
+                        if not n in cs: cs[n] = 0
+                        xopen(o + f'/${n}/{cs[n]}.txt','w').write(f'File size: {f.readu32()}\n')
+                        cs[n] += 1
+                    case 'RSFL':
+                        if not n in cs: cs[n] = 0
+                        c = f.readu32()
+                        ob = []
+                        for _ in range(c):
+                            sn = f.read0s().decode('ascii')
+                            f.align(4,p)
+                            ob.append(f'{sn}\n{f.readu32()}\n{f.readu32()}\n{f.readu32()}')
+                        xopen(o + f'/${n}/{cs[n]}.txt','w').write('\n\n'.join(ob))
+                        cs[n] += 1
+                    case 'LTXT':
+                        if not n in cs: cs[n] = 0
+                        c = f.readu32()
+                        ob = []
+                        for _ in range(c):
+                            ob.append(f.read(f.readu32()*2).rsplit(b'\0\0')[0].decode('utf-16le'))
+                            f.align(4,p)
+                        xopen(f'{o}/${n}/{cs[n]}.txt','w').write('\n\n'.join(ob))
+                        cs[n] += 1
+                    case 'HTXT':
+                        if not n in cs: cs[n] = 0
+                        c = f.readu32()
+                        ob = []
+                        for _ in range(c):
+                            ob.append(f.read(4)[::-1].hex().upper() + ': ' + f.read(f.readu32()*2).rsplit(b'\0\0')[0].decode('utf-16le'))
+                            f.align(4,p)
+                        xopen(f'{o}/${n}/{cs[n]}.txt','w').write('\n\n'.join(ob))
+                        cs[n] += 1
+                    case 'TTXT':
+                        if not n in cs: cs[n] = 0
+                        c = f.readu32()
+                        ob = []
+                        for _ in range(c):
+                            ob.append(f.read0s().decode('ascii'))
+                            f.align(4,p)
+                            ob[-1] += f': {f.readf32()} {f.readf32()} {f.readf32()} {f.readf32()} {f.readf32()}x{f.readf32()}'
+                        xopen(f'{o}/${n}/{cs[n]}.txt','w').write('\n'.join(ob))
+                        cs[n] += 1
+                    case _: raise NotImplementedError(f'Unknown: {n} @ 0x{p:X}')
+
+                f.seek(ep)
+
+            f.close()
+            if listdir(o): return
 
     return 1

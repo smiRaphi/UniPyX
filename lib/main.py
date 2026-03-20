@@ -140,6 +140,12 @@ def _neof(f):
     b = bool(f.read(1))
     if b: f.seek(-1,1)
     return b
+def send_keys(i:str,escape=False):
+    if escape:
+        i = i.replace('{','\0').replace('}','\1')
+        for c in '+^%~()[]': i = i.replace(c,'{' + c + '}')
+        i = i.replace('\0','{{}').replace('\1','{}}')
+    subprocess.run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',f"(New-Object -ComObject WScript.Shell).SendKeys('{i}')"])
 
 def msplit(i:str|list[str],seps:list[str]) -> list[str]:
     out = i if type(i) == list else [i]
@@ -568,7 +574,7 @@ def fix_isinstext(o:str,oi:str=None):
     return ret
 def fix_innoinstext(o:str,i:str):
     if not exists(o + '/$INSFILES'): return False
-    if exists(o + '/$INSFILES/unarc.dll'): uad = o + '\\$INSFILES'
+    if exists(o + '/$INSFILES/unarc.dll') or exists(o + '/$INSFILES/UnArcLib.dll'): uad = o + '\\$INSFILES'
     elif exists(o + '/$INSFILES/tmp/unarc.dll'): uad = o + '\\$INSFILES\\tmp'
     elif exists(o + '/$INSFILES/{tmp}/unarc.dll'): uad = o + '\\$INSFILES\\{tmp}'
     else: return False
@@ -577,7 +583,7 @@ def fix_innoinstext(o:str,i:str):
     copydir(uad,td.p)
     open(td + '/.hookshot','x').close()
 
-    bcmd = ['unarc-cpp',td + '\\unarc.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
+    bcmd = ['unarc-cpp',td + '\\' + ('UnArcLib' if exists(td + '/UnArcLib.dll') else 'unarc') + '.dll','x','-o+','-dp' + o,'-w' + td,'-cfgarc.ini']
     for f in os.listdir(dirname(i)):
         f = dirname(i) + '\\' + f
         if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue

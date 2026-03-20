@@ -1887,7 +1887,7 @@ def extract4_2(inp:str,out:str,t:str):
                 elif n == b'BODY': f.splt['d'] = (f.pos,s)
 
                 f.seek(ep)
-                f.alignpos(4)
+                f.align(4)
 
             bn = noext(i)
             id = dirname(i)

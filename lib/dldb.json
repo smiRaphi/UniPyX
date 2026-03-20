@@ -5507,6 +5507,30 @@
             }
         }]
     },
+    "isd":{
+        "p":"isd/PSUI.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20180115003944if_/https://vdisasm.com/isd/files/isdsetup.1.3.3.exe",
+            "ex":"inno",
+            "x":{
+                "PascalScript.dll":"isd/PascalScript.dll",
+                "PascalScript.Printing.dll":"isd/PascalScript.Printing.dll",
+                "PSUI.exe":"isd/PSUI.exe",
+                "VDisAsm.Helpers.dll":"isd/VDisAsm.Helpers.dll",
+                "ToastNotifications.dll":"isd/ToastNotifications.dll",
+                "ICSharpCode.AvalonEdit.dll":"isd/ICSharpCode.AvalonEdit.dll",
+                "ICSharpCode.NRefactory.Cecil.dll":"isd/ICSharpCode.NRefactory.Cecil.dll",
+                "ICSharpCode.NRefactory.CSharp.dll":"isd/ICSharpCode.NRefactory.CSharp.dll",
+                "ICSharpCode.NRefactory.dll":"isd/ICSharpCode.NRefactory.dll",
+                "ICSharpCode.NRefactory.Xml.dll":"isd/ICSharpCode.NRefactory.Xml.dll",
+                "Mono.Cecil.dll":"isd/Mono.Cecil.dll",
+                "Mono.Cecil.Mdb.dll":"isd/Mono.Cecil.Mdb.dll",
+                "Mono.Cecil.Pdb.dll":"isd/Mono.Cecil.Pdb.dll",
+                "Mono.Cecil.Rocks.dll":"isd/Mono.Cecil.Rocks.dll",
+                "ICSharpCode.Decompiler.dll":"isd/ICSharpCode.Decompiler.dll"
+            }
+        }]
+    },
     "pefile":{
         "pip":"pefile"
     },

@@ -233,7 +233,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'Compressia':
             if db.print_try: print('Trying with compressia')
             prc = subprocess.Popen([db.get('compressia'),'e',i,o],stdout=-1,stderr=-1)
-            run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-Command',"(New-Object -ComObject WScript.Shell).SendKeys('{ENTER}')"],print_try=False,getexe=False)
+            send_keys('{ENTER}')
             prc.wait()
             if listdir(o): return
         case 'CRUSH': return msdos(['uncrush','-qo',i],cwd=o)

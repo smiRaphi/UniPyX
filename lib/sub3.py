@@ -244,7 +244,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             rmdir(p)
                 else:
                     for x in listdir(o):
-                        if x != 'app': mv(o + '/' + x,o + '/$INSFILES/' + x)
+                        if not x in ('app','$INSFILES'):
+                            if x == 'install_script.iss' and exists(o + '/$INSFILES/install_script.iss'): mv(o + '/' + x,o + '/$INSFILES/' + x[:-4] + '_2.iss')
+                            else: mv(o + '/' + x,o + '/$INSFILES/' + x)
                     if exists(o + '/app'): copydir(o + '/app',o,True)
                     if listdir(o) == ['$INSFILES']:
                         if fix_innoinstext(o,i): return
@@ -1356,7 +1358,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.skip(4)
             c = f.readu32()
             assert f.readu32() == 0
-            f.alignpos(8)
+            f.align(8)
             f.skip(4*c)
             nos = [f.readu32() for _ in range(c)]
             bo = f.readu32()
@@ -1375,5 +1377,24 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             del f
             if listdir(o): return
+        case 'Pascal Script Binary':
+            td = TmpDir()
+            mkdir(td + '/Desktop')
+            opp = td + '/AppData/Roaming/vdisasm/isd/options.xml'
+            xopen(opp,'w').write('<?xml version="1.0" encoding="utf-8"?><Options xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><LastScriptPath>' + i + '</LastScriptPath><LastMethodName></LastMethodName></Options>')
+            if db.print_try: print('Trying with isd')
+            p = subprocess.Popen([db.get('isd')],env=os.environ.copy() | {'APPDATA':td.p + '\\AppData\\Roaming','USERPROFILE':td.p})
+            of = o + '\\' + tbasename(i) + '.pas'
+
+            sleep(2)
+            send_keys('%fe')
+            sleep(0.5)
+            send_keys(of,escape=True)
+            send_keys('{ENTER}')
+            sleep(0.75)
+            while not exists(of) or not getsize(of): sleep(0.1)
+            p.kill()
+            td.destroy()
+            return
 
     return 1

@@ -826,6 +826,10 @@
         "rs":"Transformers: Devastation BXM"
     },
     {
+        "d":[["isat","PACu",0],["isin",["\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4]],
+        "rs":"Softpal ADV PAC"
+    },
+    {
         "d":[["isat","\\xDE\\xAD\\xBE\\xEF",0],["isat","<?xml version=",14]],
         "rs":"Konami Python IMG","s":1
     },

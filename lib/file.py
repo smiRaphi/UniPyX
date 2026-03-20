@@ -88,8 +88,10 @@ class File:
     def writes64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'q',data))
     def writefloat(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'f',data))
 
-    def align(self,blocksize:int): return self.write(b'\0' * align(self.tell(),blocksize))
-    def alignpos(self,blocksize:int): self.skip(align(self.tell(),blocksize))
+    def align(self,blocksize:int,base:int=0):
+        v = align(self.tell() - base,blocksize)
+        self.skip(v)
+        return v
 
     def add_file(self,f):
         if type(f) == str: f = open(f,'rb')

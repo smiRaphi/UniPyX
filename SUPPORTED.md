@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 786
+# Supported Formats: 792
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -200,7 +200,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (112)
+## Executables/Packers/Installers (113)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -290,6 +290,7 @@ MSI | .msi | [lessmsi](https://github.com/activescott/lessmsi), MSIExec (Windows
 MSP | .msp | [MsiX](http://www.windowswiki.info/2009/02/19/how-to-extract-msumspmsiexe-files-from-the-command-line/), [7-Zip](https://7-zip.org/) |
 Netopsystems FEAD | .exe | Input (/nos_ne) |
 PACKWIN | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
+Pascal Script Binary | .bin | [Inno Setup Decompiler](https://web.archive.org/web/20170201213810/http://vdisasm.com/isd/) |
 PKLITE | .exe .com | [deark](https://github.com/activescott/deark) |
 PKTINY | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Pro-Pack | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
@@ -316,7 +317,7 @@ Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 
-## Various (365)
+## Various (370)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 0Size24 Data | * | Custom |
@@ -349,8 +350,9 @@ AmusementMakers Project B.G. Archive | ??? | Custom |
 Anna-Marie Archive | ??? | Custom |
 Arc System Works PAC | .pac | [arcsys.bms](https://aluigi.org/bms/arcsys.bms) |
 Artech DAT | .dat | Custom |
-ASDG SPLiT | .spl .spt | Custom |
 ASCARON Entertainment CPR | .cpr | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+ASDG SPLiT | .spl .spt | Custom |
+Asura Engine Resource | .asr .ps2 | Custom |
 Atari Masterpieces Resources | ??? | Custom |
 Atari Masterpieces Strings | ??? | Custom |
 Azada Wizard | .wzd | Custom |

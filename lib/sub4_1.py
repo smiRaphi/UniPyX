@@ -1245,7 +1245,7 @@ def extract4_1(inp:str,out:str,t:str):
                 f.skip(-0x20)
                 open(o + f'/{ix:02d}_header.bin','wb').write(f.read(hs))
                 open(o + f'/{ix:02d}.bin','wb').write(f.read(ds))
-                f.alignpos(0x100)
+                f.align(0x100)
             f.close()
 
             if c: return
@@ -1297,7 +1297,7 @@ def extract4_1(inp:str,out:str,t:str):
                     f.seek(p)
                 else:
                     fs[-1].append(f.read0s().decode('utf-8'))
-                    f.alignpos(4)
+                    f.align(4)
             for fe in fs:
                 f.seek(fe[0])
                 xopen(o + '/' + fe[3],'wb').write(f.read(fe[1]))
@@ -1461,7 +1461,7 @@ def extract4_1(inp:str,out:str,t:str):
                     f.skip(-0x12)
                     self.meta = xopen(o + '/$INFO.txt','w',encoding='utf-8')
                     self.meta.write('--- Signature ---\n' + f.read0s().decode('utf-8') + '\n--- --- ---\n\n')
-                    f.alignpos(4)
+                    f.align(4)
                     self.fts = {}
 
                     while f.pos < (self.pos+self.size):
@@ -1471,7 +1471,7 @@ def extract4_1(inp:str,out:str,t:str):
                 def reads(self):
                     l = f.readu32()
                     r = f.read(l)[:-1]
-                    f.alignpos(4)
+                    f.align(4)
                     return r.decode('utf-8')
                 def read_block(self,pr:str=None):
                     n = f.read(4).decode('ascii')
@@ -1519,7 +1519,7 @@ def extract4_1(inp:str,out:str,t:str):
                                 ts = f.readu32()
                                 f.skip(-8)
                                 xopen(self.o + f'/{n}{self.fts[n]}/{c:03d}.{tn.lower()}','wb').write(f.read(ts+8))
-                                f.alignpos(4)
+                                f.align(4)
                                 c += 1
                             self.fts[n] += 1
                         case 'BNCH':
@@ -1543,7 +1543,7 @@ def extract4_1(inp:str,out:str,t:str):
                         case _: raise NotImplementedError(f'Unknown Block: {n} @ 0x{f.pos-8:04X}')
  
                     f.seek(p)
-                    f.alignpos(4)
+                    f.align(4)
 
             g = GDED(o,f.size)
             f.close()
