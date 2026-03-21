@@ -1,6 +1,9 @@
 import struct,io,sys
 
 def align(n:int,blocksize:int): return -n % blocksize
+def swap32(i:bytes):
+    c = len(i) // 4
+    return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
 
 class File:
     def __init__(self,f,mode='r',endian='>',middle_u24_little=True):
@@ -237,6 +240,15 @@ def crc_hash(i:bytes,algo:str,*args,**kwargs):
         case 'tarzan': fnc = tarzan_hash
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
+def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None):
+    match algo:
+        case 'xor': return xor(i,key)
+        case 'inv'|'invert': return inv(i)
+        case 'blowfish'|'blowfish_ebc':
+            from Cryptodome.Cipher import Blowfish
+            return Blowfish.new(key,Blowfish.MODE_ECB).decrypt(i)
+        case 'blowfish_le'|'blowfish_le_ebc': return swap32(decrypt(swap32(i),'blowfish_ebc',key))
+        case _: raise NotImplementedError(algo)
 
 class Huffman:
     TREE_SIZE = 512

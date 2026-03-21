@@ -518,6 +518,30 @@
         "rs":"Michigan: Report From Hell BIN"
     },
     {
+        "d":[["isat","LF 2",0],["isat","\\x10\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');f.seek(16);fo=int.from_bytes(f.read(4),'little');return o==fo and (16+c*8)==(o<<2)"]],
+        "rs":"Contact File Data","s":1
+    },
+    {
+        "d":[["isat","NFA0\\1\\0\\0\\0",0],["n0",4,8],["isat","\\0",7],["py","f=open(inp,'rb');f.seek(8);return int.from_bytes(f.read(4),'little')<65536"]],
+        "rs":"Nemea File Archive","s":1
+    },
+    {
+        "d":[["isat","PACK",0],["n0",4,4],["str0",8,64,5],["n0",4,72],["n0",4,76],["n0",4,80],["n0",4,84],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little')*80+8;f.seek(80);return (c+-c%256)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"D.N.A. Softwares Pack"
+    },
+    {
+        "d":[["s%",8],["isat","LZSS",0],["n0",4,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);d=int.from_bytes(f.read(4),'little')+8;return (d+-d%8)==s"]],
+        "rs":"D.N.A. Softwares LZSS"
+    },
+    {
+        "d":[["size",[532,4294967295]],["isat","./",4],["isat","./",264],["n0",4,0],["str0e",4,256,7],["n0",4,260],["str0e",264,256,7],["n0",4,520],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=4+260*c\nfor _ in range(c):\n try:assert f.read(256).split(b'\\0')[0].decode('ascii').isprintable()\n except:return\n s+=int.from_bytes(f.read(4),'little')\nreturn s==f.seek(0,2)"]],
+        "rs":"@N-Factory DAT"
+    },
+    {
+        "d":[["isat","HTSW",0],["isatS","\\0",8,8],["n0",4,4],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(20);l=int.from_bytes(f.read(4),'little')\nfor _ in range(c-1):\n if int.from_bytes(f.read(4),'little')!=l:return\n l=int.from_bytes(f.read(4),'little')\nreturn l==s"]],
+        "rs":"UTG Software DDD","s":1
+    },
+    {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'big')+8)==s"]],
         "rs":"Lucas Arts Bundle"
     },

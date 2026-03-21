@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 795
+# Supported Formats: 801
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -318,9 +318,10 @@ Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 
-## Various (372)
+## Various (378)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
+@N-Factory DAT | .dat | Custom |
 0Size24 Data | * | Custom |
 10,000 Bullets FILE.BIN | .bin | Custom |
 1941 Frozen Front Data | ??? | Custom |
@@ -383,6 +384,7 @@ CI Games DPK | .dpk | [Game Extractor Server](https://github.com/Sembiance/dexve
 Codename Kids Next Door JAM2/FSTA | .jam .fst | Custom |
 Coktel Vision STK | .stk | Custom |
 Compressed File Library | .cfl | [uncfl](https://solhsa.com/cfl/index.html) |
+Contact File Data | .dat | Custom |
 Cosmo Volume Game Archive | .vol | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 CPK | .cpk | [CpkExtract](https://github.com/1330-Studios/CPK-Extract) |
 Creative Assembly PFH0 | .pfh | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -390,6 +392,8 @@ CRI CPK | .cpk | [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
 CSI NY GRF | .grf | Custom |
 CTPK | .ctpk | [ctpktool](https://github.com/dnasdw/ctpktool) |
 Culpa Innata SFS | .sfs | Custom |
+D.N.A. Softwares LZSS | * | Custom |
+D.N.A. Softwares Pack | .p .mus | Custom |
 D1 Grand Prix Series 2005 BIN | .bin | Custom |
 Dance Layout Script | .dls | Custom |
 Danganronpa WAD | .wad | [wad_archiver.py](https://github.com/vn-tools/danganronpa-tools/tree/master/wad_archiver) |
@@ -530,6 +534,7 @@ Motocross Mania DAT | .dat | [e_biker.bms](https://mirror.aluigi.org/bms/e_biker
 NCAA Gamebreaker PG | .pg | Custom |
 NDS Sound Data | .sdat | [ndssntext](https://gbatemp.net/download/nds-sound-extractor.28818/) |
 NeoBook Cartoon | .nbc | Custom |
+Nemea File Archive | .bin | Custom |
 New York Race KIX+KBF | .kix+.kbf | Custom |
 Nexar New PAC | .pac | Custom |
 Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/KillzXGaming/NLG-File-Editor-Tool), [NlgFileTool MFF](https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper), [luigi_mansion_dict.bms](https://mirror.aluigi.org/bms/luigi_mansion_dict.bms) |
@@ -663,6 +668,7 @@ Unity Assets | .assets .sharedassets .assets.split | [AssetRipper](https://githu
 Unity Bundle | .bundle | [AssetRipper](https://github.com/AssetRipper/AssetRipper) |
 Unreal Engine Web Package | .js+.pak | Custom |
 Unreal ZenLoader | .ucas | [UnrealPak](https://www.unrealengine.com/), [ZenTools](https://github.com/WistfulHopes/ZenTools-UE4) |
+UTG Software DDD | .ddd | Custom |
 Valve Package | .vpk | [VPKEdit](https://github.com/craftablescience/VPKEdit) |
 Vicarious Visions GFC+GOB | .gfc+.gob | [over_the_hedge.bms](https://mirror.aluigi.org/bms/over_the_hedge.bms) |
 Vietcong Compressed Big File | .cbf | [CBF.wcx](http://www.vietcong-coop.net/site?node_id=6&action=show_data&p_id=510&ordercol=bin_file&ordertype=ASC&row=609)

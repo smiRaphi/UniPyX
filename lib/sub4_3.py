@@ -600,5 +600,115 @@ def extract4_3(inp:str,out:str,t:str):
         case 'GameMaker Archive':
             run(['undertalemodcli','load',i,'-s',dirname(db.get('undertalemodcli')) + '\\ExportAll.csx'],cwd=o)
             if listdir(o): return
+        case 'Contact File Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'LF 2'
+
+            f.skip(4)
+            c = f.readu32()
+            f.seek(f.readu32())
+            fs = []
+            for _ in range(c): fs.append((f.readu32() << 2,f.readu32()))
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                if d[:0x40] == b'// -----------------------------------------\r\n// FileLinkNDS.H  ': fn = 'FileLinkNDS.h'
+                else:
+                    if d[:4] == b'SCR0': ext = 'scr'
+                    else: ext = guess_ext_nds(d)
+                    fn = f'{ix:04d}.{ext}'
+                xopen(o + '/' + fn,'wb').write(d)
+
+            f.close()
+            if fs: return
+        case 'Nemea File Archive':
+            KEY = (0xEE ^ 0xE6).to_bytes(1)
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,xor
+            f = File(i,endian='<')
+            assert f.read(4) == b'NFA0'
+
+            f.skip(4)
+            c = f.readu32()
+            f.skip(4)
+            fs = []
+            for _ in range(c):
+                inf = xor(f.read(0x94),KEY)
+                fs.append((int.from_bytes(inf[8:12],'little'),int.from_bytes(inf[12:16],'little'),inf[20:].rsplit(b'\0\0')[0].decode('utf-16le'))) # fe[2] = ,int.from_bytes(inf[16:20],'little')
+            for fe in fs:
+                f.seek(fe[1])
+                #if fe[2]: print(xor(f.read(4),KEY).hex(),fe[0],fe[1],hex(fe[2]));raise
+                xopen(o + '/' + fe[2],'wb').write(xor(f.read(fe[0]),KEY))
+
+            f.close()
+            if fs: return
+        case 'D.N.A. Softwares Pack':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PACK'
+
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                fn = f.read(0x40).rstrip(b'\0').decode('ascii')
+                f.skip(8)
+                fs.append((f.readu32(),f.readu32(),fn))
+            for fe in fs:
+                f.seek(fe[0])
+                d = f.read(fe[1])
+                xopen(o + '/' + fe[2] + ('.lzss' if d[:4] == b'LZSS' else ''),'wb').write(d)
+                if d[:4] == b'LZSS': xopen(o + '/' + fe[2],'wb').write(dnasoft_lzss_decrypt(d))
+
+            f.close()
+            if fs: return
+        case 'D.N.A. Softwares LZSS':
+            if db.print_try: print('Trying with custom extractor')
+            of = o + '/' + basename(i)
+            if i.lower().endswith('.lzss'): of = of[:-5]
+            xopen(of,'wb').write(dnasoft_lzss_decrypt(open(i,'rb').read()))
+            return
+        case '@N-Factory DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            c = f.readu32()
+
+            fs = []
+            for _ in range(c):
+                fn = f.read(0x100).split(b'\0',1)[0].decode('ascii').replace('\\','/')
+                while fn.startswith(('./','../')): fn = fn.split('/',1)[1]
+                fs.append((f.readu32(),fn))
+            for fe in fs: xopen(o + '/' + fe[1],'wb').write(f.read(fe[0]))
+
+            f.close()
+            if fs: return
+        case 'UTG Software DDD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'HTSW'
+
+            c = f.readu32()
+            assert f.readu64() == 0
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.read(fe[1] - fe[0])
+                xopen(o + '/' + f'{ix:02d}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
+            if fs: return
 
     return 1
+
+def dnasoft_lzss_decrypt(i:bytes):
+    from lib.file import decrypt
+    KEY = b'\xe4\x81\xd4\xed\x17\xd4\x41\x62\xfa\x5c\xe9\x95\xae\x25\x2f\xd0\x98\xc0\x14\xce\xd9\xa7\x42\xf9\x9f\xfa\x8d\x38\x2b\x2a\x13\x6a\x26\xe0\xd9\x70\x8e\xab\xb5\xf1\x8e\x77\xed\x80\x9b\x1c\xaf\x51\x91\x8d\x68\x00\x61\xb2\x46\x3d'
+
+    assert i[:4] == b'LZSS'
+    rs = int.from_bytes(i[4:8],'little')
+    return decrypt(i[8:8+rs+-rs%8],'blowfish_le',KEY)[:rs]

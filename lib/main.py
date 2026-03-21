@@ -771,7 +771,6 @@ def guess_ext_psx(f):
     if not f: return 'null'
     import io
     if type(f) == bytes: f = io.BytesIO(f)
-
     tag = f.read(4)
 
     ext = 'bin'
@@ -801,7 +800,6 @@ def guess_ext_ps2(f):
     if not f: return 'null'
     import io
     if type(f) == bytes: f = io.BytesIO(f)
-
     tag = f.read(4)
 
     ext = None
@@ -859,6 +857,17 @@ def guess_ext_ps2(f):
                 if f.read(1)[0] >> 4 > 5: break
                 f.seek(15,1)
             else: ext = 'psadpcm'
+
+    return ext or 'bin'
+def guess_ext_nds(f):
+    if not f: return 'null'
+    import io
+    if type(f) == bytes: f = io.BytesIO(f)
+    tag = f.read(4)
+
+    ext = None
+    if tag in (b'RGCN',b'RLCN',b'RECN',b'RNAN',b'RCSN'): ext = tag.decode('ascii').lower()[::-1]
+    elif tag in (b'BMD0',): ext = tag[:3].decode('ascii').lower()
 
     return ext or 'bin'
 
