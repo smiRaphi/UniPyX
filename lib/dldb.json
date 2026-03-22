@@ -56,9 +56,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1773615600
+            "ts":1773961200
         }],
-        "ts":1773615600
+        "ts":1773961200
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -122,9 +122,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1773961200
+            "ts":1774134000
         }],
-        "ts":1773961200
+        "ts":1774134000
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -522,13 +522,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/8f/9d/dolphin-master-2603-86-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/2c/34/dolphin-master-2603-100-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1773871081
+            "ts":1774151923
         }],
-        "ts":1773871081
+        "ts":1774151923
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2070,15 +2070,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.2/GDRE_tools-v2.5.0-beta.2-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.3/GDRE_tools-v2.5.0-beta.3-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1773453415
+            "ts":1774023271
         }],
-        "ts":1773453415
+        "ts":1774023271
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2355,23 +2355,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46029/SDLVICE-3.10-win64-r46029.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46032/SDLVICE-3.10-win64-r46032.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46029/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46029/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46029/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46029/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46029/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46029/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46032/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46032/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46032/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46032/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46032/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46032/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1773957593
+            "ts":1774133506
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1773957593
+        "ts":1774133506
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2733,14 +2733,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_19_f77ab6bd_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_21_5e5230dd_32.zip",
             "x":{
-                "RenderDoc_2026_03_19_f77ab6bd_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_19_f77ab6bd_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_21_5e5230dd_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_21_5e5230dd_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1773874800
+            "ts":1774047600
         }],
-        "ts":1773874800
+        "ts":1774047600
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -6435,14 +6435,14 @@
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
-            "u":"https://files.prodkeys.net/Prodkeys.NET_v21-0-0.zip",
+            "u":"https://files.prodkeys.net/ProdKeys.Net-21.2.0.zip",
             "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
+                "ProdKeys.Net-21.2.0/prod.keys":"prodkeys/prod.keys",
+                "ProdKeys.Net-21.2.0/title.keys":"prodkeys/title.keys"
             },
-            "ts":1763976235
+            "ts":1770756321
         }],
-        "ts":1763976235
+        "ts":1770756321
     },
     "devkeys":{
         "p":"prodkeys/dev.keys"

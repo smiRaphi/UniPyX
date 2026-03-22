@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 801
+# Supported Formats: 803
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -200,7 +200,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (114)
+## Executables/Packers/Installers (116)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -236,6 +236,8 @@ COMPACK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos
 Compress-EXE | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Compressed Nintendo Switch Executable | .nso | [nsnsotool](https://github.com/0CBH0/nsnsotool) |
 Cruncher | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
+CryptPE | .exe | Custom |
+CryptPE BinTable.h | .h | Custom |
 d0lLZ 1 | .dol | Custom |
 d0lLZ 2 | .dol | Custom |
 DexEXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |

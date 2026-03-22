@@ -145,6 +145,7 @@ class BitReader:
                 break
             v |= b << (n - 1 - i)
         return v
+    def reset(self): self.m = 0
     @property
     def eof(self): return self.p >= len(self.d) and not self.m
 
@@ -240,14 +241,31 @@ def crc_hash(i:bytes,algo:str,*args,**kwargs):
         case 'tarzan': fnc = tarzan_hash
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
-def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None):
+def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor': return xor(i,key)
         case 'inv'|'invert': return inv(i)
-        case 'blowfish'|'blowfish_ebc':
+        case 'blowfish'|'blowfish_ecb':
             from Cryptodome.Cipher import Blowfish
             return Blowfish.new(key,Blowfish.MODE_ECB).decrypt(i)
-        case 'blowfish_le'|'blowfish_le_ebc': return swap32(decrypt(swap32(i),'blowfish_ebc',key))
+        case 'blowfish_le'|'blowfish_le_ecb': return swap32(decrypt(swap32(i),'blowfish_ecb',key))
+        case 'salsa20':
+            import ctypes
+            from Cryptodome.Cipher import Salsa20
+            ctx = Salsa20.new(key,iv[:8])
+            pctx = ctypes.cast(ctx._state.get(),ctypes.POINTER(ctypes.c_uint32))
+
+            bc = None
+            if 'block_count' in kwargs: bc = kwargs['block_count']
+            elif len(iv) > 8:
+                assert len(iv) <= 16
+                bc = int.from_bytes(iv[8:16],'little') # using int.from_bytes instead of struct to support len(iv) != 16
+            if bc is not None:
+                pctx[8],pctx[9] = bc & 0xFFFFFFFF,(bc >> 32) & 0xFFFFFFFF # stream_state->input[8/9] = block count
+
+            o = ctx.decrypt(i)
+            if kwargs.get('return_block_count'): return o,pctx[8] | (pctx[9] << 32)
+            return o
         case _: raise NotImplementedError(algo)
 
 class Huffman:
@@ -276,9 +294,10 @@ class Huffman:
             if v is None: raise EOFError("Unexpected EOF while reading leaf")
             return v
 
-    def unpack(self,usize:int):
+    def unpack(self,usize:int,padding=False):
         self.token = 256
         root = self.create_tree()
+        if padding: self.inp.reset()
         out = bytearray()
 
         for _ in range(usize):
@@ -291,7 +310,7 @@ class Huffman:
             out.append(sym)
 
         return bytes(out)
-def huffman_decompress(i:bytes,usize:int): return Huffman(BitReader(i)).unpack(usize)
+def huffman_decompress(i:bytes,usize:int,padding=False): return Huffman(BitReader(i)).unpack(usize,padding)
 def lzss_decompress(i:bytes,usize:int=None):
     d = BitReader(i)
     ob = bytearray()

@@ -204,10 +204,13 @@ def supdate(c:Cache,k:str,inf:dict):
             s = c.get('https://prodkeys.net/')
             if not '500: Internal server error' in s:
                 s = c.get(re.search(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"',s)[1])
-                ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1].split('+')[0],'%Y-%m-%dT%H:%M:%S')
+                ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1],'%Y-%m-%dT%H:%M:%S%z')
                 if ts > ots:
-                    nu = re.search(r'(?i)href="(https://files\.prodkeys\.net/ProdKeys\.net(?:-v\d+\.\d+\.|_v\d+\-\d+\-)\d+\.zip)"',s)[1]
-                    if nu != u: u = nu
+                    nu = re.search(r'(?i)href="(https://files\.prodkeys\.net/ProdKeys\.net(?:-v?\d+\.\d+\.|_v\d+\-\d+\-)\d+\.zip)"',s)[1]
+                    if nu != u:
+                        u = nu
+                        bdir = u.split('/')[-1].rsplit('.',1)[0]
+                        for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                     else: ts = 0
         elif dom == 'dl.xpdfreader.com':
             s = c.get('https://www.xpdfreader.com/download.html',verify=False)
@@ -277,6 +280,7 @@ if __name__ == '__main__':
             if len(argv[2]) == 20 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == 'Z': print(ft(argv[2],'%Y-%m-%dT%H:%M:%SZ'))
             elif len(argv[2]) == 23 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == ' ' and argv[2][13] == argv[2][16] == ':' and argv[2][19:] == ' UTC': print(ft(argv[2],'%Y-%m-%d %H:%M:%S UTC'))
             elif len(argv[2]) == 24 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == '.' and argv[2][23] == 'Z': print(ft(argv[2].split('.')[0],'%Y-%m-%dT%H:%M:%S'))
+            elif len(argv[2]) == 25 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == argv[2][22] == ':' and argv[2][19] in '+-': print(ft(argv[2],'%Y-%m-%dT%H:%M:%S%z'))
             elif len(argv[2]) == 10 and argv[2][2] == argv[2][5] == '/': print(ft(argv[2],'%m/%d/%Y'))
             elif len(argv[2]) == 10 and argv[2][4] == argv[2][7] == '-': print(ft(argv[2],'%Y-%m-%d'))
     else: update()

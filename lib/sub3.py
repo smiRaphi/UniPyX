@@ -1401,5 +1401,60 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['wasm2wat',i,'--enable-all','-o',o + '\\' + tbasename(i) + '.wat'])
             run(['wasm-decompile',i,'--enable-all','-o',o + '\\' + tbasename(i) + '.txt'])
             return
+        case 'CryptPE BinTable.h':
+            if db.print_try: print('Trying with custom extractor')
+            import re,ast
+            from lib.file import decrypt,decompress
+
+            inf = open(i).read()
+            s = int(re.search(r'static size_t file_size *= *(\d+);',inf)[1])
+            inf = {x[0]:bytes(ast.literal_eval(f'({x[1]})')) for x in re.findall(r'static uint8_t (\w+)\[\] *= *\{([^\}]+)\}',inf)}
+            tree,bc = decrypt(inf['tree'],'salsa20',inf['key'],inf['nonce'],return_block_count=True)
+            dat = decrypt(inf['binary'],'salsa20',inf['key'],inf['nonce'],block_count=bc)
+
+            open(f'{o}/{tbasename(i)}.exe','wb').write(decompress(tree + dat,'huffman',usize=s,padding=True))
+            return
+        case 'CryptPE':
+            if db.print_try: print('Trying with custom extractor')
+            import re
+            from lib.file import decrypt,decompress,EXE
+            f = EXE(i)
+
+            ds = f.secs['.data'][1] - 0x80 - 0x20 - 0x10 - 0x30
+            f.seek(f.secs['.text'][0] + 0x800)
+            cod = f.read(f.secs['.text'][1] - 0x800)
+
+            cmps1 = re.findall(b'\x81[\xFF\xFD].{4}',cod)
+            scmp = {}
+            for c in cmps1:
+                adr = int.from_bytes(c[2:6],'little')
+                if adr > ds: continue
+                if not adr in scmp: scmp[adr] = []
+                scmp[adr].append(c[1])
+            cmps1 = [x for x in scmp if len(scmp[x]) == 2 and 0xFF in scmp[x] and 0xFD in scmp[x]]
+            assert len(cmps1) == 1
+
+            cmps2 = [int.from_bytes(x[2:4],'little') for x in re.findall(b'\x81\xFF.[\0\1]\0\0',cod)]
+            cmps2 = [x for x in cmps2 if 0x140 >= x >= 0x30]
+            assert len(cmps2) == 1
+
+            movs = [int.from_bytes(x[1:5],'little') for x in re.findall(b'\xB9.{4}',cod)]
+            movs = [x for x in movs if cmps1[0]*1.75 > x > cmps1[0]/2.5]
+            cmps3 = [int.from_bytes(x[3:7],'little') for x in re.findall(b'\x49\x81\xF9.{4}',cod)]
+            cmps3 = [x for x in cmps3 if x in movs]
+            assert len(cmps3) == 1
+            del cod
+
+            f.seek(f.secs['.data'][0] + 0x80)
+            key = f.read(0x20)
+            nonce = f.read(0x10)
+            tree = f.read(cmps2[0])
+            dat = f.read(cmps1[0])
+
+            tree,bc = decrypt(tree,'salsa20',key,nonce,return_block_count=True)
+            dat = decrypt(dat,'salsa20',key,nonce,block_count=bc)
+
+            open(f'{o}/{tbasename(i)}.exe','wb').write(decompress(tree + dat,'huffman',usize=cmps3[0],padding=True))
+            return
 
     return 1
