@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 804
+# Supported Formats: 806
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -320,8 +320,9 @@ Xamarin Compressed | ??? | Custom + [LZ4](https://github.com/lz4/lz4) |
 Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
+[zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (378)
+## Various (379)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -375,6 +376,7 @@ Blitz Games Archive | ??? | [blitz_games.bms](https://mirror.aluigi.org/bms/blit
 Bloodrayne POD | .pod | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Blur PAK | .pak | [blur.bms](https://mirror.aluigi.org/bms/blur.bms) |
 Borland Form | .dfm | [dfm2txt](https://github.com/Sembiance/dexvert/blob/37a7da64dfd630b79046144f0c413f9c2084b122/qemu/win2k/data/app/dfm2txt/dfm2txt.exe)(src?) + Custom |
+Braveheart BLB 2.0 | .bml | Custom |
 Broderbund Mohawk MHK | .mhk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 BRSAR | .brsar | [mrst](https://github.com/em-eight/mrst) |
 Build Engine Group | .grp | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -703,7 +705,7 @@ ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | * | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (119)
+## Compression Enthusiasts/One-Off Formats (120)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
@@ -762,6 +764,7 @@ LIMIT | .limit .lim | [LIMIT](http://cd.textfiles.com/nightowl/nopv13/014A/LIMIT
 Lizard | .lz .liz | [Lizard](https://github.com/inikep/lizard) |
 LZFSE | ??? | [lzfse](https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe)(src?) |
 LZHAM | ??? | [lzham](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/lzham/lzham_alpha7_r1.7z) |
+LZMAT | .lzmat | [lzmat](https://web.archive.org/web/20150512034714/http://www.matcode.com/lzmat.htm) |
 LZOP | .lzop | [lzop](https://www.lzop.org/) |
 LZPM | .lzpm | [LZPM](https://compressme.net/) |
 LZPX | .lzpx | [LZPX](https://sourceforge.net/project/lzpx/) |

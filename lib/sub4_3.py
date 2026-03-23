@@ -702,6 +702,29 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Braveheart BLB 2.0':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'BLB2.0\0\0'
+
+            f.skip(2)
+            c = f.readu16()
+            f.skip(0x12)
+            nl = f.readu16()
+            fs = []
+            for _ in range(c):
+                fs.append((f.read(8).rstrip(b'\0').decode('ascii'),f.readu32()))
+                f.skip(6)
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,f.size))
+
+            for ix in range(c):
+                f.seek(fs[ix][1])
+                xopen(o + '/' + fs[ix][0],'wb').write(f.read(fs[ix+1][1] - fs[ix][1]))
+
+            f.close()
+            if fs: return
 
     return 1
 

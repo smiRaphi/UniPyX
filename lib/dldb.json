@@ -5568,6 +5568,15 @@
         }],
         "ts":0
     },
+    "lzmat":{
+        "p":"test_lzmat.exe",
+        "fs":[{
+            "u":"https://web.archive.org/web/20110720025549if_/http://www.matcode.com/lzmat_lib.zip",
+            "x":{
+                "test_lzmat.exe":"test_lzmat.exe"
+            }
+        }]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

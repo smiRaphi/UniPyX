@@ -1470,5 +1470,11 @@ def extract3(inp:str,out:str,t:str) -> bool:
             d = decompress(d,'lzma',null_usize=True)
             open(f'{o}/{tbasename(i)}.exe','wb').write(d)
             return
+        case 'zexe':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = decompress(open(i,'rb').read()[0x200:],'gzip')
+            open(f'{o}/{tbasename(i)}.{"exe" if d[:2] == b"MZ" else "elf"}','wb').write(d)
+            return
 
     return 1

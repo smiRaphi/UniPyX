@@ -1066,6 +1066,10 @@
         "rs":"One Piece Straw Wars Pirate Defense Resource"
     },
     {
+        "d":[["isat","BLB2.0\\0\\0\\x20\\0",0],["isat","\\x12\\0\\0\\0",14],["isat","\\0\\1\\0\\0\\0\\0\\0\\0\\x08\\0",22],["isat","\\0\\0",42],["n0",2,10],["n0",2,12],["n0",2,18],["n0",2,20],["str0",32,8,3],["py","f=open(inp,'rb');f.seek(10)\nif f.read(2)!=f.read(2):return\nf.seek(20);d=f.read(2);f.seek(40);return d==f.read(2)"]],
+        "rs":"Braveheart BLB 2.0","s":1
+    },
+    {
         "d":[["size",[128,2147483648]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],
              ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');cc=c*8+4;so=int.from_bytes(f.read(4),'little');ss=int.from_bytes(f.read(4),'little')+so;o=int.from_bytes(f.read(4),'little')\nif not(((cc+(-cc%64))==so and (ss+(-ss%64))==o)or((cc+(-cc%0x800))==so and (ss+(-ss%0x800))==o)):return\nf.seek(so);return int.from_bytes(f.read(4),'little')==(c*4-4)"]],
         "rs":"D1 Grand Prix Series 2005 BIN"
@@ -1183,6 +1187,11 @@
         "rqr":"Microsoft Visual Studio",
         "d":[["contain","\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFFexpand 32-byte kexpand 16-byte k",[10240,3584]],["contain","MemoryLoadLibrary() failed.\\n\\0\\0\\0\\0main\\0\\0\\0\\0MemoryGetProcAddress() couldn't fine main().\\n\\0\\0\\0",[10272,3584]]],
         "rs":"CryptPE"
+    },
+    {
+        "rqr":"Linux/UNIX shell script",
+        "d":[["size",[520,null]],["hash","D40B661B6AA38AA5663E749A07D60AF45E134F62",0,512]],
+        "rs":"zexe","s":1
     },
     {
         "d":[["isat","Davilex Games BV",4],["isatS","\\0",12,20],["py","return exists(splitext(inp)[0]+'.img')and exists(splitext(inp)[0]+'.idx')"]],
@@ -1970,6 +1979,10 @@
     {
         "d":[["namei","tarzan.fsd"],["n0",4,0],["n0",4,4],["isatS","\\0",16,24560]],
         "rs":"Disney's Tarzan FSD"
+    },
+    {
+        "d":[["ext",".lzmat"],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');return s>=f.seek(0,2)"]],
+        "rs":"LZMAT"
     },
     {
         "rqr":null,
