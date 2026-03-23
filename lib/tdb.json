@@ -1438,5 +1438,8 @@
     "WebAssembly":[
         "webassembly (wasm) binary module version 0x1 (mvp)",
         "webassembly module (binary)"
+    ],
+    "Fatpack":[
+        "fatpack"
     ]
 }

@@ -1456,5 +1456,19 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             open(f'{o}/{tbasename(i)}.exe','wb').write(decompress(tree + dat,'huffman',usize=cmps3[0],padding=True))
             return
+        case 'Fatpack':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import ext_exe,decompress
+            f = ext_exe(i)
+
+            if '.fpack  ' in f.SECTIONS: d = f.SECTIONS['.fpack  '].get_data()
+            else:
+                inf = f.DIRECTORY_ENTRY_RESOURCE.entries[0].directory.entries[0].directory.entries[0].data.struct
+                d = f.get_data(inf.OffsetToData,inf.Size)
+            f.close()
+
+            d = decompress(d,'lzma',null_usize=True)
+            open(f'{o}/{tbasename(i)}.exe','wb').write(d)
+            return
 
     return 1

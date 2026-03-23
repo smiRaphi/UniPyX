@@ -118,7 +118,7 @@ class File:
     def __len__(self): return self._size
     def __bool__(self):
         b = self.reads()
-        self.skip(-1)
+        if b: self.back(1)
         return bool(b)
 class BitReader:
     def __init__(self,d:bytes):
@@ -193,7 +193,9 @@ def ext_exe(i:str,dotnet=False):
         return dnfile.dnPE(i)
     else:
         import pefile
-        return pefile.PE(i)
+        r = pefile.PE(i)
+        r.SECTIONS = {s.Name.rstrip(b'\0').decode(errors='ignore'):s for s in r.sections}
+        return r
 
 def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
     match algo:
@@ -204,9 +206,10 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'gzip':
             import gzip
             fnc = gzip.decompress
-        case 'lzma':
+        case 'lzma'|'lzma_alone':
             import lzma
-            fnc = lzma.decompress
+            if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
+            return lzma.LZMADecompressor(format=lzma.FORMAT_ALONE).decompress(i)
         case 'zstd':
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
             else:

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 803
+# Supported Formats: 804
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -200,7 +200,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (116)
+## Executables/Packers/Installers (117)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -251,6 +251,7 @@ Excel DNA XLL | .dll | [exceldna-unpack](https://github.com/augustoproiete/excel
 EXECUTRIX-COMPRESSOR | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 ExeLITE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 EXEPACK | .exe .com | [deark](https://github.com/activescott/deark) |
+Fatpack | .exe | Custom |
 FreeArc | .arc | [unarc](https://sourceforge.net/projects/freearc/) |
 GameCube DOLXZ | .dol | Custom |
 GPEComp | .elf ` ` | Custom |
