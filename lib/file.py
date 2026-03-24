@@ -89,7 +89,8 @@ class File:
     def writes16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'h',data))
     def writes32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'i',data))
     def writes64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'q',data))
-    def writefloat(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'f',data))
+    def writef32(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'f',data))
+    def writef64(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'d',data))
 
     def align(self,blocksize:int,base:int=0):
         v = align(self.tell() - base,blocksize)
@@ -210,6 +211,7 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
             return lzma.LZMADecompressor(format=lzma.FORMAT_ALONE).decompress(i)
+        case 'lzma_us32'|'lzma_alone_us32': return decompress(i[:9] + b'\0'*4 + i[9:],'lzma_alone',*args,**kwargs)
         case 'zstd':
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
             else:
@@ -235,23 +237,59 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'lzss': fnc = lzss_decompress
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
-def crc_hash(i:bytes,algo:str,*args,**kwargs):
+def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
     match algo:
         case 'crc32':
             import zlib
             return zlib.crc32(i,*args,**kwargs) & 0xFFFFFFFF
         case 'crc16': fnc = crc16
         case 'tarzan': fnc = tarzan_hash
+        case 'sha1'|'sha256'|'md5':
+            import hashlib
+            r = getattr(hashlib,algo)(i).digest()
+            if kwargs.get('bytes') or args in {(True,),(1,)}: return r
+            return int.from_bytes(r,'big')
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
-        case 'xor': return xor(i,key)
-        case 'inv'|'invert': return inv(i)
-        case 'blowfish'|'blowfish_ecb':
+        case 'xor':
+            if type(key) == int: key = (key,)
+            bytes(i[x] ^ key[x % len(key)] for x in range(len(i)))
+        case 'rxor':
+            if type(key) == bytes: key = key[0]
+            d = bytearray(i)
+            for ix in range(len(i)): key = d[ix] = d[ix] ^ key
+            return bytes(d)
+        case 'inv'|'invert': return bytes(x ^ 0xFF for x in i)
+        case 'roll':
+            if type(key) == int: key = (key,)
+            return bytes((i[x] - key[x % len(key)]) & 0xFF for x in range(len(i)))
+        case 'rolr':
+            if type(key) == int: key = (key,)
+            return bytes((i[x] + key[x % len(key)]) & 0xFF for x in range(len(i)))
+
+        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_gcm':
+            from Cryptodome.Cipher import AES
+            m = algo[4:] or 'cbc'
+
+            kw = kwargs
+            if m in {'ccm','eax','gcm','siv','ocb','ctr'}: kw['nonce'] = iv
+            elif m in {'cbc','cfb','ofb','openpgp'}: kw['iv'] = iv
+            obj = AES.new(key,mode=getattr(AES,f'MODE_{m.upper()}'),**kw)
+            if i is None: return obj
+
+            return obj.decrypt(i)
+        case 'blowfish'|'blowfish_ecb'|'blowfish_cbc':
             from Cryptodome.Cipher import Blowfish
-            return Blowfish.new(key,Blowfish.MODE_ECB).decrypt(i)
-        case 'blowfish_le'|'blowfish_le_ecb': return swap32(decrypt(swap32(i),'blowfish_ecb',key))
+            m = algo[9:] or 'ecb'
+
+            kw = kwargs
+            if m in {'cbc','cfb','ofb','openpgp'}: kw['iv'] = iv
+            elif m in {'eax','ctr'}: kw['nonce'] = iv
+
+            return Blowfish.new(key,getattr(Blowfish,f'MODE_{m.upper()}'),**kw).decrypt(i)
+        case 'blowfish_le'|'blowfish_le_ecb': return swap32(decrypt(swap32(i),'blowfish' + algo[12:],key,iv))
         case 'salsa20':
             import ctypes
             from Cryptodome.Cipher import Salsa20
@@ -269,6 +307,57 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             o = ctx.decrypt(i)
             if kwargs.get('return_block_count'): return o,pctx[8] | (pctx[9] << 32)
             return o
+        case 'chacha20'|'xchacha20'|'tls_chacha20':
+            from Cryptodome.Cipher import ChaCha20
+            return ChaCha20.new(key,iv).decrypt(i)
+        case 'chacha20_poly1305'|'xchacha20_poly1305'|'tls_chacha20_poly1305':
+            from Cryptodome.Cipher import ChaCha20_Poly1305
+            obj = ChaCha20_Poly1305.new(key,iv)
+            if 'tag' in kwargs: tag = kwargs['tag']
+            else: tag = i[-16:]
+            if tag: return obj.decrypt_and_verify(i[:-16],tag)
+            return obj.decrypt(i)
+        case 'rc4'|'arc4':
+            from Cryptodome.Cipher import ARC4
+            return ARC4.new(key).decrypt(i)
+
+        case 'hatch':
+            d = bytearray(i)
+            ln = len(i)
+            swp = 0
+
+            l1 = key * 4
+            idx1 = 0
+            l2 = crc_hash(ln.to_bytes(8,'little'),'crc32').to_bytes(4,'little')*4
+            idx2 = 8
+            xr = (ln >> 2) & 0x7F
+
+            for ix in range(ln):
+                v = d[ix]
+                v ^= xr ^ l2[idx2];idx2 += 1
+                if swp: v = ((v & 0x0F) << 4) | (v >> 4)
+                v ^= l1[idx1];idx1 += 1
+                d[ix] = v
+
+                if idx1 < 16:
+                    if idx2 > 12:
+                        idx2 = 0
+                        swp = not swp
+                elif idx2 <= 8:
+                    idx1 = 0
+                    swp = not swp
+                else:
+                    xr = (xr + 2) & 0x7F
+                    if swp:
+                        swp = 0
+                        idx1 = xr % 7
+                        idx2 = (xr % 12) +2
+                    else:
+                        swp = 1
+                        idx1 = (xr % 12) + 3
+                        idx2 = xr % 7
+
+            return bytes(d)
         case _: raise NotImplementedError(algo)
 
 class Huffman:
@@ -337,9 +426,6 @@ def lzss_decompress(i:bytes,usize:int=None):
                 win[winp] = b
                 winp = (winp + 1) & 0x1FFF
     return bytes(ob)[:usize]
-
-def xor(i:bytes,k:bytes): return bytes(i[x] ^ k[x % len(k)] for x in range(len(i)))
-def inv(i:bytes): return bytes(x ^ 0xFF for x in i)
 
 N64CHM = (
     '\0' + '\0'*14 + ' '

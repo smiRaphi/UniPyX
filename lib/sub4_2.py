@@ -508,8 +508,7 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Petroglyph MEG':
             if db.print_try: print('Trying with custom extractor')
-            from zlib import crc32
-            from lib.file import File
+            from lib.file import File,decrypt,crc_hash
             f = File(i,endian='<')
 
             fnc = f.readu32()
@@ -523,7 +522,6 @@ def extract4_2(inp:str,out:str,t:str):
                 fnc = f.readu32()
                 fc = f.readu32()
                 if AES:
-                    from Cryptodome.Cipher import AES
                     v = 3
 
                     fns = f.readu32()
@@ -549,7 +547,7 @@ def extract4_2(inp:str,out:str,t:str):
                         kdb.append((kiv[:0x10],kiv[0x10:]))
 
                     for k,iv in kdb:
-                        def aes(i:bytes): return AES.new(key=k,mode=AES.MODE_CBC,IV=iv).decrypt(i)
+                        aes = lambda i: decrypt(i,'aes_cbc',k,iv)
                         dent = aes(ent)
                         if not sum(dent[4:8]) and int.from_bytes(dent[12:16],'little') == ds:break
                     else: raise NotImplementedError('Key not found')
@@ -565,14 +563,14 @@ def extract4_2(inp:str,out:str,t:str):
             if v < 3 or not aes:
                 for _ in range(fnc):
                     fn = f.read(f.readu16())
-                    sdb[crc32(fn) & 0xFFFFFFFF] = fn.decode('ascii')
+                    sdb[crc_hash(fn,'crc32')] = fn.decode('ascii')
                 if v == 3: f.seek(0x18+fns)
             else:
                 fnd = aes(f.read(fns))
                 for _ in range(fnc):
                     fnl = int.from_bytes(fnd[:2],'little')
                     fn,fnd = fnd[2:fnl+2],fnd[fnl+2:]
-                    sdb[crc32(fn) & 0xFFFFFFFF] = fn.decode('ascii')
+                    sdb[crc_hash(fn,'crc32')] = fn.decode('ascii')
 
             fs = []
             dn = {}
@@ -637,7 +635,7 @@ def extract4_2(inp:str,out:str,t:str):
             if c: return
         case 'Hatch Game Engine HATCH':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,crc_hash
+            from lib.file import File,crc_hash,decrypt
             f = File(i,endian='<')
             assert f.read(5) == b'HATCH' and f.readu24() == 1
             c = f.readu16()
@@ -707,41 +705,12 @@ def extract4_2(inp:str,out:str,t:str):
                     #while fn.startswith(('../','..\\')): fn = fn[3:]
                 else: fn = f'\0{crc:08X}.'
 
-                fs.append([fn,off,s,us,(crc.to_bytes(4,'little')*4,zlib.crc32(us.to_bytes(8,'little')).to_bytes(4,'little')*4,(us >> 2) & 0x7F) if enc else ()])
+                fs.append([fn,off,s,us,crc if enc else None])
 
             for fe in fs:
                 f.seek(fe[1])
                 d = f.decompress(fe[2],'zlib' if fe[2] != fe[3] else 'none')
-                if fe[4]:
-                    d = bytearray(d)
-                    swp = idx1 = 0
-                    idx2 = 8
-                    xr = fe[4][2]
-                    for ix in range(fe[3]):
-                        v = d[ix]
-                        v ^= xr ^ fe[4][1][idx2];idx2 += 1
-                        if swp: v = ((v & 0x0F) << 4) | (v >> 4)
-                        v ^= fe[4][0][idx1];idx1 += 1
-                        d[ix] = v
-
-                        if idx1 < 16:
-                            if idx2 > 12:
-                                idx2 = 0
-                                swp = not swp
-                        elif idx2 <= 8:
-                            idx1 = 0
-                            swp = not swp
-                        else:
-                            xr = (xr + 2) & 0x7F
-                            if swp:
-                                swp = 0
-                                idx1 = xr % 7
-                                idx2 = (xr % 12) +2
-                            else:
-                                swp = 1
-                                idx1 = (xr % 12) + 3
-                                idx2 = xr % 7
-                    d = bytes(d)
+                if fe[4] is not None: d = decrypt(d,'hatch',fe[4])
                 if fe[0][0] == '\0':
                     fn = fe[0][1:]
                     if d[:4] == b'SPR\0': fn += 'spr'
@@ -939,7 +908,7 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Lucas Arts Bundle':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decrypt
             f = File(i,endian='>')
 
             doff = None
@@ -959,13 +928,12 @@ def extract4_2(inp:str,out:str,t:str):
                         pd = f.readu32('<')
                         c = f.readu32('<')
                         k = f.read(1)
-                        kv = k[0]
                         f.skip(0x13)
                         if unk > 0x10: f.skip(0xC8)
 
                         f.skip(pd*2)
                         for _ in range(c):
-                            n = bytes(x ^ kv for x in f.read(0xC8).split(k)[0]).decode('ascii')
+                            n = decrypt(f.read(0xC8).split(k)[0],'xor',k).decode('ascii')
                             fs.append((n,f.readu32('<'),f.readu32('<'))) # le
                             f.skip(0x2C)
                     case 'BNDT':
@@ -1177,7 +1145,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Novalogic Resource':
             KEYS = {b'\xAD\xDE\xED\xAC',b'\x2D\xDE\xED\xAC\xAD\xDE\xED\xAC\xAD\xDE\xED\xAC'}
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,xor
+            from lib.file import File,decrypt
             f = File(i,endian='<')
             assert f.read(12) == b'RESOURCE2xxx'
             c = f.readu32()
@@ -1187,7 +1155,7 @@ def extract4_2(inp:str,out:str,t:str):
                 rn = f.read(12)
                 for k in KEYS:
                     try:
-                        n = xor(rn,k).rstrip(b'\0').decode('ascii')
+                        n = decrypt(rn,'xor',k).rstrip(b'\0').decode('ascii')
                         assert n and n.isprintable()
                     except:pass
                     else:break
@@ -1962,7 +1930,6 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Jikan de Fantasia JRZ':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
             assert f.read(0x18) == b'__DEFLATE_ARCHIVE_S_01__'
@@ -1993,7 +1960,7 @@ def extract4_2(inp:str,out:str,t:str):
                 hs = f.readu32()
                 f.skip(hs-4)
                 d = []
-                for _ in range(hs//4): d.append(zlib.decompress(f.read(f.readu32())))
+                for _ in range(hs//4): d.append(f.decompress(f.readu32(),'zlib'))
                 xopen(fe[1],'wb').write(b''.join(d))
 
             f.close()
@@ -2001,8 +1968,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Vietcong Compressed Big File': return quickbms('cbf')
         case 'Shrek Smash n\' Crash Racing Pack':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
             assert f.read(4) == b'PAK\0'
 
@@ -2028,7 +1994,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(fe[2])
                 f.seek(f.readu32())
                 d = f.read(fe[0])
-                if d[:4] == b'!CMP': d = zlib.decompress(d[8:])
+                if d[:4] == b'!CMP': d = decompress(d[8:],'zlib')
                 xopen(f'{o}/{fe[3]}','wb').write(d)
             if fs: return
         case 'Shrek Smash n\' Crash Racing CMP':

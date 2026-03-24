@@ -220,18 +220,14 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
                 zrif = base64.b64encode(bn).decode()
 
-            osj = OSJump()
-            osj.jump(o)
-            run(['pkg2zip','-x',i] + ([zrif] if work else []))
-            if exists('app') and listdir('app') and listdir('app/' + listdir('app')[0]):
-                td = o + '/app/' + listdir('app')[0]
-                osj.back()
+            run(['pkg2zip','-x',i] + ([zrif] if work else []),cwd=o)
+            if exists(o + '/app') and listdir(o + '/app') and listdir(o + '/app/' + listdir(o + '/app')[0]):
+                td = o + '/app/' + listdir(o + '/app')[0]
 
                 run(['psvpfsparser','-i',td,'-o',o,'-z',zrif])
                 rmtree(o + '/app')
 
                 if listdir(o): return
-            else: osj.back()
             if not work and listdir(o):
                 if exists(o + '/pspemu/PSP'):
                     copydir(o + '/pspemu/PSP',o,True,reni=True)

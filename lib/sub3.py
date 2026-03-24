@@ -1059,8 +1059,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Netcrypt':
             if db.print_try: print('Trying with custom extractor')
             import base64
-            from Cryptodome.Cipher import AES
-            from lib.file import EXE
+            from lib.file import EXE,decrypt
 
             x = EXE(i)
             x.seek(x.secs['.text'][0])
@@ -1085,7 +1084,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             x.close()
             key,iv,dat = [base64.b64decode(x.decode('utf-16le')) for x in (key,iv,dat)]
 
-            dat = AES.new(key,AES.MODE_CBC,iv).decrypt(dat)
+            dat = decrypt(dat,'aes_cbc',key,iv)
             if dat[:2] == b'MZ':
                 open(o + '/' + basename(i),'wb').write(dat[:-dat[-1]])
                 return
@@ -1342,7 +1341,6 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case '.NETZ':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File,ext_exe
             e = ext_exe(i,dotnet=True)
             assert len(e.net.resources) == 1 and e.net.resources[0].name == 'app.resources'
@@ -1371,9 +1369,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             for ix,fe in enumerate(fs):
                 f.seek(bo + fe[1] + 1)
-                d = f.read(f.readu32())
                 xopen(o + '/' + (ffn if ix == 0 else fe[0].replace('!1',' ').replace('!2',',').replace('!3','.Resources').replace('!4','Culture').split(',')[0] + '.dll'),
-                      'wb').write(zlib.decompress(d))
+                      'wb').write(f.decompress(f.readu32(),'zlib'))
 
             del f
             if listdir(o): return
@@ -1476,5 +1473,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
             d = decompress(open(i,'rb').read()[0x200:],'gzip')
             open(f'{o}/{tbasename(i)}.{"exe" if d[:2] == b"MZ" else "elf"}','wb').write(d)
             return
+        case 'MASM Installer':
+            from lib.file import EXE
+
+            f = EXE(i)
+            f.seek(f.secs['.data'][0])
+            tf = TmpFile(name='.data')
+            open(tf.p,'wb').write(f.read(f.secs['.data'][1]))
+            f.close()
+
+            run(['7z','x',tf.p,'-o' + o,'-aoa'])
+            tf.destroy()
+            if listdir(o): return
 
     return 1

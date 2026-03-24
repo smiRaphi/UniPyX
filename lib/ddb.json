@@ -39,6 +39,10 @@
         "rqr":["GameMaker game data archive","GameMaker Studio game data archive"],
         "rs":"GameMaker Archive","s":1
     },
+    {
+        "rqr":["MASM","MASMTASM","PE32 executable for MS Windows 4.00 (GUI)","assembler",true],
+        "rs":"MASM Installer"
+    },
 
     {
         "rq":"ISO",

@@ -1,9 +1,7 @@
 import struct,io,os
 from hashlib import pbkdf2_hmac,md5,sha1,sha256
-from lib.file import File,align
+from lib.file import File,align,decrypt
 _File = File
-
-from Cryptodome.Cipher import AES
 
 BASED = os.path.dirname(os.path.abspath(__file__)) + '/tmd_'
 
@@ -14,7 +12,7 @@ def clamp(n:int,max:int):
 def decrypt_content(inf:str,ouf:str,key:bytes,tmdc:'TMD.TMDContent'):
     i,o = open(inf,'rb'),open(str(ouf),'wb')
 
-    aes = AES.new(key,AES.MODE_CBC,tmdc.index.to_bytes(2,'big') + b'\0'*14)
+    aes = decrypt(None,'aes_cbc',key,tmdc.index.to_bytes(2,'big') + b'\0'*14)
     tln = 0
 
     p = d = b''
@@ -53,12 +51,12 @@ def encrypt_key(tid:str|bytes,key:bytes,ckey:bytes) -> bytes:
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.rjust(16,b'\0')
 
-    return AES.new(key=ckey,mode=AES.MODE_CBC,IV=tid).encrypt(key)
+    return decrypt(None,'aes_cbc',ckey,tid).encrypt(key)
 def decrypt_key(tid:str|bytes,key:bytes,ckey:bytes) -> bytes:
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.rjust(16,b'\0')
 
-    return AES.new(key=ckey,mode=AES.MODE_CBC,IV=tid).decrypt(key)
+    return decrypt(key,'aes_cbc',ckey,tid)
 def get_encrypted_key(tid:str|bytes,pwd:str|bytes|int,ckey:bytes):
     return encrypt_key(tid,derive_key(tid,pwd),ckey)
 

@@ -433,7 +433,7 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Transformers: Devastation BXM': raise NotImplementedError
         case 'Nexar New PAC':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,inv,decompress
+            from lib.file import File,decrypt,decompress
             f = File(i,endian='<')
             assert f.read(4) == b'PACu'
 
@@ -443,7 +443,7 @@ def extract4_3(inp:str,out:str,t:str):
             f.seek(f.size - 4)
             idxs = f.readu32()
             f.seek(f.size - 4 - idxs)
-            inf = File(decompress(inv(f.read(idxs)),'huffman',usize=0x4C*c),endian=f._end)
+            inf = File(decompress(decrypt(f.read(idxs),'inv'),'huffman',usize=0x4C*c),endian=f._end)
 
             for _ in range(c):
                 fn = inf.read(0x40).rstrip(b'\0').decode('shift-jis' if fmtv < 7 else 'utf-8')
@@ -624,10 +624,10 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Nemea File Archive':
-            KEY = (0xEE ^ 0xE6).to_bytes(1)
+            KEY = 0xEE ^ (0x1E6 & 0xFF)
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,xor
+            from lib.file import File,decrypt
             f = File(i,endian='<')
             assert f.read(4) == b'NFA0'
 
@@ -636,12 +636,12 @@ def extract4_3(inp:str,out:str,t:str):
             f.skip(4)
             fs = []
             for _ in range(c):
-                inf = xor(f.read(0x94),KEY)
+                inf = decrypt(f.read(0x94),'xor',KEY)
                 fs.append((int.from_bytes(inf[8:12],'little'),int.from_bytes(inf[12:16],'little'),inf[20:].rsplit(b'\0\0')[0].decode('utf-16le'))) # fe[2] = ,int.from_bytes(inf[16:20],'little')
             for fe in fs:
                 f.seek(fe[1])
-                #if fe[2]: print(xor(f.read(4),KEY).hex(),fe[0],fe[1],hex(fe[2]));raise
-                xopen(o + '/' + fe[2],'wb').write(xor(f.read(fe[0]),KEY))
+                #if fe[2]: print(decrypt(f.read(4),'xor',KEY).hex(),fe[0],fe[1],hex(fe[2]));raise
+                xopen(o + '/' + fe[2],'wb').write(decrypt(f.read(fe[0]),'xor',KEY))
 
             f.close()
             if fs: return
@@ -714,7 +714,7 @@ def extract4_3(inp:str,out:str,t:str):
             nl = f.readu16()
             fs = []
             for _ in range(c):
-                fs.append((f.read(8).rstrip(b'\0').decode('ascii'),f.readu32()))
+                fs.append((f.read(nl).rstrip(b'\0').decode('ascii'),f.readu32()))
                 f.skip(6)
             fs.sort(key=lambda x:x[1])
             fs.append((0,f.size))

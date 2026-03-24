@@ -600,14 +600,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Hollow Knight Save':
             if db.print_try: print('Trying with custom extractor')
-            from Cryptodome.Cipher import AES
+            from lib.file import decrypt
             from base64 import b64decode
 
             f = open(i,'rb')
             f.seek(0x19)
             dat = f.read().split(b'=')[0]
             f.close()
-            dat = AES.new(b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l',AES.MODE_ECB).decrypt(b64decode(dat + b'===='))
+            dat = decrypt(b64decode(dat + b'===='),'aes_ecb',b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l')
 
             open(o + '/' + tbasename(i) + '.json','wb').write(dat[:-dat[-1]])
             return
@@ -919,7 +919,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             return quickbms('ttgames')
         case 'XPAC':
-            import zlib
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
 
@@ -954,8 +953,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for of in fs:
                 f.seek(of[1])
                 zlb = of[2] >= 12 and f.read(2) == b'\x78\xDA'
-                f.skip(-2)
-                if zlb: d = zlib.decompress(f.read(of[2]))
+                f.back(2)
+                if zlb: d = f.decompress(of[2],'zlib')
                 else: d = f.read(of[2] or of[3])
                 xopen(o + '/' + of[0],'wb').write(d)
             if fs: return
@@ -968,7 +967,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             lng = f.readu32()
             if lng != f.size:
                 f._end = '<'
-                f.skip(-4)
+                f.back(4)
                 nlng = f.readu32()
                 if nlng != f.size and abs(f.size-nlng) > abs(f.size-lng):
                     f._end = '>'
@@ -1242,7 +1241,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'BackupMii NAND Image':
             if db.print_try: print('Trying with custom extractor')
-            from Cryptodome.Cipher import AES
 
             if getsize(i) == 0x400:
                 i = dirname(i) + '/nand.bin'
@@ -1319,7 +1317,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         for _ in range(8):
                             cluster.append(f.read(0x800))
                             if not noecc: f.skip(0x40)
-                        data = AES.new(nand_key,AES.MODE_CBC,iv=bytes(0x10)).decrypt(b''.join(cluster))[:fs['size']-bsiz]
+                        data = decrypt(b''.join(cluster),'aes_cbc',nand_key,b'\0'*16)[:fs['size']-bsiz]
                         of.write(data)
                         bsiz += len(data)
 
@@ -1659,7 +1657,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'ZDA Game Archive':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1670,16 +1667,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for _ in range(fc): fs.append((f.read(40).strip(b'\0').decode('utf-8'),f.readu32(),f.readu32(),bo + f.readu32()))
             for fe in fs:
                 f.seek(fe[3])
-                d = f.read(fe[2])
-                if fe[1] != fe[2]: d = zlib.decompress(d)
-                of = xopen(o + '/' + fe[0],'wb')
-
-                lb = 0xBB
-                for b in d:
-                    b ^= lb
-                    of.write(bytes([b]))
-                    lb = b
-                of.close()
+                xopen(o + '/' + fe[0],'wb').write(decrypt(f.decompress(fe[2],'zlib' if fe[1] != fe[2] else 'none'),'rxor',0xBB))
             if fs: return
         case 'Disney Games Archive':
             if db.print_try: print('Trying with custom extractor')
@@ -1694,10 +1682,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'Dragon UnPACKer 5 Plugin':
             if db.print_try: print('Trying with custom extractor')
-            import zlib,lzma
-
-            def delzma(i): return lzma.decompress(i[:9] + b'\0'*4 + i[9:],format=lzma.FORMAT_ALONE)
-
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1724,8 +1708,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.skip(8)
                     fn = f.read(f.readu8()).decode('utf-8')
                     fn = o + '/' + os.path.join(f.read(f.readu8()).decode('utf-8'),fn)
-                    d = f.read(s)
-                    if c == 1: d = zlib.decompress(d)
+                    d = f.decompress(s,('none','zlib')[c])
                     xopen(fn,'wb').write(d)
             elif v == 4:
                 offc = f.reads32()
@@ -1754,9 +1737,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 df = None
                 for oe in offs:
                     f.seek(oe[4])
-                    d = f.read(oe[5])
-                    if oe[1] == 1: d = zlib.decompress(d)
-                    elif oe[1] == 2: d = delzma(d)
+                    d = f.decompress(oe[5],('none','zlib','lzma_us32')[oe[1]])
 
                     b = File(d,endian='<')
                     if oe[0] == 1:
@@ -1786,9 +1767,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
                 for fe in fs:
                     df.seek(fe[0])
-                    d = df.read(fe[1])
-                    if fe[2] == 1: d = zlib.decompress(d)
-                    elif fe[2] == 2: d = delzma(d)
+                    d = df.decompress(fe[1],('none','zlib','lzma_us32')[fe[2]])
                     open(o + '/' + fnd.get(fe[3],str(fe[3])),'wb').write(d)
             elif v == 5:
                 f.skip(2)
@@ -1819,9 +1798,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 df = None
                 for oe in offs:
                     f.seek(oe[4])
-                    d = f.read(oe[5])
-                    if oe[1] == 1: d = zlib.decompress(d)
-                    elif oe[1] == 2: d = delzma(d)
+                    d = f.decompress(oe[5],('none','zlib','lzma_us32')[oe[1]])
 
                     b = File(d,endian='<')
                     if oe[0] == 1:

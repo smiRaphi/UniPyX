@@ -170,14 +170,14 @@ def extract4_1(inp:str,out:str,t:str):
         case 'MediaMobile PAK':
             if db.print_try: print('Trying with custom extractor')
             txt = re.compile(r'^[А-Яа-яЁё0-9\s\.,!\?"\'\-—\(\)]*$')
-            from lib.file import File
+            from lib.file import File,decrypt
             f = File(i,endian='>')
 
             c = f.readu32()
             fs = [f.readu32() for _ in range(c)]
 
             for ix in range(c):
-                d = bytes(x ^ 0x53 for x in f.read(fs[ix]))
+                d = decrypt(f.read(fs[ix]),'xor',0x53)
                 if fs[ix] < 0xB0000:
                     try: td = d.decode('cp1251')
                     except: pass
@@ -302,8 +302,7 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'Atari Masterpieces Resources':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
 
             of = f.readu32()
@@ -316,7 +315,7 @@ def extract4_1(inp:str,out:str,t:str):
                 e = guess_ext(d)
                 open(o + f'/{fe[2]}.{e}','wb').write(d)
                 if e == 'zlib':
-                    d = zlib.decompress(d)
+                    d = decompress(d,'zlib')
                     open(o + f'/{fe[2]}_ext.{guess_ext(d)}','wb').write(d)
             f.close()
 
@@ -340,8 +339,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Atari Masterpieces VPXH': raise NotImplementedError
         case 'Torus Ashen PackFile':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
 
             assert f.read(4) == b'PMAN'
@@ -359,7 +357,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if d[:2] == b'ZL' and d[5] == 0x78 and not (d[5]<<8|d[6])%31: ext = 'zl'
                 else: ext = 'bin'
                 open(o + f'/{ix}.{ext}','wb').write(d)
-                if ext == 'zl': open(o + f'/{ix}_ext.bin','wb').write(zlib.decompress(d[5:]))
+                if ext == 'zl': open(o + f'/{ix}_ext.bin','wb').write(decompress(d[5:],'zlib'))
             f.close()
 
             if fs: return
@@ -446,7 +444,6 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'StormCE IIII':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
             from lib.file import File
             f = File(i,endian='<')
 
@@ -455,42 +452,30 @@ def extract4_1(inp:str,out:str,t:str):
 
             if t == 'Y':
                 f.skip(8)
-                open(o + '/' + tbasename(i),'wb').write(zlib.decompress(f.read()))
+                open(o + '/' + tbasename(i),'wb').write(f.decompress(None,'zlib'))
             elif t == 'p':
                 f.skip(8)
                 c = 0
                 while f:
                     s = f.readu32()
                     if not s: break
-                    open(o + f'/{c}.bin','wb').write(zlib.decompress(f.read(s)));c += 1
+                    open(o + f'/{c}.bin','wb').write(f.decompress(s,'zlib'));c += 1
             elif t == 'i':
                 s = f.readu32()
                 f.skip(12)
-                open(o + '/' + tbasename(i),'wb').write(zlib.decompress(f.read(s)))
+                open(o + '/' + tbasename(i),'wb').write(f.decompress(s,'zlib'))
                 d = f.read()
                 if d: open(o + '/trailer.bin','wb').write(d)
             return
-        case 'HMM Encrypted Snapshot':
-            raise NotImplementedError
-            if db.print_try: print('Trying with custom extractor')
-            import zipfile
-            from lib.file import File
-            from Cryptodome.PublicKey import RSA
-            from Cryptodome.Cipher import PKCS1_v1_5
-
-            rsa = RSA.construct((0xd597f61ca364a25af50832a5e18e855a426532ee9210729cd6555394736da2dd52269c2a096f622a4dedf3498e1a1b2fe107366445f6234c8a9912e6727092017a019dec984e5136c935a3d67238889bf5c7c3d358f88c6439db9635e3eab0088b36c6a08803c7fc6699f20e0a221a4b973b0360869c81eefb22c39731b98015,
-                                 0x10001))
-
-            f = File(i,endian='<')
-            key = PKCS1_v1_5.new()
+        case 'HMM Encrypted Snapshot': raise NotImplementedError
         case 'JDownloader2 Encrypted Subconfig'|'JDownloader2 Encrypted Accounts':
             if db.print_try: print('Trying with custom extractor')
-            from Cryptodome.Cipher import AES
+            from lib.file import decrypt
             if t == 'JDownloader2 Encrypted Subconfig':k = b'\x01\x02\x11\x01\x01T\x01\x01\x01\x01\x12\x01\x01\x01"\x01'
             elif t == 'JDownloader2 Encrypted Accounts':k = b'\x01\x06\x04\x05\x02\x07\x04\x03\x0c=\x0eK\xfe\xf9\xd4!'
 
             d = open(i,'rb').read()
-            d = AES.new(k,AES.MODE_CBC,iv=k).decrypt(d)
+            d = decrypt(d,'aes_cbc',k,k)
             if d.strip()[:1] != b'{': return 1
             open(o + '/' + tbasename(i) + '.json','wb').write(d[:-d[-1]])
             return
@@ -1095,11 +1080,11 @@ def extract4_1(inp:str,out:str,t:str):
 
                 dbf = open(DBP,'wb')
                 zf = zipfile.ZipFile(BytesIO(db.c.get('https://github.com/Infinest/Gimmick-ROM-extractor/releases/download/1.21/Gimmick_ROM_extractor.zip',follow_redirects=True).content))
-                for h,p in (('C90971742F35300A94797EC76208462C024FE0C938356B216463FB61ACF6FB4F','config.json'),
-                            ('1D3CE6FCD673E0349C07494687796ADDDF08A30A53B78672C884907B980F47A2','alternate_configs/Streets of Kamurocho (Streets of Rage 2)/config.json'),
-                            ('FE8314DF62A13B63990995722F6F9A083AA5B30A4971E3297B49C241A44241F5','alternate_configs/Abarenbo Tengu & Zombie Nation/config.json'),
-                            ('0'*64,'alternate_configs/F-117A Stealth Fighter/config.json')):
-                    dbf.write(bytes.fromhex(h))
+                for h,p in ((0xC90971742F35300A94797EC76208462C024FE0C938356B216463FB61ACF6FB4F,'config.json'),
+                            (0x1D3CE6FCD673E0349C07494687796ADDDF08A30A53B78672C884907B980F47A2,'alternate_configs/Streets of Kamurocho (Streets of Rage 2)/config.json'),
+                            (0xFE8314DF62A13B63990995722F6F9A083AA5B30A4971E3297B49C241A44241F5,'alternate_configs/Abarenbo Tengu & Zombie Nation/config.json'),
+                            (0,'alternate_configs/F-117A Stealth Fighter/config.json')):
+                    dbf.write(h)
                     dbf.write(json.loads(zf.read(p).replace(b',\n}',b'}'))['AES_KEY'].encode('ascii').ljust(16,b'\0'))
                 dbf.close()
             dbf = open(DBP,'rb')
@@ -1107,14 +1092,12 @@ def extract4_1(inp:str,out:str,t:str):
             dbf.close()
 
             if db.print_try: print('Trying with custom extractor')
-            import hashlib
+            from lib.file import File,decrypt,crc_hash
             fd = open(noext(i) + '.mdf','rb')
-            hsh = hashlib.sha256(fd.read(0x1000)).digest()
+            hsh = crc_hash(fd.read(0x1000),'sha256')
             assert hsh in bdb
             key = bdb[hsh]
 
-            from Cryptodome.Cipher import AES
-            from lib.file import File
             f = File(i,endian='<')
 
             f.skip(8)
@@ -1126,7 +1109,7 @@ def extract4_1(inp:str,out:str,t:str):
                 fs.append(f.read(4).hex().upper())
                 f.skip(4)
 
-            aes = AES.new(key,AES.MODE_CBC,b'\0'*16)
+            aes = decrypt(None,'aes_cbc',key,b'\0'*16)
             for ix in range(c):
                 f.skip(8)
                 fd.seek(f.readu32())
@@ -1314,7 +1297,7 @@ def extract4_1(inp:str,out:str,t:str):
             else: tf.destroy()
         case 'Smiles Fortune Hunters PAK':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decrypt
             f = File(i,endian='<')
             assert f.read(8) == b'Ver 1.0.'
 
@@ -1322,13 +1305,14 @@ def extract4_1(inp:str,out:str,t:str):
             fs = [(f.read(f.readu32()).decode('utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
-                xopen(o + '/' + fe[0],'wb').write(bytes(x ^ 0xA5 for x in f.read(fe[2])))
+                xopen(o + '/' + fe[0],'wb').write(decrypt(f.read(fe[2]),'xor',0xA5))
             f.close()
             if fs: return
         case 'ODAU Zip':
             if db.print_try: print('Trying with custom extractor')
+            from lib.file import decrypt
             import zipfile,io
-            zipfile.ZipFile(io.BytesIO(bytes(x ^ 0xA5 for x in open(i,'rb').read()))).extractall(o)
+            zipfile.ZipFile(io.BytesIO(decrypt(open(i,'rb').read(),'xor',0xA5))).extractall(o)
             if listdir(o): return
         case 'Hell - A Cyberpunk Thriller PL/SL':
             txt = re.compile(r'^[\w \.,!\?"\'\-\(\)]*$')
@@ -1594,7 +1578,7 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'Sinergy GUT':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decrypt
             f = File(inp,endian='<')
 
             msg = b''
@@ -1617,7 +1601,7 @@ def extract4_1(inp:str,out:str,t:str):
                 s = f.readu32()
                 of = f.readu32()
                 f.skip(8)
-                fs.append((bp+of,s,bytes(x ^ 0xFF for x in f.read(fnl)).rstrip(b'\0').decode('utf-8')))
+                fs.append((bp+of,s,decrypt(f.read(fnl),'inv').rstrip(b'\0').decode('utf-8')))
 
             for fe in fs:
                 f.seek(fe[0])
