@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 807
+# Supported Formats: 808
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -323,7 +323,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (379)
+## Various (380)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -517,6 +517,7 @@ LithTech Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/d
 Little Witch Parfait RLPK | .rlpk | Custom |
 LMPK | .lmpk | Custom |
 London Racer Destruction Madness WAD | .wad | [london_racer.bms](https://mirror.aluigi.org/bms/london_racer.bms) |
+Looking Glass Resource | .res | Custom |
 Lucas Learning DAT | .dat | Custom |
 Lucas Arts Bundle | .bdl | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |

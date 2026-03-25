@@ -5577,6 +5577,12 @@
             }
         }]
     },
+    "pwexplode":{
+        "p":"pwexplode.py",
+        "fs":[
+        "https://raw.githubusercontent.com/Schallaven/pwexplode/refs/heads/master/pwexplode.py"
+        ]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

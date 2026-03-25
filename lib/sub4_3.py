@@ -725,6 +725,60 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Looking Glass Resource':
+            TMP = (
+                "bin","string","image","font","anim","pall","shadtab","voc","shape","pict",
+                "b2extern","b2reloc","b2code","b2header","b2resrvd","obj3d","stencil","movie",
+                "rect",
+                "palette512"
+            )
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decompress
+            from multiprocessing.pool import ThreadPool
+            f = File(i,endian='<')
+            assert f.read(0x10) == b'LG Res File v2\r\n'
+
+            cm = f.read(0x60).split(b'\x1A')[0]
+            if cm: open(f'{o}/$comment.txt','wb').write(cm)
+
+            f.skip(12)
+            f.seek(f.readu32())
+            c = f.readu16()
+            bo = f.readu32()
+            fs = [(f.readu16(),f.readu24(),f.readu8(),f.readu24(),f.readu8()) for _ in range(c)]
+            f.seek(bo)
+
+            p = ThreadPool()
+            def dec(d,fn,fe):
+                d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]]
+                xopen(fn,'wb').write(d)
+            def decc(d,ix1,ext,fsd,fe):
+                d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]-fsd[0]]
+                for ix in range(len(fsd)-1): xopen(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}','wb').write(d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
+            pcs = []
+
+            for fe in fs:
+                fn = f'{fe[0]:03d}'
+                if fe[4] < len(TMP): ext = TMP[fe[4]]
+                elif fe[4] == 0x30: ext = 'map'
+                elif 0x40 > fe[4] >= 0x30: ext = f'app{fe[4]-0x2F:02d}'
+                else: ext = f'{fe[4]:02d}'
+
+                if fe[2] & 0x20: db.get('pwexplode')
+                if fe[2] & 2:
+                    cd = f.readu16()
+                    fsd = [f.readu32() for _ in range(cd+1)]
+                    f.skip(fsd[0] - (6 + cd*4))
+                    pcs.append(p.apply_async(decc,(f.read(fe[3]-fsd[0]),fn,ext,fsd,fe)))
+                else: pcs.append(p.apply_async(dec,(f.read(fe[3]),f'{o}/{fn}.{ext}',fe)))
+                f.align(4)
+
+            f.close()
+            for p in pcs: p.get()
+            p.join()
+            p.close()
+            if fs: return
 
     return 1
 

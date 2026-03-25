@@ -616,7 +616,8 @@
         "imp compressed archive"
     ],
     "ARHANGEL":[
-        "arhangel compressed archive"
+        "arhangel compressed archive",
+        "arhangel archive data"
     ],
     "JAR":[
         "jar compressed archive",

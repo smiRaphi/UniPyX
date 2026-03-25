@@ -235,6 +235,13 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
             return bin.lzo.decompress(i,False,kwargs.get('usize',args[0]),algorithm='LZO1Y')
         case 'huffman': fnc = huffman_decompress
         case 'lzss': fnc = lzss_decompress
+        case 'lzw_lg':
+            fnc = lzw_decompress
+            if algo == 'lzw_lg': kwargs |= {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
+        case 'implode':
+            if 'db' in kwargs: kwargs['db'].get('pwexplode')
+            import bin.pwexplode # type: ignore
+            return bin.pwexplode.explode(i)
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
 def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
@@ -255,7 +262,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
             if type(key) == int: key = (key,)
-            bytes(i[x] ^ key[x % len(key)] for x in range(len(i)))
+            return bytes(i[x] ^ key[x % len(key)] for x in range(len(i)))
         case 'rxor':
             if type(key) == bytes: key = key[0]
             d = bytearray(i)
@@ -426,6 +433,53 @@ def lzss_decompress(i:bytes,usize:int=None):
                 win[winp] = b
                 winp = (winp + 1) & 0x1FFF
     return bytes(ob)[:usize]
+def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
+    max_dict = max_dict or reset
+    d = BitReader(i)
+
+    resetd = lambda:{x:x.to_bytes() for x in range(0x100)}
+    dic = resetd()
+    nxt = 0x100
+    def get_nxt():
+        nonlocal dic,nxt
+        while True:
+            b = d.get_bits(bit_width)
+            if b != reset: return b
+            dic = resetd()
+            nxt = 0x100
+
+    c = get_nxt()
+    if c in (None,eof): return b''
+
+    o = []
+    seq = dic[c]
+    o.append(seq)
+    prev_seq = seq
+
+    while True:
+        c = d.get_bits(bit_width)
+        if c is None or c == eof: break
+        if c == reset:
+            dic = resetd()
+            nxt = 256
+            c = d.get_bits(bit_width)
+            if c is None or c == eof: break
+            seq = dic[c]
+            d.append(seq)
+            prev_seq = seq
+            continue
+
+        if c in dic: seq = dic[c]
+        elif c == nxt: seq = prev_seq + prev_seq[:1]
+        else: raise ValueError(f"Invalid LZW code encountered: {c}")
+
+        d.append(seq)
+        if nxt < max_dict:
+            dic[nxt] = prev_seq + seq[:1]
+            nxt += 1
+        prev_seq = seq
+
+    return b"".join(d)
 
 N64CHM = (
     '\0' + '\0'*14 + ' '

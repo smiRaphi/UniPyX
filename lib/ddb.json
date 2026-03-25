@@ -334,6 +334,11 @@
         "rs":"Dance Layout Script","s":1
     },
     {
+        "rqr":"Looking Glass Resource data",
+        "d":[["isat","LG Res File v2\\r\\n",0],["isatS","\\0",12,112],["n0",4,124],["py","f=open(inp,'rb');f.seek(124);f.seek(int.from_bytes(f.read(4),'little'));return sum(f.read(2))and f.read(4)==b'\\x80\\0\\0\\0'"]],
+        "rs":"Looking Glass Resource","s":1
+    },
+    {
         "d":[["n0",2,0],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=0\nfor _ in range(c):\n while f.read(1)not in (b'\\0',b''):pass\n if not f.read(1):return\n f.seek(-1,1)\n if f.tell()%2:f.seek(1,1)\n s+=int.from_bytes(f.read(2),'little')*32\ns+=f.tell();return s==f.seek(0,2)"]],
         "rs":"EBAB Animation Data"
     },
