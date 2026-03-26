@@ -56,9 +56,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1773961200
+            "ts":1774306800
         }],
-        "ts":1773961200
+        "ts":1774306800
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -122,9 +122,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1774134000
+            "ts":1774479600
         }],
-        "ts":1774134000
+        "ts":1774479600
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -163,56 +163,46 @@
     },
     "garbro":{
         "p":"GARbro/GARbro.Console.exe",
-        "fs":[[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/ArcFormats.dll",
-            "GARbro/ArcFormats.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/ArcFormats.dll.config",
-            "GARbro/ArcFormats.dll.config"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GameData",
-            "GARbro/GameData"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GameRes.dll",
-            "GARbro/GameRes.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GameRes.dll.config",
-            "GARbro/GameRes.dll.config"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GARbro.Console.exe",
-            "GARbro/GARbro.Console.exe"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/GARbro.Console.exe.config",
-            "GARbro/GARbro.Console.exe.config"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/ICSharpCode.SharpZipLib.dll",
-            "GARbro/ICSharpCode.SharpZipLib.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/Microsoft.WindowsAPICodePack.dll",
-            "GARbro/Microsoft.WindowsAPICodePack.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/Microsoft.WindowsAPICodePack.Shell.dll",
-            "GARbro/Microsoft.WindowsAPICodePack.Shell.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/NAudio.dll",
-            "GARbro/NAudio.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/Net20.dll",
-            "GARbro/Net20.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/NVorbis.dll",
-            "GARbro/NVorbis.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/System.IO.FileSystem.dll",
-            "GARbro/System.IO.FileSystem.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/System.Security.Cryptography.Algorithms.dll",
-            "GARbro/System.Security.Cryptography.Algorithms.dll"
-        ],[
-            "https://update.bioruebe.com/uniextract/nightly/bin/GARbro/System.Security.Cryptography.Primitives.dll",
-            "GARbro/System.Security.Cryptography.Primitives.dll"
-        ]],
-        "ts":0
+        "fs":[{
+            "u":"https://nightly.link/crskycode/GARbro/workflows/build/master/GARbro-Mod-ci-build.zip",
+            "x":{
+                "GameData/":"GARbro/GameData",
+                "x64/SQLite.Interop.dll":"GARbro/SQLite.Interop.dll",
+                "ArcExtra.dll":"GARbro/ArcExtra.dll",
+                "ArcFormats.dll":"GARbro/ArcFormats.dll",
+                "ArcLegacy.dll":"GARbro/ArcLegacy.dll",
+                "BCnEncoder.dll":"GARbro/BCnEncoder.dll",
+                "CommunityToolkit.HighPerformance.dll":"GARbro/CommunityToolkit.HighPerformance.dll",
+                "GameRes.dll":"GARbro/GameRes.dll",
+                "GARbro.Console.exe":"GARbro/GARbro.Console.exe",
+                "ICSharpCode.SharpZipLib.dll":"GARbro/ICSharpCode.SharpZipLib.dll",
+                "K4os.Compression.LZ4.dll":"GARbro/K4os.Compression.LZ4.dll",
+                "Microsoft.Bcl.HashCode.dll":"GARbro/Microsoft.Bcl.HashCode.dll",
+                "Microsoft.Bcl.Numerics.dll":"GARbro/Microsoft.Bcl.Numerics.dll",
+                "Microsoft.Deployment.Compression.Cab.dll":"GARbro/Microsoft.Deployment.Compression.Cab.dll",
+                "Microsoft.Deployment.Compression.dll":"GARbro/Microsoft.Deployment.Compression.dll",
+                "NAudio.Core.dll":"GARbro/NAudio.Core.dll",
+                "NAudio.dll":"GARbro/NAudio.dll",
+                "NAudio.Wasapi.dll":"GARbro/NAudio.Wasapi.dll",
+                "Net20.dll":"GARbro/Net20.dll",
+                "Newtonsoft.Json.dll":"GARbro/Newtonsoft.Json.dll",
+                "Snappier.dll":"GARbro/Snappier.dll",
+                "System.Buffers.dll":"GARbro/System.Buffers.dll",
+                "System.Data.SQLite.dll":"GARbro/System.Data.SQLite.dll",
+                "System.Memory.dll":"GARbro/System.Memory.dll",
+                "System.Numerics.Vectors.dll":"GARbro/System.Numerics.Vectors.dll",
+                "System.Runtime.CompilerServices.Unsafe.dll":"GARbro/System.Runtime.CompilerServices.Unsafe.dll",
+                "System.Security.AccessControl.dll":"GARbro/System.Security.AccessControl.dll",
+                "System.Security.Principal.Windows.dll":"GARbro/System.Security.Principal.Windows.dll",
+                "System.Text.Encoding.CodePages.dll":"GARbro/System.Text.Encoding.CodePages.dll",
+                "System.Threading.Tasks.Extensions.dll":"GARbro/System.Threading.Tasks.Extensions.dll",
+                "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
+                "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
+            },
+            "nightly_run":23453656033,
+            "ts":1774519920
+        }],
+        "ts":1774519920
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -522,13 +512,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/2c/34/dolphin-master-2603-100-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/de/f7/dolphin-master-2603-129-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1774151923
+            "ts":1774475316
         }],
-        "ts":1774151923
+        "ts":1774475316
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2070,15 +2060,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.3/GDRE_tools-v2.5.0-beta.3-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.4/GDRE_tools-v2.5.0-beta.4-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1774023271
+            "ts":1774223374
         }],
-        "ts":1774023271
+        "ts":1774223374
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2355,23 +2345,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46032/SDLVICE-3.10-win64-r46032.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46036/SDLVICE-3.10-win64-r46036.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46032/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46032/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46032/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46032/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46032/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46032/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46036/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46036/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46036/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46036/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46036/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46036/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1774133506
+            "ts":1774459058
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1774133506
+        "ts":1774459058
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2733,14 +2723,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_21_5e5230dd_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_25_6aca8fac_32.zip",
             "x":{
-                "RenderDoc_2026_03_21_5e5230dd_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_21_5e5230dd_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_25_6aca8fac_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_25_6aca8fac_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1774047600
+            "ts":1774393200
         }],
-        "ts":1774047600
+        "ts":1774393200
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5575,13 +5565,15 @@
             "x":{
                 "test_lzmat.exe":"test_lzmat.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "pwexplode":{
         "p":"pwexplode.py",
         "fs":[
         "https://raw.githubusercontent.com/Schallaven/pwexplode/refs/heads/master/pwexplode.py"
-        ]
+        ],
+        "ts":0
     },
     "wasm2c":{
         "p":"wasm2c.exe",

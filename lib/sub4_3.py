@@ -431,33 +431,9 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Transformers: Devastation BXM': raise NotImplementedError
-        case 'Nexar New PAC':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt,decompress
-            f = File(i,endian='<')
-            assert f.read(4) == b'PACu'
-
-            c = f.readu32()
-            fmtv = f.readu32()
-            fmt = ('none','lzss','huffman','zlib','zlib_or_none','unknown 1','unknown 2','zstd_or_none')[fmtv]
-            f.seek(f.size - 4)
-            idxs = f.readu32()
-            f.seek(f.size - 4 - idxs)
-            inf = File(decompress(decrypt(f.read(idxs),'inv'),'huffman',usize=0x4C*c),endian=f._end)
-
-            for _ in range(c):
-                fn = inf.read(0x40).rstrip(b'\0').decode('shift-jis' if fmtv < 7 else 'utf-8')
-                f.seek(inf.readu32())
-                us,s = inf.readu32(),inf.readu32()
-                if fmt == 'zlib_or_none': d = f.decompress(s,'zlib' if s != us else 'none')
-                elif fmt == 'zstd_or_none': d = f.decompress(s,'zstd' if s != us else 'none')
-                elif fmt in ('lzss','huffman'): d = f.decompress(s,fmt,usize=us)
-                else: d = f.decompress(s,fmt)
-                xopen(o + '/' + fn,'wb').write(d)
-
-            f.close()
-            del inf
-            if c: return
+        case 'Nexas New PAC':
+            run(['garbro','-x',i],cwd=o)
+            if listdir(o): return
         case 'Asura Engine Resource':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -779,6 +755,25 @@ def extract4_3(inp:str,out:str,t:str):
             p.join()
             p.close()
             if fs: return
+        case 'Gwtar':
+            if db.print_try: print('Trying with custom extractor')
+            import re
+
+            f = open(i,'rb')
+            d = b''
+            while not b'</script>' in d: d += f.read(0x1000)
+            f.seek(len(d.split(b'</script>',1)[0]))
+            d = f.read(0x100).decode('utf-8')
+            assert 'let overhead' in d
+
+            f.seek(int(re.search(r'let +overhead *= *parseInt\("(\d+)"\)',d)[1]))
+            tf = TmpFile('.tar',path=o)
+            xopen(tf.p,'wb').write(f.read())
+            f.close()
+
+            r = extract(tf.p,o,'TAR')
+            tf.destroy()
+            return r
 
     return 1
 

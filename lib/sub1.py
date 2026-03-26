@@ -395,7 +395,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 elif os.path.exists(o + '/Disk1/ikernel.ex_'):
                     if fix_isinstext(o,o + '/Disk1'): return
                 elif listdir(o): return
-                run(['garbro','x','-o',o,i])
+                run(['garbro','-x',i],cwd=o)
                 if listdir(o): return
             else:
                 run(['unzip','-q','-o',i,'-d',o])

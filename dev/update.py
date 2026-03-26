@@ -164,7 +164,7 @@ def supdate(c:Cache,k:str,inf:dict):
                     if NCHKS[repo] in p.split('/')[-1]: nu = p;break
                 else: nu = None
 
-            if nu and nu != u:
+            if nu:
                 run = int(c.srch(r'/runs/(\d+)/',nu[:-4] + '?preview'))
                 if f.get('nightly_run') != run:
                     f['nightly_run'] = run

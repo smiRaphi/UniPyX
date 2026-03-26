@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 808
+# Supported Formats: 809
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -133,7 +133,7 @@ YAC | .yac .yc | [YAC](https://www.sac.sk/download/pack/yac102.zip) |
 Yamazaki Zipper | .yz | [yzdec](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/yz1/deepf106.zip)(src?) |
 yEnc | .ntx .yenc | [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 Z | .z | [7-Zip](https://7-zip.org/) |
-ZIP | .zip .zipx .exe | [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://bioruebe.com/dev/uniextract/)([src](https://github.com/morkt/GARbro)) |
+ZIP | .zip .zipx .exe | [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) |
 ZLIB | .zlib | [zlib](https://docs.python.org/3/library/zlib.html) |
 ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https://bioruebe.com/dev/uniextract/)(src?) |
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
@@ -323,7 +323,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (380)
+## Various (381)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -476,6 +476,7 @@ God of Thunder Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/de
 Godot Pack | .pck | [GDRETools](https://github.com/GDRETools/gdsdecomp) |
 Golden Tee Fore! BIG | .big | Custom |
 Groove World Archive | .grv | Custom |
+Gwtar | .gwtar.html | Custom -> TAR |
 HAL Switch CMP | .cmp | [kirbyswitch-decompress.bms](https://gamebanana.com/questions/25367) |
 HAL XBIN | .xbin | Custom |
 Haemimont Games HPK | .hpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -543,7 +544,7 @@ NDS Sound Data | .sdat | [ndssntext](https://gbatemp.net/download/nds-sound-extr
 NeoBook Cartoon | .nbc | Custom |
 Nemea File Archive | .bin | Custom |
 New York Race KIX+KBF | .kix+.kbf | Custom |
-Nexar New PAC | .pac | Custom |
+Nexas New PAC | .pac | [GARbro](https://github.com/crskycode/GARbro) |
 Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/KillzXGaming/NLG-File-Editor-Tool), [NlgFileTool MFF](https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper), [luigi_mansion_dict.bms](https://mirror.aluigi.org/bms/luigi_mansion_dict.bms) |
 Nicktoons Gravjet Racing LIN | .lin | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |
