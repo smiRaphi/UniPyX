@@ -1212,21 +1212,199 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for f in listdir(o):
                 if f.startswith('unknown_') and f.endswith('.bin') and not getsize(o + '/' + f): remove(o + '/' + f)
             return
-        case 'Mario Kart 64 N64 ROM':
+        case 'Mario Kart 64 N64 ROM'|'F-Zero X N64 ROM'|'Wonder Project J2 N64 ROM':
             f = open(i,'rb')
             f.seek(0x3B)
-            tg = f.read(4).decode('ascii')
+            tg = f.read(4).decode('latin-1')
             f.close()
+            rt = t[:-8]
 
-            if t == 'Mario Kart 64 N64 ROM' and tg == 'NKTE': scr = 'spaghettikart_yaml'
+            if rt == 'Mario Kart 64' and tg == 'NKTE': scr = 'spaghettikart_yaml'
+            elif rt == 'F-Zero X' and tg in ('CFZE','CFZJ'): scr = 'fzerox_yaml'
+            elif rt == 'Wonder Project J2' and tg ==  'NJ2J': scr = 'wonder_torch_yaml'
             else: raise NotImplementedError(t + ': ' + tg)
 
             import zipfile
             run(['torch','o2r','-s',db.get(scr),'-d',o,i])
             if len(listdir(o)) == 2:
                 remove(o + '/torch.hash.yml')
-                zipfile.ZipFile(o + '/' + listdir(o)[0]).extractall(o)
-                remove(o + '/' + listdir(o)[0])
+                assert listdir(o) == ['generic.o2r']
+                zipfile.ZipFile(o + '/generic.o2r').extractall(o)
+                remove(o + '/generic.o2r')
+                return
+        case 'Pilotwings 64 N64 ROM'|'Dr. Mario 64 N64 ROM'|'Wave Race 64 N64 ROM'|'Pokemon Puzzle League N64 ROM'|'Super Smash Bros. N64 ROM'|\
+             'Gex 64: Enter The Gecko N64 ROM'|'Snowboard Kids 2 N64 ROM'|'Glover N64 ROM': # 'Wonder Project J2 N64 ROM'
+            MP = {
+                'Pilotwings 64':{
+                    0:'pilotwings64decomp_yaml',
+                    1:'config/{cc}/pilotwings64',
+                    'NPWE':'us',
+                },
+                'Dr. Mario 64':{
+                    0:'drmario64_yaml',
+                    1:'config/{cc}/drmario64',
+                    'NN6E':'us',
+                    'NN6G':'gw',
+                    '\0\0\0\0':'cn',
+                },
+                'Wave Race 64':{
+                    0:'wave_race_64_yaml',
+                    1:'waverace64',
+                    2:{'linker_scripts'},
+                    'NWRE:2.0':'us.rev1',
+                },
+                'Pokemon Puzzle League':{
+                    0:'puzzleleague64_yaml',
+                    1:'config/{cc}/puzzleleague64',
+                    3:{'tools'},
+                    'NPNE':'usa',
+                    'NPNF':'fra',
+                    'NPND':'ger',
+                    'NPNP':'eur',
+                },
+                'Super Smash Bros.':{
+                    0:'ssb_decommp_re_yaml',
+                    1:'smashbrothers',
+                    2:{'symbols'},
+                    'NALJ':'jp',
+                    'NALE':'us',
+                },
+                'Gex 64: Enter The Gecko':{
+                    0:'gex64decomp_yaml',
+                    1:'gexenterthegecko',
+                    2:{'symbol_addrs.txt'},
+                    'NX2E':'us',
+                },
+                'Snowboard Kids 2':{
+                    0:'snowboardkids2_decomp_yaml',
+                    1:'snowboardkids2',
+                    2:{'symbol_addrs.txt','linker_scripts'},
+                    'NK2E':'us',
+                },
+                'Glover':{
+                    0:'glover_decomp_yaml',
+                    1:'glover',
+                    2:{'symbol_addrs.txt','reloc_addrs.txt'},
+                    'NGVE':'us',
+                },
+                'Wonder Project J2':{
+                    0:'wonder_splat_yaml',
+                    1:'wonderprojectj2',
+                    2:{'buggy_syms.txt','libultra_symbols.txt','symbol_addrs.txt','hardware_syms.txt'},
+                    'NJ2J':'jp',
+                },
+            }
+
+            f = open(i,'rb')
+            f.seek(0x3B)
+            tg = f.read(4).decode('latin-1')
+            v = f.read(1)[0]
+            if v != 0: tg += f':{(v & 0xF) + 1}.{v >> 4}'
+            f.close()
+            rt = t[:-8]
+
+            if rt in MP and tg in MP[rt]:
+                bps = db.get(MP[rt][0])
+                scr = MP[rt][1].format(cc=MP[rt][tg]) + f'.{MP[rt][tg]}.yaml'
+            else: raise NotImplementedError(t + ': ' + tg)
+
+            if db.print_try: print(f'Trying with splat + {MP[rt][0]}/{scr}')
+            import splat.scripts.split as splat # type: ignore
+
+            class Stub:
+                def __init__(self,*args,**kwargs):pass
+                def __call__(self,*args,**kwargs): return Stub()
+                def __getattribute__(self,name): return Stub()
+                def __setattr__(self,name,value): pass
+                def __iter__(self): return self
+                def __next__(self): raise StopIteration
+
+            idat = open(i,'rb').read()
+            if rt == 'Dr. Mario 64':
+                import io
+                ob = io.BytesIO()
+                ob.close = Stub()
+                class ArgStub:
+                    def __init__(self,*args,**kwargs):pass
+                    def add_argument(self,*args,**kwargs):pass
+                    def parse_args(self):
+                        obj = ArgStub()
+                        obj.in_rom = i
+                        obj.out_rom = '\0'
+                        obj.segments = f'compress_segments.{MP[rt][tg]}.csv'
+                        obj.version = MP[rt][tg]
+                        return obj
+                class PathStub:
+                    def __init__(self):pass
+                    def open(self,mode):
+                        assert mode == 'wb'
+                        return ob
+
+                p = os.getcwd()
+                os.chdir(bps)
+                sys.path.append(bps)
+                sys.modules['crunch64'] = Stub()
+                import rom_decompressor # type: ignore
+                rom_decompressor.argparse.ArgumentParser = ArgStub
+                rom_decompressor.__Path = rom_decompressor.Path
+                rom_decompressor.print = Stub()
+                rom_decompressor.Path = lambda x: PathStub() if x == '\0' else rom_decompressor.__Path(x)
+
+                rom_decompressor.romDecompressorMain()
+                del rom_decompressor
+                sys.path.remove(bps)
+                os.chdir(p)
+                sys.modules.pop('crunch64')
+                ob.seek(0)
+                idat = ob.getvalue()
+                del ob
+                assert len(idat)
+
+            class StubProg:
+                def __init__(self,lst): self.__lst = lst
+                def __iter__(self): return self.__lst.__iter__()
+                set_description = Stub()
+
+            class SplatErr(Exception):pass
+            def log_error(*args,**kargs): raise SplatErr(*args,**kargs)
+            splat.log.error = log_error
+            splat.log.write = Stub()
+            splat.log.parsing_error_preamble = lambda p,ln,l: log_error(f'error reading {p}, line {ln+1}:\n\t{l}')
+            splat.log.output_file = Stub()
+            splat.log.newline = False
+            splat.progress_bar.get_progress_bar = lambda i:StubProg(i)
+            splat.statistics = Stub()
+            splat.read_target_binary = lambda: idat
+
+            if scr.startswith('config/'):
+                copydir(bps + '/' + dirname(scr),o + '/' + dirname(scr))
+                bbp = scr.split('/')[0]
+                for x in listdir(bps + '/' + bbp):
+                    p = f'{bps}/{bbp}/{x}'
+                    if isfile(p): copy(p,f'{o}/{bbp}/{x}')
+            else: copy(bps + '/' + scr,o + '/' + scr)
+            if 2 in MP[rt]:
+                for x in MP[rt][2]: copy(f'{bps}/{x}',f'{o}/{x}')
+            old = len(listdir(o))
+            if 3 in MP[rt]:
+                for x in MP[rt][3]: copy(f'{bps}/{x}',f'{o}/{x}')
+            splat.main([splat.Path(o + '/' + scr)],["all"],verbose=False,use_cache=False)
+            if 3 in MP[rt]: remove(*[f'{o}/{x}' for x in MP[rt][3]])
+
+            if len(listdir(o)) > old:
+                if rt == 'Wave Race 64':
+                    import re,ast
+                    from lib.file import decompress
+
+                    offs = ast.literal_eval(re.search(r'target_mio0_offsets = (\[[\s\dA-Fa-fx,]+\])',xopen(bps + '/mio0_extract.py','r').read())[1])
+                    f = open(i,'rb')
+                    for of in offs:
+                        f.seek(of)
+                        if f.read(4) == b'MIO0':
+                            f.seek(of)
+                            xopen(f'{o}/mio0/decompressed_{of:08X}.bin','wb').write(decompress(f.read(),'mio0'))
+                elif rt == 'Super Smash Bros.':
+                    raise NotImplementedError('VPK0: https://github.com/decompals/crunch64/issues/1')
                 return
         case 'Final Fantasy X 2 ISO':
             run(['7z','x',i,'-o' + o + '\\$ISO'])

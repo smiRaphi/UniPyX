@@ -242,6 +242,9 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
             if 'db' in kwargs: kwargs['db'].get('pwexplode')
             import bin.pwexplode # type: ignore
             return bin.pwexplode.explode(i)
+        case 'mio0'|'yay0'|'yaz0'|'vpk0':
+            import crunch64
+            fnc = getattr(crunch64,algo).decompress
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
 def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:

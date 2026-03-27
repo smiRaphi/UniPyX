@@ -888,6 +888,11 @@
         "rs":"Typing of the Dead HAB","s":1
     },
     {
+        "rqr":"Nintendo 64 ROM image (",
+        "d":["hash","2DAD57E9D8E4F4164BFC76370983D79B",0,4096],
+        "rs":"Dr. Mario 64 N64 ROM","s":1
+    },
+    {
         "d":[["isat","RESET\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["isat","ROMDIR\\0\\0\\0\\0",16],["n0",2,10],["n0",2,26]],
         "rs":"PlayStation 2 IOPRP IMG","s":1},{
         "d":[["size",4194304],["isat","RESET\\0\\0\\0\\0\\0",10048],["isat","ROMDIR\\0\\0\\0\\0",10064]],

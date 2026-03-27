@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 809
+# Supported Formats: 818
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -139,7 +139,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | [compression.zstd](https://docs.python.org/3/library/compression.zstd.html)/[backports.zstd](https://pypi.org/project/backports.zstd/) |
 
-## ROM Formats (57)
+## ROM Formats (66)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -152,7 +152,9 @@ C64 LiBRary | .lbr | [DirMaster](https://style64.org/dirmaster) |
 C64 Tape | .tap | [DirMaster](https://style64.org/dirmaster) |
 CPC Plus IMG | ??? | Custom |
 Donkey Kong Banana Kingdom | ??? | Custom |
+Dr. Mario 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Dr. Mario 64 decomp YAML](https://github.com/AngheloAlf/drmario64/tree/master/config) |
 Encrypted GD-ROM | .bin | Custom + [chdecrypt](https://github.com/JayFoxRox/Chihiro-Tools) |
+F-Zero X N64 ROM | .z64 | [Torch](https://github.com/HarbourMasters/Torch) + [F-Zero X Decompilation YAML](https://github.com/inspectredc/fzerox) |
 Famicom Disk Image | ??? | Custom |
 Final Fantasy X 2 ISO | .iso | Custom |
 GameCube GCAM ISO | .iso | Custom -> GameCube ISO |
@@ -161,6 +163,8 @@ GameCube TGC ISO | .iso | Custom -> GameCube ISO |
 GBA ADS SFCD | .sfcd | Custom |
 GBA ADS Video ROM | .gba | Custom |
 GD-ROM CUE+BIN | .cue+.bin | [buildgdi](https://github.com/Sappharad/GDIbuilder) |
+Gex 64: Enter The Gecko N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Gex64Decomp YAML](https://github.com/MatBourgon/Gex64Decomp) |
+Glover N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Glover Decomp YAML](https://github.com/bigyoshi51/glover-decomp) |
 iNES ROM | .nes | Custom |
 Initial D 3 Export A | ??? | [Initial D 3 Exp](https://github.com/NaomiMod/games-ExtractTools/tree/main/InitialD3_Exp) |
 Konami Python IMG | .img | Custom |
@@ -175,8 +179,10 @@ NCSD | .cci .3ds | [3dstool](https://github.com/dnasdw/3dstool) |
 NDS | .nds .srl | [mdnds](https://github.com/Roughsketch/mdnds) |
 NES Remix ROM | ??? | Custom |
 Nintendo TMD | .tmd ` ` | Custom |
+Pilotwings 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Pilotwings64Decomp YAML](https://github.com/gcsmith/Pilotwings64Decomp/tree/main/config)
 PlayStation APA IMG | .pfs | [pfs2tar](https://github.com/ps2homebrew/pfsshell) + [7-Zip](https://7-zip.org/) |
 PlayStation Boot Package | .pbp | Custom |
+Pokemon Puzzle League N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Puzzle League decomp YAML](https://github.com/AngheloAlf/puzzleleague64/tree/master/config) |
 PS3 ISO | .iso | [ps3dec](https://github.com/Redrrx/ps3dec) -> ISO |
 PS4 PKG | .pkg | [ps4pkg](https://github.com/CyB1K/PS4-Fake-PKG-Tools-3.87) |
 PS5 PKG | .pkg | [ps5pkg](https://github.com/DNNDHH/PS5-PKGs) |
@@ -184,13 +190,16 @@ PSVita PKG | .pkg | [pkg2zip](https://github.com/mmozeiko/pkg2zip) + [psvpfspars
 Ridge Racer V A | ` ` | [rrvatool](https://github.com/ch-mcl/PS2_RidgeRacerV_ArchiveTool)
 RVZ | .rvz | [DolphinTool](https://dolphin-emu.org/download/) |
 SimpleFlashFS | .sffs | Custom |
+Snowboard Kids 2 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Snowboard Kids 2 decomp YAML](https://github.com/cdlewis/snowboardkids2-decomp) |
 SPS IPF | .ipf | [uaeunp](https://www.winuae.net/download/), [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 StudyBox IMG | .img | Custom |
 Switch NCA | .nca | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Switch NSP | .nsp | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Switch XCI | .xci | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Virtua Striker 3 A | ??? | Custom |
+Wave Race 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Wave Race 64 decomp YAML](https://github.com/LLONSIT/Wave-Race-64) |
 Wii ISO | .iso | [DolphinTool](https://dolphin-emu.org/download/), [WIT](https://wit.wiimm.de/) |
+Wonder Project J2 N64 ROM | .z64 | [Torch](https://github.com/HarbourMasters/Torch) + [Wonder Torch YAML](https://github.com/LLONSIT-glitch/wonder/tree/master/assets/yaml) |
 WUX | .wux | [JWUDTool](https://github.com/Maschell/JWUDTool) |
 Xbox LIVE ROM | ` ` | [py360/stfs](https://raw.githubusercontent.com/arkem/py360/stfs) |
 Xbox PIRS | ` ` | [py360/stfs](https://raw.githubusercontent.com/arkem/py360/stfs) |

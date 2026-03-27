@@ -43,11 +43,14 @@ class DLDB:
         if not 'httpx' in self.udb: self.udb['httpx'] = int(time())
 
         self.piptries = {}
+        self.pipinstalled = {}
         class DLDBPip:
             @classmethod
             def find_spec(cls,fullname,path,target=None):
                 n = fullname.split('.')[0]
                 if n in self.pdb:
+                    self.pipinstalled[n] -= 1
+                    if self.pipinstalled[n] != 0: return
                     if n in self.piptries:
                         print(self.piptries[n])
                         raise Exception('pip Import Error')
@@ -56,10 +59,13 @@ class DLDB:
             @classmethod
             def find_spec(cls,fullname,path,target=None):
                 n = fullname.split('.')[0]
-                if n in self.udb and n in self.pdb and self.udb[n] < self.pdb[n].get('ts',0): self.pip(n)
+                if n in self.pdb:
+                    if n not in self.pipinstalled: self.pipinstalled[n] = 0
+                    self.pipinstalled[n] += 1
+                    if n in self.udb and self.udb[n] < self.pdb[n].get('ts',0): self.pip(n)
 
-        sys.meta_path.append(DLDBPip)
         sys.meta_path.insert(1,DLDBPipUpdate)
+        sys.meta_path.append(DLDBPip)
 
     def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,print_out=False,**kwargs) -> tuple[int,str|bytes,str|bytes]:
         if print_try and self.print_try: print('Trying with',cmd[0])
@@ -251,11 +257,11 @@ class DLDB:
             self.ghthp = ThreadPool()
             self.ghq = []
 
-        out = out.strip('/')
-        os.makedirs(out,exist_ok=True)
         d = self.c.get(url,headers={'accept':'application/json','x-requested-with':'XMLHttpRequest'}).json()
         if 'meta' in d and 'title' in d['meta']: tit = d['meta']['title']
         d = d['payload']
+        out = out.strip('/')
+        os.makedirs(out,exist_ok=True)
         if not 'refInfo' in d:
             assert 'codeViewTreeRoute' in d
             d = d['codeViewTreeRoute']

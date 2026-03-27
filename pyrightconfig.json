@@ -2,5 +2,13 @@
     "extraPaths": [
         "./bin/pip"
     ],
+    "exclude": [
+        "**/node_modules", "**/.*","**/__pycache__",
+        "./bin/pip",
+        "./out",
+        "./bin/sarc.py",
+        "./bin/splat64",
+        "./bin/Torch",
+    ],
     "typeCheckingMode": "off"
 }

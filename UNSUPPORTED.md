@@ -30,6 +30,7 @@ UltraCompressor 2 | .uc2 | ? | ? | ? | detected
 ELI 5750 | ? | ? | ? | ? | detected
 Transformers: Devastation BXM | .bxm | Transformers: Devastation | ? | ? | detected, json like
 Gateshark2NTR Plugin | .plg | https://gbatemp.net/threads/yokai-watch-3-ntr-plug-in.525593/<br>https://gbatemp.net/threads/release-gateshark2ntr.436504/post-9252959 | https://gbatemp.net/threads/release-gateshark2ntr.436504/ | ? | detected
+Super Smash Bros. N64 ROM | .z64 | SSB | ? | [splat64](https://pypi.org/project/splat64/) + [SSB decomp YAML](https://github.com/VetriTheRetri/ssb-decomp-re) | detected, waiting for crunch64 to support vpk0
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
