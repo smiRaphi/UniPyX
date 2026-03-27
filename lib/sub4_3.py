@@ -774,6 +774,26 @@ def extract4_3(inp:str,out:str,t:str):
             r = extract(tf.p,o,'TAR')
             tf.destroy()
             return r
+        case 'PlayStation V2 Trophy File':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(4) == b'\xB2\x28\xC6\x0A' and f.readu32() == 1
+
+            f.skip(8)
+            c = f.readu32()
+            f.seek(f.readu32() + 0x20)
+            fs = []
+            for _ in range(c):
+                fs.append((f.read(0x20).rstrip(b'\0').decode('utf-8'),f.readu64(),f.readu64()))
+                f.skip(0x10)
+
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[2]))
+
+            f.close()
+            if fs: return
 
     return 1
 

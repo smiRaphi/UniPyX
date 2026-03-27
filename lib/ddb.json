@@ -994,6 +994,15 @@
         "rs":"PlayStation Trophy File","s":1
     },
     {
+        "d":[["isat","\\xB2\\x28\\xC6\\x0A\\0\\0\\0\\1",0],["isat","\\0\\0\\0\\x40",20],["n0",8,8],["n0",4,16],
+             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8)\nif int.from_bytes(f.read(8),'big')!=s:return\nc=int.from_bytes(f.read(4),'big');o=int.from_bytes(f.read(4),'big');f.seek(o+64);return int.from_bytes(f.read(8),'big')==(o+32+64*c)"]],
+        "rs":"PlayStation V2 Trophy File","s":1
+    },
+    {
+        "d":[["isat","\\x95\\x95\\x9E\\xE6",0],["isat","-",12],["isat","-",17],["isat","-",22],["isat","-",27],["str",4,36],["py","f=open(inp,'rb');f.seek(4);d=f.read(36);return not (d[:8]+d[9:13]+d[14:18]+d[19:23]+d[24:]).strip(b'abcdef01234567890')"]],
+        "rs":"PlayStation Encrypted File","s":1
+    },
+    {
         "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix') or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')+12)==s"]],
         "rs":"Nintendo HARC+HIDX","s":1},{
         "d":[["isat","HIDX",0],["n0",4,4],["py","if not exists(splitext(inp)[0]+'.har'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*17+8)==s"]],

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 818
+# Supported Formats: 819
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -332,7 +332,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (381)
+## Various (382)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -602,6 +602,7 @@ PlayStation 3 Signed Package | .pkg | [ps3_unpkg](https://github.com/wargio/ps3t
 PlayStation Archive | .psarc | [PS3 4.50 SDK-YLoD [450_001].7z/psarc](https://archive.org/download/ps3_sdks), [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |
 PlayStation SFO | .sfo | Custom |
 PlayStation Trophy File | .trp | Custom |
+PlayStation V2 Trophy File | .ucp | Custom |
 Pokemon FSYS | .fsys | [gcfsysd](https://www.hcs64.com/vgm_ripping.html) |
 PS2 Memory Card | ??? | [mymc](http://www.csclub.uwaterloo.ca:11068/mymc/) |
 PS3/PSV PUP | .pup | Custom |

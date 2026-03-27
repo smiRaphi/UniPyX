@@ -56,9 +56,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1774306800
+            "ts":1774479600
         }],
-        "ts":1774306800
+        "ts":1774479600
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -122,9 +122,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1774479600
+            "ts":1774566000
         }],
-        "ts":1774479600
+        "ts":1774566000
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -512,13 +512,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/de/f7/dolphin-master-2603-129-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/65/15/dolphin-master-2603-138-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1774475316
+            "ts":1774559018
         }],
-        "ts":1774475316
+        "ts":1774559018
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2345,23 +2345,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46036/SDLVICE-3.10-win64-r46036.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46037/SDLVICE-3.10-win64-r46037.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46036/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46036/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46036/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46036/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46036/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46036/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46037/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46037/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46037/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46037/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46037/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46037/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1774459058
+            "ts":1774604971
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1774459058
+        "ts":1774604971
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2723,14 +2723,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_25_6aca8fac_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_26_18e6d687_32.zip",
             "x":{
-                "RenderDoc_2026_03_25_6aca8fac_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_25_6aca8fac_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_26_18e6d687_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_26_18e6d687_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1774393200
+            "ts":1774479600
         }],
-        "ts":1774393200
+        "ts":1774479600
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -6542,7 +6542,8 @@
             "u":"https://github.com/inspectredc/fzerox/tree/main/assets",
             "github":"Torch/fzerox/assets",
             "ts":1772705894
-        }]
+        }],
+        "ts":0
     },
     "wonder_torch_yaml":{
         "p":"Torch/wonder",
@@ -6553,7 +6554,8 @@
             "u":"https://github.com/LLONSIT-glitch/wonder/tree/master/assets",
             "github":"Torch/wonder/assets",
             "ts":1767538195
-        }]
+        }],
+        "ts":0
     },
     "pilotwings64decomp_yaml":{
         "p":"splat64/PilotWings64Decomp",
@@ -6561,7 +6563,8 @@
             "u":"https://github.com/gcsmith/Pilotwings64Decomp/tree/main/config",
             "github":"splat64/PilotWings64Decomp/config",
             "ts":1774464164
-        }]
+        }],
+        "ts":0
     },
     "drmario64_yaml":{
         "p":"splat64/drmario64",
@@ -6584,7 +6587,8 @@
         ],[
             "https://raw.githubusercontent.com/AngheloAlf/drmario64/refs/heads/master/tools/compressor/rom_decompressor.py",
             "splat64/drmario64/rom_decompressor.py"
-        ]]
+        ]],
+        "ts":0
     },
     "wave_race_64_yaml":{
         "p":"splat64/wave_race_64",
@@ -6598,7 +6602,8 @@
         ],[
             "https://raw.githubusercontent.com/LLONSIT/Wave-Race-64/refs/heads/master/tools/mio0_extract.py",
             "splat64/wave_race_64/mio0_extract.py"
-        ]]
+        ]],
+        "ts":0
     },
     "puzzleleague64_yaml":{
         "p":"splat64/puzzleleague64",
@@ -6610,7 +6615,8 @@
             "u":"https://github.com/AngheloAlf/puzzleleague64/tree/master/tools/splat_ext",
             "github":"splat64/puzzleleague64/tools/splat_ext",
             "ts":1724693862
-        }]
+        }],
+        "ts":0
     },
     "ssb_decomp_re_yaml":{
         "p":"splat64/ssb_decomp_re",
@@ -6624,7 +6630,8 @@
         ],[
             "https://github.com/VetriTheRetri/ssb-decomp-re/raw/refs/heads/main/smashbrothers.us.yaml",
             "splat64/ssb_decomp_re/smashbrothers.us.yaml"
-        ]]
+        ]],
+        "ts":0
     },
     "gex64decomp_yaml":{
         "p":"splat64/Gex64Decomp",
@@ -6634,7 +6641,8 @@
         ],[
             "https://raw.githubusercontent.com/MatBourgon/Gex64Decomp/refs/heads/master/symbol_addrs.txt",
             "splat64/Gex64Decomp/symbol_addrs.txt"
-        ]]
+        ]],
+        "ts":0
     },
     "snowboardkids2_decomp_yaml":{
         "p":"splat64/snowboardkids2_decomp",
@@ -6648,7 +6656,8 @@
             "u":"https://github.com/cdlewis/snowboardkids2-decomp/tree/main/linker_scripts",
             "github":"splat64/snowboardkids2_decomp/linker_scripts",
             "ts":1771650618
-        }]
+        }],
+        "ts":0
     },
     "glover_decomp_yaml":{
         "p":"splat64/glover_decomp",
@@ -6661,7 +6670,8 @@
         ],[
             "https://raw.githubusercontent.com/bigyoshi51/glover-decomp/refs/heads/main/reloc_addrs.txt",
             "splat64/glover_decomp/reloc_addrs.txt"
-        ]]
+        ]],
+        "ts":0
     },
     "wonder_splat_yaml":{
         "p":"splat64/wonder",
@@ -6680,7 +6690,8 @@
         ],[
             "https://raw.githubusercontent.com/LLONSIT-glitch/wonder/refs/heads/master/hardware_syms.ld",
             "splat64/wonder/hardware_syms.txt"
-        ]]
+        ]],
+        "ts":0
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",

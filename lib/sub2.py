@@ -1062,7 +1062,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             return
         case 'N64 Memory Pak':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decode_n64_mpak,crc16
+            from lib.file import File,decode_n64_mpak,crc_hash
             f = File(i,endian='>')
             big = f.size >= 0x80000
             f.seek(0x100)
@@ -1091,7 +1091,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.back(0x20)
                 rd = bytearray(f.read(0x20))
                 rd[9:11] = b'\0\0'
-                if crc16(rd,0x5935) != ldrgcrc: ppd = 0
+                if crc_hash(rd,poly=0x5935) != ldrgcrc: ppd = 0
 
                 pp = sp
                 ps = 0
