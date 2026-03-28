@@ -122,9 +122,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1774566000
+            "ts":1774652400
         }],
-        "ts":1774566000
+        "ts":1774652400
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -512,13 +512,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/65/15/dolphin-master-2603-138-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/f1/d8/dolphin-master-2603-146-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1774559018
+            "ts":1774670555
         }],
-        "ts":1774559018
+        "ts":1774670555
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2723,14 +2723,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_26_18e6d687_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_27_18e6d687_32.zip",
             "x":{
-                "RenderDoc_2026_03_26_18e6d687_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_26_18e6d687_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_27_18e6d687_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_27_18e6d687_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1774479600
+            "ts":1774566000
         }],
-        "ts":1774479600
+        "ts":1774566000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5581,6 +5581,65 @@
     },
     "crunch64":{
         "pip":"crunch64"
+    },
+    "wolvenkit.cli":{
+        "p":"WolvenKit.Console/WolvenKit.CLI.exe",
+        "fs":[{
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-03-28/WolvenKit.Console-8.17.4-nightly.2026-03-28.zip",
+            "x":{
+                "appsettings.json":"WolvenKit.Console/appsettings.json",
+                "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
+                "DynamicData.dll":"WolvenKit.Console/DynamicData.dll",
+                "kraken.dll":"WolvenKit.Console/kraken.dll",
+                "Microsoft.Extensions.Configuration.Abstractions.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.Abstractions.dll",
+                "Microsoft.Extensions.Configuration.Binder.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.Binder.dll",
+                "Microsoft.Extensions.Configuration.CommandLine.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.CommandLine.dll",
+                "Microsoft.Extensions.Configuration.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.dll",
+                "Microsoft.Extensions.Configuration.EnvironmentVariables.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+                "Microsoft.Extensions.Configuration.FileExtensions.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.FileExtensions.dll",
+                "Microsoft.Extensions.Configuration.Json.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.Json.dll",
+                "Microsoft.Extensions.Configuration.UserSecrets.dll":"WolvenKit.Console/Microsoft.Extensions.Configuration.UserSecrets.dll",
+                "Microsoft.Extensions.DependencyInjection.Abstractions.dll":"WolvenKit.Console/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+                "Microsoft.Extensions.DependencyInjection.dll":"WolvenKit.Console/Microsoft.Extensions.DependencyInjection.dll",
+                "Microsoft.Extensions.Diagnostics.Abstractions.dll":"WolvenKit.Console/Microsoft.Extensions.Diagnostics.Abstractions.dll",
+                "Microsoft.Extensions.Diagnostics.dll":"WolvenKit.Console/Microsoft.Extensions.Diagnostics.dll",
+                "Microsoft.Extensions.FileProviders.Abstractions.dll":"WolvenKit.Console/Microsoft.Extensions.FileProviders.Abstractions.dll",
+                "Microsoft.Extensions.FileProviders.Physical.dll":"WolvenKit.Console/Microsoft.Extensions.FileProviders.Physical.dll",
+                "Microsoft.Extensions.FileSystemGlobbing.dll":"WolvenKit.Console/Microsoft.Extensions.FileSystemGlobbing.dll",
+                "Microsoft.Extensions.Hosting.Abstractions.dll":"WolvenKit.Console/Microsoft.Extensions.Hosting.Abstractions.dll",
+                "Microsoft.Extensions.Hosting.dll":"WolvenKit.Console/Microsoft.Extensions.Hosting.dll",
+                "Microsoft.Extensions.Logging.Abstractions.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.Abstractions.dll",
+                "Microsoft.Extensions.Logging.Configuration.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.Configuration.dll",
+                "Microsoft.Extensions.Logging.Console.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.Console.dll",
+                "Microsoft.Extensions.Logging.Debug.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.Debug.dll",
+                "Microsoft.Extensions.Logging.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.dll",
+                "Microsoft.Extensions.Logging.EventLog.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.EventLog.dll",
+                "Microsoft.Extensions.Logging.EventSource.dll":"WolvenKit.Console/Microsoft.Extensions.Logging.EventSource.dll",
+                "Microsoft.Extensions.Options.ConfigurationExtensions.dll":"WolvenKit.Console/Microsoft.Extensions.Options.ConfigurationExtensions.dll",
+                "Microsoft.Extensions.Options.dll":"WolvenKit.Console/Microsoft.Extensions.Options.dll",
+                "Microsoft.Extensions.Primitives.dll":"WolvenKit.Console/Microsoft.Extensions.Primitives.dll",
+                "Semver.dll":"WolvenKit.Console/Semver.dll",
+                "SharpGLTF.Core.dll":"WolvenKit.Console/SharpGLTF.Core.dll",
+                "System.Collections.Immutable.dll":"WolvenKit.Console/System.Collections.Immutable.dll",
+                "System.CommandLine.dll":"WolvenKit.Console/System.CommandLine.dll",
+                "System.CommandLine.Hosting.dll":"WolvenKit.Console/System.CommandLine.Hosting.dll",
+                "System.CommandLine.NamingConventionBinder.dll":"WolvenKit.Console/System.CommandLine.NamingConventionBinder.dll",
+                "System.Diagnostics.DiagnosticSource.dll":"WolvenKit.Console/System.Diagnostics.DiagnosticSource.dll",
+                "System.IO.Pipelines.dll":"WolvenKit.Console/System.IO.Pipelines.dll",
+                "System.Reactive.dll":"WolvenKit.Console/System.Reactive.dll",
+                "System.Text.Encodings.Web.dll":"WolvenKit.Console/System.Text.Encodings.Web.dll",
+                "System.Text.Json.dll":"WolvenKit.Console/System.Text.Json.dll",
+                "WolvenKit.CLI.deps.json":"WolvenKit.Console/WolvenKit.CLI.deps.json",
+                "WolvenKit.CLI.dll":"WolvenKit.Console/WolvenKit.CLI.dll",
+                "WolvenKit.CLI.exe":"WolvenKit.Console/WolvenKit.CLI.exe",
+                "WolvenKit.CLI.runtimeconfig.json":"WolvenKit.Console/WolvenKit.CLI.runtimeconfig.json",
+                "WolvenKit.Common.dll":"WolvenKit.Console/WolvenKit.Common.dll",
+                "WolvenKit.Core.dll":"WolvenKit.Console/WolvenKit.Core.dll",
+                "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
+                "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
+            }
+        }],
+        "ts":0
     },
     "wasm2c":{
         "p":"wasm2c.exe",

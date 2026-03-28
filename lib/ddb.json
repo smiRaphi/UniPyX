@@ -1003,6 +1003,10 @@
         "rs":"PlayStation Encrypted File","s":1
     },
     {
+        "d":[["isat","CR2W",0],["n0",4,24],["n0",4,28],["n0",4,32],["n0",4,36],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(24);return int.from_bytes(f.read(4),'little')<=int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"REDengine W2ResourCe","s":1
+    },
+    {
         "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix') or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')+12)==s"]],
         "rs":"Nintendo HARC+HIDX","s":1},{
         "d":[["isat","HIDX",0],["n0",4,4],["py","if not exists(splitext(inp)[0]+'.har'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*17+8)==s"]],

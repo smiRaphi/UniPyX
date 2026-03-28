@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 819
+# Supported Formats: 821
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -332,7 +332,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (382)
+## Various (384)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -617,6 +617,8 @@ RARC | .arc .rarc | [WSZST](https://szs.wiimm.de/) |
 Rayman DCZ | .dcz | [rayman_dcz.bms](https://mirror.aluigi.org/bms/rayman_dcz.bms) |
 RDB | .rdb | [Cethleann](https://github.com/yretenai/Cethleann) |
 Red Baron VOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)), Custom |
+REDengine Archive | .archive | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
+REDengine W2ResourCe | [a lot](https://wiki.redmodding.org/cyberpunk-2077-modding/for-mod-creators-theory/files-and-what-they-do/file-formats#w2rc-file-format-table) | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 Remedy BIN+RMDP | .bin+.rmdp | [remedy_bin_rmdp.bms](https://mirror.aluigi.org/bms/remedy_bin_rmdp.bms) |
 RenderDoc Capture | .rdc | [RenderDoc](https://renderdoc.org/) |
 RenderWare Texture Dictionary | .txd | [rwexporter](https://github.com/AmyrAhmady/rwexporter) |

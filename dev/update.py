@@ -59,6 +59,7 @@ GFMTS = {
     'LongSoft/UEFITool':lambda tag:f'UEFIExtract_NE_{tag}_win64.zip',
     'UnderminersTeam/UndertaleModTool':lambda tag:f'UTMT_CLI_v{tag}-Windows.zip',
     'WebAssembly/wabt':lambda tag:f'wabt-{tag}-windows-x64.tar.gz',
+    'WolvenKit/WolvenKit-nightly-releases':lambda tag:f'WolvenKit.Console-{tag}.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'

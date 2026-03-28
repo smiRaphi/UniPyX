@@ -794,6 +794,12 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'REDengine Archive':
+            run(['wolvenkit.cli','extract',i,'-o',o,'-v','Quiet'])
+            if listdir(o): return
+        case 'REDengine W2ResourCe':
+            run(['wolvenkit.cli','convert','s',i,'-o',o,'-v','Quiet'])
+            if listdir(o): return
 
     return 1
 
