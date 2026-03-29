@@ -876,6 +876,30 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Purple Moon Resource PRD+PRS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(noext(i) +  '.prd',endian='<')
+            fd = File(noext(i) +  '.prs',endian='<')
+            f.seek(0xA8)
+
+            while f:
+                f.skip(8)
+                of = f.readu32()
+                if of == 0xFFFFFFFF:
+                    f.skip(12)
+                    continue
+                fd.seek(of - 0x1C)
+                f.skip(8)
+                e = fd.read(4).rstrip(b'\0').decode('ascii')
+                gid = fd.readu16()
+                fn = f'{o}/{gid}{fd.read(0x12).rstrip(b"\0").decode("ascii")}.{e}'
+                fd.skip(4)
+                xopen(fn,'wb').write(fd.read(f.readu32()))
+
+            f.close()
+            fd.close()
+            if listdir(o): return
 
     return 1
 

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 823
+# Supported Formats: 824
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -332,7 +332,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (386)
+## Various (387)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -611,6 +611,7 @@ PS3/PSV PUP | .pup | Custom |
 Pseudo Interactive PIX | .pix | Custom |
 Pseudo Interactive SmallF | .sf | Custom |
 PSX PFW | .pfw | Custom |
+Purple Moon Resource PRD+PRS | .prd+.prs | Custom |
 QOOB Flash IMG | ??? | Custom |
 Quake 3D WAD | .wad | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Quake PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
