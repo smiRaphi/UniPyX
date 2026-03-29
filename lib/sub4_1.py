@@ -1757,6 +1757,28 @@ def extract4_1(inp:str,out:str,t:str):
                 return
         case 'Vicarious Visions GFC+GOB': return quickbms('over_the_hedge')
         case 'GIANTS Archive': return quickbms('gar')
+        case 'XNB': return quickbms('xnb')
+        case 'XNB Dictionary':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(1)
+            f.skip(f.readu8()+1+4)
+            f.skip(f.readu8()+6)
+            c = f.readu32()
+            ob = {}
+
+            for _ in range(c):
+                f.skip(1)
+                k = f.read(f.readleb128u()).decode('utf-8')
+                f.skip(1)
+                ob[k] = f.read(f.readleb128u()).decode('utf-8')
+            f.close()
+
+            if ob:
+                open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8').write(json.dumps(ob,indent=2,ensure_ascii=False))
+                return
 
         case _:
             from lib.sub4_2 import extract4_2

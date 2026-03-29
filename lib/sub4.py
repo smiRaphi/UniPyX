@@ -631,23 +631,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with wpack')
             run(['msdos',db.get('wpack'),i],print_try=False,cwd=o)
             if listdir(o): return
-        case 'RPACK':
-            if db.print_try: print('Trying with custom extractor')
-            raise NotImplementedError
-            from lib.file import File
-
-            f = File(i,endian='<')
-            assert f.read(4) == b'RP6L','Invalid RPACK file'
-            if f.readu32() == 4: offm = 16
-            else: assert False,"Unknown offset multiplier"
-
-            cmp = f.readu32()
-            assert cmp in (0,),'Unknown compression method'
-
-            pc,sc,fc,fncl,fnc,bs = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
-            secis = {}
-            for _ in range(sc):
-                s = {'type':f.readu8()}
         case 'Minecraft PCK': return quickbms('minecraft_pck')
         case 'Mo\'PaQ':
             run(['mpqextractor','-e','*','-o',o,i])
@@ -692,8 +675,23 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
-             'LithTech Resource'|'Doom Engine WAD'|'GE:Red Baron VOL'|\
-             'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF':
+             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|\
+             'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF'|'GE:Red Baron VOL':
+            CODS = {
+                'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
+                'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
+                'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
+                'Gizmo Studios BOLT':'BLT_BOLT','Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
+                'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Digital Illusions PDT':'PDT_PDT1','Dynamix DYN':'DYN_DYNAMIX',
+                'Earth And Beyond MIX':'MIX_MIX1','Electronic Arts LIB':'LIB_EALIB','Empire Earth 1 SSA':'SSA_RASS','Ensemble Studios DRS':'DRS',
+                'Etherlords 2 Resource':'RES_8|RES','F.E.A.R. LTAR':'ARCH00_LTAR','Final Fantasy 7 LGP':'LGP','Holistic Design MUK':'MUK_MUKFILE',
+                'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',
+                'Highway Pursuit HPDT':'HD_HPDT','Xenonauts PFP':'PFP_PFPK','LithTech Resource':'LPS_LITHTECH','Doom Engine WAD':'WAD_IWAD',
+                'UE3 Package':'UE3_727|UE3_648|UE3_607|UE3_584|UE3_576|UE3_575|UE3_564|UE3_547|UE3_539|UE3_512|UE3_507|UE3_871|UE3_868|UE3_807|UE3_805|UE3_451|UE3_Generic|UE3_Texture2D_Generic|UE3_Texture2D_547|UE3_Texture2D_539|UE3_Texture2D_512|UE3_Texture2D_451|UE3_Texture2D_507|UE3_Texture2D_871|UE3_Texture2D_868|UE3_Texture2D_807|UE3_Texture2D_648|UE3_Texture2D_584|UE3_Texture2D_576|UE3_Texture2D_575',
+                'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3','GE:Red Baron VOL':'VOL_VOL',
+                'GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
+            }
+
             if db.print_try: print('Trying with gameextractor')
             import subprocess,httpx
 
@@ -714,23 +712,17 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     print(p.stdout.read().decode())
                     print(p.stderr.read().decode())
                     raise Exception('gameextractor server failed to start')
-                r = httpx.post(f'http://127.0.0.1:{port}/extract',timeout=30 if t == 'GE:Red Baron VOL' else (60*3),json={'inputFilePath':i,'outputDirPath':o,'codes':{
-                    'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
-                    'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
-                    'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
-                    'Gizmo Studios BOLT':'BLT_BOLT','Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
-                    'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Digital Illusions PDT':'PDT_PDT1','Dynamix DYN':'DYN_DYNAMIX',
-                    'Earth And Beyond MIX':'MIX_MIX1','Electronic Arts LIB':'LIB_EALIB','Empire Earth 1 SSA':'SSA_RASS','Ensemble Studios DRS':'DRS',
-                    'Etherlords 2 Resource':'RES_8|RES','F.E.A.R. LTAR':'ARCH00_LTAR','Final Fantasy 7 LGP':'LGP','Holistic Design MUK':'MUK_MUKFILE',
-                    'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',
-                    'Highway Pursuit HPDT':'HD_HPDT','Xenonauts PFP':'PFP_PFPK','LithTech Resource':'LPS_LITHTECH','Doom Engine WAD':'WAD_IWAD',
-                    'UE3 Package':'UE3_727|UE3_648|UE3_607|UE3_584|UE3_576|UE3_575|UE3_564|UE3_547|UE3_539|UE3_512|UE3_507|UE3_871|UE3_868|UE3_807|UE3_805|UE3_451|UE3_Generic|UE3_Texture2D_Generic|UE3_Texture2D_547|UE3_Texture2D_539|UE3_Texture2D_512|UE3_Texture2D_451|UE3_Texture2D_507|UE3_Texture2D_871|UE3_Texture2D_868|UE3_Texture2D_807|UE3_Texture2D_648|UE3_Texture2D_584|UE3_Texture2D_576|UE3_Texture2D_575',
-                    'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3','GE:Red Baron VOL':'VOL_VOL',
-                    'GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
-                }[t].split('|')})
+                if t in CODS: c = CODS[t]
+                elif t == 'Dying Light RPACK': c = 'RPACK_' + open(i,'rb').read(4).decode('ascii')
+                else: raise Exception('No mapped codes for ' + t)
+
+                id = dirname(i)
+                cd = listdir(id)
+                r = httpx.post(f'http://127.0.0.1:{port}/extract',timeout=30 if t == 'GE:Red Baron VOL' else (60*3),json={'inputFilePath':i,'outputDirPath':o,'codes':c.split('|')})
                 p.kill()
                 if r.status_code == 200 and r.json().get('files'):
-                    if exists(noext(i) + '_ge_decompressed' + extname(i)): remove(noext(i) + '_ge_decompressed' + extname(i))
+                    for f in listdir(id):
+                        if f not in cd and f.startswith(tbasename(i) + '_ge_decompressed') and f.endswith(extname(i)): remove(id + '/' + f)
                     return
             except httpx.ReadTimeout: p.kill()
             except:
@@ -2532,28 +2524,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     return
 
                 return quickbms('luigi_mansion_dict')
-        case 'XNB': return quickbms('xnb')
-        case 'XNB Dictionary':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            f.skip(1)
-            f.skip(f.readu8()+1+4)
-            f.skip(f.readu8()+6)
-            c = f.readu32()
-            ob = {}
-
-            for _ in range(c):
-                f.skip(1)
-                k = f.read(f.readleb128u()).decode('utf-8')
-                f.skip(1)
-                ob[k] = f.read(f.readleb128u()).decode('utf-8')
-            f.close()
-
-            if ob:
-                open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8').write(json.dumps(ob,indent=2,ensure_ascii=False))
-                return
 
         case _:
             from lib.sub4_1 import extract4_1

@@ -13,7 +13,6 @@ Crinkler | .exe | https://github.com/InkboxSoftware/smallEXE | https://github.co
 d0lLZ 3 | .dol | ? | https://wiibrew.org/wiki/Dollz | https://wiibrew.org/w/images/e/ef/Dollz3.zip | detected
 VMProtect | .exe | ? | ? | ? | detected
 Atomik Cruncher | ? | ? | ? | http://aminet.net/package/util/pack/xfdmaster | detected
-RPACK | .rpack | Dying Light | ? | https://github.com/Qivex/rpack-extract/blob/main/rpack-extract.lua | custom, detected
 HAL YAML | ? | Kirby/HAL games | ? | https://github.com/firubii/KirbyLib/blob/main/KirbyLib/Yaml.cs | detected
 Encrypted Rclone Config | .conf | ARMGDDN | https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/obscure/obscure.go#L19<br>https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/crypt.go#L74 | ? | detected
 The Binding of Isaac Resource | ? | TBOI(Re) | ? | ? | detected

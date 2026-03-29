@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 824
+# Supported Formats: 825
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -332,7 +332,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (387)
+## Various (388)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -443,6 +443,7 @@ Dotemu INF+BIN | .inf+.bin | [InfBinRepacker](https://github.com/Hinoroni/InfBin
 Dr. Luigi ZALZ | .zalz | Custom + [dr_luigi_wiiu.bms](https://mirror.aluigi.org/bms/dr_luigi_wiiu.bms) |
 Dragon UnPACKer 5 Plugin | .d5p | Custom |
 Dragon VDK IMG | .vdk | [dcopy](https://github.com/pulkomandy/ddosutils) |
+Dying Light RPACK | .rpack | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Dynamix DYN | .dyn | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Earth And Beyond MIX | .mix | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 EBAB Animation Data | .ebab | Custom |
