@@ -836,7 +836,9 @@ def extract4_3(inp:str,out:str,t:str):
                 f.skip(0x10)
                 fe.extend([f.readu64(),f.readu64(),f.readu64()])
                 f.skip(0x20)
-                if f.readu64() & 4:
+                fe.append(f.readu8())
+                f.skip(7)
+                if fe[4] == 4:
                     fe[1] += 12
                     fe[2] -= 12
                 f.skip(0x18)
@@ -850,7 +852,7 @@ def extract4_3(inp:str,out:str,t:str):
                 if fe[3] == 0: d = b''
                 else:
                     f.seek(fe[1])
-                    d = f.decompress(fe[2],'none' if fe[2] == fe[3] else 'oodle_kraken',usize=fe[3],db=db)
+                    d = f.decompress(fe[2],('none','zlib','oodle_kraken',0,'oodle_kraken','oodle_leviathan'),usize=fe[3],db=db)
                 xopen(fn,'wb').write(d)
 
             f.close()
@@ -900,6 +902,58 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if listdir(o): return
+        case 'Sonic PAC':
+            run(['hedgearcpack',i,o,'-E'])
+            if listdir(o): return
+        case 'Sonic BINA':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+
+            if f.read(4) == b'BINA':
+                f.skip(3)
+                f._end = {b'L':'<',b'B':'>'}[f.read(1)]
+                f.skip(8)
+                assert f.read(4) == b'DATA'
+                f.skip(4)
+                de = f.readu32()
+                to = de + f.readu32()
+                te = f.readu32()
+                f.skip(f.readu16() + 2)
+                do = f.pos
+                de += do
+                to += do
+                te += to
+            else:
+                f._end = '>'
+                to = f.readu32()
+                te = f.readu32()
+                f.skip(8)
+                assert f.read(8) == b'\x00\x001BBINA'
+                f.skip(4)
+                do = f.pos
+                to += do
+                de = to
+                te += to
+
+            f.seek(to)
+            fs = []
+            while f.pos < te:
+                b1 = f.readu8()
+                fl,r = b1 >> 6,b1 & 0x3F
+                if not fl: break
+                if fl > 1:
+                    r = f.readu8() + (r >> 8)
+                    if fl > 2: r = f.readu16('>') + (r >> 16)
+                fs.append((r << 2) + do)
+            fs.append(de)
+            fs = sorted(list(set(fs)))
+            for ix in range(len(fs)-1):
+                f.seek(fs[ix])
+                xopen(f'{o}/{ix:02d}.bin','wb').write(f.read(fs[ix+1] - fs[ix]))
+
+            f.close()
+            return
 
     return 1
 

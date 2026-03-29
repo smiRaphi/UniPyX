@@ -367,6 +367,14 @@
         "rs":"Purple Moon Resource PRD+PRS","s":1
     },
     {
+        "d":[["isat","BINA",0],["isat","L",7],["isat","\\1\\0\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Sonic BINA","s":1},{
+        "d":[["isat","BINA",0],["isat","B",7],["isat","\\0\\1\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'big')==s"]],
+        "rs":"Sonic BINA","s":1},{
+        "d":[["isat","\\0",18],["isat","\\0\\01BBINA",20],["isatS","\\0",4,12],["isatS","\\0",4,28],["isin",["\\0","\\1"],19],["n0",4,0],["n0",4,4]],
+        "rs":"Sonic BINA","s":1
+    },
+    {
         "rqr":"Win16 NE executable (generic)",
         "d":[["isat","\\x01\\x83",140],["contain","\\x1ABatman AC Resource Library\\0\\0\\0",[272,2048]]],
         "rs":"Batman AC Resource","s":1

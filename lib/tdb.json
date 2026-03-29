@@ -1495,5 +1495,9 @@
     ],
     "REDengine Archive":[
         "redengine game data archive"
+    ],
+    "Sonic PAC":[
+        "sonic's serie game data archive (little-endian)",
+        "sonic's serie game data archive (big-endian)"
     ]
 }

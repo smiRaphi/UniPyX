@@ -246,7 +246,7 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
             fnc = getattr(crunch64,algo).decompress
-        case 'oodle_kraken':
+        case 'oodle_kraken'|'oodle_leviathan':
             global OODLE
             assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
             import ctypes

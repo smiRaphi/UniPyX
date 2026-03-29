@@ -26,7 +26,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
                         else: rename(o + '/' + sd,o + '/$' + sd)
                 else:
                     rename(o + '/sys',o + '/$SYS')
-                    copydir(o + '/files',o,True)
+                    while True:
+                        try: copydir(o + '/files',o,True)
+                        except PermissionError: pass
+                        else: break
                 return
             tf = TmpFile('.iso')
             run(['dolphintool','convert','-u',gtmp('user'),'-i',i,'-o',tf,'-f','iso'])

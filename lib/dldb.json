@@ -5647,6 +5647,12 @@
         "https://raw.githubusercontent.com/Sainan/noodle/refs/heads/senpai/2.9.14/oo2core_win64.dll"
         ]
     },
+    "hedgearcpack":{
+        "p":"HedgeArcPack.exe",
+        "fs":[
+        "https://github.com/Radfordhound/HedgeLib/releases/download/v0.1-xcompress/HedgeArcPack.exe"
+        ]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{
