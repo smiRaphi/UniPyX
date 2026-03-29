@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 821
+# Supported Formats: 823
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -332,7 +332,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (384)
+## Various (386)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 @N-Factory DAT | .dat | Custom |
@@ -504,6 +504,7 @@ Holistic Design MUK | .muk | [Game Extractor Server](https://github.com/Sembianc
 Hollow Knight Save | ??? | Custom |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |
+idTech 7 Resource | .resource | Custom |
 IFF Data | .iff * | Custom |
 Impact Screensaver ILB | .ilb | Custom |
 Initial D XAF | .xaf | [assamUnpack](https://github.com/refint/assamUnpack) |
@@ -600,6 +601,7 @@ Pixelbite ZIP | ??? | Custom |
 PlayStation 3 Core OS Package | .pkg | [ps3_cosunpkg](https://github.com/wargio/ps3tools) |
 PlayStation 3 Signed Package | .pkg | [ps3_unpkg](https://github.com/wargio/ps3tools) |
 PlayStation Archive | .psarc | [PS3 4.50 SDK-YLoD [450_001].7z/psarc](https://archive.org/download/ps3_sdks), [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |
+PlayStation BLS Update | .pup | Custom |
 PlayStation SFO | .sfo | Custom |
 PlayStation Trophy File | .trp | Custom |
 PlayStation V2 Trophy File | .ucp | Custom |

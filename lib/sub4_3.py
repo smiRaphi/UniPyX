@@ -800,6 +800,82 @@ def extract4_3(inp:str,out:str,t:str):
         case 'REDengine W2ResourCe':
             run(['wolvenkit.cli','convert','s',i,'-o',o,'-v','Quiet'])
             if listdir(o): return
+        case 'idTech 7 Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'IDCL'
+
+            v = f.readu32()
+            unk = sum(f.read(4))
+            f.skip(0x14)
+            if v == 13 and unk: f.skip(4)
+            c = f.readu32()
+            f.skip(4)
+            dc = f.readu32()
+            f.skip(0x14)
+            no = f.readu64()
+            f.skip(8)
+            to = f.readu64()
+            f.skip(8)
+            nio = f.readu64() + dc * 4
+
+            f.seek(no)
+            nc = f.readu64()
+            ns = [f.readu64() for _ in range(nc)]
+            p = f.pos
+            for ix in range(nc):
+                f.seek(p+ns[ix])
+                ns[ix] = f.read0s()
+
+            f.seek(to)
+            fs = []
+            for _ in range(c):
+                f.skip(0x20)
+                fe = [f.readu64() + 1]
+                f.skip(0x10)
+                fe.extend([f.readu64(),f.readu64(),f.readu64()])
+                f.skip(0x20)
+                if f.readu64() & 4:
+                    fe[1] += 12
+                    fe[2] -= 12
+                f.skip(0x18)
+                fs.append(fe)
+
+            for fe in fs:
+                f.seek(nio + fe[0]*8)
+                fn = ns[f.readu64()].decode('utf-8').replace('\\','/').split('/')
+                fn = o + '/' + sub_path(('/'.join((fn[ix] + '_dir') if exists(o + '/' + '/'.join(fn[:ix+1])) and isfile(o + '/' + '/'.join(fn[:ix+1])) else fn[ix] for ix in range(len(fn)-1)) + '/' + fn[-1]).lstrip('/').replace(':','/'))
+                if exists(fn) and isdir(fn): move(fn,fn + '_dir')
+                if fe[3] == 0: d = b''
+                else:
+                    f.seek(fe[1])
+                    d = f.decompress(fe[2],'none' if fe[2] == fe[3] else 'oodle_kraken',usize=fe[3],db=db)
+                xopen(fn,'wb').write(d)
+
+            f.close()
+            if fs: return
+        case 'PlayStation BLS Update':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'SLB2'
+
+            f.skip(8)
+            c = f.readu32()
+            cs = f.size // f.readu64()
+            f.skip(8)
+            fs = []
+            for _ in range(c):
+                fe = [f.readu32() * cs,f.readu32()]
+                f.skip(8)
+                fs.append(fe + [f.read(0x20).rstrip(b'\0').decode('utf-8')])
+            for fe in fs:
+                f.seek(fe[0])
+                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1
 

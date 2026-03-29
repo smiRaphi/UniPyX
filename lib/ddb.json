@@ -844,7 +844,7 @@
     },
     {
         "d":[["isat","\\0\\0\\0",0],["isat","\\0\\0\\0",4],["isat","\\0\\0\\0\\0",12],["isat","\\0\\0\\0\\0",-4],["isin",["\\x01","\\x02","\\x03","\\x06","\\x07","\\x08","\\x09"],3],["isin",["\\x00","\\x01","\\x02","\\x03","\\x04","\\x05","\\x06","\\x07","\\x08","\\x09"],7],
-             ["py","f=open(inp,'rb');fs=f.seek(0,2);f.seek(8);fo=int.from_bytes(f.read(4),'big')\nif fo<8 or fo%0x10!=0 or (fo+5)>fs:return\nf.seek(fo-8);return (int.from_bytes(f.read(4),'big')+5)<=fs"]],
+             ["py","f=open(inp,'rb');fs=f.seek(0,2);f.seek(8);fo=int.from_bytes(f.read(4),'big')\nif fo<8 or fo%0x10 or (fo+5)>fs:return\nf.seek(fo-8);return (int.from_bytes(f.read(4),'big')+5)<=fs"]],
         "rs":"Nintendo Mario Party Message"
     },
     {
@@ -868,7 +868,7 @@
         "rs":"Transformers: Devastation BXM"
     },
     {
-        "d":[["isat","PACu",0],["isin",["\\0\\0\\0\\0","\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0","\\x04\\0\\0\\0","\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(s-4);i=int.from_bytes(f.read(4),'little');return (76*c*2)>=i and (i+16)<s"]],
+        "d":[["isat","PACu",0],["isin",["\\0\\0\\0\\0","\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0","\\x04\\0\\0\\0","\\x05\\0\\0\\0","\\x06\\0\\0\\0","\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(s-4);i=int.from_bytes(f.read(4),'little');return (76*c*2)>=i and (i+16)<s"]],
         "rs":"Nexas New PAC","s":true
     },
     {
@@ -985,6 +985,14 @@
         "rs":"PlayStation 3 SELF/SPRX","s":1
     },
     {
+        "d":[["isat","\\x54\\x14\\xF5\\xEE",0],["isat","\\x04\\0\\0\\0",8]],
+        "rs":"PlayStation 5 SELF","s":1
+    },
+    {
+        "d":[["isat","\\x4F\\x15\\x3D\\x1D",0],["isat","\\x04\\0\\0\\0",8]],
+        "rs":"PlayStation 4 SELF","s":1
+    },
+    {
         "d":[["n0",4,4],["n0",8,8],["n0",8,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'big');return int.from_bytes(f.read(8),'big')==s and(16+48*c)==int.from_bytes(f.read(8),'big')"]],
         "rs":"PlayStation 3 Core OS Package","s":1
     },
@@ -1003,8 +1011,17 @@
         "rs":"PlayStation Encrypted File","s":1
     },
     {
+        "d":[["isat","SLB2",0],["isin",["\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0"],4],["isatS","\\0",12,20],["isatS","\\0",8,40],["n0",4,12],["n0",4,16],["n0",4,32],["n0",4,36],["str0",48,32,7],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);return(int.from_bytes(f.read(4),'little')*512)==s"]],
+        "rs":"PlayStation BLS Update","s":1
+    },
+    {
         "d":[["isat","CR2W",0],["n0",4,24],["n0",4,28],["n0",4,32],["n0",4,36],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(24);return int.from_bytes(f.read(4),'little')<=int.from_bytes(f.read(4),'little')==s"]],
         "rs":"REDengine W2ResourCe","s":1
+    },
+    {
+        "d":[["isat","IDCL",0],["isin",["\\x0C\\0\\0\\0","\\x0D\\0\\0\\0"],4],
+             ["py","f=open(inp,'rb');f.seek(4);vr=int.from_bytes(f.read(4),'little')>12;v=sum(f.read(4))and vr;f.seek(36 if v else 32)\nif not sum(f.read(4)):return\nc=int.from_bytes(f.read(4),'little');f.seek(16,1)\nif not sum(f.read(8))or not sum(f.read(8)):return\no=int.from_bytes(f.read(8),'little');h=int.from_bytes(f.read(8),'little');return h&7==o&7 and h==((136 if v else 112)if vr else 124)and o==int.from_bytes(f.read(8),'little')and(o+c*32)==int.from_bytes(f.read(8),'little')<=int.from_bytes(f.read(8),'little')"]],
+        "rs":"idTech 7 Resource","s":1
     },
     {
         "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix') or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')+12)==s"]],
@@ -1027,8 +1044,6 @@
     {
         "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","f=open(inp,'rb');c=f.read(4)\nif c!=f.read(4) or c==f.read(4):return\nc=int.from_bytes(c,'little');f.seek(8)\nfor _ in range(c):f.seek(int.from_bytes(f.read(2),'little'),1)\nf.seek(4,1);return f.read(8)[:4]==b'\\0\\0\\0\\0' and int.from_bytes(f.read(4),'little')==(f.tell()-16+c*20)"]],
         "rs":"Petroglyph MEG"},{
-        "d":[["isat","\\xFF\\xFF\\xFF\\xFF\\xA4\\x70\\x7D\\x3F",0],["n0",4,8],["n0",4,12],["n0",4,16],["n0",2,20],["py","f=open(inp,'rb');f.seek(12);return f.read(4)==f.read(4)"]],
-        "rs":"Petroglyph MEG","s":1},{
         "d":[["isat","\\xFF\\xFF\\xFF",0],["isat","\\xA4\\x70\\x7D\\x3F",4],["isin",["\\xFF","\\x8F"],3],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');f.seek(12);return f.read(4)==f.read(4)"]],
         "rs":"Petroglyph MEG","s":1
     },
@@ -1102,7 +1117,7 @@
     },
     {
         "d":[["size",[128,2147483648]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],
-             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');cc=c*8+4;so=int.from_bytes(f.read(4),'little');ss=int.from_bytes(f.read(4),'little')+so;o=int.from_bytes(f.read(4),'little')\nif not(((cc+(-cc%64))==so and (ss+(-ss%64))==o)or((cc+(-cc%0x800))==so and (ss+(-ss%0x800))==o)):return\nf.seek(so);return int.from_bytes(f.read(4),'little')==(c*4-4)"]],
+             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');cc=c*8+4;so=int.from_bytes(f.read(4),'little');ss=int.from_bytes(f.read(4),'little')+so;o=int.from_bytes(f.read(4),'little')\nif not(((cc+(-cc%64))==so and (ss+(-ss%64))==o)or((cc+(-cc%2048))==so and (ss+(-ss%2048))==o)):return\nf.seek(so);return int.from_bytes(f.read(4),'little')==(c*4-4)"]],
         "rs":"D1 Grand Prix Series 2005 BIN"
     },
     {

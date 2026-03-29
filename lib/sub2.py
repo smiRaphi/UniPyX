@@ -1102,7 +1102,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     if cp == 1: break
                     pp = cp
 
-                fs.append((fn.replace(':','﹕').replace('?','﹖').replace('"',"''").replace('*','﹡'),sp * 0x100,ps * 0x100 - ppd))
+                fs.append((fn.replace(':','：').replace('?','？').replace('"',"''").replace('*','﹡'),sp * 0x100,ps * 0x100 - ppd))
 
             for fe in fs:
                 f.seek(fe[1])

@@ -859,19 +859,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
             _splitext = lfmmstr.os.path.splitext
             lfmmstr.os.path.splitext = lambda *args,**kwargs: (o,) if args == (basename(i),) else _splitext(*args,**kwargs)
             REPM = {
-                '*':'_',
-                '?':'_',
                 '\\':'_',
                 '/':'_',
-                '<':'_',
-                '>':'_',
-                ':':'_',
-                '\n':' ',
                 '\x99':'™',
                 '\xA9':'©',
                 '\xAE':'®',
-                '"':"''",
-            }
+            } | SUB_PATH
             _join = lfmmstr.os.path.join
             lfmmstr.os.path.join = lambda i1,i2: _join(i1,i2.translate(str.maketrans(REPM)))
 

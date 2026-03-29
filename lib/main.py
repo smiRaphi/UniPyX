@@ -97,6 +97,20 @@ def isvalid(p:str,reject_dirs=False):
             elif e.errno in (errno.ENAMETOOLONG,errno.ERANGE): return False
         except (TypeError,ValueError): return False
     return True
+SUB_PATH = str.maketrans({
+    ':':'：',
+    '?':'',
+    '*':'',
+    '|':'',
+    '"':'',
+    '<':'',
+    '>':'',
+    '\n':' ',
+})
+def sub_path(p:str,home=False):
+    if home and len(p) > 3 and p[0].isalpha() and p[1] == ':' and p[2] in '\\/': h,p = p[:3],p[3:]
+    else: h = ''
+    return h + p.translate(SUB_PATH).replace('\r','')
 def set_ctime(p:str,t:int,unix=True):
     try:
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)

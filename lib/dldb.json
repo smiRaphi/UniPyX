@@ -5641,6 +5641,12 @@
         }],
         "ts":0
     },
+    "noodle":{
+        "p":"oo2core_win64.dll",
+        "fs":[
+        "https://raw.githubusercontent.com/Sainan/noodle/refs/heads/senpai/2.9.14/oo2core_win64.dll"
+        ]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

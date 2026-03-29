@@ -198,6 +198,7 @@ def ext_exe(i:str,dotnet=False):
         r.SECTIONS = {s.Name.rstrip(b'\0').decode(errors='ignore'):s for s in r.sections}
         return r
 
+OODLE = None
 def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
     match algo:
         case 'none': return i
@@ -245,6 +246,23 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
             fnc = getattr(crunch64,algo).decompress
+        case 'oodle_kraken':
+            global OODLE
+            assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
+            import ctypes
+            if not OODLE:
+                from ctypes import c_void_p,c_int,c_ssize_t,CFUNCTYPE
+                OODLE = ctypes.CDLL(kwargs['db'].get('noodle'))
+                OODLE.OodleLZ_Decompress.argtypes = [
+                    c_void_p,c_ssize_t,c_void_p,c_ssize_t,c_int,c_int,c_int,c_void_p,c_ssize_t,c_void_p#CFUNCTYPE(None,c_void_p,c_void_p,c_ssize_t)
+                    ,c_void_p,c_void_p,c_ssize_t,c_int
+                ]
+                OODLE.OodleLZ_Decompress.restype = c_ssize_t
+
+            o = ctypes.create_string_buffer(kwargs['usize'])
+            r = OODLE.OodleLZ_Decompress(i,len(i),o,kwargs['usize'],0 if algo in () else 1,0,0,None,0,None,None,None,0,0)
+            if r == 0: raise Exception('Failed to decompress')
+            return o.raw[:r]
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
 def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
