@@ -267,9 +267,9 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
     return fnc(i,*args,**kwargs)
 def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
     match algo:
-        case 'crc32':
+        case 'crc32'|'adler32':
             import zlib
-            return zlib.crc32(i,*args,**kwargs) & 0xFFFFFFFF
+            return getattr(zlib,algo)(i,*args,**kwargs) & 0xFFFFFFFF
         case 'crc16': fnc = crc16
         case 'tarzan': fnc = tarzan_hash
         case 'sha1'|'sha256'|'md5':

@@ -995,6 +995,54 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case '-8 SysFile':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(0x14)
+            s1 = f.readu32()
+            s2 = f.readu32()
+            f.skip(8)
+            open(o + '/0.png','wb').write(f.read(s1))
+            open(o + '/1.png','wb').write(f.read(s2))
+
+            f.close()
+            return
+        case 'Archer Maclean\'s Mercury PAQ':
+            CRCC = b"________________________________________________0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____________________________________________________________________________________________________________________________________"
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,crc_hash
+            MP = {crc_hash(x.rstrip().translate(CRCC),'crc32'):x.rstrip().decode('ascii') for x in open('bin/archer_mac_mercury.hsh','rb').readlines()}
+
+            f = File(i,endian='<')
+            assert f.readu32() in {0x7D1,0xFEED}
+
+            c = f.readu32()
+            f.skip(8)
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32(),f.readu32(),f.readu32()))
+                assert f.readu32() == fs[-1][1],f.pos - 0x10
+            for fe in fs:
+                f.seek(fe[2])
+                d = f.read(fe[1])
+                if fe[0] in MP: fn = MP[fe[0]]
+                else:
+                    if d[:4] in {b'DEAD',b'COL0'}: ex = d[:4].decode('ascii')
+                    elif b'MIG.00.1PSP\0' in d[0x20:0x50]: ex = 'pst'
+                    elif d[:8] == b'********': ex = 'lvl.txt'
+                    elif d[:13] == b'\r\nNEW_SURFACE': ex = 'srf.txt'
+                    elif d[:9] == b'[Control]': ex = 'ctl.txt'
+                    elif d[:10] == b'Obj Name: ': ex = 'obj.txt'
+                    elif d[:10] == b'Thumbnail=': ex = 'tmb.txt'
+                    elif d[:4] == b'\xED\xFE\0\0': ex = 'paq'
+                    else: ex = guess_ext(d)
+                    fn = hex(fe[0])[2:].zfill(8).upper() + '.' + ex
+                xopen(o + '/' + fn,'wb').write(d)
+
+            f.close()
+            if fs: return
 
     return 1
 
