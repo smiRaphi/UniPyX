@@ -954,6 +954,47 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             return
+        case 'The Mummy Returns PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.skip(4)
+            m = f.readu32()
+
+            f.skip(4)
+            c = f.readu32()
+            to = f.readu32()*m
+            tgo = f.readu32()*m
+            f.skip(0x10)
+            so = f.readu32()*m
+            f.seek(to)
+
+            fs = []
+            for _ in range(c):
+                fe = [f.readu32()*m]
+                f.skip(4)
+                fe.extend([f.readu32(),f.readu32() + so])
+                htg = f.readu32()
+                assert htg in {0,1},f.pos
+                if htg: fe.append(f.readu32() + tgo)
+                else:
+                    f.skip(4)
+                    fe.append(None)
+                f.skip(8)
+                fs.append(fe)
+
+            for fe in fs:
+                if fe[3]:
+                    f.seek(fe[3])
+                    ex = '.' + f.read(4).decode('ascii')
+                else: ex = ''
+                f.seek(fe[2])
+                fn = f.read0s().decode('utf-8') + ex
+                f.seek(fe[0])
+                xopen(o + '/' + (fn or 'StringTable.pak.sys'),'wb').write(f.read(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1
 

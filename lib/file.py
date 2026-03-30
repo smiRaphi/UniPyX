@@ -255,7 +255,7 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
                 OODLE = ctypes.CDLL(kwargs['db'].get('noodle'))
                 OODLE.OodleLZ_Decompress.argtypes = [
                     c_void_p,c_ssize_t,c_void_p,c_ssize_t,c_int,c_int,c_int,c_void_p,c_ssize_t,c_void_p#CFUNCTYPE(None,c_void_p,c_void_p,c_ssize_t)
-                    ,c_void_p,c_void_p,c_ssize_t,c_int
+                   ,c_void_p,c_void_p,c_ssize_t,c_int
                 ]
                 OODLE.OodleLZ_Decompress.restype = c_ssize_t
 

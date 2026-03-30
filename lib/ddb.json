@@ -380,6 +380,11 @@
         "rs":"Batman AC Resource","s":1
     },
     {
+        "d":[["size",[2160,null]],["s%",16],["n0",4,0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["isatS","\\0",4,24],["n0",4,32],["n0",4,40],["n0",4,44],["isatS","\\0",4,52],["isatS","\\0",4,60],
+             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);a=int.from_bytes(f.read(4),'little')\nif s%a:return\nf.seek(12);c=int.from_bytes(f.read(4),'little')*32;to=int.from_bytes(f.read(4),'little')*a;tgo=int.from_bytes(f.read(4),'little')*a;f.seek(28);tgo+=int.from_bytes(f.read(4),'little')*4;fo=int.from_bytes(f.read(4),'little')*a\nif (s-(fo+32+-32%a))>2048 or(to+c+-c%a)!=fo:return\nf.seek(40);so=int.from_bytes(f.read(4),'little')*a\nif (tgo+-tgo%a)!=so:return\nso+=int.from_bytes(f.read(4),'little')\nif (so+-so%a)!=to:return\nf.seek(fo+4);return (s-(int.from_bytes(f.read(4),'little')*a))<=2048"]],
+        "rs":"The Mummy Returns PAK","s":1
+    },
+    {
         "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
         "rs":"TREVA SDPC","s":1
     },
