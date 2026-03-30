@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 828
+# Supported Formats: 831
 
 ## "Common" Archives/Compressors/Encodings (133)
 Name | Extension(s) | Extractor(s) | Comment
@@ -332,9 +332,10 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (391)
+## Various (394)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
+-8 SysFile | .bin | Custom |
 @N-Factory DAT | .dat | Custom |
 0Size24 Data | * | Custom |
 10,000 Bullets FILE.BIN | .bin | Custom |
@@ -365,6 +366,7 @@ AMOS Memory Bank | ??? | Custom |
 AmusementMakers Project B.G. Archive | ??? | Custom |
 Anna-Marie Archive | ??? | Custom |
 Arc System Works PAC | .pac | [arcsys.bms](https://aluigi.org/bms/arcsys.bms) |
+Archer Maclean's Mercury PAQ | .paq | Custom |
 Artech DAT | .dat | Custom |
 ASCARON Entertainment CPR | .cpr | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 ASDG SPLiT | .spl .spt | Custom |
@@ -673,7 +675,8 @@ Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game E
 Teardown Encrypted File | .tde | [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt) |
 The Mummy Returns PAK | .ps2 | Custom |
 The Sims FAR | .far | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-THQ Worms UTF Strings | .utf | Custom |
+THQ PAK | .pak | Custom |
+THQ Worms UTF Strings | ??? | Custom |
 THQ Worms Resources | ??? | Custom |
 Tiled TMX/TSX | .tmx .tsx | Custom |
 Torus Ashen PackFile | .pf | Custom |

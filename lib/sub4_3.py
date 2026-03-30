@@ -1043,6 +1043,25 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'THQ PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'kcap' and f.readu32() == 1
+
+            f.skip(8)
+            so = f.readu32()
+            c = f.readu32()
+            fs = []
+            for _ in range(c): fs.append((f.readu32() + so,f.readu32(),f.readu32()))
+            for fe in fs:
+                f.seek(fe[0])
+                fn = f.read0s().decode('ascii')
+                f.seek(fe[1])
+                xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
+
+            f.close()
+            if fs: return
 
     return 1
 

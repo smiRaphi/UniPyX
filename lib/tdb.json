@@ -1499,5 +1499,8 @@
     "Sonic PAC":[
         "sonic's serie game data archive (little-endian)",
         "sonic's serie game data archive (big-endian)"
+    ],
+    "THQ PAK":[
+        "spongebob squarepants: lights,camera,pants! game data archive"
     ]
 }
