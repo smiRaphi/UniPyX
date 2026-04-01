@@ -201,7 +201,9 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 remove(tf.p + '_decrypted.iso')
                 if r or not listdir(o): return 1
                 return
-            if not extract(i,o,'ISO'): return
+            if not extract(i,o,'ISO'):
+                if exists(o + '/PS3_GAME/USRDIR/EBOOT.BIN') and open(o + '/PS3_GAME/USRDIR/EBOOT.BIN','rb').read(4) != b'SCE\0': return 1
+                return
         case 'PSVita PKG':
             if exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
             elif exists(noext(i) + '.work.bin'): work = noext(i) + '.work.bin'

@@ -578,8 +578,24 @@
         "rs":"UTG Software DDD","s":1
     },
     {
+        "d":[["isat","TotemTech Data v1.73 (c) 1999-2002 Kalisto Entertainment - All right reserved",0],["isatS","\\0",179,77]],
+        "rs":"TotemTech Data","s":1
+    },
+    {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'big')+8)==s"]],
         "rs":"Lucas Arts Bundle"
+    },
+    {
+        "d":[["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(-4,1);o=int.from_bytes(f.read(4),'little')\nif o%4 or o>=s or o<32:return\nf.seek(s-o)\nif f.read(4)!=b'\\x03\\0\\0\\0':return\nc=int.from_bytes(f.read(4),'little');f.seek(4,1)\nif sum(f.read(4))or(c*20+12)!=o:return\nus=int.from_bytes(f.read(4),'big');f.seek(4,1);s=int.from_bytes(f.read(4),'big');f.seek(4,1);d=int.from_bytes(f.read(4),'big')-((s or us)>>4);return d==0 or 0<d<16"]],
+        "rs":"L.A. Noire BIG"
+    },
+    {
+        "d":[["size",[5120,307200]],["isat","ASH0",0],["n0",4,4],["n0",4,8],["py","return len(open(inp,'rb').read().split(b'ASH0'))==5"]],
+        "rs":"Super Mario Maker Level","s":1
+    },
+    {
+        "d":[["isat","ASH0",0],["n0",4,4],["n0",4,8]],
+        "rs":"Nintendo ASH0","s":1
     },
     {
         "d":[["isatS","\\0",24,-28],["n0",4,-32],["n0",4,-4],["contain","END \\0\\0\\0\\0\\0\\0\\0\\0",[-64,32]],["py","f=open(inp,'rb');f.seek(0,2);f.seek(-4,1);b=f.read(4);f.seek(-32,1)\nif b!=f.read(4):return\nf.seek(int.from_bytes(b,'little'));return f.read(4)==b'STR ' and sum(f.read(4))"]],
@@ -1008,16 +1024,16 @@
     },
     {
         "rqr":"Sony SELF - SPRX format",
-        "d":[["isat","\\0\\0\\x02",4],["isat","\\0\\x01",10],["n0",4,12]],
+        "d":[["isat","\\0\\0\\0\\x02",4],["isat","\\0\\x01",10],["n0",4,12]],
         "rs":"PlayStation 3 SELF/SPRX","s":1
-    },
-    {
-        "d":[["isat","\\x54\\x14\\xF5\\xEE",0],["isat","\\x04\\0\\0\\0",8]],
-        "rs":"PlayStation 5 SELF","s":1
     },
     {
         "d":[["isat","\\x4F\\x15\\x3D\\x1D",0],["isat","\\x04\\0\\0\\0",8]],
         "rs":"PlayStation 4 SELF","s":1
+    },
+    {
+        "d":[["isat","\\x54\\x14\\xF5\\xEE",0],["isat","\\x04\\0\\0\\0",8]],
+        "rs":"PlayStation 5 SELF","s":1
     },
     {
         "d":[["n0",4,4],["n0",8,8],["n0",8,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'big');return int.from_bytes(f.read(8),'big')==s and(16+48*c)==int.from_bytes(f.read(8),'big')"]],
@@ -1766,8 +1782,7 @@
     },
     {
         "rqr":null,
-        "d":[["str0",4,244,4,false],["isat","\\0\\0\\0\\0",248,false],
-             ["isat","(C) ",0],["isat","ELF0",0],["isat","DOL0",0],["isat","BIN0",0]],"qq":true,
+        "d":[["str0",4,244,4],["isat","\\0\\0\\0\\0",248],["isin",["(C) ","ELF0","DOL0","BIN0"],0]],
         "rs":"QOOB Flash IMG"
     },
     {

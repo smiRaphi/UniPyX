@@ -7,6 +7,7 @@ CTTR = {
     'application/java-archive':'jar',
     'audio/mpeg':'mp3',
     'audio/vorbis':'ogg',
+    'binary/octet-stream':'bin',
     'image/jpeg':'jpg',
     'image/svg+xml':'svg',
     'image/vnd.adobe.photoshop':'psd',
@@ -455,7 +456,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
             f.close()
 
             run(['7z','x',i,'-o' + o,'-aoa'])
-            if listdir(o): return fix_tar(o)
+            if listdir(o):
+                if len(listdir(o)) == 1 and open(o + '/' + listdir(o),'rb').read(10) == b'WARC/1.0\r\n':
+                    extract1(o + '/' + listdir(o)[0],o,'Web ARchive')
+                    return
+                return fix_tar(o)
         case 'ZPAQ':
             run(['zpaq','x',i,'-f','-to',o])
             if listdir(o): return
@@ -748,7 +753,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             from urllib.parse import unquote_to_bytes
             hd,d = open(i,'rb').read().split(b'\r\n\r\n',1)
-            hd = {x.split(b': ',1)[0].decode('latin-1').lower():x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
+            hd = {x.split(b': ',1)[0].decode('latin-1'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
+            hds = {'$header':hd.split(b'\r\n')[0].decode('latin-1')} | {x:hd[x].decode('latin-1') for x in hd}
+            hd = {x.lower():hd[x] for x in hd}
 
             of = o + '/'
             if 'content-disposition' in hd and\
@@ -781,6 +788,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             else: of += basename(i)
 
             open(of,'wb').write(d)
+            json.dump(hds,open(of + '_headers.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
             return
         case 'Motorola S-Record':
             if db.print_try: print('Trying with custom extractor')
@@ -888,5 +896,89 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else: ext = 'txt'
             open(f'{o}/{tbasename(i)}.{ext}','wb').write(d)
             return
+        case 'Web ARchive':
+            if db.print_try: print('Trying with custom extractor')
+            from urllib.parse import unquote_to_bytes
+            f = open(i,'rb')
+
+            tr = {}
+            while True:
+                if f.readline().rstrip(b'\r\n') != b'WARC/1.0': break
+                hd = read_http_head(f.readline)
+                hds = hd.copy()
+                hd = {k.lower():v for k,v in hd.items()}
+                assert 'warc-type' in hd and 'content-length' in hd
+                if not hd['warc-type'] in tr: tr[hd['warc-type']] = 0
+
+                bfn = f'{o}/{hd["warc-type"]}/{tr[hd['warc-type']]}_'
+                if hd['warc-type'] == 'warcinfo':
+                    json.dump(read_http_head(f.readline,int(hd['content-length']),idn=True),xopen(bfn + 'info.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+                elif hd['warc-type'] in ('request','response'):
+                    p = int(hd['content-length'])
+                    bp = f.tell()
+                    gv = f.readline(p)
+                    rhd = read_http_head(f.readline,p - len(gv))
+                    hds['$http'] = {'$header':gv.strip().decode('utf-8')} | rhd.copy()
+                    rhd = {k.lower():v for k,v in rhd.items()}
+
+                    if 'content-disposition' in rhd and\
+                       'attachment' in rhd['content-disposition'].lower() and\
+                       'filename'   in rhd['content-disposition'].lower():
+                        rfn = rhd['content-disposition'].split('; ',1)[1]
+                        rfn = rfn[8:].strip()
+                        if rfn[:1] == '*':
+                            enc,rfn = rfn[2:].strip().split("''",1)
+                            rfn = rfn.strip().split()[0]
+                            fn = unquote_to_bytes(rfn).decode(enc)
+                        else:
+                            rfn = rfn[1:].strip()
+                            if rfn[:1] == '"':
+                                rfn,rfn = rfn[1:].split('"')[0]
+                                if '; ' in rfn and 'filename' in rfn.lower() and "''" in rfn:
+                                    enc,rfn = rfn[2:].strip().split("''",1)
+                                    rfn = rfn.strip().split()[0]
+                                    fn = unquote_to_bytes(rfn).decode(enc.decode('latin-1'))
+                                else: fn = unquote_to_bytes(rfn).decode('latin-1')
+                    elif 'content-type' in rhd:
+                        fn = 'content.'
+                        ct = rhd['content-type'].split(';')[0].lower()
+                        if ct in CTTR: ct = CTTR[ct]
+                        else:
+                            ct = ct.split('/')[1].split('+')[-1]
+                            if ct.startswith('x-'): ct = ct[2:]
+                            if ct.startswith('vnd.'): ct = ct[4:]
+                        fn += ct
+                    else: fn = 'content.bin'
+
+                    ll = min(int(rhd.get('content-length',bp + p)),p-(f.tell()-bp))
+                    if ll: xopen(bfn + fn,'wb').write(f.read(ll))
+                    f.seek(bp + p)
+                else: raise NotImplementedError(hd['warc-type'])
+                json.dump(hds,xopen(bfn + 'header.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+                tr[hd['warc-type']] += 1
+                f.readline();f.readline()
+
+            f.close()
+            if tr: return
 
     return 1
+
+def read_http_head(readline,max:int=None,idn=False):
+    o = {}
+    p = 0
+    while not max or p < max:
+        l = readline(max-p if max else None)
+        p += len(l)
+        l = l.rstrip(b'\r\n')
+        if not l: break
+        if idn and l[0] == 0x20:
+            try: lr = l.decode('utf-8');assert lr.isprintable()
+            except: lr = l.decode('latin-1')
+            o[list(o)[-1]] += lr
+            continue
+        l = l.lstrip()
+        if not l: break
+        try: lr = l.decode('utf-8');assert lr.isprintable()
+        except: lr = l.decode('latin-1')
+        o[lr.split(': ',1)[0]] = lr.split(': ',1)[1]
+    return o

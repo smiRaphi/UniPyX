@@ -246,6 +246,7 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
             fnc = getattr(crunch64,algo).decompress
+        case 'ash0': fnc = ash0_decompress
         case 'oodle_kraken'|'oodle_leviathan':
             global OODLE
             assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
@@ -501,6 +502,59 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
         prev_seq = seq
 
     return b"".join(d)
+def ash0_decompress(i:bytes):
+    if len(i) < 12 or i[:4] != b'ASH0': return b''
+    decomp_size = int.from_bytes(i[4:8],'big') & 0xFFFFFF
+    sym_offset = int.from_bytes(i[8:12],'big')
+    if sym_offset >= len(i): return b''
+
+    out = bytearray(decomp_size)
+    out_pos = 0
+    dist_reader = BitReader(i[sym_offset:])
+    sym_reader = BitReader(i[12:])
+
+    def read_tree(reader, width, max_nodes):
+        nodes = [(0,0)] * (max_nodes * 2)
+        root = 0
+        node_count = 1
+        stack = []
+        while True:
+            if reader.get_bit():
+                nodes[root] = (node_count, node_count + 1)
+                stack.append(node_count + 1)
+                root = node_count
+                node_count += 2
+            else:
+                nodes[root] = (reader.get_bits(width), None)
+                if not stack: break
+                root = stack.pop()
+        return nodes
+
+    try:
+        sym_tree = read_tree(sym_reader,9,1 << 9)
+        dist_tree = read_tree(dist_reader,11,1 << 11)
+    except: return b''
+
+    def get_huffman_code(reader,tree):
+        node = tree[0]
+        while node[1] is not None: node = tree[node[reader.get_bit() or 0]] 
+        return node[0]
+
+    while out_pos < decomp_size:
+        try:
+            sym = get_huffman_code(sym_reader,sym_tree)
+            if sym < 0x100: out[out_pos] = sym;out_pos += 1
+            else:
+                length = sym - 0x100 + 3
+                dist = get_huffman_code(dist_reader,dist_tree) + 1
+                copy_pos = out_pos - dist
+                for _ in range(length):
+                    if out_pos >= decomp_size: break
+                    out[out_pos] = out[copy_pos];out_pos += 1
+                    copy_pos += 1
+        except: break
+
+    return bytes(out)
 
 N64CHM = (
     '\0' + '\0'*14 + ' '

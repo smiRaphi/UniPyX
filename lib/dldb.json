@@ -56,9 +56,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1774479600
+            "ts":1774738800
         }],
-        "ts":1774479600
+        "ts":1774738800
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -122,9 +122,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1774652400
+            "ts":1774821600
         }],
-        "ts":1774652400
+        "ts":1774821600
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -507,18 +507,18 @@
         "fs":[
         "https://update.bioruebe.com/uniextract/nightly/bin/x64/UnRAR.exe"
         ],
-        "ts":1757254045798
+        "ts":1757254045
     },
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/f1/d8/dolphin-master-2603-146-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/dc/75/dolphin-master-2603-161-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1774670555
+            "ts":1774897183
         }],
-        "ts":1774670555
+        "ts":1774897183
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -665,14 +665,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0286/mame0286b_x64.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0287/mame0287b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1772033594
+            "ts":1774889171
         }],
-        "ts":1772033594
+        "ts":1774889171
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -2345,23 +2345,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46037/SDLVICE-3.10-win64-r46037.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46038/SDLVICE-3.10-win64-r46038.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46037/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46037/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46037/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46037/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46037/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46037/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46038/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46038/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46038/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46038/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46038/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46038/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1774604971
+            "ts":1774796193
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1774604971
+        "ts":1774796193
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2723,14 +2723,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_27_18e6d687_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_29_18e6d687_32.zip",
             "x":{
-                "RenderDoc_2026_03_27_18e6d687_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_27_18e6d687_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_03_29_18e6d687_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_03_29_18e6d687_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1774566000
+            "ts":1774738800
         }],
-        "ts":1774566000
+        "ts":1774738800
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5585,7 +5585,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-03-28/WolvenKit.Console-8.17.4-nightly.2026-03-28.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-03-29/WolvenKit.Console-8.17.4-nightly.2026-03-29.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5637,21 +5637,34 @@
                 "WolvenKit.Core.dll":"WolvenKit.Console/WolvenKit.Core.dll",
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
-            }
+            },
+            "ts":1774779504
         }],
-        "ts":0
+        "ts":1774779504
     },
     "noodle":{
         "p":"oo2core_win64.dll",
         "fs":[
         "https://raw.githubusercontent.com/Sainan/noodle/refs/heads/senpai/2.9.14/oo2core_win64.dll"
-        ]
+        ],
+        "ts":0
     },
     "hedgearcpack":{
         "p":"HedgeArcPack.exe",
         "fs":[
         "https://github.com/Radfordhound/HedgeLib/releases/download/v0.1-xcompress/HedgeArcPack.exe"
-        ]
+        ],
+        "ts":0
+    },
+    "bff":{
+        "p":"bff-cli.exe",
+        "fs":[{
+            "u":"https://github.com/widberg/bff/releases/download/v0.1.0-rc1/bff-windows-v0.1.0-rc1.zip",
+            "x":{
+                "bff-cli.exe":"bff-cli.exe"
+            }
+        }],
+        "ts":0
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -6094,7 +6107,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.5/lessmsi-v2.12.5.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.7/lessmsi-v2.12.7.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -6103,9 +6116,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1771696899
+            "ts":1774893298
         }],
-        "ts":1771696899
+        "ts":1774893298
     },
     "msix":{
         "p":"MsiX.exe",

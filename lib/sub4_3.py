@@ -1062,6 +1062,65 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'TotemTech Data':
+            import glob
+            run(['bff','extract','-e','binary',i,o])
+            if exists(o + '/manifest.json') and exists(o + '/resources') and listdir(o + '/resources'):
+                js = json.load(open(o + '/manifest.json',encoding='utf-8'))
+                remove(o + '/manifest.json')
+                td = TmpDir(mdir=False,path=o)
+                mv(o + '/resources',td.p)
+
+                open(o + '/$signature.txt','w',encoding='utf-8').write(js['version'])
+                for x in js['blocks']:
+                    assert len(x) == 1 and 'resources' in x
+                    for fn in x['resources']:
+                        assert len(fn) == 1 and 'name' in fn
+                        fn = fn['name']
+                        rfn = glob.glob(glob.escape(td.p + '/' + fn.replace(':','_').replace('>','_')) + '.*')
+                        assert len(rfn) == 1
+                        mv(rfn[0],o + '/' + fn.replace(':','').replace('>','/'))
+
+                td.destroy()
+                return
+        case 'L.A. Noire BIG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+
+            f.seek(-4,2)
+            f.seek(-f.readu32('<'),2)
+            f.skip(4)
+            c = f.readu32('<')
+            fs = []
+            for _ in range(c):
+                fe = [f.readu32('>'),f.readu32('>') << 4,f.readu32('>')]
+                f.skip(4)
+                fe.append(f.readu32('>'))
+                fs.append(fe)
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[3] or fe[2])
+                if d[:4] in {b'segs',}: ex = d[:4].decode('ascii')
+                else: ex = guess_ext(d)
+                xopen(f'{o}/{fe[0]:08X}.{ex}','wb').write(d)
+
+            f.close()
+            if fs: return
+        case 'Nintendo ASH0':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = decompress(open(i,'rb').read(),'ash0')
+            xopen(o + '/' + tbasename(i),'wb').write(d)
+            return
+        case 'Super Mario Maker Level':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = open(i,'rb').read().split(b'ASH0')[1:]
+            assert len(d) == 4
+            for ix,n in ((0,'thumbnail0.tnl'),(1,'course_data.cdt'),(2,'course_data_sub.cdt'),(3,'thumbnail1.tnl')): xopen(o + '/' + n,'wb').write(decompress(b'ASH0' + d[ix],'ash0'))
+            return
 
     return 1
 

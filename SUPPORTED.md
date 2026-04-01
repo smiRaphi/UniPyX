@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 831
+# Supported Formats: 836
 
-## "Common" Archives/Compressors/Encodings (133)
+## "Common" Archives/Compressors/Encodings (134)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -125,6 +125,7 @@ UHARC | .uha .uhc | [UHARC](https://www.sac.sk/download/pack/uharc06b.zip) |
 UUencoded | .uu .uue | Custom + [binascii](https://docs.python.org/3/library/binascii.html) |
 VHD | .vhd | [7-Zip](https://7-zip.org/) |
 VirtualBox Disk Image | .vdi | [7-Zip](https://7-zip.org/) |
+Web ARchive | .warc | Custom |
 Windows Help File | .hlp | [7-Zip](https://7-zip.org/) |
 XAR | .xar | [7-Zip](https://7-zip.org/) |
 XX34 | .x34 | [XX34](https://www.sac.sk/download/utilfile/xx3402.zip)
@@ -332,7 +333,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (394)
+## Various (398)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -523,6 +524,7 @@ Karma Studios Lang | ??? | Custom |
 Konami DPG | .dpg | Custom |
 Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
 Konami FireBeat LZSS | * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+L.A. Noire BIG | .big.ps3 | Custom |
 LEGO JAM | .jam | [legoracer_jam.bms](https://mirror.aluigi.org/bms/legoracer_jam.bms) |
 Level5 ARC | .arc | [3ds-xfsatool](https://github.com/MeltyPlayer/MeltyTool/tree/main/cli/tools/3ds-xfsatool) |
 Level5 Encrypted CRI CPK | .cpk | [Viola](https://github.com/SuperTavor/Viola) + [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
@@ -561,6 +563,7 @@ Nexas New PAC | .pac | [GARbro](https://github.com/crskycode/GARbro) |
 Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/KillzXGaming/NLG-File-Editor-Tool), [NlgFileTool MFF](https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper), [luigi_mansion_dict.bms](https://mirror.aluigi.org/bms/luigi_mansion_dict.bms) |
 Nicktoons Gravjet Racing LIN | .lin | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |
+Nintendo ASH0 | .bin | Custom |
 Nintendo Binary YAML | .byml .byaml .yml .yaml | [byml-to-yaml](https://github.com/ArchLeaders/byml_to_yaml) |
 Nintendo BLZ | .blz .lz * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
 Nintendo CTR Banner | .bnr | Custom |
@@ -663,6 +666,7 @@ String16 Data | * | Custom |
 String16BE Data | * | Custom |
 STXT Language Data | .stxt | Custom |
 Stylus Config Export | .json | Custom |
+Super Mario Maker Level | .bin | Custom |
 Super Monkey Ball SPG2 | .spg2 | Custom |
 Super Monkey Ball Tip 'n Tilt PAK | .pak | Custom |
 Super Monkey Ball Tip 'n Tilt String Data | ??? | Custom |
@@ -682,6 +686,7 @@ Tiled TMX/TSX | .tmx .tsx | Custom |
 Torus Ashen PackFile | .pf | Custom |
 Torus Ashen Strings | ??? | Custom |
 Torus Ashen ZLib | ??? | Custom |
+TotemTech Data | .dps | [bff](https://github.com/widberg/bff) |
 TREVA SDPC | .sdpc | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
 Trine FBQ | .fbq | Custom, [trine2.bms](https://mirror.aluigi.org/bms/trine2.bms) |
 TTGames DAT | .dat | [ttgames.bms](https://mirror.aluigi.org/bms/ttgames.bms) |

@@ -26,13 +26,15 @@ class PS3Keys:
         f.seek(4,1)
         key = f.read(0x20).strip().decode().replace('-','')
 
-        return self.db.get(key) or self.__db['TEST01814']
+        return self.db.get(key) or self.db['TEST01814']
     def __getitem__(self,key): return self.get(key)
 
 def makedb():
-    import httpx,re
+    import httpx,re,zipfile,io
 
     ks = re.findall(r'">(\w*)</a><TD>.+<TD>([A-Fa-f\d]*)</TR>',httpx.get('https://ps3.aldostools.org/dkey.html',verify=False).text)
+    z = zipfile.ZipFile(io.BytesIO(httpx.get('http://redump.org/keys/ps3/').content))
+    for n,i in (('L.A. Noire (USA, Asia) (En,Fr,De,Es,It)','BLUS30554'),): ks.append((i,z.read(n + '.key').hex()))
 
     o = open(__db__,'wb')
     for i,k in ks:

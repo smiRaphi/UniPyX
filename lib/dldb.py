@@ -145,7 +145,10 @@ class DLDB:
                         for d in e['del']:
                             if os.path.exists('bin/' + d):
                                 if os.path.isdir('bin/' + d): rmtree('bin/' + d)
-                                else: os.remove('bin/' + d)
+                                else:
+                                    for _ in range(50):
+                                        try: os.remove('bin/' + d)
+                                        except PermissionError: sleep(0.1)
                 self.udb[exe] = t
             exei = os.path.abspath('bin/' + exi['p'])
             self.save()
