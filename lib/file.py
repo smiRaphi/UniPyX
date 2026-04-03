@@ -349,6 +349,28 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'rc4'|'arc4':
             from Cryptodome.Cipher import ARC4
             return ARC4.new(key).decrypt(i)
+        case 'rsa'|'rsa_le':
+            from Cryptodome.PublicKey import RSA
+            if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
+            elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and iv is None: k = RSA.import_key(key)
+            else: raise NotImplementedError()
+
+            assert k.size_in_bytes() == len(i)
+            return pow(int.from_bytes(i,'little' if algo == 'rsa_le' else 'big'),k.e,k.n).to_bytes(k.size_in_bytes(),'big')
+        case 'rsa_inv'|'rsa_inv_le':
+            assert 'r' in kwargs
+
+            from Cryptodome.PublicKey import RSA
+            if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
+            elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and iv is None: k = RSA.import_key(key)
+            else: raise NotImplementedError()
+
+            assert k.size_in_bytes() == len(i)
+            c = pow(int.from_bytes(i,'little' if algo == 'rsa_inv_le' else 'big'),k.e,k.n)
+            R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
+            return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
 
         case 'hatch':
             d = bytearray(i)

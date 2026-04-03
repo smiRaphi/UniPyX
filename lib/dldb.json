@@ -5666,6 +5666,15 @@
         }],
         "ts":0
     },
+    "derbh_dzip":{
+        "p":"derbh_dzip.exe",
+        "fs":[{
+            "u":"https://mirror.aluigi.org/misc/dzip.zip",
+            "x":{
+                "dzip.exe":"derbh_dzip.exe"
+            }
+        }]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{
@@ -6188,6 +6197,14 @@
         "fs":[[
             "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/javascriptobfuscator.py",
             "jsbeautifier_jsobfuscator.py"
+        ]],
+        "ts":0
+    },
+    "burut":{
+        "p":"BMS/burut.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/burut.bms",
+            "BMS/burut.bms"
         ]],
         "ts":0
     },

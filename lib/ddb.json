@@ -931,6 +931,10 @@
         "rs":"Typing of the Dead HAB","s":1
     },
     {
+        "d":[["s%",16],["size",[96,null]],["isat","SDF0",0],["isat","\\x80",12],["isat","\\x01\\0\\0\\x0A",-560],["isat","\\x01\\0\\0\\x80",-516],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif f.read(1)[0]&0xF0:return\nf.seek(8);c1=int.from_bytes(f.read(4),'big');f.seek(13);c2=int.from_bytes(f.read(3),'big');return (32+c1*48+c2*16+560)==s and int.from_bytes(f.read(2),'big')<=c1"]],
+        "rs":"SDFTool SDF.bin","s":1
+    },
+    {
         "rqr":"Nintendo 64 ROM image (",
         "d":["hash","2DAD57E9D8E4F4164BFC76370983D79B",0,4096],
         "rs":"Dr. Mario 64 N64 ROM","s":1
@@ -972,6 +976,10 @@
     {
         "d":[["isat","DPLK",0],["n0",8,8],["n0",8,32],["n0",8,40],["n0",8,48],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8)\nif int.from_bytes(f.read(8),'little')!=s:return\nf.seek(40);return (int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(8),'little'))==s"]],
         "rs":"Ultimate Ghosts 'n Goblins DPLK","s":1
+    },
+    {
+        "d":[["isat","PAK \\x01\\0\\x02\\0",0],["isin",["\\xdc)\\xea4","\\x19\\xa6\\xc9\\xd2","\\x12-\\xea#","\\xab=J\\xd4","w55\\xea","\\x18\\xee\\xde\\x19","\\xcd\\x91\\xa6\\x9c"],8]],
+        "rs":"Burut Creative Team PAK","s":1
     },
     {
         "d":[["isat","**************************************************************\\r\\n** Sinergy GUT File\\r\\n**\\r\\n** [",0],["contain","\\0",[272,240]]],
@@ -1065,6 +1073,14 @@
         "d":[["isat","IDCL",0],["isin",["\\x0C\\0\\0\\0","\\x0D\\0\\0\\0"],4],
              ["py","f=open(inp,'rb');f.seek(4);vr=int.from_bytes(f.read(4),'little')>12;v=sum(f.read(4))and vr;f.seek(36 if v else 32)\nif not sum(f.read(4)):return\nc=int.from_bytes(f.read(4),'little');f.seek(16,1)\nif not sum(f.read(8))or not sum(f.read(8)):return\no=int.from_bytes(f.read(8),'little');h=int.from_bytes(f.read(8),'little');return h&7==o&7 and h==((136 if v else 112)if vr else 124)and o==int.from_bytes(f.read(8),'little')and(o+c*32)==int.from_bytes(f.read(8),'little')<=int.from_bytes(f.read(8),'little')"]],
         "rs":"idTech 7 Resource","s":1
+    },
+    {
+        "d":[["isat","DTRZ",0],["isat","\\0",8],["n0",4,4],["str0e",9,48,5]],
+        "rs":"Marmalade Derbh DZIP"
+    },
+    {
+        "d":[["size",[16,268435455]],["isat","\\x3D\\x03",0],["isatS","\\0",4,-4],["py","f=open(inp,'rb');f.seek(1);v=int.from_bytes(f.read(3),'big')\nif v>0x030101:f.seek(6)\nwhile 1:\n c=f.read(4)\n if len(c)!=4:return\n if not sum(c):break\n f.seek(int.from_bytes(f.read(4),'little')-4,1)\nreturn not f.read(1)"]],
+        "rs":"Marmalade Resource Group"
     },
     {
         "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix') or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')+12)==s"]],

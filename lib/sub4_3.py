@@ -1121,6 +1121,64 @@ def extract4_3(inp:str,out:str,t:str):
             assert len(d) == 4
             for ix,n in ((0,'thumbnail0.tnl'),(1,'course_data.cdt'),(2,'course_data_sub.cdt'),(3,'thumbnail1.tnl')): xopen(o + '/' + n,'wb').write(decompress(b'ASH0' + d[ix],'ash0'))
             return
+        case 'SDFTool SDF.bin':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decrypt
+            f = File(i,endian='>')
+            assert f.read(4) == b'SDF0'
+
+            f.skip(4)
+            c1 = f.readu32()
+            assert f.reads8() < 0
+            c2 = f.readu24()
+            f.skip(2 + 3 + 3 + 8)
+
+            of = xopen(o + '/1.txt','w')
+            of.write(f'{c1}\n\n')
+            for ix in range(c1): of.write(f'{f.readu16()} {f.readu24()} {f.readu24()}\n{f.read(0x28).hex()}\n\n')
+            of.close()
+
+            of = xopen(o + '/2.txt','w')
+            of.write(f'{c2}\n\n')
+            for ix in range(c2): of.write(f'{f.read(0x10).hex()}\n')
+            of.close()
+
+            assert f.readu8() == 1 and f.readu16() == 0
+            xopen(o + '/hash.bin','wb').write(f.read(f.readu8() * 4))
+            assert f.readu8() == 1 and f.readu16() == 0
+            d = f.read(f.readu8() * 4)
+            d = decrypt(d,'rsa_inv_le',0xd0c57d605d21c23b91000de888121741c3e2b8ba476b81b25123275b6b5c008b6b10abb59d357dd2fed5fea988940b94adc2136bb45c93d992b7102a5988033b73f6386ef9cce6bbc6dab03ba6e90a25976ef305a087302660475011c5ee50b8d44e1cc081d61273913664e1810abb97b93c1a6c0e6ebd8862d92ed88e62a450cd050dd4e212285128b453ef48711b0be4a0fc43bb8403efd57eda741644ee4cf64bc85187e0ee22fd3c61e4670eb19d47c99a3c9827219f0d4f6743f9fa27375deedf30dd2c17b5a6cd05339c399f2986e9c8919038a70c4f5fc2a760763e128818d1bb1c79a8d8a05d4401ac3004e5f64913a43c8cad637e94d478b63a27d2760105fdeadc8ff71914aaa9b9da29f35d294d4c23638f7f6170ba5358bc127f72c78b6bc4ce746cd350647c61f32dbdfc6135c1db2ec7c2ab9d914ed9a79b46c1ee57692b5fda14c1f0c0597a3c39414d7b8c519144c93dc72ab08b1c7a7b8e651cefcb1b3291128b4136d05abfe33af3568a163c7a839be864bc5abf3ac735fa33bb1ca45953f8431ed9fff2df07f0fbb5a071a462340463fcdfe79f9dee85e297115e1e5d077c414b2bf8523802fc7fd32a40e77cf8be6e0a115aa2709ba2c1fe04fadae81db12d0c71d5020c10f6a62f5e35f4a3d8ec0d3bf3dd914482cc39fd4e221e2feb39e23e0ef408954ef638b2d75e210ba0b6a473d526fc17588b,
+                                       3,r=2)
+            assert d[:1] == b'\1'
+            d = d[1:].split(b'\0',1)[1][::-1]
+            xopen(o + '/signature.bin','wb').write(d)
+
+            f.close()
+            return
+        case 'Marmalade Derbh DZIP':
+            tf = TmpFile('.dz',path=o)
+            tf.link(i)
+            run(['derbh_dzip','-q','-d',tf])
+            tf.destroy()
+            if exists(tf.p[:-3]) and listdir(tf.p[:-3]):
+                copydir(tf.p[:-3],o,True)
+                return
+        case 'Marmalade Resource Group':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu8() == 0x3D and f.readu8() == 3
+
+            v = f.readu16('>')
+            if v > 0x0101: f.skip(2)
+            while f:
+                h = f.readu32()
+                if not h: break
+                d = f.read(f.readu32() - 4)
+                xopen(f'{o}/{h:08X}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
+            if listdir(o): return
 
     return 1
 

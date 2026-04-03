@@ -2124,6 +2124,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Burut Creative Team PAK': return quickbms('burut')
 
         case _:
             from lib.sub4_3 import extract4_3

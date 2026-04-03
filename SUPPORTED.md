@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 836
+# Supported Formats: 840
 
 ## "Common" Archives/Compressors/Encodings (134)
 Name | Extension(s) | Extractor(s) | Comment
@@ -333,7 +333,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (398)
+## Various (402)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -395,6 +395,7 @@ BRSAR | .brsar | [mrst](https://github.com/em-eight/mrst) |
 Build Engine Group | .grp | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Build Engine RFF | .rff | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Bunny Pro. Das2 DPK | .dpk | Custom |
+Burut Creative Team PAK | .pak | [burut.bms](https://mirror.aluigi.org/bms/burut.bms) |
 Cannons Tournament PAK | .pak | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Chrome PAK | .pak | [chrome-pak](https://github.com/myfreeer/chrome-pak-customizer) |
@@ -538,6 +539,8 @@ Lucas Learning DAT | .dat | Custom |
 Lucas Arts Bundle | .bdl | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |
+Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
+Marmalade Resource Group | .group.bin | Custom |
 MediaMobile PAK | .pak | Custom |
 Metal Slug 3D PAK | .pak | Custom |
 Metroid Prime 4 RFRM ENUM | ??? | Custom |
@@ -641,6 +644,7 @@ RPG Maker Archive | ??? | Custom |
 Safari WebArchive | ??? | [pywebarchive](https://pypi.org/project/pywebarchive/) |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
+SDFTool SDF.bin | .bin | Custom |
 SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |
