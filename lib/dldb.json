@@ -37,7 +37,8 @@
                 "graalvm/GRAALVM-README.md",
                 "graalvm/LICENSE.txt",
                 "graalvm/release",
-                "graalvm/LICENSE_NATIVEIMAGE.txt"
+                "graalvm/LICENSE_NATIVEIMAGE.txt",
+                "graalvm/THIRD_PARTY_LICENSE.txt"
             ],
             "ts":1768892525
         }],

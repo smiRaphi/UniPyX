@@ -675,7 +675,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
-             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|\
+             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|'Frogwares 0000 Package'|\
              'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF'|'GE:Red Baron VOL':
             CODS = {
                 'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
@@ -714,6 +714,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     raise Exception('gameextractor server failed to start')
                 if t in CODS: c = CODS[t]
                 elif t == 'Dying Light RPACK': c = 'RPACK_' + open(i,'rb').read(4).decode('ascii')
+                elif t == 'Frogwares 0000 Package': c = '0000_package' + ('_2' if open(i,'rb').read(8)[7] == 7 else '')
                 else: raise Exception('No mapped codes for ' + t)
 
                 id = dirname(i)
