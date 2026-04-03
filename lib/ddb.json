@@ -380,6 +380,11 @@
         "rs":"Batman AC Resource","s":1
     },
     {
+        "rqr":"Visual Studio 2005",
+        "d":[["isat",".rdata\\0\\0",528],["isat","\\0\\xC0\\0\\0",544],["isat","\\0\\x30\\0\\0",584],["hash","1E9D83E375386F3410BDF3C23FB176CF63AF12FE",4192,4400],["contain","BZh91AY&SY",[327680,49152]]],
+        "rs":"Tixati Installer"
+    },
+    {
         "d":[["isat","\\1\\0\\1\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0\\x89PNG",32],["isatS","\\0",4,16],["n0",4,8],["n0",4,12],["n0",4,20],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);v=f.read(4)\nif v!=f.read(4):return\nf.seek(20)\nif v!=f.read(4):return\nv=int.from_bytes(v,'little')+int.from_bytes(f.read(4),'little');d=int.from_bytes(f.read(4),'little');return v==d and(d+36)==s"]],
         "rs":"-8 SysFile"
     },

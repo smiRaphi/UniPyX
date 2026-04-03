@@ -208,6 +208,9 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'gzip':
             import gzip
             fnc = gzip.decompress
+        case 'bz2'|'bzip2':
+            import bz2
+            fnc = bz2.decompress
         case 'lzma'|'lzma_alone':
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]

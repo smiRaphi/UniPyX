@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 840
+# Supported Formats: 842
 
 ## "Common" Archives/Compressors/Encodings (134)
 Name | Extension(s) | Extractor(s) | Comment
@@ -210,7 +210,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (118)
+## Executables/Packers/Installers (119)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -320,6 +320,7 @@ Steam DRM | .exe | [Steamless](https://github.com/atom0s/Steamless) |
 T-PACK | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Tenth Planet Soft | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 TinyProg | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
+Tixati Installer | .exe | Custom |
 TSCRUNCH | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 UCEXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 UPX | .exe | [upx](https://github.com/upx/upx) |
@@ -333,7 +334,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (402)
+## Various (403)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -476,6 +477,7 @@ Fox Engine Console QAR | .dat .qar | [MGSV_QAR_Tool](https://community.pcgamingw
 Fox Engine FPK | .fpk .fpkd | [GzsTool](https://github.com/Atvaark/GzsTool) |
 Fox Engine PFTXS | .pftxs | [GzsTool](https://github.com/Atvaark/GzsTool) |
 Fox Engine QAR | .dat .qar | [GzsTool](https://github.com/Atvaark/GzsTool) |
+Frogwares 0000 Package | .0000 | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 FrontPage Theme | ??? | Custom |
 Gabriel Knight 3 Barn | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 GameMaker Archive | .win .unx .ios .droid .psp .3ds .symbian | [UndertaleModTool](https://github.com/UnderminersTeam/UndertaleModTool) + [Scripts/Resource Exporters/ExportAll*.csx](https://github.com/UnderminersTeam/UndertaleModTool/tree/master/UndertaleModTool/Scripts/Resource%20Exporters) |

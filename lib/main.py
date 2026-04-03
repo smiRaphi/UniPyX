@@ -21,7 +21,7 @@ DOSMAX = {
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,splitext,abspath = os.path.basename,os.path.dirname,os.path.splitext,os.path.abspath
-symlink,rename = os.symlink,os.rename
+rename = os.symlink,os.rename
 getsize,listdir = os.path.getsize,os.listdir
 def tbasename(i:str): return splitext(basename(str(i)))[0]
 def extname(i:str): return splitext(str(i))[1]
@@ -65,6 +65,9 @@ def copydir(i:str,o:str,delete=False,reni=False):
     for x in listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
+def symlink(i:str,o:str):
+    mkdir(dirname(o))
+    os.symlink(i,o)
 def xopen(f:str,m='r',encoding='utf-8',newline=None):
     f = abspath(str(f))
     mkdir(dirname(f))
@@ -199,6 +202,8 @@ def analyze(inp:str,raw=False):
         trid.print = lambda *_,**__:None
         if not TRDB: TRDB = trid.trdpkg2defs(dirname(db.get('trid')) + '\\triddefs.trd',usecache=True)
         ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
+        for wt in {'InstallShield setup',}:
+            if wt in ts: ts.remove(wt)
     _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
     ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
@@ -252,10 +257,10 @@ def analyze(inp:str,raw=False):
             ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
         else: f.close()
 
-    for wt in ('plain text','Plain text','ASCII text','data','null data','null bytes','directory',
+    for wt in {'plain text','Plain text','ASCII text','data','null data','null bytes','directory',
                'XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files','LLVM Bitcode (generic)','PC Paint/Pictor bitmap'
                'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'):
+               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'}:
         if wt in ts: ts.remove(wt)
     tst = []
     for t in ts:
