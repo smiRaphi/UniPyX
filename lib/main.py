@@ -223,8 +223,13 @@ def analyze(inp:str,raw=False):
         if f.read(2) == b'MZ':
             f.seek(0x3C)
             f.seek(int.from_bytes(f.read(4),'little'))
-            if f.read(4) == b'PE\0\0':
-                f.close()
+            pe = f.read(4) == b'PE\0\0'
+            f.close()
+
+            dpth = db.get('die')
+            dprc = subprocess.Popen([dpth,'-p','-D',dirname(dpth) + '\\db',inp],stdout=-1,stderr=-3)
+
+            if pe:
                 log = gtmp('.log')
                 db.run(['exeinfope',inp + '*','/s','/log:' + log])
                 for _ in range(15):
@@ -251,9 +256,9 @@ def analyze(inp:str,raw=False):
                     remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
                 err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
                 if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
-            else: f.close()
 
-            _,o,_ = db.run(['die','-p','-D',dirname(db.get('die')) + '\\db',inp])
+            dprc.wait()
+            o = dprc.stdout.read().decode('cp437')
             ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
         else: f.close()
 

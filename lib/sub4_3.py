@@ -1193,6 +1193,35 @@ def extract4_3(inp:str,out:str,t:str):
 
             run(['na_game_tool','-extract','-ifmt',ty,i,o])
             if listdir(o): return
+        case 'Bethesda BSA':
+            for enc in ('utf7','utf8','utf32','unicode'):
+                run(['bsab','-e','-o','--noheaders','--encoding',enc,i,o])
+                if listdir(o): return
+        case 'RE Engine PAK':
+            lp = dirname(db.get('ree.unpacker')) + '/Projects'
+            if len(listdir(lp)) != 1:
+                remove(lp + '/all.list')
+                lst = list(set(sum([open(lp + '/' + x,encoding='utf-8').read().split('\n') for x in listdir(lp)],[])))
+                remove(*[lp + '/' + x for x in listdir(lp)])
+                open(lp + '/all.list','w',encoding='utf-8').write('\n'.join(lst))
+
+            run(['ree.unpacker','all',i,o],cwd=dirname(lp))
+            if listdir(o): return
+        case 'Capcom Encrypted MAME ROM':
+            KEY = (0xB5,0x29,0x6C,0x96)
+
+            if db.print_try: print('Trying with custom extractor')
+            import zipfile,io
+            from lib.file import decrypt,decompress
+            d = open(i,'rb').read()
+
+            if '_d.' in basename(i).lower(): iv = 'natives/STM/streaming/Roms/DecryptionRom/' + basename(i).replace('_d','_D')
+            else: iv = 'natives/STM/streaming/Roms/' + basename(i)
+
+            d = decrypt(d,'capcom_mame',KEY,iv)
+            d = decompress(d,'lz4',no_size=True)
+            zipfile.ZipFile(io.BytesIO(d)).extractall(o)
+            if listdir(o): return
 
     return 1
 

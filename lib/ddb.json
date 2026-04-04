@@ -1100,6 +1100,10 @@
         "rs":"idTech 7 Resource","s":1
     },
     {
+        "d":[["isat","KPKA",0],["isin",["\\x02\\x00","\\x04\\x00","\\x04\\x01","\\x04\\x02"],4],["isin",["\\0\\0","\\x08\\0","\\x0C\\0","\\x18\\0","\\x28\\0","\\x2C\\0"],6],["n0",4,8]],
+        "rs":"RE Engine PAK","s":1
+    },
+    {
         "d":[["isat","DTRZ",0],["isat","\\0",8],["n0",4,4],["str0e",9,48,5]],
         "rs":"Marmalade Derbh DZIP"
     },
@@ -1454,6 +1458,12 @@
     {
         "d":["contain","FiLeStArTfIlEsTaRt\\n",[0,1000]],
         "rs":"BinSCII"
+    },
+    {
+        "d":[["isat","BSA\\0",0]],
+        "rs":"Bethesda BSA"},{
+        "d":[["ext",".bsa"],["isat","\\0\\1\\0\\0",0]],
+        "rs":"Bethesda BSA"
     },
     {
         "rqr":null,
@@ -2282,6 +2292,11 @@
         "rqr":null,
         "d":["ext",[".zh",".zhuff"]],
         "rs":"Zhuff"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".mameac.2"],
+        "rs":"Capcom Encrypted MAME ROM"
     },
     {
         "rq":null,

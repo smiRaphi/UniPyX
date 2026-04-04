@@ -226,6 +226,8 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'lz4'|'lz4_block':
             import lz4.block
             fnc = lz4.block.decompress
+            if kwargs.get('no_size'): kwargs['uncompressed_size'] = len(i) * 8
+            if 'no_size' in kwargs: kwargs.pop('no_size')
         case 'lz4_frame':
             import lz4.frame
             fnc = lz4.frame.decompress
@@ -412,6 +414,11 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                         idx2 = xr % 7
 
             return bytes(d)
+        case 'capcom_mame':
+            if type(iv) == str: iv = iv.encode('ascii')
+            key = [iv[3],key[0],iv[1],key[1],iv[0],key[2],iv[2],key[3]]
+            for ix,b in enumerate(iv[4:]): key[ix % 8] ^= b
+            return decrypt(i,'xor',bytes(key))
         case _: raise NotImplementedError(algo)
 
 class Huffman:

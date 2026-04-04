@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 854
+# Supported Formats: 857
 
 ## "Common" Archives/Compressors/Encodings (135)
 Name | Extension(s) | Extractor(s) | Comment
@@ -335,7 +335,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (414)
+## Various (417)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -385,6 +385,7 @@ BackupMii NAND Image | ??? | Custom |
 Balko UFL Game Archive | .ufl | Custom |
 Battlezone 2 PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 BCH | .bch | Custom |
+Bethesda BSA | .bsa | [BSA Browser](https://github.com/AlexxEG/BSA_Browser) |
 Bezel Archive | .bea | [vroom_scne.bms](https://mirror.aluigi.org/bms/vroom_scne.bms) |
 Bezel Shader Pack | ??? | Custom |
 BioWare Entity Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -402,6 +403,7 @@ Bunny Pro. Das2 DPK | .dpk | Custom |
 Burut Creative Team PAK | .pak | [burut.bms](https://mirror.aluigi.org/bms/burut.bms) |
 Bureau 13 GL | .gl | [na_game_tool](https://nihav.org/game_tool.html) |
 Cannons Tournament PAK | .pak | Custom |
+Capcom Encrypted MAME ROM | .mameac.2 | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Chrome PAK | .pak | [chrome-pak](https://github.com/myfreeer/chrome-pak-customizer) |
 CI Games DPK | .dpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -640,6 +642,7 @@ Quantum3 DIR+WAD | .dir+.wad | Custom |
 RARC | .arc .rarc | [WSZST](https://szs.wiimm.de/) |
 Rayman DCZ | .dcz | [rayman_dcz.bms](https://mirror.aluigi.org/bms/rayman_dcz.bms) |
 RDB | .rdb | [Cethleann](https://github.com/yretenai/Cethleann) |
+RE Engine PAK | .pak | [REE.Unpacker](https://github.com/Ekey/REE.PAK.Tool) |
 Red Baron VOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)), Custom |
 REDengine Archive | .archive | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 REDengine W2ResourCe | [a lot](https://wiki.redmodding.org/cyberpunk-2077-modding/for-mod-creators-theory/files-and-what-they-do/file-formats#w2rc-file-format-table) | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
