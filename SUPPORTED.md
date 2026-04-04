@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 842
+# Supported Formats: 854
 
-## "Common" Archives/Compressors/Encodings (134)
+## "Common" Archives/Compressors/Encodings (135)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -85,6 +85,7 @@ Floppy Image | .img .dsk | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](htt
 Freeze Compressed | .frz | [Ancient](https://github.com/temisu/ancient) |
 FVL0 Compressed | .fvl | [Ancient](https://github.com/temisu/ancient) |
 GEM Resource | .gem | [deark](https://entropymine.com/deark/) |
+Git Bundle | .gitbundle | [Git](https://git-scm.com/) |
 Google Update Installer | .exe | [7-Zip](https://7-zip.org/) |
 GZIP | .gz | Custom, [7-Zip](https://7-zip.org/) |
 HA | .ha | [HA](https://www.sac.sk/download/pack/ha0999.zip) |
@@ -334,7 +335,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (403)
+## Various (414)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -343,10 +344,12 @@ Name | Extension(s) | Extractor(s) | Comment
 10,000 Bullets FILE.BIN | .bin | Custom |
 1941 Frozen Front Data | ??? | Custom |
 1941 Frozen Front Lang | ??? | Custom |
-1nsane Game Archive | ??? | Custom |
+1nsane Game Archive | .idf | Custom |
 3D Ultra Cool TBVolume | .tbv | Custom |
 3D Ultra Cool PKX | * | Custom |
 7 Studios FS | .fs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+7th Level BIN | .bin | [na_game_tool](https://nihav.org/game_tool.html) |
+Access Software AP | .ap | [na_game_tool](https://nihav.org/game_tool.html) |
 Across Crossword Puzzle | .puz | Custom |
 Action Replay RAM Disk | ??? | Custom |
 ActiveMime | ??? | [amime.py](https://github.com/idiom/activemime-format) |
@@ -397,18 +400,22 @@ Build Engine Group | .grp | [gamearch](https://www.shikadi.net/camoto/desktop/),
 Build Engine RFF | .rff | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Bunny Pro. Das2 DPK | .dpk | Custom |
 Burut Creative Team PAK | .pak | [burut.bms](https://mirror.aluigi.org/bms/burut.bms) |
+Bureau 13 GL | .gl | [na_game_tool](https://nihav.org/game_tool.html) |
 Cannons Tournament PAK | .pak | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Chrome PAK | .pak | [chrome-pak](https://github.com/myfreeer/chrome-pak-customizer) |
 CI Games DPK | .dpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Codename Kids Next Door JAM2/FSTA | .jam .fst | Custom |
-Coktel Vision STK | .stk | Custom |
+Coktel Vision STK | .stk | [na_game_tool](https://nihav.org/game_tool.html) |
+Coktel Vision STK2 | .itk | [na_game_tool](https://nihav.org/game_tool.html) |
 Compressed File Library | .cfl | [uncfl](https://solhsa.com/cfl/index.html) |
+Conquest Earth WAD | .wad | [na_game_tool](https://nihav.org/game_tool.html) |
 Contact File Data | .dat | Custom |
 Cosmo Volume Game Archive | .vol | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 CPK | .cpk | [CpkExtract](https://github.com/1330-Studios/CPK-Extract) |
 Creative Assembly PFH0 | .pfh | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 CRI CPK | .cpk | [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
+Cryo BigFile | .big | [na_game_tool](https://nihav.org/game_tool.html) |
 CSI NY GRF | .grf | Custom |
 CTPK | .ctpk | [ctpktool](https://github.com/dnasdw/ctpktool) |
 Culpa Innata SFS | .sfs | Custom |
@@ -456,6 +463,7 @@ Electronic Arts LIB | .lib | [Game Extractor Server](https://github.com/Sembianc
 Empire Earth 1 SSA | .ssa | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Encrypted Arsenal MTC+MDF | .mtc+.mdf | Custom |
 Ensemble Studios DRS | .drs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Escal Compressed | * | [na_game_tool](https://nihav.org/game_tool.html) |
 eSMART Data | ??? | Custom |
 eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -491,6 +499,7 @@ Glacier RPKG | .rpkg | [rpkg](https://github.com/glacier-modding/RPKG-Tool) |
 God of Thunder Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Godot Pack | .pck | [GDRETools](https://github.com/GDRETools/gdsdecomp) |
 Golden Tee Fore! BIG | .big | Custom |
+Goosebumps CFS | .cfs | [na_game_tool](https://nihav.org/game_tool.html) |
 Groove World Archive | .grv | Custom |
 Gwtar | .gwtar.html | Custom -> TAR |
 HAL Switch CMP | .cmp | [kirbyswitch-decompress.bms](https://gamebanana.com/questions/25367) |
@@ -502,13 +511,14 @@ Harry Potter and Prisoner of Azkaban SDT | .sdt | Custom |
 Harry Potter: Quidditch World Cup CCD | .ccd | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Hatch Game Engine HATCH | .hatch | Custom | 
 Hatch Game Engine HMAP | .hmap | Custom |
-Hell - A Cyberpunk Thriller PL/SL | .pl .sl | Custom |
+Hell: A Cyberpunk Thriller Library | .pl .sl | [na_game_tool](https://nihav.org/game_tool.html) |
 High Impact Games WAD | .wad | [tjzip_dump.py](https://github.com/electrogecko/UYA_pyTools/blob/main/SM/tjzip_dump.py) + Custom |
 Highway Hunter Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Highway Pursuit HPDT | .hpdt | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 HMM Packfile | ??? | [hmmunpack](https://github.com/ross-spencer/hmmunpack) |
 Holistic Design MUK | .muk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Hollow Knight Save | ??? | Custom |
+Hostile Waters MNG | .mng | [na_game_tool](https://nihav.org/game_tool.html) |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |
 idTech 7 Resource | .resource | Custom |
@@ -664,6 +674,7 @@ Sonic AMB | .amb | [sonic4.bms](https://mirror.aluigi.org/bms/sonic4.bms) |
 Sonic BINA | * | Custom |
 Sonic PAC | .pac | [HedgeArcPack](https://github.com/Radfordhound/HedgeLib) |
 Soulcalibur Legends NPAC | .npac | Custom |
+SouthPeak Interactive Puzzle Archive | .mco | [na_game_tool](https://nihav.org/game_tool.html) |
 Star Fox DAT | .dat | [star_fox_zero_dat.bms](https://mirror.aluigi.org/bms/star_fox_zero_dat.bms) |
 StormCE IIII | ??? | Custom |
 StormCE Library VFS | .vfs | Custom |
@@ -695,6 +706,7 @@ Torus Ashen ZLib | ??? | Custom |
 TotemTech Data | .dps | [bff](https://github.com/widberg/bff) |
 TREVA SDPC | .sdpc | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
 Trine FBQ | .fbq | Custom, [trine2.bms](https://mirror.aluigi.org/bms/trine2.bms) |
+Tsunami Media RLB | .rlb | [na_game_tool](https://nihav.org/game_tool.html) |
 TTGames DAT | .dat | [ttgames.bms](https://mirror.aluigi.org/bms/ttgames.bms) |
 Typing of the Dead HAB | .hab | Custom |
 U8 | .arc | [WSZST](https://szs.wiimm.de/) |

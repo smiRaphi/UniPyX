@@ -590,7 +590,7 @@ def extract4_3(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 d = f.read(fe[1])
-                if d[:0x40] == b'// -----------------------------------------\r\n// FileLinkNDS.H  ': fn = 'FileLinkNDS.h'
+                if d[:0x40] == b'// -----------------------------------------\r\n// FileLinkNDS.H  ': fn = 'FileLinkNDS.H'
                 else:
                     if d[:4] == b'SCR0': ext = 'scr'
                     else: ext = guess_ext_nds(d)
@@ -1178,6 +1178,20 @@ def extract4_3(inp:str,out:str,t:str):
                 xopen(f'{o}/{h:08X}.{guess_ext(d)}','wb').write(d)
 
             f.close()
+            if listdir(o): return
+        case '7th Level BIN'|'Access Software AP'|'Bureau 13 GL'|'Braid Dead 13 DAT'|'Beam Software GOB'|'Conquest Earth WAD'|'Cryo BigFile'|\
+             'Escal Compressed'|'Gabriel Knight 3 Barn'|'Goosebumps CFS'|'Hell: A Cyberpunk Thriller Library'|\
+             'SouthPeak Interactive Puzzle Archive'|'Hostile Waters MNG'|'Tsunami Media RLB'|'Coktel Vision STK'|'Coktel Vision STK2':
+            MP = {
+                '7th Level BIN':'7lev_bin','Access Software AP':'access_ap','Bureau 13 GL':'b13_gl','Braid Dead 13 DAT':'bd13_dat','Beam Software GOB':'beam_gob',
+                'Conquest Earth WAD':'ce_wad','Cryo BigFile':'cryo_archive','Escal Compressed':'escal-z','Gabriel Knight 3 Barn':'gk3_barn','Goosebumps CFS':'goosebumps',
+                'Hell: A Cyberpunk Thriller Library':'hell-lib','SouthPeak Interactive Puzzle Archive':'mco','Hostile Waters MNG':'mng','Tsunami Media RLB':'rlb',
+                'Coktel Vision STK':'stk','Coktel Vision STK2':'stk2',
+            }
+            if t in MP: ty = MP[t]
+            else: raise NotImplementedError('Type not mapped:',t)
+
+            run(['na_game_tool','-extract','-ifmt',ty,i,o])
             if listdir(o): return
 
     return 1

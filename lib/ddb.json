@@ -960,7 +960,27 @@
     },
     {
         "d":[["s%",2],["n0",2,0],["n0",4,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(2);o=int.from_bytes(f.read(4),'little')\nif (o+6)>s:return\nf.seek(o);return f.read(4)==b'\\x06\\0\\0\\0'"]],
-        "rs":"Hell - A Cyberpunk Thriller PL/SL"
+        "rs":"Hell: A Cyberpunk Thriller Library"
+    },
+    {
+        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')\nif (2+c*4)!=int.from_bytes(f.read(4),'little'):return\ns=f.seek(0,2);f.seek(c*4-2);return s==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Access Software AP"
+    },
+    {
+        "d":[["n0",2,0],["n0",4,2],["n0",4,-12],["str0",-8,8,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');o=int.from_bytes(f.read(4),'little');f.seek(o);return f.read(4)==b'\\x06\\0\\0\\0' and(c*12+o)==f.seek(0,2)"]],
+        "rs":"Bureau 13 GL"
+    },
+    {
+        "d":[["isat","RATVID\\1\\0",2],["n0",2,0]],
+        "rs":"The Horde VDX","s":1
+    },
+    {
+        "d":[["isat","ZGWH",0],["n0",4,4],["str0e",8,48,5]],
+        "rs":"Hostile Waters MNG"
+    },
+    {
+        "d":[["hash","B66C96E78603E4D1EC4780BC91E9D3E8061AEE3F",256]],
+        "rs":"SouthPeak Interactive Puzzle Archive","s":1
     },
     {
         "d":[["isat","SLPK",0],["isat","\\0\\0\\0\\0",16],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (0x20+0x10*c)==int.from_bytes(f.read(4),'little')"]],
@@ -1705,6 +1725,26 @@
     {
         "d":[["n0",2,0],["n0",4,19],["str0e",2,13,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');f.seek(19);return int.from_bytes(f.read(4),'little')==(2+c*22)"]],
         "rs":"Coktel Vision STK"
+    },
+    {
+        "d":[["isat","STK2.",0],["str0",0,28,20],["n0",4,28],["py","f=open(inp,'rb');f.seek(28);f.seek(int.from_bytes(f.read(4),'little')+4);p=f.tell()+4;f.seek(int.from_bytes(f.read(4),'little'));return int.from_bytes(f.read(4),'little')==p"]],
+        "rs":"Coktel Vision STK2"
+    },
+    {
+        "d":[["isat","XCELZLIB",-8],["isat","\\1\\0\\0\\0",-20],["n0",4,-16],["n0",4,-12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(-16,1);return (20+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Conquest Earth WAD"
+    },
+    {
+        "d":[["isat","BigFile 1.00\\0\\0\\0\\0",0],["isatS","\\0",4,28],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Cryo BigFile","s":1
+    },
+    {
+        "d":[["isatS","x",5,2],["isat","\\0\\x20\\x01",18],["n0",2,0],["n0",4,7],["n0",8,11],["n0",1,21],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(7);return (s-(int.from_bytes(f.read(4),'little')+32))in{0,8}"]],
+        "rs":"Escal Compressed"
+    },
+    {
+        "d":[["isat","FSH2",0],["isat","\\1\\0\\0\\0Root",24],["isatS","\\0",12,12],["n0",4,8]],
+        "rs":"Goosebumps CFS"
     },
     {
         "d":[["isat","FUFS",0],["n0",4,8],["n0",4,12]],
