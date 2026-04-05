@@ -30,6 +30,7 @@ Requires a somewhat new version (3.10+) of python (I've only tested old versions
 * self compiled [lha](https://github.com/jca02266/lha)
 * self compiled [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp)
 * self compiled [uclpack](https://www.oberhumer.com/opensource/ucl/)
+* self compiled [uclpack32](https://www.oberhumer.com/opensource/ucl/) + [patch](./dev/uclpack32.patch) diviation for Import Tuner Challenge TOC+DAT
 * self compiled [ddosutils](https://github.com/pulkomandy/ddosutils)
 * self compiled [bk_tools](https://github.com/MittenzHugg/bk_tools)
 * self compiled [paq8k3](https://github.com/JohannesBuchner/paq/tree/master/paq8k3)

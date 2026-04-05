@@ -2618,6 +2618,15 @@
             }
         }]
     },
+    "uclpack32":{
+        "p":"uclpack32.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "uclpack32.exe":"uclpack32.exe"
+            }
+        }]
+    },
     "unecm":{
         "p":"unecm.exe",
         "fs":[{

@@ -68,20 +68,29 @@ def extract4_3(inp:str,out:str,t:str):
 
             c = f.readu32()
             f.skip(12)
+            offs = []
             for ix in range(c):
-                fn = f'{o}\\{ix:03d}.bin'
-                fd.seek(f.readu32()*0x800)
-                d = fd.read(f.readu32())
-                us = f.readu32()
-                if us and us != len(d):
-                    assert d[:8] == b'\x00\xE9UCL\xFF\x01\x1A',ix
-                    tf = TmpFile('.ucl')
-                    open(tf.p,'wb').write(d[:0x1A] + d[0x1E:] + b'\0'*4) # strip unflagged crc and add EOF (?)
-                    run(['uclpack','-d',tf,fn],print_try=False,print_out=True)
-                    tf.destroy()
-                    assert exists(fn) and getsize(fn) == us,ix
-                else: open(fn,'wb').write(d)
+                of,zs,us = f.readu32(),f.readu32(),f.readu32()
                 f.skip(4)
+                if of in offs: continue
+                offs.append(of)
+
+                fd.seek(of*0x800)
+                fn = f'{o}\\{ix:04d}.bin'
+                d = fd.read(zs)
+
+                if d and zs == us: raise NotImplementedError(ix)
+                elif not d: assert us == 0,ix
+                elif us != zs and d[:8] == b'\x00\xE9UCL\xFF\x01\x1A':
+                    tf = TmpFile('.ucl')
+                    open(tf.p,'wb').write(d)
+                    _,r,_ = run(['uclpack32','-d',tf,fn],print_try=False)
+                    if exists(fn) and getsize(fn) == us: tf.destroy()
+                    else:
+                        mv(tf.p,f'{o}/F/{ix:04d}_{r.strip().rsplit("\n",1)[1].split(": ",1)[1]}.ucl')
+                else:
+                    assert us in (0,zs),ix
+                    open(fn,'wb').write(d)
 
             f.close()
             fd.close()
