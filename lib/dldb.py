@@ -149,6 +149,7 @@ class DLDB:
                                     for _ in range(50):
                                         try: os.remove('bin/' + d)
                                         except PermissionError: sleep(0.1)
+                                        else: break
                 self.udb[exe] = t
             exei = os.path.abspath('bin/' + exi['p'])
             self.save()

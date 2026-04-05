@@ -37,7 +37,8 @@
                 "graalvm/GRAALVM-README.md",
                 "graalvm/LICENSE.txt",
                 "graalvm/release",
-                "graalvm/LICENSE_NATIVEIMAGE.txt"
+                "graalvm/LICENSE_NATIVEIMAGE.txt",
+                "graalvm/THIRD_PARTY_LICENSE.txt"
             ],
             "ts":1768892525
         }],
@@ -56,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1774738800
+            "ts":1775253600
         }],
-        "ts":1774738800
+        "ts":1775253600
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -122,9 +123,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1774821600
+            "ts":1775253600
         }],
-        "ts":1774821600
+        "ts":1775253600
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -199,10 +200,10 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":23453656033,
-            "ts":1774519920
+            "nightly_run":23875911376,
+            "ts":1775328544
         }],
-        "ts":1774519920
+        "ts":1775328544
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -512,13 +513,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/dc/75/dolphin-master-2603-161-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/dc/2e/dolphin-master-2603-223-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1774897183
+            "ts":1775321485
         }],
-        "ts":1774897183
+        "ts":1775321485
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2345,23 +2346,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46038/SDLVICE-3.10-win64-r46038.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46048/SDLVICE-3.10-win64-r46048.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46038/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46038/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46038/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46038/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46038/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46038/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46048/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46048/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46048/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46048/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46048/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46048/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1774796193
+            "ts":1775264386
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1774796193
+        "ts":1775264386
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2732,14 +2733,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_03_29_18e6d687_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_03_9b799442_32.zip",
             "x":{
-                "RenderDoc_2026_03_29_18e6d687_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_03_29_18e6d687_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_03_9b799442_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_03_9b799442_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1774738800
+            "ts":1775167200
         }],
-        "ts":1774738800
+        "ts":1775167200
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2776,10 +2777,10 @@
     "kanzi":{
         "p":"Kanzi.exe",
         "fs":[[
-            "https://github.com/flanglet/kanzi-cpp/releases/download/2.5.1/Kanzi64.exe",
+            "https://github.com/flanglet/kanzi-cpp/releases/download/2.5.2/Kanzi64.exe",
             "Kanzi.exe"
         ]],
-        "ts":1772993575
+        "ts":1775314115
     },
     "ppmd":{
         "p":"PPMd.exe",
@@ -2890,14 +2891,17 @@
     "auracomp":{
         "p":"auracomp/auracomp.exe",
         "fs":[{
-            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/1.6.4/auracomp_net472.zip",
+            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/2.0.0.0/auracomp_net472.zip",
             "x":{
                 "auracomp.exe":"auracomp/auracomp.exe",
                 "auracomp.exe.config":"auracomp/auracomp.exe.config",
-                "AuroraLib.Core.dll":"auracomp/AuroraLib.Core.dll",
                 "AuroraLib.Compression.dll":"auracomp/AuroraLib.Compression.dll",
+                "AuroraLib.Compression.Nintendo.dll":"auracomp/AuroraLib.Compression.Nintendo.dll",
+                "AuroraLib.Compression.Sega.dll":"auracomp/AuroraLib.Compression.Sega.dll",
                 "AuroraLib.Compression-Extended.dll":"auracomp/AuroraLib.Compression-Extended.dll",
-                "Microsoft.Bcl.AsyncInterfaces.dll":"auracomp/Microsoft.Bcl.AsyncInterfaces.dll",
+                "AuroraLib.Core.dll":"auracomp/AuroraLib.Core.dll",
+                "AuroraLib.Core.Format.dll":"auracomp/AuroraLib.Core.Format.dll",
+                "K4os.Hash.xxHash.dll":"auracomp/K4os.Hash.xxHash.dll",
                 "System.Buffers.dll":"auracomp/System.Buffers.dll",
                 "System.Memory.dll":"auracomp/System.Memory.dll",
                 "System.Numerics.Vectors.dll":"auracomp/System.Numerics.Vectors.dll",
@@ -2905,9 +2909,9 @@
                 "System.Threading.Tasks.Extensions.dll":"auracomp/System.Threading.Tasks.Extensions.dll",
                 "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
             },
-            "ts":1772621604
+            "ts":1775241307
         }],
-        "ts":1772621604
+        "ts":1775241307
     },
     "bk_extract":{
         "p":"bk_extract.exe",
@@ -5594,7 +5598,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-03-29/WolvenKit.Console-8.17.4-nightly.2026-03-29.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-04-02/WolvenKit.Console-8.17.4-nightly.2026-04-02.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5647,9 +5651,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1774779504
+            "ts":1775125618
         }],
-        "ts":1774779504
+        "ts":1775125618
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5674,6 +5678,69 @@
             }
         }],
         "ts":0
+    },
+    "derbh_dzip":{
+        "p":"derbh_dzip.exe",
+        "fs":[{
+            "u":"https://mirror.aluigi.org/misc/dzip.zip",
+            "x":{
+                "dzip.exe":"derbh_dzip.exe"
+            }
+        }],
+        "ts":0
+    },
+    "na_game_tool":{
+        "p":"na_game_tool.exe",
+        "fs":[{
+            "u":".",
+            "x":{
+                "na_game_tool.exe":"na_game_tool.exe"
+            }
+        }]
+    },
+    "git":{
+        "p":"git/git.exe",
+        "fs":[{
+            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0-rc0.windows.1/MinGit-2.54.0-rc0-64-bit.zip",
+            "x":{
+                "mingw64/bin/git.exe":"git/git.exe",
+                "mingw64/bin/libiconv-2.dll":"git/libiconv-2.dll",
+                "mingw64/bin/libintl-8.dll":"git/libintl-8.dll",
+                "mingw64/bin/libpcre2-8-0.dll":"git/libpcre2-8-0.dll",
+                "mingw64/bin/libwinpthread-1.dll":"git/libwinpthread-1.dll",
+                "mingw64/bin/zlib1.dll":"git/zlib1.dll"
+            }
+        }],
+        "ts":0
+    },
+    "bsab":{
+        "p":"bsab.exe",
+        "fs":[{
+            "u":"https://github.com/AlexxEG/BSA_Browser/releases/download/v1.13.1-17-gcfbdd47/BSA.Browser.Portable.7z",
+            "x":{
+                "bsab.exe":"bsab.exe"
+            }
+        }],
+        "ts":0
+    },
+    "ree.unpacker":{
+        "p":"REE.Unpacker/REE.Unpacker.exe",
+        "fs":[{
+            "u":"https://github.com/Ekey/REE.PAK.Tool/releases/download/Latest/REE.Unpacker.zip",
+            "x":{
+                "REE.Unpacker.exe":"REE.Unpacker/REE.Unpacker.exe",
+                "REE.Unpacker.exe.config":"REE.Unpacker/REE.Unpacker.exe.config",
+                "libzstd.dll":"REE.Unpacker/libzstd.dll",
+                "System.Buffers.dll":"REE.Unpacker/System.Buffers.dll",
+                "Zstandard.Net.dll":"REE.Unpacker/Zstandard.Net.dll"
+            },
+            "ts":1772285021
+        },{
+           "u":"https://github.com/Ekey/REE.PAK.Tool/tree/main/Projects",
+           "github":"REE.Unpacker/Projects",
+           "ts":1772892778
+        }],
+        "ts":1772892778
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -6116,7 +6183,7 @@
     "lessmsi":{
         "p":"lessmsi/lessmsi.exe",
         "fs":[{
-            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.7/lessmsi-v2.12.7.zip",
+            "u":"https://github.com/activescott/lessmsi/releases/download/v2.12.9/lessmsi-v2.12.9.zip",
             "x":{
                 "lessmsi.exe":"lessmsi/lessmsi.exe",
                 "lessmsi.core.dll":"lessmsi/lessmsi.core.dll",
@@ -6125,9 +6192,9 @@
                 "mspack.dll":"lessmsi/mspack.dll",
                 "wix.dll":"lessmsi/wix.dll"
             },
-            "ts":1774893298
+            "ts":1775152978
         }],
-        "ts":1774893298
+        "ts":1775152978
     },
     "msix":{
         "p":"MsiX.exe",
@@ -6197,6 +6264,14 @@
         "fs":[[
             "https://raw.githubusercontent.com/beautifier/js-beautify/refs/heads/main/python/jsbeautifier/unpackers/javascriptobfuscator.py",
             "jsbeautifier_jsobfuscator.py"
+        ]],
+        "ts":0
+    },
+    "burut":{
+        "p":"BMS/burut.bms",
+        "fs":[[
+            "https://mirror.aluigi.org/bms/burut.bms",
+            "BMS/burut.bms"
         ]],
         "ts":0
     },

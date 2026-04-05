@@ -1485,5 +1485,24 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['7z','x',tf.p,'-o' + o,'-aoa'])
             tf.destroy()
             if listdir(o): return
+        case 'Tixati Installer':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import ext_exe,decompress
+            f = ext_exe(i)
+
+            nms = [x.decode('utf-8').strip('\\/') for x in f.SECTIONS['.rdata'].get_data().split('Copy program files...'.encode('utf-16le'))[1].split(b'\0') if x]
+            fnd = bool(nms)
+            nmsbz = [x for x in nms if x.endswith('.bz2')]
+            nms = [x for x in nms if x not in nmsbz]
+
+            for x in f.DIRECTORY_ENTRY_RESOURCE.entries[0].directory.entries:
+                x = x.directory.entries[0].data.struct
+                d = f.get_data(x.OffsetToData,x.Size)
+                if d[:3] == b'BZh': xopen(o + '/' + nmsbz.pop(0)[:-3],'wb').write(decompress(d,'bzip2'))
+                elif d[:23] == b'SCROLL THIS WINDOW DOWN': xopen(o + '/' + nms.pop(0),'wb').write(d)
+                else: raise NotImplementedError('Unknown file')
+
+            f.close()
+            if fnd and not nmsbz and not nms: return
 
     return 1

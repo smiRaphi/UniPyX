@@ -61,6 +61,7 @@ GFMTS = {
     'WebAssembly/wabt':lambda tag:f'wabt-{tag}-windows-x64.tar.gz',
     'WolvenKit/WolvenKit-nightly-releases':lambda tag:f'WolvenKit.Console-{tag}.zip',
     'widberg/bff':lambda tag:f'bff-windows-{tag}.zip',
+    'git-for-windows/git':lambda tag:f'MinGit-{tag[1:].split(".windows.")[0]}-64-bit.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -132,8 +133,10 @@ def supdate(c:Cache,k:str,inf:dict):
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
             if repo not in ('VirusTotal/yara','allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'):
-                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','widberg/bff'): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
-                elif repo in (): s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
+                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','widberg/bff','git-for-windows/git','AlexxEG/BSA_Browser'):
+                    s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                elif repo in ():
+                    s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
                 else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')

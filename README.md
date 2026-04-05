@@ -40,6 +40,7 @@ Requires a somewhat new version (3.10+) of python (I've only tested old versions
 * self compiled [luadec5 1-3](https://github.com/viruscamp/luadec)
 * self compiled [FastLZ+6unpack](https://github.com/ariya/FastLZ)
 * self compiled [python-lzo](https://github.com/jd-boyd/python-lzo) because the pip package is outdated
+* self compiled [na_game_tool](https://nihav.org/game_tool.html)
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
 * [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX

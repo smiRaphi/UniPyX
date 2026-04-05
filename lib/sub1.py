@@ -960,6 +960,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if tr: return
+        case 'Git Bundle':
+            run(['git','clone',i,o])
+            if listdir(o): return
 
     return 1
 

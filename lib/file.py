@@ -208,6 +208,9 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'gzip':
             import gzip
             fnc = gzip.decompress
+        case 'bz2'|'bzip2':
+            import bz2
+            fnc = bz2.decompress
         case 'lzma'|'lzma_alone':
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
@@ -223,6 +226,8 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
         case 'lz4'|'lz4_block':
             import lz4.block
             fnc = lz4.block.decompress
+            if kwargs.get('no_size'): kwargs['uncompressed_size'] = len(i) * 8
+            if 'no_size' in kwargs: kwargs.pop('no_size')
         case 'lz4_frame':
             import lz4.frame
             fnc = lz4.frame.decompress
@@ -349,6 +354,28 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'rc4'|'arc4':
             from Cryptodome.Cipher import ARC4
             return ARC4.new(key).decrypt(i)
+        case 'rsa'|'rsa_le':
+            from Cryptodome.PublicKey import RSA
+            if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
+            elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and iv is None: k = RSA.import_key(key)
+            else: raise NotImplementedError()
+
+            assert k.size_in_bytes() == len(i)
+            return pow(int.from_bytes(i,'little' if algo == 'rsa_le' else 'big'),k.e,k.n).to_bytes(k.size_in_bytes(),'big')
+        case 'rsa_inv'|'rsa_inv_le':
+            assert 'r' in kwargs
+
+            from Cryptodome.PublicKey import RSA
+            if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
+            elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and iv is None: k = RSA.import_key(key)
+            else: raise NotImplementedError()
+
+            assert k.size_in_bytes() == len(i)
+            c = pow(int.from_bytes(i,'little' if algo == 'rsa_inv_le' else 'big'),k.e,k.n)
+            R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
+            return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
 
         case 'hatch':
             d = bytearray(i)
@@ -387,6 +414,11 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                         idx2 = xr % 7
 
             return bytes(d)
+        case 'capcom_mame':
+            if type(iv) == str: iv = iv.encode('ascii')
+            key = [iv[3],key[0],iv[1],key[1],iv[0],key[2],iv[2],key[3]]
+            for ix,b in enumerate(iv[4:]): key[ix % 8] ^= b
+            return decrypt(i,'xor',bytes(key))
         case _: raise NotImplementedError(algo)
 
 class Huffman:

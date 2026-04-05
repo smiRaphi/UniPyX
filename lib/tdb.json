@@ -22,7 +22,8 @@
         "squirrel setup",
         "ios application",
         "mozilla firefox browser extension",
-        "google chrome extension"
+        "google chrome extension",
+        "ios app zip archive data"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
@@ -1506,5 +1507,15 @@
     "Web ARchive":[
         "warc archive version 1.0",
         "web archive file format"
+    ],
+    "7th Level BIN":[
+        "7th level game data"
+    ],
+    "Git Bundle":[
+        "git bundle",
+        "git bundle (v2)"
+    ],
+    "Tsunami Media RLB":[
+        "tsunami media game data archive"
     ]
 }

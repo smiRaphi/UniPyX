@@ -2124,6 +2124,30 @@ def extract4_2(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Burut Creative Team PAK': return quickbms('burut')
+        case 'Next Level Games DICT+DATA':
+            be = open(i,'rb').read(4) == b'\xA9\xF3\x24\x58'
+
+            if be: raise NotImplementedError('big endian')
+            else:
+                tf = o + '\\tmp' + os.urandom(4).hex() + '.dict'
+                tfd = tf[:-3] + 'ata'
+                symlink(i,tf)
+                symlink(noext(i) + '.data',tfd)
+
+                run(['nlgfiletool',i])
+                if exists(tf[:-5]) and isdir(tf[:-5]) and listdir(tf[:-5]):
+                    remove(tf,tfd)
+                    copydir(tf[:-5],o,True)
+                    return
+
+                run(['nlgfiletool-mff',i])
+                remove(tf,tfd)
+                if exists(tf[:-5]) and isdir(tf[:-5]) and listdir(tf[:-5]):
+                    copydir(tf[:-5],o,True)
+                    return
+
+                return quickbms('luigi_mansion_dict')
 
         case _:
             from lib.sub4_3 import extract4_3

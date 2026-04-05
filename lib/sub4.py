@@ -675,7 +675,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
-             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|\
+             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|'Frogwares 0000 Package'|\
              'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF'|'GE:Red Baron VOL':
             CODS = {
                 'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
@@ -714,6 +714,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     raise Exception('gameextractor server failed to start')
                 if t in CODS: c = CODS[t]
                 elif t == 'Dying Light RPACK': c = 'RPACK_' + open(i,'rb').read(4).decode('ascii')
+                elif t == 'Frogwares 0000 Package': c = '0000_package' + ('_2' if open(i,'rb').read(8)[7] == 7 else '')
                 else: raise Exception('No mapped codes for ' + t)
 
                 id = dirname(i)
@@ -1322,69 +1323,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'PS2 Memory Card':
             run(['mymc','-i',i,'extract','*'],cwd=o)
             if listdir(o): return
-        case 'Coktel Vision STK':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            fc = f.readu16()
-            fs = []
-            for _ in range(fc):
-                fs.append((f.read(13).split(b'\0')[0].decode('cp866'),f.readu32(),f.readu32(),f.readu8()))
-
-            def decompress_chk(size:int):
-                bidx = 4078
-                buf = bytearray(b' ' * bidx + b'\0' * 36)
-                dat = b''
-
-                pos = f.pos
-                cmd = 0
-                while size > 0:
-                    cmd >>= 1
-                    if not cmd & 0x100: cmd = f.readu8() | 0xFF00
-
-                    if cmd & 1:
-                        b = f.reads()
-                        dat += b
-                        buf[bidx] = b[0]
-                        bidx += 1
-                        bidx %= 4096
-                        size -= 1
-                    else:
-                        h,l = f.readu8(),f.readu8()
-                        off = h | ((l & 0xF0) << 4)
-                        leng = (l & 0x0F) + 3
-
-                        for i in range(leng):
-                            dat += bytes([buf[(off + i) % 4096]])
-                            size -= 1
-                            if size <= 0: break
-
-                            buf[bidx] = buf[(off + i) % 4096]
-                            bidx += 1
-                            bidx %= 4096
-                return dat
-            def decompress():
-                csize = usize = 0
-                dat = b''
-                while csize != 0xFFFF:
-                    csize = f.readu16()
-                    rsize = f.readu16()
-                    usize += rsize
-
-                    assert csize >= 4
-                    f.skip(2)
-                    dat += decompress_chk(rsize)
-                assert len(dat) == usize
-                return dat
-
-            for fe in fs:
-                f.seek(fe[2])
-                if fe[3] == 2: dat = decompress()
-                elif fe[3] > 0: dat = decompress_chk(f.readu32())
-                else: dat = f.read(fe[1])
-                open(o + '/' + fe[0],'wb').write(dat)
-            if fs: return
         case 'SLUDGE Data File':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -2501,29 +2439,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             open(o + '/' + tbasename(i) + '.txt','wb').write(open(i,'rb').read().replace(b'\0',b' ').replace(b'|',b'\n'))
             return
-        case 'Next Level Games DICT+DATA':
-            be = open(i,'rb').read(4) == b'\xA9\xF3\x24\x58'
-
-            if be: raise NotImplementedError('big endian')
-            else:
-                tf = o + '\\tmp' + os.urandom(4).hex() + '.dict'
-                tfd = tf[:-3] + 'ata'
-                symlink(i,tf)
-                symlink(noext(i) + '.data',tfd)
-
-                run(['nlgfiletool',i])
-                if exists(tf[:-5]) and isdir(tf[:-5]) and listdir(tf[:-5]):
-                    remove(tf,tfd)
-                    copydir(tf[:-5],o,True)
-                    return
-
-                run(['nlgfiletool-mff',i])
-                remove(tf,tfd)
-                if exists(tf[:-5]) and isdir(tf[:-5]) and listdir(tf[:-5]):
-                    copydir(tf[:-5],o,True)
-                    return
-
-                return quickbms('luigi_mansion_dict')
 
         case _:
             from lib.sub4_1 import extract4_1
