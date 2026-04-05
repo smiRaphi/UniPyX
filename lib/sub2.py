@@ -1324,7 +1324,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 def __iter__(self): return self
                 def __next__(self): raise StopIteration
 
-            idat = open(i,'rb').read()
+            idat = readfile(i)
             if rt == 'Dr. Mario 64':
                 import io
                 ob = io.BytesIO()

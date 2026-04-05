@@ -72,8 +72,8 @@ def extract4_1(inp:str,out:str,t:str):
                 d = b''
                 for ix in range(10):
                     if not exists(fi + str(ix)): break
-                    d += open(fi + str(ix),'rb').read()
-            else: d = open(i,'rb').read()
+                    d += readfile(fi + str(ix),'rb')
+            else: d = readfile(i)
 
             from lib.file import File
             f = File(d,endian='>')
@@ -474,7 +474,7 @@ def extract4_1(inp:str,out:str,t:str):
             if t == 'JDownloader2 Encrypted Subconfig':k = b'\x01\x02\x11\x01\x01T\x01\x01\x01\x01\x12\x01\x01\x01"\x01'
             elif t == 'JDownloader2 Encrypted Accounts':k = b'\x01\x06\x04\x05\x02\x07\x04\x03\x0c=\x0eK\xfe\xf9\xd4!'
 
-            d = open(i,'rb').read()
+            d = readfile(i)
             d = decrypt(d,'aes_cbc',k,k)
             if d.strip()[:1] != b'{': return 1
             open(o + '/' + tbasename(i) + '.json','wb').write(d[:-d[-1]])
@@ -1310,10 +1310,8 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'ODAU Zip':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt
-            import zipfile,io
-            zipfile.ZipFile(io.BytesIO(decrypt(open(i,'rb').read(),'xor',0xA5))).extractall(o)
-            if listdir(o): return
+            from lib.file import decrypt,decompress
+            if decompress(decrypt(readfile(i),'xor',0xA5),'zip',o=o): return
         case 'Siren 2 SLPK ROM':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

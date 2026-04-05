@@ -269,6 +269,21 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
             r = OODLE.OodleLZ_Decompress(i,len(i),o,kwargs['usize'],0 if algo in () else 1,0,0,None,0,None,None,None,0,0)
             if r == 0: raise Exception('Failed to decompress')
             return o.raw[:r]
+        case 'zip':
+            import io
+            from zipfile import ZipFile
+            z = ZipFile(io.BytesIO(i))
+
+            om = kwargs.get('out',kwargs.get('o'))
+            if type(om) == int and om == 1:
+                assert len(z.namelist()) == 1
+                r = z.read(z.namelist()[0])
+            elif type(om) == str:
+                z.extractall(om)
+                r = z.namelist()
+            else: r = {n:z.read(n) for n in z.namelist()}
+            z.close()
+            return r
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
 def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:

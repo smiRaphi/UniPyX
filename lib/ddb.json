@@ -595,7 +595,7 @@
         "rs":"L.A. Noire BIG"
     },
     {
-        "d":[["size",[5120,307200]],["isat","ASH0",0],["n0",4,4],["n0",4,8],["py","return len(open(inp,'rb').read().split(b'ASH0'))==5"]],
+        "d":[["size",[5120,307200]],["isat","ASH0",0],["n0",4,4],["n0",4,8],["py","return len(readfile(inp).split(b'ASH0'))==5"]],
         "rs":"Super Mario Maker Level","s":1
     },
     {
@@ -768,7 +768,7 @@
     },
     {
         "rq":"CUE+BIN",
-        "d":["py","import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',open(inp,encoding='utf-8').read())\nreturn len(f) == 3 and f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'"],
+        "d":["py","import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',readfile(inp,'r'))\nreturn len(f) == 3 and f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'"],
         "rs":"GD-ROM CUE+BIN","s":1
     },
     {
@@ -1821,7 +1821,7 @@
     {
         "rqr":null,
         "t":"text",
-        "d":[["size",[4,65536]],["s%",4],["py","d=open(inp,encoding='ascii').read();np=d.rstrip('=')\nif (len(d)-len(np))>3:return\nfor c in np:\n if c not in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/+':return\nreturn True"]],
+        "d":[["size",[4,65536]],["s%",4],["py","d=readfile(inp,'r',encoding='ascii');np=d.rstrip('=')\nif (len(d)-len(np))>3:return\nfor c in np:\n if c not in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/+':return\nreturn True"]],
         "rs":"Base64"
     },
     {
@@ -2062,7 +2062,7 @@
     },
     {
         "d":[["s%",2048],["ext",".dat"],
-             ["py","import re;d=dirname(inp)\nfor _ in range(3):\n\tif exists(d+'/SYSTEM.CNF'):break\n\td=dirname(d)\nelse:return False\nmf=re.search(r'cdrom0:\\\\(.+);\\d+\\n',open(d+'/SYSTEM.CNF').read())[1]\nreturn exists(d+'/'+mf)"]],
+             ["py","import re;d=dirname(inp)\nfor _ in range(3):\n\tif exists(d+'/SYSTEM.CNF'):break\n\td=dirname(d)\nelse:return False\nmf=re.search(r'cdrom0:\\\\(.+);\\d+\\n',readfile(d+'/SYSTEM.CNF','r'))[1]\nreturn exists(d+'/'+mf)"]],
         "rs":"DDR DAT"
     },
     {

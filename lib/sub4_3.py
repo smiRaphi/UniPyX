@@ -654,7 +654,8 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             of = o + '/' + basename(i)
             if i.lower().endswith('.lzss'): of = of[:-5]
-            xopen(of,'wb').write(dnasoft_lzss_decrypt(open(i,'rb').read()))
+            d = dnasoft_lzss_decrypt(readfile(i))
+            xopen(of,'wb').write(d)
             return
         case '@N-Factory DAT':
             if db.print_try: print('Trying with custom extractor')
@@ -1120,15 +1121,17 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Nintendo ASH0':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
-            d = decompress(open(i,'rb').read(),'ash0')
+            d = decompress(readfile(i),'ash0')
             xopen(o + '/' + tbasename(i),'wb').write(d)
             return
         case 'Super Mario Maker Level':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
-            d = open(i,'rb').read().split(b'ASH0')[1:]
+            d = readfile(i).split(b'ASH0')[1:]
             assert len(d) == 4
-            for ix,n in ((0,'thumbnail0.tnl'),(1,'course_data.cdt'),(2,'course_data_sub.cdt'),(3,'thumbnail1.tnl')): xopen(o + '/' + n,'wb').write(decompress(b'ASH0' + d[ix],'ash0'))
+            for ix,n in ((0,'thumbnail0.tnl'),(1,'course_data.cdt'),(2,'course_data_sub.cdt'),(3,'thumbnail1.tnl')):
+                dd = decompress(b'ASH0' + d[ix],'ash0')
+                xopen(o + '/' + n,'wb').write(dd)
             return
         case 'SDFTool SDF.bin':
             if db.print_try: print('Trying with custom extractor')
@@ -1220,17 +1223,17 @@ def extract4_3(inp:str,out:str,t:str):
             KEY = (0xB5,0x29,0x6C,0x96)
 
             if db.print_try: print('Trying with custom extractor')
-            import zipfile,io
             from lib.file import decrypt,decompress
-            d = open(i,'rb').read()
 
             if '_d.' in basename(i).lower(): iv = 'natives/STM/streaming/Roms/DecryptionRom/' + basename(i).replace('_d','_D')
             else: iv = 'natives/STM/streaming/Roms/' + basename(i)
 
-            d = decrypt(d,'capcom_mame',KEY,iv)
-            d = decompress(d,'lz4',no_size=True)
-            zipfile.ZipFile(io.BytesIO(d)).extractall(o)
-            if listdir(o): return
+            if decompress(
+                decompress(
+                    decrypt(readfile(i),'capcom_mame',KEY,iv),
+                    'lz4',no_size=True),
+                'zip',o=o
+            ): return
 
     return 1
 

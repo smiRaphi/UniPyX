@@ -104,7 +104,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             sleep(0.1)
 
         while True:
-            r = open(oup + '/_OUT.TXT','rb').read()
+            r = readfile(oup + '/_OUT.TXT')
             if len(r) == getsize(oup + '/_OUT.TXT'):
                 r = r.decode('utf-8')
                 break
@@ -140,7 +140,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with compression.zstd')
             from lib.file import decompress
             of = o + '\\' + tbasename(i)
-            d = decompress(open(i,'rb').read(),'zstd')
+            d = decompress(readfile(i),'zstd')
             xopen(of,'wb').write(d)
 
             xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
@@ -161,13 +161,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with lzma')
             from lib.file import decompress
             of = o + '\\' + tbasename(i)
-            d = decompress(open(i,'rb').read(),'lzma')
+            d = decompress(readfile(i),'lzma')
             xopen(of,'wb').write(d)
             if d: return
         case 'LZ4':
             if db.print_try: print('Trying with lz4')
             from lib.file import decompress
-            try: d = decompress(open(i,'rb').read(),'lz4')
+            try: d = decompress(readfile(i),'lz4')
             except: return 1
             xopen(o + '/' + tbasename(i),'wb').write(d)
             return
@@ -412,7 +412,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with zlib')
             import zlib
 
-            id = open(i,'rb').read()
+            id = readfile(i)
             try:d = zlib.decompress(id)
             except zlib.error:return 1
 
@@ -721,7 +721,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if not extract1(i,o,'7z'): return # 7z
         case 'BinSCII':
             tf = TmpFile('.bsc')
-            open(tf.p,'wb').write(b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + open(i,'rb').read().split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
+            open(tf.p,'wb').write(b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + readfile(i).split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
             r = extract1(tf.p,o,'DIET') # deark
             tf.destroy()
             return r
@@ -735,7 +735,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'UUencoded':
             if db.print_try: print('Trying with custom extractor')
             import binascii
-            d = open(i,encoding='utf-8').read()
+            d = readfile(i,'r')
             if 'begin ' in d: d = [x for x in re.findall(r'(?ms)begin \d+ ([^\n]+)\n(.+?)\nend\n',d)]
             else: d = [(tbasename(i),d)]
 
@@ -752,7 +752,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'HTTP Response':
             if db.print_try: print('Trying with custom extractor')
             from urllib.parse import unquote_to_bytes
-            hd,d = open(i,'rb').read().split(b'\r\n\r\n',1)
+            hd,d = readfile(i).split(b'\r\n\r\n',1)
             hd = {x.split(b': ',1)[0].decode('latin-1'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
             hds = {'$header':hd.split(b'\r\n')[0].decode('latin-1')} | {x:hd[x].decode('latin-1') for x in hd}
             hd = {x.lower():hd[x] for x in hd}

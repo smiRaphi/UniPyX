@@ -440,12 +440,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 copydir(o + '/.rsrc',o,True)
                 return
         case 'Netopsystems FEAD':
-            bk = os.environ.get('__COMPAT_LAYER')
-            os.environ['__COMPAT_LAYER'] = 'RUNASINVOKER'
             if db.print_try: print('Trying with input (/nos_ne)')
-            run([i,'/s','/nos_ne','/nos_o' + o],print_try=False)
-            if bk != None: os.environ['__COMPAT_LAYER'] = bk
-            else: del os.environ['__COMPAT_LAYER']
+            run([i,'/s','/nos_ne','/nos_o' + o],print_try=False,env=os.environ.copy() | {'__COMPAT_LAYER':'RUNASINVOKER'})
             if listdir(o): return
         case 'Advanced Installer':
             if db.print_try: print('Trying with input (/extract)')
@@ -625,7 +621,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             pr7z = db.print_try
             lerr = False
             errp = ''
-            for x in open(i,encoding='utf-8').read().strip().split('\n'):
+            for x in readfile(i,'r').strip().split('\n'):
                 x = x.strip() + ' '
                 t,x = x.split(' ',1)
                 assert t in 'fdl',t
@@ -835,7 +831,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
-            try: d = decompress(open(i,'rb').read()[8:],'lz4')
+            try: d = decompress(readfile(i)[8:],'lz4')
             except: return 1
             xopen(o + '/' + basename(i),'wb').write(d)
             return
@@ -844,7 +840,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'JavaScriptObfuscator': return jsbeautifier('jsobfuscator')
         case 'Javascript Obfuscator.com':
             if db.print_try: print('Trying with custom extractor')
-            d = open(i,encoding='utf-8').read()
+            d = readfile(i,'r')
 
             def jsstr(i:str) -> str: return ast.literal_eval(i.replace(r'\/','/'))
 
@@ -1470,7 +1466,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'zexe':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
-            d = decompress(open(i,'rb').read()[0x200:],'gzip')
+            d = decompress(readfile(i)[0x200:],'gzip')
             open(f'{o}/{tbasename(i)}.{"exe" if d[:2] == b"MZ" else "elf"}','wb').write(d)
             return
         case 'MASM Installer':

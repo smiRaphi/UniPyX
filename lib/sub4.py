@@ -84,7 +84,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             try:
                 from bin.sarc import SARC # type: ignore
-                sarc = SARC(open(i,'rb').read())
+                sarc = SARC(readfile(i))
                 sarc.extract_to_dir(o)
                 del sarc
             except ImportError: raise
@@ -168,7 +168,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Iron Sky GPK':
             fs = []
-            for x in re.findall(r'<File((?: \w+="\w{3}: [^"]*")+)\s*/>',open(i,encoding='utf-8').read()):
+            for x in re.findall(r'<File((?: \w+="\w{3}: [^"]*")+)\s*/>',readfile(i,'r')):
                 tfs = {}
                 for y in re.findall(r'(\w+)="(\w{3}): ([^"]*)"',x):
                     if y[1] in ['U16','U32','U64']: tfs[y[0]] = int(y[2])
@@ -771,7 +771,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             amime.__zlib_decompress = amime.zlib.decompress
             amime.zlib.decompress = lambda *args,**kwargs:CDat(amime.__zlib_decompress(*args,**kwargs))
 
-            dat = CDat(open(i,'rb').read())
+            dat = CDat(readfile(i))
             if amime.ActiveMimeDocument.is_activemime(dat[:14]): amd = amime.ActiveMimeDocument(dat,amime.ActiveMimeDocument.is_base64(dat[:14]))
             else: amd = amime.ActimeMimeParser().process(dat) # typo in amime.py
             assert amd
@@ -1207,7 +1207,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             assert exists(inp)
             if db.print_try: print('Trying with custom extractor')
 
-            scr = open(i,encoding='utf-8').read()
+            scr = readfile(i,'r')
             inf = json.loads(re.search(r'loadPackage\((\{.+\})\);\n',scr)[1])
             dirs = re.findall(r"Module\['FS_createPath'\]\(\"([^\"]+)\", *\"([^\"]+)\", *true, *true\);\n",scr)
             dat = re.search(r"var REMOTE_PACKAGE_BASE = '(.+)';\n",scr)[1]
@@ -1318,7 +1318,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'AMOS Memory Bank':
             if db.print_try: print('Trying with custom extractor')
-            open(o + '/' + tbasename(i) + '.bin','wb').write(open(i,'rb').read()[20:])
+            d = readfile(i)[0x14:]
+            open(o + '/' + tbasename(i) + '.bin','wb').write(d)
             return
         case 'PS2 Memory Card':
             run(['mymc','-i',i,'extract','*'],cwd=o)
@@ -1754,7 +1755,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if len(listdir(o)) > 1 or infp != infsp: return
         case 'WarioWare Mega Party Game PAC':
             if db.print_try: print('Trying with custom extractor')
-            d = auracomp(open(i,'rb').read()[0x20:],None,'nintendo-yay0')
+            d = auracomp(readfile(i)[0x20:],None,'nintendo-yay0')
             if d:
                 open(o + '\\' + tbasename(i),'wb').write(d)
                 return
@@ -1776,7 +1777,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 open(o + '/' + fe[2] + ('.djc' if d.startswith(b'DJcomp\0\0') else ''),'wb').write(d)
             if fs: return
         case 'Borland Form':
-            d = open(i,'rb').read()
+            d = readfile(i)
             for x in range(10):
                 if x.to_bytes() in d:
                     of = o + '\\' + tbasename(i) + '.txt'
@@ -2003,7 +2004,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with ce_msbt')
             import bin.ce_msbt as msbt # type: ignore
 
-            d = open(i,'rb').read()
+            d = readfile(i)
             end = {b'\xFF\xFE':'<',b'\xFE\xFF':'>'}[d[8:10]]
             tbe = {'<':'little','>':'big'}[end]
 
@@ -2071,7 +2072,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 return r
             bmg.struct.unpack_from = punpfr
 
-            bmg = bmg.BMG(b'MESGbmg1' + open(i,'rb').read()[8:])
+            bmg = bmg.BMG(b'MESGbmg1' + readfile(i)[8:])
             assert bmg.messages
             if bmg.scripts: raise NotImplementedError
             if bmg.labels: raise NotImplementedError
@@ -2081,7 +2082,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'UE Text Resource':
             if db.print_try: print('Trying with custom extractor')
-            txt = open(i,'rb').read().replace(b'\0',b'\r\n\r\n').rstrip(b'\r\n')
+            txt = readfile(i).replace(b'\0',b'\r\n\r\n').rstrip(b'\r\n')
             try: txt.decode('utf-8')
             except: return 1
             open(o + '/' + tbasename(i) + '.txt','wb').write(txt)
@@ -2437,7 +2438,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'UMD Data':
             if db.print_try: print('Trying with custom extractor')
-            open(o + '/' + tbasename(i) + '.txt','wb').write(open(i,'rb').read().replace(b'\0',b' ').replace(b'|',b'\n'))
+            d = readfile(i).replace(b'\0',b' ').replace(b'|',b'\n')
+            open(o + '/' + tbasename(i) + '.txt','wb').write(d)
             return
 
         case _:

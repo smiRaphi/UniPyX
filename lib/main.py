@@ -73,6 +73,12 @@ def xopen(f:str,m='r',encoding='utf-8',newline=None):
     mkdir(dirname(f))
     if 'b' in m: return open(f,m)
     return open(f,m,encoding=encoding,newline=newline)
+def readfile(f:str,m='rb',encoding='utf-8',newline=None,**kwargs) -> bytes|str:
+    if 'b' in m: o = open(f,m,**kwargs)
+    else: o = open(f,m,encoding=encoding,newline=newline,**kwargs)
+    r = o.read()
+    o.close()
+    return r
 def rldir(i:str,files=True) -> list[str]:
     i = str(i)
     o = []
@@ -236,7 +242,7 @@ def analyze(inp:str,raw=False):
                     if exists(log) and getsize(log): break
                     sleep(0.1)
                 if exists(log):
-                    lg = open(log,encoding='utf-8',errors='ignore').read().strip()
+                    lg = readfile(log,'r',errors='ignore').strip()
                     os.remove(log)
                     m = EIPER1.search(lg)
                     if m: ts.append(m[1])
@@ -323,7 +329,7 @@ def analyze(inp:str,raw=False):
             if x[0] == 'py':
                 lc = {}
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof},locals=lc)
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile},locals=lc)
                     ret = lc['check'](inp)
                 except:
                     print(x[1])

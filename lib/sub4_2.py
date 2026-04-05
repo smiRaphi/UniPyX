@@ -838,7 +838,7 @@ def extract4_2(inp:str,out:str,t:str):
             db.get('tjzip_dump')
             from bin.tjzip_dump import parse_hig_wad,tjzip_decompress,TJZIPError # type: ignore
 
-            inp = open(i,'rb').read()
+            inp = readfile(i)
             try:
                 _,coff,dsiz = parse_hig_wad(inp)
                 coff = 0xC0 # force header size to 0xC0
@@ -1170,7 +1170,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Specnaz UFF/BFS': raise NotImplementedError
         case 'Nicktoons Gravjet Racing LIN':
             if db.print_try: print('Trying with custom extractor')
-            d = open(i,'rb').read()
+            d = readfile(i)
 
             for fd in d.split(b'\xC0\xDE\0\1')[1:]:
                 nl = int.from_bytes(fd[:4],'big')
@@ -1429,7 +1429,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Yuzu Vulkan Pipeline Cache':
             if db.print_try: print('Trying with custom extractor')
             of = o + '/' + tbasename(i) + '.bin'
-            d = open(i,'rb').read()
+            d = readfile(i)
             xopen(of,'wb').write(d[12:])
             open(o + '/$yuzu_version.txt','w').write(str(int.from_bytes(d[8:12],'little')))
 
@@ -1779,7 +1779,7 @@ def extract4_2(inp:str,out:str,t:str):
                 return
         case 'Feral FSBF':
             if db.print_try: print('Trying with custom extractor')
-            d = open(i,'rb').read()[16:]
+            d = readfile(i)[0x10:]
             assert d[:3] == b'FSB'
             xopen(o + '/' + tbasename(i) + '.fsb','wb').write(d)
             return
@@ -1797,7 +1797,7 @@ def extract4_2(inp:str,out:str,t:str):
             if c: return
         case 'Feral Bink Video':
             if db.print_try: print('Trying with custom extractor')
-            d = open(i,'rb').read()[0x18:]
+            d = readfile(i)[0x18:]
             assert d[:3] == b'BIK'
             xopen(o + '/' + tbasename(i) + '.bik','wb').write(d)
         case 'Motocross Mania DAT': return quickbms('e_biker')
@@ -1999,8 +1999,9 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Shrek Smash n\' Crash Racing CMP':
             if db.print_try: print('Trying with custom extractor')
-            import zlib
-            open(f'{o}/{basename(i)}','wb').write(zlib.decompress(open(i,'rb').read()[8:]))
+            from lib.file import decompress
+            d = decompress(readfile(i)[8:],'zlib')
+            open(o + '/' + basename(i),'wb').write(d)
             return
         case 'Roblox Flag Cache':
             if db.print_try: print('Trying with custom extractor')
