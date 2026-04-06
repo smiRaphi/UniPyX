@@ -1250,6 +1250,23 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Kamen Rider Atsume BIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            f.skip(4)
+            c = f.readu16()
+            bo = 6 + c*8
+            fs = []
+            for _ in range(c): fs.append((f.readu32()+bo,f.readu32()))
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                xopen(f'{o}/{ix:02d}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
+            if fs: return
 
     return 1
 

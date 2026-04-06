@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 857
+# Supported Formats: 859
 
 ## "Common" Archives/Compressors/Encodings (135)
 Name | Extension(s) | Extractor(s) | Comment
@@ -335,7 +335,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (417)
+## Various (419)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -535,6 +535,7 @@ Iron Sky GPK | .gpk | Custom |
 JDownloader2 Encrypted Accounts | .ejs | Custom |
 JDownloader2 Encrypted Subconfig | .ejs | Custom |
 Jikan de Fantasia JRZ | .jrz | Custom |
+Kamen Rider Atsume BIN | .bin | Custom |
 Karma Studios Lang | ??? | Custom |
 Konami DPG | .dpg | Custom |
 Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
@@ -672,6 +673,7 @@ Siren 2 SLPK ROM | .slpk | Custom |
 Sky CoTL Preferences | .pref | Custom |
 SLUDGE Data File | .sludge | Custom |
 Smiles Fortune Hunters PAK | .pak | Custom |
+Smoking Car Productions Disk Cache | .hdf | Custom |
 Snoopy Vs. The Red Baron X | .xpc .xps | Custom |
 Sonic AMB | .amb | [sonic4.bms](https://mirror.aluigi.org/bms/sonic4.bms) |
 Sonic BINA | * | Custom |

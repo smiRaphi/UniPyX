@@ -160,7 +160,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     else: return 1
                     bcd.append('--base' + st + '=' + bf)
 
-                run(bcd + [i])
+                if run(bcd + [i])[0] == 0xc0000005: raise ValueError('Access violation (0xc0000005/3221225477)')
                 if listdir(o) and listdir(o + '/ExeFS') and listdir(o + '/RomFS'): return
                 rmdir(o)
                 mkdir(o)
