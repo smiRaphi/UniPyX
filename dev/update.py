@@ -133,11 +133,13 @@ def supdate(c:Cache,k:str,inf:dict):
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
             if repo not in ('VirusTotal/yara','allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'):
-                if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','widberg/bff','git-for-windows/git','AlexxEG/BSA_Browser'):
-                    s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
-                elif repo in ():
-                    s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
-                else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
+                s = '<p><strong>This page is taking too long to load.</strong></p>'
+                while '<p><strong>This page is taking too long to load.</strong></p>' in s:
+                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','widberg/bff','git-for-windows/git','AlexxEG/BSA_Browser'):
+                        s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
+                    elif repo in ():
+                        s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
+                    else: s = c.get(u.split('/releases/download/')[0] + '/releases/latest')
 
                 ts = ft(GRELTS.search(s)[1],'%Y-%m-%dT%H:%M:%SZ')
                 tag = GRELTG.search(s)[1]
@@ -205,18 +207,13 @@ def supdate(c:Cache,k:str,inf:dict):
             nu = f'https://{dom}{m[1]}'
             if nu != u: u = nu
             else: ts = 0
-        elif dom == 'files.prodkeys.net':
-            s = c.get('https://prodkeys.net/')
-            if not '500: Internal server error' in s:
-                s = c.get(re.search(r'href="(https://prodkeys\.net/yuzu-prod-keys-n\d+/)"',s)[1])
-                ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1],'%Y-%m-%dT%H:%M:%S%z')
-                if ts > ots:
-                    nu = re.search(r'(?i)href="(https://files\.prodkeys\.net/ProdKeys\.net(?:-v?\d+\.\d+\.|_v\d+\-\d+\-)\d+\.zip)"',s)[1]
-                    if nu != u:
-                        u = nu
-                        bdir = u.split('/')[-1].rsplit('.',1)[0]
-                        for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
-                    else: ts = 0
+        elif dom == 'prodkeys.dev':
+            s = c.get('https://prodkeys.dev/prod-keys-file-eden/')
+            ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1],'%Y-%m-%dT%H:%M:%S%z')
+            if ts > ots:
+                nu = re.search(r'href="(https?://prodkeys\.dev/wp\-content/uploads/\d{4}/\d{2}/[^"]+\.zip)"><span class="kb-svg-icon-wrap ',s)[1]
+                if nu != u: u = nu
+                else: ts = 0
         elif dom == 'dl.xpdfreader.com':
             s = c.get('https://www.xpdfreader.com/download.html',verify=False)
             ts = ft(re.search(r'Released: ([^<]+)</p>',s)[1],'%Y %b %d')

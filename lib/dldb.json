@@ -123,9 +123,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1775253600
+            "ts":1775426400
         }],
-        "ts":1775253600
+        "ts":1775426400
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -513,13 +513,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/dc/2e/dolphin-master-2603-223-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/10/0a/dolphin-master-2603-250-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1775321485
+            "ts":1775471314
         }],
-        "ts":1775321485
+        "ts":1775471314
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2265,13 +2265,13 @@
     "pea":{
         "p":"pea.exe",
         "fs":[{
-            "u":"https://github.com/peazip/PeaZip/releases/download/10.9.0/peazip_portable-10.9.0.WIN64.zip",
+            "u":"https://github.com/peazip/PeaZip/releases/download/11.0.0/peazip_portable-11.0.0.WIN64.zip",
             "x":{
-                "peazip_portable-10.9.0.WIN64/pea.exe":"pea.exe"
+                "peazip_portable-11.0.0.WIN64/pea.exe":"pea.exe"
             },
-            "ts":1770445938
+            "ts":1775451247
         }],
-        "ts":1770445938
+        "ts":1775451247
     },
     "icupkg":{
         "p":"icu4c/icupkg.exe",
@@ -2733,14 +2733,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_03_9b799442_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_05_9b799442_32.zip",
             "x":{
-                "RenderDoc_2026_04_03_9b799442_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_03_9b799442_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_05_9b799442_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_05_9b799442_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1775167200
+            "ts":1775340000
         }],
-        "ts":1775167200
+        "ts":1775340000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5598,7 +5598,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-04-02/WolvenKit.Console-8.17.4-nightly.2026-04-02.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-04-05/WolvenKit.Console-8.17.4-nightly.2026-04-05.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5651,9 +5651,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1775125618
+            "ts":1775384336
         }],
-        "ts":1775125618
+        "ts":1775384336
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5736,9 +5736,9 @@
             },
             "ts":1772285021
         },{
-           "u":"https://github.com/Ekey/REE.PAK.Tool/tree/main/Projects",
-           "github":"REE.Unpacker/Projects",
-           "ts":1772892778
+            "u":"https://github.com/Ekey/REE.PAK.Tool/tree/main/Projects",
+            "github":"REE.Unpacker/Projects",
+            "ts":1772892778
         }],
         "ts":1772892778
     },
@@ -6617,14 +6617,14 @@
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
-            "u":"https://files.prodkeys.net/ProdKeys.Net-21.2.0.zip",
+            "u":"https://prodkeys.dev/wp-content/uploads/2026/03/Prodkeys-22.0.0.zip",
             "x":{
-                "ProdKeys.Net-21.2.0/prod.keys":"prodkeys/prod.keys",
-                "ProdKeys.Net-21.2.0/title.keys":"prodkeys/title.keys"
+                "prod.keys":"prodkeys/prod.keys",
+                "title.keys":"prodkeys/title.keys"
             },
-            "ts":1770756321
+            "ts":1774379085
         }],
-        "ts":1770756321
+        "ts":1774379085
     },
     "devkeys":{
         "p":"prodkeys/dev.keys"

@@ -1295,7 +1295,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             assert f.read(4) == b'RFRM'
             f.skip(0x10)
-            assert f.read(12) == b'MSBT\x10\0\0\0\x10\0\0\0'
+            assert f.read(12) == b'MSBT' and f.readu32() == f.readu32() == 0x10
 
             while f:
                 n = f.read(4).decode('ascii')
@@ -1318,7 +1318,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             assert f.read(4) == b'RFRM'
             f.skip(0x10)
-            assert f.read(12) == b'ENUM\x0A\0\0\0\x0A\0\0\0'
+            assert f.read(12) == b'ENUM' and f.readu32() == f.readu32() == 10
 
             fc = f.readu32()
             of = open(o + '/' + tbasename(i) + '.txt','w')
@@ -1646,8 +1646,7 @@ def extract4_2(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Feral Header Library':
             if db.print_try: print('Trying with custom extractor')
-            from hashlib import md5
-            from lib.file import File
+            from lib.file import File,crc_hash
             f = File(i)
             assert f.read(4) == b'BILH'
             f.skip(0x14)
@@ -1659,7 +1658,7 @@ def extract4_2(inp:str,out:str,t:str):
             def getfn(n:str):
                 n = n.lower()
                 ex = n.rsplit('.',1)[1]
-                return md5(n[:-len(ex)].encode()).hexdigest().upper() + '.' + ex
+                return f'{crc_hash(n[:-len(ex)].encode(),"md5"):032X}.{ex}'
 
             rc = f.readu32('<')
             f.skip(12)
