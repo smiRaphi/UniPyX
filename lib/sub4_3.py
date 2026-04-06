@@ -683,7 +683,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = [(f.readu32(),f.readu32()) for _ in range(c)]
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
-                d = f.read(fe[1] - fe[0])
+                d = f.readc(fe[1] - fe[0])
                 xopen(o + '/' + f'{ix:02d}.{guess_ext(d)}','wb').write(d)
 
             f.close()
@@ -707,7 +707,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for ix in range(c):
                 f.seek(fs[ix][1])
-                xopen(o + '/' + fs[ix][0],'wb').write(f.read(fs[ix+1][1] - fs[ix][1]))
+                xopen(o + '/' + fs[ix][0],'wb').write(f.readc(fs[ix+1][1] - fs[ix][1]))
 
             f.close()
             if fs: return
@@ -756,8 +756,8 @@ def extract4_3(inp:str,out:str,t:str):
                     cd = f.readu16()
                     fsd = [f.readu32() for _ in range(cd+1)]
                     f.skip(fsd[0] - (6 + cd*4))
-                    pcs.append(p.apply_async(decc,(f.read(fe[3]-fsd[0]),fn,ext,fsd,fe)))
-                else: pcs.append(p.apply_async(dec,(f.read(fe[3]),f'{o}/{fn}.{ext}',fe)))
+                    pcs.append(p.apply_async(decc,(f.readc(fe[3]-fsd[0]),fn,ext,fsd,fe)))
+                else: pcs.append(p.apply_async(dec,(f.readc(fe[3]),f'{o}/{fn}.{ext}',fe)))
                 f.align(4)
 
             f.close()
@@ -800,7 +800,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[2]))
+                xopen(f'{o}/{fe[0]}','wb').write(f.readc(fe[2]))
 
             f.close()
             if fs: return
@@ -884,7 +884,7 @@ def extract4_3(inp:str,out:str,t:str):
                 fs.append(fe + [f.read(0x20).rstrip(b'\0').decode('utf-8')])
             for fe in fs:
                 f.seek(fe[0])
-                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+                xopen(o + '/' + fe[2],'wb').write(f.readc(fe[1]))
 
             f.close()
             if fs: return
@@ -907,7 +907,7 @@ def extract4_3(inp:str,out:str,t:str):
                 gid = fd.readu16()
                 fn = f'{o}/{gid}{fd.read(0x12).rstrip(b"\0").decode("ascii")}.{e}'
                 fd.skip(4)
-                xopen(fn,'wb').write(fd.read(f.readu32()))
+                xopen(fn,'wb').write(fd.readc(f.readu32()))
 
             f.close()
             fd.close()
@@ -960,7 +960,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = sorted(list(set(fs)))
             for ix in range(len(fs)-1):
                 f.seek(fs[ix])
-                xopen(f'{o}/{ix:02d}.bin','wb').write(f.read(fs[ix+1] - fs[ix]))
+                xopen(f'{o}/{ix:02d}.bin','wb').write(f.readc(fs[ix+1] - fs[ix]))
 
             f.close()
             return
@@ -1001,7 +1001,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(fe[2])
                 fn = f.read0s().decode('utf-8') + ex
                 f.seek(fe[0])
-                xopen(o + '/' + (fn or 'StringTable.pak.sys'),'wb').write(f.read(fe[1]))
+                xopen(o + '/' + (fn or 'StringTable.pak.sys'),'wb').write(f.readc(fe[1]))
 
             f.close()
             if fs: return
@@ -1014,8 +1014,8 @@ def extract4_3(inp:str,out:str,t:str):
             s1 = f.readu32()
             s2 = f.readu32()
             f.skip(8)
-            open(o + '/0.png','wb').write(f.read(s1))
-            open(o + '/1.png','wb').write(f.read(s2))
+            open(o + '/0.png','wb').write(f.readc(s1))
+            open(o + '/1.png','wb').write(f.readc(s2))
 
             f.close()
             return
@@ -1036,7 +1036,7 @@ def extract4_3(inp:str,out:str,t:str):
                 assert f.readu32() == fs[-1][1],f.pos - 0x10
             for fe in fs:
                 f.seek(fe[2])
-                d = f.read(fe[1])
+                d = f.readc(fe[1])
                 if fe[0] in MP: fn = MP[fe[0]]
                 else:
                     if d[:4] in {b'DEAD',b'COL0'}: ex = d[:4].decode('ascii')
@@ -1068,7 +1068,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(fe[0])
                 fn = f.read0s().decode('ascii')
                 f.seek(fe[1])
-                xopen(o + '/' + fn,'wb').write(f.read(fe[2]))
+                xopen(o + '/' + fn,'wb').write(f.readc(fe[2]))
 
             f.close()
             if fs: return
@@ -1111,7 +1111,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                d = f.read(fe[3] or fe[2])
+                d = f.readc(fe[3] or fe[2])
                 if d[:4] in {b'segs',}: ex = d[:4].decode('ascii')
                 else: ex = guess_ext(d)
                 xopen(f'{o}/{fe[0]:08X}.{ex}','wb').write(d)
@@ -1147,18 +1147,18 @@ def extract4_3(inp:str,out:str,t:str):
 
             of = xopen(o + '/1.txt','w')
             of.write(f'{c1}\n\n')
-            for ix in range(c1): of.write(f'{f.readu16()} {f.readu24()} {f.readu24()}\n{f.read(0x28).hex()}\n\n')
+            for ix in range(c1): of.write(f'{f.readu16()} {f.readu24()} {f.readu24()}\n{f.readc(0x28).hex()}\n\n')
             of.close()
 
             of = xopen(o + '/2.txt','w')
             of.write(f'{c2}\n\n')
-            for ix in range(c2): of.write(f'{f.read(0x10).hex()}\n')
+            for ix in range(c2): of.write(f'{f.readc(0x10).hex()}\n')
             of.close()
 
             assert f.readu8() == 1 and f.readu16() == 0
-            xopen(o + '/hash.bin','wb').write(f.read(f.readu8() * 4))
+            xopen(o + '/hash.bin','wb').write(f.readc(f.readu8() * 4))
             assert f.readu8() == 1 and f.readu16() == 0
-            d = f.read(f.readu8() * 4)
+            d = f.readc(f.readu8() * 4)
             d = decrypt(d,'rsa_inv_le',0xd0c57d605d21c23b91000de888121741c3e2b8ba476b81b25123275b6b5c008b6b10abb59d357dd2fed5fea988940b94adc2136bb45c93d992b7102a5988033b73f6386ef9cce6bbc6dab03ba6e90a25976ef305a087302660475011c5ee50b8d44e1cc081d61273913664e1810abb97b93c1a6c0e6ebd8862d92ed88e62a450cd050dd4e212285128b453ef48711b0be4a0fc43bb8403efd57eda741644ee4cf64bc85187e0ee22fd3c61e4670eb19d47c99a3c9827219f0d4f6743f9fa27375deedf30dd2c17b5a6cd05339c399f2986e9c8919038a70c4f5fc2a760763e128818d1bb1c79a8d8a05d4401ac3004e5f64913a43c8cad637e94d478b63a27d2760105fdeadc8ff71914aaa9b9da29f35d294d4c23638f7f6170ba5358bc127f72c78b6bc4ce746cd350647c61f32dbdfc6135c1db2ec7c2ab9d914ed9a79b46c1ee57692b5fda14c1f0c0597a3c39414d7b8c519144c93dc72ab08b1c7a7b8e651cefcb1b3291128b4136d05abfe33af3568a163c7a839be864bc5abf3ac735fa33bb1ca45953f8431ed9fff2df07f0fbb5a071a462340463fcdfe79f9dee85e297115e1e5d077c414b2bf8523802fc7fd32a40e77cf8be6e0a115aa2709ba2c1fe04fadae81db12d0c71d5020c10f6a62f5e35f4a3d8ec0d3bf3dd914482cc39fd4e221e2feb39e23e0ef408954ef638b2d75e210ba0b6a473d526fc17588b,
                                        3,r=2)
             assert d[:1] == b'\1'
@@ -1186,7 +1186,7 @@ def extract4_3(inp:str,out:str,t:str):
             while f:
                 h = f.readu32()
                 if not h: break
-                d = f.read(f.readu32() - 4)
+                d = f.readc(f.readu32() - 4)
                 xopen(f'{o}/{h:08X}.{guess_ext(d)}','wb').write(d)
 
             f.close()
@@ -1234,6 +1234,22 @@ def extract4_3(inp:str,out:str,t:str):
                     'lz4',no_size=True),
                 'zip',o=o
             ): return
+        case 'Smoking Car Productions Disk Cache':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                fs.append((f.read(12).rstrip(b'\0').decode('ascii'),f.readu32()*0x800,f.readu32()*0x800))
+                assert f.readu16() in {0,1}
+            for fe in fs:
+                f.seek(fe[1])
+                xopen(o + '/' + fe[0],'wb').write(f.readc(fe[2]))
+
+            f.close()
+            if fs: return
 
     return 1
 

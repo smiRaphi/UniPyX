@@ -2066,6 +2066,10 @@
         "rs":"DDR DAT"
     },
     {
+        "d":[["s%",2048],["size",[145408,null]],["isatS","\\xE0",356,143004],["isatS","\\0",22,142982],["isin",["\\1\\0","\\0\\0"],24],["n0",4,0],["n0",4,16],["str0",4,12,6],["py","f=open(inp,'rb');return int.from_bytes(f.read(4),'little')<=6500"]],
+        "rs":"Smoking Car Productions Disk Cache"
+    },
+    {
         "d":[["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+4;return s==f.seek(0,2)"]],
         "rs":"Metroid Samus Returns PKG"
     },

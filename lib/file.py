@@ -27,6 +27,10 @@ class File:
     def skip(self,n:int): return self.seek(n,1)
     def back(self,n:int): return self.skip(-n)
     def reads(self): return self.read(1)
+    def readc(self,n:int=None):
+        d = self.read(n)
+        if d is not None: assert len(d) == n,"Unexpected EOF"
+        return d
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -104,7 +108,7 @@ class File:
             if not p: break
             self.write(p)
 
-    def decompress(self,size:int,algo:str,*args,**kwargs): return decompress(self.read(size),algo,*args,**kwargs)
+    def decompress(self,size:int,algo:str,*args,**kwargs): return decompress(self.readc(size),algo,*args,**kwargs)
 
     @property
     def pos(self): return self.tell()
