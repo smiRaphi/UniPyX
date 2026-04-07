@@ -379,10 +379,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 tof.write(inf.read(siz))
                 tof.close()
             if listdir(o): return
-        case 'Teardown Encrypted File':
-            of = o + '\\' + basename(o) + '_'
-            run(['tdedecrypt',i + '_',of])
-            if exists(of[:-1]) and (getsize(of[:-1]) or not getsize(i)): return
+        case 'Teardown Encrypted':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decrypt
+            d = decrypt(readfile(i),'dxor',
+                        b"599Cc51887A8cb0C20F9CdE34cf9e0A535E5cAd1C26c7b562596ACC207Ae9A0bfB3E3161f31af5bEf1c2f064b3628174D83BF6E0739D9D6918fD9C2Eba02D5aD",
+                        b"0C3b676fe8d7188Cde022F71632830F36b98b181aD48Fed160006eA59")
+            open(o + '/' + tbasename(i),'wb').write(d)
+            return
         case 'UE4 Package':
             err = run(['repak','info',i],print_try=False)[2]
             if 'trying version V11 failed: pak is encrypted but no key was provided' in err:

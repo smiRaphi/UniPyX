@@ -698,7 +698,7 @@ Taiko no Tatsujin Data 3 | ??? | Custom |
 Transformers: Devastation DAT | .dat .dtt | Custom |
 Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-Teardown Encrypted File | .tde | [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt) |
+Teardown Encrypted | .tde | Custom |
 The Mummy Returns PAK | .ps2 | Custom |
 The Sims FAR | .far | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 THQ PAK | .pak | Custom |

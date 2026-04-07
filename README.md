@@ -16,7 +16,6 @@ Requires a somewhat new version (3.10+) of python (I've only tested old versions
 * sinemore.bms by [DKDave](https://reshax.com/profile/70-dkdave/) taken from https://reshax.com/topic/18788-sine-mora-ex-pc-bin/#findComment-102758 (sinemore.zip/sinemore.txt) because of cloudflare
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
-* self compiled [TDEDecrypt](https://github.com/Aftersol/TDEDecrypt)
 * self compiled [bbccp](https://github.com/ethandicks/bbc-disk-tools) without glob
 * self compiled [assamUnpack](https://github.com/refint/assamUnpack) without input request
 * self compiled [atr](https://github.com/jhallen/atari-tools)

@@ -832,15 +832,6 @@
         ],
         "ts":0
     },
-    "tdedecrypt":{
-        "p":"TDEDecrypt.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "TDEDecrypt.exe":"TDEDecrypt.exe"
-            }
-        }]
-    },
     "repak":{
         "p":"repak.exe",
         "fs":[{

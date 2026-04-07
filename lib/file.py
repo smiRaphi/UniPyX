@@ -29,7 +29,7 @@ class File:
     def reads(self): return self.read(1)
     def readc(self,n:int=None):
         d = self.read(n)
-        if d is not None: assert len(d) == n,"Unexpected EOF"
+        if n is not None: assert len(d) == n,"Unexpected EOF"
         return d
 
     def middle_scramble(self,d:bytes):
@@ -314,6 +314,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             d = bytearray(i)
             for ix in range(len(i)): key = d[ix] = d[ix] ^ key
             return bytes(d)
+        case 'dxor': return bytes(i[x] ^ key[x % len(key)] ^ iv[x % len(iv)] for x in range(len(i)))
         case 'inv'|'invert': return bytes(x ^ 0xFF for x in i)
         case 'roll':
             if type(key) == int: key = (key,)
