@@ -1611,7 +1611,7 @@ def extract4_2(inp:str,out:str,t:str):
                     tb.skip(0x10)
                     fe.append(tb.readu32())
                     fe.append(tb.readu32())
-                    fe.append(file_syso+tb.pos)
+                    #fe.append(file_syso+tb.pos)
                     finf.append(tuple(fe))
 
                 # off, zsize, usize, redirect idx, flags
@@ -1632,7 +1632,7 @@ def extract4_2(inp:str,out:str,t:str):
                             sf = sfinf[fe[2] + rix]
                             fs.append((f'${rgm[rix]}/{n}',file_seco + dofs[didx + 1 + rix] + sf[0],sf[1],sf[2],sf[4]))
                     else: fs.append((n,file_seco + dofs[didx] + sf[0],sf[1],sf[2],sf[4]))
-                    assert (fs[-1][1]+fs[-1][2]) <= file_syso,fe[-1]
+                    assert (fs[-1][1]+fs[-1][2]) <= file_syso#,fe[-1]
 
                 for fe in Sn2h:
                     n = FSHM.get(fe[0],f'$unk_strm/{fe[0]:10X}.bin').replace(':/','/').replace(':','_')

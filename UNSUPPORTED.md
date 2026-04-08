@@ -1,7 +1,7 @@
 ## Formats
 Name | Extension(s) | Sample(s) | URLs | Extractor(s) | Comment
 ---- | ------------ | --------- | ---- | ------------ | -------
-TRFDS | .trfds | Modern Pokemon games | https://github.com/pkZukan/PokeDocs/tree/main/SV | https://github.com/pkZukan/gftool<br>https://github.com/psthrn42/SCVI_Extract | needs custom
+Trinity OnePack | .trpfs+.trpfd | Modern Pokemon games | BAD:<br>https://github.com/pkZukan/PokeDocs/tree/main/SV | BAD:<br>https://github.com/pkZukan/gftool<br>https://github.com/psthrn42/SCVI_Extract | needs custom, detected
 Web Archive ARC | .arc | ? | http://fileformats.archiveteam.org/wiki/ARC_(Internet_Archive)<br>https://archive.org/web/researcher/ArcFileFormat.php | https://github.com/ikreymer/webarchiveplayer |
 Astrotite | ? | ? | http://fileformats.archiveteam.org/wiki/Astrotite | http://download.cnet.com/Astrotite-200X-and-AstroA2P/3000-2250_4-75064900.html |
 B6Z | .b6z | ? | http://fileformats.archiveteam.org/wiki/B6Z | https://web.archive.org/web/20250906002136/http://b6zip.com/ |

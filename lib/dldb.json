@@ -123,9 +123,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1775426400
+            "ts":1775599200
         }],
-        "ts":1775426400
+        "ts":1775599200
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -513,13 +513,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/10/0a/dolphin-master-2603-250-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/89/8b/dolphin-master-2603-255-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1775471314
+            "ts":1775509126
         }],
-        "ts":1775471314
+        "ts":1775509126
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -1067,9 +1067,9 @@
     "pyinstxtractor-ng":{
         "p":"pyinstxtractor-ng.exe",
         "fs":[
-        "https://github.com/pyinstxtractor/pyinstxtractor-ng/releases/download/2025.01.05/pyinstxtractor-ng.exe"
+        "https://github.com/pyinstxtractor/pyinstxtractor-ng/releases/download/2026.04.07/pyinstxtractor-ng.exe"
         ],
-        "ts":0
+        "ts":1775548560
     },
     "ar":{
         "p":"binutils/ar.exe",
@@ -2052,15 +2052,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.4/GDRE_tools-v2.5.0-beta.4-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.5/GDRE_tools-v2.5.0-beta.5-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1774223374
+            "ts":1775531242
         }],
-        "ts":1774223374
+        "ts":1775531242
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2337,23 +2337,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46048/SDLVICE-3.10-win64-r46048.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46064/SDLVICE-3.10-win64-r46064.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46048/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46048/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46048/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46048/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46048/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46048/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46064/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46064/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46064/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46064/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46064/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46064/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1775264386
+            "ts":1775656983
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1775264386
+        "ts":1775656983
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2724,14 +2724,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_05_9b799442_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_07_9b799442_32.zip",
             "x":{
-                "RenderDoc_2026_04_05_9b799442_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_05_9b799442_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_07_9b799442_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_07_9b799442_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1775340000
+            "ts":1775512800
         }],
-        "ts":1775340000
+        "ts":1775512800
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5589,7 +5589,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.4-nightly.2026-04-05/WolvenKit.Console-8.17.4-nightly.2026-04-05.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-08/WolvenKit.Console-8.17.5-nightly.2026-04-08.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5642,16 +5642,17 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1775384336
+            "ts":1775644064
         }],
-        "ts":1775384336
+        "ts":1775644064
     },
     "noodle":{
         "p":"oo2core_win64.dll",
         "fs":[
         "https://raw.githubusercontent.com/Sainan/noodle/refs/heads/senpai/2.9.14/oo2core_win64.dll"
         ],
-        "ts":0
+        "ts":1770489508,
+        "$":"WARNING: 2.9.16 removes support for circular window LZB16 decode"
     },
     "hedgearcpack":{
         "p":"HedgeArcPack.exe",

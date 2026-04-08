@@ -540,10 +540,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             assert f.readu8() == 0x7D
             f.skip(0x7D)
 
-            bs = f.readu8()
-            if   bs & (0b100 << 5) == (0b000 << 5): bs =  bs & 0x7F
-            elif bs & (0b110 << 5) == (0b100 << 5): bs = (bs & 0x3F) << 8 | f.readu8()
-            elif bs & (0b111 << 5) == (0b110 << 5): bs = (bs & 0x1F) << 24 | (f.readu8() << 16) | (f.readu8() << 8) | f.readu8()
+            bs = f.readcompiu()
             bs -= 1
             assert bs > 0
 

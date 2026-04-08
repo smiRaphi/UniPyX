@@ -56,18 +56,20 @@ class File:
             end = '>'
         return struct.unpack(end + fmt,d)[0]
 
-    def readu8 (self)          -> int: return self.unpacki(1,0)
-    def readu16(self,end=None) -> int: return self.unpacki(2,0,end)
-    def readu24(self,end=None) -> int: return self.unpacki(3,0,end)
-    def readu32(self,end=None) -> int: return self.unpacki(4,0,end)
-    def readu40(self,end=None) -> int: return self.unpacki(5,0,end)
-    def readu64(self,end=None) -> int: return self.unpacki(8,0,end)
-    def reads8 (self)          -> int: return self.unpacki(1,1)
-    def reads16(self,end=None) -> int: return self.unpacki(2,1,end)
-    def reads24(self,end=None) -> int: return self.unpacki(3,1,end)
-    def reads32(self,end=None) -> int: return self.unpacki(4,1,end)
-    def reads40(self,end=None) -> int: return self.unpacki(5,1,end)
-    def reads64(self,end=None) -> int: return self.unpacki(8,1,end)
+    def readu8 (self)         : return self.unpacki(1,0)
+    def readu16(self,end=None): return self.unpacki(2,0,end)
+    def readu24(self,end=None): return self.unpacki(3,0,end)
+    def readu32(self,end=None): return self.unpacki(4,0,end)
+    def readu40(self,end=None): return self.unpacki(5,0,end)
+    def readu48(self,end=None): return self.unpacki(6,0,end)
+    def readu64(self,end=None): return self.unpacki(8,0,end)
+    def reads8 (self)         : return self.unpacki(1,1)
+    def reads16(self,end=None): return self.unpacki(2,1,end)
+    def reads24(self,end=None): return self.unpacki(3,1,end)
+    def reads32(self,end=None): return self.unpacki(4,1,end)
+    def reads40(self,end=None): return self.unpacki(5,1,end)
+    def reads48(self,end=None): return self.unpacki(6,1,end)
+    def reads64(self,end=None): return self.unpacki(8,1,end)
     def readf32(self,end=None):
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
@@ -79,6 +81,20 @@ class File:
             n |= (b & 0x7f) << (c * 7)
             if not b & 0x80: return n
             c += 1
+    def readcompiu(self,null=False):
+        b = self.readu8()
+        if b == 0xFF and null: return None
+        h = b >> 5
+        if   h & 0b100 == 0b000: b =  b & 0x7F
+        elif h & 0b110 == 0b100: b = (b & 0x3F) << 8 | self.readu8()
+        elif h & 0b111 == 0b110: b = (b & 0x1F) << 24 | self.readu24('>')
+        else: raise ValueError(f"Invalid compressed integer size (0b{h:03b} {b & 0x1F:05b})")
+        return b
+    def readcompis(self,null=False):
+        v = self.readcompiu(null)
+        if v is None: return v
+        if v & 1: return -(v >> 1) - 1
+        return v >> 1
 
     def read0s(self):
         r = b''
