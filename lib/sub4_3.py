@@ -735,14 +735,14 @@ def extract4_3(inp:str,out:str,t:str):
             fs = [(f.readu16(),f.readu24(),f.readu8(),f.readu24(),f.readu8()) for _ in range(c)]
             f.seek(bo)
 
-            p = ThreadPool()
             def dec(d,fn,fe):
                 d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]]
                 xopen(fn,'wb').write(d)
             def decc(d,ix1,ext,fsd,fe):
                 d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]-fsd[0]]
                 for ix in range(len(fsd)-1): xopen(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}','wb').write(d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
-            pcs = []
+            p = ThreadPool()
+            prcs = []
 
             for fe in fs:
                 fn = f'{fe[0]:03d}'
@@ -756,14 +756,14 @@ def extract4_3(inp:str,out:str,t:str):
                     cd = f.readu16()
                     fsd = [f.readu32() for _ in range(cd+1)]
                     f.skip(fsd[0] - (6 + cd*4))
-                    pcs.append(p.apply_async(decc,(f.readc(fe[3]-fsd[0]),fn,ext,fsd,fe)))
-                else: pcs.append(p.apply_async(dec,(f.readc(fe[3]),f'{o}/{fn}.{ext}',fe)))
+                    prcs.append(p.apply_async(decc,(f.readc(fe[3]-fsd[0]),fn,ext,fsd,fe)))
+                else: prcs.append(p.apply_async(dec,(f.readc(fe[3]),f'{o}/{fn}.{ext}',fe)))
                 f.align(4)
 
             f.close()
-            for p in pcs: p.get()
-            p.join()
+            for prc in prcs: prc.get()
             p.close()
+            p.join()
             if fs: return
         case 'Gwtar':
             if db.print_try: print('Trying with custom extractor')

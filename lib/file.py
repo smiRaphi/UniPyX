@@ -1,18 +1,19 @@
 import struct,io,sys
 
+ENDMAP = {'<':'little','>':'big'}
+
 def align(n:int,blocksize:int): return -n % blocksize
 def swap32(i:bytes):
     c = len(i) // 4
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
 
 class File:
-    def __init__(self,f,mode='r',endian='>',middle_u24_little=True):
+    def __init__(self,f,mode='r',endian='>'):
         if 'w' in mode and endian == '-': raise NotImplementedError('Middle endian not implemented for writing')
         if type(f) == str: f = open(f,mode.rstrip('b') + 'b')
         elif type(f) == bytes: f = io.BytesIO(f)
         self._f = f
         self._end = endian
-        self._mend_u24_le = middle_u24_little
 
         self._start_pos = self._f.tell()
         self._size = self.seek(0,2)
@@ -31,6 +32,7 @@ class File:
         d = self.read(n)
         if n is not None: assert len(d) == n,"Unexpected EOF"
         return d
+    def padc(self,n:int): assert not sum(self.readc(n)),"Unexpected Value in padding"
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -39,31 +41,33 @@ class File:
             o.append(d[i*2])
         if len(d) % 2: o.append(d[-1])
         return bytes(o)
+    def unpacki(self,n:int,signed=False,end=None):
+        d = self.readc(n)
+        end = end or self._end
+        if end == '-':
+            d = self.middle_scramble(d)
+            end = '>'
+        return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
     def unpack(self,fmt:str,end=None):
-        d = self.read(struct.calcsize(fmt))
+        d = self.readc(struct.calcsize(fmt))
         end = end or self._end
         if end == '-':
             d = self.middle_scramble(d)
             end = '>'
         return struct.unpack(end + fmt,d)[0]
 
-    def readu8 (self) -> int: return self.unpack('B')
-    def readu16(self,end=None) -> int: return self.unpack('H',end)
-    def readu24(self,end=None) -> int:
-        end = end or self._end
-        d = self.read(3)
-        if end == '-':
-            if not self._mend_u24_le: d = self.middle_scramble(d)
-            end = '>'
-        if end == '<': d = d + b'\0'
-        else: d = b'\0' + d
-        return struct.unpack(end+'I',d)[0]
-    def readu32(self,end=None) -> int: return self.unpack('I',end)
-    def readu64(self,end=None) -> int: return self.unpack('Q',end)
-    def reads8 (self) -> int: return self.unpack('b')
-    def reads16(self,end=None) -> int: return self.unpack('h',end)
-    def reads32(self,end=None) -> int: return self.unpack('i',end)
-    def reads64(self,end=None) -> int: return self.unpack('q',end)
+    def readu8 (self)          -> int: return self.unpacki(1,0)
+    def readu16(self,end=None) -> int: return self.unpacki(2,0,end)
+    def readu24(self,end=None) -> int: return self.unpacki(3,0,end)
+    def readu32(self,end=None) -> int: return self.unpacki(4,0,end)
+    def readu40(self,end=None) -> int: return self.unpacki(5,0,end)
+    def readu64(self,end=None) -> int: return self.unpacki(8,0,end)
+    def reads8 (self)          -> int: return self.unpacki(1,1)
+    def reads16(self,end=None) -> int: return self.unpacki(2,1,end)
+    def reads24(self,end=None) -> int: return self.unpacki(3,1,end)
+    def reads32(self,end=None) -> int: return self.unpacki(4,1,end)
+    def reads40(self,end=None) -> int: return self.unpacki(5,1,end)
+    def reads64(self,end=None) -> int: return self.unpacki(8,1,end)
     def readf32(self,end=None):
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
@@ -296,12 +300,15 @@ def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
             import zlib
             return getattr(zlib,algo)(i,*args,**kwargs) & 0xFFFFFFFF
         case 'crc16': fnc = crc16
-        case 'tarzan': fnc = tarzan_hash
+
         case 'sha1'|'sha256'|'md5':
             import hashlib
             r = getattr(hashlib,algo)(i).digest()
             if kwargs.get('bytes') or args in {(True,),(1,)}: return r
             return int.from_bytes(r,'big')
+
+        case 'tarzan': fnc = tarzan_hash
+        case 'hash40': return (len(i) << 32) | crc_hash(i,'crc32')
         case _: raise NotImplementedError(algo)
     return fnc(i,*args,**kwargs)
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:

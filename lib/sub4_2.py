@@ -1506,7 +1506,6 @@ def extract4_2(inp:str,out:str,t:str):
                 c += 1
             if c: return
         case 'Super Smash Bros Ultimate ARC':
-            raise NotImplementedError
             REGS = {
                 0x087b3c2f:"jp",
                 0x9372c64c:"jp_ja",
@@ -1529,13 +1528,15 @@ def extract4_2(inp:str,out:str,t:str):
                 0x4cf4768f:"zh_tw",
             }
 
-            from zlib import crc32
-            FSHM = {crc32(x.rstrip(b'\n')) & 0xFFFFFFFF:x.rstrip(b'\n').decode('utf-8') for x in open(db.get('ssbu_hashes_all'),'rb').readlines()}
-
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,crc_hash,decompress
+            from multiprocessing.pool import ThreadPool
+
+            FSHM = {crc_hash(x.strip(b'\n\r'),'hash40'):x.strip(b'\n\r').decode('utf-8') for x in open(db.get('ssbu_hashes_all'),'rb').readlines()}
+
             f = File(i,endian='<')
             assert f.readu64() == 0xABCDEF9876543210
+
             stream_seco = f.readu64()
             file_seco = f.readu64()
             shared_seco = f.readu64()
@@ -1545,13 +1546,13 @@ def extract4_2(inp:str,out:str,t:str):
             dao = f.readu32()
             if dao > 0x10:
                 f.back(4)
-                tb = f.read(dao)
+                tb = f.readc(dao)
                 v = 3
             else:
                 decs = f.readu32()
                 coms = f.readu32()
                 secs = f.readu32()
-                if dao < 0x10: tb = f.read(coms)
+                if dao < 0x10: tb = f.readc(coms)
                 else: tb = f.decompress(coms,'zstd')[:decs]
                 f.seek(file_syso+secs)
                 v = 5
@@ -1565,10 +1566,10 @@ def extract4_2(inp:str,out:str,t:str):
                 cs.append(tc[0])
                 assert not tc[1] and tb.readu32() == tb.readu32() == 0x10
             rc = (tb.readu8(),tb.readu8())
-            assert not tb.readu16()
+            tb.padc(2)
 
             fs = []
-            rgm = []
+            sfs = []
             if v == 1:
                 # cs: DirC, FiC1, FiNmC, SuFiC1, LasTabC, HsDirC, FiInfC, FiC2, SuFiC2
                 # c1: mov, p1, p2, mus
@@ -1578,72 +1579,102 @@ def extract4_2(inp:str,out:str,t:str):
                         8  * c1[1])
 
                 # path, idx, flgs
-                Sn2h = set((tb.readu32(),tb.readu32(),tb.readu32()) for _ in range(c1[1]))
-                tb.skip(4 * c1[2] + 0x10 * c1[3])
+                Sn2h = tuple([(tb.readu40(),tb.readu24(),tb.readu32()) for _ in range(c1[1])])
+                Si2f = tuple([tb.readu32() for _ in range(c1[2])])
+                So = tuple([(tb.readu64(),tb.readu64()) for _ in range(c1[3])])
 
+                rgm = []
                 for ix in range(rc[0]):
                     rgm.append(REGS.get(tb.readu32(),f'unk_{ix}'))
                     tb.skip(8)
 
                 dil = []
                 for _ in range(cs[0]):
-                    tb.skip(4)
-                    dil.append(tb.readu32() >> 8)
-                    tb.skip(4*11)
+                    tb.skip(5)
+                    dil.append(tb.readu24())
+                    tb.skip(8*3 + 4*5)
                 dil = tuple(dil)
 
                 dofs = []
                 for _ in range(cs[1]+cs[7]):
-                    dofs.append(tb.reads64())
+                    dofs.append(tb.readu64())
                     tb.skip(4*5)
                 dofs = tuple(dofs)
                 tb.skip(8 * cs[5])
 
                 finf = []
                 for _ in range(cs[6]):
-                    # path, didx, ftf, sfidx
-                    fe = [tb.readu32(),tb.readu32() >> 8]
-                    tb.skip(4)
-                    fe.append(tb.readu32() >> 8)
+                    # path, didx, ftf, sfidx, flags
+                    fe = [tb.readu40(),tb.readu24()]
+                    tb.skip(5)
+                    fe.append(tb.readu24())
                     tb.skip(0x10)
                     fe.append(tb.readu32())
-                    if tb.readu32() & 0x00300000 == 0x00300000: continue
+                    fe.append(tb.readu32())
+                    fe.append(file_syso+tb.pos)
                     finf.append(tuple(fe))
-                finf = set(finf)
 
-                # off, zsize, usize, flags
-                sfinf = tuple([(tb.readu32() << 2,tb.readu32(),tb.readu32(),tb.readu32() >> 24) for _ in range(cs[3] + cs[8])])
+                # off, zsize, usize, redirect idx, flags
+                sfinf = tuple([(tb.readu32() << 2,tb.readu32(),tb.readu32(),tb.readu24(),tb.readu8()) for _ in range(cs[3] + cs[8])])
 
                 for fe in finf:
+                    sf = sfinf[fe[3]]
+                    while (fe[4] & 0x00300000) == 0x00300000:
+                        fe = finf[sf[3]]
+                        sf = sfinf[fe[3]]
+                    # unk/invalid & empty/stream
+                    if sf[4] & 8 or sf[4] & 0x40: continue
+
                     didx = dil[fe[1]]
-                    n = FSHM.get(fe[0],'$unk/' + fe[0].to_bytes(4,'big').hex().upper() + '.bin').replace(':/','/').replace(':','_')
+                    n = FSHM.get(fe[0],f'$unk/{fe[0]:10X}.bin').replace(':/','/').replace(':','_')
                     if fe[2]:
                         for rix in range(rc[1]):
                             sf = sfinf[fe[2] + rix]
-                            do = dofs[didx + 1 + rix]
-                            fs.append(('$' + rgm[rix] + '/' + n,file_seco + do + sf[0],sf[1],sf[2],sf[3]))
-                    else:
-                        sf = sfinf[fe[2]]
-                        do = dofs[didx]
-                        fs.append((n,file_seco + do + sf[0],sf[1],sf[2],sf[3]))
+                            fs.append((f'${rgm[rix]}/{n}',file_seco + dofs[didx + 1 + rix] + sf[0],sf[1],sf[2],sf[4]))
+                    else: fs.append((n,file_seco + dofs[didx] + sf[0],sf[1],sf[2],sf[4]))
+                    assert (fs[-1][1]+fs[-1][2]) <= file_syso,fe[-1]
 
-            else: v = tb.readu32()
+                for fe in Sn2h:
+                    n = FSHM.get(fe[0],f'$unk_strm/{fe[0]:10X}.bin').replace(':/','/').replace(':','_')
+                    if fe[2] in {1,2}:
+                        for rix in range(5 if fe[2] == 2 else rc[1]):
+                            sfs.append((f'${rgm[rix]}/{n}',*So[Si2f[fe[1] + rix]]))
+                    else: sfs.append((n,*So[Si2f[fe[1]]]))
+
+            else:
+                tb.seek(0)
+                xopen(o + f'/$TABLE{v}.bin','wb').write(tb.read())
+                raise NotImplementedError(v)
+                v = tb.readu32()
+            tb.close()
+
+            def writed(d,fe):
+                if fe[4] & 1:
+                    if fe[4] & 2:
+                        try:
+                            d = decompress(d,'zstd')
+                            assert len(d) == fe[3]
+                        except:
+                            open(o + '/$ERROR.bin','wb').write(d)
+                            print(f'{fe[0]}: {fe[2]} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
+                            raise
+                    else: raise NotImplementedError(bin(fe[4])[2:].zfill(8) + '\n' + d[:0x10].hex(' ').upper())
+                xopen(o + '/' + fe[0],'wb').write(d)
+            p = ThreadPool()
+            prcs = []
 
             for fe in fs:
                 f.seek(fe[1])
-                print(f'{fe[0]}: {fe[2]} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
-                print(f.read(0x10).hex(' ').upper());f.back(0x10)
-                if input(': '): open(o + '/test.bin','wb').write(d)
-                if fe[4] & 1:
-                    if fe[4] & 2: d = f.decompress(fe[2],'zstd')
-                    else: raise NotImplementedError(bin(fe[4])[2:].zfill(32) + '\n' + d[:8].hex(' ').upper())
-                else: d = f.read(fe[2])
-                xopen(o + '/' + fe[0],'wb').write(d[:fe[3]])
-            if fs: return
+                prcs.append(p.apply_async(writed,(f.readc(fe[2]),fe)))
+            for fe in sfs:
+                f.seek(fe[2])
+                xopen(o + '/' + fe[0],'wb').write(f.readc(fe[1]))
 
-            if dao == 0x10: run(['smash_arc_cli',db.get('ssbu_hashes_all'),i,o])
-            else: raise NotImplementedError
-            if listdir(o): return
+            f.close()
+            for prc in prcs: prc.get()
+            p.close()
+            p.join()
+            if fs: return
         case 'Feral Header Library':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,crc_hash

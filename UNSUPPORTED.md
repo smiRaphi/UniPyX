@@ -6,7 +6,7 @@ Web Archive ARC | .arc | ? | http://fileformats.archiveteam.org/wiki/ARC_(Intern
 Astrotite | ? | ? | http://fileformats.archiveteam.org/wiki/Astrotite | http://download.cnet.com/Astrotite-200X-and-AstroA2P/3000-2250_4-75064900.html |
 B6Z | .b6z | ? | http://fileformats.archiveteam.org/wiki/B6Z | https://web.archive.org/web/20250906002136/http://b6zip.com/ |
 SSB DT | ? | SSB Wii U/3DS | ? | https://github.com/Sammi-Husky/Sm4sh-Tools |
-SSBU Data | ? | SSBU | ? | https://github.com/jam1garner/smash-arc/blob/master/src/lookups.rs#L385<br>https://github.com/jam1garner/smash-arc/blob/master/src/arc_file.rs#L31<br>https://github.com/ultimate-research/UltimateModManager/blob/master/source/arcReader.h#L172<br>https://github.com/ultimate-research/UltimateModManager/blob/master/include/arcStructs.h#L218<br>https://github.com/Ploaj/ArcCross/blob/master/ArcCross/ARC.cs | needs custom, detected
+SSBU Arc v > 1.0.0 | .arc | SSBU | ? | https://github.com/jam1garner/smash-arc/blob/master/src/lookups.rs#L385<br>https://github.com/jam1garner/smash-arc/blob/master/src/arc_file.rs#L31<br>https://github.com/ultimate-research/UltimateModManager/blob/master/source/arcReader.h#L172<br>https://github.com/ultimate-research/UltimateModManager/blob/master/include/arcStructs.h#L218<br>https://github.com/Ploaj/ArcCross/blob/master/ArcCross/ARC.cs | needs custom
 Playdate Container | ? | ? | ? | https://github.com/rarenight/pdx-decrypt/blob/main/pdx-decrypt.py | detected
 Denuvo | .exe | https://store.steampowered.com/curator/26095454-Denuvo-Watch/ | ? | hypervisor? | detected
 Crinkler | .exe | https://github.com/InkboxSoftware/smallEXE | https://github.com/runestubbe/Crinkler | https://github.com/runestubbe/Crinkler/blob/master/source/Crinkler/Crinkler.cpp#L485 | detected
