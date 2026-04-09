@@ -123,9 +123,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1775599200
+            "ts":1775685600
         }],
-        "ts":1775599200
+        "ts":1775685600
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -2337,23 +2337,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46064/SDLVICE-3.10-win64-r46064.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46074/SDLVICE-3.10-win64-r46074.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46064/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46064/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46064/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46064/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46064/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46064/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46074/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46074/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46074/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46074/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46074/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46074/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1775656983
+            "ts":1775684949
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1775656983
+        "ts":1775684949
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2724,14 +2724,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_07_9b799442_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_08_29c60755_32.zip",
             "x":{
-                "RenderDoc_2026_04_07_9b799442_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_07_9b799442_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_08_29c60755_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_08_29c60755_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1775512800
+            "ts":1775599200
         }],
-        "ts":1775512800
+        "ts":1775599200
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5693,7 +5693,7 @@
     "git":{
         "p":"git/git.exe",
         "fs":[{
-            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0-rc0.windows.1/MinGit-2.54.0-rc0-64-bit.zip",
+            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0-rc1.windows.1/MinGit-2.54.0-rc1-64-bit.zip",
             "x":{
                 "mingw64/bin/git.exe":"git/git.exe",
                 "mingw64/bin/libiconv-2.dll":"git/libiconv-2.dll",
@@ -5701,9 +5701,10 @@
                 "mingw64/bin/libpcre2-8-0.dll":"git/libpcre2-8-0.dll",
                 "mingw64/bin/libwinpthread-1.dll":"git/libwinpthread-1.dll",
                 "mingw64/bin/zlib1.dll":"git/zlib1.dll"
-            }
+            },
+            "ts":1775711734
         }],
-        "ts":0
+        "ts":1775711734
     },
     "bsab":{
         "p":"bsab.exe",
@@ -5733,6 +5734,19 @@
             "ts":1772892778
         }],
         "ts":1772892778
+    },
+    "flatbuffers":{
+        "pip":"flatbuffers"
+    },
+    "flatc":{
+        "p":"flatc.exe",
+        "fs":[{
+            "u":"https://github.com/google/flatbuffers/releases/download/v25.12.19-2026-02-06-03fffb2/Windows.flatc.binary.zip",
+            "x":{
+                "flatc.exe":"flatc.exe"
+            }
+        }],
+        "ts":0
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -6852,6 +6866,97 @@
             "splat64/wonder/hardware_syms.txt"
         ]],
         "ts":0
+    },
+    "trpfs.fbs":{
+        "p":"PokeDocs/trpfs.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Flatbuffers/filesystem/trpfs.fbs",
+            "PokeDocs/trpfs.fbs"
+        ],{
+            "u":null,
+            "cmd":[
+                "flatc",
+                "--python",
+                "--gen-onefile",
+                "--filename-suffix",
+                "",
+                "-o",
+                "PokeDocs",
+                "PokeDocs\\trpfs.fbs"
+            ],
+            "del":[
+                "PokeDocs\\trpfs.fbs"
+            ]
+        }],
+        "ts":0
+    },
+    "trpfd.fbs":{
+        "p":"PokeDocs/trpfd.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Flatbuffers/filesystem/trpfd.fbs",
+            "PokeDocs/trpfd.fbs"
+        ],{
+            "u":null,
+            "cmd":[
+                "flatc",
+                "--python",
+                "--gen-onefile",
+                "--filename-suffix",
+                "",
+                "-o",
+                "PokeDocs",
+                "PokeDocs\\trpfd.fbs"
+            ],
+            "del":[
+                "PokeDocs\\trpfd.fbs"
+            ]
+        }],
+        "ts":0
+    },
+    "trpak.fbs":{
+        "p":"PokeDocs/trpak.py",
+        "fs":[[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Flatbuffers/filesystem/trpak.fbs",
+            "PokeDocs/trpak.fbs"
+        ],{
+            "u":null,
+            "cmd":[
+                "flatc",
+                "--python",
+                "--gen-onefile",
+                "--filename-suffix",
+                "",
+                "-o",
+                "PokeDocs",
+                "PokeDocs\\trpak.fbs"
+            ],
+            "del":[
+                "PokeDocs\\trpak.fbs"
+            ]
+        }],
+        "ts":0
+    },
+    "trpfd_hashes":{
+        "p":"PokeDocs/hsh_fd",
+        "fs":[[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/ZA/Hashlists/FileSystem/hashes_inside_fd.txt",
+            "PokeDocs/hsh_fd/za.txt"
+        ],[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Hashlists/FileSystem/hashes_inside_fd.txt",
+            "PokeDocs/hsh_fd/sv.txt"
+        ]],
+        "ts":1765921945
+    },
+    "trpak_hashes":{
+        "p":"PokeDocs/hsh_pak",
+        "fs":[[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/ZA/Hashlists/FileSystem/hashes_inside_trpak.txt",
+            "PokeDocs/hsh_pak/za.txt"
+        ],[
+            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Hashlists/FileSystem/hashes_inside_trpak.txt",
+            "PokeDocs/hsh_pak/sv.txt"
+        ]],
+        "ts":1765921945
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",

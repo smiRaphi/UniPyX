@@ -1267,6 +1267,69 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Trinity OnePack':
+            if db.print_try: print('Trying with custom extractor')
+            assert exists(noext(i) + '.trpfs')
+            db.get('trpfs.fbs')
+            from lib.file import File,crc_hash
+            FMAP = {}
+            def gfmap(h):
+                if h in FMAP: return FMAP[h]
+                if not None in FMAP:
+                    FMAP[None] = {}
+                    for hf in rldir(db.get('trpfd_hashes')): FMAP[None] |= {int(x[0][2:],16):x[1].decode('utf-8') for x in [l.split(b' ',1) for l in readfile(hf).splitlines() if l[:2] == b"0x"]}
+                return FMAP[None][h]
+
+            fd = File(noext(i) + '.trpfs',endian='<')
+            assert fd.read(8) == b'ONEPACK\0'
+
+            bo = fd.readu64()
+            fd.seek(bo)
+            fbuf = fd.read()
+
+            if exists(noext(i) + '.trpfd'):
+                db.get('trpfd.fbs')
+                from bin.PokeDocs.trpfd import TRPFD # type: ignore
+                tfd = TRPFD.GetRootAs(readfile(noext(i) + '.trpfd'))
+                FMAP |= {crc_hash(x,'fnv1a_64'):x.decode('utf-8') for x in [tfd.PackStrings(ix) for ix in range(tfd.PackStringsLength())]}
+                del tfd
+
+            from bin.PokeDocs.trpfs import TRPFS # type: ignore
+            tfs = TRPFS.GetRootAs(fbuf)
+            assert tfs.FileOffsetsLength() == tfs.FileHashesLength()
+            fs = [(tfs.FileOffsets(ix),tfs.FileHashes(ix)) for ix in range(tfs.FileOffsetsLength())]
+            del tfs
+            fs.append((bo,0))
+
+            for ix,fe in enumerate(fs[:-1]):
+                fd.seek(fe[0])
+                xopen(o + '/' + gfmap(fe[1]),'wb').write(fd.readc(fs[ix + 1][0] - fe[0]))
+
+            fd.close()
+            if fs: return
+        case 'Trinity PAK':
+            if db.print_try: print('Trying with custom extractor')
+            db.get('trpak.fbs')
+            from lib.file import decompress
+
+            FMAP = {}
+            for hf in rldir(db.get('trpak_hashes')): FMAP |= {int(x[0][2:],16):x[1].decode('utf-8') for x in [l.split(b' ',1) for l in readfile(hf).splitlines() if l[:2] == b"0x"] if x[1]}
+
+            from bin.PokeDocs.trpak import TRPAK # type: ignore
+            tpk = TRPAK.GetRootAs(readfile(i))
+            assert tpk.FileEntryLength() == tpk.FileHashesLength()
+
+            for ix in range(tpk.FileEntryLength()):
+                fl = tpk.FileEntry(ix)
+                h = tpk.FileHashes(ix)
+                fn = FMAP.get(h,f'$unk/{h:16X}.bin')
+                if not fn:
+                    print(fn,hex(h),fl.ByteBufferLength(),fl.ByteBufferIsNone(),fl.CompressType(),fl.Unk2(),fl.FileSize())
+                d = bytes(fl.ByteBuffer(dix) for dix in range(fl.ByteBufferLength()))
+                xopen(o + '/' + fn,'wb').write(decompress(d,(0,'zlib','lz4','oodle','none')[fl.CompressType()],usize=fl.FileSize(),db=db))
+
+            del tpk
+            if listdir(o): return
 
     return 1
 

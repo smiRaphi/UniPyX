@@ -6,6 +6,8 @@ def align(n:int,blocksize:int): return -n % blocksize
 def swap32(i:bytes):
     c = len(i) // 4
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
+def mask(n:int): return (1 << n) - 1
+def maskb(n:int): return mask(n * 8)
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
@@ -276,7 +278,7 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
             import crunch64
             fnc = getattr(crunch64,algo).decompress
         case 'ash0': fnc = ash0_decompress
-        case 'oodle_kraken'|'oodle_leviathan':
+        case 'oodle'|'oodle_kraken'|'oodle_leviathan':
             global OODLE
             assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
             import ctypes
@@ -316,6 +318,14 @@ def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
             import zlib
             return getattr(zlib,algo)(i,*args,**kwargs) & 0xFFFFFFFF
         case 'crc16': fnc = crc16
+        case 'crc16_ccitt'|'crc16_ansi'|'crc16_ibm'|'crc16_dnp':
+            kwargs['poly'] = {
+                'ccitt':0x1021,
+                'ibm':0x8005,'ansi':0x8005,
+                'dnp':0x3D65,
+            }[algo[6:]]
+            fnc = crc16
+        case 'fnv1a_64': fnc = fnv1a_64
 
         case 'sha1'|'sha256'|'md5':
             import hashlib
@@ -379,7 +389,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 assert len(iv) <= 16
                 bc = int.from_bytes(iv[8:16],'little') # using int.from_bytes instead of struct to support len(iv) != 16
             if bc is not None:
-                pctx[8],pctx[9] = bc & 0xFFFFFFFF,(bc >> 32) & 0xFFFFFFFF # stream_state->input[8/9] = block count
+                pctx[8],pctx[9] = bc & maskb(4),(bc >> 32) & maskb(4) # stream_state->input[8/9] = block count
 
             o = ctx.decrypt(i)
             if kwargs.get('return_block_count'): return o,pctx[8] | (pctx[9] << 32)
@@ -429,12 +439,12 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             idx1 = 0
             l2 = crc_hash(ln.to_bytes(8,'little'),'crc32').to_bytes(4,'little')*4
             idx2 = 8
-            xr = (ln >> 2) & 0x7F
+            xr = (ln >> 2) & mask(7)
 
             for ix in range(ln):
                 v = d[ix]
                 v ^= xr ^ l2[idx2];idx2 += 1
-                if swp: v = ((v & 0x0F) << 4) | (v >> 4)
+                if swp: v = ((v & mask(4)) << 4) | (v >> 4)
                 v ^= l1[idx1];idx1 += 1
                 d[ix] = v
 
@@ -446,7 +456,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                     idx1 = 0
                     swp = not swp
                 else:
-                    xr = (xr + 2) & 0x7F
+                    xr = (xr + 2) & mask(7)
                     if swp:
                         swp = 0
                         idx1 = xr % 7
@@ -519,16 +529,16 @@ def lzss_decompress(i:bytes,usize:int=None):
             b = d.get_bits(8)
             ob.append(b)
             win[winp] = b
-            winp = (winp + 1) & 0x1FFF
+            winp = (winp + 1) & mask(13)
         else:
             of = d.get_bits(13)
             if of == 0: break
             l = d.get_bits(4) + 2
             for x in range(l + 1):
-                b = win[(of + x) & 0x1FFF]
+                b = win[(of + x) & mask(13)]
                 ob.append(b)
                 win[winp] = b
-                winp = (winp + 1) & 0x1FFF
+                winp = (winp + 1) & mask(13)
     return bytes(ob)[:usize]
 def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
     max_dict = max_dict or reset
@@ -579,7 +589,7 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
     return b"".join(d)
 def ash0_decompress(i:bytes):
     if len(i) < 12 or i[:4] != b'ASH0': return b''
-    decomp_size = int.from_bytes(i[4:8],'big') & 0xFFFFFF
+    decomp_size = int.from_bytes(i[5:8],'big')
     sym_offset = int.from_bytes(i[8:12],'big')
     if sym_offset >= len(i): return b''
 
@@ -650,15 +660,18 @@ def decode_n64_mpak(i:bytes):
         o.append(N64CHM[b])
     return ''.join(o)
 
-def crc16(i:bytes,poly:int,init=0) -> int:
+def crc16(i:bytes,poly=0x8005,init=0) -> int:
     crc = init
     for b in i:
         crc ^= b << 8
         for _ in range(8):
             if crc & 0x8000: crc = (crc << 1) ^ poly
             else: crc <<= 1
-            crc &= 0xFFFF
+            crc &= maskb(2)
     return crc
+def fnv1a_64(i:bytes,prime=1099511628211,offset=14695981039346656837):
+    for b in i: offset = ((offset ^ b) * prime) & maskb(8)
+    return offset
 def tarzan_hash(i:bytes):
     o = 0
     shft = 0
@@ -669,4 +682,4 @@ def tarzan_hash(i:bytes):
         shft += 8
         if shft > 24: shft = 0
         lng += 1
-    return (o + lng) & 0xFFFFFFFF
+    return (o + lng) & maskb(4)

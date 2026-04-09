@@ -161,7 +161,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     bcd.append('--base' + st + '=' + bf)
 
                 if run(bcd + [i])[0] == 0xc0000005: raise ValueError('Access violation (0xc0000005/3221225477)')
-                if listdir(o) and listdir(o + '/ExeFS') and listdir(o + '/RomFS'): return
+                if listdir(o) and exists(o + '/ExeFS') and exists(o + '/RomFS') and listdir(o + '/ExeFS') and listdir(o + '/RomFS'): return
                 rmdir(o)
                 mkdir(o)
         case 'NDS':
@@ -205,8 +205,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if exists(o + '/PS3_GAME/USRDIR/EBOOT.BIN') and open(o + '/PS3_GAME/USRDIR/EBOOT.BIN','rb').read(4) != b'SCE\0': return 1
                 return
         case 'PSVita PKG':
-            if exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
-            elif exists(noext(i) + '.work.bin'): work = noext(i) + '.work.bin'
+            if exists(noext(i) + '.work.bin'): work = noext(i) + '.work.bin'
+            elif exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
             else:
                 f = open(i,'rb')
                 f.seek(0x10)
@@ -227,10 +227,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             run(['pkg2zip','-x',i] + ([zrif] if work else []),cwd=o)
             if exists(o + '/app') and listdir(o + '/app') and listdir(o + '/app/' + listdir(o + '/app')[0]):
-                td = o + '/app/' + listdir(o + '/app')[0]
+                td = o + '\\tmp' + os.urandom(8).hex()
+                mv(o + '/app',td)
+                td += '\\' + listdir(td)[0]
 
                 run(['psvpfsparser','-i',td,'-o',o,'-z',zrif])
-                rmtree(o + '/app')
+                rmtree(dirname(td))
 
                 if listdir(o): return
             if not work and listdir(o):
@@ -1096,7 +1098,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.back(0x20)
                 rd = bytearray(f.read(0x20))
                 rd[9:11] = b'\0\0'
-                if crc_hash(rd,poly=0x5935) != ldrgcrc: ppd = 0
+                if crc_hash(rd,'crc16',poly=0x5935) != ldrgcrc: ppd = 0
 
                 pp = sp
                 ps = 0

@@ -1,7 +1,6 @@
 ## Formats
 Name | Extension(s) | Sample(s) | URLs | Extractor(s) | Comment
 ---- | ------------ | --------- | ---- | ------------ | -------
-Trinity OnePack | .trpfs+.trpfd | Modern Pokemon games | BAD:<br>https://github.com/pkZukan/PokeDocs/tree/main/SV | BAD:<br>https://github.com/pkZukan/gftool<br>https://github.com/psthrn42/SCVI_Extract | needs custom, detected
 Web Archive ARC | .arc | ? | http://fileformats.archiveteam.org/wiki/ARC_(Internet_Archive)<br>https://archive.org/web/researcher/ArcFileFormat.php | https://github.com/ikreymer/webarchiveplayer |
 Astrotite | ? | ? | http://fileformats.archiveteam.org/wiki/Astrotite | http://download.cnet.com/Astrotite-200X-and-AstroA2P/3000-2250_4-75064900.html |
 B6Z | .b6z | ? | http://fileformats.archiveteam.org/wiki/B6Z | https://web.archive.org/web/20250906002136/http://b6zip.com/ |
@@ -33,6 +32,7 @@ Super Smash Bros. N64 ROM | .z64 | SSB | ? | [splat64](https://pypi.org/project/
 PlayStation Encrypted File | .pfenc | PlayStation PC ports -> uds/\<store\>/uds00.ucp/* | ? | ? | detected, encrypted, no block size
 PlayStation 5 SELF | * | https://www.playstation.com/en-us/support/hardware/ps5/system-software/ | ? | https://github.com/zecoxao/PS5FTP/blob/master/source/ftps4.c | detected
 PlayStation 4 SELF | * | https://www.playstation.com/en-us/support/hardware/ps4/system-software/ | ? | https://github.com/zecoxao/PS5FTP/blob/master/source/ftps4.c | detected
+Pokemon GFLXPack | .gfpak | Pokemon Sword/Shield | ? | ? |
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

@@ -121,7 +121,7 @@ class DLDB:
                     if type(e) == str: e = {'u':e,'p':e.split('?')[0].split('/')[-1]}
                     elif type(e) == list: e = {'u':e[0],'p':e[1]}
                     if 'p' in e: p = 'bin/' + e['p']
-                    else:
+                    elif e['u'] is not None:
                         if e.get('ex'): ex = e['ex']
                         else:
                             ex = e['u'].split('?')[0].split('/')[-1].lower()
@@ -132,7 +132,7 @@ class DLDB:
 
                     if e['u'] == '.': p,ex = 'bin/bin.7z','.7z'
                     elif 'github' in e: self.gh_dir(e['u'],'bin/' + e['github'])
-                    else: self.dl(e['u'],p,verify=e.get('v',True))
+                    elif e['u'] is not None: self.dl(e['u'],p,verify=e.get('v',True))
                     if 'x' in e:
                         bk = self.print_try
                         self.print_try = False
@@ -141,6 +141,7 @@ class DLDB:
 
                         self.print_try = bk
                         if e['u'] != '.': os.remove(p)
+                    if 'cmd' in e: self.run(e['cmd'],print_try=False,cwd='bin')
                     if 'del' in e:
                         for d in e['del']:
                             if os.path.exists('bin/' + d):

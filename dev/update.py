@@ -102,6 +102,9 @@ def supdate(c:Cache,k:str,inf:dict):
         elif type(f) == dict:
             u = f['u']
             if 'ts' in f: ots = f['ts'] or tts
+        if u is None:
+            nfs.append(f)
+            continue
         if u == '.': dom = None
         else: dom = u.split('://')[1].split('/')[0]
 

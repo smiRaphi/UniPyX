@@ -514,10 +514,16 @@
         "rs":"Super Smash Bros Ultimate ARC","s":1
     },
     {
-        "d":[["isat","ONEPACK\\0",0],["n0",8,8],["py","return exists(splitext(i)[0]+'.trpfd')"]],
+        "d":[["isat","ONEPACK\\0",0],["n0",8,8]],
         "rs":"Trinity OnePack","s":1},{
-        "d":[["ext",".trpfd"],["n0",8,0],["py","p=splitext(i)[0]+'.trpfs';return exists(p)and open(p,'rb').read(8)==b'ONEPACK\\0'"]],
+        "d":[["ext",".trpfd"],["n0",8,0],["py","p=splitext(inp)[0]+'.trpfs';return exists(p)and open(p,'rb').read(8)==b'ONEPACK\\0'"]],
         "rs":"Trinity OnePack","s":1
+    },
+    {
+        "d":[["isat","\\x10\\0\\0\\0\\0\\0\\0\\0\\x08\\0\\x0C\\0\\x04\\0\\x08\\0\\x08\\0\\0\\0",0],["isat","\\x04\\0\\0\\0",24],["n0",4,20],["n0",4,28],["n0",4,32]],
+        "rs":"Trinity PAK"},{
+        "d":[["isat","\\x10\\0\\0\\0\\x08\\0\\x0C\\0\\x04\\0\\x08\\0\\x08\\0\\0\\0",0],["isat","\\x04\\0\\0\\0",20],["n0",4,16],["n0",4,24],["n0",4,28]],
+        "rs":"Trinity PAK"
     },
     {
         "d":[["isat","BILH",0],["isat","\\0\\0\\0\\0",8],["isatS","\\xFF",8,16],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(4),'little'))==s"]],
