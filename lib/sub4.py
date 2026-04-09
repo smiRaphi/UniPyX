@@ -908,7 +908,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if not exists(i): return 1
 
             return quickbms('ttgames')
-        case 'XPAC':
+        case 'Sumo Digital XPAC':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
 

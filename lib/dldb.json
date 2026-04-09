@@ -6672,22 +6672,6 @@
         ],
         "ts":0
     },
-    "hatch/sonic_galactic_demo2.txt":{
-        "p":"hatch/sonic_galactic_demo2.txt",
-        "fs":[[
-            "https://raw.githubusercontent.com/bartlomiejduda/Tools/refs/heads/master/NEW%20Tools/Hatch%20Engine/Hatch%20Engine%20Archive%20Tool/filelists/sonic_galactic_demo2_filenames.txt",
-            "hatch/sonic_galactic_demo2.txt"
-        ]],
-        "ts":0
-    },
-    "ssbu_hashes_all":{
-        "p":"ssbu_hashes_all.txt",
-        "fs":[[
-            "https://raw.githubusercontent.com/ultimate-research/archive-hashes/refs/heads/master/Hashes_all",
-            "ssbu_hashes_all.txt"
-        ]],
-        "ts":0
-    },
     "spaghettikart_yaml":{
         "p":"Torch/SpaghettiKart",
         "fs":[[
@@ -6936,27 +6920,45 @@
         }],
         "ts":0
     },
-    "trpfd_hashes":{
-        "p":"PokeDocs/hsh_fd",
+    "pokemon_hashes":{
+        "p":"hashes/pokemon.bhl",
         "fs":[[
-            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/ZA/Hashlists/FileSystem/hashes_inside_fd.txt",
-            "PokeDocs/hsh_fd/za.txt"
-        ],[
-            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Hashlists/FileSystem/hashes_inside_fd.txt",
-            "PokeDocs/hsh_fd/sv.txt"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pokemon.bhl",
+            "hashes/pokemon.bhl"
         ]],
-        "ts":1765921945
+        "ts":1775753345
     },
-    "trpak_hashes":{
-        "p":"PokeDocs/hsh_pak",
+    "tarzan_hashes":{
+        "p":"hashes/tarzan.bhl",
         "fs":[[
-            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/ZA/Hashlists/FileSystem/hashes_inside_trpak.txt",
-            "PokeDocs/hsh_pak/za.txt"
-        ],[
-            "https://raw.githubusercontent.com/pkZukan/PokeDocs/refs/heads/main/SV/Hashlists/FileSystem/hashes_inside_trpak.txt",
-            "PokeDocs/hsh_pak/sv.txt"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/tarzan.bhl",
+            "hashes/tarzan.bhl"
         ]],
-        "ts":1765921945
+        "ts":1775755195
+    },
+    "archer_mac_mercury_hashes":{
+        "p":"hashes/archer_mac_mercury.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/archer_mac_mercury.bhl",
+            "hashes/archer_mac_mercury.bhl"
+        ]],
+        "ts":1775755483
+    },
+    "ssbu_hashes":{
+        "p":"hashes/ssbu.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/ssbu.bhl",
+            "hashes/ssbu.bhl"
+        ]],
+        "ts":1775755622
+    },
+    "sonic_galactic_demo2_hashes":{
+        "p":"sonic_galactic_demo2",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sonic_galactic_demo2.bhl",
+            "hashes/sonic_galactic_demo2.bhl"
+        ]],
+        "ts":1775756197
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 861
+# Supported Formats: 862
 
 ## "Common" Archives/Compressors/Encodings (135)
 Name | Extension(s) | Extractor(s) | Comment
@@ -335,7 +335,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (421)
+## Various (422)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -711,6 +711,7 @@ Torus Ashen ZLib | ??? | Custom |
 TotemTech Data | .dps | [bff](https://github.com/widberg/bff) |
 TREVA SDPC | .sdpc | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
 Trine FBQ | .fbq | Custom, [trine2.bms](https://mirror.aluigi.org/bms/trine2.bms) |
+Trinity GFLXPack | .gfpak | Custom |
 Trinity OnePack | .trpfs(+.trpfd) | Custom |
 Trinity PAK | .trpak | Custom |
 Tsunami Media RLB | .rlb | [na_game_tool](https://nihav.org/game_tool.html) |

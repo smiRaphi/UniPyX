@@ -99,14 +99,14 @@ def extract4_3(inp:str,out:str,t:str):
             scr = db.get('xbxdetool')
             fl = dirname(scr) + '/Filelists'
             if exists(fl + '/hash_list.txt'):
-                hl = [x.split('|',1)[1] for x in open(fl + '/hash_list.txt').read().strip('\r\n').split('\n') if x]
+                HL = [x.split('|',1)[1] for x in open(fl + '/hash_list.txt').read().strip('\r\n').split('\n') if x]
                 remove(fl + '/hash_list.txt')
                 for hf in listdir(fl):
                     hf = fl + '/' + hf
                     if isfile(hf) and hf.lower().endswith('.txt'):
-                        hl += open(hf).read().strip('\r\n').split('\n')
+                        HL += open(hf).read().strip('\r\n').split('\n')
                         remove(hf)
-                hl.extend([
+                HL.extend([
                     '/chr/oj/qsten010901.ces','/chr/oj/qsten011101.ces','/chr/oj/qsten011104.ces','/chr/oj/qsten011108.ces','/chr/oj/qsten011305.ces','/chr/oj/qsten011501.ces','/chr/oj/qsten011503.ces',
 
                     '/ev/motion/ptcs/xs00010100/xs00010100_c03_cm_xs00010100_c03.eva','/ev/motion/ptcs/xs00010100/xs00010100_c01_cm_xs00010100_c01.eva','/ev/motion/ptcs/xs00010100/xs00010100_c03_evr_oj010006.anm','/ev/motion/ptcs/xs11020100_1/xs11020100_1_c08_kee002_ev_cmn_500_019_pcefb.eva',
@@ -121,8 +121,8 @@ def extract4_3(inp:str,out:str,t:str):
                     '/ev/motion/en/en050201/509011m_sp_10_anm.anm',
                     '/ev/motion/oj/ws121101r/509001m_sp_2_st_anm.anm','/ev/motion/oj/ws121101r/509002m_sp_2_lp_anm.anm',
                 ])
-                open(fl + '/list.txt','w').write('\n'.join(sorted(list(set(hl)))))
-                del hl
+                open(fl + '/list.txt','w').write('\n'.join(sorted(list(set(HL)))))
+                del HL
 
             run([scr,'extract-all','-i',i,'-o',o],cwd=dirname(scr))
             if listdir(o): return
@@ -386,10 +386,9 @@ def extract4_3(inp:str,out:str,t:str):
             xopen(o + '/' + basename(i),'wb').write(d)
             return
         case 'Disney\'s Tarzan FSD':
-            from lib.file import File,crc_hash
-            MP = {crc_hash(x[:1022].encode('ascii'),'tarzan'):x.replace(':','') for x in open('bin/tarzan.hsh').read().split('\n')}
-
             if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,HashLib
+            HL = HashLib.dl('tarzan',db,fmt=lambda x:x[:1022],encoding='ascii')
             f = File(i,endian='<')
 
             ep = f.size
@@ -400,16 +399,18 @@ def extract4_3(inp:str,out:str,t:str):
                 fs.append(fe)
                 ep = min(ep,fe[1])
 
+            HL.wait()
             for fe in fs:
                 f.seek(fe[1])
                 d = f.read(fe[2])
-                if fe[0] in MP: fn = MP[fe[0]]
+                if fe[0] in HL: fn = HL[fe[0]].replace(':','')
                 else:
                     if d.startswith(b'ESF'): ext = 'esf'
                     elif d.startswith(b'EGF'): ext = 'egf'
                     else: ext = 'bin'
                     fn = f'{fe[0]:08X}.{ext}'
                 xopen(o + '/' + fn,'wb').write(d)
+
             f.close()
             if fs: return
         case 'Transformers: Devastation DAT':
@@ -1022,9 +1023,8 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Archer Maclean\'s Mercury PAQ':
             CRCC = b"________________________________________________0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____________________________________________________________________________________________________________________________________"
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,crc_hash
-            MP = {crc_hash(x.rstrip().translate(CRCC),'crc32'):x.rstrip().decode('ascii') for x in open('bin/archer_mac_mercury.hsh','rb').readlines()}
-
+            from lib.file import File,HashLib
+            HL = HashLib.dl('archer_mac_mercury',db,fmt=lambda x:x.translate(CRCC),encoding='ascii')
             f = File(i,endian='<')
             assert f.readu32() in {0x7D1,0xFEED}
 
@@ -1034,10 +1034,12 @@ def extract4_3(inp:str,out:str,t:str):
             for _ in range(c):
                 fs.append((f.readu32(),f.readu32(),f.readu32()))
                 assert f.readu32() == fs[-1][1],f.pos - 0x10
+
+            HL.wait()
             for fe in fs:
                 f.seek(fe[2])
                 d = f.readc(fe[1])
-                if fe[0] in MP: fn = MP[fe[0]]
+                if fe[0] in HL: fn = HL[fe[0]]
                 else:
                     if d[:4] in {b'DEAD',b'COL0'}: ex = d[:4].decode('ascii')
                     elif b'MIG.00.1PSP\0' in d[0x20:0x50]: ex = 'pst'
@@ -1271,14 +1273,8 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             assert exists(noext(i) + '.trpfs')
             db.get('trpfs.fbs')
-            from lib.file import File,crc_hash
-            FMAP = {}
-            def gfmap(h):
-                if h in FMAP: return FMAP[h]
-                if not None in FMAP:
-                    FMAP[None] = {}
-                    for hf in rldir(db.get('trpfd_hashes')): FMAP[None] |= {int(x[0][2:],16):x[1].decode('utf-8') for x in [l.split(b' ',1) for l in readfile(hf).splitlines() if l[:2] == b"0x"]}
-                return FMAP[None][h]
+            from lib.file import File,HashLib
+            HL = HashLib.dl('pokemon',db)
 
             fd = File(noext(i) + '.trpfs',endian='<')
             assert fd.read(8) == b'ONEPACK\0'
@@ -1287,13 +1283,6 @@ def extract4_3(inp:str,out:str,t:str):
             fd.seek(bo)
             fbuf = fd.read()
 
-            if exists(noext(i) + '.trpfd'):
-                db.get('trpfd.fbs')
-                from bin.PokeDocs.trpfd import TRPFD # type: ignore
-                tfd = TRPFD.GetRootAs(readfile(noext(i) + '.trpfd'))
-                FMAP |= {crc_hash(x,'fnv1a_64'):x.decode('utf-8') for x in [tfd.PackStrings(ix) for ix in range(tfd.PackStringsLength())]}
-                del tfd
-
             from bin.PokeDocs.trpfs import TRPFS # type: ignore
             tfs = TRPFS.GetRootAs(fbuf)
             assert tfs.FileOffsetsLength() == tfs.FileHashesLength()
@@ -1301,35 +1290,95 @@ def extract4_3(inp:str,out:str,t:str):
             del tfs
             fs.append((bo,0))
 
+            HL.wait()
+            if exists(noext(i) + '.trpfd'):
+                db.get('trpfd.fbs')
+                from bin.PokeDocs.trpfd import TRPFD # type: ignore
+                tfd = TRPFD.GetRootAs(readfile(noext(i) + '.trpfd'))
+                HL.add([tfd.PackStrings(ix).decode('utf-8') for ix in range(tfd.PackStringsLength())])
+                del tfd
+                HL.save()
+
             for ix,fe in enumerate(fs[:-1]):
                 fd.seek(fe[0])
-                xopen(o + '/' + gfmap(fe[1]),'wb').write(fd.readc(fs[ix + 1][0] - fe[0]))
+                xopen(o + '/' + HL.get(fe[1],f'$unk/{h:016X}.bin'),'wb').write(fd.readc(fs[ix + 1][0] - fe[0]))
 
             fd.close()
             if fs: return
         case 'Trinity PAK':
             if db.print_try: print('Trying with custom extractor')
             db.get('trpak.fbs')
-            from lib.file import decompress
-
-            FMAP = {}
-            for hf in rldir(db.get('trpak_hashes')): FMAP |= {int(x[0][2:],16):x[1].decode('utf-8') for x in [l.split(b' ',1) for l in readfile(hf).splitlines() if l[:2] == b"0x"] if x[1]}
+            from lib.file import decompress,HashLib
+            HL = HashLib.dl('pokemon',db)
 
             from bin.PokeDocs.trpak import TRPAK # type: ignore
             tpk = TRPAK.GetRootAs(readfile(i))
             assert tpk.FileEntryLength() == tpk.FileHashesLength()
 
+            HL.wait()
             for ix in range(tpk.FileEntryLength()):
                 fl = tpk.FileEntry(ix)
                 h = tpk.FileHashes(ix)
-                fn = FMAP.get(h,f'$unk/{h:16X}.bin')
-                if not fn:
-                    print(fn,hex(h),fl.ByteBufferLength(),fl.ByteBufferIsNone(),fl.CompressType(),fl.Unk2(),fl.FileSize())
+                fn = HL.get(h,f'$unk/{h:016X}.bin')
                 d = bytes(fl.ByteBuffer(dix) for dix in range(fl.ByteBufferLength()))
                 xopen(o + '/' + fn,'wb').write(decompress(d,(0,'zlib','lz4','oodle','none')[fl.CompressType()],usize=fl.FileSize(),db=db))
 
             del tpk
             if listdir(o): return
+        case 'Trinity GFLXPack':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,HashLib
+            HL = HashLib.dl('pokemon',db)
+
+            f = File(i,endian='<')
+            assert f.read(8) == b'GFLXPACK'
+
+            f.skip(8)
+            fc,dc = f.readu32(),f.readu32()
+            fo = f.readu64()
+            fho = f.readu64()
+            dos = [f.readu64() for _ in range(dc)]
+
+            f.seek(fho)
+            hs = [f.readu64() for _ in range(fc)]
+            f.seek(fo)
+            fes = []
+            for _ in range(fc):
+                f.skip(2)
+                fe = [f.readu16(),f.readu32(),f.readu32()]
+                f.skip(4)
+                fe.append(f.readu64())
+                fes.append(fe)
+
+            fs = []
+            for do in dos:
+                f.seek(do)
+                dh = f.readu64()
+                dc = f.readu32()
+                f.skip(4)
+
+                for _ in range(dc):
+                    eh = f.readu64()
+                    cix = f.readu32()
+                    f.skip(4)
+                    fs.append(fes[cix] + [cix,dh,eh,hs[cix]])
+
+            HL.wait()
+            ch = {}
+            for fe in fs:
+                if fe[5] in HL and fe[6] in HL: fn = HL[fe[5]] + HL[fe[6]]
+                elif fe[7] in HL: fn = HL[fe[7]]
+                else: fn = HL.get(fe[5],f'$unk/{fe[5]:016X}/') + HL.get(fe[6],f'{fe[6]:016X}.bin')
+
+                if fe[4] in ch: cp(o + '/' + ch[fe[4]],o + '/' + fn)
+                else:
+                    f.seek(fe[3])
+                    d = f.decompress(fe[2],('none','zlib','lz4','oodle')[fe[0]],usize=fe[1],db=db)
+                    xopen(o + '/' + fn,'wb').write(d)
+                    ch[fe[4]] = fn
+
+            f.close()
+            if fs: return
 
     return 1
 

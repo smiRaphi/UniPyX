@@ -1,6 +1,6 @@
 import struct,io,sys
 
-ENDMAP = {'<':'little','>':'big'}
+ENDMAP = {'<':'little','>':'big','-':'big'}
 
 def align(n:int,blocksize:int): return -n % blocksize
 def swap32(i:bytes):
@@ -11,7 +11,6 @@ def maskb(n:int): return mask(n * 8)
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
-        if 'w' in mode and endian == '-': raise NotImplementedError('Middle endian not implemented for writing')
         if type(f) == str: f = open(f,mode.rstrip('b') + 'b')
         elif type(f) == bytes: f = io.BytesIO(f)
         self._f = f
@@ -46,9 +45,7 @@ class File:
     def unpacki(self,n:int,signed=False,end=None):
         d = self.readc(n)
         end = end or self._end
-        if end == '-':
-            d = self.middle_scramble(d)
-            end = '>'
+        if end == '-': d = self.middle_scramble(d)
         return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
     def unpack(self,fmt:str,end=None):
         d = self.readc(struct.calcsize(fmt))
@@ -57,6 +54,10 @@ class File:
             d = self.middle_scramble(d)
             end = '>'
         return struct.unpack(end + fmt,d)[0]
+    def packi(self,i:int,n:int,signed=False,end=None):
+        d = i.to_bytes(n,ENDMAP[end or self._end],signed=bool(signed))
+        if end == '-': d = self.middle_scramble(d)
+        return self.write(d)
 
     def readu8 (self)         : return self.unpacki(1,0)
     def readu16(self,end=None): return self.unpacki(2,0,end)
@@ -80,17 +81,23 @@ class File:
         n = c = b = 0
         while True:
             b = self.readu8()
-            n |= (b & 0x7f) << (c * 7)
+            n |= (b & mask(7)) << (c * 7)
             if not b & 0x80: return n
             c += 1
+    def readvlq(self):
+        n = b = 0
+        while True:
+            b = self.readu8()
+            n = (n << 7) | (b & mask(7))
+            if not b & 0x80: return n
     def readcompiu(self,null=False):
         b = self.readu8()
         if b == 0xFF and null: return None
         h = b >> 5
-        if   h & 0b100 == 0b000: b =  b & 0x7F
-        elif h & 0b110 == 0b100: b = (b & 0x3F) << 8 | self.readu8()
-        elif h & 0b111 == 0b110: b = (b & 0x1F) << 24 | self.readu24('>')
-        else: raise ValueError(f"Invalid compressed integer size (0b{h:03b} {b & 0x1F:05b})")
+        if   h & 0b100 == 0b000: b =  b & mask(7)
+        elif h & 0b110 == 0b100: b = (b & mask(6)) << 8 | self.readu8()
+        elif h & 0b111 == 0b110: b = (b & mask(5)) << 24 | self.readu24('>')
+        else: raise ValueError(f"Invalid compressed integer size (0b{h:03b} {b & mask(5):05b})")
         return b
     def readcompis(self,null=False):
         v = self.readcompiu(null)
@@ -107,16 +114,27 @@ class File:
             r += b
         return r
 
-    def writeu8 (self,data:int): return self.write(struct.pack('B',data))
-    def writeu16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'H',data))
-    def writeu32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'I',data))
-    def writeu64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'Q',data))
-    def writes8 (self,data:int): return self.write(struct.pack('b',data))
-    def writes16(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'h',data))
-    def writes32(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'i',data))
-    def writes64(self,data:int,end=None): return self.write(struct.pack((end or self._end)+'q',data))
-    def writef32(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'f',data))
-    def writef64(self,data:float,end=None): return self.write(struct.pack((end or self._end)+'d',data))
+    def writeu8 (self,v:int): return self.packi(v,1,0)
+    def writeu16(self,v:int,end=None): return self.packi(v,2,0,end)
+    def writeu32(self,v:int,end=None): return self.packi(v,4,0,end)
+    def writeu48(self,v:int,end=None): return self.packi(v,6,0,end)
+    def writeu64(self,v:int,end=None): return self.packi(v,8,0,end)
+    def writes8 (self,v:int): return self.packi(v,1,1)
+    def writes16(self,v:int,end=None): return self.packi(v,2,1,end)
+    def writes32(self,v:int,end=None): return self.packi(v,4,1,end)
+    def writes48(self,v:int,end=None): return self.packi(v,6,1,end)
+    def writes64(self,v:int,end=None): return self.packi(v,8,1,end)
+    def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
+    def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
+    def writevlq(self,v:int):
+        b = [v & mask(7)]
+        v >>= 7
+
+        while v > 0:
+            b.append((v & mask(7)) | 0x80)
+            v >>= 7
+
+        return self.write(bytes(reversed(b)))
 
     def align(self,blocksize:int,base:int=0):
         v = align(self.tell() - base,blocksize)
@@ -225,18 +243,18 @@ def ext_exe(i:str,dotnet=False):
         return r
 
 OODLE = None
-def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
+def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     match algo:
         case 'none': return i
         case 'zlib':
             import zlib
-            fnc = zlib.decompress
+            return zlib.decompress(i,wbits=kwargs.get('wbits',15))
         case 'gzip':
             import gzip
-            fnc = gzip.decompress
+            return gzip.decompress(i)
         case 'bz2'|'bzip2':
             import bz2
-            fnc = bz2.decompress
+            return bz2.decompress(i)
         case 'lzma'|'lzma_alone':
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
@@ -248,36 +266,32 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
                 try: import backports_zstd as zstd # type: ignore
                 except: from backports import zstd # type: ignore
             if 'zstd_dict' in kwargs and type(kwargs['zstd_dict']) == bytes: kwargs['zstd_dict'] = zstd.ZstdDict(kwargs['zstd_dict'])
-            fnc = zstd.decompress
+            return zstd.decompress(i,kwargs.get('zstd_dict'))
         case 'lz4'|'lz4_block':
             import lz4.block
-            fnc = lz4.block.decompress
-            if kwargs.get('no_size'): kwargs['uncompressed_size'] = len(i) * 8
-            if 'no_size' in kwargs: kwargs.pop('no_size')
+            return lz4.block.decompress(i,uncompressed_size=(len(i) * 8) if kwargs.get('no_size') else kwargs['usize'])
         case 'lz4_frame':
             import lz4.frame
-            fnc = lz4.frame.decompress
-        case 'lzo'|'lzo1x':
+            return lz4.frame.decompress(i)
+        case 'lzo'|'lzo1x'|'lzo1y':
             if 'db' in kwargs: kwargs['db'].get('lzo')
+            if algo == 'lzo': algo = 'lzo1x'
+
             import bin.lzo # type: ignore
-            return bin.lzo.decompress(i,False,kwargs.get('usize',args[0]),algorithm='LZO1X')
-        case 'lzo1y':
-            if 'db' in kwargs: kwargs['db'].get('lzo')
-            import bin.lzo # type: ignore
-            return bin.lzo.decompress(i,False,kwargs.get('usize',args[0]),algorithm='LZO1Y')
-        case 'huffman': fnc = huffman_decompress
-        case 'lzss': fnc = lzss_decompress
+            return bin.lzo.decompress(i,False,kwargs['usize'],algorithm=algo.upper())
+        case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
+        case 'lzss': return lzss_decompress(i,usize=kwargs['usize'])
         case 'lzw_lg':
-            fnc = lzw_decompress
-            if algo == 'lzw_lg': kwargs |= {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
+            if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
+            return lzw_decompress(i,**args)
         case 'implode':
             if 'db' in kwargs: kwargs['db'].get('pwexplode')
             import bin.pwexplode # type: ignore
             return bin.pwexplode.explode(i)
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
-            fnc = getattr(crunch64,algo).decompress
-        case 'ash0': fnc = ash0_decompress
+            return getattr(crunch64,algo).decompress(i)
+        case 'ash0': return ash0_decompress(i)
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
             global OODLE
             assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
@@ -310,13 +324,12 @@ def decompress(i:bytes,algo:str,*args,**kwargs) -> bytes:
             else: r = {n:z.read(n) for n in z.namelist()}
             z.close()
             return r
-        case _: raise NotImplementedError(algo)
-    return fnc(i,*args,**kwargs)
-def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
+    raise NotImplementedError(algo)
+def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
         case 'crc32'|'adler32':
             import zlib
-            return getattr(zlib,algo)(i,*args,**kwargs) & 0xFFFFFFFF
+            return getattr(zlib,algo)(i,**kwargs) & maskb(4)
         case 'crc16': fnc = crc16
         case 'crc16_ccitt'|'crc16_ansi'|'crc16_ibm'|'crc16_dnp':
             kwargs['poly'] = {
@@ -325,18 +338,21 @@ def crc_hash(i:bytes,algo:str,*args,**kwargs) -> int:
                 'dnp':0x3D65,
             }[algo[6:]]
             fnc = crc16
+        case 'fnv1_32': fnc = fnv1_32
+        case 'fnv1a_32': fnc = fnv1a_32
+        case 'fnv1_64': fnc = fnv1_64
         case 'fnv1a_64': fnc = fnv1a_64
 
         case 'sha1'|'sha256'|'md5':
             import hashlib
             r = getattr(hashlib,algo)(i).digest()
-            if kwargs.get('bytes') or args in {(True,),(1,)}: return r
+            if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
 
         case 'tarzan': fnc = tarzan_hash
-        case 'hash40': return (len(i) << 32) | crc_hash(i,'crc32')
+        case 'hash40': return (len(i) << 32) | crc_hash(i,'crc32',**kwargs)
         case _: raise NotImplementedError(algo)
-    return fnc(i,*args,**kwargs)
+    return fnc(i,**kwargs)
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
@@ -429,6 +445,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             c = pow(int.from_bytes(i,'little' if algo == 'rsa_inv_le' else 'big'),k.e,k.n)
             R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
             return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
+        case 'tea'|'tea_be'|'tea_le': return tea_decrypt(i,key,le=algo == 'tea_le')
 
         case 'hatch':
             d = bytearray(i)
@@ -472,7 +489,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             key = [iv[3],key[0],iv[1],key[1],iv[0],key[2],iv[2],key[3]]
             for ix,b in enumerate(iv[4:]): key[ix % 8] ^= b
             return decrypt(i,'xor',bytes(key))
-        case _: raise NotImplementedError(algo)
+    raise NotImplementedError(algo)
 
 class Huffman:
     TREE_SIZE = 512
@@ -641,6 +658,59 @@ def ash0_decompress(i:bytes):
 
     return bytes(out)
 
+def crc16(i:bytes,poly=0x8005,init=0) -> int:
+    crc = init
+    for b in i:
+        crc ^= b << 8
+        for _ in range(8):
+            if crc & 0x8000: crc = (crc << 1) ^ poly
+            else: crc <<= 1
+            crc &= maskb(2)
+    return crc
+def fnv1_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
+    for b in i: offset = ((offset * prime) & maskb(8)) ^ b
+    return offset
+def fnv1a_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
+    for b in i: offset = ((offset ^ b) * prime) & maskb(8)
+    return offset
+def fnv1_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
+    for b in i: offset = ((offset * prime) & maskb(4)) ^ b
+    return offset
+def fnv1a_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
+    for b in i: offset = ((offset ^ b) * prime) & maskb(4)
+    return offset
+def tarzan_hash(i:bytes):
+    o = 0
+    shft = 0
+    lng =  0
+
+    for b in i:
+        o += b << shft
+        shft += 8
+        if shft > 24: shft = 0
+        lng += 1
+    return (o + lng) & maskb(4)
+
+def tea_decrypt(i:bytes,k:bytes,le=False):
+    e = '<' if le else '>'
+    if type(i) == bytes: i = struct.unpack(f'{e}{len(i)//4}I',i)
+    if type(k) == bytes: k = struct.unpack(f'{e}4I',k)
+    i = list(i)
+    assert len(k) == 4 and not len(i) % 2
+
+    DLT = 0x9e3779b9
+    def dec_blk(i):
+        v0,v1 = i[0],i[1]
+        sv = (DLT * 32) & maskb(4)
+        for _ in range(32):
+            v1 = (v1 - (((v0 << 4) + k[2]) ^ (v0 + sv) ^ ((v0 >> 5) + k[3]))) & maskb(4)
+            v0 = (v0 - (((v1 << 4) + k[0]) ^ (v1 + sv) ^ ((v1 >> 5) + k[1]))) & maskb(4)
+            sv = (sv - DLT) & maskb(4)
+        return v0,v1
+
+    for ix in range(0,len(i),2): i[ix:ix+2] = dec_blk(i[ix:ix+2])
+    return struct.pack(f'{e}{len(i)}I',*i)
+
 N64CHM = (
     '\0' + '\0'*14 + ' '
     '0123456789ABCDEF'
@@ -660,26 +730,93 @@ def decode_n64_mpak(i:bytes):
         o.append(N64CHM[b])
     return ''.join(o)
 
-def crc16(i:bytes,poly=0x8005,init=0) -> int:
-    crc = init
-    for b in i:
-        crc ^= b << 8
-        for _ in range(8):
-            if crc & 0x8000: crc = (crc << 1) ^ poly
-            else: crc <<= 1
-            crc &= maskb(2)
-    return crc
-def fnv1a_64(i:bytes,prime=1099511628211,offset=14695981039346656837):
-    for b in i: offset = ((offset ^ b) * prime) & maskb(8)
-    return offset
-def tarzan_hash(i:bytes):
-    o = 0
-    shft = 0
-    lng =  0
+import os,time
+from threading import Thread
 
-    for b in i:
-        o += b << shft
-        shft += 8
-        if shft > 24: shft = 0
-        lng += 1
-    return (o + lng) & maskb(4)
+HASHTS = {
+    'crc16':2,'crc16_ccitt':2,'crc16_ansi':2,'crc16_ibm':2,'crc16_dnp':2,
+    'crc32':4,'adler32':4,
+    'fnv1_32':4,'fnv1a_32':4,
+    'fnv1_64':8,'fnv1a_64':8,
+    'md5':16,'sha1':20,'sha256':32,
+    'tarzan':4,'hash40':5,
+}
+class HashLib:
+    def __init__(self,p:str,fmt=lambda x:x,encoding='utf-8'):
+        self.p = os.path.abspath(p)
+        self.fmt = fmt
+        self.enc = encoding
+
+        self.db = {}
+        self.lhsh = None
+
+        self._load_thrd = None
+    @classmethod
+    def new(cls,p:str,ht:str,**kwargs):
+        c = cls(p,**kwargs)
+        c.ht = ht
+        c.hs = HASHTS[ht]
+        return c
+    @classmethod
+    def dl(cls,p:str,db,**kwargs): return cls(db.get(p + '_hashes'),**kwargs).load()
+
+    def load(self):
+        if os.path.exists(self.p):
+            assert os.path.isfile(self.p)
+            self._load_thrd = Thread(target=self._load)
+            self._load_thrd.start()
+        return self
+    def wait(self):
+        if self._load_thrd is not None:
+            if self._load_thrd.is_alive(): self._load_thrd.join()
+            self._load_thrd = None
+    def _load(self):
+        f = File(self.p,'rb',endian='>')
+        self.ots = f.readu48()/100
+        self.ht = f.read0s().decode(self.enc)
+        self.hs = HASHTS[self.ht]
+        c = f.readvlq()
+        ks = [f.unpacki(self.hs) for _ in range(c)]
+        d = b'\x78\xDA' + f.read()
+        f.close()
+        vs = [x.decode(self.enc) for x in decompress(d,'zlib').split(b'\0')]
+        db = zip(ks,vs)
+        self.lhsh = hash(db)
+        self.db = dict(db)
+
+    def save(self):
+        ks = list(self.db.keys())
+        vs = list(self.db.values())
+        nhsh = hash(zip(ks,vs))
+        if self.lhsh == nhsh: return
+        import zlib
+
+        f = File(self.p,'wb',endian='>')
+        ts = int(time.time()*100)
+        f.writeu48(ts)
+        f.write(self.ht.encode(self.enc) + b'\0')
+        f.writevlq(len(ks))
+
+        for k in ks: f.packi(k,self.hs)
+        f.write(zlib.compress(bytes(b'\0'.join([x.encode(self.enc) for x in vs])),level=9)[2:])
+        f.close()
+
+        self.lhsh = nhsh
+        self.ots = ts
+
+    def crc(self,i:str|bytes):
+        if type(i) == str: i = i.encode(self.enc)
+        return crc_hash(self.fmt(i),self.ht)
+
+    def add(self,i:list[str]|str):
+        if type(i) == str: i = [i]
+        for v in i:
+            k = self.crc(v)
+            if k not in self.db: self.db[k] = v
+    def get(self,v:str|int,default=None) -> str:
+        if type(v) == str: v = self.crc(v)
+        return self.db.get(v,default)
+    def __getitem__(self,v:str|int): return self.get(v)
+    def __contains__(self,v:str|int):
+        if type(v) == str: v = self.crc(v)
+        return v in self.db

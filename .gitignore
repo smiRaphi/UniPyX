@@ -17,5 +17,4 @@ __pycache__
 !/bin/tmd.py
 !/bin/sgkey.py
 !/bin/uekey.py
-!/bin/*.hsh
 !/bin/UTMT_CLI/ExportAll.csx
