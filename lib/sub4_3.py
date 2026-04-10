@@ -1,5 +1,19 @@
 from lib.main import *
 
+BARBIE_XMP = {
+    'mCTy':'mCTy',
+    'WAVE':'wav',
+    'SMK1':'smk',
+    'SMK2':'smk',
+    'SMAK':'smk',
+    'SMKI':'smk',
+    'Canv':'omc',
+    'BLIT':'posh',
+    'HCAn':'hca',
+    '0HDR':'hdr',
+    '0MFS':'omf',
+}
+
 def extract4_3(inp:str,out:str,t:str):
     run = db.run
     i = inp
@@ -1379,6 +1393,76 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Barbie: Riding Club OMF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(4) == b'0MFS'
+
+            f.seek(f.readu32())
+            dc = f.readu32()
+            fs = []
+            mcs = []
+            for _ in range(dc):
+                n = f.readc(4).decode('ascii')
+                assert n.isprintable()
+                c = f.readu32()
+                for _ in range(c):
+                    fs.append((n,f.reads32(),f.readu32(),f.readu32()))
+                    if n == 'mCTy': mcs.append(fs[-1][2])
+            xc = f.readu32()
+            xfs = [(f.readu32(),f.readu32()) for _ in range(xc)]
+
+            nm = {}
+            for m in mcs:
+                f.seek(m)
+                dc = f.readu32()
+                for _ in range(dc):
+                    n = f.readc(4).decode('ascii')
+                    assert n.isprintable()
+                    if not n in nm: nm[n] = {}
+                    f.padc(2)
+                    c = f.readu32()
+                    for _ in range(c):
+                        id = f.reads32()
+                        nm[n][id] = f.readc(f.readu8()).decode('ascii')
+
+            for fe in fs:
+                if fe[0] == '0HDR':
+                    try:
+                        fn = fe[1].to_bytes(4,'big',signed=True).decode('ascii')
+                        assert fn.isprintable()
+                    except: fn = str(fe[1])
+                elif fe[0] in nm and fe[1] in nm[fe[0]]: fn = fe[0] + '/' + nm[fe[0]][fe[1]]
+                else: fn = f'${fe[0]}/{fe[1]}'
+                fn += '.' + BARBIE_XMP.get(fe[0],fe[0])
+
+                f.seek(fe[2])
+                xopen(o + '/' + fn,'wb').write(f.readc(fe[3]))
+            for ix,fe in enumerate(xfs):
+                f.seek(fe[0])
+                xopen(f'{o}/$unk/{ix:02d}.bin','wb').write(f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Barbie: Riding Club Cache':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+
+            bn = tbasename(i)
+            while f:
+                s = int(f.readc(12).rstrip())
+                if bn: fn,bn = bn,None
+                else:
+                    fn = f.readc(34).rstrip().decode('ascii')
+                    x = f.readc(6).rstrip().decode('ascii')
+                    assert fn.isprintable() and x.isprintable()
+                    fn = f'{x}/{fn}.{BARBIE_XMP.get(x,x)}'
+                xopen(o + '/' + fn,'wb').write(f.readc(s))
+
+            f.close()
+            if not bn: return
 
     return 1
 

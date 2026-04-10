@@ -395,6 +395,14 @@
         "rs":"Archer Maclean's Mercury PAQ"
     },
     {
+        "d":[["isat","0MFS",0],["n0",4,4],["n0",4,-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(4);f.seek(int.from_bytes(f.read(4),'big'));c=int.from_bytes(f.read(4),'big');return c>1 and f.read(12)==b'mCTy\\0\\0\\0\\1\\xFF\\xFF\\xFB\\xA9'"]],
+        "rs":"Barbie: Riding Club OMF","s":1
+    },
+    {
+        "d":[["isat","\\r\\n",10],["str",0,10],["py","f=open(inp,'rb');s=f.read(12)\nif len(s)!=12 or not s.endswith(b'\\r\\n') or not s[:10].rstrip(b' ').isdigit():return\nf.seek(int(s.rstrip()),1)\nwhile 1:\n s0,s1,s2=f.read(12),f.read(34),f.read(6)\n if not s0:break\n if len(s0+s1+s2)!=52 or not(s0[10:]==s1[32:]==s2[4:]==b'\\r\\n')or not s0[:10].rstrip(b' ').isdigit():return\n try:assert(s1[:32]+s2[:4]).decode('ascii').isprintable()\n except:return\n f.seek(int(s0.rstrip()),1)\nreturn True"]],
+        "rs":"Barbie: Riding Club Cache"
+    },
+    {
         "d":[["size",[2160,null]],["s%",16],["n0",4,0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["isatS","\\0",4,24],["n0",4,32],["n0",4,40],["n0",4,44],["isatS","\\0",4,52],["isatS","\\0",4,60],
              ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);a=int.from_bytes(f.read(4),'little')\nif s%a:return\nf.seek(12);c=int.from_bytes(f.read(4),'little')*32;to=int.from_bytes(f.read(4),'little')*a;tgo=int.from_bytes(f.read(4),'little')*a;f.seek(28);tgo+=int.from_bytes(f.read(4),'little')*4;fo=int.from_bytes(f.read(4),'little')*a\nif (s-(fo+32+-32%a))>2048 or(to+c+-c%a)!=fo:return\nf.seek(40);so=int.from_bytes(f.read(4),'little')*a\nif (tgo+-tgo%a)!=so:return\nso+=int.from_bytes(f.read(4),'little')\nif (so+-so%a)!=to:return\nf.seek(fo+4);return (s-(int.from_bytes(f.read(4),'little')*a))<=2048"]],
         "rs":"The Mummy Returns PAK","s":1

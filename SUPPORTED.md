@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 862
+# Supported Formats: 864
 
 ## "Common" Archives/Compressors/Encodings (135)
 Name | Extension(s) | Extractor(s) | Comment
@@ -335,7 +335,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (422)
+## Various (424)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -383,6 +383,8 @@ Azito 3D Pack File | ??? | Custom |
 Azito 3D Pack Message | ??? | Custom |
 BackupMii NAND Image | ??? | Custom |
 Balko UFL Game Archive | .ufl | Custom |
+Barbie: Riding Club Cache | .cache | Custom |
+Barbie: Riding Club OMF | .omf | Custom |
 Battlezone 2 PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 BCH | .bch | Custom |
 Bethesda BSA | .bsa | [BSA Browser](https://github.com/AlexxEG/BSA_Browser) |
@@ -688,6 +690,7 @@ String16 Data | * | Custom |
 String16BE Data | * | Custom |
 STXT Language Data | .stxt | Custom |
 Stylus Config Export | .json | Custom |
+Sumo Digital XPAC | .xpac | Custom |
 Super Mario Maker Level | .bin | Custom |
 Super Monkey Ball SPG2 | .spg2 | Custom |
 Super Monkey Ball Tip 'n Tilt PAK | .pak | Custom |
@@ -750,7 +753,6 @@ Xenoblade Chronicles X DE ARH2 | .arh+.ard | [XbxDeTool](https://github.com/Nenk
 Xenonauts PFP | .pfp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 XNB | .xnb | [xnb.bms](https://mirror.aluigi.org/bms/xnb.bms) |
 XNB Dictionary | ??? | Custom |
-XPAC | .xpac | Custom + [sasr_xpac_hashes.bt](https://github.com/tge-was-taken/010-Editor-Templates/blob/master/templates/sasr_xpac_hashes.bt) |
 Yuzu Cache | ??? | Custom |
 Yuzu Vulkan Pipeline Cache | ??? | Custom -> Vulkan Pipeline Cache |
 ZDA Game Archive | ??? | Custom |
