@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 864
+# Supported Formats: 865
 
-## "Common" Archives/Compressors/Encodings (135)
+## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -37,6 +37,7 @@ Asar | .asar | [7-Zip](https://7-zip.org/) + [Asar7z](https://www.tc4shell.com/e
 ASD | .asd .exe | (Custom + ) [ASD](https://www.sac.sk/download/pack/asd020.exe) |
 BBC Micro SSD | .ssd | [bbccp](https://github.com/ethandicks/bbc-disk-tools) |
 Base64 | .b64 | [base64](https://docs.python.org/3/library/base64.html) |
+Bencode | .torrent | Custom |
 BinHex | .bhx | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/), [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 BinSCII | .bsc | Custom + [deark](https://entropymine.com/deark/) |
 BIX | .bix | [BIX](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |

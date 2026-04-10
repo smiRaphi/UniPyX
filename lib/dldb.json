@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1775253600
+            "ts":1775685600
         }],
-        "ts":1775253600
+        "ts":1775685600
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -123,9 +123,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1775685600
+            "ts":1775772000
         }],
-        "ts":1775685600
+        "ts":1775772000
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -513,13 +513,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/89/8b/dolphin-master-2603-255-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/42/a4/dolphin-master-2603-257-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1775509126
+            "ts":1775748272
         }],
-        "ts":1775509126
+        "ts":1775748272
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -766,7 +766,7 @@
     "hfsexplorer":{
         "p":"hfsexplorer/hfsx.jar",
         "fs":[{
-            "u":"https://github.com/unsound/hfsexplorer/releases/download/hfsexplorer-2021.10.9/hfsexplorer-2021.10.9-bin.zip",
+            "u":"https://github.com/unsound/hfsexplorer/releases/download/hfsexplorer-2026.4.9/hfsexplorer-2026.4.9-bin.zip",
             "x":{
                 "lib/apache-ant-1.7.0-bzip2.jar":"hfsexplorer/apache-ant-1.7.0-bzip2.jar",
                 "lib/csframework.jar":"hfsexplorer/csframework.jar",
@@ -774,9 +774,10 @@
                 "lib/hfsx_dmglib.jar":"hfsexplorer/hfsx_dmglib.jar",
                 "lib/iharder-base64.jar":"hfsexplorer/iharder-base64.jar",
                 "lib/llio_amd64.dll":"hfsexplorer/llio_amd64.dll"
-            }
+            },
+            "ts":1775830411
         }],
-        "ts":0
+        "ts":1775830411
     },
     "iqipack":{
         "p":"iQiPack.exe",
@@ -2337,23 +2338,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46074/SDLVICE-3.10-win64-r46074.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46075/SDLVICE-3.10-win64-r46075.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46074/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46074/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46074/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46074/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46074/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46074/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46075/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46075/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46075/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46075/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46075/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46075/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1775684949
+            "ts":1775738722
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1775684949
+        "ts":1775738722
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2724,14 +2725,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_08_29c60755_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_09_022a63e1_32.zip",
             "x":{
-                "RenderDoc_2026_04_08_29c60755_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_08_29c60755_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_09_022a63e1_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_09_022a63e1_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1775599200
+            "ts":1775685600
         }],
-        "ts":1775599200
+        "ts":1775685600
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5589,7 +5590,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-08/WolvenKit.Console-8.17.5-nightly.2026-04-08.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-10/WolvenKit.Console-8.17.5-nightly.2026-04-10.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5642,9 +5643,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1775644064
+            "ts":1775816709
         }],
-        "ts":1775644064
+        "ts":1775816709
     },
     "noodle":{
         "p":"oo2core_win64.dll",

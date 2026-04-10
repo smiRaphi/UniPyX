@@ -963,6 +963,60 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'Git Bundle':
             run(['git','clone',i,o])
             if listdir(o): return
+        case 'Bencode':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            f = open(i,'rb')
+            s = f.seek(0,2);f.seek(0)
+            fc = 0
+
+            def reads(n=1):return f.read(n).decode('ascii')
+            def readv(ty=None):
+                nonlocal fc
+                if ty is None: ty = reads()
+                match ty:
+                    case 'd':
+                        b = {}
+                        while 1:
+                            ty = reads()
+                            if ty == 'e':break
+                            k = readv(ty)
+                            b[k] = readv()
+                        return b
+                    case 'l':
+                        b = []
+                        while 1:
+                            ty = reads()
+                            if ty == 'e':break
+                            b.append(readv(ty))
+                        return b
+                    case 'i':
+                        b = 0
+                        while 1:
+                            c = reads()
+                            if c.isdigit(): b = b*10 + int(c)
+                            else: break
+                        return b
+                    case '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9':
+                        f.seek(-1,1)
+                        l = readv('i')
+                        d = f.read(l)
+                        try:
+                            b = d.decode('utf-8')
+                            assert b.isprintable()
+                        except:
+                            b = f'${fc}.bin'
+                            xopen(o + '/' + b,'wb').write(d)
+                            fc += 1
+                        return b
+                    case _: raise NotImplementedError(ty)
+
+            ob = []
+            while f.tell() < s: ob.append(readv())
+            f.close()
+            if ob:
+                json.dump(ob,xopen(f'{o}/{tbasename(i)}.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+                return
 
     return 1
 

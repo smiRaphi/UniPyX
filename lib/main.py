@@ -108,12 +108,12 @@ def isvalid(p:str,reject_dirs=False):
     return True
 SUB_PATH = str.maketrans({
     ':':'：',
-    '?':'',
-    '*':'',
-    '|':'',
-    '"':'',
-    '<':'',
-    '>':'',
+    '?':'？',
+    '*':'﹡',
+    '|':'｜',
+    '"':'＂',
+    '<':'＜',
+    '>':'＞',
     '\n':' ',
 })
 def sub_path(p:str,home=False):

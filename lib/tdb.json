@@ -1517,5 +1517,10 @@
     ],
     "Tsunami Media RLB":[
         "tsunami media game data archive"
+    ],
+    "Bencode":[
+        "bittorrent file",
+        "torrent",
+        "torrent (trackerless)"
     ]
 }

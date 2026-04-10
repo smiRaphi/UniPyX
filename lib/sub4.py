@@ -729,6 +729,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     for f in listdir(id):
                         if f not in cd and f.startswith(tbasename(i) + '_ge_decompressed') and f.endswith(extname(i)): remove(id + '/' + f)
                     return
+                elif r.status_code == 400 and r.json().get('error','').startswith('Unknown plugin code: '): raise Exception(r.json()['error'])
             except httpx.ReadTimeout: p.kill()
             except:
                 p.kill()
@@ -913,11 +914,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
             from lib.file import File,HashLib
             HL = HashLib.dl('sumo_xpac',db,fmt=lambda x:x.upper().replace(b'/',b'\\'),encoding='utf-8')
 
-            bak = {}
-            for h in {0x55F4D9E6,0x4638DEE8,0x71CA44A2}: bak[h] = f'{h:08X}.zig'
-            for h in {0x09A915C5,0x94AAD2E5,0xC03C389F}: bak[h] = f'{h:08X}.zif'
-            for h in {0x0090AE05,0x9D853559,0x7EFC3B8B}: bak[h] = f'{h:08X}.tso'
-            for h in {0xFFE6BEC5,0x59C8DA80}: bak[h] = f'{h:08X}.txt'
+            bak = {
+                0xC03C389F:'.\\Resource\\Racers\\Zobio.zif',0x71CA44A2:'.\\Resource\\Racers\\Zobio.zig',
+                0x94AAD2E5:'.\\Resource\\Tracks\\Particle_TestTrack.zif',0x4638DEE8:'.\\Resource\\Tracks\\Particle_TestTrack.zig',
+                0x09A915C5:'.\\Resource\\Tracks\\SeasideHill_Hard_Unused.zif',0x55F4D9E6:'.\\Resource\\Tracks\\SeasideHill_Hard_Unused.zig',
+                0xFFE6BEC5:'.\\Resource\\TSOData\\ItemDefaults.txt',0x59C8DA80:'.\\Resource\\TSOData\\GroupNames.txt',
+            }
+            for h in {0x0090AE05,0x9D853559,0x7EFC3B8B}: bak[h] = f'.\\Resource\\TSOData\\{h:08X}.tso'
 
             f = File(i,endian='<')
             f.skip(12)
