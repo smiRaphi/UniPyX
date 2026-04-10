@@ -412,7 +412,7 @@
         "rs":"TTGames DAT","s":1
     },
     {
-        "d":[["ext",".xpac"],["isat","\\0\\0\\0\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0\\0\\0\\0\\0",16],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,28]],
+        "d":[["s%",2048],["size",[4096,null]],["isatS","\\0",8,0],["isatS","\\0",8,16],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');f.seek(8);o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');s=f.seek(20)+c*20\nif (s+-s%2048)!=o:return\nfor _ in range(c):\n if sum(f.read(4))or not sum(f.read(4))or int.from_bytes(f.read(4),'little')%2048 or f.read(4)!=f.read(4):return\nreturn not sum(f.read(o-f.tell()))"]],
         "rs":"Sumo Digital XPAC"
     },
     {

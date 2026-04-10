@@ -342,6 +342,10 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'fnv1a_32': fnc = fnv1a_32
         case 'fnv1_64': fnc = fnv1_64
         case 'fnv1a_64': fnc = fnv1a_64
+        case 'bkdr'|'bkdr_ltr': fnc = bkdr
+        case 'bkdr_rtl':
+            i = i[::-1]
+            fnc = bkdr
 
         case 'sha1'|'sha256'|'md5':
             import hashlib
@@ -679,6 +683,10 @@ def fnv1_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
 def fnv1a_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
     for b in i: offset = ((offset ^ b) * prime) & maskb(4)
     return offset
+def bkdr(i:bytes,seed=131,init=0):
+    h = init
+    for b in i: h = (h * seed + b) & maskb(4)
+    return h
 def tarzan_hash(i:bytes):
     o = 0
     shft = 0
@@ -738,6 +746,7 @@ HASHTS = {
     'crc32':4,'adler32':4,
     'fnv1_32':4,'fnv1a_32':4,
     'fnv1_64':8,'fnv1a_64':8,
+    'bkdr':4,'bkdr_ltr':4,'bkdr_rtl':4,
     'md5':16,'sha1':20,'sha256':32,
     'tarzan':4,'hash40':5,
 }
@@ -765,6 +774,9 @@ class HashLib:
             assert os.path.isfile(self.p)
             self._load_thrd = Thread(target=self._load)
             self._load_thrd.start()
+        return self
+    def loadb(self):
+        self.load().wait()
         return self
     def wait(self):
         if self._load_thrd is not None:

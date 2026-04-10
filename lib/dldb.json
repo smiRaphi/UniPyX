@@ -6665,13 +6665,6 @@
         }],
         "ts":0
     },
-    "sasr_xpac_hashes":{
-        "p":"sasr_xpac_hashes.bt",
-        "fs":[
-        "https://raw.githubusercontent.com/tge-was-taken/010-Editor-Templates/656453e2b101b9999a72bd6179c95a490e12addf/templates/sasr_xpac_hashes.bt"
-        ],
-        "ts":0
-    },
     "spaghettikart_yaml":{
         "p":"Torch/SpaghettiKart",
         "fs":[[
@@ -6926,7 +6919,7 @@
             "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pokemon.bhl",
             "hashes/pokemon.bhl"
         ]],
-        "ts":1775753345
+        "ts":1775826450
     },
     "tarzan_hashes":{
         "p":"hashes/tarzan.bhl",
@@ -6942,7 +6935,7 @@
             "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/archer_mac_mercury.bhl",
             "hashes/archer_mac_mercury.bhl"
         ]],
-        "ts":1775755483
+        "ts":1775810698
     },
     "ssbu_hashes":{
         "p":"hashes/ssbu.bhl",
@@ -6959,6 +6952,14 @@
             "hashes/sonic_galactic_demo2.bhl"
         ]],
         "ts":1775756197
+    },
+    "sumo_xpac_hashes":{
+        "p":"hashes/sumo_xpac.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sumo_xpac.bhl",
+            "hashes/sumo_xpac.bhl"
+        ]],
+        "ts":1775825612
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",
