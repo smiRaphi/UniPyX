@@ -1463,6 +1463,53 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if not bn: return
+        case 'PlayStation Encrypted SFM':
+            if db.print_try: print('Trying with custom extractor')
+            from Cryptodome.Cipher import AES
+            from lib.file import File,decrypt
+
+            dn = dirname(i)
+            for _ in range(3):
+                if exists(dn + '/npbind.dat'):
+                    np = dn + '/npbind.dat'
+                    break
+                dn = dirname(dn)
+            else:
+                print('npbind.dat not found')
+                return 1
+
+            f = File(np,endian='>')
+            assert f.read(4) == b'\xD2\x94\xA0\x18' and f.readu32() == 1
+            f.skip(8)
+            es,ec = f.readu64(),f.readu64()
+            f.skip(0x60)
+            nps = []
+            for _ in range(ec):
+                ep = f.pos + es
+                while f.pos < ep:
+                    ty = f.readu16()
+                    if ty == 0x10:
+                        nps.append(f.readc(f.readu16())[:0x10].ljust(0x10,b'\0'))
+                        break
+                    else: f.skip(f.readu16())
+                f.seek(ep)
+            f.close()
+
+            d = open(i,'rb').read()
+            div,d = d[:0x10],d[0x10:]
+
+            for n in nps:
+                for k in (b'!\xf4\x1ak\xad\x8a\x1d>\xcaz\xd5\x86\xc1\x01\xb7\xa9',
+                          b'\x02\xcc\xd3F\xb4Y\xcb\x83P^\x8ev\nD\xd4W'):
+                    derk = AES.new(k,AES.MODE_CBC,iv=b'\0'*16).encrypt(n)
+                    dc = decrypt(d,'aes_cbc',derk,div)
+                    if dc[-1] > 16: continue
+                    dc = dc[:-dc[-1]]
+                    try: assert dc.decode('utf-8').replace('\n','').replace('\r','').isprintable()
+                    except: pass
+                    else:
+                        xopen(f'{o}/{tbasename(i)}.{extname(i)[2:]}','wb').write(dc)
+                        return
 
     return 1
 

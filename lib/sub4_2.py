@@ -178,18 +178,18 @@ def extract4_2(inp:str,out:str,t:str):
             assert f.read(4) == b'\xDC\xA2\x4D\x00'
 
             v = f.readu32()
-            if v not in (1,2,3): raise NotImplementedError(f'Version: {v}')
+            assert v in {1,2,3},f'Version: {v}'
             f.skip(8)
             c = f.readu32()
             s = f.readu32()
-            if s != 0x40: raise NotImplementedError(f'Entry Size: {s}')
+            assert s == 0x40,f'Entry Size: {s}'
             if v < 3: f.skip(0x28)
-            else: f.skip(0x18)
+            else: f.skip(0x48)
 
             fs = []
             for _ in range(c):
                 fs.append((f.read(0x20).rstrip(b'\0').decode('utf-8'),f.readu64(),f.readu64()))
-                f.skip(0x10)
+                f.skip(s-0x30)
 
             for fe in fs:
                 f.seek(fe[1])
