@@ -1522,5 +1522,8 @@
         "bittorrent file",
         "torrent",
         "torrent (trackerless)"
+    ],
+    "Starsky & Hutch WAD":[
+        "starsky'n'hutch game data archive"
     ]
 }

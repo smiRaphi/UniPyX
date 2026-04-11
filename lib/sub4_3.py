@@ -1510,6 +1510,82 @@ def extract4_3(inp:str,out:str,t:str):
                     else:
                         xopen(f'{o}/{tbasename(i)}.{extname(i)[2:]}','wb').write(dc)
                         return
+        case 'Starsky & Hutch WAD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,mask
+            f = File(i,endian='<')
+            f.padc(8)
+            assert f.read(4) == b'WAD!' and f.readu32() == 4
+
+            f.skip(8)
+            xopen(o + '/$description.txt','wb').write(f.readc(0x80).rstrip(b'\0'))
+            f.skip(8)
+            fnc = f.readu32()
+            fno = f.readu32()
+            f.padc(4)
+            fdic = f.readu32()
+            fdio = f.readu32()
+            pnc = f.readu32()
+            pno = f.readu32()
+            nmdlt,fddlt = f.readu16(),f.readu16()
+            xno = f.readu32()
+            xnc = f.readu32()
+            pnno = f.readu32()
+            pnnc = f.readu32()
+            sto = f.readu32()
+            f.skip(4)
+
+            f.seek(xno)
+            xs = [f.readc(4).rstrip(b'\0').decode('ascii') for _ in range(xnc)]
+
+            f.seek(pno)
+            pkns1 = [f.readu32() for _ in range(pnc)]
+            pkns1 = [(pkn & mask(7),(pkn >> 7) & mask(8),pkn >> 15) for pkn in pkns1]
+            f.seek(pnno)
+            pkns2 = [f.readu32() for _ in range(pnnc)]
+            pkns2 = [(pkn & mask(7),(pkn >> 7) & mask(8),pkn >> 15) for pkn in pkns2]
+
+            pns = []
+            for dix,pn in enumerate(pkns1):
+                xi,nl,no = pn
+
+                assert xi != 0x7E
+                if 0x77 <= xi <= 0x7D:
+                    bxi,bnl,bno = pkns2[nl]
+                    f.seek(sto + bno)
+                    n = f.readc(bnl).decode('ascii')
+                    if not n.isprintable() or (xi > 0x78 and '#' not in n): raise Exception(f'{n.encode("ascii")} ({bnl} @ {sto+bno}) @ {pnno+nl*4} ({dix} @ {pno+dix*4})')
+                    if '#' in n: n = n.replace('#',f'{no:0{0x7E - xi}d}')
+                    elif xi == 0x77: n += f'-{no}'
+                    elif xi == 0x78: n += f'_{no}'
+                    if bxi != 0x7F: n += '.' + xs[bxi]
+                else:
+                    f.seek(sto + no)
+                    n = f.readc(nl).decode('ascii')
+                    assert n.isprintable()
+                    if xi != 0x7F: n += '.' + xs[xi]
+                pns.append(n)
+
+            f.seek(fdio)
+            fds = [(f.readu32(),f.readu32()) for _ in range(fdic)]
+            fds = [(0,0) if x[1] == 0xFFFFFFFF else x for x in fds]
+            f.seek(fno)
+            fis = [(f.readu16(),f.readu16(),f.readu16(),f.readu16()) for _ in range(fnc)]
+            for fi in fis:
+                dc,do,fc,fo = fi
+                p = '/'.join(pns[do-nmdlt:do+dc-nmdlt])
+                for ix in range(fc):
+                    try:
+                        fe = fds[fo+ix-fddlt]
+                        assert (fe[0]+fe[1]) < f.size
+                        f.seek(fe[1])
+                    except:
+                        print(f'{fo+ix-fddlt} ({fo}+{ix}-{fddlt}) / {len(fds)} @ {f.pos - 8}')
+                        raise
+                    xopen(f'{o}/{p}/{pns[fo+ix-nmdlt]}','wb').write(f.readc(fe[0]))
+
+            f.close()
+            if fds: return
 
     return 1
 

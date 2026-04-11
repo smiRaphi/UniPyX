@@ -692,8 +692,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',
                 'Highway Pursuit HPDT':'HD_HPDT','Xenonauts PFP':'PFP_PFPK','LithTech Resource':'LPS_LITHTECH','Doom Engine WAD':'WAD_IWAD',
                 'UE3 Package':'UE3_727|UE3_648|UE3_607|UE3_584|UE3_576|UE3_575|UE3_564|UE3_547|UE3_539|UE3_512|UE3_507|UE3_871|UE3_868|UE3_807|UE3_805|UE3_451|UE3_Generic|UE3_Texture2D_Generic|UE3_Texture2D_547|UE3_Texture2D_539|UE3_Texture2D_512|UE3_Texture2D_451|UE3_Texture2D_507|UE3_Texture2D_871|UE3_Texture2D_868|UE3_Texture2D_807|UE3_Texture2D_648|UE3_Texture2D_584|UE3_Texture2D_576|UE3_Texture2D_575',
-                'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3','GE:Red Baron VOL':'VOL_VOL',
-                'GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
+                'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3',
+                'GE:Red Baron VOL':'VOL_VOL','GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
             }
 
             if db.print_try: print('Trying with gameextractor')
