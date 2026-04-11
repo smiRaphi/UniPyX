@@ -1586,6 +1586,31 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fds: return
+        case 'Torque HHA':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'\x4F\xF3\x2F\xAC\0\0\1\0'
+
+            ss = f.readu32()
+            c = f.readu32()
+            f.skip(ss)
+            fs = []
+            for _ in range(c):
+                fe = (0x10 + f.readu32(),0x10 + f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32())
+                assert fe[2] in {0,1},f.pos - 0x10
+                fs.append(fe)
+
+            for fe in fs:
+                f.seek(fe[0])
+                fn = f.read0s().decode('utf-8') + '/'
+                f.seek(fe[1])
+                fn += f.read0s().decode('utf-8')
+                f.seek(fe[3])
+                xopen(o + '/' + fn,'wb').write(f.decompress(fe[5],('none','deflate')[fe[2]]))
+
+            f.close()
+            if fs: return
 
     return 1
 

@@ -249,6 +249,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'zlib':
             import zlib
             return zlib.decompress(i,wbits=kwargs.get('wbits',15))
+        case 'deflate':
+            import zlib
+            return zlib.decompress(i,wbits=-15)
         case 'gzip':
             import gzip
             return gzip.decompress(i)

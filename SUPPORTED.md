@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 866
+# Supported Formats: 868
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (425)
+## Various (427)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -685,6 +685,7 @@ Sonic PAC | .pac | [HedgeArcPack](https://github.com/Radfordhound/HedgeLib) |
 Soulcalibur Legends NPAC | .npac | Custom |
 SouthPeak Interactive Puzzle Archive | .mco | [na_game_tool](https://nihav.org/game_tool.html) |
 Star Fox DAT | .dat | [star_fox_zero_dat.bms](https://mirror.aluigi.org/bms/star_fox_zero_dat.bms) |
+Starsky & Hutch WAD | .btw | Custom |
 StormCE IIII | ??? | Custom |
 StormCE Library VFS | .vfs | Custom |
 String16 Count16 Data | * | Custom |
@@ -710,6 +711,7 @@ THQ PAK | .pak | Custom |
 THQ Worms UTF Strings | ??? | Custom |
 THQ Worms Resources | ??? | Custom |
 Tiled TMX/TSX | .tmx .tsx | Custom |
+Torque HHA | .hha | Custom |
 Torus Ashen PackFile | .pf | Custom |
 Torus Ashen Strings | ??? | Custom |
 Torus Ashen ZLib | ??? | Custom |

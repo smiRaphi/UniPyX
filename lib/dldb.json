@@ -123,9 +123,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1775772000
+            "ts":1775858400
         }],
-        "ts":1775772000
+        "ts":1775858400
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -513,13 +513,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/42/a4/dolphin-master-2603-257-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/81/08/dolphin-master-2603-259-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1775748272
+            "ts":1775905947
         }],
-        "ts":1775748272
+        "ts":1775905947
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2725,14 +2725,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_09_022a63e1_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_10_f1ea0386_32.zip",
             "x":{
-                "RenderDoc_2026_04_09_022a63e1_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_09_022a63e1_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_10_f1ea0386_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_10_f1ea0386_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1775685600
+            "ts":1775772000
         }],
-        "ts":1775685600
+        "ts":1775772000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",

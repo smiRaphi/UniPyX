@@ -890,7 +890,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             from base64 import b64decode
             d = b64decode(open(i).read().strip().strip('=') + '===')
             try: assert '\0' not in d.decode('utf-8')
-            except: ext = 'bin'
+            except: ext = guess_ext(d)
             else:
                 if d.strip().startswith(b'{"') and d.strip().endswith(b'}'): ext = 'json'
                 else: ext = 'txt'

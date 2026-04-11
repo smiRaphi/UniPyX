@@ -1055,8 +1055,9 @@
         "rs":"One Piece Battle Adventure APF FSM","s":1
     },
     {
-        "d":[["isin",["\\x4D\\xB5\\x5A\\x5E","\\xE0\\x62\\xFF\\x93","\\x83\\xBA\\xF3\\x71"],8],["n0",4,0],["n0",4,4],["n0",4,12],["n0",4,16]],
-        "rs":"Sine Mora EX BIN","s":1
+        "d":[["isin",["\\x4D\\xB5\\x5A\\x5E","\\xD5\\xA7\\x1E\\x1E","\\x09\\x87\\xE1\\x5C","\\x50\\xB6\\xC0\\x06","\\x83\\xBA\\xF3\\x71","\\x1F\\x04\\x0C\\xF1","\\xDE\\xD4\\x92\\x1F","\\x5B\\x02\\xF2\\x08","\\xE0\\x62\\xFF\\x93","\\x30\\xF8\\x22\\x1E","\\xCE\\xDC\\xB1\\x17","\\xE0\\xF3\\x8E\\x20","\\x11\\xC4\\xD5\\x5E","\\xE0\\xE1\\xEB\\xD7"],8],
+             ["n0",4,0],["n0",4,4],["n0",4,12],["n0",4,16]],
+        "rs":"Sine Mora EX BIN"
     },
     {
         "d":[["isin",["\\0\\0\\x80\\x08","\\x08\\x80\\0\\0"],0],["isat","\\0\\0\\0\\0",20],["isatS","\\xCC",160,-168],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(4);s=int.from_bytes(f.read(4),e);return exists(splitext(inp)[0]+'.gob')and os.path.getsize(splitext(inp)[0]+'.gob')==s"]],
@@ -1069,6 +1070,10 @@
     {
         "d":[["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,36],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');s=(12+32*c);f.seek(36);return (s+(-s%2048))==int.from_bytes(f.read(4),'little')"]],
         "rs":"Doom 3 Xbox Graph"
+    },
+    {
+        "d":[["s%",16],["isat","\\x4F\\xF3\\x2F\\xAC\\0\\0\\1\\0",0],["n0",4,8],["n0",4,12],["str0e",16,64,5],["py","f=open(inp,'rb');f.seek(8);o=int.from_bytes(f.read(4),'little');c=o+16+int.from_bytes(f.read(4),'little')*24;f.seek(o+28);return (c+-c%16)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Torque HHA"
     },
     {
         "d":[["isat","SFS1",0],["n0",2,4],["n0",2,6],["str0e",8,64,10]],
