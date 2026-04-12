@@ -174,7 +174,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if os.path.exists(o + '/Image0') and listdir(o + '/Image0'):
                 fs = listdir(o)
                 copydir(o + '/Image0',o)
-                mv(o + '/Sc0',o + '/sce_sys')
+                copydir(o + '/Sc0',o + '/sce_sys',True)
                 for x in fs: remove(o + '/' + x)
                 return
         case 'PS5 PKG':

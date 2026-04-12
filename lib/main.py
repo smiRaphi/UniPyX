@@ -176,8 +176,9 @@ def msplit(i:str|list[str],seps:list[str]) -> list[str]:
     return out
 
 TDB:dict = json.load(xopen('lib/tdb.json'))
-DDB:list[dict] = json.load(xopen('lib/ddb.json'))
 TDBF = set(sum(TDB.values(),[]))
+WEAK = set(json.load(xopen('lib/weak.json')))
+DDB:list[dict] = json.load(xopen('lib/ddb.json'))
 TRDB = None
 db = DLDB()
 
@@ -268,11 +269,7 @@ def analyze(inp:str,raw=False):
             ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
         else: f.close()
 
-    for wt in {'plain text','Plain text','ASCII text','data','null data','null bytes','directory',
-               'XBase DataBase (generic)','HomeLab/BraiLab Tape image','VXD Driver','Sybase iAnywhere database files','LLVM Bitcode (generic)','PC Paint/Pictor bitmap'
-               'DICOM medical imaging bitmap (w/o header)','Enter a useful filetype description','Z-Code V8 adventure for Infocom Z-Machine','LTAC compressed audio (v1.61)',
-               'Adobe Photoshop Color swatch','Gazebo model Configuration','DEGAS med-res bitmap','GEM bitmap (v1)',"T'SoundSystem Source (with rem)",'Bio-Rad Image(s) bitmap'}:
-        if wt in ts: ts.remove(wt)
+    ts = [x for x in ts if not x in WEAK]
     tst = []
     for t in ts:
         if t.startswith('Nintendo 3DS SMDH file: "'): tst.append('Nintendo 3DS SMDH file')

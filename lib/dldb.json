@@ -5749,6 +5749,9 @@
         }],
         "ts":0
     },
+    "mmh3":{
+        "pip":"mmh3"
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

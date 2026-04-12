@@ -349,6 +349,10 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'bkdr_rtl':
             i = i[::-1]
             fnc = bkdr
+        case 'murmur3'|'mmh3'|'murmur3_32'|'mmh3_32'|'murmur3_128'|'mmh3_128':
+            import mmh3
+            kwargs['seed'] = kwargs.get('seed',0) & maskb(4)
+            fnc = getattr(mmh3,f'mmh3_{"x64_128" if "128" in algo else "32"}_uintdigest')
 
         case 'sha1'|'sha256'|'md5':
             import hashlib
@@ -750,6 +754,8 @@ HASHTS = {
     'fnv1_32':4,'fnv1a_32':4,
     'fnv1_64':8,'fnv1a_64':8,
     'bkdr':4,'bkdr_ltr':4,'bkdr_rtl':4,
+    'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
+    'murmur3_128':8,'mmh3_128':8,
     'md5':16,'sha1':20,'sha256':32,
     'tarzan':4,'hash40':5,
 }
