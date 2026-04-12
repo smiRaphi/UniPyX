@@ -1133,7 +1133,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if fe[3] == 2:
                         fn += 'txt'
                         if f.readu16('>') == (fe[1] - 2): fn += '.res'
-                    else: fn += fix_zeebo(f,fe[3]) or f'{fe[3]}.unk'
+                    else: fn += guess_ext_zeebo(f,fe[3])
 
                     f.seek(fe[0])
                     open(o + '/' + fn,'wb').write(f.read(fe[1]))
@@ -1149,7 +1149,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'Zeebo FUFS':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
 
             assert f.read(4) == b'FUFS'
@@ -1160,27 +1160,25 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for _ in range(fc): fs.append((f.readu32(),f.readu32(),f.readu32()))
             for fe in fs:
                 f.seek(fe[0])
+                d = f.read(fe[2])
 
-                tag = f.read(4)
-                ext = fix_zeebo(f)
-                if not ext and fe[2] < 0x1000:
-                    try: (tag + f.read(fe[2]-4)).decode('utf-8')
+                ext = guess_ext_zeebo(d)
+                if ext == 'bin' and fe[2] < 0x1000:
+                    try: assert not '\0' in d.decode('utf-8')
                     except: ext = 'bin'
                     else: ext = 'txt'
-                else: ext = 'bin'
 
-                f.seek(fe[0])
-                open(o + '/' + hex(fe[1])[2:].upper().zfill(8) + '.' + ext,'wb').write(f.read(fe[2]))
+                open(f'{o}/{fe[1]:08X}.{ext}','wb').write(d)
+                if ext == 'plzp':
+                    d = decompress(d[12:],'zlib')
+                    open(f'{o}/{fe[1]:08X}_ext.{guess_ext_zeebo(d)}','wb').write(d)
             if fs: return
         case 'Zeebo PLZP':
-            import zlib
             if db.print_try: print('Trying with custom extractor')
-            f = open(i,'rb')
-            f.seek(12)
-            data = zlib.decompress(f.read())
-            try: open(o + '/' + tbasename(i) + '.' + (fix_zeebo(data) or 'bin'),'wb').write(data)
-            except zlib.error: pass
-            else: return
+            from lib.file import decompress
+            d = decompress(readfile(i)[12:],'zlib')
+            open(f'{o}/{tbasename(i)}.{guess_ext_zeebo(d)}','wb').write(d)
+            return
         case 'ZLARC':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

@@ -690,25 +690,45 @@ def fix_cab2(o:str):
             try: mv(o + '/' + f,o + '/' + fn)
             except PermissionError: pass
             else: break
-def fix_zeebo(f,hint:int=None):
-    import io
-    if type(f) == bytes: f = io.BytesIO(f)
+def guess_ext(d:bytes) -> str:
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
 
-    tag = f.read(4)
+    ext = 'bin'
+    if d[:4] == b'\x89PNG': ext = 'png'
+    elif d[:4] == b'RIFF': ext = 'wav'
+    elif d[:4] == b'OggS': ext = 'ogg'
+    elif d[:4] == b'fLaC': ext = 'flac'
+    elif d[:4] == b'MThd': ext = 'mid'
+    elif d[:4] == b'DXBC': ext = 'cso'
+    elif d[:4] == b'NES\x1A': ext = 'nes'
+    elif d[:4] == b'\x7FELF': ext = 'elf'
+    elif d[:4] == b'DDS ': ext = 'dds'
+    elif d[:4] == b'\x1BLua': ext = 'luac'
+    elif d[:0x14] == b'Creative Voice File\x1A': ext = 'voc'
+    elif d[:0x17] == b'Kaydara FBX Binary  \0\x1A\0': ext = 'fbx'
+    elif d[6:10] == b'JFIF': ext = 'jpg'
+    elif d[:4] == b'\0\0\1\xBA' and\
+         d[4] >> 6 == 0b01 and d[4] & 4 and\
+         d[6] & 4 and d[8] & 4 and d[9] & 1 and\
+         d[12] & 3 == 0b11 and not d[13] >> 3: ext = 'mpeg2'
+    elif d[:2] == b'BM' and (not sum(d[4:8]) or not d[3]): ext = 'bmp'
+    elif d[:0x13] == b'<?xml version="1.0"': ext = 'xml'
+    elif d[:10] == b'# Blender ' and d[15:0x1A] == b' MTL File: ' and (d[10:11]+d[12:13]+d[14:15]).isdigit() and d[11] == d[13] == 0x2E: ext = 'blend'
+    elif int.from_bytes(d[:4],'little') == s and d[5] == 0xAF and d[4] in {0x11,0x12,0x30,0x31,0x44}: ext = 'flc'
+    elif s > 0x100 and (d[:3] == b'ID3' or
+                       (d[0] == 0xFF and d[1] & 0xE0 == 0xE0 and d[1] & 0x18 != 8 and d[1] & 0x06 != 0 and
+                        d[2] & 0xF0 != 0xF0 and d[2] & 0x0C != 0x0C and d[3] & 0b11 != 0b10)): ext = 'mp3'
+    elif d[0] == 0x78 and not (d[0]<<8 | d[1])%31: ext = 'zlib'
 
-    if tag == b'\x89PNG': ext = 'png'
-    elif tag == b'RIFF': ext = 'wav'
-    elif tag == b'MThd': ext = 'mid'
-    elif tag == b'PLZP': ext = 'plzp'
-    else:
-        f.seek(2,1)
-        if f.read(4) == b'JFIF': ext = 'jpg'
-        elif tag[:3] == b'ID3' or\
-            (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
-                ext = 'mp3'
-        elif tag[0] == 0x78 and not (tag[0]<<8 | tag[1])%31: ext = 'zlib'
-        elif not hint is None and hint <= 3: ext = ('image','audio','txt','bin')[hint]
-        else: ext = None
+    return ext
+def guess_ext_zeebo(d:bytes,hint:int=None):
+    if not d: return 'null'
+
+    if d[:4] == b'PLZP': ext = 'plzp'
+    elif not hint is None and hint <= 3: ext = ('image','audio','txt','bin')[hint]
+    else: ext = guess_ext(d)
 
     if not hint is None:
         if hint == 0 and ext not in ('png','jpg'): ext = 'image'
@@ -716,187 +736,51 @@ def fix_zeebo(f,hint:int=None):
         elif hint == 2: ext = 'txt'
 
     return ext
-def guess_ext(f):
-    if not f: return 'null'
-    import io
-    if type(f) == bytes:
-        s = len(f)
-        f = io.BytesIO(f)
-    else:
-        p = f.tell()
-        s = f.seek(0,2)
-        f.seek(p)
-
-    tag = f.read(4)
-    if len(tag) != 4: return 'bin'
+def guess_ext_psx(d:bytes):
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
 
     ext = None
-    if tag == b'\x89PNG': ext = 'png'
-    elif tag == b'RIFF': ext = 'wav'
-    elif tag == b'OggS': ext = 'ogg'
-    elif tag == b'fLaC': ext = 'flac'
-    elif tag == b'MThd': ext = 'mid'
-    elif tag == b'DXBC': ext = 'cso'
-    elif tag == b'NES\x1A': ext = 'nes'
-    elif tag == b'DDS ': ext = 'dds'
-    elif tag == b'\x1BLua': ext = 'luac'
-    if not ext and tag == b'Crea':
-        if f.read(0x10) == b'tive Voice File\x1A': ext = 'voc'
-        else: f.seek(-0x10,1)
-    if not ext and tag == b'Kayd':
-        if f.read(0x13) == b'ara FBX Binary  \0\x1A\0': ext = 'fbx'
-        else: f.seek(-0x13,1)
-    if not ext and tag == b'\0\0\1\xBA':
-        b = f.read(1)[0]
-        if b >> 6 == 0b01 and b & 4:
-            f.seek(1,1)
-            b = f.read(1)[0]
-            if b & 4:
-                f.seek(1,1)
-                b = f.read(1)[0]
-                if b & 4:
-                    b = f.read(1)[0]
-                    if b & 1:
-                        f.seek(2,1)
-                        b = f.read(1)[0]
-                        if b & 3 == 3:
-                            b = f.read(1)[0]
-                            if not b & 0xF8: ext = 'mpeg2'
-                            f.seek(-1,1)
-                        f.seek(-3,1)
-                    f.seek(-1,1)
-                f.seek(-2,1)
-            f.seek(-2,1)
-        f.seek(-1,1)
-    if not ext and tag[:2] == b'BM':
-        f.seek(1,1)
-        t1 = f.read(1)[0]
-        if not sum(f.read(4)) or not t1: ext = 'bmp'
-        else: f.seek(-6,1)
-    if not ext and tag == b'<?xm':
-        if f.read(15) == b'l version="1.0"': ext = 'xml'
-        else: f.seek(-15,1)
-    if not ext and tag == b'# Bl':
-        hd = f.read(0x16)
-        if hd[:6] == b'ender ' and hd[11:] == b' MTL File: ' and (hd[6:7]+hd[8:9]+hd[10:11]).isdigit() and hd[7] == hd[9] == 0x2E: ext = 'blend'
-        else: f.seek(-0x16,1)
-    if not ext:
-        if s == int.from_bytes(tag,'little'):
-            if f.read(2) in (b'\x11\xAF',b'\x12\xAF',b'\x30\xAF',b'\x31\xAF',b'\x44\xAF'): ext = 'flc'
-            else: f.seek(-2,1)
-    if not ext:
-        f.seek(2,1)
-        if f.read(4) == b'JFIF': ext = 'jpg'
-        elif s > 0x100 and tag[:3] == b'ID3' or\
-            (tag[0] == 0xFF and tag[1] & 0xE0 == 0xE0 and tag[1] & 0x18 != 8 and tag[1] & 0x06 != 0 and tag[2] & 0xF0 != 0xF0 and tag[2] & 0x0C != 0x0C and tag[3] & 3 != 2):
-                ext = 'mp3'
-        elif tag[0] == 0x78 and not (tag[0]<<8 | tag[1])%31: ext = 'zlib'
-        else: ext = 'bin'
+    if d[:4] == b'pBAV': ext = 'vh'
+    elif d[:4] == b'pQES': ext = 'sep'
+    elif d[:4] in {b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'}: ext = 'vag'
+    elif d[:4] == b'\x10\0\0\0' and int.from_bytes(d[4:8],'little') in {2,8,9} and\
+         int.from_bytes(d[8:12],'little') == (int.from_bytes(d[0x10:0x12],'little')*int.from_bytes(d[0x12:0x14],'little')*2+12): ext = 'tim'
+    elif not s%0x10 and not sum(d[:0x10]):
+        for p in range(0x10,s,0x10):
+            if d[p] >> 4 > 5 or d[p+1] > 7: break
+        else: ext = 'vb'
+    if not ext: ext = guess_ext(d)
 
     return ext
-def guess_ext_psx(f):
-    if not f: return 'null'
-    import io
-    if type(f) == bytes: f = io.BytesIO(f)
-    tag = f.read(4)
+def guess_ext_ps2(d:bytes):
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
 
-    ext = 'bin'
-    if tag == b'\x89PNG': ext = 'png'
-    elif tag == b'RIFF': ext = 'wav'
-    elif tag == b'MThd': ext = 'mid'
-    elif tag == b'pBAV': ext = 'vh'
-    elif tag == b'pQES': ext = 'sep'
-    elif tag in (b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'): ext = 'vag'
-    elif tag == b'\x10\0\0\0' and int.from_bytes(f.read(4),'little') in (2,8,9):
-        fo = int.from_bytes(f.read(4),'little')
-        f.seek(4,1)
-        nc,np = int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')
-        if (nc*np*2+12) == fo: ext = 'tim'
-    elif (tag+f.read(12)) == b'\0'*16:
-        p = f.tell()
-        s = f.seek(0,2)
-        f.seek(p)
-        if not (s-(p-16)) % 0x10:
-            while f.tell() < s:
-                if f.read(1)[0] >> 4 > 5 or f.read(1)[0] > 7: break
-                f.seek(14,1)
-            else: ext = 'vb'
+    ext = None
+    if d[:4] == b'TIM2': ext = 'tm2'
+    if d[::8] == b'IECSsreV': ext = 'hd'
+    if d[:0x18] == b'RESET\0\0\0\0\0\x08\0\0\0\0\0ROMDIR\0\0': ext = 'img'
+    elif d[:0x10] == b'BOOT2 = cdrom0:\\': ext = 'cnf'
+    elif not s%0x10 and not d[0] and not sum(d[2:0x10]):
+        for p in range(0x10,s,0x10):
+            if d[p] >> 4 > 5: break
+        else: ext = 'psadpcm'
+    if not ext:
+        ext = guess_ext_psx(d)
+        if ext == 'vb': ext = guess_ext(d)
 
     return ext
-def guess_ext_ps2(f):
-    if not f: return 'null'
-    import io
-    if type(f) == bytes: f = io.BytesIO(f)
-    tag = f.read(4)
+def guess_ext_nds(d:bytes):
+    if not d: return 'null'
 
-    ext = None
-    if tag == b'\x89PNG': ext = 'png'
-    elif tag == b'RIFF': ext = 'wav'
-    elif tag == b'MThd': ext = 'mid'
-    elif tag == b'TIM2': ext = 'tm2'
-    elif tag == b'\x7FELF': ext = 'elf'
-    elif tag in (b'VAG1',b'VAG2',b'VAGi',b'pGAV',b'VAGp'): ext = 'vag'
-    if not ext and tag == b'IECS':
-        if f.read(4) == b'sreV': ext = 'hd'
-        else: f.seek(-4,1)
-    if not ext and tag == b'RESE':
-        if f.read(20) == b'T\0\0\0\0\0\x08\0\0\0\0\0ROMDIR\0\0': ext = 'img'
-        else: f.seek(-20,1)
-    if not ext and tag == b'\0\0\1\xBA':
-        b = f.read(1)[0]
-        if b >> 6 == 0b01 and b & 4:
-            f.seek(1,1)
-            b = f.read(1)[0]
-            if b & 4:
-                f.seek(1,1)
-                b = f.read(1)[0]
-                if b & 4:
-                    b = f.read(1)[0]
-                    if b & 1:
-                        f.seek(2,1)
-                        b = f.read(1)[0]
-                        if b & 3 == 3:
-                            b = f.read(1)[0]
-                            if b & 0xF8 in (0,0xF8): ext = 'mpeg2'
-                            f.seek(-1,1)
-                        f.seek(-3,1)
-                    f.seek(-1,1)
-                f.seek(-2,1)
-            f.seek(-2,1)
-        f.seek(-1,1)
-    if not ext and tag == b'\x10\0\0\0':
-        if int.from_bytes(f.read(4),'little') in (2,8,9):
-            fo = int.from_bytes(f.read(4),'little')
-            f.seek(4,1)
-            nc,np = int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')
-            if (nc*np*2+12) == fo: ext = 'tim'
-            else: f.seek(-0x10,1)
-        else: f.seek(-4,1)
-    if not ext and tag == b'BOOT':
-        if f.read(12) == b'2 = cdrom0:\\': ext = 'cnf'
-        else: f.seek(-12,1)
-    if not ext and not (tag[0]+tag[2]+tag[3]):
-        p = f.tell()
-        s = f.seek(0,2)
-        f.seek(p)
-        if not (s-(p-4)) % 0x10 and not sum(f.read(12)):
-            while f.tell() < s:
-                if f.read(1)[0] >> 4 > 5: break
-                f.seek(15,1)
-            else: ext = 'psadpcm'
+    if d[:4] in {b'RGCN',b'RLCN',b'RECN',b'RNAN',b'RCSN'}: ext = d[:4].decode('ascii').lower()[::-1]
+    elif d[:4] in {b'BMD0',}: ext = d[:3].decode('ascii').lower()
+    else: ext = guess_ext(d)
 
-    return ext or 'bin'
-def guess_ext_nds(f):
-    if not f: return 'null'
-    import io
-    if type(f) == bytes: f = io.BytesIO(f)
-    tag = f.read(4)
-
-    ext = None
-    if tag in (b'RGCN',b'RLCN',b'RECN',b'RNAN',b'RCSN'): ext = tag.decode('ascii').lower()[::-1]
-    elif tag in (b'BMD0',): ext = tag[:3].decode('ascii').lower()
-
-    return ext or 'bin'
+    return ext
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
