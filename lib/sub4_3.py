@@ -1611,6 +1611,139 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'One Piece Battle Adventure FSM':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+
+            f._end = '>' if f.readu8() == 1 else '<'
+            f.skip(7)
+            assert f.read(7) == b'FSM_v1.'
+            v = f.read(1)[0]-0x30
+            assert v in {1,2},v
+            f.back(14)
+
+            if v == 1:
+                f.skip(2)
+                align = 0x20
+                ces = 0xC
+            elif v == 2:
+                align = f.readu16()
+                ces = 0x20
+            tab_is = f.readu32()
+            assert tab_is in {0,1}
+            f.skip(8)
+            c = f.readu32() + f.readu32()
+            fes = f.readu32()
+            uxs = f.readu32() * 4
+
+            f.seek(align+-align%0x20)
+
+            def readce():
+                be = f._end
+
+                f._end = '>' if f.readu8() == 1 else '<'
+                ct = f.readu8()
+                assert ct in {0,3,5,7},ct
+                assert ct != 5,f'{ct} not implemented (FUN_002ff030)'
+                f.skip(2)
+                us,zs = f.readu32(),f.readu32()
+                f.skip(ces - 12)
+
+                d = f.decompress(zs,('none',0,0,'lzss16',0,1,0,'zlib')[ct],usize=us,big_endian=f._end == '>')
+                f.align(align)
+
+                f._end = be
+                return d
+
+            ft = File(readce(),endian=f._end)
+            ft_readv = ft.readu32 if tab_is else ft.readu16
+            ovs = [ft_readv() for _ in range(c)]
+            ft.align(4)
+            ftbp = ft.pos
+
+            drs = ['/']*c
+            fc = 0
+            for ix in range(c):
+                ft.seek(ftbp + fc * uxs + ix * 12 + ovs[ix])
+                vs = (ft.readu32(),ft.readu32(),ft.readu32())
+
+                if vs[0] & 0x10000000:
+                    n = ft.read0s().decode('ascii')
+                    ft.back(len(n)+1)
+                    drs += [drs.pop() + '/' + n] * vs[2]
+                else:
+                    ft.skip(uxs)
+                    fc += 1
+
+                    fn = ft.read0s()
+                    ft.back(len(fn)+1)
+                    try:
+                        fn = fn.decode('ascii')
+                        assert fn.isprintable() and fn,fn
+                    except:
+                        print(ft.pos)
+                        raise
+                    f.seek(align + fes + vs[1]*align)
+                    f.align(align)
+                    f.align(0x20)
+                    d = readce() if uxs else f.readc(vs[2])
+                    xopen(o + '/' + drs.pop() + '/' + fn,'wb').write(d)
+
+            ft.close()
+            f.close()
+            return
+        case 'One Piece Battle Adventure NXD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            dbb = db.print_try
+            db.print_try = False
+
+            f = File(i)
+            f._end = '>' if f.readu8() == 1 else '<'
+            f.skip(1)
+            aln = f.readu16()
+            f.skip(4)
+            assert f.read(7) == b'FSM_v1.'
+            v = f.read(1)[0]-0x30
+            assert v in {1,2},v
+            if v == 1: aln = 0x20
+
+            fc = f.readu32()
+            f.skip(4)
+            fs = f.readu32()
+            f.seek(aln + fs)
+            f.align(aln)
+            f.align(0x20)
+            f.skip(fc*aln)
+
+            while f:
+                bp = f.pos
+                if f.readu8() in {0,1}:
+                    f.skip(1)
+                    if not f.readu16()%0x10 and f.readu32() in {0,1} and f.read(7) == b'FSM_v1.' and f.read(1) in b'12': break
+                f.seek(bp+0x10)
+            else:
+                f.close()
+                db.print_try = dbb
+                return 1
+            aln = bp
+
+            rs = []
+            for of in range(0,f.size,aln):
+                f.seek(of)
+                if f.readu8() not in {0,1}: continue
+                f.skip(1)
+                if f.readu16()%0x10 or not f.readu32() in {0,1} or f.read(7) != b'FSM_v1.' or not f.read(1) in b'12': continue
+                f.seek(of)
+                tf = TmpFile()
+                xopen(tf,'wb').write(f.read())
+                rs.append(extract4_3(tf.p,o,'One Piece Battle Adventure FSM'))
+                tf.destroy()
+
+            f.close()
+            db.print_try = dbb
+            if not any(rs): return
 
     return 1
 

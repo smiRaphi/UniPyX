@@ -1048,8 +1048,12 @@
         "rs":"Alter Echo RAD","s":1
     },
     {
-        "d":[["isat","FSM_v1.",8],["isin",["1","2"],15],["n0",8,0],["n0",4,16],["n0",4,20]],
-        "rs":"One Piece Battle Adventure APF FSM","s":1
+        "d":[["ext","nxd"],["s%",8192],["isat","FSM_v1.",8],["isin",["1","2"],15],["isin",["\\0","\\1"],0],["isin",["\\1\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\0"],4]],
+        "rs":"One Piece Battle Adventure NXD","s":1
+    },
+    {
+        "d":[["isat","FSM_v1.",8],["isin",["1","2"],15],["isin",["\\0","\\1"],0],["isin",["\\1\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\0"],4]],
+        "rs":"One Piece Battle Adventure FSM","s":1
     },
     {
         "d":[["isin",["\\x4D\\xB5\\x5A\\x5E","\\xD5\\xA7\\x1E\\x1E","\\x09\\x87\\xE1\\x5C","\\x50\\xB6\\xC0\\x06","\\x83\\xBA\\xF3\\x71","\\x1F\\x04\\x0C\\xF1","\\xDE\\xD4\\x92\\x1F","\\x5B\\x02\\xF2\\x08","\\xE0\\x62\\xFF\\x93","\\x30\\xF8\\x22\\x1E","\\xCE\\xDC\\xB1\\x17","\\xE0\\xF3\\x8E\\x20","\\x11\\xC4\\xD5\\x5E","\\xE0\\xE1\\xEB\\xD7"],8],

@@ -131,7 +131,6 @@ def extract4_2(inp:str,out:str,t:str):
             xopen(o + '/$rest.bin','wb').write(f.read())
             f.close()
             if c: return
-        case 'One Piece Battle Adventure APF FSM': raise NotImplementedError
         case 'Doom 3 Xbox GFC+GOB':
             t1,t2 = TmpFile('.gfc',path=o),TmpFile('.gob',path=o)
             t1.link(i)
@@ -1513,7 +1512,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(file_syso+secs)
                 v = 5
 
-            tb = File(tb,endian='<')
+            tb = File(tb,endian=f._end)
             tb.skip(4)
             cs = [tb.readu32() for _ in range(9)]
             tc = (tb.readu32(),tb.readu32())

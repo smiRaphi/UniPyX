@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 868
+# Supported Formats: 870
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (427)
+## Various (429)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -611,6 +611,8 @@ NSMBW Coin World ARC | .arc | Custom |
 NUB2 | .nub .nub2 | [nus3_nub2.bms](https://mirror.aluigi.org/bms/nus3_nub2.bms) |
 ODAU Zip | .odau | Custom |
 OHRRPGCE RPG | ??? | Custom |
+One Piece Battle Adventure FSM | .apf .pac | Custom |
+One Piece Battle Adventure NXD | .nxd | Custom |
 One Piece Straw Wars Pirate Defense Resource | ??? | Custom |
 Orange Juice Encrypted | .dat | [qpcrypt](https://github.com/jwilins/qptk) |
 Orange Juice LAG | .lag | Custom |

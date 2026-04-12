@@ -284,6 +284,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return bin.lzo.decompress(i,False,kwargs['usize'],algorithm=algo.upper())
         case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'lzss': return lzss_decompress(i,usize=kwargs['usize'])
+        case 'lzss16': return lzss16_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
             return lzw_decompress(i,**args)
@@ -568,6 +569,102 @@ def lzss_decompress(i:bytes,usize:int=None):
                 win[winp] = b
                 winp = (winp + 1) & mask(13)
     return bytes(ob)[:usize]
+def lzss16_decompress(i:bytes,usize:int=None,big_endian=False):
+    pos = 0
+
+    def ru8():
+        nonlocal pos
+        if pos >= len(i): return
+        b = i[pos]
+        pos += 1
+        return b
+
+    def ru16():
+        b1 = ru8()
+        if b1 is None: return
+        b2 = ru8()
+        if b2 is None: return
+        return (b1 << 8) | b2 if big_endian else (b2 << 8) | b1
+
+    ob = bytearray()
+    win = bytearray(0x2000)
+    winp = 0
+
+    ctrlw = ru16()
+    if ctrlw is None: return bytes()
+    bl = 16
+
+    def get_flg():
+        nonlocal ctrlw,bl
+
+        if bl == 0:
+            cw = ru16()
+            if cw is None: return
+            ctrlw = cw
+            bl = 16
+
+        bit = ctrlw & 1
+        ctrlw >>= 1
+        bl -= 1
+
+        if bl == 0:
+            cw = ru16()
+            if cw is not None:
+                ctrlw = cw
+                bl = 16
+
+        return bit
+
+    while True:
+        if usize and len(ob) >= usize: break
+
+        f1 = get_flg()
+        if f1 is None: break
+
+        if f1 == 1:
+            b = ru8()
+            if b is None: break
+            ob.append(b)
+            win[winp] = b
+            winp = (winp + 1) & mask(13)
+        else:
+            f2 = get_flg()
+            if f2 is None: break
+            if f2 == 0:
+                b3 = get_flg()
+                b4 = get_flg()
+                if b3 is None or b4 is None: break
+
+                mtlen = ((b3 << 1) | b4) + 2
+                dist = ru8()
+                if dist is None: break
+                mtdist = dist
+            else:
+                b1 = ru8()
+                if b1 is None: break
+                b2 = ru8()
+                if b2 is None: break
+
+                mtdist = b1 + ((b2 >> 3) * 256)
+                lenc = b2 & 0x07 
+
+                if lenc != 0: mtlen = lenc + 2
+                else:
+                    b3 = ru8()
+                    if b3 is None: break
+                    if b3 == 0: break
+                    elif b3 == 1: continue
+                    else: mtlen = b3 + 1
+
+            cpysrc = (winp - mtdist) & mask(13)
+            for _ in range(mtlen):
+                b = win[cpysrc]
+                ob.append(b)
+                win[winp] = b
+                winp = (winp + 1) & mask(13)
+                cpysrc = (cpysrc + 1) & mask(13)
+
+    return bytes(ob)[:usize] if usize else bytes(ob)
 def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
     max_dict = max_dict or reset
     d = BitReader(i)
