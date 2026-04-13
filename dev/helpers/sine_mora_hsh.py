@@ -1,7 +1,7 @@
 import os
 from lib.file import sdbm,File
 
-P = r"E:\Programmieren\python\UniPyX\out\Sine Mora"
+P = r"<dir>"
 HL = []
 for x in os.listdir(P):
     x = os.path.join(P,x)
@@ -44,7 +44,7 @@ if 0:
             for x in exts: chk(i + '.' + x,prf=False)
         else: chk(i)
 elif 0:
-    PM = r"E:\Programmieren\python\UniPyX\out\Sine Mora\render"
+    PM = r"<dir>\render"
     import re
     R1 = re.compile(r'(?m)^\t"([^"])" *: *\{')
     RS = [re.compile(x) for x in {r'"RENDERSTATEBLOCK" *: *"([^"]+)"',r'"(?:VERTEX|PIXEL)SHADER" *: *\["([^"]+)" *,',r'"SAMPLERSTATE" *: *\["[^"]*" *, *"([^"]+)"\]'}]
@@ -70,7 +70,7 @@ elif 0:
             chk(f'{x}{ix:02d}.sph',prf=False)
 
     L1 = ('_norm','_diff','_mask')
-    PS = r"E:\Programmieren\python\UniPyX\out\Sine Mora\tira\$unk"
+    PS = r"<dir>"
     for x in os.listdir(PS):
         if not x.endswith('.sph'): continue
         f = File(os.path.join(PS,x),endian='<')
@@ -143,10 +143,10 @@ for x in PL.copy():
         p = 'textures/'
         if x.startswith('gui_'): chk(p + 'gui/' + x,prf=False)
         chk(p + x,prf=False)
-        for i1 in os.listdir(r"E:\Programmieren\python\UniPyX\out\Sine Mora"): chk(f'objects/levels/{i1[:-4]}/{x[:-4]}',prf=False)
+        for i1 in os.listdir(r"<dir>"): chk(f'objects/levels/{i1[:-4]}/{x[:-4]}',prf=False)
     elif x.endswith(('.sph')):
         chk('objects/' + x[:-4],prf=False)
-        for i1 in os.listdir(r"E:\Programmieren\python\UniPyX\out\Sine Mora"): chk(f'objects/levels/{i1[:-4]}/{x[:-4]}',prf=False)
+        for i1 in os.listdir(r"<dir>"): chk(f'objects/levels/{i1[:-4]}/{x[:-4]}',prf=False)
     elif x.endswith(('.bson')): chk(f'scenes/{x[:-5]}',prf=False)
     elif x.endswith(('.sub')): chk(f'subtitles/{x[:-4]}',prf=False)
     elif x.startswith('textures/'): chk(x.rsplit('/',1)[1] + '.dds',prf=False)
