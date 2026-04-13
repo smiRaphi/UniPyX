@@ -276,6 +276,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lz4_frame':
             import lz4.frame
             return lz4.frame.decompress(i)
+        case 'lz4_fast': return lz4_fast_decompress(i,usize=kwargs['usize'])
         case 'lzo'|'lzo1x'|'lzo1y':
             if 'db' in kwargs: kwargs['db'].get('lzo')
             if algo == 'lzo': algo = 'lzo1x'
@@ -350,6 +351,10 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'bkdr_rtl':
             i = i[::-1]
             fnc = bkdr
+        case 'sdbm'|'sdbm_ltr': fnc = sdbm
+        case 'sdbm_rtl':
+            i = i[::-1]
+            fnc = sdbm
         case 'murmur3'|'mmh3'|'murmur3_32'|'mmh3_32'|'murmur3_128'|'mmh3_128':
             import mmh3
             kwargs['seed'] = kwargs.get('seed',0) & maskb(4)
@@ -765,6 +770,43 @@ def ash0_decompress(i:bytes):
         except: break
 
     return bytes(out)
+def lz4_fast_decompress(d:bytes,usize:int=None):
+    p = 0
+    ob = bytearray()
+
+    try:
+        while usize is None or len(ob) < usize:
+            tok = d[p]
+            p += 1
+
+            num_literals = tok >> 4
+            if num_literals == 0x0F:
+                while True:
+                    l = d[p]
+                    p += 1
+                    num_literals += l
+                    if l != 0xFF: break
+
+            ob.extend(d[p : p + num_literals])
+            p += num_literals
+
+            if usize is not None and len(ob) >= usize: break
+
+            off = d[p] | (d[p + 1] << 8)
+            p += 2
+
+            ml = (tok & 0x0F) + 4
+            if ml == 19:
+                while True:
+                    l = d[p]
+                    p += 1
+                    ml += l
+                    if l != 0xFF: break
+
+            for _ in range(ml): ob.append(ob[-off])
+    except IndexError: pass
+        
+    return bytes(ob[:usize])
 
 def crc16(i:bytes,poly=0x8005,init=0) -> int:
     crc = init
@@ -790,6 +832,10 @@ def fnv1a_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
 def bkdr(i:bytes,seed=131,init=0):
     h = init
     for b in i: h = (h * seed + b) & maskb(4)
+    return h
+def sdbm(i:bytes,seed=0x1003F,init=0):
+    h = init
+    for b in i: h = ((h + b) * seed) & maskb(4)
     return h
 def tarzan_hash(i:bytes):
     o = 0
@@ -851,6 +897,7 @@ HASHTS = {
     'fnv1_32':4,'fnv1a_32':4,
     'fnv1_64':8,'fnv1a_64':8,
     'bkdr':4,'bkdr_ltr':4,'bkdr_rtl':4,
+    'sdbm':4,'sdbm_ltr':4,'sdbm_rtl':4,
     'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
     'murmur3_128':8,'mmh3_128':8,
     'md5':16,'sha1':20,'sha256':32,

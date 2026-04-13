@@ -1692,7 +1692,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             ft.close()
             f.close()
-            return
+            if listdir(o): return
         case 'One Piece Battle Adventure NXD':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

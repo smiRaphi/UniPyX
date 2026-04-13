@@ -6551,15 +6551,6 @@
         ]],
         "ts":0
     },
-    "sinemora":{
-        "p":"BMS/sinemora.bms",
-        "fs":[{
-            "u":".",
-            "x":{
-                "BMS/sinemora.bms":"BMS/sinemora.bms"
-            }
-        }]
-    },
     "gar":{
         "p":"BMS/gar.bms",
         "fs":[[
@@ -6964,6 +6955,14 @@
             "hashes/sumo_xpac.bhl"
         ]],
         "ts":1775825612
+    },
+    "sine_mora_hashes":{
+        "p":"hashes/sine_mora.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sine_mora.bhl",
+            "hashes/sine_mora.bhl"
+        ]],
+        "ts":1776098034
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",

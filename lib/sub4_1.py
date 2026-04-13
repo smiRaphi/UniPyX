@@ -1692,19 +1692,30 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if listdir(o): return
         case 'Sine Mora EX BIN':
-            if not quickbms('sinemora'):
-                for f in os.listdir(o):
-                    x = int(tbasename(f).rsplit('_',1)[1])
-                    d = open(o + '/' + f,'rb').read()
-                    if d.startswith((b'#include ',b'//')): ext = 'hlsl'
-                    elif d[:4] == b'0WAR': ext ='0war'
-                    elif d[:2] == b'\x00\x03' and d[2:6] in (b'\xFF\xFF\xFE\xFF',b'\xFE\xFF\xFE\xFF') and d[8:12] == b'CTAB': ext = 'fxc'
-                    elif d[:1] == b'{': ext = 'json'
-                    elif d[-2:] == b'\r\n' and d.isascii() and d.replace(b'\r\n',b'').replace(b'_',b'').replace(b'/',b'').isalnum(): ext = 'txt'
-                    elif d[:16] in (b'\xFF\xFE\x20\x00\x21\x00\x22\x00\x23\x00\x24\x00\x25\x00\x26\x00',b'\xFF\xFE\x30\x00\x31\x00\x32\x00\x33\x00\x34\x00\x35\x00\x36\x00'): ext = 'bin'
-                    else: ext = guess_ext(d)
-                    mv(o + '/' + f,o + f'/{x:03d}.{ext}')
-                return
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,HashLib
+            HL = HashLib.dl('sine_mora',db)
+            f = File(inp,endian='<')
+
+            fs = []
+            while (f.pos+20) < f.size:
+                fs.append(((f.readu32(),f.readu32(),f.readu32()),
+                           f.readu32(),f.readu32(),f.pos))
+                f.skip(fs[-1][2])
+
+            HL.wait()
+            for fe in fs:
+                fn = o + '/'
+                if fe[0][0] in HL: fn += HL.get(fe[0][0]) + '.' + HL.get(fe[0][2],f"{fe[0][2]:08X}")
+                elif fe[0][1] in HL: fn += '$unk/' + HL.get(fe[0][1])
+                else: fn += f"$unk/{fe[0][0]:08X}." + HL.get(fe[0][2],f"{fe[0][2]:08X}")
+
+                f.seek(fe[3])
+                d = f.decompress(fe[2],'lz4_fast',usize=fe[1])
+                xopen(fn,'wb').write(d)
+
+            f.close()
+            if fs: return
         case 'Vicarious Visions GFC+GOB': return quickbms('over_the_hedge')
         case 'GIANTS Archive': return quickbms('gar')
         case 'XNB': return quickbms('xnb')

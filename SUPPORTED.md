@@ -671,7 +671,7 @@ SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |
 Shrek Smash n' Crash Racing Pack | .dat | Custom |
-Sine Mora EX BIN | .bin | [sinemore.bms](https://reshax.com/topic/18788-sine-mora-ex-pc-bin/#findComment-102758) |
+Sine Mora EX BIN | .bin | Custom |
 Sinergy GUT | .gut | Custom |
 Siren 2 EVD | .evd | Custom |
 Siren 2 PAK | .pak | Custom |
