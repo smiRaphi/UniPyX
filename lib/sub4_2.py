@@ -1634,9 +1634,11 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Feral Header Library':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,crc_hash
-            f = File(i)
+            f = File(i,endian='<')
             assert f.read(4) == b'BILH'
-            f.skip(0x14)
+            if (24+f.readu32()+f.readu64()) == f.size: ver = 1
+            else: ver = 2
+            f.skip(8)
 
             def reads():
                 l = f.readu32()
@@ -1647,17 +1649,23 @@ def extract4_2(inp:str,out:str,t:str):
                 ex = n.rsplit('.',1)[1]
                 return f'{crc_hash(n[:-len(ex)].encode(),"md5"):032X}.{ex}'
 
-            rc = f.readu32('<')
-            f.skip(12)
-            for _ in range(rc): f.read0s()
+            if ver == 2:
+                rc = f.readu32()
+                f.skip(12)
+                for _ in range(rc): f.read0s()
+            elif ver == 1:
+                f.seek(4)
+                f.seek(24 + f.readu32())
+            else: raise NotImplementedError(ver)
             assert f.read(3) == b'BIN'
-            v = f.readu8()-48
+            ver = f.readu8()-48
+
+            if ver == 1: raise NotImplementedError(ver)
 
             bvl = db.print_try
             db.print_try = False
-            if v == 2:
-                if f.readu8(): f._end = '>'
-                else: f._end = '<'
+            if ver in {1,2}:
+                f._end = '>' if f.readu8() else '<'
                 f.skip(1)
                 secc = f.readu8()
                 f.skip(1)
@@ -1680,12 +1688,14 @@ def extract4_2(inp:str,out:str,t:str):
                     rlvs = {}
                     for _ in range(lc):
                         f.seek(sp)
-                        ro += f.reads32();sp += 4
-                        p = op + ro
+                        lof = f.reads32();sp += 4
+                        if ver == 2: ro += lof
+                        p = op + ro + (lof if ver == 1 else 0)
                         f.seek(p)
-                        v = f.reads32() + ro
-                        if v != -1: rlvs[p] = v + op - 4
+                        v = f.reads32() + (ro if ver != 1 else 0)
+                        if v != -1: rlvs[p] = v + (ro if ver == 1 else 0) + op - 4
                         else: rlvs[p] = None
+                        if ver == 1: ro += lof
                     rl = tuple(rlvs)
 
                     rp = 0
@@ -1738,7 +1748,7 @@ def extract4_2(inp:str,out:str,t:str):
 
                             ofs[ebf].count += 1
                     osp += ss
-            else: raise NotImplementedError(v)
+            else: raise NotImplementedError(ver)
             f.close()
             db.print_try = bvl
             if listdir(o): return

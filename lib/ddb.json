@@ -538,7 +538,9 @@
         "rs":"Trinity GFLXPack","s":1
     },
     {
-        "d":[["isat","BILH",0],["isat","\\0\\0\\0\\0",8],["isatS","\\xFF",8,16],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","BILH",0],["isat","\\0\\0",10],["isatS","\\xFF",8,16],["n0",8,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Feral Header Library","s":1},{
+        "d":[["isat","BILH",0],["isat","\\0\\0",14],["isatS","\\xFF",8,16],["n0",4,4],["n0",8,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(8),'little'))==s"]],
         "rs":"Feral Header Library","s":1
     },
     {
@@ -568,6 +570,10 @@
     {
         "d":[["isat","PBG\\x1A",0],["n0",4,8],["n0",4,16],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');f.seek(16);return (12+c*12)==int.from_bytes(f.read(4),'little')"]],
         "rs":"AmusementMakers Project B.G. Archive","s":1
+    },
+    {
+        "d":[["isat","\\x0D\\xD0\\xAD\\xBA\\1\\0\\0\\0",0],["isat","\\0",-1],["n0",8,8],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(8),'little'));c1,c2=int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')\nif c1>c2:return\nf.seek(c1*20,1)\nif f.read(5)!=b'\\x10\\0\\0\\0\\0' or f.read(1)[0]>1 or f.read(1)[0]:return\nf.seek(1,1);return sum(f.read(4))and sum(f.read(4))"]],
+        "rs":"RTX Remix Package","s":1
     },
     {
         "d":[["isin",["LTAR\\x04\\0\\0\\0","LTAR\\x03\\0\\0\\0",

@@ -21,12 +21,11 @@ enum ST:u32 {
 };
 struct RebLoc {
     s32 reb_loc_off @ sec_p;sec_p += 4;
-    reb_o += reb_loc_off;
-    $ = parent.p + reb_o;
-    s32 v;
+    s32 v @ (parent.p + reb_o + reb_loc_off);
     s64 rv = v + reb_o [[export]];
+    reb_o += reb_loc_off;
     s64 rvo = rv + parent.p - 4 [[export]];
-    if (rv != -1) {
+    if (v != -1) {
         u32 pv @ rvo;
     }
 };
@@ -38,7 +37,7 @@ struct Section {
     if (type == ST::Rebase) {
         reb_o = 0;
         u32 loc_c @ sec_p;sec_p += 4;
-        RebLoc locs[loc_c];
+        RebLoc locs[20];
     }
 };
 
@@ -49,7 +48,7 @@ struct Block {
     u32 size;
     s32 hunk3;
     s32 hunk4;
-    u64 p = $ + size;
+    u64 p = $ + hunk1 + hunk2;
 
     match(name) {
         // resource lib
@@ -57,15 +56,24 @@ struct Block {
         // header lib
         ("BILH"):{
             u32 refc;
-            u32 unk1;
-            u32 unk2;
-            u32 unk3;
+            float unk1[refc];
+            padding[12];
+            u32 sizes[refc];
             Str refs[refc];
 
             char bin[3];
             char version;
 
             if (version == '2') {
+                bool big_endian;
+                u8 alignment;
+                u8 sections_count;
+                padding[1];
+                be u32 data_length;
+                padding[4];
+                sec_p = $ + data_length;
+                Section secs[sections_count];
+            } else if (version == '1') {
                 bool big_endian;
                 u8 alignment;
                 u8 sections_count;
@@ -86,5 +94,5 @@ struct Block {
 };
 
 u64 sec_p = 0;
-s64 reb_o = 0;
+s64 reb_o = 0 [[export]];
 Block a @ 0;

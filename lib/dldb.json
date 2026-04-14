@@ -5752,6 +5752,15 @@
     "mmh3":{
         "pip":"mmh3"
     },
+    "gdeflate":{
+        "p":"gdeflate.dll",
+        "fs":[{
+            "u":".",
+            "x":{
+                "gdeflate.dll":"gdeflate.dll"
+            }
+        }]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

@@ -1744,6 +1744,38 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             db.print_try = dbb
             if not any(rs): return
+        case 'RTX Remix Package':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,crc_hash
+            f = File(i,endian='<')
+            assert f.read(4) == b'\x0D\xD0\xAD\xBA' and f.readu32() == 1
+
+            f.seek(f.readu64())
+            ac,bc = f.readu16(),f.readu16()
+            asts = [[f.readu16() for _ in range(10)] for _ in range(ac)]
+            blbs = []
+            for _ in range(bc):
+                fe = [f.readu40(),f.readu8()]
+                assert fe[1] in {0,1}
+                f.padc(1)
+                assert f.readu8() == 0
+                blbs.append(fe + [f.readu32(),f.readu32()])
+            stb = [x.decode('utf-8') for x in f.read()[:-1].split(b'\0')]
+
+            for a in asts:
+                bfn,xfn = splitext(stb[a[0]])
+                bfn = o + '/' + bfn
+                isn = not a[9]-a[8]
+                for ix in range(a[8],a[9] + 1):
+                    f.seek(blbs[ix][0])
+                    # seems to be some variation https://github.com/microsoft/DirectStorage/tree/main/GDeflate isn't able to decompress
+                    d = f.decompress(blbs[ix][2],('none','none'#'gdeflate'
+                                                  )[blbs[ix][1]],usize=a[2] | a[3] << 16,db=db)
+                    assert crc_hash(d,'crc32') == blbs[ix][3]
+                    xopen(bfn + ('' if isn else f'_{ix}') + xfn + ('.gd' if blbs[ix][1] else ''),'wb').write(d)
+
+            f.close()
+            if asts: return
 
     return 1
 

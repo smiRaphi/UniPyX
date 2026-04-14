@@ -109,7 +109,7 @@ class File:
         r = b''
         b = b''
         while True:
-            b = self.reads()
+            b = self.read(1)
             if not b or b == b'\0':break
             r += b
         return r
@@ -243,7 +243,9 @@ def ext_exe(i:str,dotnet=False):
         return r
 
 OODLE = None
+GDEFLATE = None
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
+    global OODLE,GDEFLATE
     match algo:
         case 'none': return i
         case 'zlib':
@@ -258,6 +260,21 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'bz2'|'bzip2':
             import bz2
             return bz2.decompress(i)
+        case 'zip':
+            import io
+            from zipfile import ZipFile
+            z = ZipFile(io.BytesIO(i))
+
+            om = kwargs.get('out',kwargs.get('o'))
+            if type(om) == int and om == 1:
+                assert len(z.namelist()) == 1
+                r = z.read(z.namelist()[0])
+            elif type(om) == str:
+                z.extractall(om)
+                r = z.namelist()
+            else: r = {n:z.read(n) for n in z.namelist()}
+            z.close()
+            return r
         case 'lzma'|'lzma_alone':
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
@@ -298,7 +315,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return getattr(crunch64,algo).decompress(i)
         case 'ash0': return ash0_decompress(i)
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
-            global OODLE
             assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
             import ctypes
             if not OODLE:
@@ -314,21 +330,45 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = OODLE.OodleLZ_Decompress(i,len(i),o,kwargs['usize'],0 if algo in () else 1,0,0,None,0,None,None,None,0,0)
             if r == 0: raise Exception('Failed to decompress')
             return o.raw[:r]
-        case 'zip':
-            import io
-            from zipfile import ZipFile
-            z = ZipFile(io.BytesIO(i))
+        case 'gdeflate':
+            assert GDEFLATE or 'db' in kwargs
+            import ctypes
+            if not GDEFLATE:
+                GDEFLATE = ctypes.CDLL(kwargs['db'].get('gdeflate'))
 
-            om = kwargs.get('out',kwargs.get('o'))
-            if type(om) == int and om == 1:
-                assert len(z.namelist()) == 1
-                r = z.read(z.namelist()[0])
-            elif type(om) == str:
-                z.extractall(om)
-                r = z.namelist()
-            else: r = {n:z.read(n) for n in z.namelist()}
-            z.close()
-            return r
+                GDEFLATE.DecompressData.argtypes = [ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t]
+                GDEFLATE.DecompressData.restype = ctypes.c_int
+
+            assert i[:2] == b'\x04\xFB'
+            isz = len(i)
+            bcc = int.from_bytes(i[2:4],'little')
+            if not bcc:
+                avg = [int.from_bytes(i[8:12],'little')]
+                cp = avg[0]
+                for ix in range(3,isz//4):
+                    avv = sum(avg) / len(avg)
+                    bv = v = int.from_bytes(i[ix*4:ix*4+4],'little')
+                    v -= cp
+                    cp = bv
+                    if v > 0x10000 or v > avv*(1.75 if ix > 13 else (3 if ix < 6 else 2)):
+                        bcc = ix
+                        break
+                    avg.append(v)
+                else: raise ValueError('Failed to detect block count')
+                i = i[:2] + bcc.to_bytes(2,'little') + i[4:]
+                bcc -= 2
+
+            flgs = int.from_bytes(i[4:7],'little')
+            us = bcc * 0x10000 + ((flgs >> 2) & mask(18))
+            if flgs & mask(2) != 1: i = i[:4] + (flgs & 0xffffC | 1).to_bytes(3,'little') + i[7:]
+
+            ibuf = (ctypes.c_uint8 * isz).from_buffer_copy(i)
+            obuf = (ctypes.c_uint8 * us)()
+
+            r = GDEFLATE.DecompressData(ibuf,isz,obuf,us)
+            if r == 0: raise ValueError('Failed to decompress')
+            return bytes(obuf)
+
     raise NotImplementedError(algo)
 def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
