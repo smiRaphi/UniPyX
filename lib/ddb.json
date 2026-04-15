@@ -1238,6 +1238,11 @@
         "rs":"eSMART Data"
     },
     {
+        "d":[["size",[27,131072]],["isat","\\0",-1],["n0",4,0],["n0",4,4],
+             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big')\nif (c*23)>f.seek(0,2):return\nf.seek(4);d=dirname(inp)+'/'\nfor _ in range(c):\n s=int.from_bytes(f.read(4),'big');fn=f.read(s)\n if len(fn)!=s:return\n s=int.from_bytes(f.read(4),'big');n=f.read(s)\n if len(n)!=s:return\n try:assert not n or exists(d+n.decode('ascii'))or exists(d+n.decode('utf-8')+splitext(fn.decode('utf-8'))[1])\n except:return\n f.seek(8,1)\n if f.read(1)!=b'\\0':return\nreturn not f.read(1)"]],
+        "rs":"Moe Cure Net FileList"
+    },
+    {
         "d":[["isat","\\0\\0\\0\\x20",0],["n0",4,4],["n0",4,8],["n0",4,12],["str0e",16,52,5],["py","f=open(inp,'rb');f.seek(4);o=f.read(4);f.seek(12);f.seek(int.from_bytes(f.read(4),'big'),1);return o==f.read(4)"]],
         "rs":"One Piece Straw Wars Pirate Defense Resource"
     },

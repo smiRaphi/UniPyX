@@ -1868,6 +1868,36 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'Moe Cure Net FileList':
+            if db.print_try: print('Trying with custom extractor')
+            import json
+            from lib.file import File
+            f = File(i,endian='>')
+            c = f.readu32()
+            ob = {}
+
+            fds = {}
+            for _ in range(c):
+                n = f.readc(f.readu32()).decode('utf-8')
+                sn = f.readc(f.readu32()).decode('utf-8')
+                if sn:
+                    if not sn in fds:
+                        fsn = dirname(i) + '/' + sn
+                        if exists(fsn): fds[sn] = open(dirname(i) + '/' + sn,'rb')
+                        elif exists(fsn + extname(n)): fds[sn] = open(fsn + extname(n),'rb')
+                        else: print('Could not find',sn,'skipping')
+                    if sn in fds:
+                        fds[sn].seek(f.readu32())
+                        xopen(o + '/' + n,'wb').write(fds[sn].read(f.readu32()))
+                else:
+                    f.skip(4)
+                    ob[n] = f.readu32()
+                f.skip(1)
+
+            for x in fds.values(): x.close()
+            f.close()
+            if ob: json.dump(ob,open(o + '/$settings.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+            if listdir(o): return
 
     return 1
 
