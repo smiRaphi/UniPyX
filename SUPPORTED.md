@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 875
+# Supported Formats: 877
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (434)
+## Various (436)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -437,6 +437,8 @@ Data MP4 | .mp4 | Custom | MP4 File with file appended to guid section, used to 
 Davilex Games IDX+IMG | .idx+.img | [davilex_games.bms](https://mirror.aluigi.org/bms/davilex_games.bms) |
 DBS Database | .dbs | Custom |
 DDR DAT | .dat | Custom |
+Death End re:Quest 2 GDAT | .dat | Custom |
+Death End re:Quest 2 ZLIB | \* | Custom |
 Deathloop Resource | .resource | Custom + [deathloop.bms](https://mirror.aluigi.org/bms/deathloop.bms) |
 Def Jam Fight For NY: The Takeover PAKN | .pakn | Custom |
 DEL CUTSEQ | ??? | Custom |

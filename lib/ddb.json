@@ -889,6 +889,14 @@
         "rs":"Dr. Luigi ZALZ","s":1
     },
     {
+        "d":[["isat","GDAT",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*8+8)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Death End re:Quest 2 GDAT","s":1
+    },
+    {
+        "d":[["isat","\\0\\0\\0\\1",40],["isat","BILZ",128],["isat","\\0\\0\\0\\x07\\x78",140],["isatS","\\0",24,16],["isatS","\\0",84,44],["n0",4,132],["n0",4,136],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(136);return (144+int.from_bytes(f.read(4),'big'))==s"]],
+        "rs":"Death End re:Quest 2 ZLIB","s":1
+    },
+    {
         "d":[["isat","BEZSHAPK\\0\\0\\1\\0",0],["isin",["\\xFF\\xFE","\\xFE\\xFF"],12]],
         "rs":"Bezel Shader Pack","s":1
     },

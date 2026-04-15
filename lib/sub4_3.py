@@ -1920,6 +1920,63 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'Death End re:Quest 2 GDAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'GDAT'
+
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                ty = f.read(4)
+                if ty[0] == 0:
+                    try:
+                        ty = ty[1:].decode('ascii')[::-1]
+                        assert ty.isprintable()
+                    except: ty = 'bin'
+                else: ty = 'bin'
+
+                d = None
+                if fe[1] >= 0x96:
+                    f.skip(0x7C)
+                    if f.read(4) == b'BILZ':
+                        f.skip(4)
+                        if (0x90+f.readu32('>')) == fe[1]:
+                            f.skip(4)
+                            d = f.decompress(fe[1]-0x90,'zlib')
+                if d is None:
+                    f.seek(fe[0])
+                    d = f.read(fe[1])
+
+                xopen(o + f'/{ix:02d}.{ty}','wb').write(d)
+
+            f.close()
+            if fs: return
+        case 'Death End re:Quest 2 ZLIB':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            ty = f.read(4)
+            if ty[0] == 0:
+                try:
+                    ty = ty[1:].decode('ascii')[::-1]
+                    assert ty.isprintable()
+                except: ty = extname(i)[1:]
+            else: ty = extname(i)[1:]
+
+            f.skip(0x7C)
+            assert f.read(4) == b'BILZ'
+            f.skip(4)
+            zs = f.readu32()
+            f.skip(4)
+            d = f.decompress(zs,'zlib')
+            xopen(o + f'/{tbasename(i)}.{ty}','wb').write(d)
+
+            f.close()
+            if d: return
 
     return 1
 
