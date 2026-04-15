@@ -706,7 +706,7 @@
         "rs":"Taiko no Tatsujin Data 3"
     },
     {
-        "d":[["size",[8,65535]],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');o=int.from_bytes(f.read(2),'little');s=f.seek(0,2);f.seek(o-2);return int.from_bytes(f.read(2),'little')==s"]],
+        "d":[["size",[8,65535]],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');o=int.from_bytes(f.read(2),'little');s=f.seek(0,2)\nif o<2:return\nf.seek(o-2);return int.from_bytes(f.read(2),'little')==s"]],
         "rs":"THQ Worms Resources"
     },
     {

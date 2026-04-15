@@ -336,6 +336,7 @@ def analyze(inp:str,raw=False):
                     exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile},locals=lc)
                     ret = lc['check'](inp)
                 except:
+                    print(xv['rs'] + ':')
                     print(x[1])
                     raise
             elif x[0] == 'ps':
