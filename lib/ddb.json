@@ -1243,6 +1243,10 @@
         "rs":"Moe Cure Net FileList"
     },
     {
+        "d":[["size",[60,1073741824]],["n0",4,0],["n0",2,-2],["n0",2,-4],["n0",2,-6],["n0",2,-8],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'big');s=f.seek(0,2);f.seek(o);c1,c2=int.from_bytes(f.read(2),'big'),int.from_bytes(f.read(2),'big')\nif c1==0 or c2==0 or c1<c2 or(o+4+c1*2+2+c2*8+6)!=s:return\nf.seek(c1*2+2,1)\nif f.read(4)!=b'\\0\\0\\0\\x04':return\nf.seek(c2*4-4,1);return int.from_bytes(f.read(4),'big')==o"]],
+        "rs":"The Indian In The Cupboard Data"
+    },
+    {
         "d":[["isat","\\0\\0\\0\\x20",0],["n0",4,4],["n0",4,8],["n0",4,12],["str0e",16,52,5],["py","f=open(inp,'rb');f.seek(4);o=f.read(4);f.seek(12);f.seek(int.from_bytes(f.read(4),'big'),1);return o==f.read(4)"]],
         "rs":"One Piece Straw Wars Pirate Defense Resource"
     },

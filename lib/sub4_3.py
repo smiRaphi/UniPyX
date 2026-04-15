@@ -1898,6 +1898,28 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if ob: json.dump(ob,open(o + '/$settings.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
             if listdir(o): return
+        case 'The Indian In The Cupboard Data':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            f.seek(f.readu32())
+
+            ac,c = f.readu16(),f.readu16()
+            f.skip(ac*2+2)
+            fs = [f.readu32() for _ in range(c+1)]
+            for ix in range(c):
+                f.seek(fs[ix])
+                d = f.read(fs[ix+1]-fs[ix])
+                if d[:2] == b'\x80\x01': ex = 'pal.image'
+                elif d[:2] == b'\x80\x02': ex = 'image'
+                elif d[:2] == b'\x80\x06': ex = 'anim'
+                else:
+                    ex = guess_ext(d)
+                    if ex == 'bin' and int.from_bytes(d[:2],'big') <= 0x100 and len(d) <= 770: ex = 'pal'
+                xopen(o + f'/{ix:04d}.{ex}','wb').write(d)
+
+            f.close()
+            if c: return
 
     return 1
 
