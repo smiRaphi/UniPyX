@@ -1776,6 +1776,45 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if asts: return
+        case 'Cheat Engine Cheat Table':
+            if db.print_try: print('Trying with custom extractor')
+            import re
+            RGS = re.compile(r' +')
+
+            import xml.etree.ElementTree as ET
+            tr = ET.parse(i).getroot()
+
+            def fcs(iob,d):
+                if iob.find('CheatEntries') is not None:
+                    for x in iob.find('CheatEntries').findall('CheatEntry'):
+                        n = x.find('ID').text
+                        if x.find('Description') is not None: n = RGS.sub(' ',sub_path(x.find('Description').text.strip('"'),slash=True)).strip() + '_' + n
+                        if x.find('AssemblerScript') is not None: xopen(d + '/' + n + '.asm','w').write(x.find('AssemblerScript').text)
+                        fcs(x,d + '/' + n)
+            fcs(tr,o)
+
+            if tr.find('CheatCodes') is not None:
+                ob = []
+                for x in tr.find('CheatCodes').findall('CodeEntry'):
+                    n = x.find("Description").text.strip('"')
+                    if x.attrib.get('GroupHeader') == '1': ob.append(f'=== {n} ===')
+                    else:
+                        if x.find('AddressString') is not None:
+                            ob.append(f'{n} @ {x.find("AddressString").text}')
+                            for pn in ('Before','Actual','After'):
+                                if x.find(pn) is not None: ob.append(pn + ': ' + ' '.join([b.text for b in x.find(pn).findall('Byte')]))
+                            ob.append('')
+                if ob: xopen(o + '/codes.txt','w').write('\n'.join(ob))
+            if tr.find('UserdefinedSymbols') is not None:
+                ob = [x.find('Name').text + ' @ ' + x.find('Address').text for x in tr.find('UserdefinedSymbols').findall('SymbolEntry')]
+                if ob: xopen(o + '/symbols.txt','w').write('\n'.join(ob))
+            if tr.find('LuaScript') is not None: xopen(o + '/script.lua','w').write(tr.find('LuaScript').text)
+            if tr.find('DisassemblerComments') is not None:
+                ob = [x.find('Address').text.strip() + '\n' + x.find('Comment').text.strip() for x in tr.find('DisassemblerComments').findall('DisassemblerComment')]
+                if ob: xopen(o + '/disassembler_comments.txt','w').write('\n\n'.join(ob))
+
+            del tr
+            if listdir(o): return
 
     return 1
 

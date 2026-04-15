@@ -115,11 +115,18 @@ SUB_PATH = str.maketrans({
     '<':'＜',
     '>':'＞',
     '\n':' ',
+    '\t':' ',
 })
-def sub_path(p:str,home=False):
+SUB_PATHX = str.maketrans({
+    '/':'／',
+    '\\':'＼',
+})
+def sub_path(p:str,home=False,slash=False):
     if home and len(p) > 3 and p[0].isalpha() and p[1] == ':' and p[2] in '\\/': h,p = p[:3],p[3:]
     else: h = ''
-    return h + p.translate(SUB_PATH).replace('\r','')
+    r = p.translate(SUB_PATH).replace('\r','')
+    if slash: r = r.translate(SUB_PATHX)
+    return h + r
 def set_ctime(p:str,t:int,unix=True):
     try:
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)
