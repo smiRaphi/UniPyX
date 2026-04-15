@@ -1815,6 +1815,59 @@ def extract4_3(inp:str,out:str,t:str):
 
             del tr
             if listdir(o): return
+        case 'Wii Exported Save Data':
+            sdk = db.bin_path + 'wii_sd.bdb'
+            if exists(sdk):
+                sdk = open(sdk,'rb').read()
+                sdky,sdiv = sdk[:0x10],sdk[0x10:]
+            else:
+                import re
+                rg = re.findall(r'<code>([a-f\dA-F]{32})</code>',db.c.get('https://wiki.wiidatabase.de/wiki/SD-Key').text)
+                assert len(rg) == 2
+                sdky,sdiv = bytes.fromhex(rg[0]),bytes.fromhex(rg[1])
+                open(sdk,'wb').write(sdky + sdiv)
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decrypt
+            f = File(i,endian='>')
+            h = decrypt(f.readc(0xF0C0),'aes_cbc',sdky,sdiv)
+            xopen(o + '/$SYS/header.bin','wb').write(h)
+            h = File(h,endian='>')
+
+            h.skip(8)
+            bnrs = h.readu32()
+            h.skip(0x14)
+            xopen(o + '/$SYS/banner.bnr','wb').write(h.readc(bnrs))
+            h.close()
+
+            bks = f.readu32()
+            assert bks == 0x70 and f.read(2) == b'Bk' and f.readu16() == 1
+            f.skip(4)
+            c = f.readu32()
+            f.skip(bks - 0x10)
+            f.align(0x40)
+
+            for _ in range(c):
+                assert f.read(4) == b'\x03\xAD\xF1\x7E'
+                s = f.readu32()
+                f.skip(2)
+                ty = f.readu8()
+                assert ty in {1,2}
+                fn = f.readc(0x45).split(b'\0')[0].decode('utf-8')
+                iv = f.readc(0x10)
+                f.align(0x40)
+                if ty == 2 and s != 0: raise ValueError(f'Directory with size @ 0x{f.pos - 0x80:08X}')
+                if ty == 2: mkdir(o + '/' + fn)
+                elif ty == 1:
+                    d = f.readc(s + -s%0x40)
+                    xopen(o + '/' + fn,'wb').write(decrypt(d,'aes_cbc',sdky,iv)[:s])
+
+            f.seek(-0x300)
+            xopen(o + '/$SYS/device.crt','wb').write(f.readc(0x180))
+            xopen(o + '/$SYS/application.crt','wb').write(f.readc(0x180))
+
+            f.close()
+            if c: return
 
     return 1
 

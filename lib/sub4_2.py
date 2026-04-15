@@ -1,5 +1,4 @@
 from lib.main import *
-from lib.dldb import BDIR
 
 def extract4_2(inp:str,out:str,t:str):
     run = db.run
@@ -532,7 +531,7 @@ def extract4_2(inp:str,out:str,t:str):
                     else: raise NotImplementedError('Encrypted archive without encrypted file entries, can\'t get/verify key')
                     ent = f.read(0x20)
 
-                    DB = BDIR + '/bin/pet_megkeys.bdb'
+                    DB = db.bin_path + 'pet_megkeys.bdb'
                     if not exists(DB):
                         import re
                         bdb = open(DB,'wb')

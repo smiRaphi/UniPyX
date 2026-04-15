@@ -29,8 +29,10 @@ def copy(i:str,o:str):
     else: copyfile(i,o)
 class DLDB:
     def __init__(self):
-        self.dbp = 'lib/dldb.json'
-        self.udbp = 'bin/updb.json'
+        self.bin_path = BDIR + '\\bin\\'
+
+        self.dbp = BDIR + '/lib/dldb.json'
+        self.udbp = self.bin_path + 'updb.json'
         self.c = httpx.Client()
         self.print_try = False
 
@@ -109,18 +111,18 @@ class DLDB:
             cd = os.getcwd()
             os.chdir(BDIR)
             exi = self.db[exe]
-            if exe in self.udb and self.udb[exe] < exi.get('ts',0) and os.path.exists('bin/' + exi['p']):
-                if os.path.isdir('bin/' + exi['p']): rmtree('bin/' + exi['p'])
-                else: os.remove('bin/' + exi['p'])
-            if exi.get('fs',1) == None: os.makedirs('bin/' + exi['p'],exist_ok=True)
-            if not os.path.exists('bin/' + exi['p']):
+            if exe in self.udb and self.udb[exe] < exi.get('ts',0) and os.path.exists(self.bin_path + exi['p']):
+                if os.path.isdir(self.bin_path + exi['p']): rmtree(self.bin_path + exi['p'])
+                else: os.remove(self.bin_path + exi['p'])
+            if exi.get('fs',1) == None: os.makedirs(self.bin_path + exi['p'],exist_ok=True)
+            if not os.path.exists(self.bin_path + exi['p']):
                 t = int(time())
                 up = True
                 print('Downloading',exe)
                 for e in exi['fs']:
                     if type(e) == str: e = {'u':e,'p':e.split('?')[0].split('/')[-1]}
                     elif type(e) == list: e = {'u':e[0],'p':e[1]}
-                    if 'p' in e: p = 'bin/' + e['p']
+                    if 'p' in e: p = self.bin_path + e['p']
                     elif e['u'] is not None:
                         if e.get('ex'): ex = e['ex']
                         else:
@@ -130,8 +132,8 @@ class DLDB:
                             else: ex = '.' + ex.split('.')[-1]
                         p = gtmp('.exe' if ex in ('run','inno','nsis') else ex)
 
-                    if e['u'] == '.': p,ex = 'bin/bin.7z','.7z'
-                    elif 'github' in e: self.gh_dir(e['u'],'bin/' + e['github'])
+                    if e['u'] == '.': p,ex = self.bin_path + 'bin.7z','.7z'
+                    elif 'github' in e: self.gh_dir(e['u'],self.bin_path + e['github'])
                     elif e['u'] is not None: self.dl(e['u'],p,verify=e.get('v',True))
                     if 'x' in e:
                         bk = self.print_try
@@ -141,18 +143,18 @@ class DLDB:
 
                         self.print_try = bk
                         if e['u'] != '.': os.remove(p)
-                    if 'cmd' in e: self.run(e['cmd'],print_try=False,cwd='bin')
+                    if 'cmd' in e: self.run(e['cmd'],print_try=False,cwd=self.bin_path[:-1])
                     if 'del' in e:
                         for d in e['del']:
-                            if os.path.exists('bin/' + d):
-                                if os.path.isdir('bin/' + d): rmtree('bin/' + d)
+                            if os.path.exists(self.bin_path + d):
+                                if os.path.isdir(self.bin_path + d): rmtree(self.bin_path + d)
                                 else:
                                     for _ in range(50):
-                                        try: os.remove('bin/' + d)
+                                        try: os.remove(self.bin_path + d)
                                         except PermissionError: sleep(0.1)
                                         else: break
                 self.udb[exe] = t
-            exei = os.path.abspath('bin/' + exi['p'])
+            exei = os.path.abspath(self.bin_path + exi['p'])
             self.save()
             os.chdir(cd)
         return exei,up
@@ -163,8 +165,8 @@ class DLDB:
             with zipfile.ZipFile(p,'r') as z:
                 for tx in xl:
                     if tx == '*':
-                        os.makedirs('bin/' + xl[tx],exist_ok=True)
-                        z.extractall('bin/' + xl[tx])
+                        os.makedirs(self.bin_path + xl[tx],exist_ok=True)
+                        z.extractall(self.bin_path + xl[tx])
                     elif type(xl[tx]) == dict:
                         if '?ex' in xl[tx]: ex = xl[tx].pop('?ex')
                         else: ex = os.path.splitext(tx)[1].lower()
@@ -177,27 +179,27 @@ class DLDB:
                             os.makedirs(td,exist_ok=True)
                             z.extractall(td)
                             xall = True
-                        copy(td + '/' + tx,'bin/' + xl[tx])
+                        copy(td + '/' + tx,self.bin_path + xl[tx])
                     else:
                         d = z.read(tx)
-                        xopen('bin/' + xl[tx],'wb').write(d)
+                        xopen(self.bin_path + xl[tx],'wb').write(d)
             if xall: rmtree(td)
         elif ex in ('.tgz','.tar.gz'):
             with tarfile.open(p,'r:gz') as z:
-                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+                for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile(tx).read())
         elif ex in ['.txz','.tar.xz']:
             with tarfile.open(p,'r:xz') as z:
-                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+                for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile(tx).read())
         elif ex in ('.tzt','.tar.zst'):
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,p])
             with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
-                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile(tx).read())
+                for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile(tx).read())
             rmtree(td)
         elif ex in ('.7z','.arj','.zipx','nsis','.lha'):
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,'-aoa',p])
-            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            for tx in xl: copy(td + '/' + tx,self.bin_path + xl[tx])
             for _ in range(5):
                 try: rmtree(td)
                 except PermissionError: sleep(0.1)
@@ -205,7 +207,7 @@ class DLDB:
         elif ex == '.rar':
             td = gtmp()
             self.run(['unrar','x','-or','-op' + td,p])
-            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            for tx in xl: copy(td + '/' + tx,self.bin_path + xl[tx])
             for _ in range(5):
                 try: rmtree(td)
                 except PermissionError: sleep(0.1)
@@ -214,26 +216,26 @@ class DLDB:
             td = gtmp()
             os.makedirs(td,exist_ok=True)
             self.run(['lessmsi','x',p,td + '\\'])
-            for tx in xl: copy(td + '/SourceDir/' + tx,'bin/' + xl[tx])
+            for tx in xl: copy(td + '/SourceDir/' + tx,self.bin_path + xl[tx])
             rmtree(td)
         elif ex == '.deb':
             td = gtmp()
             os.makedirs(td,exist_ok=True)
             self.run(['7z','x','-y','-o' + td,p])
             with tarfile.open(td + '/data.tar','r') as z:
-                for tx in xl: xopen('bin/' + xl[tx],'wb').write(z.extractfile('./' + tx).read())
+                for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile('./' + tx).read())
             rmtree(td)
         elif ex == 'inno':
             td = gtmp()
             os.makedirs(td,exist_ok=True)
             self.run(['innounp-2','-x','-b','-m','-d' + td,'-u','-h','-o','-y',p])
-            for tx in xl: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,'bin/' + xl[tx])
+            for tx in xl: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,self.bin_path + xl[tx])
             rmtree(td)
         elif ex == 'run':
             td = gtmp()
             os.makedirs(td,exist_ok=True)
             self.run([p,'-y'],stdin='\n',getexe=False,cwd=td)
-            for tx in xl: copy(td + '/' + tx,'bin/' + xl[tx])
+            for tx in xl: copy(td + '/' + tx,self.bin_path + xl[tx])
             rmtree(td)
         else: raise NotImplementedError(p + f' [{ex}]')
     def dl(self,url:str,out:str,verify=True):
@@ -296,6 +298,6 @@ class DLDB:
         return e
 
     def save(self):
-        open((BDIR or '.') + '/' + self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))
+        open(self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))
 
 from io import open

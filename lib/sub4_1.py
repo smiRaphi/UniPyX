@@ -1,5 +1,4 @@
 from lib.main import *
-from lib.dldb import BDIR
 from lib.sub4 import auracomp
 
 def extract4_1(inp:str,out:str,t:str):
@@ -1073,7 +1072,7 @@ def extract4_1(inp:str,out:str,t:str):
             run(['rcs','-f','-d',i,of])
             if exists(of) and getsize(of): return
         case 'Encrypted Arsenal MTC+MDF':
-            DBP = BDIR + '/bin/mtcmdf.bdb'
+            DBP = db.bin_path + 'mtcmdf.bdb'
             if not exists(DBP):
                 import zipfile,json
                 from io import BytesIO
