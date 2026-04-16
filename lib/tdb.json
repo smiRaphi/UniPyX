@@ -212,7 +212,8 @@
         "installshield z archive"
     ],
     "InstallShield Archive":[
-        "installshield compressed archive (generic)"
+        "installshield compressed archive (generic)",
+        "installshield cabinet archive data version 6"
     ],
     "Stirling Compressed":[
         "stirling technologies installshield compressed"

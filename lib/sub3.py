@@ -385,8 +385,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'InstallShield Archive':
             td = TmpDir(path=o)
-            e,_,_ = run(['i6comp','x','-rof',i],cwd=td.p)
-            if not e and listdir(td.p):
+            e,_,r = run(['i6comp','x','-rof',i],cwd=td.p)
+            if (not e or 'Could not open ' in r) and listdir(td.p):
                 copydir(td,o,True)
                 td.destroy()
                 return

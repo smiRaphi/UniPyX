@@ -897,6 +897,10 @@
         "rs":"Death End re:Quest 2 ZLIB","s":1
     },
     {
+        "d":[["isat","\\0\\x80\\0\\0",4],["isatS","\\0",12,31188],["n0",4,0],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');lo=32768\nwhile sum(f.read(4)):\n if int.from_bytes(f.read(4),'little')!=lo:return\n lo+=int.from_bytes(f.read(4),'little')\nreturn lo==f.seek(0,2)"]],
+        "rs":"The Great Escape DAT"
+    },
+    {
         "d":[["isat","BEZSHAPK\\0\\0\\1\\0",0],["isin",["\\xFF\\xFE","\\xFE\\xFF"],12]],
         "rs":"Bezel Shader Pack","s":1
     },

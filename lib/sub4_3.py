@@ -2161,6 +2161,26 @@ def extract4_3(inp:str,out:str,t:str):
             infp = inf.tell()
             inf.close()
             if len(listdir(o)) > 1 or infp != infsp: return
+        case 'The Great Escape DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            fo = 0x8000
+            fs = []
+            while f.pos < fo:
+                h = f.readu32()
+                if not h: break
+                fs.append((h,f.readu32(),f.readu32()))
+                fo = min(fo,fs[-1][1])
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.read(fe[2])
+                xopen(f'{o}/{fe[0]:08X}.{guess_ext(d)}','wb').write(d)
+
+            f.close()
+            if fs: return
 
     return 1
 
