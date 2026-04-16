@@ -388,34 +388,173 @@ def extract4(inp:str,out:str,t:str) -> bool:
             open(o + '/' + tbasename(i),'wb').write(d)
             return
         case 'UE4 Package':
-            err = run(['repak','info',i],print_try=False)[2]
-            if 'trying version V11 failed: pak is encrypted but no key was provided' in err:
+            VS = (
+                (0x2C,0x00,{0,1,2,3}), # unknown, initial, no timestamp, compression & encryption
+                (0x2D,0x01,{4,5,6}), # index encryption, relative offset, delete
+                (0x3D,0x11,{7,}), # key GUID
+                (0xBD,0x11,{8,}), # compression names x4
+                (0xDD,0x11,{8,},8.1), # compression names x5
+                (0xDE,0x11,{9,}), # frozen index byte
+                (0xDD,0x11,range(10,12)), # path hash, fnv64 bug fix
+            )
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decrypt,decompress,crc_hash
+            from multiprocessing.pool import ThreadPool
+            f = File(i,endian='<')
+            f.seek(-max(x[0] for x in VS))
+            hd = f.read(max(x[0] for x in VS))
+
+            for po in VS:
+                if hd[-po[0]+po[1]:-po[0]+po[1]+4] == b'\xE1\x12\x6F\x5A' and int.from_bytes(hd[-po[0]+po[1]+4:-po[0]+po[1]+8],'little') in po[2]:
+                    if len(po) == 4: v = po[2]
+                    else: v = int.from_bytes(hd[-po[0]+po[1]+4:-po[0]+po[1]+8],'little')
+                    ho = po[0]
+                    break
+            else:
+                f.close()
+                return 1
+
+            f.seek(-ho)
+            if v >= 7: guid = f.readu128() or None
+            else: guid = None
+            if v >= 4: enc = f.readu8()
+            else: enc = 0
+
+            f.skip(8)
+            idxo = f.readu64()
+            idxs = f.readu64()
+            f.skip(0x14)
+            if v == 9: f.skip(1)
+            if v >= 8: cmps = ['none'] + [x.lower() for x in [f.read(0x20).rstrip(b'\0').decode('ascii') for _ in range(4 if v == 8 else 5)] if x]
+            else: cmps = ('none','zlib','gzip','oodle')
+
+            f.seek(idxo)
+            idx = f.read(idxs)
+            if enc:
                 from bin.uekey import UEKeys
-                k = UEKeys().get(i)
-                if not k: return 1
-                k = ['-a',k.hex()]
-            else: k = []
+                ks = UEKeys()
 
-            run(['repak'] + k + ['unpack','-o',o,'-q','-f',i])
-            if listdir(o): return
-            if k: return 1
+                if guid is not None and guid in ks: ky = ks.get(guid)
+                else:
+                    if guid is not None: print(f'GUID: 0x{guid:016X}')
+                    td = idx[:0x280]
+                    for k in ks:
+                        dtd = decrypt(td,'aes_ecb',k)
+                        mnl = int.from_bytes(dtd[:4],'little',signed=True)
+                        if mnl < 0:
+                            mlt = 2
+                            enc = 'utf-16le'
+                            mnl = -mnl
+                        else:
+                            mlt = 1
+                            enc = 'utf-8'
+                        mnl -= 1
 
-            td = TmpDir()
-            tds = td + '\\s\\s'
-            mkdir(tds)
+                        try: assert not sum(dtd[4+mnl*mlt:4+mnl*mlt+mlt]) and dtd[4:4+mnl*mlt].decode(enc).isprintable()
+                        except: continue
+                        else: ky = k;break
+                    else:
+                        print('Key not found')
+                        return 1
+                    if guid is not None: print(f'Key Hash: {crc_hash(ky,"sha256"):016X}\nRaw Key: {ky.hex().upper()}')
+                idx = decrypt(idx,'aes_ecb',ky)
+            else: ky = None
 
-            for v in ('5.6.1','4.27.2','4.26.2','4.25.4','4.24.3','4.22.3','4.21.2','4.20.3','4.19.2','4.12.0','4.27.0','4.25.3'):
-                v = 'unrealpak_' + v
-                std = TmpDir(path=tds)
-                for f in rldir(dirname(db.get(v))): symlink(f,std.p + '\\' + basename(f))
+            if v > 9:
+                f.close()
+                xopen(o + '/$index.bin','wb').write(idx)
+                run(['repak'] + (['-a',ky.hex()] if ky else []) + ['unpack','-o',o,'-q','-f',i])
+                if listdir(o): return
+                raise NotImplementedError(f'{v} > 9')
 
-                if db.print_try: print('Trying with',v)
-                run([std + '\\UnrealPak.exe',i,'-Extract',o],cwd=std.p,print_try=False)
-                std.destroy()
-                if listdir(o):
-                    td.destroy()
-                    return
-            td.destroy()
+            idx = File(idx,endian=f._end)
+            def reads():
+                l = idx.reads32()
+                if l < 0:
+                    l = -l
+                    mlt = 2
+                    enc = 'utf-16le'
+                else:
+                    mlt = 1
+                    enc = 'utf-8'
+                d = idx.readc(l*mlt)
+                if not sum(d[-mlt:]): d = d[:-mlt]
+                return d.decode(enc)
+
+            md = reads().replace('\\','/').strip('/')
+            c = idx.readu32()
+            fs = []
+            for _ in range(c):
+                fe = {
+                    'fn':o + '/' + sanitize_relative(md + '/' + reads().replace('\\','/').strip('/')),
+                    'o':idx.readu64(),
+                    's':idx.readu64(),
+                    'us':idx.readu64(),
+                    'c':cmps[idx.readu8() if v == 8 else idx.readu32()],
+                }
+                if v <= 1: fe['ts'] = idx.readu64()
+                fe['h'] = idx.read(20)
+
+                if v >= 3 and fe['c'] != 0:
+                    fe['bs'] = [(idx.readu64(),idx.readu64()) for _ in range(idx.readu32())]
+                    if v < 5: fe['bs'] = [(x-fe['o'],y) for x,y in fe['bs']]
+                    fe['o'] += fe['bs'][0][0]
+                if v >= 3:
+                    fe['e'] = idx.readu8() & 1
+                    fe['bus'] = idx.readu32()
+                else: fe['e'] = 0
+                fs.append(fe)
+            idx.close()
+
+            if ky is None:
+                encs = [x for x in fs if x['e'] and x['us'] > 0]
+                if encs:
+                    from bin.uekey import UEKeys
+                    ks = UEKeys()
+                    if guid is not None and guid in ks: ky = ks.get(guid)
+                    else:
+                        efe = min(encs,key=lambda x:x['s'])
+                        if guid is not None: print(f'GUID: 0x{guid:016X}')
+                        f.seek(efe['o'])
+                        pd = f.read(efe['s'] + -efe['s']%0x10)
+
+                        for k in ks:
+                            if crc_hash(decrypt(pd,'aes_ecb',k)[:efe['s']],'sha1',bytes=True) == efe['h']:
+                                ky = k
+                                break
+                        else:
+                            print('Key not found')
+                            return 1
+                        if guid is not None: print(f'Key Hash: {crc_hash(ky,"sha256"):016X}\nRaw Key: {ky.hex().upper()}')
+
+            p = ThreadPool()
+            def decs(ix:int,d,us,alg): return ix,decompress(d,alg,usize=us)
+            def decc(d,fe):
+                if fe['e']: d = decrypt(d,'aes_ecb',ky)[:fe['s']]
+                if fe['c'] in {'none','zlib','gzip'}: d = decompress(d,fe['c'])
+                elif fe['c'] in {'zstd',}:
+                    pcs = [p.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],None,'zstd')) for ix,b in enumerate(fe['bs'])]
+                    d = b''.join([x[1] for x in sorted([pc.get() for pc in pcs],key=lambda x:x[0])])
+                elif fe['c'] in {'lz4','oodle'}:
+                    pcs = [p.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],min(fe['us']-fe['bus']*ix,fe['bus']),fe['c'])) for ix,b in enumerate(fe['bs'])]
+                    d = b''.join([x[1] for x in sorted([pc.get() for pc in pcs],key=lambda x:x[0])])
+                else: raise NotImplementedError(fe['c'])
+
+                xopen(fe['fn'],'wb').write(d)
+                if 'ts' in fe: set_ctime(fe['fn'],fe['ts'])
+
+            pcs = []
+            for fe in fs:
+                f.seek(fe['o'])
+                if fe['e']: d = f.read(fe['s'] + -fe['s']%0x10)
+                else: d = f.read(fe['s'])
+                pcs.append(p.apply_async(decc,(d,fe)))
+            for pc in pcs: pc.get()
+            p.close()
+            p.join()
+
+            if fs: return
         case 'Unreal ZenLoader':
             td = TmpDir()
             tds = td + '\\s\\s'
@@ -909,41 +1048,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if not exists(i): return 1
 
             return quickbms('ttgames')
-        case 'Sumo Digital XPAC':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
-            HL = HashLib.dl('sumo_xpac',db,fmt=lambda x:x.upper().replace(b'/',b'\\'),encoding='utf-8')
-
-            bak = {
-                0xC03C389F:'.\\Resource\\Racers\\Zobio.zif',0x71CA44A2:'.\\Resource\\Racers\\Zobio.zig',
-                0x94AAD2E5:'.\\Resource\\Tracks\\Particle_TestTrack.zif',0x4638DEE8:'.\\Resource\\Tracks\\Particle_TestTrack.zig',
-                0x09A915C5:'.\\Resource\\Tracks\\SeasideHill_Hard_Unused.zif',0x55F4D9E6:'.\\Resource\\Tracks\\SeasideHill_Hard_Unused.zig',
-                0xFFE6BEC5:'.\\Resource\\TSOData\\ItemDefaults.txt',0x59C8DA80:'.\\Resource\\TSOData\\GroupNames.txt',
-            }
-            for h in {0x0090AE05,0x9D853559,0x7EFC3B8B}: bak[h] = f'.\\Resource\\TSOData\\{h:08X}.tso'
-
-            f = File(i,endian='<')
-            f.skip(12)
-            c = f.readu32()
-            f.skip(4)
-
-            fs = []
-            for _ in range(c):
-                f.skip(4)
-                fs.append((f.readu32(),f.readu32(),f.readu32(),f.readu32()))
-
-            HL.wait()
-            for fe in fs:
-                if fe[0] in HL: fn = HL[fe[0]]
-                elif fe[0] in bak: fn = '$unk/' + bak.get(fe[0])
-                else: fn = f'$unk/{fe[0]:08X}.bin'
-
-                f.seek(fe[1])
-                zlb = fe[2] >= 12 and f.read(2) == b'\x78\xDA'
-                f.seek(fe[1])
-                d = f.decompress(fe[2] or fe[3],'zlib' if zlb else 'none')
-                xopen(o + '/' + fn,'wb').write(d)
-            if fs: return
         case 'IFF Data':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
@@ -1602,155 +1706,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fs = [(f.read(12).strip(b'\0').decode('utf-8'),f.readu32()) for _ in range(fc)]
             for fe in fs: xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
             if fs: return
-        case 'Dragon UnPACKer 5 Plugin':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            assert f.read(5) == b'DUPP\x1A'
-            v = f.readu8()
-            f.skip(2)
-
-            inf = open(o + '/' + tbasename(i) + '.ini','w',encoding='utf-8')
-            inf.write(f'[{tbasename(i)}]\nenabled=1\n')
-            infsp = inf.tell()
-
-            if v < 4:
-                f.skip(12)
-                ps = f.reads32()
-                fc = f.reads32()
-
-                for vn in ('name','url','author','comment'): inf.write(f'{vn}={f.read(f.readu8()).decode("utf-8")}\n')
-                if ps > 0: open(o + '/picture.bmp').write(f.read(ps))
-
-                for _ in range(fc):
-                    s = f.reads32()
-                    f.skip(0x10)
-                    c = f.reads32()
-                    f.skip(8)
-                    fn = f.read(f.readu8()).decode('utf-8')
-                    fn = o + '/' + os.path.join(f.read(f.readu8()).decode('utf-8'),fn)
-                    d = f.decompress(s,('none','zlib')[c])
-                    xopen(fn,'wb').write(d)
-            elif v == 4:
-                offc = f.reads32()
-                offs = []
-                for _ in range(offc):
-                    oe = [f.readu8()]
-                    fls = f.readu8()
-                    if fls & 1: oe.append(f.readu8())
-                    else:
-                        f.skip(1)
-                        oe.append(0)
-                    if fls & 0x20: oe.append(f.readu8())
-                    else:
-                        f.skip(1)
-                        oe.append(0)
-                    if fls & 0x40: oe.append(f.reads32())
-                    else:
-                        f.skip(4)
-                        oe.append(0)
-                    oe += [f.reads64(),f.reads64()]
-                    f.skip(0x28)
-                    offs.append(oe)
-
-                fs = []
-                fnd = {}
-                df = None
-                for oe in offs:
-                    f.seek(oe[4])
-                    d = f.decompress(oe[5],('none','zlib','lzma_us32')[oe[1]])
-
-                    b = File(d,endian='<')
-                    if oe[0] == 1:
-                        b.skip(12)
-                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode("utf-8")}\n')
-                        inf.write(f'comment={b.read(b.readu32()).decode("utf-8")}\n')
-                    elif oe[0] == 2:
-                        for _ in range(oe[3]):
-                            fe = [b.reads64(),b.reads64()]
-                            b.skip(12)
-                            fls = b.readu8()
-                            if fls & 0x10: fe.append(b.readu8())
-                            else:
-                                b.skip(1)
-                                fe.append(0)
-                            b.skip(1)
-                            fe.append(b.reads32())
-                            b.skip(0x45)
-                            if not fls & 0x40: fs.append(fe)
-                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
-                    elif oe[0] == 20:
-                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
-                    elif oe[0] == 21: df = b
-                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
-
-                if fs and not df: return 1
-
-                for fe in fs:
-                    df.seek(fe[0])
-                    d = df.decompress(fe[1],('none','zlib','lzma_us32')[fe[2]])
-                    open(o + '/' + fnd.get(fe[3],str(fe[3])),'wb').write(d)
-            elif v == 5:
-                f.skip(2)
-                offc = f.readu32()
-                offs = []
-                for _ in range(offc):
-                    oe = [f.readu8()]
-                    fls = f.readu8()
-                    if fls & 1: oe.append(f.readu8())
-                    else:
-                        f.skip(1)
-                        oe.append(0)
-                    if fls & 0x20: oe.append(f.readu8())
-                    else:
-                        f.skip(1)
-                        oe.append(0)
-                    if fls & 0x40: oe.append(f.readu32())
-                    else:
-                        f.skip(4)
-                        oe.append(0)
-                    oe += [f.reads64(),f.reads64()]
-                    f.skip(0x48)
-                    offs.append(oe)
-
-                fs = []
-                fnd = {}
-                fld = {}
-                df = None
-                for oe in offs:
-                    f.seek(oe[4])
-                    d = f.decompress(oe[5],('none','zlib','lzma_us32')[oe[1]])
-
-                    b = File(d,endian='<')
-                    if oe[0] == 1:
-                        b.skip(12)
-                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode("utf-8")}\n')
-                        inf.write(f'comment={b.read(b.readu32()).decode("utf-8")}\n')
-                    elif oe[0] == 2:
-                        for _ in range(oe[3]):
-                            fe = [b.reads64(),b.reads64()]
-                            b.skip(12)
-                            fls = b.readu32()
-                            if fls & 0x10: fe.append(b.readu8())
-                            else:
-                                b.skip(1)
-                                fe.append(0)
-                            b.skip(5)
-                            fe += [b.readu32(),b.readu32()]
-                            b.skip(0x44)
-                            if not fls & 0x40: fs.append(fe)
-                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
-                    elif oe[0] == 20:
-                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
-                    elif oe[0] == 23:
-                        for ix in range(oe[3]): fld[ix] = b.read(b.readu8()).decode('utf-8')
-                    elif oe[0] == 21: df = b
-                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
-
-            infp = inf.tell()
-            inf.close()
-            if len(listdir(o)) > 1 or infp != infsp: return
         case 'WarioWare Mega Party Game PAC':
             if db.print_try: print('Trying with custom extractor')
             d = auracomp(readfile(i)[0x20:],None,'nintendo-yay0')

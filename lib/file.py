@@ -68,6 +68,7 @@ class File:
     def readu40(self,end=None): return self.unpacki(5,0,end)
     def readu48(self,end=None): return self.unpacki(6,0,end)
     def readu64(self,end=None): return self.unpacki(8,0,end)
+    def readu128(self,end=None):return self.unpacki(16,0,end)
     def reads8 (self)         : return self.unpacki(1,1)
     def reads16(self,end=None): return self.unpacki(2,1,end)
     def reads24(self,end=None): return self.unpacki(3,1,end)
@@ -75,6 +76,7 @@ class File:
     def reads40(self,end=None): return self.unpacki(5,1,end)
     def reads48(self,end=None): return self.unpacki(6,1,end)
     def reads64(self,end=None): return self.unpacki(8,1,end)
+    def reads128(self,end=None):return self.unpacki(16,1,end)
     def readf32(self,end=None):
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
@@ -119,13 +121,17 @@ class File:
     def writeu8 (self,v:int): return self.packi(v,1,0)
     def writeu16(self,v:int,end=None): return self.packi(v,2,0,end)
     def writeu32(self,v:int,end=None): return self.packi(v,4,0,end)
+    def writeu40(self,v:int,end=None): return self.packi(v,5,0,end)
     def writeu48(self,v:int,end=None): return self.packi(v,6,0,end)
     def writeu64(self,v:int,end=None): return self.packi(v,8,0,end)
+    def writeu128(self,v:int,end=None):return self.packi(v,16,0,end)
     def writes8 (self,v:int): return self.packi(v,1,1)
     def writes16(self,v:int,end=None): return self.packi(v,2,1,end)
     def writes32(self,v:int,end=None): return self.packi(v,4,1,end)
+    def writes40(self,v:int,end=None): return self.packi(v,5,1,end)
     def writes48(self,v:int,end=None): return self.packi(v,6,1,end)
     def writes64(self,v:int,end=None): return self.packi(v,8,1,end)
+    def writes128(self,v:int,end=None):return self.packi(v,16,1,end)
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
     def writevlq(self,v:int):

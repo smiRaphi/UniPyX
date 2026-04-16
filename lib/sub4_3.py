@@ -1977,6 +1977,190 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if d: return
+        case 'Sumo Digital XPAC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,HashLib
+            HL = HashLib.dl('sumo_xpac',db,fmt=lambda x:x.upper().replace(b'/',b'\\'),encoding='utf-8')
+
+            bak = {
+                0xC03C389F:'.\\Resource\\Racers\\Zobio.zif',0x71CA44A2:'.\\Resource\\Racers\\Zobio.zig',
+                0x94AAD2E5:'.\\Resource\\Tracks\\Particle_TestTrack.zif',0x4638DEE8:'.\\Resource\\Tracks\\Particle_TestTrack.zig',
+                0x09A915C5:'.\\Resource\\Tracks\\SeasideHill_Hard_Unused.zif',0x55F4D9E6:'.\\Resource\\Tracks\\SeasideHill_Hard_Unused.zig',
+                0xFFE6BEC5:'.\\Resource\\TSOData\\ItemDefaults.txt',0x59C8DA80:'.\\Resource\\TSOData\\GroupNames.txt',
+            }
+            for h in {0x0090AE05,0x9D853559,0x7EFC3B8B}: bak[h] = f'.\\Resource\\TSOData\\{h:08X}.tso'
+
+            f = File(i,endian='<')
+            f.skip(12)
+            c = f.readu32()
+            f.skip(4)
+
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.readu32(),f.readu32(),f.readu32()))
+
+            HL.wait()
+            for fe in fs:
+                if fe[0] in HL: fn = HL[fe[0]]
+                elif fe[0] in bak: fn = '$unk/' + bak.get(fe[0])
+                else: fn = f'$unk/{fe[0]:08X}.bin'
+
+                f.seek(fe[1])
+                zlb = fe[2] >= 12 and f.read(2) == b'\x78\xDA'
+                f.seek(fe[1])
+                d = f.decompress(fe[2] or fe[3],'zlib' if zlb else 'none')
+                xopen(o + '/' + fn,'wb').write(d)
+            if fs: return
+        case 'Dragon UnPACKer 5 Plugin':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            assert f.read(5) == b'DUPP\x1A'
+            v = f.readu8()
+            f.skip(2)
+
+            inf = open(o + '/' + tbasename(i) + '.ini','w',encoding='utf-8')
+            inf.write(f'[{tbasename(i)}]\nenabled=1\n')
+            infsp = inf.tell()
+
+            if v < 4:
+                f.skip(12)
+                ps = f.reads32()
+                fc = f.reads32()
+
+                for vn in ('name','url','author','comment'): inf.write(f'{vn}={f.read(f.readu8()).decode("utf-8")}\n')
+                if ps > 0: open(o + '/picture.bmp').write(f.read(ps))
+
+                for _ in range(fc):
+                    s = f.reads32()
+                    f.skip(0x10)
+                    c = f.reads32()
+                    f.skip(8)
+                    fn = f.read(f.readu8()).decode('utf-8')
+                    fn = o + '/' + os.path.join(f.read(f.readu8()).decode('utf-8'),fn)
+                    d = f.decompress(s,('none','zlib')[c])
+                    xopen(fn,'wb').write(d)
+            elif v == 4:
+                offc = f.reads32()
+                offs = []
+                for _ in range(offc):
+                    oe = [f.readu8()]
+                    fls = f.readu8()
+                    if fls & 1: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x20: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x40: oe.append(f.reads32())
+                    else:
+                        f.skip(4)
+                        oe.append(0)
+                    oe += [f.reads64(),f.reads64()]
+                    f.skip(0x28)
+                    offs.append(oe)
+
+                fs = []
+                fnd = {}
+                df = None
+                for oe in offs:
+                    f.seek(oe[4])
+                    d = f.decompress(oe[5],('none','zlib','lzma_us32')[oe[1]])
+
+                    b = File(d,endian='<')
+                    if oe[0] == 1:
+                        b.skip(12)
+                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode("utf-8")}\n')
+                        inf.write(f'comment={b.read(b.readu32()).decode("utf-8")}\n')
+                    elif oe[0] == 2:
+                        for _ in range(oe[3]):
+                            fe = [b.reads64(),b.reads64()]
+                            b.skip(12)
+                            fls = b.readu8()
+                            if fls & 0x10: fe.append(b.readu8())
+                            else:
+                                b.skip(1)
+                                fe.append(0)
+                            b.skip(1)
+                            fe.append(b.reads32())
+                            b.skip(0x45)
+                            if not fls & 0x40: fs.append(fe)
+                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
+                    elif oe[0] == 20:
+                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
+                    elif oe[0] == 21: df = b
+                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
+
+                if fs and not df: return 1
+
+                for fe in fs:
+                    df.seek(fe[0])
+                    d = df.decompress(fe[1],('none','zlib','lzma_us32')[fe[2]])
+                    open(o + '/' + fnd.get(fe[3],str(fe[3])),'wb').write(d)
+            elif v == 5:
+                f.skip(2)
+                offc = f.readu32()
+                offs = []
+                for _ in range(offc):
+                    oe = [f.readu8()]
+                    fls = f.readu8()
+                    if fls & 1: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x20: oe.append(f.readu8())
+                    else:
+                        f.skip(1)
+                        oe.append(0)
+                    if fls & 0x40: oe.append(f.readu32())
+                    else:
+                        f.skip(4)
+                        oe.append(0)
+                    oe += [f.reads64(),f.reads64()]
+                    f.skip(0x48)
+                    offs.append(oe)
+
+                fs = []
+                fnd = {}
+                fld = {}
+                df = None
+                for oe in offs:
+                    f.seek(oe[4])
+                    d = f.decompress(oe[5],('none','zlib','lzma_us32')[oe[1]])
+
+                    b = File(d,endian='<')
+                    if oe[0] == 1:
+                        b.skip(12)
+                        for vn in ('name','url','author'): inf.write(f'{vn}={b.read(b.readu8()).decode("utf-8")}\n')
+                        inf.write(f'comment={b.read(b.readu32()).decode("utf-8")}\n')
+                    elif oe[0] == 2:
+                        for _ in range(oe[3]):
+                            fe = [b.reads64(),b.reads64()]
+                            b.skip(12)
+                            fls = b.readu32()
+                            if fls & 0x10: fe.append(b.readu8())
+                            else:
+                                b.skip(1)
+                                fe.append(0)
+                            b.skip(5)
+                            fe += [b.readu32(),b.readu32()]
+                            b.skip(0x44)
+                            if not fls & 0x40: fs.append(fe)
+                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
+                    elif oe[0] == 20:
+                        for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
+                    elif oe[0] == 23:
+                        for ix in range(oe[3]): fld[ix] = b.read(b.readu8()).decode('utf-8')
+                    elif oe[0] == 21: df = b
+                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
+
+            infp = inf.tell()
+            inf.close()
+            if len(listdir(o)) > 1 or infp != infsp: return
 
     return 1
 

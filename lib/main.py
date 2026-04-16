@@ -127,6 +127,24 @@ def sub_path(p:str,home=False,slash=False):
     r = p.translate(SUB_PATH).replace('\r','')
     if slash: r = r.translate(SUB_PATHX)
     return h + r
+def sanitize_relative(p:str):
+    rps = [len(x) for x in p.replace('\\','/').split('/')]
+    ps = []
+    cp = 0
+    for x in rps:
+        ps.append((p[cp:cp+x],p[cp+x:cp+x+1]))
+        cp += x + 1
+    ops = []
+    for x in ps:
+        if x[0] == '..':
+            if ops: ops.pop()
+            continue
+        elif x[0] in {'.',''}: continue
+        ops.append(x[0] + x[1])
+    r = ''.join(ops)
+    if p[-1] not in '\\/' and r[-1] in '\\/': r = r[:-1]
+    elif p[-1] != r[-1]: r = r[:-1] + p[-1]
+    return r
 def set_ctime(p:str,t:int,unix=True):
     try:
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)

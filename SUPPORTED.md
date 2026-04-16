@@ -736,7 +736,7 @@ U8 | .arc | [WSZST](https://szs.wiimm.de/) |
 uBlock Origin Config Backup | .json | Custom |
 UE Text Resource | ??? | Custom |
 UE3 Package | .pak .upk .xxx | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-UE4 Package | .pak | [repak](https://github.com/trumank/repak), [UnrealPak](https://www.unrealengine.com/) |
+UE4 Package | .pak | Custom, [repak](https://github.com/trumank/repak) |
 Ultimate Ghosts 'n Goblins DPLK | .dplk | Custom |
 UMD Data | ??? | Custom |
 Unison DAT | .dat | Custom |

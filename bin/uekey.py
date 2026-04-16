@@ -1,5 +1,8 @@
+GUIDs = {}
+LUIDs = set()
+LUT = 1776344000
+
 import os,time
-from hashlib import sha3_256
 
 __db__ = os.path.join(os.path.dirname(__file__),'uekeys.bdb')
 
@@ -10,29 +13,31 @@ class UEKeys:
 
         i = open(__db__,'rb')
         ot = int.from_bytes(i.read(6),'big')
-        if time.time() - ot > (60*60*24*7*3):
+        if time.time() - ot > (60*60*24*7*3) or ot < LUT:
             i.close()
             makedb()
             i = open(__db__,'rb')
             i.seek(6)
 
-        self.db:dict[str,tuple[bytes,tuple[bytes,...]]] = {}
+        lc = int.from_bytes(i.read(4),'big')
+        self.ldb = set([i.read(0x20) for _ in range(lc)])
+
+        self.db:dict[int,tuple[bytes,...]] = {}
         while True:
-            nl = i.read(1)
-            if not nl: break
-            n = i.read(nl[0]).decode('utf-8')
-            hl = i.read(1)[0]
-            hs = [i.read(0x20) for _ in range(hl)]
-            self.db[n] = (i.read(0x20),hs)
+            idc = i.read(1)
+            if not idc: break
+            ids = [int.from_bytes(i.read(0x10),'big') for _ in range(idc[0])]
+            k = i.read(0x20)
+            for id in ids: self.db[id] = k
         i.close()
 
-    def get(self,f:str):
-        if f in self.db: return self.db[f][0]
-        assert os.path.exists(f) and os.path.isfile(f)
-        h = sha3_256(open(f,'rb').read(0x500)).digest()
-        for k in self.db:
-            if h in self.db[k][1]: return self.db[k][0]
-        return None
+    def get(self,guid:bytes|int):
+        if type(guid) == bytes:
+            assert len(guid) == 0x10
+            guid = int.from_bytes(guid,'big')
+        return self.db[guid]
+    def __iter__(self): return iter(self.ldb)
+    def __contains__(self,item): return item in self.db
 
 def makedb():
     import httpx,re,base64
@@ -45,9 +50,8 @@ def makedb():
     if s.status_code == 401: s = httpx.get(u,cookies={x[0]:x[1] for x in re.findall(r'document\.cookie *= *"([^=]+)=([^;]+);',s.text)})
     s = s.text.replace('&nbsp;',' ').replace('\xa0',' ')
 
-    o = open(__db__,'wb')
-    o.write(int(time.time()).to_bytes(6,'big'))
-    dn = []
+    ks = {}
+    lks = []
     for m in re.findall(r'"li[12]">([^<>]{45,})</li>',s):
         if not ' ' in m: continue
         n,k = unescape(m).strip().rsplit(' ',1)
@@ -61,17 +65,25 @@ def makedb():
         else:
             #print(unescape(m).encode('latin-1'),'|' + n + '|' + k + '|')
             continue
+        assert len(k) == 0x20
 
-        if n in dn: continue
-        dn.append(n)
+        if n in GUIDs:
+            if not k in ks: ks[k] = []
+            for id in GUIDs[n]: ks[k].append(id.to_bytes(0x10,'big') if type(id) == int else id)
+            if id in LUIDs: lks.append(k)
+        else: lks.append(k)
 
-        dx = []
-        if n == 'princess peach showtime': dx.append("9FAD1D4A12CFE3AE4C4B36A8DDE24D906781F71387D217AC3FB0C7AD5016CAAC")
+    o = open(__db__,'wb')
+    o.write(int(time.time()).to_bytes(6,'big'))
+    lks = set(lks)
+    o.write(len(lks).to_bytes(4,'big'))
+    o.write(b''.join(lks))
+    for k,ids in ks.items():
+        ids = list(set(ids))
+        o.write(len(ids).to_bytes(1))
+        o.write(b''.join(ids))
+        o.write(k)
 
-        assert len(dx) < 0x100
-        n = n.encode('utf-8')
-        assert len(n) < 0x100
-        o.write(len(n).to_bytes(1,'big') + n + len(dx).to_bytes(1,'big') + b''.join(bytes.fromhex(x) for x in dx) + k)
     o.close()
 
 if __name__ == '__main__':
