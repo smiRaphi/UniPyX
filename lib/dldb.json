@@ -5761,6 +5761,22 @@
             }
         }]
     },
+    "mcx":{
+        "p":"mcx.exe",
+        "fs":[{
+            "u":"https://github.com/SamDreamsMaker/Max-Compression/releases/download/v2.2.0/mcx-windows-x64.zip",
+            "x":{
+                "mcx-windows-x64/mcx.exe":"mcx.exe"
+            }
+        }]
+    },
+    "aceapex":{
+        "p":"aceapex.exe",
+        "fs":[[
+            "https://github.com/yasha1971-coder/aceapex/releases/download/v1.0.0-beta/aceapex-windows-x64.exe",
+            "aceapex.exe"
+        ]]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

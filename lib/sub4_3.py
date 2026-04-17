@@ -1064,7 +1064,7 @@ def extract4_3(inp:str,out:str,t:str):
                     elif d[:10] == b'Thumbnail=': ex = 'tmb.txt'
                     elif d[:4] == b'\xED\xFE\0\0': ex = 'paq'
                     else: ex = guess_ext(d)
-                    fn = hex(fe[0])[2:].zfill(8).upper() + '.' + ex
+                    fn = f'{fe[0]:08X}.{ex}'
                 xopen(o + '/' + fn,'wb').write(d)
 
             f.close()

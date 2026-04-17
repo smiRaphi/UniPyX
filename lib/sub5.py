@@ -440,6 +440,14 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case '6pack':
             run(['6unpack',i],cwd=o)
             if listdir(o): return
+        case 'Max Compression':
+            of = o + '\\' + tbasename(i)
+            run(['mcx','decompress','-f','-k','-q','--preserve-mtime',i,'-o',of])
+            if exists(of) and getsize(of): return
+        case 'ACEAPEX':
+            of = o + '/' + tbasename(i)
+            run(['aceapex','d','--in',i,'--out',of])
+            if exists(of) and getsize(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 878
+# Supported Formats: 880
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -777,10 +777,11 @@ ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | * | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (120)
+## Compression Enthusiasts/One-Off Formats (122)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
+ACEAPEX | .aet | [ACEAPEX](https://github.com/yasha1971-coder/aceapex) |
 Ai | .ai | [ai](https://www.sac.sk/download/pack/ai11.zip) |
 ARHANGEL | .arh | [ARHANGEL](https://www.sac.sk/download/pack/arh140.zip) |
 B1 | .b1 | [b1-pack-tool](http://dev.b1.org/) |
@@ -841,6 +842,7 @@ LZOP | .lzop | [lzop](https://www.lzop.org/) |
 LZPM | .lzpm | [LZPM](https://compressme.net/) |
 LZPX | .lzpx | [LZPX](https://sourceforge.net/project/lzpx/) |
 LZPXJ | .lzpxj | [LZPXJ](https://sourceforge.net/projects/lzpxj/) |
+Max Compression | .mcx | [mcx](https://github.com/SamDreamsMaker/Max-Compression) |
 mcm | .mcm | [mcm](https://encode.su/threads/2127-MCM-LZP), [mcmsk](https://encode.su/threads/2127-MCM-LZP/page3) |
 NanoZip | .nz .nzip | [nz](https://web.archive.org/web/20160304180916/http://nanozip.net/) |
 NLZM | .nlzm | [NLZM](https://github.com/nauful/NLZM) |

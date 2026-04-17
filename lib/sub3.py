@@ -1497,5 +1497,6 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fnd and not nmsbz and not nms: return
+        case 'SecuROM': raise NotImplementedError
 
     return 1
