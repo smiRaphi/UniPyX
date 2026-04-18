@@ -1098,7 +1098,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.back(0x20)
                 rd = bytearray(f.read(0x20))
                 rd[9:11] = b'\0\0'
-                if crc_hash(rd,'crc16',poly=0x5935) != ldrgcrc: ppd = 0
+                if crc_hash(rd,'crc16_opensafety_a') != ldrgcrc: ppd = 0
 
                 pp = sp
                 ps = 0

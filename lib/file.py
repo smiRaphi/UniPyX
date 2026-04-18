@@ -8,6 +8,12 @@ def swap32(i:bytes):
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
 def mask(n:int): return (1 << n) - 1
 def maskb(n:int): return mask(n * 8)
+def reflecti(v:int,w:int):
+    r = 0
+    for _ in range(w):
+        r = (r << 1) | (v & 1)
+        v >>= 1
+    return r
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
@@ -455,20 +461,139 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if r == 0: raise ValueError('Failed to decompress')
             return bytes(obuf)
     raise NotImplementedError(algo)
+CRC8 = {   #  poly,init,xor ,reflect
+ 'tech_3250':(0x1D,0xFF,0x00,True ),
+    'gsm':   (0x1D,0x00,0x00,False),'gsm_a':(0x1D,0,0,False),
+'mifare_mad':(0x1D,0xC7,0x00,False),
+    'icode': (0x1D,0xFD,0x00,False),
+    'hitag': (0x1D,0xFF,0x00,False),
+    'j1850': (0x1D,0xFF,0xFF,False),'sae_j1850':(0x1D,0xFF,0xFF,False),
+    'rohc':  (0x07,0xFF,0x00,True ),
+    'smbus': (0x07,0x00,0x00,False),'atm':(0x07,0,0,False), # default
+    'itu':   (0x07,0x00,0x55,False),'i432_1':(0x07,0,0x55,False),
+    'wcdma': (0x9B,0x00,0x00,True ),
+    'lte':   (0x9B,0x00,0x00,False),
+  'cdma2000':(0x9B,0xFF,0x00,False),
+    'maxim': (0x31,0x00,0x00,True ),'maxim_dow':(0x31,0,0,True),
+    'nrsc5': (0x31,0xFF,0x00,False),
+'opensafety':(0x2F,0x00,0x00,False),
+   'autosar':(0x2F,0xFF,0xFF,False),
+    'darc':  (0x39,0x00,0x00,True ),
+    'gsm_b': (0x49,0x00,0xFF,False),
+    'ccitt': (0x8D,0x00,0x00,False),
+ 'bluetooth':(0xA7,0x00,0x00,True ),
+    'dvb_s2':(0xD5,0x00,0x00,False),
+}
+CRC16 = {   # poly  , init , xor  , reflect
+    'ansi':  (0x8005,0x0000,0x0000,True ),'ibm':(0x8005,0,0,True),'arc':(0x8005,0,0,True),'lha':(0x8005,0,0,True), # default
+    'maxim': (0x8005,0x0000,0xFFFF,True ),'maxim_dow':(0x8005,0,0xFFFF,True),
+    'modbus':(0x8005,0xFFFF,0x0000,True ),
+    'usb':   (0x8005,0xFFFF,0xFFFF,True ),
+    'umts':  (0x8005,0x0000,0x0000,False),'buypass':(0x8005,0,0,False),'verifone':(0x8005,0,0,False),
+   'dds_110':(0x8005,0x800D,0x0000,False),
+    'cms':   (0x8005,0xFFFF,0x0000,False),
+    'kermit':(0x1021,0x0000,0x0000,True ),'ccitt':(0x1021,0,0,True),'ccitt_true':(0x1021,0,0,True),
+  'tms37157':(0x1021,0x89EC,0x0000,True ),
+    'riello':(0x1021,0xB2AA,0x0000,True ),
+'iso_iec_14443_3_a':(0x1021,0xC6C6,0,True),
+   'mcrf4xx':(0x1021,0xFFFF,0x0000,True ),
+    'x25':   (0x1021,0xFFFF,0xFFFF,True ),'ibm_sdlc':(0x1021,0xFFFF,0xFFFF,True),'iso_hdlc':(0x1021,0xFFFF,0xFFFF,True),
+    'xmodem':(0x1021,0x0000,0x0000,False),'zmodem':(0x1021,0,0,False),'acorn':(0x1021,0,0,False),
+    'gsm'   :(0x1021,0x0000,0xFFFF,False),
+'spi_fujitsu':(0x1021,0x1D0F,0x000,False),'aug_ccitt':(0x1021,0x1D0F,0,False),
+'ccitt_false':(0x1021,0xFFFF,0x000,False),'ibm_3740':(0x1021,0xFFFF,0,False),
+   'genibus':(0x1021,0xFFFF,0xFFFF,False),'icode':(0x1021,0xFFFF,0xFFFF,False),'darc':(0x1021,0xFFFF,0xFFFF,False),
+'opensafety':(0x5935,0x0000,0x0000,False),'opensafety_a':(0x5935,0,0,False),
+    'm17':   (0x5935,0xFFFF,0x0000,False),
+    'dnp':   (0x3D65,0x0000,0xFFFF,True ),
+   'en13757':(0x3D65,0x0000,0xFFFF,False),
+    'dect_r':(0x0589,0x0000,0x0001,False),
+    'dect_x':(0x0589,0x0000,0x0000,False),
+'opensafety_b':(0x755B,0x00,0x0000,False),
+  'teledisk':(0xA097,0x0000,0x0000,False),
+   't10_dif':(0x8BB7,0x0000,0x0000,False),
+  'profibus':(0x1DCF,0xFFFF,0xFFFF,False),
+    'nrsc5' :(0x080B,0xFFFF,0x0000,True ),
+    'lj1200':(0x6F63,0x0000,0x0000,False),
+  'cdma2000':(0xC867,0xFFFF,0x0000,False),
+}
+CRC24 = {   # poly    , init   , xor    , reflect
+   'openpgp':(0x864CFB,0xB704CE,0x000000,False),
+   'flexray':(0x5D6DCB,0xFEDCBA,0x000000,False),'flexray_a':(0x5D6DCB,0xFEDCBA,0,False),
+ 'flexray_b':(0x5D6DCB,0xABCDEF,0x000000,False),
+}
+CRC32 = {   # poly      , init     , xor      , reflect
+    'jamcrc':(0x04C11DB7,0xFFFFFFFF,0x00000000,True ),
+    'ieee':  (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'iso':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'iso_hdlc':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
+    'adccp': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'pkzip':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
+    'mpeg2': (0x04C11DB7,0xFFFFFFFF,0x00000000,False),
+    'posix': (0x04C11DB7,0x00000000,0xFFFFFFFF,False),'cksum': (0x04C11DB7,0,0xFFFFFFFF,False),
+    'bzip2': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),
+    'mef':   (0x741B8CD7,0xFFFFFFFF,0x00000000,True ),
+    'k':     (0x741B8CD7,0xFFFFFFFF,0xFFFFFFFF,True ),'koopman':(0x741B8CD7,0xFFFFFFFF,0xFFFFFFFF,True),
+    'xfer':  (0x000000AF,0x00000000,0x00000000,False),
+   'autosar':(0xF4ACFB13,0xFFFFFFFF,0xFFFFFFFF,True ),
+    'c':     (0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'castagnoli':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),'iscsi':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
+    'd':     (0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True ),'base94':(0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True),'base94_d':(0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True),
+    'q':     (0x814141AB,0x00000000,0x00000000,False),'aixm':(0x814141AB,0,0,False),
+'cd_rom_edc':(0x8001801B,0x00000000,0x00000000,True ),
+}
+CRC40 = {   # poly        , init       , xor        , reflect
+    'gsm':   (0x0004820009,0x0000000000,0x0000000000,False), # default
+}
+CRC64 = {   # poly              , init             , xor              , reflect
+    '':      (0x42F0E1EBA9EA3693,0x0000000000000000,0x0000000000000000,False), # default
+    'we':    (0x42F0E1EBA9EA3693,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,False),
+    '1b':    (0x000000000000001B,0x0000000000000000,0x0000000000000000,True ),
+    'jones': (0xAD93D23594C935A9,0xFFFFFFFFFFFFFFFF,0x0000000000000000,True ),
+}
 def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
-        case 'crc32'|'adler32':
+        case 'crc8': fnc = crc8
+        case 'crc16': fnc = crc16
+        case 'crc24': fnc = crc24
+        case 'crc32'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip':
+            import zlib
+            fnc = zlib.crc32
+        case 'crc40': fnc = crc40
+        case 'crc64': fnc = crc64
+        case 'crc8_tech_3250'|'crc8_gsm'|'crc8_gsm_a'|'crc8_mifare_mad'|'crc8_icode'|'crc8_hitag'|\
+             'crc8_j1850'|'crc8_sae_j1850'|'crc8_rohc'|'crc8_smbus'|'crc8_atm'|'crc8_itu'|'crc8_i432_1'|\
+             'crc8_wcdma'|'crc8_lte'|'crc8_cdma2000'|'crc8_maxim'|'crc8_maxim_dow'|'crc8_nrsc5'|\
+             'crc8_opensafety'|'crc8_autosar'|'crc8_darc'|'crc8_gsm_b'|'crc8_ccitt'|'crc8_bluetooth'|\
+             'crc8_dvb_s2':
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC8[algo[5:]]
+            fnc = crc8
+        case 'crc16_ansi'|'crc16_ibm'|'crc16_arc'|'crc16_lha'|'crc16_maxim'|'crc16_maxim_dow'|'crc16_modbus'|\
+             'crc16_usb'|'crc16_umts'|'crc16_buypass'|'crc16_verifone'|'crc16_dds_110'|'crc16_cms'|'crc16_kermit'|\
+             'crc16_ccitt'|'crc16_ccitt_true'|'crc16_tms37157'|'crc16_riello'|'crc16_iso_iec_14443_3_a'|\
+             'crc16_mcrf4xx'|'crc16_x25'|'crc16_ibm_sdlc'|'crc16_iso_hdlc'|'crc16_xmodem'|'crc16_zmodem'|'crc16_acorn'|\
+             'crc16_gsm'|'crc16_spi_fujitsu'|'crc16_aug_ccitt'|'crc16_ccitt_false'|'crc16_ibm_3740'|'crc16_genibus'|\
+             'crc16_icode'|'crc16_darc'|'crc16_opensafety'|'crc16_opensafety_a'|'crc16_m17'|'crc16_dnp'|'crc16_en13757'|\
+             'crc16_dect_r'|'crc16_dect_x'|'crc16_opensafety_b'|'crc16_teledisk'|'crc16_t10_dif'|'crc16_profibus'|\
+             'crc16_nrsc5'|'crc16_lj1200'|'crc16_cdma2000':
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC16[algo[6:]]
+            fnc = crc16
+        case 'crc24_openpgp'|'crc24_flexray'|'crc24_flexray_a'|'crc24_flexray_b':
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC24[algo[6:]]
+            fnc = crc24
+        case 'crc32_jamcrc'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip'|'crc32_mpeg2'|\
+             'crc32_posix'|'crc32_cksum'|'crc32_bzip2'|'crc32_mef'|'crc32_k'|'crc32_koopman'|'crc32_xfer'|'crc32_autosar'|\
+             'crc32_c'|'crc32_castagnoli'|'crc32_iscsi'|'crc32_d'|'crc32_base94'|'crc32_base94_d'|'crc32_q'|\
+             'crc32_aixm'|'crc32_cd_rom_edc':
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32[algo[5:].lstrip('_')]
+            fnc = crc32
+        case 'crc40_gsm':
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC40[algo[6:]]
+            fnc = crc40
+        case 'crc64_we'|'crc64_1b'|'crc64_jones':
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC64[algo[6:]]
+            fnc = crc64
+
+        case 'adler32':
             import zlib
             if 'init' in kwargs: kwargs['value'] = kwargs.pop('init')
-            return getattr(zlib,algo)(i,**kwargs) & maskb(4)
-        case 'crc16': fnc = crc16
-        case 'crc16_ccitt'|'crc16_ansi'|'crc16_ibm'|'crc16_dnp':
-            kwargs['poly'] = {
-                'ccitt':0x1021,
-                'ibm':0x8005,'ansi':0x8005,
-                'dnp':0x3D65,
-            }[algo[6:]]
-            fnc = crc16
+            fnc = zlib.adler32
         case 'fnv1_32': fnc = fnv1_32
         case 'fnv1a_32': fnc = fnv1a_32
         case 'fnv1_64': fnc = fnv1_64
@@ -934,15 +1059,30 @@ def lz4_fast_decompress(d:bytes,usize:int=None):
         
     return bytes(ob[:usize])
 
-def crc16(i:bytes,poly=0x8005,init=0) -> int:
-    crc = init
-    for b in i:
-        crc ^= b << 8
-        for _ in range(8):
-            if crc & 0x8000: crc = (crc << 1) ^ poly
-            else: crc <<= 1
-            crc &= maskb(2)
-    return crc
+def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None):
+    crc = init if value is None else (value ^ xor)
+    if reflect:
+        poly = reflecti(poly,size)
+        for b in i:
+            crc ^= b
+            for _ in range(8):
+                if crc & 1: crc = (crc >> 1) ^ poly
+                else: crc >>= 1
+    else:
+        msk1,msk2,sv = 1 << (size - 1),mask(size),size - 8
+        for b in i:
+            crc ^= b << sv
+            for _ in range(8):
+                if crc & msk1: crc = (crc << 1) ^ poly
+                else: crc <<= 1
+                crc &= msk2
+    return crc ^ xor
+def crc8(i:bytes,poly=0x7,init=0,xor=0,reflect=False,value:int=None): return crc(i,8,poly,init,xor,reflect,value)
+def crc16(i:bytes,poly=0x8005,init=0,xor=0,reflect=True,value:int=None): return crc(i,16,poly,init,xor,reflect,value)
+def crc24(i:bytes,poly=0x864CFB,init=0xB7074CE,xor=0,reflect=False,value:int=None): return crc(i,24,poly,init,xor,reflect,value)
+def crc32(i:bytes,poly=0x04C11DB7,init=0xFFFFFFFF,xor=0xFFFFFFFF,reflect=True,value:int=None): return crc(i,32,poly,init,xor,reflect,value)
+def crc40(i:bytes,poly=0x0004820009,init=0,xor=0,reflect=False,value:int=None): return crc(i,40,poly,init,xor,reflect,value)
+def crc64(i:bytes,poly=0x42F0E1EBA9EA3693,init=0x0000000000000000,xor=0x0000000000000000,reflect=False,value:int=None): return crc(i,64,poly,init,xor,reflect,value)
 def fnv1_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
     for b in i: offset = ((offset * prime) & maskb(8)) ^ b
     return offset
@@ -1018,14 +1158,20 @@ import os,time
 from threading import Thread
 
 HASHTS = {
-    'crc16':2,'crc16_ccitt':2,'crc16_ansi':2,'crc16_ibm':2,'crc16_dnp':2,
-    'crc32':4,'adler32':4,
+    f'crc8_{x}':1 for x in CRC8}|{
+    f'crc16_{x}':2 for x in CRC16}|{
+    f'crc24_{x}':3 for x in CRC24}|{
+    f'crc32{"_" if len(x)>1 else ""}{x}':4 for x in CRC32}|{
+    f'crc40_{x}':5 for x in CRC40}|{
+    f'crc64_{x}':8 for x in CRC64}|{
+    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,
+    'adler32':4,
     'fnv1_32':4,'fnv1a_32':4,
     'fnv1_64':8,'fnv1a_64':8,
     'bkdr':4,'bkdr_ltr':4,'bkdr_rtl':4,
     'sdbm':4,'sdbm_ltr':4,'sdbm_rtl':4,
     'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
-    'murmur3_128':8,'mmh3_128':8,
+    'murmur3_128':16,'mmh3_128':16,
     'md5':16,'sha1':20,'sha256':32,
     'tarzan':4,'hash40':5,
 }
