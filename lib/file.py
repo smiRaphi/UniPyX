@@ -499,10 +499,10 @@ CRC16 = {   # poly  , init , xor  , reflect
    'mcrf4xx':(0x1021,0xFFFF,0x0000,True ),
     'x25':   (0x1021,0xFFFF,0xFFFF,True ),'ibm_sdlc':(0x1021,0xFFFF,0xFFFF,True),'iso_hdlc':(0x1021,0xFFFF,0xFFFF,True),
     'xmodem':(0x1021,0x0000,0x0000,False),'zmodem':(0x1021,0,0,False),'acorn':(0x1021,0,0,False),
-    'gsm'   :(0x1021,0x0000,0xFFFF,False),
+    'gsm':   (0x1021,0x0000,0xFFFF,False),
 'spi_fujitsu':(0x1021,0x1D0F,0x000,False),'aug_ccitt':(0x1021,0x1D0F,0,False),
 'ccitt_false':(0x1021,0xFFFF,0x000,False),'ibm_3740':(0x1021,0xFFFF,0,False),
-   'genibus':(0x1021,0xFFFF,0xFFFF,False),'icode':(0x1021,0xFFFF,0xFFFF,False),'darc':(0x1021,0xFFFF,0xFFFF,False),
+   'genibus':(0x1021,0xFFFF,0xFFFF,False),'icode':(0x1021,0xFFFF,0xFFFF,False),'darc':(0x1021,0xFFFF,0xFFFF,False),'epc':(0x1021,0xFFFF,0xFFFF,False),
 'opensafety':(0x5935,0x0000,0x0000,False),'opensafety_a':(0x5935,0,0,False),
     'm17':   (0x5935,0xFFFF,0x0000,False),
     'dnp':   (0x3D65,0x0000,0xFFFF,True ),
@@ -513,39 +513,46 @@ CRC16 = {   # poly  , init , xor  , reflect
   'teledisk':(0xA097,0x0000,0x0000,False),
    't10_dif':(0x8BB7,0x0000,0x0000,False),
   'profibus':(0x1DCF,0xFFFF,0xFFFF,False),
-    'nrsc5' :(0x080B,0xFFFF,0x0000,True ),
+    'nrsc5': (0x080B,0xFFFF,0x0000,True ),
     'lj1200':(0x6F63,0x0000,0x0000,False),
   'cdma2000':(0xC867,0xFFFF,0x0000,False),
 }
 CRC24 = {   # poly    , init   , xor    , reflect
-   'openpgp':(0x864CFB,0xB704CE,0x000000,False),
+    'lte':   (0x864CFB,0x000000,0x000000,False),'lte_a':(0x864CFB,0,0,False),
+   'openpgp':(0x864CFB,0xB704CE,0x000000,False), # default
    'flexray':(0x5D6DCB,0xFEDCBA,0x000000,False),'flexray_a':(0x5D6DCB,0xFEDCBA,0,False),
  'flexray_b':(0x5D6DCB,0xABCDEF,0x000000,False),
+    'lte_b': (0x800063,0x000000,0x000000,False),
+    'os9':   (0x800063,0xFFFFFF,0xFFFFFF,False),
+    'ble':   (0x00065B,0x555555,0x000000,True ),
+'interlaken':(0x328B63,0xFFFFFF,0xFFFFFF,False),
 }
 CRC32 = {   # poly      , init     , xor      , reflect
     'jamcrc':(0x04C11DB7,0xFFFFFFFF,0x00000000,True ),
     'ieee':  (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'iso':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'iso_hdlc':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
-    'adccp': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'pkzip':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
+    'adccp': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'pkzip':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'xz':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'v42':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
     'mpeg2': (0x04C11DB7,0xFFFFFFFF,0x00000000,False),
-    'posix': (0x04C11DB7,0x00000000,0xFFFFFFFF,False),'cksum': (0x04C11DB7,0,0xFFFFFFFF,False),
-    'bzip2': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),
+    'posix': (0x04C11DB7,0x00000000,0xFFFFFFFF,False),'cksum':(0x04C11DB7,0,0xFFFFFFFF,False),
+    'bzip2': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),'aal5':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),'dect_b':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),'b':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),
     'mef':   (0x741B8CD7,0xFFFFFFFF,0x00000000,True ),
     'k':     (0x741B8CD7,0xFFFFFFFF,0xFFFFFFFF,True ),'koopman':(0x741B8CD7,0xFFFFFFFF,0xFFFFFFFF,True),
     'xfer':  (0x000000AF,0x00000000,0x00000000,False),
    'autosar':(0xF4ACFB13,0xFFFFFFFF,0xFFFFFFFF,True ),
-    'c':     (0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'castagnoli':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),'iscsi':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
+    'c':     (0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'castagnoli':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),'iscsi':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),'base91_c':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
+'intrelaken':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'nvme':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
     'd':     (0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True ),'base94':(0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True),'base94_d':(0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True),
     'q':     (0x814141AB,0x00000000,0x00000000,False),'aixm':(0x814141AB,0,0,False),
 'cd_rom_edc':(0x8001801B,0x00000000,0x00000000,True ),
 }
-CRC40 = {   # poly        , init       , xor        , reflect
-    'gsm':   (0x0004820009,0x0000000000,0x0000000000,False), # default
-}
 CRC64 = {   # poly              , init             , xor              , reflect
-    '':      (0x42F0E1EBA9EA3693,0x0000000000000000,0x0000000000000000,False), # default
+    'xz':    (0x42F0E1EBA9EA3693,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,True ),'go_ecma':(0x42F0E1EBA9EA3693,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,True),
+    'ecma':  (0x42F0E1EBA9EA3693,0x0000000000000000,0x0000000000000000,False),'ecma_182':(0x42F0E1EBA9EA3693,0,0,False), # default
     'we':    (0x42F0E1EBA9EA3693,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,False),
-    '1b':    (0x000000000000001B,0x0000000000000000,0x0000000000000000,True ),
+    'redis': (0xAD93D23594C935A9,0x0000000000000000,0x0000000000000000,True ),
     'jones': (0xAD93D23594C935A9,0xFFFFFFFFFFFFFFFF,0x0000000000000000,True ),
+    'ms':    (0x259C84CBA6426349,0xFFFFFFFFFFFFFFFF,0x0000000000000000,True ),
+    'go_iso':(0x000000000000001B,0x0000000000000000,0x0000000000000000,True ),
+    'nvme':  (0xAD93D23594C93659,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,True ),
 }
 def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
@@ -555,7 +562,6 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'crc32'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip':
             import zlib
             fnc = zlib.crc32
-        case 'crc40': fnc = crc40
         case 'crc64': fnc = crc64
         case 'crc8_tech_3250'|'crc8_gsm'|'crc8_gsm_a'|'crc8_mifare_mad'|'crc8_icode'|'crc8_hitag'|\
              'crc8_j1850'|'crc8_sae_j1850'|'crc8_rohc'|'crc8_smbus'|'crc8_atm'|'crc8_itu'|'crc8_i432_1'|\
@@ -571,24 +577,31 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
              'crc16_gsm'|'crc16_spi_fujitsu'|'crc16_aug_ccitt'|'crc16_ccitt_false'|'crc16_ibm_3740'|'crc16_genibus'|\
              'crc16_icode'|'crc16_darc'|'crc16_opensafety'|'crc16_opensafety_a'|'crc16_m17'|'crc16_dnp'|'crc16_en13757'|\
              'crc16_dect_r'|'crc16_dect_x'|'crc16_opensafety_b'|'crc16_teledisk'|'crc16_t10_dif'|'crc16_profibus'|\
-             'crc16_nrsc5'|'crc16_lj1200'|'crc16_cdma2000':
+             'crc16_nrsc5'|'crc16_lj1200'|'crc16_cdma2000'|'crc16_epc':
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC16[algo[6:]]
             fnc = crc16
-        case 'crc24_openpgp'|'crc24_flexray'|'crc24_flexray_a'|'crc24_flexray_b':
+        case 'crc24_lte'|'crc24_lte_a'|'crc24_openpgp'|'crc24_flexray'|'crc24_flexray_a'|'crc24_flexray_b'|\
+             'crc24_lte_b'|'crc24_os9'|'crc24_ble'|'crc24_interlaken':
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC24[algo[6:]]
             fnc = crc24
-        case 'crc32_jamcrc'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip'|'crc32_mpeg2'|\
-             'crc32_posix'|'crc32_cksum'|'crc32_bzip2'|'crc32_mef'|'crc32_k'|'crc32_koopman'|'crc32_xfer'|'crc32_autosar'|\
-             'crc32_c'|'crc32_castagnoli'|'crc32_iscsi'|'crc32_d'|'crc32_base94'|'crc32_base94_d'|'crc32_q'|\
+        case 'crc32_jamcrc'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip'|'crc32_xz'|'crc32_v42'|\
+             'crc32_mpeg2'|'crc32_posix'|'crc32_cksum'|'crc32_bzip2'|'crc32_aal5'|'crc32_dect_b'|'crc32_b'|'crc32_mef'|\
+             'crc32_k'|'crc32_koopman'|'crc32_xfer'|'crc32_autosar'|'crc32_c'|'crc32_castagnoli'|'crc32_iscsi'|\
+             'crc32_base91_c'|'crc32_intrelaken'|'crc32_nvme'|'crc32_d'|'crc32_base94'|'crc32_base94_d'|'crc32_q'|\
              'crc32_aixm'|'crc32_cd_rom_edc':
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32[algo[5:].lstrip('_')]
             fnc = crc32
-        case 'crc40_gsm':
-            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC40[algo[6:]]
-            fnc = crc40
-        case 'crc64_we'|'crc64_1b'|'crc64_jones':
+        case 'crc64_xz'|'crc64_go_ecma'|'crc64_ecma'|'crc64_ecma_182'|'crc64_we'|'crc64_redis'|'crc64_jones'|'crc64_ms'|\
+             'crc64_go_iso'|'crc64_nvme':
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC64[algo[6:]]
             fnc = crc64
+
+        case 'crc40_gsm':
+            kwargs['size'] = 40
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = {
+                'gsm':(0x0004820009,0x0000000000,0x0000000000,False)
+            }[algo[6:]]
+            fnc = crc
 
         case 'adler32':
             import zlib
@@ -610,15 +623,32 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             import mmh3
             kwargs['seed'] = kwargs.get('seed',0) & maskb(4)
             fnc = getattr(mmh3,f'mmh3_{"x64_128" if "128" in algo else "32"}_uintdigest')
+        case 'xxh32'|'xxh64'|'xxh3_64'|'xxh128'|'xxh3_128':
+            if algo == 'xxh128': algo = 'xxh3_128'
+            import xxhash
+            fnc = getattr(xxhash,algo + '_' + ('' if kwargs.pop('bytes',False) else 'int') + 'digest')
 
-        case 'sha1'|'sha256'|'md5':
+        case 'sha1'|'sha224'|'sha256'|'sha384'|'sha512'|'sha3_224'|'sha3_256'|'sha3_384'|'sha3_512'|'sha512_224'|'sha512_256'|\
+             'blake2b'|'blake2s'|'md5'|'shake128'|'shake_128'|'shake256'|'shake_256'|'ripemd160'|'sm3':
+            if algo in {'shake128','shake256'}: algo = algo[:5] + '_' + algo[5:]
+            oby = kwargs.pop('bytes',False)
+            kw = {}
+            if algo in {'shake_128','shake_256'}: kw['length'] = kwargs.pop('digest_size',int(algo[6:]) // 8)
+
             import hashlib
-            r = getattr(hashlib,algo)(i).digest()
+            r = hashlib.new(algo,i,**kwargs).digest(**kw)
+            if oby: return r
+            return int.from_bytes(r,'big')
+        case 'md5_sha1':
+            import hashlib
+            r = hashlib.md5(i).digest() + hashlib.sha1(i).digest()
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
 
         case 'tarzan': fnc = tarzan_hash
-        case 'hash40': return (len(i) << 32) | crc_hash(i,'crc32',**kwargs)
+        case 'hash40':
+            import zlib
+            return (len(i) << 32) | zlib.crc32(i,value=kwargs.get('value') or 0)
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
@@ -1081,7 +1111,6 @@ def crc8(i:bytes,poly=0x7,init=0,xor=0,reflect=False,value:int=None): return crc
 def crc16(i:bytes,poly=0x8005,init=0,xor=0,reflect=True,value:int=None): return crc(i,16,poly,init,xor,reflect,value)
 def crc24(i:bytes,poly=0x864CFB,init=0xB7074CE,xor=0,reflect=False,value:int=None): return crc(i,24,poly,init,xor,reflect,value)
 def crc32(i:bytes,poly=0x04C11DB7,init=0xFFFFFFFF,xor=0xFFFFFFFF,reflect=True,value:int=None): return crc(i,32,poly,init,xor,reflect,value)
-def crc40(i:bytes,poly=0x0004820009,init=0,xor=0,reflect=False,value:int=None): return crc(i,40,poly,init,xor,reflect,value)
 def crc64(i:bytes,poly=0x42F0E1EBA9EA3693,init=0x0000000000000000,xor=0x0000000000000000,reflect=False,value:int=None): return crc(i,64,poly,init,xor,reflect,value)
 def fnv1_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
     for b in i: offset = ((offset * prime) & maskb(8)) ^ b
@@ -1162,9 +1191,8 @@ HASHTS = {
     f'crc16_{x}':2 for x in CRC16}|{
     f'crc24_{x}':3 for x in CRC24}|{
     f'crc32{"_" if len(x)>1 else ""}{x}':4 for x in CRC32}|{
-    f'crc40_{x}':5 for x in CRC40}|{
     f'crc64_{x}':8 for x in CRC64}|{
-    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,
+    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40_gsm':5,'crc64':8,
     'adler32':4,
     'fnv1_32':4,'fnv1a_32':4,
     'fnv1_64':8,'fnv1a_64':8,
@@ -1172,7 +1200,14 @@ HASHTS = {
     'sdbm':4,'sdbm_ltr':4,'sdbm_rtl':4,
     'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
     'murmur3_128':16,'mmh3_128':16,
-    'md5':16,'sha1':20,'sha256':32,
+    'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
+    'md5':16,'sha1':20,'md5_sha1':36,
+    'sha224':28,'sha256':32,'sha384':48,'sha512':64,
+    'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,
+    'sha512_224':28,'sha512_256':32,
+    'blake2b':32,'blake2s':16,
+    'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
+    'ripemd160':20,'sm3':32,
     'tarzan':4,'hash40':5,
 }
 class HashLib:

@@ -5772,6 +5772,9 @@
             }
         }]
     },
+    "xxhash":{
+        "pip":"xxhash"
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{
