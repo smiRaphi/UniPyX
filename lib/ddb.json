@@ -2289,6 +2289,11 @@
     },
     {
         "rqr":null,
+        "d":[["name","data.arc"],["size",[8388608,16777216]],["n0",4,0],["n0",4,4],["isat","\\0",8],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');return f.seek(int.from_bytes(f.read(4),'little'),1)<u and f.read(1)==b'\\0'"]],
+        "rs":"Other Ocean Interactive ARC"
+    },
+    {
+        "rqr":null,
         "d":["ext",".zl"],
         "rs":"OpenZL"
     },

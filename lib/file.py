@@ -33,9 +33,10 @@ class File:
     def reads(self): return self.read(1)
     def readc(self,n:int=None):
         d = self.read(n)
-        if n is not None: assert len(d) == n,"Unexpected EOF"
+        if n is not None and len(d) != n: raise EOFError("Unexpected EOF")
         return d
-    def padc(self,n:int): assert not sum(self.readc(n)),"Unexpected Value in padding"
+    def padc(self,n:int): 
+        if sum(self.readc(n)): raise ValueError("Unexpected Value in padding")
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -169,10 +170,7 @@ class File:
 
     def update_size(self): self._size = self.tell()
     def __len__(self): return self._size
-    def __bool__(self):
-        b = self.reads()
-        if b: self.back(1)
-        return bool(b)
+    def __bool__(self): return self.pos < self.size
 class BitReader:
     def __init__(self,d:bytes):
         self.d = d
@@ -286,8 +284,12 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lzma'|'lzma_alone':
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
+            elif kwargs.get('usize') is not None: i = i[:5] + kwargs['usize'].to_bytes(8,'little') + i[13:]
             return lzma.LZMADecompressor(format=lzma.FORMAT_ALONE).decompress(i)
         case 'lzma_us32'|'lzma_alone_us32': return decompress(i[:9] + b'\0'*4 + i[9:],'lzma_alone',*args,**kwargs)
+        case 'msf':
+            import lzma
+            return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[{'id':lzma.FILTER_LZMA1,'dict_size':0x1000000,'lc':3,'lp':0,'pb':2}]).decompress(i)[:kwargs.get('usize')]
         case 'zstd':
             if sys.version_info >= (3,14): from compression import zstd # type: ignore
             else:

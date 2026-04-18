@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 882
+# Supported Formats: 884
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (439)
+## Various (441)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -620,8 +620,10 @@ OHRRPGCE RPG | ??? | Custom |
 One Piece Battle Adventure FSM | .apf .pac | Custom |
 One Piece Battle Adventure NXD | .nxd | Custom |
 One Piece Straw Wars Pirate Defense Resource | ??? | Custom |
+Opalium Engine PAK | .opk .obp .ovp .osp | Custom |
 Orange Juice Encrypted | .dat | [qpcrypt](https://github.com/jwilins/qptk) |
 Orange Juice LAG | .lag | Custom |
+Other Ocean Interactive ARC | .arc | Custom |
 Package Resource Index | .pri | [makepri](https://www.nuget.org/packages/Microsoft.Windows.SDK.BuildTools/) |
 Package Resource Index XML | .xml | Custom |
 Palm MemoPad Archive | .mpa | Custom |

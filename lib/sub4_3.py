@@ -2176,7 +2176,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                d = f.read(fe[2])
+                d = f.readc(fe[2])
                 xopen(f'{o}/{fe[0]:08X}.{guess_ext(d)}','wb').write(d)
 
             f.close()
@@ -2197,7 +2197,7 @@ def extract4_3(inp:str,out:str,t:str):
 
                 for ix,fe in enumerate(fs):
                     f.seek(fe[0])
-                    d = f.read(fe[1])
+                    d = f.readc(fe[1])
                     if fe[1] > 0x18 and d[:4] == b'Ce\x87\x09': ex = 'rfs'
                     elif len(p) == 2 and p[0] == 1 and ix == 0: ex = 'bg'
                     elif len(p) == 2 and p[0] == 1 and ix == 2 and not fe[1]%4: ex = 'pal'
@@ -2213,6 +2213,61 @@ def extract4_3(inp:str,out:str,t:str):
             readb([])
             f.close()
             if listdir(o): return
+        case 'Opalium Engine PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'PAK '
+
+            c = f.readu32()
+            f.skip(8)
+            fs = []
+            for _ in range(c):
+                fe = (f.readu32(),f.readu32())
+                f.skip(4)
+                es = f.readu32()
+                f.skip(8)
+                fs.append((fe[0],fe[1],f.readc(es - 0x18).rstrip(b'\0').decode('ascii')))
+
+            for fe in fs:
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                xopen(o + '/' + fe[2],'wb').write(d)
+
+            f.close()
+            if fs: return
+        case 'Other Ocean Interactive ARC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            fd = File(i,endian='<')
+            fd.skip(4)
+
+            cs = fd.readu32()
+            f = File(fd.decompress(cs,'msf'),endian=fd._end)
+            fs = []
+            while f:
+                try: fs.append((f.read0s().decode('ascii'),f.readu32() + cs + 8,f.readu32()))
+                except (UnicodeDecodeError,EOFError):
+                    f.close()
+                    fd.close()
+                    return 1
+            f.close()
+            fs.append((0,fd.size,0))
+
+            for ix,fe in enumerate(fs[:-1]):
+                s = fs[ix+1][1] - fe[1]
+                if s < 0 or (s == 0 and fe[2] != 0):
+                    fd.close()
+                    return 1
+                fd.seek(fe[1])
+                d = fd.decompress(s,'msf' if s != fe[2] else 'none',usize=fe[2])
+                if len(d) != fe[2]:
+                    fd.close()
+                    return 1
+                xopen(o + '/' + fe[0],'wb').write(d)
+
+            fd.close()
+            if fs: return
 
     return 1
 
