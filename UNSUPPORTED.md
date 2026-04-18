@@ -32,6 +32,7 @@ PlayStation Encrypted File | .pfenc | PlayStation PC ports -> uds/\<store\>/uds0
 PlayStation 5 SELF | * | https://www.playstation.com/en-us/support/hardware/ps5/system-software/ | ? | https://github.com/zecoxao/PS5FTP/blob/master/source/ftps4.c | detected
 PlayStation 4 SELF | * | https://www.playstation.com/en-us/support/hardware/ps4/system-software/ | ? | https://github.com/zecoxao/PS5FTP/blob/master/source/ftps4.c | detected
 SecuROM | .exe | https://archive.org/download/The_Great_Escape_USA | ? | https://www.cdmediaworld.com/hardware/cdrom/cd_utils_8.shtml#UnSecuromNT | detected
+Warp | .exe | ? | https://github.com/dgiagio/warp | ? |
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

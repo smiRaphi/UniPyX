@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 880
+# Supported Formats: 881
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (437)
+## Various (438)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -405,6 +405,7 @@ Build Engine RFF | .rff | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Bunny Pro. Das2 DPK | .dpk | Custom |
 Burut Creative Team PAK | .pak | [burut.bms](https://mirror.aluigi.org/bms/burut.bms) |
 Bureau 13 GL | .gl | [na_game_tool](https://nihav.org/game_tool.html) |
+Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |

@@ -1160,6 +1160,10 @@
         "rs":"Marmalade Resource Group"
     },
     {
+        "d":[["s%",2048],["isat","Ce\\x87\\x09",0],["n0",4,4],["n0",2,8],["n0",2,10],["n0",2,12],["n0",2,14],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif s!=int.from_bytes(f.read(4),'little'):return\nc11,c12,c21,c22=[int.from_bytes(f.read(2),'little')for _ in range(4)];o=c11*8+16;return c11==c12 and c21==c22 and(o+-o%2048)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Candy Land Adventure RFS","s":1
+    },
+    {
         "d":[["isat","package\\1\\0\\0\\0",0],["isat","\\1",23],["isatS","\\0",8,24],["n0",8,11],["n0",4,19],["n0",4,36]],
         "rs":"Frogwares 0000 Package"},{
         "d":[["isat","package\\x07\\0\\0\\0\\1\\0\\0\\0",0],["isat","\\1",27],["isatS","\\0",8,28],["n0",8,15],["n0",4,23],["n0",4,40]],

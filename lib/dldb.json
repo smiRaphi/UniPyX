@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1775685600
+            "ts":1776376800
         }],
-        "ts":1775685600
+        "ts":1776376800
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -101,12 +101,13 @@
             "x":{
                 "yara64.exe":"yara/yara.exe",
                 "yarac64.exe":"yara/yarac.exe"
-            }
+            },
+            "ts":1761815641
         },[
             "https://raw.githubusercontent.com/Yara-Rules/rules/refs/heads/master/packers/peid.yar",
             "yara/packers_peid.yar"
         ]],
-        "ts":0
+        "ts":1761815641
     },
     "die":{
         "p":"DiE/diec.exe",
@@ -123,9 +124,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1776031200
+            "ts":1776376800
         }],
-        "ts":1776031200
+        "ts":1776376800
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -513,13 +514,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/0e/0c/dolphin-master-2603-269-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/11/a4/dolphin-master-2603-299-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1776045788
+            "ts":1776448787
         }],
-        "ts":1776045788
+        "ts":1776448787
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2338,23 +2339,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46075/SDLVICE-3.10-win64-r46075.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46078/SDLVICE-3.10-win64-r46078.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46075/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46075/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46075/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46075/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46075/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46075/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46078/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46078/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46078/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46078/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46078/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46078/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1775738722
+            "ts":1776420772
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1775738722
+        "ts":1776420772
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2725,14 +2726,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_11_f1ea0386_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_16_f9cc1039_32.zip",
             "x":{
-                "RenderDoc_2026_04_11_f1ea0386_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_11_f1ea0386_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_16_f9cc1039_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_16_f9cc1039_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1775858400
+            "ts":1776290400
         }],
-        "ts":1775858400
+        "ts":1776290400
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2784,13 +2785,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.9.1/zxc-windows-x64.exe.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.10.0/zxc-windows-x64.zip",
             "x":{
-                "zxc.exe":"zxc.exe"
+                "bin/zxc.exe":"zxc.exe"
             },
-            "ts":1773647217
+            "ts":1776317062
         }],
-        "ts":1773647217
+        "ts":1776317062
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -5590,7 +5591,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-13/WolvenKit.Console-8.17.5-nightly.2026-04-13.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-17/WolvenKit.Console-8.17.5-nightly.2026-04-17.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5643,9 +5644,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1776076324
+            "ts":1776421740
         }],
-        "ts":1776076324
+        "ts":1776421740
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5665,12 +5666,13 @@
     "bff":{
         "p":"bff-cli.exe",
         "fs":[{
-            "u":"https://github.com/widberg/bff/releases/download/v0.1.0-rc1/bff-windows-v0.1.0-rc1.zip",
+            "u":"https://github.com/widberg/bff/releases/download/v0.1.0/bff-windows-v0.1.0.zip",
             "x":{
                 "bff-cli.exe":"bff-cli.exe"
-            }
+            },
+            "ts":1776108879
         }],
-        "ts":0
+        "ts":1776108879
     },
     "derbh_dzip":{
         "p":"derbh_dzip.exe",
@@ -5694,7 +5696,7 @@
     "git":{
         "p":"git/git.exe",
         "fs":[{
-            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0-rc1.windows.1/MinGit-2.54.0-rc1-64-bit.zip",
+            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0-rc2.windows.1/MinGit-2.54.0-rc2-64-bit.zip",
             "x":{
                 "mingw64/bin/git.exe":"git/git.exe",
                 "mingw64/bin/libiconv-2.dll":"git/libiconv-2.dll",
@@ -5703,9 +5705,9 @@
                 "mingw64/bin/libwinpthread-1.dll":"git/libwinpthread-1.dll",
                 "mingw64/bin/zlib1.dll":"git/zlib1.dll"
             },
-            "ts":1775711734
+            "ts":1776190998
         }],
-        "ts":1775711734
+        "ts":1776190998
     },
     "bsab":{
         "p":"bsab.exe",
@@ -5768,14 +5770,16 @@
             "x":{
                 "mcx-windows-x64/mcx.exe":"mcx.exe"
             }
-        }]
+        }],
+        "ts":0
     },
     "aceapex":{
         "p":"aceapex.exe",
         "fs":[[
             "https://github.com/yasha1971-coder/aceapex/releases/download/v1.0.0-beta/aceapex-windows-x64.exe",
             "aceapex.exe"
-        ]]
+        ]],
+        "ts":0
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -5852,12 +5856,13 @@
     "uefiextract":{
         "p":"UEFIExtract.exe",
         "fs":[{
-            "u":"https://github.com/LongSoft/UEFITool/releases/download/A73/UEFIExtract_NE_A73_win64.zip",
+            "u":"https://github.com/LongSoft/UEFITool/releases/download/A74/UEFIExtract_NE_A74_win64.zip",
             "x":{
                 "UEFIExtract.exe":"UEFIExtract.exe"
-            }
+            },
+            "ts":1776324352
         }],
-        "ts":0
+        "ts":1776324352
     },
     "ps3_unself":{
         "p":"ps3tools/unself.exe",

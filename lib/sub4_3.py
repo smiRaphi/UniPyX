@@ -2181,6 +2181,38 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Candy Land Adventure RFS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            def readb(p:list):
+                bo = f.pos
+                assert f.read(4) == b'Ce\x87\x09'
+                pf = '/'.join([f'{x:02d}' for x in p])
+                f.skip(4)
+                c = f.readu16()
+                f.skip(6)
+                fs = [(f.readu32()+bo,f.readu32()) for _ in range(c)]
+
+                for ix,fe in enumerate(fs):
+                    f.seek(fe[0])
+                    d = f.read(fe[1])
+                    if fe[1] > 0x18 and d[:4] == b'Ce\x87\x09': ex = 'rfs'
+                    elif len(p) == 2 and p[0] == 1 and ix == 0: ex = 'bg'
+                    elif len(p) == 2 and p[0] == 1 and ix == 2 and not fe[1]%4: ex = 'pal'
+                    elif len(p) == 2 and p[0] == 1 and c >= 7 and ix == 5: ex = 'anim'
+                    elif (len(p) == 2 and p[0] == 1 and ((c >= 7 and ix == 6) or (c >= 6 and ix == 5))) or (len(p) == 1 and p[0] == 2): ex = 'mono.11025hz.s8.pcm'
+                    elif len(p) == 2 and p[0] == 0 and ix == 0: ex = 'anim'
+                    else: ex = guess_ext(d)
+                    xopen(f'{o}/{pf}/{ix:02d}.{ex}','wb').write(d)
+                    if ex == 'rfs':
+                        f.seek(fe[0])
+                        readb(p + [ix])
+
+            readb([])
+            f.close()
+            if listdir(o): return
 
     return 1
 
