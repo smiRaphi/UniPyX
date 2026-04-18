@@ -231,7 +231,7 @@ class EXE(File):
             seco = self.readu16()
             self.reco = self.readu16()
             blcks = 1 << self.readu16()
-            self.skip()
+            self.skip(12)
             self.recs = self.readu16()
 
             self.seek(self.coff_off + seco)

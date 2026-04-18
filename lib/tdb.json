@@ -1532,5 +1532,11 @@
     ],
     "SecuROM":[
         "securom"
+    ],
+    "MMFW Resource":[
+        "mmfw films",
+        "mmfw pictures",
+        "mmfw sounds",
+        "mmfw resource data (generic)"
     ]
 }
