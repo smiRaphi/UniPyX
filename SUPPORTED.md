@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 884
+# Supported Formats: 885
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (441)
+## Various (442)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -533,6 +533,7 @@ ID String0 Count8 Data | ??? | Custom |
 idTech 7 Resource | .resource | Custom |
 IFF Data | .iff * | Custom |
 Impact Screensaver ILB | .ilb | Custom |
+Import Tuner Challenge TOC+DAT | .toc+.dat | Custom |
 Initial D XAF | .xaf | [assamUnpack](https://github.com/refint/assamUnpack) |
 Ion Storm Resource | ??? | Custom |
 IPS Patch | .ips | Custom |
@@ -892,7 +893,7 @@ SZIP | .szip .szp | [szip](http://www.compressconsult.com/szip/szip_112a_win32.z
 TERSE | ??? | [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp) |
 THOR | ??? | [THOR](https://web.archive.org/web/20140115050229/http://www.maximumcompression.com/thor_096.zip) |
 TANGELO | .tangelo | [TANGELO](https://encode.su/threads/1738-TANGELO-new-compressor-(derived-from-PAQ8-FP8)) |
-UCL | .ucl | [uclpack](https://www.oberhumer.com/opensource/ucl/) |
+UCLPack | .ucl | Custom |
 ULZ | .ulz | [ULZ](https://compressme.net/) |
 Vlaz | .vlaz | [Vlaz](https://encode.su/threads/4450-Vlaz-LZAV-codec-client) |
 Yappy | .yap | [yappy](http://nishi.dreamhosters.com/u/yappy_v0.rar)(src?) |

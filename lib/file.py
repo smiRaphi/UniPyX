@@ -250,8 +250,9 @@ def ext_exe(i:str,dotnet=False):
 
 OODLE = None
 GDEFLATE = None
+UCL = None
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
-    global OODLE,GDEFLATE
+    global OODLE,GDEFLATE,UCL
     match algo:
         case 'none': return i
         case 'zlib':
@@ -281,6 +282,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             else: r = {n:z.read(n) for n in z.namelist()}
             z.close()
             return r
+
         case 'lzma'|'lzma_alone':
             import lzma
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
@@ -304,28 +306,102 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import lz4.frame
             return lz4.frame.decompress(i)
         case 'lz4_fast': return lz4_fast_decompress(i,usize=kwargs['usize'])
+
         case 'lzo'|'lzo1x'|'lzo1y':
             if 'db' in kwargs: kwargs['db'].get('lzo')
             if algo == 'lzo': algo = 'lzo1x'
 
             import bin.lzo # type: ignore
             return bin.lzo.decompress(i,False,kwargs['usize'],algorithm=algo.upper())
+        case 'implode':
+            if 'db' in kwargs: kwargs['db'].get('pwexplode')
+            import bin.pwexplode # type: ignore
+            return bin.pwexplode.explode(i)
+        case 'ucl_nrv2b'|'ucl_nrv2b_8'|'ucl_nrv2b_16'|'ucl_nrv2b_32'|\
+             'ucl_nrv2d'|'ucl_nrv2d_8'|'ucl_nrv2d_16'|'ucl_nrv2d_32'|\
+             'ucl_nrv2e'|'ucl_nrv2e_8'|'ucl_nrv2e_16'|'ucl_nrv2e_32':
+                assert 'usize' in kwargs and (UCL or kwargs.get('db'))
+                UCLERR = {-ix:x for ix,x in enumerate(('OK','ERROR','OUT_OF_MEMORY','NOT_COMPRESSIBLE','INPUT_OVERRUN','OUTPUT_OVERRUN','LOOKBEHIND_OVERRUN','EOF_NOT_FOUND','INPUT_NOT_CONSUMED'))}
+
+                if algo in {'ucl_nrv2b','ucl_nrv2d','ucl_nrv2e'}: algo += '_8'
+                import ctypes
+                if not UCL:
+                    UCL = ctypes.CDLL(kwargs['db'].get('ucl'))
+                    UCL.InitUCL.argtypes = []
+                    UCL.InitUCL.restype = ctypes.c_int
+
+                    for a in 'BDE':
+                        for f in ('','_Safe'):
+                            for s in ('8','LE16','LE32'):
+                                fn = getattr(UCL,f'DecompressNRV2{a}{f}_{s}')
+                                fn.argtypes = [ctypes.POINTER(ctypes.c_ubyte),ctypes.c_uint,ctypes.POINTER(ctypes.c_ubyte),ctypes.POINTER(ctypes.c_uint)]
+                                fn.restype = ctypes.c_int
+
+                    r = UCL.InitUCL()
+                    if r != 0: raise ValueError(UCLERR[r])
+                bs = int(algo.split('_')[-1])
+                fn = getattr(UCL,'DecompressNRV2' + algo[8].upper() + ('_Safe' if kwargs.get('safe') else '') + '_' + (f'LE{bs}' if bs > 8 else '8'))
+
+                src_len,dst_len = len(i),ctypes.c_uint(kwargs['usize'])
+                src = (ctypes.c_ubyte * src_len).from_buffer_copy(i)
+                dst = (ctypes.c_ubyte * kwargs['usize'])()
+                r = fn(ctypes.cast(src,ctypes.POINTER(ctypes.c_ubyte)),src_len,ctypes.cast(dst,ctypes.POINTER(ctypes.c_ubyte)),ctypes.byref(dst_len))
+                if r != 0: raise ValueError(UCLERR[r])
+                return bytes(dst[:dst_len.value])
+        case 'uclpack'|'uclpack_itc':
+            itc = algo == 'uclpack_itc'
+            safe = bool(kwargs.get('safe',True))
+
+            if i[:8] != b'\x00\xE9UCL\xFF\x01\x1A': raise ValueError('invalid uclpack header')
+            dcrc = int.from_bytes(i[8:12],'big') & 1 and safe
+            crc = 1
+            mth = i[12]
+            if not mth in {0x2B,0x2D,0x2E}: raise ValueError(f'invalid uclpack method (0x{mth:02X})')
+            mth = f'{mth:02x}'
+            lvl = i[13]
+            if 10 < lvl < 1: raise ValueError(f'invalid uclpack level ({lvl})')
+            blks = int.from_bytes(i[14:18],'big')
+            if not itc and 0x800000 < blks < 0x400: raise ValueError(f'invalid uclpack block size ({blks})')
+
+            p = 0x12
+            ics = len(i)
+            o = bytearray()
+            while p < ics:
+                us = int.from_bytes(i[p:p+4],'big');p += 4
+                if us == 0: break
+                if us > blks: raise ValueError(f'uncompressed block size ({us}) is larger than block size ({blks})')
+                zs = int.from_bytes(i[p:p+4],'big');p += 4
+                if zs > blks: raise ValueError(f'compressed block size ({zs}) is larger than block size ({blks})')
+                if zs > us: raise ValueError(f'compressed block size ({zs}) is larger than uncompressed block size ({us})')
+                if zs == 0: raise ValueError(f'compressed block size ({zs}) is zero')
+
+                cd = i[p:p+zs];p += zs
+                if len(cd) != zs: raise EOFError(f'unexpected EOF (by {zs - len(cd)})')
+                if zs == us: d = cd
+                else:
+                    d = decompress(cd,f'ucl_nrv{mth}_{32 if itc else 8}',usize=us,safe=safe,db=kwargs.get('db'))
+                    if len(d) != us: raise ValueError(f'actual decompressed block size ({len(d)}) is not equal to expected size ({us})')
+                o.extend(d)
+                if dcrc: crc = crc_hash(d,'adler32',init=crc)
+                if len(cd) != zs: break
+
+            if dcrc and crc != int.from_bytes(i[p:p+4],'big'): raise ValueError('CRC mismatch')
+            return bytes(o)
+
         case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'lzss': return lzss_decompress(i,usize=kwargs['usize'])
         case 'lzss16': return lzss16_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
             return lzw_decompress(i,**args)
-        case 'implode':
-            if 'db' in kwargs: kwargs['db'].get('pwexplode')
-            import bin.pwexplode # type: ignore
-            return bin.pwexplode.explode(i)
+
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
             return getattr(crunch64,algo).decompress(i)
         case 'ash0': return ash0_decompress(i)
+
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
-            assert 'usize' in kwargs and (OODLE or 'db' in kwargs)
+            assert 'usize' in kwargs and (OODLE or kwargs.get('db'))
             import ctypes
             if not OODLE:
                 from ctypes import c_void_p,c_int,c_ssize_t,CFUNCTYPE
@@ -341,7 +417,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if r == 0: raise Exception('Failed to decompress')
             return o.raw[:r]
         case 'gdeflate':
-            assert GDEFLATE or 'db' in kwargs
+            assert GDEFLATE or kwargs.get('db')
             import ctypes
             if not GDEFLATE:
                 GDEFLATE = ctypes.CDLL(kwargs['db'].get('gdeflate'))
@@ -378,12 +454,12 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = GDEFLATE.DecompressData(ibuf,isz,obuf,us)
             if r == 0: raise ValueError('Failed to decompress')
             return bytes(obuf)
-
     raise NotImplementedError(algo)
 def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
         case 'crc32'|'adler32':
             import zlib
+            if 'init' in kwargs: kwargs['value'] = kwargs.pop('init')
             return getattr(zlib,algo)(i,**kwargs) & maskb(4)
         case 'crc16': fnc = crc16
         case 'crc16_ccitt'|'crc16_ansi'|'crc16_ibm'|'crc16_dnp':

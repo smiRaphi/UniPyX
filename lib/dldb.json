@@ -2603,24 +2603,6 @@
             }
         }]
     },
-    "uclpack":{
-        "p":"uclpack.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "uclpack.exe":"uclpack.exe"
-            }
-        }]
-    },
-    "uclpack32":{
-        "p":"uclpack32.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "uclpack32.exe":"uclpack32.exe"
-            }
-        }]
-    },
     "unecm":{
         "p":"unecm.exe",
         "fs":[{
@@ -5780,6 +5762,15 @@
             "aceapex.exe"
         ]],
         "ts":0
+    },
+    "ucl":{
+        "p":"ucl.dll",
+        "fs":[{
+            "u":".",
+            "x":{
+                "ucl.dll":"ucl.dll"
+            }
+        }]
     },
     "wasm2c":{
         "p":"wasm2c.exe",

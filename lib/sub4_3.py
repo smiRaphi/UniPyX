@@ -76,35 +76,57 @@ def extract4_3(inp:str,out:str,t:str):
             if fs: return
         case 'Import Tuner Challenge TOC+DAT':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decompress
+            from multiprocessing.pool import ThreadPool
             f = File(i,endian='>')
             fd = open(noext(i) + '.dat','rb')
 
             c = f.readu32()
             f.skip(12)
-            offs = []
+
+            offs = set()
+            p = ThreadPool()
+            def decc(ix,us,d,algo):
+                ex = None
+                if algo != 'none':
+                    try: d = decompress(d,algo,db=db)
+                    except EOFError: ex = 'ucl'
+                    else: assert len(d) == us
+
+                if ex is None:
+                    if len(d) > 0x80 and d[0x70:0x80] == b'mdl_Detail\0\0\0\0\0\0': ex = 'mdl'
+                    elif len(d) >= 0x90 and d[0x70:0x90] == b'polySurfaceShape3\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' or d[0x80:0x90] == b'polySurfaceShape3\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0': ex = 'shp3'
+                    elif b'Microsoft (R) Xbox 360 Shader Compiler 2.' in d[:0x600]:
+                        p = d.find(b'Microsoft (R) Xbox 360 Shader Compiler 2.')
+                        st = d[p-7:p-1]
+                        if st == b'vs_3_0': ex = 'xvu'
+                        elif st == b'ps_3_0': ex = 'xpu'
+                        else: ex = '!!!'
+                    elif d[:4] in {b'XPR2',b'XMD\0'}: ex = d[:3].decode('ascii').lower()
+                    elif d[:4] in {b'KBDS',b'DNBW'}: ex = d[:4].decode('ascii').lower()
+                    elif b'Shape\0' in d[0x110:0x130]: ex = 'shp'
+                    else: ex = guess_ext(d)
+                xopen(f'{o}/{ix:04d}.{ex}','wb').write(d)
+
+            pcs = []
             for ix in range(c):
                 of,zs,us = f.readu32(),f.readu32(),f.readu32()
                 f.skip(4)
                 if of in offs: continue
-                offs.append(of)
+                offs.add(of)
 
                 fd.seek(of*0x800)
-                fn = f'{o}\\{ix:04d}.bin'
                 d = fd.read(zs)
 
                 if d and zs == us: raise NotImplementedError(ix)
                 elif not d: assert us == 0,ix
-                elif us != zs and d[:8] == b'\x00\xE9UCL\xFF\x01\x1A':
-                    tf = TmpFile('.ucl')
-                    open(tf.p,'wb').write(d)
-                    _,r,_ = run(['uclpack32','-d',tf,fn],print_try=False)
-                    if exists(fn) and getsize(fn) == us: tf.destroy()
-                    else:
-                        mv(tf.p,f'{o}/F/{ix:04d}_{r.strip().rsplit("\n",1)[1].split(": ",1)[1]}.ucl')
+                elif us != zs and d[:8] == b'\x00\xE9UCL\xFF\x01\x1A': pcs.append(p.apply_async(decc,(ix,us,d,'uclpack_itc')))
                 else:
                     assert us in (0,zs),ix
-                    open(fn,'wb').write(d)
+                    pcs.append(p.apply_async(decc,(ix,us,d,'none')))
+            for pc in pcs: pc.get()
+            p.close()
+            p.join()
 
             f.close()
             fd.close()

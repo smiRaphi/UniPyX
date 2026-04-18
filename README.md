@@ -27,8 +27,6 @@ Requires a somewhat new version (3.10+) of python (I've only tested old versions
 * self compiled [ZLI](https://github.com/facebook/openzl)
 * self compiled [lha](https://github.com/jca02266/lha)
 * self compiled [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp)
-* self compiled [uclpack](https://www.oberhumer.com/opensource/ucl/)
-* self compiled [uclpack32](https://www.oberhumer.com/opensource/ucl/) + [patch](./dev/uclpack32.patch) diviation for Import Tuner Challenge TOC+DAT
 * self compiled [ddosutils](https://github.com/pulkomandy/ddosutils)
 * self compiled [bk_tools](https://github.com/MittenzHugg/bk_tools)
 * self compiled [paq8k3](https://github.com/JohannesBuchner/paq/tree/master/paq8k3)
@@ -40,6 +38,7 @@ Requires a somewhat new version (3.10+) of python (I've only tested old versions
 * self compiled [python-lzo](https://github.com/jd-boyd/python-lzo) because the pip package is outdated
 * self compiled [na_game_tool](https://nihav.org/game_tool.html)
 * self made [GDeflate](https://github.com/microsoft/DirectStorage/tree/main/GDeflate) wrapper
+* self made [ucl](https://www.oberhumer.com/opensource/ucl/) wrapper
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
 * [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX

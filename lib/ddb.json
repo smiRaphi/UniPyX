@@ -1463,7 +1463,7 @@
     },
     {
         "d":["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",0],
-        "rs":"UCL","s":1
+        "rs":"UCLPack","s":1
     },
     {
         "rqr":"GLIBC",

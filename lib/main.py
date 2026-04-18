@@ -736,6 +736,7 @@ def guess_ext(d:bytes) -> str:
     elif d[:0x17] == b'Kaydara FBX Binary  \0\x1A\0': ext = 'fbx'
     elif d[:4] == b'FORM' and d[8:12] == b'AIFF': ext = 'aif'
     elif d[6:10] == b'JFIF': ext = 'jpg'
+    elif d[-0x12:] == b'TRUEVISION-XFILE.\0': ext = 'tga'
     elif d[:4] == b'\0\0\1\xBA' and\
          d[4] >> 6 == 0b01 and d[4] & 4 and\
          d[6] & 4 and d[8] & 4 and d[9] & 1 and\

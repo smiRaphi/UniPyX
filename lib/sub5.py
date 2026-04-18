@@ -265,10 +265,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if exists(of) and getsize(of): return
             run(['tersedecompress++',i,of,'-b'])
             if exists(of) and getsize(of): return
-        case 'UCL':
-            of = o + '/' + tbasename(i)
-            run(['uclpack','-d',i,o])
-            if exists(of) and getsize(of): return
+        case 'UCLPack':
+            from lib.file import decompress
+            d = decompress(open(i,'rb').read(),'uclpack',db=db)
+            xopen(o + '/' + tbasename(i),'wb').write(d)
+            return
         case 'Binary ][ Archive':
             run(['nulib2','-xs',i],cwd=o)
             if listdir(o): return
