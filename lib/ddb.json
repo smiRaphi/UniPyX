@@ -577,6 +577,10 @@
         "rs":"Piper SAGE","s":1
     },
     {
+        "d":[["isat","\\0\\0\\1\\0",0],["isat","5D",38],["isin",["POHS","GSTS","KART","TOOB","EVOM","TSAC","GATS"],32],["isin",["DP","PF","TS","TR","EM","CC"],36],["isatS","\\0",472,40],["n0",4,4],["n0",4,20]],
+        "rs":"DreamFactory 5 Resource","s":1
+    },
+    {
         "d":[["isat","\\x0D\\xD0\\xAD\\xBA\\1\\0\\0\\0",0],["isat","\\0",-1],["n0",8,8],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(8),'little'));c1,c2=int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')\nif c1>c2:return\nf.seek(c1*20,1)\nif f.read(5)!=b'\\x10\\0\\0\\0\\0' or f.read(1)[0]>1 or f.read(1)[0]:return\nf.seek(1,1);return sum(f.read(4))and sum(f.read(4))"]],
         "rs":"RTX Remix Package","s":1
     },

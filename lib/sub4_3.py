@@ -2338,6 +2338,31 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'DreamFactory 5 Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.padc(2)
+            assert f.readu16() == 1
+
+            f.skip(0x10)
+            c = f.readu32()
+            f.padc(8);f.skip(8)
+            f.align(0x200)
+            f.skip(0x200)
+
+            ofs = [f.readu32() for _ in range(c)]
+            for of in ofs:
+                f.seek(of)
+                id,s = f.readu32(),f.readu32()
+                f.skip(4)
+                ty = f.read(4)[::-1].decode('ascii')
+                if ty == '\0\0\0\0': ty = 'text'
+                assert ty.isprintable()
+                xopen(f'{o}/{id:03d}.{ty.lower()}','wb').write(f.read(s))
+
+            f.close()
+            if ofs: return
 
     return 1
 
