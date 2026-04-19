@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 885
+# Supported Formats: 886
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (442)
+## Various (443)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -634,6 +634,7 @@ Petroglyph CHK List | .chk | Custom |
 Petroglyph MEG | .meg | Custom |
 Petroglyph Zlib CH | .ch | Custom |
 Phineas And Ferb WAD | .wad | Custom |
+Piper SAGE | .sgo | Custom |
 Pixelbite BAR | .bar | Custom |
 Pixelbite ZIP | ??? | Custom |
 PlayStation 3 Core OS Package | .pkg | [ps3_cosunpkg](https://github.com/wargio/ps3tools) |

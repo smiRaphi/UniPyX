@@ -36,3 +36,7 @@ Warp | .exe | ? | https://github.com/dgiagio/warp | ? |
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
 - F-Zero G/AX LZ: gxpand -> [gfz-cli](https://github.com/RaphaelTetreault/gfz-cli)
+- lib/file.py:crc_hash SipHash
+- lib/file.py:crc_hash DJB2
+- lib/file.py:crc_hash City/Farm Hash
+- lib/file.py:crc_hash Blake3

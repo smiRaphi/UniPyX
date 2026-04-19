@@ -2290,6 +2290,54 @@ def extract4_3(inp:str,out:str,t:str):
 
             fd.close()
             if fs: return
+        case 'Piper SAGE':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'RIFF'
+            ep = f.readu32() + f.pos
+            typ = f.read(4).decode('ascii')
+            assert typ == 'SAGE'
+
+            FNM = {}
+            def readb(typ):
+                n = f.read(4).decode('ascii')
+                bs = f.readu32()
+                ep = bs + f.pos
+
+                match n:
+                    case 'LIST':
+                        typ = f.read(4).decode('ascii')
+                        while f.pos < ep: readb(typ)
+                    case 'SWAV':
+                        assert bs == 0x58
+                        fn = sub_path(f.read(0x50).rstrip(b'\0').decode('ascii'))
+                        f.skip(4)
+                        FNM[f.readu32()] = fn
+                    case 'S256':
+                        f.skip(0x21)
+                        fn = sub_path(f.read(0x50).rstrip(b'\0').decode('ascii'))
+                        f.skip(0x11)
+                        of = f.readu32()
+                        FNM[of] = (fn,f.read(ep - f.pos - 4))
+
+                    case 'RIFF':
+                        f.back(8)
+                        assert f.pos in FNM
+                        xopen(o + '/' + FNM.pop(f.pos),'wb').write(f.read(bs + 8))
+                    case 'DIB8':
+                        fe = FNM.pop(f.pos - 8)
+                        xopen(o + '/' + fe[0],'wb').write(b'BM' + (14 + len(fe[1]) + bs).to_bytes(4,'little') + b'\0'*4 + (14 + len(fe[1])).to_bytes(4,'little') + fe[1] + f.read(bs))
+
+                    case 'SGDS'|'SSND'|'SDIB': pass
+                    case _: raise NotImplementedError(f'{n} ({bs}) @ 0x{f.pos - 8:08X}')
+
+                f.seek(ep)
+                f.align(2)
+            while f.pos < ep: readb(typ)
+
+            f.close()
+            if listdir(o): return
 
     return 1
 
