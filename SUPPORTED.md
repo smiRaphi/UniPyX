@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 887
+# Supported Formats: 888
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (443)
+## Various (444)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -656,6 +656,7 @@ QOOB Flash IMG | ??? | Custom |
 Quake 3D WAD | .wad | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Quake PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Quantum3 DIR+WAD | .dir+.wad | Custom |
+Quest3D ZICB | .cgr .q3d | Custom |
 RARC | .arc .rarc | [WSZST](https://szs.wiimm.de/) |
 Rayman DCZ | .dcz | [rayman_dcz.bms](https://mirror.aluigi.org/bms/rayman_dcz.bms) |
 RDB | .rdb | [Cethleann](https://github.com/yretenai/Cethleann) |

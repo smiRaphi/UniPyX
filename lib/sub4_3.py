@@ -2364,6 +2364,28 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if ofs: return
         case 'Pixar USD Crate': raise NotImplementedError
+        case 'Quest3D ZICB':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            of = o + '/' + basename(i)
+            while f:
+                n = f.read(4).decode('latin-1')
+                s = f.readu32()
+                ep = f.pos + s
+
+                match n:
+                    case 'ACTF'|'ZINS'|'ZIOS': pass
+                    case 'ZICB':
+                        if exists(of): raise FileExistsError
+                        writefile(of,f.decompress(s,'zlib'))
+                    case _: raise NotImplementedError(f'{n} ({s}) @ 0x{f.pos:08X}')
+
+                f.seek(ep)
+
+            f.close()
+            if exists(of): return
 
     return 1
 
