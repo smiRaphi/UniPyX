@@ -2386,6 +2386,41 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if exists(of): return
+        case 'Surreal Software SRSC':
+            TMAP = {
+                0x200:'node',
+                0x203:'mesh',
+                0x204:'uv',
+                0x207:'pos',
+                0x208:'skl',
+                0x211:'parent',
+                0x214:'anim',
+                0x216:'vert',
+                0x302:'sndinf',
+                0x303:'pcm',
+                0x305:'sndfmt',
+                0x402:'lvl',
+                0x501:'mdlinf',
+                0x502:'mdl',
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'SRSC' and f.readu8() == f.readu8() == 1
+
+            of = f.readu32()
+            c = f.readu16()
+            f.padc(4)
+            f.seek(of)
+            fs = [(f.readu16(),f.readu16(),f.readu16(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[3])
+                ex = TMAP.get(fe[0],f'{fe[0]:03X}')
+                writefile(f'{o}/{fe[2]:02X}/{fe[1]:02X}.{ex}',f.readc(fe[4]))
+
+            f.close()
+            if fs: return
 
     return 1
 

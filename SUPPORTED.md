@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 888
+# Supported Formats: 889
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (444)
+## Various (445)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -712,6 +712,7 @@ Super Mario Maker Level | .bin | Custom |
 Super Monkey Ball SPG2 | .spg2 | Custom |
 Super Monkey Ball Tip 'n Tilt PAK | .pak | Custom |
 Super Monkey Ball Tip 'n Tilt String Data | ??? | Custom |
+Surreal Software SRSC | .adu .mdu .odu .qdu .sdu .tdu .xdu .lvl .ldu .vdu | Custom |
 Taiko no Tatsujin Data 1 | ??? | Custom |
 Taiko no Tatsujin Data 2 | ??? | Custom |
 Taiko no Tatsujin Data 3 | ??? | Custom |
