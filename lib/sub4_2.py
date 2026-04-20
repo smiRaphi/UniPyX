@@ -47,7 +47,7 @@ def extract4_2(inp:str,out:str,t:str):
                             c = f.readu32()
                             for _ in range(c):
                                 fn = f.read0s().decode('utf-8')
-                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                                writefile(o + f'/{n}{self.fts[n]}/{fn}',f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'PTGA':
                             if not n in self.fts: self.fts[n] = 0
@@ -55,7 +55,7 @@ def extract4_2(inp:str,out:str,t:str):
                             for _ in range(c):
                                 f.skip(1)
                                 fn = f.read0s().decode('utf-8')
-                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                                writefile(o + f'/{n}{self.fts[n]}/{fn}',f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'DBSS':
                             f.skip(4)
@@ -64,7 +64,7 @@ def extract4_2(inp:str,out:str,t:str):
                             for _ in range(c):
                                 f.skip(4)
                                 fn = f.read0s().decode('utf-8')
-                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                                writefile(o + f'/{n}{self.fts[n]}/{fn}',f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'DBPY':
                             f.skip(8)
@@ -78,7 +78,7 @@ def extract4_2(inp:str,out:str,t:str):
                                 REMF(o + f'/{n}{self.fts[n]}/{noext(fn)}',c=cc)
                                 lp = f.pos
                                 f.seek(cp)
-                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(lp-cp))
+                                writefile(o + f'/{n}{self.fts[n]}/{fn}',f.read(lp-cp))
                                 f.seek(lp)
                             self.fts[n] += 1
                         case 'BLOK'|'LOD1':
@@ -87,27 +87,27 @@ def extract4_2(inp:str,out:str,t:str):
                             while f.pos < xoff:
                                 sn = self.readt()
                                 ss = f.readu32()
-                                xopen(o + f'/{n}{self.fts[n]}/{sn}{c}.bin','wb').write(f.read(ss))
+                                writefile(o + f'/{n}{self.fts[n]}/{sn}{c}.bin',f.read(ss))
                                 if not ss: break
                                 c += 1
                             c = f.readu32()
                             for _ in range(c):
                                 fn = f.read0s().decode('utf-8')
-                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()))
+                                writefile(o + f'/{n}{self.fts[n]}/{fn}',f.read(f.readu32()))
                             self.fts[n] += 1
                         case 'PATH':
                             if not n in self.fts: self.fts[n] = 0
                             c = f.readu32()
                             for _ in range(c):
                                 fn = f.read0s().decode('utf-8')
-                                xopen(o + f'/{n}{self.fts[n]}/{fn}','wb').write(f.read(f.readu32()*0x10))
+                                writefile(o + f'/{n}{self.fts[n]}/{fn}',f.read(f.readu32()*0x10))
                             self.fts[n] += 1
                         case 'CURV'|'LITE'|'MATC'|'JONT'|'JNAM'|'SGMT'|'BINF'|'SEND'|'PTH+'|'MCAM'|'AICH'|'XPLO'|\
                              'FRCE'|'ATAK'|'PHYS'|'PSAN'|'LTRL'|'AMAX'|'ACTN'|'DPND'|'ANIM'|'WTRL'|'AFLG'|'ASLT'|'ATTR'|\
                              'DBOJ'|'OBJS'|'DBSA'|'DBSE'|'ORDR'|'TASK'|'MARK'|'PSFX'|'OCCS'|'SPLS'|'COLL'|'IKCC'|\
                              'PLFX'|'MLBL'|'MNFO'|'CCFT':
                             if not n in self.fts: self.fts[n] = 0
-                            xopen(o + f'/{n}{self.fts[n]}.bin','wb').write(f.read(s))
+                            writefile(o + f'/{n}{self.fts[n]}.bin',f.read(s))
                             self.fts[n] += 1
                         case _: raise NotImplementedError(f'Unknown block: {n} at 0x{f.pos-8:04X} of 0x{s:04x} bytes')
                     f.seek(xoff)
@@ -126,8 +126,8 @@ def extract4_2(inp:str,out:str,t:str):
             for _ in range(c):
                 f.skip(4)
                 fn = f.read0s().decode('utf-8')
-                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
-            xopen(o + '/$rest.bin','wb').write(f.read())
+                writefile(o + '/' + fn,f.read(f.readu32()))
+            writefile(o + '/$rest.bin',f.read())
             f.close()
             if c: return
         case 'Doom 3 Xbox GFC+GOB':
@@ -158,7 +158,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = [(f.read(f.readu16()).rstrip(b'\0').decode('utf-8'),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
-                xopen(o + '/' + fe[0],'wb').write(f.read(f.readu32()))
+                writefile(o + '/' + fe[0],f.read(f.readu32()))
             f.close()
             if fs: return
         case 'PlayStation 3 Signed Package':
@@ -191,7 +191,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+                writefile(o + '/' + fe[0],f.read(fe[2]))
             f.close()
             if fs: return
         case 'Phineas And Ferb WAD':
@@ -263,7 +263,7 @@ def extract4_2(inp:str,out:str,t:str):
                     for _ in range(c): fs.append((sdb[f.readu32()],f.readu32(),f.readu32()))
                     for fe in fs:
                         f.seek(fe[2])
-                        xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+                        writefile(o + '/' + fe[0],f.read(fe[1]))
                 elif cn in ob:
                     for tn in ob[cn]:
                         f.seek(cnt[cn][1] + ob[cn][tn][1])
@@ -292,7 +292,7 @@ def extract4_2(inp:str,out:str,t:str):
                 d = f.read(fs[ix+1]-fs[ix])
                 if d[:4] == b'INDX': ext = 'indx'
                 else: ext = guess_ext_ps2(d)
-                open(o + f'/{ix:02d}.{ext}','wb').write(d)
+                writefile(o + f'/{ix:02d}.{ext}',d)
             f.close()
             if fs: return
         case 'Orange Juice Encrypted':
@@ -311,7 +311,7 @@ def extract4_2(inp:str,out:str,t:str):
                 w,h = f.readu32(),f.readu32()
                 fmt = f.readu32()
                 if not fmt in (1,2): raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
-                xopen(o + f'/{fn}_{w}x{h}.{(0,"rgba8","argb16")[fmt]}','wb').write(f.read(f.readu32()))
+                writefile(o + f'/{fn}_{w}x{h}.{(0,"rgba8","argb16")[fmt]}',f.read(f.readu32()))
             f.close()
             if listdir(o): return
         case 'Destruction Derby 2 DirInfo':
@@ -327,7 +327,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+                writefile(o + '/' + fe[0],f.read(fe[2]))
             f.close()
             if fs: return
         case 'One Piece Straw Wars Pirate Defense Resource':
@@ -340,7 +340,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = [(f.read(f.readu32()).rstrip(b'\0').decode('utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
-                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+                writefile(o + '/' + fe[0],f.read(fe[2]))
             f.close()
             if fs: return
         case 'D1 Grand Prix Series 2005 BIN':
@@ -359,7 +359,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(fe[0])
                 n = f.read0s().decode('utf-8')
                 f.seek(fe[1])
-                xopen(o + '/' + n,'wb').write(f.read(fe[2]))
+                writefile(o + '/' + n,f.read(fe[2]))
             f.close()
             if fs: return
         case 'RenderWare Texture Dictionary':
@@ -380,7 +380,7 @@ def extract4_2(inp:str,out:str,t:str):
                 fs.append((f.readu32(),f.readu32(),f.read0s().decode('utf-8')))
             for fe in fs:
                 f.seek(fe[0])
-                xopen(f'{o}/{rt}/{fe[2]}','wb').write(f.read(fe[1]))
+                writefile(f'{o}/{rt}/{fe[2]}',f.read(fe[1]))
             f.close()
             if fs: return
         case 'Metal Slug 3D PAK':
@@ -398,7 +398,7 @@ def extract4_2(inp:str,out:str,t:str):
                 if d[:4] == b'PK\0\x02': ext = 'pk'
                 elif d[:4] in (b'DATA',b'MENU',b'SEDT',b'STRD'): ext = 'pak'
                 else: ext = guess_ext_ps2(d)
-                open(o + f'/{ix:02d}.{ext}','wb').write(d)
+                writefile(o + f'/{ix:02d}.{ext}',d)
             if fs: return
         case 'OHRRPGCE RPG':
             if db.print_try: print('Trying with custom extractor')
@@ -408,7 +408,7 @@ def extract4_2(inp:str,out:str,t:str):
             while f:
                 fn = f.read0s().decode('utf-8')
                 while fn.startswith(('../','..\\')): fn = fn[3:] 
-                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+                writefile(o + '/' + fn,f.read(f.readu32()))
             f.close()
             if listdir(o): return
         case 'Ludia Dir':
@@ -452,7 +452,7 @@ def extract4_2(inp:str,out:str,t:str):
                 elif not len(d)%8 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x75\xBF\xBD\xE6': ext = 'vtx'
                 elif not len(d)%2 and d[:8] == b'\0\0\0\x02\0\0\0\x02' and d[11] and d[8:12] == d[12:16] == d[20:24]: ext = 'msh'
                 else: ext = 'bin'
-                xopen(o + f'/{fe[2]}.{ext}','wb').write(d)
+                writefile(o + f'/{fe[2]}.{ext}',d)
             f.close()
             if fs: return
         case 'Mission Impossible 3 Data':
@@ -464,7 +464,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = [f.readu32()+2+c*4 for _ in range(c)]
             for ix in range(c-1):
                 f.seek(fs[ix])
-                open(o + f'/{ix:02d}.bin','wb').write(f.read(fs[ix+1]-fs[ix]))
+                writefile(o + f'/{ix:02d}.bin',f.read(fs[ix+1]-fs[ix]))
             f.close()
             if fs: return
         case 'Blade Runner TLK/MIX':
@@ -483,7 +483,7 @@ def extract4_2(inp:str,out:str,t:str):
                 elif d[:4] == b'FORM' and d[8:12] == b'WVQA': ext = 'wvqa'
                 elif d[:3] == b'Set' and d[3:4].isdigit(): ext = 'set'
                 else: ext = 'bin'
-                open(o + f'/{fe[0]}.{ext}','wb').write(d)
+                writefile(o + f'/{fe[0]}.{ext}',d)
             f.close()
             if fs: return
         case 'Nintendo HARC+HIDX':
@@ -501,7 +501,7 @@ def extract4_2(inp:str,out:str,t:str):
                 d = fd.read(fe[2])
                 if d[:4] == b'\x89PNG': ext = 'png'
                 else: ext = 'bin'
-                open(o + f'/{fe[0]}.{ext}','wb').write(d)
+                writefile(o + f'/{fe[0]}.{ext}',d)
             fd.close()
             if fs: return
         case 'Petroglyph MEG':
@@ -601,7 +601,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(fe[2])
                 d = f.read(fe[1])
                 if v == 3 and aes: d = aes(d + f.read(-fe[1]%0x10))[:fe[1]]
-                xopen(o + '/' + fe[0],'wb').write(d)
+                writefile(o + '/' + fe[0],d)
             f.close()
             if fs: return
         case 'Petroglyph Zlib CH':
@@ -611,7 +611,7 @@ def extract4_2(inp:str,out:str,t:str):
             f.skip(0x10)
             s = f.readu32()
             f.skip(0x10)
-            open(o + '/' + basename(i),'wb').write(f.decompress(s,'zlib'))
+            writefile(o + '/' + basename(i),f.decompress(s,'zlib'))
             f.close()
             if s: return
         case 'Petroglyph CHK List':
@@ -676,7 +676,7 @@ def extract4_2(inp:str,out:str,t:str):
                     elif d[:4] == b'HMDL': ex += 'hmdl'
                     else: ex += guess_ext(d)
                     fn = f'$unk/{fe[0]:08X}.{ex}'
-                xopen(o + '/' + fn,'wb').write(d)
+                writefile(o + '/' + fn,d)
             f.close()
 
             if fs: return
@@ -713,7 +713,7 @@ def extract4_2(inp:str,out:str,t:str):
                     if d.get('encoding') == 'base64': rd = base64.b64decode(rd)
                     if d.get('compression') == 'zlib': rd = zlib.decompress(rd)
                     if type(rd) != bytes: rd = rd.encode()
-                    xopen(o + f'/{n}/{ix}.bin','wb').write(rd)
+                    writefile(o + f'/{n}/{ix}.bin',rd)
             del tr
             if listdir(o): return
         case 'Pixelbite BAR':
@@ -738,7 +738,7 @@ def extract4_2(inp:str,out:str,t:str):
                     f.skip(4)
                     d = f.decompress(f.readu32(),'zlib')
                 else: d = f.read(fe[1])
-                xopen(o + '/' + fe[3],'wb').write(d)
+                writefile(o + '/' + fe[3],d)
             f.close()
             if fs: return
         case 'Pixelbite ZIP':
@@ -747,7 +747,7 @@ def extract4_2(inp:str,out:str,t:str):
             f = File(i,endian='<')
             assert f.read(4) == b'PxZP'
             f.skip(4)
-            open(o + '/' + basename(i),'wb').write(f.decompress(f.readu32(),'zlib'))
+            writefile(o + '/' + basename(i),f.decompress(f.readu32(),'zlib'))
             f.close()
             return
         case 'Codename Kids Next Door JAM2/FSTA':
@@ -785,7 +785,7 @@ def extract4_2(inp:str,out:str,t:str):
                     assert s == f.readu32()
                     f.skip(0x18)
                     d = f.read(s)
-                xopen(o + f'/{dn}{fe[1]}','wb').write(d)
+                writefile(o + f'/{dn}{fe[1]}',d)
                 set_ctime(o + f'/{dn}{fe[1]}',tm)
             f.close()
             if fs: return
@@ -819,7 +819,7 @@ def extract4_2(inp:str,out:str,t:str):
                         if d.isprintable():break
             else:
                 f.close()
-                open(o + '/' + basename(i) + '.bin','wb').write(r)
+                writefile(o + '/' + basename(i) + '.bin',r)
                 return
 
             f.back(4)
@@ -831,7 +831,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.skip(4)
                 s = f.readu32()
                 f.skip(0x54)
-                xopen(o + '/' + p,'wb').write(f.read(s))
+                writefile(o + '/' + p,f.read(s))
                 f.skip(-s%0x10)
             f.close()
             if listdir(o): return
@@ -844,7 +844,7 @@ def extract4_2(inp:str,out:str,t:str):
             for _ in range(c):
                 l = f.readline().strip().split('|')
                 fd.seek(int(l[3]))
-                xopen(o + '/' + l[1].strip('/') + '/' + l[0],'wb').write(fd.read(int(l[2])))
+                writefile(o + '/' + l[1].strip('/') + '/' + l[0],fd.read(int(l[2])))
             f.close()
             fd.close()
             if c: return
@@ -859,7 +859,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = [((f.read(8).rstrip(b'\0').decode('ascii') + '.' + f.read(3).rstrip(b'\0').decode('ascii')).rstrip('.'),f.readu24(),f.readu16()*0x800) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[2])
-                xopen(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+                writefile(o + '/' + fe[0],f.read(fe[1]))
             f.close()
             if fs: return
         case 'Lucas Arts Bundle':
@@ -904,7 +904,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(doff + fe[2])
-                xopen(o + '/' + fe[0].lstrip('/\\'),'wb').write(f.read(fe[1]))
+                writefile(o + '/' + fe[0].lstrip('/\\'),f.read(fe[1]))
             f.close()
             if fs: return
         case 'Action Replay RAM Disk':
@@ -922,7 +922,7 @@ def extract4_2(inp:str,out:str,t:str):
                 n = f.read0s().decode('ascii').replace(':','_').strip('/\\')
                 f.read0s()
                 f.align(4)
-                xopen(o + '/' + n,'wb').write(f.read(s))
+                writefile(o + '/' + n,f.read(s))
             f.close()
             if fs: return
         case 'SharkPortSave':
@@ -966,7 +966,7 @@ def extract4_2(inp:str,out:str,t:str):
                         f.seek(p)
                         if dr: [reade(pn + '/' + n) for _ in range(s-2)]
                         else:
-                            xopen(pn + '/' + n,'wb').write(f.read(s))
+                            writefile(pn + '/' + n,f.read(s))
                             set_ctime(pn + '/' + n,tm)
                     reade(o)
                 else: raise NotImplementedError(f'Platform: 0x{p:08X}')
@@ -1033,7 +1033,7 @@ def extract4_2(inp:str,out:str,t:str):
             while f:
                 s = f.readu32()
                 d = f.read(s)
-                open(f'{o}/{c:03d}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{c:03d}.{guess_ext(d)}',d)
                 c += 1
             f.close()
             if c: return
@@ -1051,7 +1051,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(fe[1])
                 n = fe[0]
                 while n.startswith(('./','../')): n = n.split('/',1)[1]
-                xopen(f'{o}/{n}','wb').write(f.read(fe[2]))
+                writefile(f'{o}/{n}',f.read(fe[2]))
             if fs: return
         case 'Pseudo Interactive PIX':
             if db.print_try: print('Trying with custom extractor')
@@ -1071,11 +1071,11 @@ def extract4_2(inp:str,out:str,t:str):
                     ss = sf.readu32()
                     n = sf.read0s().decode('utf-8')
                     d = sf.read(ss)
-                    xopen(f'{o}/{n}','wb').write(d)
+                    writefile(f'{o}/{n}',d)
 
                     if n.endswith('.x2m') and sum(d[0x18:0x1C]) and fd:
                         fd.seek(int.from_bytes(d[0x1C:0x20],'little'))
-                        xopen(f'{o}/{n[:-4]}_big.x2m','wb').write(d[:0x20] + fd.read(int.from_bytes(d[0x18:0x1C],'little')))
+                        writefile(f'{o}/{n[:-4]}_big.x2m',d[:0x20] + fd.read(int.from_bytes(d[0x18:0x1C],'little')))
                 sf.close()
 
             if fd: fd.close()
@@ -1095,7 +1095,7 @@ def extract4_2(inp:str,out:str,t:str):
                 fs.append(fe)
 
             f.seek(off)
-            for fe in fs: xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[1]-f.pos))
+            for fe in fs: writefile(f'{o}/{fe[0]}',f.read(fe[1]-f.pos))
             f.close()
             if fs: return
         case 'Novalogic Resource':
@@ -1120,7 +1120,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                xopen(f'{o}/{fe[0]}','wb').write(f.read(fe[2]))
+                writefile(f'{o}/{fe[0]}',f.read(fe[2]))
             f.close()
             if fs: return
         case 'Specnaz UFF/BFS': raise NotImplementedError
@@ -1130,7 +1130,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fd in d.split(b'\xC0\xDE\0\1')[1:]:
                 nl = int.from_bytes(fd[:4],'big')
-                xopen(f'{o}/{fd[4+5:4+nl].decode('utf-8').replace('://','/')}','wb').write(fd[4+nl:])
+                writefile(f'{o}/{fd[4+5:4+nl].decode('utf-8').replace('://','/')}',fd[4+nl:])
 
             if listdir(o): return
         case 'AmusementMakers Project B.G. Archive':
@@ -1151,7 +1151,7 @@ def extract4_2(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
                 d = decompress(f.read(fs[ix+1][1]-fe[1]),'lzss',usize=fe[0])
-                open(f'{o}/{ix:02d}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{ix:02d}.{guess_ext(d)}',d)
 
             f.close()
             if fs: return
@@ -1192,7 +1192,7 @@ def extract4_2(inp:str,out:str,t:str):
                 elif d[0]+d[1] and not d[2] and d[3] == d[8] == 0x20 and not sum(d[4:8]) and d[9] == 2 and d[10] and d[11] and d[12] and d[13] and not d[14] and d[15].bit_count() == 1: ext = 'mdl'
                 else: ext = guess_ext_ps2(d)
                 fn = f'{o}/{ix:03d}.{ext}'
-                xopen(fn,'wb').write(d)
+                writefile(fn,d)
                 if ext == 'bin.pck': extract4_2(fn,fn[:-8] + '_ext','Michigan: Report From Hell BIN')
 
             db.print_try = bck
@@ -1212,7 +1212,7 @@ def extract4_2(inp:str,out:str,t:str):
                 elif d == b'dummy': ext = 'dummy'
                 elif d[0]+d[1] and not d[2] and d[3] == d[8] == 0x20 and not sum(d[4:8]) and d[9] == 2 and d[10] and d[11] and d[12] and d[13] and not d[14] and d[15].bit_count() == 1: ext = 'mdl'
                 else: ext = guess_ext_ps2(d)
-                xopen(f'{o}/{ix:02d}.{ext}','wb').write(d)
+                writefile(f'{o}/{ix:02d}.{ext}',d)
 
             f.close()
             if fs: return
@@ -1242,7 +1242,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                open(fe[0],'wb').write(f.read(fe[2]))
+                writefile(fe[0],f.read(fe[2]))
             if fs: return
         case 'Metroid Prime 4 RFRM MSBT':
             if db.print_try: print('Trying with custom extractor')
@@ -1258,7 +1258,7 @@ def extract4_2(inp:str,out:str,t:str):
                 s = f.readu32()
                 f.skip(0x10)
                 d = f.read(s)
-                open(o + f'/{n}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),'wb').write(d)
+                writefile(o + f'/{n}.' + ('msbt' if d[:8] == b'MsgStdBn' else 'bin'),d)
             f.close()
 
             bv = db.print_try
@@ -1305,7 +1305,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[0])
-                xopen(fe[2],'wb').write(f.read(fe[1]))
+                writefile(fe[2],f.read(fe[1]))
             if fs: return
         case 'Vulkan Pipeline Cache':
             import json
@@ -1344,7 +1344,7 @@ def extract4_2(inp:str,out:str,t:str):
             uid = f.read(0x10)
             f.skip(hs-0x20)
 
-            xopen(o + '/$device_info.txt','w').write(f'Vendor: {gdb.get(str(vid),{"name":"?"})["name"]} (0x{vid:04X})\nDevice: {gdb.get(str(vid),{}).get(str(did),"?")} (0x{did:04X})\nUUID: {uuid.UUID(bytes=uid)}\n')
+            writefile(o + '/$device_info.txt',f'Vendor: {gdb.get(str(vid),{"name":"?"})["name"]} (0x{vid:04X})\nDevice: {gdb.get(str(vid),{}).get(str(did),"?")} (0x{did:04X})\nUUID: {uuid.UUID(bytes=uid)}\n','w')
 
             if vid == 0x10DE: # nvidia
                 # https://github.com/a2flo/floor/blob/dca53f78f03a261136e5580740503f0f76b4f351/src/device/vulkan/internal/vulkan_disassembly.cpp#L135
@@ -1373,12 +1373,12 @@ def extract4_2(inp:str,out:str,t:str):
                         f.back(4)
                         fs.append((o + f'/{hsh.hex().upper()}.nvbin',f.read(s-4),us))
 
-                for fe in fs: xopen(fe[0],'wb').write(decompress(fe[1],'zstd',zstd_dict=zdct)[:fe[2]])
+                for fe in fs: writefile(fe[0],decompress(fe[1],'zstd',zstd_dict=zdct)[:fe[2]])
             elif vid == 0x1002: # amd
                 f.skip(0x14)
                 while f:
                     hsh = f.read(0x10)
-                    xopen(o + f'/{hsh.hex().upper()}.elf','wb').write(f.read(f.readu64()))
+                    writefile(o + f'/{hsh.hex().upper()}.elf',f.read(f.readu64()))
             else: raise NotImplementedError()
 
             return
@@ -1386,8 +1386,8 @@ def extract4_2(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             of = o + '/' + tbasename(i) + '.bin'
             d = readfile(i)
-            xopen(of,'wb').write(d[12:])
-            open(o + '/$yuzu_version.txt','w').write(str(int.from_bytes(d[8:12],'little')))
+            writefile(of,d[12:])
+            writefile(o + '/$yuzu_version.txt',str(int.from_bytes(d[8:12],'little')),'w')
 
             extract4_2(of,o,'Vulkan Pipeline Cache')
             if len(d) >= 48: return
@@ -1430,7 +1430,7 @@ def extract4_2(inp:str,out:str,t:str):
                     stg = f.readu32()
                     if ix == 0: fstg = stg
                     inf.write(f'Stage: {STGS[stg]} ({stg})\n\n')
-                    xopen(f'{o}/{c}/{ix}_code.bin','wb').write(f.read(cs))
+                    writefile(f'{o}/{c}/{ix}_code.bin',f.read(cs))
 
                     inf.write('Texture Types:\n')
                     for _ in range(txtyc):
@@ -1453,12 +1453,12 @@ def extract4_2(inp:str,out:str,t:str):
 
                     if stg == 5: inf.write(f'Workgroup Size X: {f.readu32()}\nWorkgroup Size Y: {f.readu32()}\nWorkgroup Size Z: {f.readu32()}\nShared Memory Size: 0x{f.readu32():08X}\n')
                     else:
-                        xopen(f'{o}/{c}/{ix}_SPH.bin','wb').write(f.read(80))
+                        writefile(f'{o}/{c}/{ix}_SPH.bin',f.read(80))
                         if stg == 3:
                             inf.write(f'GP Passthrough Mask:\n')
                             for _ in range(4): inf.write(f'0x{f.readu32():08X} 0x{f.readu32():08X}\n')
                     inf.close()
-                xopen(f'{o}/{c}_{"compute" if fstg == 5 else "graphics"}_key.bin','wb').write(f.read(0x18 if fstg == 5 else 0x418))
+                writefile(f'{o}/{c}_{"compute" if fstg == 5 else "graphics"}_key.bin',f.read(0x18 if fstg == 5 else 0x418))
                 c += 1
             if c: return
         case 'Super Smash Bros Ultimate ARC':
@@ -1598,7 +1598,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             else:
                 tb.seek(0)
-                xopen(o + f'/$TABLE{v}.bin','wb').write(tb.read())
+                writefile(o + f'/$TABLE{v}.bin',tb.read())
                 raise NotImplementedError(v)
                 v = tb.readu32()
             tb.close()
@@ -1610,11 +1610,11 @@ def extract4_2(inp:str,out:str,t:str):
                             d = decompress(d,'zstd')
                             assert len(d) == fe[3]
                         except:
-                            open(o + '/$ERROR.bin','wb').write(d)
+                            writefile(o + '/$ERROR.bin',d)
                             print(f'{fe[0]}: {fe[2]} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
                             raise
                     else: raise NotImplementedError(bin(fe[4])[2:].zfill(8) + '\n' + d[:0x10].hex(' ').upper())
-                xopen(o + '/' + fe[0],'wb').write(d)
+                writefile(o + '/' + fe[0],d)
             p = ThreadPool()
             prcs = []
 
@@ -1623,7 +1623,7 @@ def extract4_2(inp:str,out:str,t:str):
                 prcs.append(p.apply_async(writed,(f.readc(fe[2]),fe)))
             for fe in sfs:
                 f.seek(fe[2])
-                xopen(o + '/' + fe[0],'wb').write(f.readc(fe[1]))
+                writefile(o + '/' + fe[0],f.readc(fe[1]))
 
             f.close()
             for prc in prcs: prc.get()
@@ -1740,7 +1740,7 @@ def extract4_2(inp:str,out:str,t:str):
                             v1,v2 = f.readu32(),f.readu32()
                             if (0x18+v1) == sss and not v2:
                                 fs = f.readu32()
-                                assert xopen(fn,'wb').write(ofs[ebf].read(fs)) == fs,f'{n}: {sss} @ 0x{f.pos-16:04X}'
+                                assert writefile(fn,ofs[ebf].read(fs)) == fs,f'{n}: {sss} @ 0x{f.pos-16:04X}'
                                 if n in ('LOCM','FSBF','TELI'): extract4_2(fn,dr,'Feral ' + n)
                                 elif n == 'LOCR': extract4_2(fn,dr,'Feral LOCM')
                             else: raise NotImplementedError(f'{n}: {sss} ({v1}|{v2}) @ 0x{f.pos-4:04X}')
@@ -1770,13 +1770,13 @@ def extract4_2(inp:str,out:str,t:str):
                 ob.append(f'{id}: {n}')
             f.close()
             if ob:
-                xopen(o + '/' + tbasename(i) + '.txt','w').write('\n'.join(ob))
+                writefile(o + '/' + tbasename(i) + '.txt','\n'.join(ob),'w')
                 return
         case 'Feral FSBF':
             if db.print_try: print('Trying with custom extractor')
             d = readfile(i)[0x10:]
             assert d[:3] == b'FSB'
-            xopen(o + '/' + tbasename(i) + '.fsb','wb').write(d)
+            writefile(o + '/' + tbasename(i) + '.fsb',d)
             return
         case 'Feral TELI':
             if db.print_try: print('Trying with custom extractor')
@@ -1794,7 +1794,7 @@ def extract4_2(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             d = readfile(i)[0x18:]
             assert d[:3] == b'BIK'
-            xopen(o + '/' + tbasename(i) + '.bik','wb').write(d)
+            writefile(o + '/' + tbasename(i) + '.bik',d)
         case 'Motocross Mania DAT': return quickbms('e_biker')
         case 'ASDG SPLiT':
             if db.print_try: print('Trying with custom extractor')
@@ -1921,7 +1921,7 @@ def extract4_2(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[1])
                 d = f.read(fe[0])
-                open(f'{o}/{ix:03d}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{ix:03d}.{guess_ext(d)}',d)
             if fs: return
         case 'Jikan de Fantasia JRZ':
             if db.print_try: print('Trying with custom extractor')
@@ -1956,7 +1956,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.skip(hs-4)
                 d = []
                 for _ in range(hs//4): d.append(f.decompress(f.readu32(),'zlib'))
-                xopen(fe[1],'wb').write(b''.join(d))
+                writefile(fe[1],b''.join(d))
 
             f.close()
             if fs:return
@@ -1990,13 +1990,13 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(f.readu32())
                 d = f.read(fe[0])
                 if d[:4] == b'!CMP': d = decompress(d[8:],'zlib')
-                xopen(f'{o}/{fe[3]}','wb').write(d)
+                writefile(f'{o}/{fe[3]}',d)
             if fs: return
         case 'Shrek Smash n\' Crash Racing CMP':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
             d = decompress(readfile(i)[8:],'zlib')
-            open(o + '/' + basename(i),'wb').write(d)
+            writefile(o + '/' + basename(i),d)
             return
         case 'Roblox Flag Cache':
             if db.print_try: print('Trying with custom extractor')
@@ -2005,7 +2005,7 @@ def extract4_2(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='<')
 
-            open(o + '/signature.bin','wb').write(b64decode(f.read(f.readu32())))
+            writefile(o + '/signature.bin',b64decode(f.read(f.readu32())))
             json.dump(json.loads(f.read().decode('utf-8')),open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
             return
         case 'New York Race KIX+KBF':
@@ -2035,7 +2035,7 @@ def extract4_2(inp:str,out:str,t:str):
                         fn = n + fd.read(0x20).rstrip(b'\0').decode('latin-1')
                         cms = f.readu8()
                         if cms: fn += '.' + f.read(cms).decode('latin-1')
-                        xopen(o + '/' + fn,'wb').write(fd.read(s))
+                        writefile(o + '/' + fn,fd.read(s))
             readd('')
 
             f.close()
@@ -2063,7 +2063,7 @@ def extract4_2(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 d = f.decompress(fe[4],(0,'none',0,0,'zstd'),fe[2])
-                xopen(o + '/' + fe[0],'wb').write(d[:fe[3]])
+                writefile(o + '/' + fe[0],d[:fe[3]])
 
             f.close()
             if fs: return
@@ -2091,7 +2091,7 @@ def extract4_2(inp:str,out:str,t:str):
             f.seek(max(x[2]+x[3] for x in fs))
             if gpl == 1: f.align(0x800)
             cm = f.read(0x80).decode('utf-8').strip()
-            if cm: open(o + '/$comment.txt','w',encoding='utf-8').write(cm)
+            if cm: writefile(o + '/$comment.txt',cm,'w')
 
             for x in fs:
                 f.seek(x[3])
@@ -2112,11 +2112,11 @@ def extract4_2(inp:str,out:str,t:str):
                     f.seek(of)
                     fof,s = f.readu32(),f.readu32()
                     f.seek(fof)
-                    open(x[4] + f'/m{ix:02d}.bin','wb').write(f.read(s))
+                    writefile(x[4] + f'/m{ix:02d}.bin',f.read(s))
                 f.seek(bo + ds)
                 if x[0] == 1: f.align(0x800)
 
-                if x[1]: open(x[4] + f'/x{x[1]}.bin','wb').write(f.read((x[2]+x[3]) - f.pos))
+                if x[1]: writefile(x[4] + f'/x{x[1]}.bin',f.read((x[2]+x[3]) - f.pos))
 
             f.close()
             if fs: return

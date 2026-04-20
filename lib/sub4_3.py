@@ -72,7 +72,7 @@ def extract4_3(inp:str,out:str,t:str):
                     del d
                     assert ob,fe[0]
                     d = b''.join(ob)
-                xopen(o + '/' + fe[3],'wb').write(d)
+                writefile(o + '/' + fe[3],d)
             if fs: return
         case 'Import Tuner Challenge TOC+DAT':
             if db.print_try: print('Trying with custom extractor')
@@ -106,7 +106,7 @@ def extract4_3(inp:str,out:str,t:str):
                     elif d[:4] in {b'KBDS',b'DNBW'}: ex = d[:4].decode('ascii').lower()
                     elif b'Shape\0' in d[0x110:0x130]: ex = 'shp'
                     else: ex = guess_ext(d)
-                xopen(f'{o}/{ix:04d}.{ex}','wb').write(d)
+                writefile(f'{o}/{ix:04d}.{ex}',d)
 
             pcs = []
             for ix in range(c):
@@ -157,7 +157,7 @@ def extract4_3(inp:str,out:str,t:str):
                     '/ev/motion/en/en050201/509011m_sp_10_anm.anm',
                     '/ev/motion/oj/ws121101r/509001m_sp_2_st_anm.anm','/ev/motion/oj/ws121101r/509002m_sp_2_lp_anm.anm',
                 ])
-                open(fl + '/list.txt','w').write('\n'.join(sorted(list(set(HL)))))
+                writefile(fl + '/list.txt','\n'.join(sorted(list(set(HL)))),'w')
                 del HL
 
             run([scr,'extract-all','-i',i,'-o',o],cwd=dirname(scr))
@@ -194,7 +194,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(fe[1])
                 s = max(fs[ix+1][1]-fe[1],fe[2]) # don't trust file size fe[2]
                 assert fe[3] == 1,f'{fe[3]}: {d[:8].hex()}'
-                xopen(o + '/' + fe[0],'wb').write(f.decompress(s,'zlib'))
+                writefile(o + '/' + fe[0],f.decompress(s,'zlib'))
 
             f.close()
             if fs: return
@@ -215,7 +215,7 @@ def extract4_3(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 d = f.decompress(fe[2] or fe[1],'zlib' if fe[2] and fe[2] != fe[1] else 'none')
-                open(f'{o}/{ix:04d}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{ix:04d}.{guess_ext(d)}',d)
 
             f.close()
             if fs: return
@@ -230,7 +230,7 @@ def extract4_3(inp:str,out:str,t:str):
                 n = f.read(0x40).rstrip(b'\0').decode('utf-8')
                 s = f.readu32()
                 fd.seek(f.readu32() * 0x800)
-                xopen(o + '/' + n,'wb').write(fd.read(s))
+                writefile(o + '/' + n,fd.read(s))
 
             f.close()
             fd.close()
@@ -254,7 +254,7 @@ def extract4_3(inp:str,out:str,t:str):
                 ob.append(f'{fe[1]:03d}: {f.read0s().decode()}')
             f.close()
             if ob:
-                open(o + '/' + tbasename(i) + '.txt','w').write('\n'.join(ob))
+                writefile(f'{o}/{tbasename(i)}.txt','\n'.join(ob),'w')
                 return
         case 'Harry Potter and Prisoner of Azkaban SDT':
             if db.print_try: print('Trying with custom extractor')
@@ -283,7 +283,7 @@ def extract4_3(inp:str,out:str,t:str):
                 try: tg = tg.decode('ascii');assert tg.isprintable()
                 except: ex = 'bin'
                 else: ex = tg.lower()
-                xopen(f'{o}/{ix:03d}.{ex}','wb').write(b''.join(d))
+                writefile(f'{o}/{ix:03d}.{ex}',b''.join(d))
 
             f.close()
             if fs: return
@@ -319,7 +319,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else: fn = f'{ix:03d}.bin'
                 f.seek(fe[1])
                 assert f.read(4) == b'VBLK'
-                xopen(o + '/' + fn,'wb').write(f.read(f.readu32() & BMSK))
+                writefile(o + '/' + fn,f.read(f.readu32() & BMSK))
 
             f.close()
             if fs: return
@@ -338,7 +338,7 @@ def extract4_3(inp:str,out:str,t:str):
             tr = ET.parse(i)
             for r in tr.getroot().find('ResourceMap').iter('NamedResource'):
                 cdt = r.find('Candidate')
-                if cdt.get('type') == 'EmbeddedData': xopen(o + '/' + r.get('uri').split('://',1)[1],'wb').write(base64.b64decode(cdt.find('Base64Value').text))
+                if cdt.get('type') == 'EmbeddedData': writefile(o + '/' + r.get('uri').split('://',1)[1],base64.b64decode(cdt.find('Base64Value').text))
             del tr
             if listdir(o): return
         case 'Team Ari Encrypted RGSSAD'|'RPG Maker Archive':
@@ -378,7 +378,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             while f:
                 fn = read_name(readu32()).decode()
-                xopen(o + '/' + fn,'wb').write(read_data(readu32()))
+                writefile(o + '/' + fn,read_data(readu32()))
 
             f.close()
             if listdir(o): return
@@ -391,7 +391,7 @@ def extract4_3(inp:str,out:str,t:str):
             f.skip(2)
             c = f.readu16()
             f.skip(4)
-            open(o + '/$description.txt','w',encoding='utf-8').write(f.read(0x18).rstrip(b'\0').decode('ascii'))
+            writefile(o + '/$description.txt',f.read(0x18).rstrip(b'\0'))
 
             fs = []
             for _ in range(c):
@@ -400,7 +400,7 @@ def extract4_3(inp:str,out:str,t:str):
             for of in fs:
                 f.seek(of)
                 fn = f.read(0x18).rstrip(b'\0').decode('ascii')
-                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+                writefile(o + '/' + fn,f.read(f.readu32()))
 
             f.close()
             if fs: return
@@ -419,7 +419,7 @@ def extract4_3(inp:str,out:str,t:str):
             else: raise NotImplementedError(hex(ct))
             f.close()
 
-            xopen(o + '/' + basename(i),'wb').write(d)
+            writefile(o + '/' + basename(i),d)
             return
         case 'Disney\'s Tarzan FSD':
             if db.print_try: print('Trying with custom extractor')
@@ -445,7 +445,7 @@ def extract4_3(inp:str,out:str,t:str):
                     elif d.startswith(b'EGF'): ext = 'egf'
                     else: ext = 'bin'
                     fn = f'{fe[0]:08X}.{ext}'
-                xopen(o + '/' + fn,'wb').write(d)
+                writefile(o + '/' + fn,d)
 
             f.close()
             if fs: return
@@ -472,7 +472,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[0])
-                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+                writefile(o + '/' + fe[2],f.read(fe[1]))
 
             f.close()
             if fs: return
@@ -500,7 +500,7 @@ def extract4_3(inp:str,out:str,t:str):
                         s = f.readu32()
                         fn = f.read(ep - f.pos - s).split(b'\0',1)[0].decode('ascii').strip(' \\/')
                         f.seek(ep - s)
-                        xopen(o + '/' + fn,'wb').write(f.read(s))
+                        writefile(o + '/' + fn,f.read(s))
                     case 'FONT':
                         u1 = f.readf32()
                         u2 = f.read(4).split(b'\0',1)
@@ -509,12 +509,12 @@ def extract4_3(inp:str,out:str,t:str):
                         fnr = f.read(0x100).split(b'\0',1)
 
                         fn = o + f'/${n}/' + fnr[0].decode('ascii').strip(' \\/')
-                        xopen(fn,'wb').write(f.read(ep - f.pos))
+                        writefile(fn,f.read(ep - f.pos))
                         try: u2[1] = u2[1].rstrip(b'\0').decode('ascii')
                         except: u2[1] = u2[1].rstrip(b'\0').hex(' ').upper()
                         try: fnr[1] = fnr[1].rstrip(b'\0').decode('ascii')
                         except: fnr[1] = fnr[1].rstrip(b'\0').hex(' ').upper()
-                        xopen(fn + '.txt','w').write(f'Unknown 1: {u1}\nUnknown 2: {u2[0].decode('ascii')}\nUnknown 2 Leftover: {u2[1]}\nWidth: {w}\nHeight: {h}\nFilename Leftover: {fnr[1]}\n')
+                        writefile(fn + '.txt',f'Unknown 1: {u1}\nUnknown 2: {u2[0].decode('ascii')}\nUnknown 2 Leftover: {u2[1]}\nWidth: {w}\nHeight: {h}\nFilename Leftover: {fnr[1]}\n','w')
                     case 'HANM':
                         f.back(8)
                         unk = f.readu32()
@@ -523,19 +523,19 @@ def extract4_3(inp:str,out:str,t:str):
                             fn1 = f.read(0x80).split(b'\0',1)
                             fn2 = f.read(0x80).split(b'\0',1)
                             fn = o + f'/${n}/' + fn2[0].decode('ascii').strip(' \\/')
-                            xopen(fn,'wb').write(f.read(ep - f.pos))
+                            writefile(fn,f.read(ep - f.pos))
                             try: fn1[1] = fn1[1].rstrip(b'\0').decode('ascii')
                             except: fn1[1] = fn1[1].rstrip(b'\0').hex(' ').upper()
                             try: fn2[1] = fn2[1].rstrip(b'\0').decode('ascii')
                             except: fn2[1] = fn2[1].rstrip(b'\0').hex(' ').upper()
-                            xopen(fn + '.txt','w').write(f'Name 1: {fn1[0].decode("ascii")}\nName 1 Leftover: {fn1[1]}\nName 2: {fn2[0].decode("ascii")}\nName 2 Leftover: {fn2[1]}\n')
+                            writefile(fn + '.txt',f'Name 1: {fn1[0].decode("ascii")}\nName 1 Leftover: {fn1[1]}\nName 2: {fn2[0].decode("ascii")}\nName 2 Leftover: {fn2[1]}\n','w')
                         elif unk == 6:
                             f.skip(4)
                             sp = f.readf32()
                             fn = o + f'/${n}/' + f.read0s().decode('ascii').strip(' \\/')
                             f.align(4,p)
-                            xopen(fn,'wb').write(f.read(ep - f.pos))
-                            xopen(fn + '.txt','w').write(f'Speed(?): {sp}\n')
+                            writefile(fn,f.read(ep - f.pos))
+                            writefile(fn + '.txt',f'Speed(?): {sp}\n','w')
                         else: raise NotImplementedError(f'Unknown: {n} {unk} @ 0x{p:X}')
                     case 'TEXT':
                         if not n in cs: cs[n] = 0
@@ -549,18 +549,18 @@ def extract4_3(inp:str,out:str,t:str):
                         cs[n] += 1
                     case 'TXFL'|'LITE'|'PHON'|'SHSN'|'NAV1'|'MLIN'|'SHAP'|'SMSG'|'CUTS'|'ENTI'|'npcc'|'HBPT'|'STPS'|'CTEV'|'FRAG'|'CTAT'|'PCLT':
                         if not n in cs: cs[n] = 0
-                        xopen(o + f'/${n}/{cs[n]}.bin','wb').write(f.read(ep - f.pos))
+                        writefile(o + f'/${n}/{cs[n]}.bin',f.read(ep - f.pos))
                         cs[n] += 1
                     case 'MSHV'|'NORM'|'MTXT'|'MSPF'|'EMOD'|'HMPT'|'CTTR':
                         f.skip(4)
                         fn = o + f'/${n}/' + f.read0s().decode('ascii').strip(' \\/')
                         f.align(4,p)
-                        xopen(fn,'wb').write(f.read(ep - f.pos))
+                        writefile(fn,f.read(ep - f.pos))
                     case 'MSHP'|'HSKN'|'CTAC':
                         f.skip(8)
                         fn = o + f'/${n}/' + f.read0s().decode('ascii').strip(' \\/')
                         f.align(4,p)
-                        xopen(fn,'wb').write(f.read(ep - f.pos))
+                        writefile(fn,f.read(ep - f.pos))
                     case 'SKYB':
                         if not n in cs: cs[n] = 0
                         xyz = (f.readf32(),f.readf32(),f.readf32())
@@ -569,11 +569,11 @@ def extract4_3(inp:str,out:str,t:str):
                         while f.pos < (ep-4):
                             skyfl.append(f.read0s().decode('ascii'))
                             f.align(4,p)
-                        xopen(o + f'/${n}/{cs[n]}.txt','w').write(f'XYZ: {xyz[0]} {xyz[1]} {xyz[2]}\nUnknown: {f.readu32()}\nFile list:\n' + '\n'.join(skyfl))
+                        writefile(f'{o}/${n}/{cs[n]}.txt',f'XYZ: {xyz[0]} {xyz[1]} {xyz[2]}\nUnknown: {f.readu32()}\nFile list:\n' + '\n'.join(skyfl),'w')
                         cs[n] += 1
                     case 'FNFO':
                         if not n in cs: cs[n] = 0
-                        xopen(o + f'/${n}/{cs[n]}.txt','w').write(f'File size: {f.readu32()}\n')
+                        writefile(f'{o}/${n}/{cs[n]}.txt',f'File size: {f.readu32()}\n','w')
                         cs[n] += 1
                     case 'RSFL':
                         if not n in cs: cs[n] = 0
@@ -583,7 +583,7 @@ def extract4_3(inp:str,out:str,t:str):
                             sn = f.read0s().decode('ascii')
                             f.align(4,p)
                             ob.append(f'{sn}\n{f.readu32()}\n{f.readu32()}\n{f.readu32()}')
-                        xopen(o + f'/${n}/{cs[n]}.txt','w').write('\n\n'.join(ob))
+                        xopen(f'{o}/${n}/{cs[n]}.txt','\n\n'.join(ob),'w')
                         cs[n] += 1
                     case 'LTXT':
                         if not n in cs: cs[n] = 0
@@ -592,7 +592,7 @@ def extract4_3(inp:str,out:str,t:str):
                         for _ in range(c):
                             ob.append(f.read(f.readu32()*2).rsplit(b'\0\0')[0].decode('utf-16le'))
                             f.align(4,p)
-                        xopen(f'{o}/${n}/{cs[n]}.txt','w').write('\n\n'.join(ob))
+                        writefile(f'{o}/${n}/{cs[n]}.txt','\n\n'.join(ob),'w')
                         cs[n] += 1
                     case 'HTXT':
                         if not n in cs: cs[n] = 0
@@ -601,7 +601,7 @@ def extract4_3(inp:str,out:str,t:str):
                         for _ in range(c):
                             ob.append(f.read(4)[::-1].hex().upper() + ': ' + f.read(f.readu32()*2).rsplit(b'\0\0')[0].decode('utf-16le'))
                             f.align(4,p)
-                        xopen(f'{o}/${n}/{cs[n]}.txt','w').write('\n\n'.join(ob))
+                        writefile(f'{o}/${n}/{cs[n]}.txt','\n\n'.join(ob),'w')
                         cs[n] += 1
                     case 'TTXT':
                         if not n in cs: cs[n] = 0
@@ -611,7 +611,7 @@ def extract4_3(inp:str,out:str,t:str):
                             ob.append(f.read0s().decode('ascii'))
                             f.align(4,p)
                             ob[-1] += f': {f.readf32()} {f.readf32()} {f.readf32()} {f.readf32()} {f.readf32()}x{f.readf32()}'
-                        xopen(f'{o}/${n}/{cs[n]}.txt','w').write('\n'.join(ob))
+                        writefile(f'{o}/${n}/{cs[n]}.txt','\n'.join(ob),'w')
                         cs[n] += 1
                     case _: raise NotImplementedError(f'Unknown: {n} @ 0x{p:X}')
 
@@ -641,7 +641,7 @@ def extract4_3(inp:str,out:str,t:str):
                     if d[:4] == b'SCR0': ext = 'scr'
                     else: ext = guess_ext_nds(d)
                     fn = f'{ix:04d}.{ext}'
-                xopen(o + '/' + fn,'wb').write(d)
+                writefile(o + '/' + fn,d)
 
             f.close()
             if fs: return
@@ -663,7 +663,7 @@ def extract4_3(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 #if fe[2]: print(decrypt(f.read(4),'xor',KEY).hex(),fe[0],fe[1],hex(fe[2]));raise
-                xopen(o + '/' + fe[2],'wb').write(decrypt(f.read(fe[0]),'xor',KEY))
+                writefile(o + '/' + fe[2],decrypt(f.read(fe[0]),'xor',KEY))
 
             f.close()
             if fs: return
@@ -682,8 +682,8 @@ def extract4_3(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[0])
                 d = f.read(fe[1])
-                xopen(o + '/' + fe[2] + ('.lzss' if d[:4] == b'LZSS' else ''),'wb').write(d)
-                if d[:4] == b'LZSS': xopen(o + '/' + fe[2],'wb').write(dnasoft_lzss_decrypt(d))
+                writefile(o + '/' + fe[2] + ('.lzss' if d[:4] == b'LZSS' else ''),d)
+                if d[:4] == b'LZSS': writefile(o + '/' + fe[2],dnasoft_lzss_decrypt(d))
 
             f.close()
             if fs: return
@@ -692,7 +692,7 @@ def extract4_3(inp:str,out:str,t:str):
             of = o + '/' + basename(i)
             if i.lower().endswith('.lzss'): of = of[:-5]
             d = dnasoft_lzss_decrypt(readfile(i))
-            xopen(of,'wb').write(d)
+            writefile(of,d)
             return
         case '@N-Factory DAT':
             if db.print_try: print('Trying with custom extractor')
@@ -705,7 +705,7 @@ def extract4_3(inp:str,out:str,t:str):
                 fn = f.read(0x100).split(b'\0',1)[0].decode('ascii').replace('\\','/')
                 while fn.startswith(('./','../')): fn = fn.split('/',1)[1]
                 fs.append((f.readu32(),fn))
-            for fe in fs: xopen(o + '/' + fe[1],'wb').write(f.read(fe[0]))
+            for fe in fs: writefile(o + '/' + fe[1],f.read(fe[0]))
 
             f.close()
             if fs: return
@@ -721,7 +721,7 @@ def extract4_3(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 d = f.readc(fe[1] - fe[0])
-                xopen(o + '/' + f'{ix:02d}.{guess_ext(d)}','wb').write(d)
+                writefile(o + '/' + f'{ix:02d}.{guess_ext(d)}',d)
 
             f.close()
             if fs: return
@@ -744,7 +744,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for ix in range(c):
                 f.seek(fs[ix][1])
-                xopen(o + '/' + fs[ix][0],'wb').write(f.readc(fs[ix+1][1] - fs[ix][1]))
+                writefile(o + '/' + fs[ix][0],f.readc(fs[ix+1][1] - fs[ix][1]))
 
             f.close()
             if fs: return
@@ -763,7 +763,7 @@ def extract4_3(inp:str,out:str,t:str):
             assert f.read(0x10) == b'LG Res File v2\r\n'
 
             cm = f.read(0x60).split(b'\x1A')[0]
-            if cm: open(f'{o}/$comment.txt','wb').write(cm)
+            if cm: writefile(f'{o}/$comment.txt',cm)
 
             f.skip(12)
             f.seek(f.readu32())
@@ -774,10 +774,10 @@ def extract4_3(inp:str,out:str,t:str):
 
             def dec(d,fn,fe):
                 d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]]
-                xopen(fn,'wb').write(d)
+                writefile(fn,d)
             def decc(d,ix1,ext,fsd,fe):
                 d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]-fsd[0]]
-                for ix in range(len(fsd)-1): xopen(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}','wb').write(d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
+                for ix in range(len(fsd)-1): writefile(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}',d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
             p = ThreadPool()
             prcs = []
 
@@ -815,7 +815,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.seek(int(re.search(r'let +overhead *= *parseInt\("(\d+)"\)',d)[1]))
             tf = TmpFile('.tar',path=o)
-            xopen(tf.p,'wb').write(f.read())
+            writefile(tf.p,f.read())
             f.close()
 
             r = extract(tf.p,o,'TAR')
@@ -837,7 +837,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                xopen(f'{o}/{fe[0]}','wb').write(f.readc(fe[2]))
+                writefile(f'{o}/{fe[0]}',f.readc(fe[2]))
 
             f.close()
             if fs: return
@@ -900,7 +900,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else:
                     f.seek(fe[1])
                     d = f.decompress(fe[2],('none','zlib','oodle_kraken',0,'oodle_kraken','oodle_leviathan'),usize=fe[3],db=db)
-                xopen(fn,'wb').write(d)
+                writefile(fn,d)
 
             f.close()
             if fs: return
@@ -921,7 +921,7 @@ def extract4_3(inp:str,out:str,t:str):
                 fs.append(fe + [f.read(0x20).rstrip(b'\0').decode('utf-8')])
             for fe in fs:
                 f.seek(fe[0])
-                xopen(o + '/' + fe[2],'wb').write(f.readc(fe[1]))
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
 
             f.close()
             if fs: return
@@ -944,7 +944,7 @@ def extract4_3(inp:str,out:str,t:str):
                 gid = fd.readu16()
                 fn = f'{o}/{gid}{fd.read(0x12).rstrip(b"\0").decode("ascii")}.{e}'
                 fd.skip(4)
-                xopen(fn,'wb').write(fd.readc(f.readu32()))
+                writefile(fn,fd.readc(f.readu32()))
 
             f.close()
             fd.close()
@@ -997,7 +997,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = sorted(list(set(fs)))
             for ix in range(len(fs)-1):
                 f.seek(fs[ix])
-                xopen(f'{o}/{ix:02d}.bin','wb').write(f.readc(fs[ix+1] - fs[ix]))
+                writefile(f'{o}/{ix:02d}.bin',f.readc(fs[ix+1] - fs[ix]))
 
             f.close()
             return
@@ -1038,7 +1038,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(fe[2])
                 fn = f.read0s().decode('utf-8') + ex
                 f.seek(fe[0])
-                xopen(o + '/' + (fn or 'StringTable.pak.sys'),'wb').write(f.readc(fe[1]))
+                writefile(o + '/' + (fn or 'StringTable.pak.sys'),f.readc(fe[1]))
 
             f.close()
             if fs: return
@@ -1051,8 +1051,8 @@ def extract4_3(inp:str,out:str,t:str):
             s1 = f.readu32()
             s2 = f.readu32()
             f.skip(8)
-            open(o + '/0.png','wb').write(f.readc(s1))
-            open(o + '/1.png','wb').write(f.readc(s2))
+            writefile(o + '/0.png',f.readc(s1))
+            writefile(o + '/1.png',f.readc(s2))
 
             f.close()
             return
@@ -1087,7 +1087,7 @@ def extract4_3(inp:str,out:str,t:str):
                     elif d[:4] == b'\xED\xFE\0\0': ex = 'paq'
                     else: ex = guess_ext(d)
                     fn = f'{fe[0]:08X}.{ex}'
-                xopen(o + '/' + fn,'wb').write(d)
+                writefile(o + '/' + fn,d)
 
             f.close()
             if fs: return
@@ -1106,7 +1106,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(fe[0])
                 fn = f.read0s().decode('ascii')
                 f.seek(fe[1])
-                xopen(o + '/' + fn,'wb').write(f.readc(fe[2]))
+                writefile(o + '/' + fn,f.readc(fe[2]))
 
             f.close()
             if fs: return
@@ -1119,7 +1119,7 @@ def extract4_3(inp:str,out:str,t:str):
                 td = TmpDir(mdir=False,path=o)
                 mv(o + '/resources',td.p)
 
-                open(o + '/$signature.txt','w',encoding='utf-8').write(js['version'])
+                writefile(o + '/$signature.txt',js['version'],'w')
                 for x in js['blocks']:
                     assert len(x) == 1 and 'resources' in x
                     for fn in x['resources']:
@@ -1152,7 +1152,7 @@ def extract4_3(inp:str,out:str,t:str):
                 d = f.readc(fe[3] or fe[2])
                 if d[:4] in {b'segs',}: ex = d[:4].decode('ascii')
                 else: ex = guess_ext(d)
-                xopen(f'{o}/{fe[0]:08X}.{ex}','wb').write(d)
+                writefile(f'{o}/{fe[0]:08X}.{ex}',d)
 
             f.close()
             if fs: return
@@ -1160,7 +1160,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
             d = decompress(readfile(i),'ash0')
-            xopen(o + '/' + tbasename(i),'wb').write(d)
+            writefile(o + '/' + tbasename(i),d)
             return
         case 'Super Mario Maker Level':
             if db.print_try: print('Trying with custom extractor')
@@ -1169,7 +1169,7 @@ def extract4_3(inp:str,out:str,t:str):
             assert len(d) == 4
             for ix,n in ((0,'thumbnail0.tnl'),(1,'course_data.cdt'),(2,'course_data_sub.cdt'),(3,'thumbnail1.tnl')):
                 dd = decompress(b'ASH0' + d[ix],'ash0')
-                xopen(o + '/' + n,'wb').write(dd)
+                writefile(o + '/' + n,dd)
             return
         case 'SDFTool SDF.bin':
             if db.print_try: print('Trying with custom extractor')
@@ -1194,14 +1194,14 @@ def extract4_3(inp:str,out:str,t:str):
             of.close()
 
             assert f.readu8() == 1 and f.readu16() == 0
-            xopen(o + '/hash.bin','wb').write(f.readc(f.readu8() * 4))
+            writefile(o + '/hash.bin',f.readc(f.readu8() * 4))
             assert f.readu8() == 1 and f.readu16() == 0
             d = f.readc(f.readu8() * 4)
             d = decrypt(d,'rsa_inv_le',0xd0c57d605d21c23b91000de888121741c3e2b8ba476b81b25123275b6b5c008b6b10abb59d357dd2fed5fea988940b94adc2136bb45c93d992b7102a5988033b73f6386ef9cce6bbc6dab03ba6e90a25976ef305a087302660475011c5ee50b8d44e1cc081d61273913664e1810abb97b93c1a6c0e6ebd8862d92ed88e62a450cd050dd4e212285128b453ef48711b0be4a0fc43bb8403efd57eda741644ee4cf64bc85187e0ee22fd3c61e4670eb19d47c99a3c9827219f0d4f6743f9fa27375deedf30dd2c17b5a6cd05339c399f2986e9c8919038a70c4f5fc2a760763e128818d1bb1c79a8d8a05d4401ac3004e5f64913a43c8cad637e94d478b63a27d2760105fdeadc8ff71914aaa9b9da29f35d294d4c23638f7f6170ba5358bc127f72c78b6bc4ce746cd350647c61f32dbdfc6135c1db2ec7c2ab9d914ed9a79b46c1ee57692b5fda14c1f0c0597a3c39414d7b8c519144c93dc72ab08b1c7a7b8e651cefcb1b3291128b4136d05abfe33af3568a163c7a839be864bc5abf3ac735fa33bb1ca45953f8431ed9fff2df07f0fbb5a071a462340463fcdfe79f9dee85e297115e1e5d077c414b2bf8523802fc7fd32a40e77cf8be6e0a115aa2709ba2c1fe04fadae81db12d0c71d5020c10f6a62f5e35f4a3d8ec0d3bf3dd914482cc39fd4e221e2feb39e23e0ef408954ef638b2d75e210ba0b6a473d526fc17588b,
                                        3,r=2)
             assert d[:1] == b'\1'
             d = d[1:].split(b'\0',1)[1][::-1]
-            xopen(o + '/signature.bin','wb').write(d)
+            writefile(o + '/signature.bin',d)
 
             f.close()
             return
@@ -1225,7 +1225,7 @@ def extract4_3(inp:str,out:str,t:str):
                 h = f.readu32()
                 if not h: break
                 d = f.readc(f.readu32() - 4)
-                xopen(f'{o}/{h:08X}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{h:08X}.{guess_ext(d)}',d)
 
             f.close()
             if listdir(o): return
@@ -1251,9 +1251,9 @@ def extract4_3(inp:str,out:str,t:str):
             lp = dirname(db.get('ree.unpacker')) + '/Projects'
             if len(listdir(lp)) != 1:
                 remove(lp + '/all.list')
-                lst = list(set(sum([open(lp + '/' + x,encoding='utf-8').read().split('\n') for x in listdir(lp)],[])))
+                lst = list(set(sum([readfile(lp + '/' + x,'r').split('\n') for x in listdir(lp)],[])))
                 remove(*[lp + '/' + x for x in listdir(lp)])
-                open(lp + '/all.list','w',encoding='utf-8').write('\n'.join(lst))
+                writefile(lp + '/all.list','\n'.join(lst),'w')
 
             run(['ree.unpacker','all',i,o],cwd=dirname(lp))
             if listdir(o): return
@@ -1284,7 +1284,7 @@ def extract4_3(inp:str,out:str,t:str):
                 assert f.readu16() in {0,1}
             for fe in fs:
                 f.seek(fe[1])
-                xopen(o + '/' + fe[0],'wb').write(f.readc(fe[2]))
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
 
             f.close()
             if fs: return
@@ -1301,7 +1301,7 @@ def extract4_3(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 d = f.readc(fe[1])
-                xopen(f'{o}/{ix:02d}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{ix:02d}.{guess_ext(d)}',d)
 
             f.close()
             if fs: return
@@ -1337,7 +1337,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for ix,fe in enumerate(fs[:-1]):
                 fd.seek(fe[0])
-                xopen(o + '/' + HL.get(fe[1],f'$unk/{h:016X}.bin'),'wb').write(fd.readc(fs[ix + 1][0] - fe[0]))
+                writefile(o + '/' + HL.get(fe[1],f'$unk/{h:016X}.bin'),fd.readc(fs[ix + 1][0] - fe[0]))
 
             fd.close()
             if fs: return
@@ -1357,7 +1357,7 @@ def extract4_3(inp:str,out:str,t:str):
                 h = tpk.FileHashes(ix)
                 fn = HL.get(h,f'$unk/{h:016X}.bin')
                 d = bytes(fl.ByteBuffer(dix) for dix in range(fl.ByteBufferLength()))
-                xopen(o + '/' + fn,'wb').write(decompress(d,(0,'zlib','lz4','oodle','none')[fl.CompressType()],usize=fl.FileSize(),db=db))
+                writefile(o + '/' + fn,decompress(d,(0,'zlib','lz4','oodle','none')[fl.CompressType()],usize=fl.FileSize(),db=db))
 
             del tpk
             if listdir(o): return
@@ -1410,7 +1410,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else:
                     f.seek(fe[3])
                     d = f.decompress(fe[2],('none','zlib','lz4','oodle')[fe[0]],usize=fe[1],db=db)
-                    xopen(o + '/' + fn,'wb').write(d)
+                    writefile(o + '/' + fn,d)
                     ch[fe[4]] = fn
 
             f.close()
@@ -1460,10 +1460,10 @@ def extract4_3(inp:str,out:str,t:str):
                 fn += '.' + BARBIE_XMP.get(fe[0],fe[0])
 
                 f.seek(fe[2])
-                xopen(o + '/' + fn,'wb').write(f.readc(fe[3]))
+                writefile(o + '/' + fn,f.readc(fe[3]))
             for ix,fe in enumerate(xfs):
                 f.seek(fe[0])
-                xopen(f'{o}/$unk/{ix:02d}.bin','wb').write(f.readc(fe[1]))
+                writefile(f'{o}/$unk/{ix:02d}.bin',f.readc(fe[1]))
 
             f.close()
             if fs: return
@@ -1481,7 +1481,7 @@ def extract4_3(inp:str,out:str,t:str):
                     x = f.readc(6).rstrip().decode('ascii')
                     assert fn.isprintable() and x.isprintable()
                     fn = f'{x}/{fn}.{BARBIE_XMP.get(x,x)}'
-                xopen(o + '/' + fn,'wb').write(f.readc(s))
+                writefile(o + '/' + fn,f.readc(s))
 
             f.close()
             if not bn: return
@@ -1530,7 +1530,7 @@ def extract4_3(inp:str,out:str,t:str):
                     try: assert dc.decode('utf-8').replace('\n','').replace('\r','').isprintable()
                     except: pass
                     else:
-                        xopen(f'{o}/{tbasename(i)}.{extname(i)[2:]}','wb').write(dc)
+                        writefile(f'{o}/{tbasename(i)}.{extname(i)[2:]}',dc)
                         return
         case 'Starsky & Hutch WAD':
             if db.print_try: print('Trying with custom extractor')
@@ -1540,7 +1540,7 @@ def extract4_3(inp:str,out:str,t:str):
             assert f.read(4) == b'WAD!' and f.readu32() == 4
 
             f.skip(8)
-            xopen(o + '/$description.txt','wb').write(f.readc(0x80).rstrip(b'\0'))
+            writefile(o + '/$description.txt',f.readc(0x80).rstrip(b'\0'))
             f.skip(8)
             fnc = f.readu32()
             fno = f.readu32()
@@ -1604,7 +1604,7 @@ def extract4_3(inp:str,out:str,t:str):
                     except:
                         print(f'{fo+ix-fddlt} ({fo}+{ix}-{fddlt}) / {len(fds)} @ {f.pos - 8}')
                         raise
-                    xopen(f'{o}/{p}/{pns[fo+ix-nmdlt]}','wb').write(f.readc(fe[0]))
+                    writefile(f'{o}/{p}/{pns[fo+ix-nmdlt]}',f.readc(fe[0]))
 
             f.close()
             if fds: return
@@ -1629,7 +1629,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(fe[1])
                 fn += f.read0s().decode('utf-8')
                 f.seek(fe[3])
-                xopen(o + '/' + fn,'wb').write(f.decompress(fe[5],('none','deflate')[fe[2]]))
+                writefile(o + '/' + fn,f.decompress(fe[5],('none','deflate')[fe[2]]))
 
             f.close()
             if fs: return
@@ -1710,7 +1710,7 @@ def extract4_3(inp:str,out:str,t:str):
                     f.align(align)
                     f.align(0x20)
                     d = readce() if uxs else f.readc(vs[2])
-                    xopen(o + '/' + drs.pop() + '/' + fn,'wb').write(d)
+                    writefile(o + '/' + drs.pop() + '/' + fn,d)
 
             ft.close()
             f.close()
@@ -1759,7 +1759,7 @@ def extract4_3(inp:str,out:str,t:str):
                 if f.readu16()%0x10 or not f.readu32() in {0,1} or f.read(7) != b'FSM_v1.' or not f.read(1) in b'12': continue
                 f.seek(of)
                 tf = TmpFile()
-                xopen(tf,'wb').write(f.read())
+                writefile(tf,f.read())
                 rs.append(extract4_3(tf.p,o,'One Piece Battle Adventure FSM'))
                 tf.destroy()
 
@@ -1794,7 +1794,7 @@ def extract4_3(inp:str,out:str,t:str):
                     d = f.decompress(blbs[ix][2],('none','none'#'gdeflate'
                                                   )[blbs[ix][1]],usize=a[2] | a[3] << 16,db=db)
                     assert crc_hash(d,'crc32') == blbs[ix][3]
-                    xopen(bfn + ('' if isn else f'_{ix}') + xfn + ('.gd' if blbs[ix][1] else ''),'wb').write(d)
+                    writefile(bfn + ('' if isn else f'_{ix}') + xfn + ('.gd' if blbs[ix][1] else ''),d)
 
             f.close()
             if asts: return
@@ -1811,7 +1811,7 @@ def extract4_3(inp:str,out:str,t:str):
                     for x in iob.find('CheatEntries').findall('CheatEntry'):
                         n = x.find('ID').text
                         if x.find('Description') is not None: n = RGS.sub(' ',sub_path(x.find('Description').text.strip('"'),slash=True)).strip() + '_' + n
-                        if x.find('AssemblerScript') is not None: xopen(d + '/' + n + '.asm','w').write(x.find('AssemblerScript').text)
+                        if x.find('AssemblerScript') is not None: writefile(d + '/' + n + '.asm',x.find('AssemblerScript').text,'w')
                         fcs(x,d + '/' + n)
             fcs(tr,o)
 
@@ -1826,14 +1826,14 @@ def extract4_3(inp:str,out:str,t:str):
                             for pn in ('Before','Actual','After'):
                                 if x.find(pn) is not None: ob.append(pn + ': ' + ' '.join([b.text for b in x.find(pn).findall('Byte')]))
                             ob.append('')
-                if ob: xopen(o + '/codes.txt','w').write('\n'.join(ob))
+                if ob: writefile(o + '/codes.txt','\n'.join(ob),'w')
             if tr.find('UserdefinedSymbols') is not None:
                 ob = [x.find('Name').text + ' @ ' + x.find('Address').text for x in tr.find('UserdefinedSymbols').findall('SymbolEntry')]
-                if ob: xopen(o + '/symbols.txt','w').write('\n'.join(ob))
-            if tr.find('LuaScript') is not None: xopen(o + '/script.lua','w').write(tr.find('LuaScript').text)
+                if ob: writefile(o + '/symbols.txt','\n'.join(ob),'w')
+            if tr.find('LuaScript') is not None: writefile(o + '/script.lua',tr.find('LuaScript').text,'w')
             if tr.find('DisassemblerComments') is not None:
                 ob = [x.find('Address').text.strip() + '\n' + x.find('Comment').text.strip() for x in tr.find('DisassemblerComments').findall('DisassemblerComment')]
-                if ob: xopen(o + '/disassembler_comments.txt','w').write('\n\n'.join(ob))
+                if ob: writefile(o + '/disassembler_comments.txt','\n\n'.join(ob),'w')
 
             del tr
             if listdir(o): return
@@ -1847,19 +1847,19 @@ def extract4_3(inp:str,out:str,t:str):
                 rg = re.findall(r'<code>([a-f\dA-F]{32})</code>',db.c.get('https://wiki.wiidatabase.de/wiki/SD-Key').text)
                 assert len(rg) == 2
                 sdky,sdiv = bytes.fromhex(rg[0]),bytes.fromhex(rg[1])
-                open(sdk,'wb').write(sdky + sdiv)
+                writefile(sdk,sdky + sdiv)
 
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,decrypt
             f = File(i,endian='>')
             h = decrypt(f.readc(0xF0C0),'aes_cbc',sdky,sdiv)
-            xopen(o + '/$SYS/header.bin','wb').write(h)
+            writefile(o + '/$SYS/header.bin',h)
             h = File(h,endian='>')
 
             h.skip(8)
             bnrs = h.readu32()
             h.skip(0x14)
-            xopen(o + '/$SYS/banner.bnr','wb').write(h.readc(bnrs))
+            writefile(o + '/$SYS/banner.bnr',h.readc(bnrs))
             h.close()
 
             bks = f.readu32()
@@ -1882,11 +1882,11 @@ def extract4_3(inp:str,out:str,t:str):
                 if ty == 2: mkdir(o + '/' + fn)
                 elif ty == 1:
                     d = f.readc(s + -s%0x40)
-                    xopen(o + '/' + fn,'wb').write(decrypt(d,'aes_cbc',sdky,iv)[:s])
+                    writefile(o + '/' + fn,decrypt(d,'aes_cbc',sdky,iv)[:s])
 
             f.seek(-0x300)
-            xopen(o + '/$SYS/device.crt','wb').write(f.readc(0x180))
-            xopen(o + '/$SYS/application.crt','wb').write(f.readc(0x180))
+            writefile(o + '/$SYS/device.crt',f.readc(0x180))
+            writefile(o + '/$SYS/application.crt',f.readc(0x180))
 
             f.close()
             if c: return
@@ -1910,7 +1910,7 @@ def extract4_3(inp:str,out:str,t:str):
                         else: print('Could not find',sn,'skipping')
                     if sn in fds:
                         fds[sn].seek(f.readu32())
-                        xopen(o + '/' + n,'wb').write(fds[sn].read(f.readu32()))
+                        writefile(o + '/' + n,fds[sn].read(f.readu32()))
                 else:
                     f.skip(4)
                     ob[n] = f.readu32()
@@ -1938,7 +1938,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else:
                     ex = guess_ext(d)
                     if ex == 'bin' and int.from_bytes(d[:2],'big') <= 0x100 and len(d) <= 770: ex = 'pal'
-                xopen(o + f'/{ix:04d}.{ex}','wb').write(d)
+                writefile(o + f'/{ix:04d}.{ex}',d)
 
             f.close()
             if c: return
@@ -1972,7 +1972,7 @@ def extract4_3(inp:str,out:str,t:str):
                     f.seek(fe[0])
                     d = f.read(fe[1])
 
-                xopen(o + f'/{ix:02d}.{ty}','wb').write(d)
+                writefile(o + f'/{ix:02d}.{ty}',d)
 
             f.close()
             if fs: return
@@ -1995,7 +1995,7 @@ def extract4_3(inp:str,out:str,t:str):
             zs = f.readu32()
             f.skip(4)
             d = f.decompress(zs,'zlib')
-            xopen(o + f'/{tbasename(i)}.{ty}','wb').write(d)
+            writefile(o + f'/{tbasename(i)}.{ty}',d)
 
             f.close()
             if d: return
@@ -2032,7 +2032,7 @@ def extract4_3(inp:str,out:str,t:str):
                 zlb = fe[2] >= 12 and f.read(2) == b'\x78\xDA'
                 f.seek(fe[1])
                 d = f.decompress(fe[2] or fe[3],'zlib' if zlb else 'none')
-                xopen(o + '/' + fn,'wb').write(d)
+                writefile(o + '/' + fn,d)
             if fs: return
         case 'Dragon UnPACKer 5 Plugin':
             if db.print_try: print('Trying with custom extractor')
@@ -2063,7 +2063,7 @@ def extract4_3(inp:str,out:str,t:str):
                     fn = f.read(f.readu8()).decode('utf-8')
                     fn = o + '/' + os.path.join(f.read(f.readu8()).decode('utf-8'),fn)
                     d = f.decompress(s,('none','zlib')[c])
-                    xopen(fn,'wb').write(d)
+                    writefile(fn,d)
             elif v == 4:
                 offc = f.reads32()
                 offs = []
@@ -2111,18 +2111,18 @@ def extract4_3(inp:str,out:str,t:str):
                             fe.append(b.reads32())
                             b.skip(0x45)
                             if not fls & 0x40: fs.append(fe)
-                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
+                    elif oe[0] == 10: writefile(o + '/' + tbasename(i) + '_banner.bmp',d)
                     elif oe[0] == 20:
                         for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
                     elif oe[0] == 21: df = b
-                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
+                    else: writefile(o + '/$' + str(oe[0]) + '.unkheader',d)
 
                 if fs and not df: return 1
 
                 for fe in fs:
                     df.seek(fe[0])
                     d = df.decompress(fe[1],('none','zlib','lzma_us32')[fe[2]])
-                    open(o + '/' + fnd.get(fe[3],str(fe[3])),'wb').write(d)
+                    writefile(o + '/' + fnd.get(fe[3],str(fe[3])),d)
             elif v == 5:
                 f.skip(2)
                 offc = f.readu32()
@@ -2172,13 +2172,13 @@ def extract4_3(inp:str,out:str,t:str):
                             fe += [b.readu32(),b.readu32()]
                             b.skip(0x44)
                             if not fls & 0x40: fs.append(fe)
-                    elif oe[0] == 10: open(o + '/' + tbasename(i) + '_banner.bmp','wb').write(d)
+                    elif oe[0] == 10: writefile(o + '/' + tbasename(i) + '_banner.bmp',d)
                     elif oe[0] == 20:
                         for ix in range(oe[3]): fnd[ix] = b.read(b.readu8()).decode('utf-8')
                     elif oe[0] == 23:
                         for ix in range(oe[3]): fld[ix] = b.read(b.readu8()).decode('utf-8')
                     elif oe[0] == 21: df = b
-                    else: open(o + '/$' + str(oe[0]) + '.unkheader','wb').write(d)
+                    else: writefile(o + '/$' + str(oe[0]) + '.unkheader',d)
 
             infp = inf.tell()
             inf.close()
@@ -2199,7 +2199,7 @@ def extract4_3(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 d = f.readc(fe[2])
-                xopen(f'{o}/{fe[0]:08X}.{guess_ext(d)}','wb').write(d)
+                writefile(f'{o}/{fe[0]:08X}.{guess_ext(d)}',d)
 
             f.close()
             if fs: return
@@ -2227,7 +2227,7 @@ def extract4_3(inp:str,out:str,t:str):
                     elif (len(p) == 2 and p[0] == 1 and ((c >= 7 and ix == 6) or (c >= 6 and ix == 5))) or (len(p) == 1 and p[0] == 2): ex = 'mono.11025hz.s8.pcm'
                     elif len(p) == 2 and p[0] == 0 and ix == 0: ex = 'anim'
                     else: ex = guess_ext(d)
-                    xopen(f'{o}/{pf}/{ix:02d}.{ex}','wb').write(d)
+                    writefile(f'{o}/{pf}/{ix:02d}.{ex}',d)
                     if ex == 'rfs':
                         f.seek(fe[0])
                         readb(p + [ix])
@@ -2254,7 +2254,7 @@ def extract4_3(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[0])
                 d = f.readc(fe[1])
-                xopen(o + '/' + fe[2],'wb').write(d)
+                writefile(o + '/' + fe[2],d)
 
             f.close()
             if fs: return
@@ -2286,7 +2286,7 @@ def extract4_3(inp:str,out:str,t:str):
                 if len(d) != fe[2]:
                     fd.close()
                     return 1
-                xopen(o + '/' + fe[0],'wb').write(d)
+                writefile(o + '/' + fe[0],d)
 
             fd.close()
             if fs: return
@@ -2324,10 +2324,10 @@ def extract4_3(inp:str,out:str,t:str):
                     case 'RIFF':
                         f.back(8)
                         assert f.pos in FNM
-                        xopen(o + '/' + FNM.pop(f.pos),'wb').write(f.read(bs + 8))
+                        writefile(o + '/' + FNM.pop(f.pos),f.read(bs + 8))
                     case 'DIB8':
                         fe = FNM.pop(f.pos - 8)
-                        xopen(o + '/' + fe[0],'wb').write(b'BM' + (14 + len(fe[1]) + bs).to_bytes(4,'little') + b'\0'*4 + (14 + len(fe[1])).to_bytes(4,'little') + fe[1] + f.read(bs))
+                        writefile(o + '/' + fe[0],b'BM' + (14 + len(fe[1]) + bs).to_bytes(4,'little') + b'\0'*4 + (14 + len(fe[1])).to_bytes(4,'little') + fe[1] + f.read(bs))
 
                     case 'SGDS'|'SSND'|'SDIB': pass
                     case _: raise NotImplementedError(f'{n} ({bs}) @ 0x{f.pos - 8:08X}')
@@ -2359,10 +2359,11 @@ def extract4_3(inp:str,out:str,t:str):
                 ty = f.read(4)[::-1].decode('ascii')
                 if ty == '\0\0\0\0': ty = 'text'
                 assert ty.isprintable()
-                xopen(f'{o}/{id:03d}.{ty.lower()}','wb').write(f.read(s))
+                writefile(f'{o}/{id:03d}.{ty.lower()}',f.read(s))
 
             f.close()
             if ofs: return
+        case 'Pixar USD Crate': raise NotImplementedError
 
     return 1
 

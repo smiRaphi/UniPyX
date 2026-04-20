@@ -297,6 +297,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             elif kwargs.get('usize') is not None: i = i[:5] + kwargs['usize'].to_bytes(8,'little') + i[13:]
             return lzma.LZMADecompressor(format=lzma.FORMAT_ALONE).decompress(i)
         case 'lzma_us32'|'lzma_alone_us32': return decompress(i[:9] + b'\0'*4 + i[9:],'lzma_alone',*args,**kwargs)
+        case 'xz':
+            import lzma
+            return lzma.LZMADecompressor(format=lzma.FORMAT_XZ).decompress(i)
         case 'msf':
             import lzma
             return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[{'id':lzma.FILTER_LZMA1,'dict_size':0x1000000,'lc':3,'lp':0,'pb':2}]).decompress(i)[:kwargs.get('usize')]
@@ -398,10 +401,19 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
         case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'lzss': return lzss_decompress(i,usize=kwargs['usize'])
+        case 'lzss8': return lzss8_decompress(i,usize=kwargs['usize'])
         case 'lzss16': return lzss16_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
             return lzw_decompress(i,**args)
+        case 'avlz':
+            if len(i) < 8: raise ValueError("Not enough data to decompress")
+            cs = int.from_bytes(i[:4],'little')
+            us = int.from_bytes(i[4:8],'little')
+
+            if cs == len(i): cs -= 8
+            if cs != len(i) - 8: raise ValueError("Invalid compressed size")
+            return lzss8_decompress(i[8:8+cs],usize=us)
 
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
@@ -436,25 +448,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             assert i[:2] == b'\x04\xFB'
             isz = len(i)
             bcc = int.from_bytes(i[2:4],'little')
-            if not bcc:
-                avg = [int.from_bytes(i[8:12],'little')]
-                cp = avg[0]
-                for ix in range(3,isz//4):
-                    avv = sum(avg) / len(avg)
-                    bv = v = int.from_bytes(i[ix*4:ix*4+4],'little')
-                    v -= cp
-                    cp = bv
-                    if v > 0x10000 or v > avv*(1.75 if ix > 13 else (3 if ix < 6 else 2)):
-                        bcc = ix
-                        break
-                    avg.append(v)
-                else: raise ValueError('Failed to detect block count')
-                i = i[:2] + bcc.to_bytes(2,'little') + i[4:]
-                bcc -= 2
+            if not bcc: raise ValueError('Empty block count')
 
             flgs = int.from_bytes(i[4:7],'little')
+            if flgs & mask(2) != 1: raise ValueError(f'Invalid Tile Size Index ({flgs & mask(2)})')
             us = bcc * 0x10000 + ((flgs >> 2) & mask(18))
-            if flgs & mask(2) != 1: i = i[:4] + (flgs & 0xffffC | 1).to_bytes(3,'little') + i[7:]
 
             ibuf = (ctypes.c_uint8 * isz).from_buffer_copy(i)
             obuf = (ctypes.c_uint8 * us)()
@@ -857,6 +855,43 @@ def lzss_decompress(i:bytes,usize:int=None):
                 win[winp] = b
                 winp = (winp + 1) & mask(13)
     return bytes(ob)[:usize]
+def lzss8_decompress(i:bytes,usize:int=None,win_size=0x1000,threshold=3,maxm=18):
+    ob = bytearray()
+    ring = bytearray(win_size)
+    p = 0
+    rp = win_size - maxm
+    f = 0
+
+    while (usize is None or len(ob) < usize) and p < len(i):
+        if not f & 0xFF00:
+            if p >= len(i): break
+            f = i[p] | 0x8000;p += 1
+
+        if f & 1:
+            if p >= len(i): break
+            c = i[p];p += 1
+
+            ob.append(c)
+            ring[rp % win_size] = c
+            rp += 1
+        else:
+            if p + 1 >= len(i): break
+            b1 = i[p];p += 1
+            b2 = i[p];p += 1
+
+            idx = ((b2 & 0xF0) << 4) | b1
+            c = (b2 & 0x0F) + threshold
+
+            for ix in range(c):
+                if usize is not None and len(ob) >= usize: break
+                c = ring[(idx + ix) % win_size]
+                ob.append(c)
+                ring[rp % win_size] = c
+                rp += 1
+
+        f >>= 1
+
+    return bytes(ob)
 def lzss16_decompress(i:bytes,usize:int=None,big_endian=False):
     pos = 0
 

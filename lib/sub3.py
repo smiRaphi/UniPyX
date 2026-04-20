@@ -16,7 +16,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
         jfp = db.get(scr)
         jf = open(jfp).read()
-        if 'from jsbeautifier.unpackers import UnpackingError' in jf: open(jfp,'w').write(jf.replace('from jsbeautifier.unpackers import UnpackingError','class UnpackingError(Exception): pass'))
+        if 'from jsbeautifier.unpackers import UnpackingError' in jf: writefile(jfp,jf.replace('from jsbeautifier.unpackers import UnpackingError','class UnpackingError(Exception): pass'),'w')
 
         if db.print_try: print('Trying with',scr)
         jsm = getattr(__import__(f'bin.{scr}'),scr)
@@ -71,7 +71,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
             d = '\n'.join(d)
 
-        open(oup + '/' + tbasename(inf) + '.js','w',encoding='utf-8').write(d)
+        writefile(oup + '/' + tbasename(inf) + '.js',d,'w')
         if d: return
     def dosbox(cmd:list,inf=i,oup=o,print_try=True,nowin=True,max=True,custs:str=None,tmpi=True,xcmds=[]):
         scr = cmd[0]
@@ -288,49 +288,43 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f = open(i,'rb')
             f.seek(943)
             if f.read(42) == b'InstallShield Self-Extracting Stub Program':
+                from lib.file import decompress
                 if db.print_try: print('Trying with custom extractor')
-                ofs = []
                 while True:
                     x = f.read(1)
                     if not x: break
-                    if x == b'\x50':
-                        if f.read(3) == b'\x4B\3\4':
-                            of = open(o + f'\\FILE{len(ofs)+1}.zip','wb')
-                            of.write(b'PK\3\4')
-                            of.write(f.read(14))
+                    if x == b'P':
+                        if f.read(3) == b'K\3\4':
+                            d = [b'PK\3\4',f.read(14)]
                             cs = f.read(4)
-                            of.write(cs)
+                            d.append(cs)
                             cs = int.from_bytes(cs,'little')
-                            of.write(f.read(4))
+                            d.append(f.read(4))
                             fnl = f.read(2)
-                            of.write(fnl)
+                            d.append(fnl)
                             fnl = int.from_bytes(fnl,'little')
-                            of.write(f.read(2))
+                            d.append(f.read(2))
                             fn = f.read(fnl)
-                            of.write(fn)
-                            ofs.append((of.name,fn.decode('utf-8')))
-                            of.write(f.read(cs))
+                            d.append(fn)
+                            fn = fn.decode('utf-8')
+                            d.append(f.read(cs))
 
                             chhd = f.read(4)
                             assert chhd == b'PK\1\2'
-                            of.write(chhd)
-                            of.write(f.read(42+fnl))
+                            d.append(chhd)
+                            d.append(f.read(42+fnl))
 
                             chhd = f.read(4)
                             assert chhd == b'PK\5\6'
-                            of.write(chhd)
-                            of.write(f.read(12))
-                            of.write((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
-                            of.write(b'\0\0')
-                            of.close()
+                            d.append(chhd)
+                            d.append(f.read(12))
+                            d.append((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
+                            d.append(b'\0\0')
+                            writefile(o + '/' + fn,decompress(b''.join(d),'zip'))
                         else: f.seek(-3,1)
                 f.close()
-                if ofs:
-                    import zipfile
-                    for x in ofs:
-                        with zipfile.ZipFile(x[0]) as z: xopen(o + '/' + x[1],'wb').write(z.read(x[1]))
-                        remove(x[0])
-                    if os.path.exists(o + '/_INST32I.EX_') or os.path.exists(o + '/_inst16.ex_'):
+                if listdir(o):
+                    if exists(o + '/_INST32I.EX_') or exists(o + '/_inst16.ex_'):
                         if fix_isinstext(o): return
                     else: return
             else: f.close()
@@ -423,7 +417,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     f.seek(48 + 24 + 56,1)
                     siz = int.from_bytes(f.read(4),'little')
                     f.seek(sp)
-                    open(o + f'/{c}.exe','wb').write(f.read(siz))
+                    writefile(o + f'/{c}.exe',f.read(siz))
                     f.seek(-f.tell() % 16,1)
                     if f.tell() >= ts: f.seek(sp + 64)
                     c += 1
@@ -567,7 +561,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
                 nrp = [sub10.sub(b'',x) for x in re.findall(rb'(%[a-z]{10}%|^)?[sS]%[a-z]{10}%[eE]%a[a-z]{10}%[tT]%[a-z]{10}%(?:[ \t]%[a-z]{10}%){1,} ((?:[a-z]%[a-z]{10}%){10})[ \t=][a-z]{10}',bat)] # find all real variables with a length of 10
                 bat = sub10.sub(lambda m: m[0] if m[0] in nrp else b'',bat)
-            open(o + '/' + fn,'wb').write(bat)
+            writefile(o + '/' + fn,bat)
 
             return
         case '624'|'4kZIP'|'Amisetup'|'aPACK'|'AVPACK'|'COM RLE Packer'|'Cruncher'|'DexEXE'|'Dn.COM Cruncher'|'Envelope'|'ExeLITE'|'JAM'|'LGLZ'|'Pack Packed'|\
@@ -716,7 +710,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if ne.get('cmpsize',0) > 0:
                         assert dat[:2] == b'\x1F\x9D'
                         tf = TmpFile('.z')
-                        open(tf.p,'wb').write(dat)
+                        writefile(tf.p,dat)
                         _,dat,err = run(['7z','e','-so','-tZ',tf],text=False,print_try=pr7z)
                         if pr7z: pr7z = False
                         tf.destroy()
@@ -725,12 +719,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             print(err.decode().strip(),path,f'[{d.name}@{d.tell():2X}]')
                             lerr = pr7z = True
 
-                    xopen(o + '/' + path,'wb').write(dat)
-                    try: xopen(o + '/' + path2,'wb').write(dat)
+                    writefile(o + '/' + path,dat)
+                    try: writefile(o + '/' + path2,dat)
                     except FileExistsError as e:
                         op = e.filename
                         while os.path.lexists(op): op = e.filename + f'${c}';c += 1
-                        xopen((o + '/' + path2).replace('/','\\').replace(e.filename,op,1),'wb').write(dat)
+                        writefile((o + '/' + path2).replace('/','\\').replace(e.filename,op,1),dat)
                     lpath = path
                 elif t == 'd':
                     mkdir(o + '/' + path)
@@ -761,7 +755,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if exists(of) and getsize(of): return
         case 'GameCube DOLXZ'|'Wii DOLXZ':
             if db.print_try: print('Trying with custom extractor')
-            import lzma
+            from lib.file import decompress
 
             f = open(i,'rb')
             f.seek(0x20)
@@ -769,8 +763,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.seek(0x124)
             siz = int.from_bytes(f.read(4),'big')
             f.seek(off)
-            open(o + '/' + basename(i),'wb').write(lzma.decompress(f.read(siz)))
+            d = f.read(siz)
             f.close()
+            writefile(o + '/' + basename(i),decompress(d,'xz'))
             return
         case 'DOLPAK':
             ti = o + '/' + tbasename(i) + '.dol'
@@ -828,9 +823,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
-            try: d = decompress(readfile(i)[8:],'lz4')
+            try: writefile(o + '/' + basename(i),decompress(readfile(i)[8:],'lz4'))
             except: return 1
-            xopen(o + '/' + basename(i),'wb').write(d)
             return
         case 'JS P.A.C.K.E.R.': return jsbeautifier('packer')
         case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
@@ -997,7 +991,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 d[ix] = add[1 if d[ix] == '{' else 0:] + d[ix].rstrip(' \t')
             d = '\n'.join(d)
 
-            open(o + '/' + tbasename(i) + '.js','w',encoding='utf-8').write(d)
+            writefile(f'{o}/{tbasename(i)}.js',d,'w')
             if d: return
         case 'C64 TBC MultiCompactor'|'C64 CruelCrunch'|'C64 Time Cruncher'|'C64 Super Compressor'|'C64 MegaByte Cruncher'|'C64 1001 CardCruncher'|\
              'C64 ECA Compactor':
@@ -1030,7 +1024,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Python Compiled Module':
             err,r,_ = run(['pycdc',i],text=False)
             assert not err
-            open(o + '/' + tbasename(i) + '.py','wb').write(r.split(b'\r\n',3)[3])
+            writefile(o + '/' + tbasename(i) + '.py',r.split(b'\r\n',3)[3])
             return
         case 'Install Creator Pro':
             run(['cicdec','-db',i,o])
@@ -1046,7 +1040,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Z-Code':
             e,r,_ = run(['txd',i],text=False)
             if e: return 1
-            open(o + '/' + tbasename(i) + '.asm','wb').write(r)
+            writefile(o + '/' + tbasename(i) + '.asm',r)
             return
         case 'Atomik Cruncher': raise NotImplementedError
         case 'Netcrypt':
@@ -1079,7 +1073,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             dat = decrypt(dat,'aes_cbc',key,iv)
             if dat[:2] == b'MZ':
-                open(o + '/' + basename(i),'wb').write(dat[:-dat[-1]])
+                writefile(o + '/' + basename(i),dat[:-dat[-1]])
                 return
         case 'Shell Archive':
             if db.print_try: print('Trying with custom extractor')
@@ -1134,7 +1128,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 f.skip(7)
                 fn = f.read(f.readu8()).decode('utf-8')
                 f.skip(1)
-                xopen(o + '/' + fn,'wb').write(f.read(f.readu32()))
+                writefile(o + '/' + fn,f.read(f.readu32()))
+
+            f.close()
             if fc: return
         case 'GPEComp':
             if db.print_try: print('Trying with custom extractor')
@@ -1145,9 +1141,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if f.read(8) == b"\x00\xE9\x55\x43\x4C\xFF\x01\x1A": break
             else: return 1
             f.seek(-8,1)
-            d = decompress(f.read(),'uclpack',db=db)
+            d = f.read()
             f.close()
-            xopen(f'{o}/{basename(i)}.elf','wb').write(d)
+            writefile(f'{o}/{basename(i)}.elf',decompress(d,'uclpack',db=db))
             return
         case 'EDI Install Archive':
             dosbox(['ediextract','/U:.',i])
@@ -1171,7 +1167,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 fs.append((fe[0],fe[1],f.read(f.readu8()).decode('utf-8')))
             for fe in fs:
                 f.seek(fe[0])
-                xopen(o + '/' + fe[2],'wb').write(f.read(fe[1]))
+                writefile(o + '/' + fe[2],f.read(fe[1]))
+
+            f.close()
             if fc: return
         case 'Xbox Executable':
             if db.print_try: print('Trying with custom extractor')
@@ -1198,7 +1196,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 fn = f.read0s().decode('ansi')
                 if fe[3]: fn = '$SYS/' + fn
                 f.seek(fe[0])
-                xopen(o + '/' + fn,'wb').write(f.read(fe[1]))
+                writefile(o + '/' + fn,f.read(fe[1]))
             if fs: return
         case 'Lua Bytecode':
             f = open(i,'rb')
@@ -1214,7 +1212,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 run(['java','-jar',db.get('unluac'),'--output',of,i],print_try=False)
             if exists(of) and getsize(of): return
 
-            if fv == 0 and mav == 5 and miv in (1,2,3): open(of,'wb').write(run([f'luadec{mav}{miv}','--',i],text=False)[1])
+            if fv == 0 and mav == 5 and miv in (1,2,3): writefile(of,run([f'luadec{mav}{miv}','--',i],text=False)[1])
             if exists(of) and getsize(of): return
         case 'Bink Video EXE':
             if db.print_try: print('Trying with custom extractor')
@@ -1230,7 +1228,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if tg[:3] == b'BIK' and tg[3] in VS:
                         s = f.readu32()+8
                         f.skip(-8)
-                        open(o + f'/{tbasename(i)}_logo.bik','wb').write(f.read(s))
+                        writefile(o + f'/{tbasename(i)}_logo.bik',f.read(s))
                         break
                     f.skip(12)
 
@@ -1238,7 +1236,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if f.read(3) == b'BIK' and f.readu8() in VS:
                 s = f.readu32()+8
                 f.skip(-8)
-                open(o + f'/{tbasename(i)}.bik','wb').write(f.read(s))
+                writefile(o + f'/{tbasename(i)}.bik',f.read(s))
+
             f.close()
             if listdir(o): return
         case 'Inno Archive':
@@ -1369,7 +1368,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             td = TmpDir()
             mkdir(td + '/Desktop')
             opp = td + '/AppData/Roaming/vdisasm/isd/options.xml'
-            xopen(opp,'w').write('<?xml version="1.0" encoding="utf-8"?><Options xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><LastScriptPath>' + i + '</LastScriptPath><LastMethodName></LastMethodName></Options>')
+            writefile(opp,'<?xml version="1.0" encoding="utf-8"?><Options xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><LastScriptPath>' + i + '</LastScriptPath><LastMethodName></LastMethodName></Options>','w')
             if db.print_try: print('Trying with isd')
             p = subprocess.Popen([db.get('isd')],env=os.environ.copy() | {'APPDATA':td.p + '\\AppData\\Roaming','USERPROFILE':td.p})
             of = o + '\\' + tbasename(i) + '.pas'
@@ -1400,7 +1399,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             tree,bc = decrypt(inf['tree'],'salsa20',inf['key'],inf['nonce'],return_block_count=True)
             dat = decrypt(inf['binary'],'salsa20',inf['key'],inf['nonce'],block_count=bc)
 
-            open(f'{o}/{tbasename(i)}.exe','wb').write(decompress(tree + dat,'huffman',usize=s,padding=True))
+            writefile(f'{o}/{tbasename(i)}.exe',decompress(tree + dat,'huffman',usize=s,padding=True))
             return
         case 'CryptPE':
             if db.print_try: print('Trying with custom extractor')
@@ -1442,7 +1441,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             tree,bc = decrypt(tree,'salsa20',key,nonce,return_block_count=True)
             dat = decrypt(dat,'salsa20',key,nonce,block_count=bc)
 
-            open(f'{o}/{tbasename(i)}.exe','wb').write(decompress(tree + dat,'huffman',usize=cmps3[0],padding=True))
+            writefile(f'{o}/{tbasename(i)}.exe',decompress(tree + dat,'huffman',usize=cmps3[0],padding=True))
             return
         case 'Fatpack':
             if db.print_try: print('Trying with custom extractor')
@@ -1455,14 +1454,13 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 d = f.get_data(inf.OffsetToData,inf.Size)
             f.close()
 
-            d = decompress(d,'lzma',null_usize=True)
-            open(f'{o}/{tbasename(i)}.exe','wb').write(d)
+            writefile(f'{o}/{tbasename(i)}.exe',decompress(d,'lzma',null_usize=True))
             return
         case 'zexe':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
             d = decompress(readfile(i)[0x200:],'gzip')
-            open(f'{o}/{tbasename(i)}.{"exe" if d[:2] == b"MZ" else "elf"}','wb').write(d)
+            writefile(f'{o}/{tbasename(i)}.{"exe" if d[:2] == b"MZ" else "elf"}',d)
             return
         case 'MASM Installer':
             from lib.file import EXE
@@ -1470,7 +1468,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f = EXE(i)
             f.seek(f.secs['.data'][0])
             tf = TmpFile(name='.data')
-            open(tf.p,'wb').write(f.read(f.secs['.data'][1]))
+            writefile(tf.p,f.read(f.secs['.data'][1]))
             f.close()
 
             run(['7z','x',tf.p,'-o' + o,'-aoa'])
@@ -1489,8 +1487,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for x in f.DIRECTORY_ENTRY_RESOURCE.entries[0].directory.entries:
                 x = x.directory.entries[0].data.struct
                 d = f.get_data(x.OffsetToData,x.Size)
-                if d[:3] == b'BZh': xopen(o + '/' + nmsbz.pop(0)[:-3],'wb').write(decompress(d,'bzip2'))
-                elif d[:23] == b'SCROLL THIS WINDOW DOWN': xopen(o + '/' + nms.pop(0),'wb').write(d)
+                if d[:3] == b'BZh': writefile(o + '/' + nmsbz.pop(0)[:-3],decompress(d,'bzip2'))
+                elif d[:23] == b'SCROLL THIS WINDOW DOWN': writefile(o + '/' + nms.pop(0),d)
                 else: raise NotImplementedError('Unknown file')
 
             f.close()

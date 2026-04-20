@@ -243,7 +243,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if f.read(2) == b'MZ':
                 tf = TmpFile('.dgc')
                 f.seek(0x36540)
-                open(tf.p,'wb').write(f.read())
+                writefile(tf.p,f.read())
             f.close()
             run(['dgcac','e',tf,o])
             if hasattr(tf,'destroy'): tf.destroy()
@@ -257,7 +257,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'Snappy':
             _,od,_ = run(['snzip','-d','-k','-c',i],text=False)
             if not od: return 1
-            open(o + '/' + tbasename(i),'wb').write(od)
+            writefile(o + '/' + tbasename(i),od)
             return
         case 'TERSE':
             of = o + '/' + (tbasename(i) if i.lower().endswith(('.pack','.spack','.terse')) else basename(i))
@@ -266,9 +266,10 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['tersedecompress++',i,of,'-b'])
             if exists(of) and getsize(of): return
         case 'UCLPack':
+            if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
             d = decompress(open(i,'rb').read(),'uclpack',db=db)
-            xopen(o + '/' + tbasename(i),'wb').write(d)
+            writefile(o + '/' + tbasename(i),d)
             return
         case 'Binary ][ Archive':
             run(['nulib2','-xs',i],cwd=o)
@@ -341,11 +342,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'ZXC':
             of = o + '/' + tbasename(i)
-            open(of,'wb').write(run(['zxc','-d','-T','0','-k','-c','-f','-q',i],text=False)[1])
+            writefile(of,run(['zxc','-d','-T','0','-k','-c','-f','-q',i],text=False)[1])
             if exists(of) and getsize(of): return fix_tar(o)
         case 'Vlaz':
             of = o + '/' + tbasename(i)
-            open(of,'wb').write(run(['vlaz','-d','-f','-c',i],text=False)[1])
+            writefile(of,run(['vlaz','-d','-f','-c',i],text=False)[1])
             if exists(of) and getsize(of): return fix_tar(o)
         case 'Gipfeli':
             of = o + '\\' + tbasename(i)
@@ -361,7 +362,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 elif tg == b'FARC1': tf = TmpFile(name=tbasename(i) + '.ark',path=o)
                 else: f.close();return 1
                 f.seek(-5,1)
-                open(tf.p,'wb').write(f.read())
+                writefile(tf.p,f.read())
                 f.close()
                 r = msdos(['unfold',basename(tf.p)],cwd=o)
                 tf.destroy()
@@ -449,6 +450,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
             of = o + '/' + tbasename(i)
             run(['aceapex','d','--in',i,'--out',of])
             if exists(of) and getsize(of): return
+        case 'GDeflate':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = decompress(i,'gdeflate',db=db)
+            writefile(o + '/' + tbasename(i),d)
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

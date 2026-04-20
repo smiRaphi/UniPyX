@@ -32,10 +32,10 @@ PlayStation 5 SELF | * | https://www.playstation.com/en-us/support/hardware/ps5/
 PlayStation 4 SELF | * | https://www.playstation.com/en-us/support/hardware/ps4/system-software/ | ? | https://github.com/zecoxao/PS5FTP/blob/master/source/ftps4.c | detected
 SecuROM | .exe | https://archive.org/download/The_Great_Escape_USA | ? | https://www.cdmediaworld.com/hardware/cdrom/cd_utils_8.shtml#UnSecuromNT | detected
 Warp | .exe | ? | https://github.com/dgiagio/warp | ? |
+Pixar USD Crate | .usd .usdc | RTX Remix | https://openusd.org/ | https://openusd.org/release/toolset.html#usdcat | detected
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
-- F-Zero G/AX LZ: gxpand -> [gfz-cli](https://github.com/RaphaelTetreault/gfz-cli)
 - lib/file.py:crc_hash SipHash
 - lib/file.py:crc_hash DJB2
 - lib/file.py:crc_hash City/Farm Hash

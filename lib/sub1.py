@@ -141,7 +141,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             from lib.file import decompress
             of = o + '\\' + tbasename(i)
             d = decompress(readfile(i),'zstd')
-            xopen(of,'wb').write(d)
+            writefile(of,d)
 
             xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
             tg = d[:4]
@@ -160,16 +160,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'LZMA':
             if db.print_try: print('Trying with lzma')
             from lib.file import decompress
-            of = o + '\\' + tbasename(i)
-            d = decompress(readfile(i),'lzma')
-            xopen(of,'wb').write(d)
+            writefile(o + '/' + tbasename(i),decompress(readfile(i),'lzma'))
             if d: return
         case 'LZ4':
             if db.print_try: print('Trying with lz4')
             from lib.file import decompress
             try: d = decompress(readfile(i),'lz4')
             except: return 1
-            xopen(o + '/' + tbasename(i),'wb').write(d)
+            writefile(o + '/' + tbasename(i),d)
             return
         case 'FastLZ':
             of = o + '\\' + tbasename(i)
@@ -206,7 +204,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 assert f.read(0x10) == (b'0000000\0'*2)
                 assert sum(f.read(0xA7)) == 0
 
-                open(o + '/' + fn,'wb').write(f.read(fs))
+                writefile(o + '/' + fn,f.read(fs))
             return
         case 'LHARC':
             run(['lha','xf','--extract-broken-archive','-w=' + o,i])
@@ -308,7 +306,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if not b'\x01CD001\x01\x00' in dat: return 1
             tf = o + '\\TMP' + os.urandom(8).hex() + '.iso'
             f.seek(dat.index(b'\x01CD001\x01\x00'))
-            open(tf,'wb').write(f.read())
+            writefile(tf,f.read())
 
             if extract1(tf,o,'ISO'): rename(tf,o + '/' + tbasename(i) + '_fixed.iso')
             else: remove(tf)
@@ -412,11 +410,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with zlib')
             import zlib
 
-            id = readfile(i)
-            try:d = zlib.decompress(id)
+            try:d = zlib.decompress(readfile(i))
             except zlib.error:return 1
 
-            open(o + '/' + tbasename(i),'wb').write(d)
+            writefile(o + '/' + tbasename(i),d)
             return
         case 'GZIP':
             f = open(i,'rb')
@@ -450,7 +447,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if db.print_try: print('Trying with gzip')
                         import gzip
                         f.seek(0)
-                        open(o + '/' + fn,'wb').write(gzip.decompress(f.read()))
+                        writefile(o + '/' + fn,gzip.decompress(f.read()))
                         f.close()
                         return
             f.close()
@@ -467,7 +464,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'BZip':
             _,f,_ = run(['bzip','-dkc',basename(i)],cwd=dirname(i),text=False)
             if f:
-                open(o + '/' + tbasename(i),'wb').write(f)
+                writefile(o + '/' + tbasename(i),f)
                 return
         case 'VirtualBox Disk Image':
             td = TmpDir(path=o)
@@ -624,7 +621,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if f.read(2) == b'MZ':
                 tf = TmpFile('.asd')
                 f.seek(0x9000)
-                open(tf.p,'wb').write(f.read())
+                writefile(tf.p,f.read())
             f.close()
             run(['asd','x','-y',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
@@ -664,7 +661,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.seek(0)
                 tf = TmpFile('.dwc')
                 d = f.read(siz-0x10)
-                open(tf.p,'wb').write(d + f.read(0x10).rsplit(b'DWC')[0] + b'DWC')
+                writefile(tf.p,d + f.read(0x10).rsplit(b'DWC')[0] + b'DWC')
                 del d
             f.close()
             r = msdos(['dwc','x',tf],cwd=o)
@@ -721,7 +718,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if not extract1(i,o,'7z'): return # 7z
         case 'BinSCII':
             tf = TmpFile('.bsc')
-            open(tf.p,'wb').write(b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + readfile(i).split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
+            writefile(tf.p,b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + readfile(i).split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
             r = extract1(tf.p,o,'DIET') # deark
             tf.destroy()
             return r
@@ -787,7 +784,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 of += ct
             else: of += basename(i)
 
-            open(of,'wb').write(d)
+            writefile(of,d)
             json.dump(hds,open(of + '_headers.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
             return
         case 'Motorola S-Record':
@@ -882,19 +879,19 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek((fe[1]+1) * cs)
-                xopen(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+                writefile(o + '/' + fe[0],f.read(fe[2]))
                 if fe[3]: set_ctime(o + '/' + fe[0],fe[3])
             if fs: return
         case 'Base64':
             if db.print_try: print('Trying with base64')
             from base64 import b64decode
-            d = b64decode(open(i).read().strip().strip('=') + '===')
+            d = b64decode(readfile(i,'r').strip().strip('=') + '===')
             try: assert '\0' not in d.decode('utf-8')
             except: ext = guess_ext(d)
             else:
                 if d.strip().startswith(b'{"') and d.strip().endswith(b'}'): ext = 'json'
                 else: ext = 'txt'
-            open(f'{o}/{tbasename(i)}.{ext}','wb').write(d)
+            writefile(f'{o}/{tbasename(i)}.{ext}',d)
             return
         case 'Web ARchive':
             if db.print_try: print('Trying with custom extractor')
@@ -951,7 +948,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     else: fn = 'content.bin'
 
                     ll = min(int(rhd.get('content-length',bp + p)),p-(f.tell()-bp))
-                    if ll: xopen(bfn + fn,'wb').write(f.read(ll))
+                    if ll: writefile(bfn + fn,f.read(ll))
                     f.seek(bp + p)
                 else: raise NotImplementedError(hd['warc-type'])
                 json.dump(hds,xopen(bfn + 'header.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
@@ -1006,7 +1003,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             assert b.isprintable()
                         except:
                             b = f'${fc}.bin'
-                            xopen(o + '/' + b,'wb').write(d)
+                            writefile(o + '/' + b,d)
                             fc += 1
                         return b
                     case _: raise NotImplementedError(ty)

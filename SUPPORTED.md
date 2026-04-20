@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 886
+# Supported Formats: 887
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -478,7 +478,7 @@ eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Exient XPK | .xpk | [nfshp2010wii.bms](https://mirror.aluigi.org/bms/nfshp2010wii.bms), [angry_birds_go.bms](https://aluigi.org/bms/angry_birds_go.bms), [xpk2.bms](https://aluigi.org/bms/xpk2.bms), [angry_birds_starwars.bms](https://aluigi.org/bms/angry_birds_starwars.bms) |
 F.E.A.R. LTAR | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-F-Zero G/AX LZ | .lz | [gxpand](https://gamebanana.com/tools/6189) |
+Amusement Vision LZ | .lz | Custom |
 FATX | .fatx | [chextract-fatx](https://github.com/JayFoxRox/Chihiro-Tools) |
 Favorite Dear LKF | .lkf | [favorite_dear_lkf_script.bms](https://github.com/bartlomiejduda/Tools/blob/master/NEW%20Tools/Favourite%20Dear/Favorite_Dear_LKF_script.bms)
 Favorite Dear MSG 1 | ??? | Custom |
@@ -783,7 +783,7 @@ ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | * | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (122)
+## Compression Enthusiasts/One-Off Formats (123)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
@@ -827,6 +827,7 @@ Fold ARK | .ark | [unfold](http://ftp.lip6.fr/pub/pc/garbo/pc/arcers/hold116e.zi
 Fold FOL | .fol | [unfold](http://ftp.lip6.fr/pub/pc/garbo/pc/arcers/hold116e.zip) |
 fxcm | .fxcm | [fxcm](https://github.com/kaitz/fxcm) |
 fxv | .fxv | [fxv](https://github.com/kaitz/fxv) |
+GDeflate | .gd | Custom |
 Gipfeli | .gipfeli | [gipfeli_tool](https://encode.su/threads/1609-gipfeli) |
 GMIX | .gmix | [gmix](https://github.com/byronknoll/gmix) |
 GRZip | ??? | [GRZip](https://www.sac.sk/download/pack/grzip.zip) |

@@ -38,12 +38,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 tf.destroy()
                 fs = listdir(o)
                 if len(fs) == 1:
-                    try:
-                        mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
-                        copydir(o + '/' + fs[0] + '/files',o,True)
-                        remove(o + '/' + fs[0])
-                    except:pass
-                    else:return
+                    while True:
+                        try:
+                            if not exists(o + '/$SYS'): mv(o + '/' + fs[0] + '/sys',o + '/$SYS')
+                            copydir(o + '/' + fs[0] + '/files',o,True)
+                            remove(o + '/' + fs[0])
+                        except PermissionError:sleep(0.1)
+                        else:return
             tf.destroy()
         case 'Wii ISO'|'GameCube ISO':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
@@ -264,7 +265,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             xpt = db.get('py360_stfs')
             xpd = open(xpt,encoding='utf-8').read()
             if 'from cStringIO import StringIO' in xpd:
-                open(xpt,'w',encoding='utf-8').write(xpd.replace(
+                writefile(xpt,xpd.replace(
                     'from cStringIO import StringIO','from io import BytesIO as StringIO').replace(
                     'from constants import','from .constants import').replace(
                     ' print ',' pass#').replace(
@@ -272,7 +273,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     "'\\x00'","b'\\0'").replace(
                     '"%s\\x00"',"b'%s\\0'").replace(
                     "data[:0x28].strip(b'\\0')","data[:0x28].strip(b'\\0').decode('utf-8')").replace(
-                    "self.filename != ''","self.filename"))
+                    "self.filename != ''","self.filename"),'w')
 
             if db.print_try: print('Trying with py360_stfs')
             import bin.py360.stfs as stfs # type: ignore
@@ -312,16 +313,16 @@ def extract2(inp:str,out:str,t:str) -> bool:
                         for r,k in [('Normal','common'),
                                     ('Korea' ,'korea' ),
                                     ('Debug' ,'debug' )]:
-                            open(ckeys + f'wii-{k}.key','wb').write(bytes.fromhex(re.search(f'<b>{r}:</b> *<code>([^<]+)</code>',s)[1]))
-                    cetk.ckey = open(ckeys + f'wii-{["common","korea","debug"][cetk.ckeyindex]}.key','rb').read()
+                            writefile(ckeys + f'wii-{k}.key',bytes.fromhex(re.search(f'<b>{r}:</b> *<code>([^<]+)</code>',s)[1]))
+                    cetk.ckey = readfile(ckeys + f'wii-{["common","korea","debug"][cetk.ckeyindex]}.key')
                 elif cns == '3':
                     if not exists(ckeys + '3ds-generator.key'):
                         s = db.c.get('https://raw.githubusercontent.com/Kc57/ntool/refs/heads/master/lib/keys.py').text
-                        open(ckeys + '3ds-generator.key','wb').write(bytes.fromhex(re.search(r'\) *\+ *0x([\da-fA-F]{32}), *87, *128\)',s)[1]))
+                        writefile(ckeys + '3ds-generator.key',bytes.fromhex(re.search(r'\) *\+ *0x([\da-fA-F]{32}), *87, *128\)',s)[1]))
 
                         x3d = re.search(r'KeyX0x3D *= *\(0x([\da-fA-F]{32}), *0x([\da-fA-F]{32})\)',s)
-                        open(ckeys + '3ds-3Dx.key','wb').write(bytes.fromhex(x3d[1]))
-                        open(ckeys + '3ds-dev-3D.key','wb').write(bytes.fromhex(x3d[2]))
+                        writefile(ckeys + '3ds-3Dx.key',bytes.fromhex(x3d[1]))
+                        writefile(ckeys + '3ds-dev-3Dx.key',bytes.fromhex(x3d[2]))
 
                         y3d = re.search(r'KeyY0x3D *= *\(\s*((?:\(0x[\da-fA-F]{32}, *0x[\da-fA-F]{32}\),?\s*)+)\)\n',s)[1]
                         y3dr = []
@@ -330,11 +331,11 @@ def extract2(inp:str,out:str,t:str) -> bool:
                             y3dr.append(bytes.fromhex(r))
                             y3dd.append(bytes.fromhex(d))
 
-                        open(ckeys + '3ds-3Dy.key','wb').write(b''.join(y3dr))
-                        open(ckeys + '3ds-dev-3Dy.key','ab').write(b''.join(y3dd))
+                        writefile(ckeys + '3ds-3Dy.key',b''.join(y3dr))
+                        writefile(ckeys + '3ds-dev-3Dy.key',b''.join(y3dd))
 
-                    g3d = open(ckeys + '3ds-generator.key','rb').read()
-                    x3d = open(ckeys + '3ds-3Dx.key','rb').read()
+                    g3d = readfile(ckeys + '3ds-generator.key')
+                    x3d = readfile(ckeys + '3ds-3Dx.key')
                     y3d = open(ckeys + '3ds-3Dy.key','rb')
                     y3d.seek(0x10 * cetk.ckeyindex)
                     y3d = y3d.read(0x10)
@@ -593,7 +594,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if not name: name = tbasename(i)
                 name += '.bin'
             f.seek(start)
-            open(o + '/' + name,'wb').write(f.read(size))
+            writefile(o + '/' + name,f.read(size))
             return
         case 'Famicom Disk Image':
             if db.print_try: print('Trying with custom extractor')
@@ -635,7 +636,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     FNAMES.append((od + '/' + name,size))
                 elif blockt == 4:
                     name,size = FNAMES.pop(0)
-                    open(name,'wb').write(f.read(size))
+                    writefile(name,f.read(size))
                     FC -= 1
                     if not FC: f.seek(disk_pos + 0xFFDC)
                 if not fds: f.skip(2)
@@ -659,7 +660,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 cik = xb1k.get(keyid[1])
                 if not cik: return 1
                 tf = TmpFile('.cik')
-                open(tf.p,'wb').write(cik)
+                writefile(tf.p,cik)
                 cmd += ['-c',tf.p]
             else: tf = None
 
@@ -674,7 +675,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Acorn Disc Filing IMG':
             tf = TmpFile('.txt')
-            open(tf.p,'w',encoding='utf-8').write(f'insert "{i}"\nextract *\nfree\nexit\n')
+            writefile(tf.p,f'insert "{i}"\nextract *\nfree\nexit\n','w')
             run(['discimagemanager','-c',tf],cwd=o)
             tf.destroy()
             if listdir(o):
@@ -733,7 +734,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             fs = [(offs[x],offs[x+1]-offs[x]) for x in range(8)]
 
             f.seek(fs[0][0])
-            open(o + '/PARAM.SFO','wb').write(f.read(fs[0][1]))
+            writefile(o + '/PARAM.SFO',f.read(fs[0][1]))
             sfo = File(o + '/PARAM.SFO',endian='<')
             sfo.skip(8)
             bko = sfo.readu32()
@@ -757,23 +758,23 @@ def extract2(inp:str,out:str,t:str) -> bool:
             mini = not psp and 'ATTRIBUTE' in ks
 
             f.seek(fs[1][0])
-            open(o + '/ICON0.PNG','wb').write(f.read(fs[1][1]))
+            writefile(o + '/ICON0.PNG',f.read(fs[1][1]))
             if fs[2][1]:
                 f.seek(fs[2][0])
                 d = f.read(fs[2][1])
-                open(o + '/ICON1.' + ('PNG' if d[:4] == b'\x89PNG' else 'PMF'),'wb').write(d)
+                writefile(o + '/ICON1.' + ('PNG' if d[:4] == b'\x89PNG' else 'PMF'),d)
             if fs[2][0] != fs[3][0]:
                 f.seek(fs[3][0])
-                open(o + '/PIC0.PNG','wb').write(f.read(fs[3][1]))
+                writefile(o + '/PIC0.PNG',f.read(fs[3][1]))
             f.seek(fs[4][0])
-            open(o + '/PIC' + ('T' if mini or ps else '') + '1.PNG','wb').write(f.read(fs[4][1]))
+            writefile(o + '/PIC' + ('T' if mini or ps else '') + '1.PNG',f.read(fs[4][1]))
             if mini or psp:
                 f.seek(fs[5][0])
-                open(o + '/SND0.AT3','wb').write(f.read(fs[5][1]))
+                writefile(o + '/SND0.AT3',f.read(fs[5][1]))
             f.seek(fs[6][0])
-            open(o + '/DATA.PSP','wb').write(f.read(fs[6][1]))
+            writefile(o + '/DATA.PSP',f.read(fs[6][1]))
             f.seek(fs[7][0])
-            open(o + '/DATA.PSAR','wb').write(f.read(fs[7][1]))
+            writefile(o + '/DATA.PSAR',f.read(fs[7][1]))
 
             return
         case 'SimpleFlashFS':
@@ -801,7 +802,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 fn = f.read(0x40).split(b'\0',1)[0].decode('ascii')
                 f.skip(0x40)
 
-                open(o + '/' + fn,'wb').write(f.read(fs))
+                writefile(o + '/' + fn,f.read(fs))
                 f.seek(cp + ln)
             if listdir(o): return
         case 'Konami Python IMG':
@@ -815,7 +816,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             ss = f.readu16()
             f.skip(2)
             infs = f.readu16()
-            open(o + '/$INFO.xml','wb').write(f.read(infs-1))
+            writefile(o + '/$INFO.xml',f.read(infs-1))
 
             f.seek(0x400)
             fs = []
@@ -833,7 +834,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek(fe[0])
-                open(o + '/' + fe[1],'wb').write(f.read(fe[2]))
+                writefile(o + '/' + fe[1],f.read(fe[2]))
             if fs: return
         case 'StudyBox IMG':
             if db.print_try: print('Trying with custom extractor')
@@ -856,7 +857,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     s -= 4
                 else: raise NotImplementedError(t)
 
-                open(o + f'/{t}{c:02d}.{ext}','wb').write(f.read(s))
+                writefile(o + f'/{t}{c:02d}.{ext}',f.read(s))
                 c += 1
             if c: return
         case 'iNES ROM':
@@ -1041,7 +1042,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             inf.write('\n')
 
             f.seek(0x10)
-            if tr: open(o + '/trainer.prg','wb').write(f.read(512))
+            if tr: writefile(o + '/trainer.prg',f.read(0x200))
             for ix in range(prgs):
                 if ix == prgs - 1:
                     d = f.read(1024*16-6)
@@ -1049,12 +1050,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     inf.write(f'Reset Vector: 0x{f.readu16():4X}\n')
                     inf.write(f'IRQ Vector: 0x{f.readu16():4X}\n')
                 else: d = f.read(1024*16)
-                open(o + f'/PRG{ix}.prg','wb').write(d)
+                writefile(o + f'/PRG{ix}.prg',d)
             inf.close()
 
             for ix in range(chrs):
                 d = f.read(1024*8)
-                open(o + f'/CHR{ix}.chr','wb').write(d)
+                writefile(o + f'/CHR{ix}.chr',d)
 
                 td = bytearray(256*128)
                 for t in range(0x200):
@@ -1064,7 +1065,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     for y in range(8):
                         b1,b2 = d[to+y],d[to+y+8]
                         for x in range(8): td[(ty+y)*256 + tx+x] = ((b1 >> (7-x)) & 1) | (((b2 >> (7-x)) & 1) << 1)
-                open(o + f'/CHR{ix}.pgm','wb').write(b'P5\n256 128\n3\n' + td)
+                writefile(o + f'/CHR{ix}.pgm',b'P5\n256 128\n3\n' + td)
 
             return
         case 'N64 Memory Pak':
@@ -1113,7 +1114,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek(fe[1])
-                xopen(fe[0],'wb').write(f.read(fe[2]))
+                writefile(fe[0],f.read(fe[2]))
             return
 
         case 'Ridge Racer V A':
@@ -1122,8 +1123,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
             symlink(db.get('rrv3va'),tf)
 
             cfp = dirname(db.get('rrvatool')) + '/RidgeRacerVArchiveTool.exe.config'
-            d = open(cfp).read().replace('<value>True</value>','<value>False</value>')
-            open(cfp,'w').write(d.replace('<setting name="ACV3Achecked" serializeAs="String">\n                <value>False</value>','<setting name="ACV3Achecked" serializeAs="String">\n                <value>True</value>'))
+            d = readfile(cfp,'r').replace('<value>True</value>','<value>False</value>')
+            writefile(cfp,d.replace('<setting name="ACV3Achecked" serializeAs="String">\n                <value>False</value>','<setting name="ACV3Achecked" serializeAs="String">\n                <value>True</value>'),'w')
             if db.print_try: print('Trying with rrvatool')
             p = subprocess.Popen([db.get('rrvatool'),i],stdout=-1,stderr=-1)
             sleep(1)
@@ -1154,13 +1155,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.skip(8)
             for fe in fs:
                 f.seek(fe[2])
-                open(o + '/' + fe[0],'wb').write(f.read(fe[1]))
+                writefile(o + '/' + fe[0],f.read(fe[1]))
 
             lo = max(fe[2] + fe[1] for fe in fs)
             xo = lo + (-lo % 0x200)
             if not xo >= f._size:
                 f.seek(xo)
-                open(o + '/_extra.bin','wb').write(f.read(f._size - xo - 0x200 - 0xB8B200 - 0x14C))
+                writefile(o + '/_extra.bin',f.read(f._size - xo - 0x200 - 0xB8B200 - 0x14C))
 
             f.close()
             if fs: return
@@ -1169,8 +1170,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 scn = f'monkey ball {d} extract'
                 if d == 'CHUNK':
                     scp = db.get(scn)
-                    scc = open(scp,encoding='utf-8').read()
-                    if '\nnext A\n' in scc: open(scp,'w',encoding='utf-8').write(scc.replace('\nnext A\n','\nmath A + 1\n'))
+                    scc = readfile(scp,'r')
+                    if '\nnext A\n' in scc: writefile(scp,scc.replace('\nnext A\n','\nmath A + 1\n'),'w')
 
                 mkdir(o + '\\' + d)
                 if quickbms(scn,ouf=o + '\\' + d): break
@@ -1201,7 +1202,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek(fe[1])
-                open(o + '/' + fe[0],'wb').write(f.read(fe[2]))
+                writefile(o + '/' + fe[0],f.read(fe[2]))
 
             f.close()
             if fs: return
@@ -1403,13 +1404,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     import re,ast
                     from lib.file import decompress
 
-                    offs = ast.literal_eval(re.search(r'target_mio0_offsets = (\[[\s\dA-Fa-fx,]+\])',xopen(bps + '/mio0_extract.py','r').read())[1])
+                    offs = ast.literal_eval(re.search(r'target_mio0_offsets = (\[[\s\dA-Fa-fx,]+\])',readfile(bps + '/mio0_extract.py','r'))[1])
                     f = open(i,'rb')
                     for of in offs:
                         f.seek(of)
                         if f.read(4) == b'MIO0':
                             f.seek(of)
-                            xopen(f'{o}/mio0/decompressed_{of:08X}.bin','wb').write(decompress(f.read(),'mio0'))
+                            writefile(f'{o}/mio0/decompressed_{of:08X}.bin',decompress(f.read(),'mio0'))
                 elif rt == 'Super Smash Bros.':
                     raise NotImplementedError('VPK0: https://github.com/decompals/crunch64/issues/1')
                 return
@@ -1435,7 +1436,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if d[:4] == b'VS\0\0': ext = 'vs'
                 elif d[6:9] in (b'BGM',b'EV0',b'MAP'): ext = d[6:9].decode('ascii').lower()
                 else: ext = guess_ext_ps2(d)
-                open(o + f'/{ix:04d}.{ext}','wb').write(d)
+                writefile(o + f'/{ix:04d}.{ext}',d)
 
             f.close()
             if fs: return

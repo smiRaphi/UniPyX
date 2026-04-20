@@ -68,15 +68,21 @@ def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir
 def symlink(i:str,o:str):
     mkdir(dirname(o))
     os.symlink(i,o)
-def xopen(f:str,m='r',encoding='utf-8',newline=None):
+def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
     f = abspath(str(f))
     mkdir(dirname(f))
-    if 'b' in m: return open(f,m)
-    return open(f,m,encoding=encoding,newline=newline)
+    if 'b' in m: return open(f,m,**kwargs)
+    return open(f,m,encoding=encoding,newline=newline,**kwargs)
 def readfile(f:str,m='rb',encoding='utf-8',newline=None,**kwargs) -> bytes|str:
     if 'b' in m: o = open(f,m,**kwargs)
     else: o = open(f,m,encoding=encoding,newline=newline,**kwargs)
     r = o.read()
+    o.close()
+    return r
+def writefile(f:str,d:bytes|str,m='wb',encoding='utf-8',newline=None,**kwargs):
+    if 'b' in m: o = xopen(f,m,**kwargs)
+    else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
+    r = o.write(d)
     o.close()
     return r
 def rldir(i:str,files=True) -> list[str]:
@@ -576,7 +582,7 @@ def hookshot(cmd:list,redirect:dict,**kwargs):
     open(hks,'w').close()
 
     #hkc = dirname(hks) + '/Hookshot.ini'
-    #open(hkc,'wb').write(b'LoadHookModulesFromHookshotDirectory = yes\n')
+    #writefile(hkc,b'LoadHookModulesFromHookshotDirectory = yes\n')
     pwc = dirname(hks) + '/Pathwinder.ini'
     pwf = open(pwc,'w',encoding='utf-8')
     for i,(k,v) in enumerate(redirect.items()):
