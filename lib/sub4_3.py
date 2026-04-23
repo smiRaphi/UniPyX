@@ -2363,65 +2363,100 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if ofs: return
-        case 'Pixar USD Crate': raise NotImplementedError
-        case 'Quest3D ZICB':
+        case 'Sunday vs. Magazine FARC':
             if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,HashLib
+
+            HL = HashLib.dl('sxm',db,fmt=lambda x:x.lower().replace('\\','/'),encoding='ascii')
+            f = File(i,endian='<')
+            assert f.read(4) == b'FARC' and f.readu32() == 0x100
+
+            c = f.readu32()
+            so = f.readu32()
+            fs = [(f.readu32(),f.readu32(),f.readu64()) for _ in range(c)]
+            if so == 0:
+                f.close()
+                fd = open(noext(i) + '.fac','rb')
+            else: fd = f
+
+            HL.wait()
+            for fe in fs:
+                fd.seek(fe[0])
+                d = fd.read(fe[1])
+                if fe[2] in HL: fn = HL[fe[2]]
+                else:
+                    if d[4:12] == b'ins\0\0\0\0\0': ex = 'res'
+                    elif d[:4] == b'FARC': ex = 'fab'
+                    elif d[:4] == b'TARC': ex = 'tpk'
+                    elif d[:4] == b'FTEX': ex = 'tex'
+                    elif d[:4] == b'PPHD': ex = 'phd'
+                    elif d[:4] == b'aeDT': ex = 'dat'
+                    elif d[:4] == b'CHNK' and d[0x10:0x14] == b'BACK': ex = 'bpk'
+                    elif d[:4] == b'CHNK' and d[0x10:0x14] == b'CHAR': ex = 'cpk'
+                    elif d[:4] == b'CHNK': ex = 'chnk'
+                    elif d[:4] == b'EMIT': ex = 'emit'
+                    elif d[:4] == b'SEQH': ex = 'spk'
+                    elif d[:5] == b'_enum': ex = 'mess.bin'
+                    else:
+                        ex = guess_ext_ps2(d)
+                        if ex == 'luac': ex = 'so'
+                        elif ex == 'psadpcm': ex = 'pbd'
+                    fn = f'{fe[2]:016X}.{ex}'
+                writefile(o + '/' + fn,d)
+
+            fd.close()
+            if fs: return
+        case 'Sunday vs. Magazine TARC'|'Sunday vs. Magazine EMIT':
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4).decode('ascii') == t[-4:]
+            f.back(4)
+            r = sxm_block(f,o)
+            f.close()
+            if r: return
+        case 'Sunday vs. Magazine BACKground PacK'|'Sunday vs. Magazine CHARacter PacK':
             from lib.file import File
             f = File(i,endian='<')
 
-            of = o + '/' + basename(i)
+            bks = {}
             while f:
-                n = f.read(4).decode('latin-1')
+                n = f.read(4).decode('ascii')
+                if not n in bks: bks[n] = 0
+                else: bks[n] += 1
+                f.skip(4)
                 s = f.readu32()
+                assert s == f.readu32()
                 ep = f.pos + s
 
                 match n:
-                    case 'ACTF'|'ZINS'|'ZIOS': pass
-                    case 'ZICB':
-                        if exists(of): raise FileExistsError
-                        writefile(of,f.decompress(s,'zlib'))
-                    case _: raise NotImplementedError(f'{n} ({s}) @ 0x{f.pos:08X}')
-
+                    case 'CHNK'|'BACK'|'UVAM'|'CHAR':
+                        if s > 0: writefile(f'{o}/{n}{bks[n]:02d}.bin',f.readc(s))
+                    case 'TEXR'|'MODL'|'MOTN': sxm_block(f,f'{o}/{n}{bks[n]:02d}',hint=n)
+                    case _: raise NotImplementedError(f'{n} ({s}) @ {f.pos-0x10:08X}')
                 f.seek(ep)
 
             f.close()
-            if exists(of): return
-        case 'Surreal Software SRSC':
-            TMAP = {
-                0x200:'node',
-                0x203:'mesh',
-                0x204:'uv',
-                0x207:'pos',
-                0x208:'skl',
-                0x211:'parent',
-                0x214:'anim',
-                0x216:'vert',
-                0x302:'sndinf',
-                0x303:'pcm',
-                0x305:'sndfmt',
-                0x402:'lvl',
-                0x501:'mdlinf',
-                0x502:'mdl',
-            }
-
-            if db.print_try: print('Trying with custom extractor')
+            if bks: return
+        case 'Sunday vs. Magazine aeDAT':
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'SRSC' and f.readu8() == f.readu8() == 1
+            assert f.read(4) == b'aeDT'
 
-            of = f.readu32()
+            f.padc(2)
             c = f.readu16()
-            f.padc(4)
-            f.seek(of)
-            fs = [(f.readu16(),f.readu16(),f.readu16(),f.readu32(),f.readu32()) for _ in range(c)]
-            for fe in fs:
-                f.seek(fe[3])
-                ex = TMAP.get(fe[0],f'{fe[0]:03X}')
-                writefile(f'{o}/{fe[2]:02X}/{fe[1]:02X}.{ex}',f.readc(fe[4]))
+            f.skip(4);f.padc(4)
+            offs = [f.readu32() for _ in range(c+1)]
+            fs = [f.read(0x20).rstrip(b'\0').decode('ascii') for _ in range(c)]
+            for ix in range(c):
+                f.seek(offs[ix])
+                writefile(o + '/' + fs[ix],f.readc(offs[ix+1]-offs[ix]))
 
             f.close()
             if fs: return
 
+        case _:
+            from lib.sub4_4 import extract4_4
+            return extract4_4(i,o,t)
     return 1
 
 def dnasoft_lzss_decrypt(i:bytes):
@@ -2431,3 +2466,46 @@ def dnasoft_lzss_decrypt(i:bytes):
     assert i[:4] == b'LZSS'
     rs = int.from_bytes(i[4:8],'little')
     return decrypt(i[8:8+rs+-rs%8],'blowfish_le',KEY)[:rs]
+def sxm_block(inp,o:str,hint=None):
+    from lib.file import File
+    f:File = inp
+    p = f.pos
+
+    match f.read(4).decode('ascii'):
+        case 'TARC':
+            assert f.readu32() == 0x100
+            c = f.readu32()
+            assert f.readu32() != 0
+            fs = [(f.read(0x38).rstrip(b'\0').decode('ascii'),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(p + fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+            return bool(fs)
+        case 'EMIT':
+            assert f.readu32() == 0x101
+            c = f.readu32()
+            f.seek(p + int.from_bytes(f.read(4),'little'))
+            d = []
+            fns = {}
+            for _ in range(c):
+                f.skip(0x20)
+                fn = f.read(0x20).rstrip(b'\0')
+                if fn:
+                    if not fn in fns: fns[fn] = 0
+                    if d: writefile(o + '/' + d[0] + (f'.{fns[fn]}' if fns[fn] else ''),b''.join(d[1:]))
+                    fns[fn] += 1
+                    d = [fn.decode('ascii')]
+                d.append(f.readc(0xE0))
+            if d: writefile(o + '/' + d[0] + (f'.{fns[fn]}' if fns[fn] else ''),b''.join(d[1:]))
+            return bool(c)
+        case _:
+            f.back(4)
+            if hint in {'MODL','MOTN'}:
+                f.skip(0x2C)
+                fof = f.readu32()
+                f.back(0x30)
+                fs = [(f.read(0x20).rstrip(b'\0').decode('ascii'),f.skip(8),f.readu32(),f.readu32()) for _ in range(fof//0x30)]
+                for fe in fs:
+                    f.seek(p + fe[3])
+                    writefile(o + '/' + fe[0],f.readc(fe[2]))
+                return bool(fs)

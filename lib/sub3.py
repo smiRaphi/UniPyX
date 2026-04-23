@@ -1059,7 +1059,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             x.seek(x.pos - 0x1000 + idx)
             while x.pos < x.secs['.text'][2]:
-                b = x.reads()
+                b = x.read(1)
                 if b == b'\0':break
                 while b != b'\0': b = x.read(1)
             else: return 1

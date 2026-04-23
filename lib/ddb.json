@@ -318,8 +318,38 @@
         "rs":"RetroStudio PAK"
     },
     {
+        "d":[["s%",4096],["ext","fah"],["isat","FARC\\0\\1\\0\\0",0],["isatS","\\0",8,12],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.fac'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);c=int.from_bytes(f.read(4),'little')*16+16;return (c+-c%4096)==s"]],
+        "rs":"Sunday vs. Magazine FARC","s":1},{
+        "d":[["isat","FARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (c*16+16)==int.from_bytes(f.read(4),'little')==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Sunday vs. Magazine FARC","s":1
+    },
+    {
+        "d":[["isat","TARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,72],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');f.seek(72);return (c*64+16)==o==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Sunday vs. Magazine TARC","s":1
+    },
+    {
+        "d":[["s%",16],["size",[304,null]],["isat","EMIT\\1\\1\\0\\0",0],["isat","\\x10\\0\\0\\0",12],["n0",4,8],["str0",48,32,5],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')*288+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Sunday vs. Magazine EMIT","s":1
+    },
+    {
+        "d":[["s%",16],["isat","CHNK\\0\\0\\1\\0",0],["isat","BACK\\0\\1\\0\\0\\x10\\0\\0\\0\\x10\\0\\0\\0",16],["isat","TEXR\\0\\1\\0\\0",48],["isatS","\\0",8,8],["isatS","\\0",8,40],["n0",4,56],["n0",4,60],["py","f=open(inp,'rb');f.seek(56);return f.read(4)==f.read(4)"]],
+        "rs":"Sunday vs. Magazine BACKground PacK","s":1
+    },
+    {
+        "d":[["s%",16],["isat","CHNK\\0\\0\\1\\0",0],["isat","CHAR\\0\\1\\0\\0\\x20\\0\\0\\0\\x20\\0\\0\\0",16],["isat","TEXR\\0\\1\\0\\0",64],["isatS","\\0",8,8],["isatS","\\0",8,40],["isatS","\\0",8,56],["n0",4,72],["n0",4,76],["py","f=open(inp,'rb');f.seek(72);return f.read(4)==f.read(4)"]],
+        "rs":"Sunday vs. Magazine CHARacter PacK","s":1
+    },
+    {
+        "d":[["isat","aeDT\\0\\0",0],["isat","\\x40",8],["isatS","\\0",7,9],["n0",2,6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(6);c=int.from_bytes(f.read(2),'little');b=int.from_bytes(f.read(4),'little');f.seek(16+c*4)\nif int.from_bytes(f.read(4),'little')!=s:return\nc=f.seek(16)+c*4+4+c*32;return (c+-c%b)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Sunday vs. Magazine aeDAT","s":1
+    },
+    {
         "d":[["isat","LMPK",0],["isat","x",8],["n0",4,4]],
         "rs":"LMPK","s":1
+    },
+    {
+        "d":[["isat","PAK_\\1\\0\\0\\0",0],["isat","\\0\\0",82],["isat","\\xFF\\xFF",96],["isatS","\\0",4,12],["n0",4,8],["str0",16,64,2],["n0",4,88],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little')*88+16;f.seek(88)\nif (c+-c%32768)!=int.from_bytes(f.read(4),'little'):return\ns=f.read(4);f.seek(4,1);return s==f.read(4)"]],
+        "rs":"Silent Hill PAK","s":1
     },
     {
         "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]<=f.read(1)[0]"]],

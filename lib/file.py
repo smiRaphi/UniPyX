@@ -1,6 +1,7 @@
 import struct,io,sys
 
 ENDMAP = {'<':'little','>':'big','-':'big'}
+UTFENDM = {'<':'le','>':'be','-':'be'}
 
 def align(n:int,blocksize:int): return -n % blocksize
 def swap32(i:bytes):
@@ -38,13 +39,26 @@ class File:
 
     def skip(self,n:int): return self.seek(n,1)
     def back(self,n:int): return self.skip(-n)
-    def reads(self): return self.read(1)
+    def reads(self,n:int,encoding='utf-8'):
+        if encoding == 'utf-16': return self.readutf16(n)
+        return self.readc(n).decode(encoding)
     def readc(self,n:int=None):
         d = self.read(n)
         if n is not None and len(d) != n: raise EOFError("Unexpected EOF")
         return d
     def padc(self,n:int): 
         if sum(self.readc(n)): raise ValueError("Unexpected Value in padding")
+    def readu(self,c=b'\0',max=None,chks=0x100):
+        o = bytearray()
+        while max is None or len(o) < max:
+            d = self.read(chks)
+            p = d.find(c)
+            if p != -1 or len(d) != chks:
+                o += d[:p]
+                self.back(len(d) - p - 1)
+                break
+            o += d
+        return bytes(o)
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -118,14 +132,11 @@ class File:
         if v & 1: return -(v >> 1) - 1
         return v >> 1
 
-    def read0s(self):
-        r = b''
-        b = b''
-        while True:
-            b = self.read(1)
-            if not b or b == b'\0':break
-            r += b
+    def read0s(self,encoding:str=None) -> bytes|str:
+        r = self.readu()
+        if encoding is not None: r = r.decode(encoding)
         return r
+    def readutf16(self,l:int): return self.readc(l * 2).decode('utf-16' + UTFENDM[self._end])
 
     def writeu8 (self,v:int): return self.packi(v,1,0)
     def writeu16(self,v:int,end=None): return self.packi(v,2,0,end)
@@ -246,6 +257,8 @@ class EXE(File):
                 self.secs[x] = (o,s,o+s)
                 self.skip(4)
         else: raise NotImplementedError(pe)
+
+        self.ovl_off = max([x[2] for x in self.secs.values()])
 def ext_exe(i:str,dotnet=False):
     if dotnet:
         import dnfile
@@ -646,6 +659,8 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             return int.from_bytes(r,'big')
 
         case 'tarzan': fnc = tarzan_hash
+        case 'luas': fnc = luas_hash
+        case 'sxm': fnc = sxm_hash
         case 'hash40':
             import zlib
             return (len(i) << 32) | zlib.crc32(i,value=kwargs.get('value') or 0)
@@ -1180,6 +1195,17 @@ def tarzan_hash(i:bytes):
         if shft > 24: shft = 0
         lng += 1
     return (o + lng) & maskb(4)
+def luas_hash(i:bytes):
+    stp = (len(i) >> 5) + 1
+    o = p = len(i)
+    while p >= stp:
+        o ^= (o * 0x20 + (o >> 2) + i[p - 1]) & maskb(4)
+        p -= stp
+    return o
+def sxm_hash(i:bytes):
+    v = 0
+    for b in i: v = ((v * 137) + b) & maskb(8)
+    return v
 
 def tea_decrypt(i:bytes,k:bytes,le=False):
     e = '<' if le else '>'
@@ -1245,7 +1271,7 @@ HASHTS = {
     'blake2b':32,'blake2s':16,
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
-    'tarzan':4,'hash40':5,
+    'tarzan':4,'luas':4,'sxm':8,'hash40':5,
 }
 class HashLib:
     def __init__(self,p:str,fmt=lambda x:x,encoding='utf-8'):
@@ -1277,7 +1303,7 @@ class HashLib:
         return self
     def wait(self):
         if self._load_thrd is not None:
-            if self._load_thrd.is_alive(): self._load_thrd.join()
+            self._load_thrd.join()
             self._load_thrd = None
     def _load(self):
         f = File(self.p,'rb',endian='>')

@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1776376800
+            "ts":1776636000
         }],
-        "ts":1776376800
+        "ts":1776636000
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -112,21 +112,21 @@
     "die":{
         "p":"DiE/diec.exe",
         "fs":[{
-            "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/die_win64_portable_3.10_x64.zip",
+            "u":"https://github.com/horsicq/DIE-engine/releases/download/3.20/die_win64_portable_3.20_x64.zip",
             "x":{
-                "diec.exe":"DiE/diec.exe",
-                "Qt5Core.dll":"DiE/Qt5Core.dll",
-                "Qt5Script.dll":"DiE/Qt5Script.dll"
+                "die/diec.exe":"DiE/diec.exe",
+                "die/Qt5Core.dll":"DiE/Qt5Core.dll",
+                "die/Qt5Script.dll":"DiE/Qt5Script.dll"
             },
-            "ts":1767222000
+            "ts":1776724505
         },{
             "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip",
             "x":{
                 "*":"DiE"
             },
-            "ts":1776376800
+            "ts":1776722400
         }],
-        "ts":1776376800
+        "ts":1776724505
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -201,10 +201,10 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":24306209693,
-            "ts":1776105835
+            "nightly_run":24631341004,
+            "ts":1776722788
         }],
-        "ts":1776105835
+        "ts":1776722788
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -514,13 +514,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/11/a4/dolphin-master-2603-299-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/5d/dc/dolphin-master-2603-312-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1776448787
+            "ts":1776615825
         }],
-        "ts":1776448787
+        "ts":1776615825
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2339,23 +2339,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46078/SDLVICE-3.10-win64-r46078.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46083/SDLVICE-3.10-win64-r46083.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46078/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46078/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46078/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46078/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46078/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46078/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46083/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46083/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46083/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46083/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46083/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46083/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1776420772
+            "ts":1776597105
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1776420772
+        "ts":1776597105
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2708,14 +2708,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_16_f9cc1039_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_20_ceeeaa54_32.zip",
             "x":{
-                "RenderDoc_2026_04_16_f9cc1039_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_16_f9cc1039_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_20_ceeeaa54_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_20_ceeeaa54_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1776290400
+            "ts":1776636000
         }],
-        "ts":1776290400
+        "ts":1776636000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5573,7 +5573,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-17/WolvenKit.Console-8.17.5-nightly.2026-04-17.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-19/WolvenKit.Console-8.17.5-nightly.2026-04-19.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5626,9 +5626,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1776421740
+            "ts":1776594029
         }],
-        "ts":1776421740
+        "ts":1776594029
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5678,7 +5678,7 @@
     "git":{
         "p":"git/git.exe",
         "fs":[{
-            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0-rc2.windows.1/MinGit-2.54.0-rc2-64-bit.zip",
+            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0.windows.1/MinGit-2.54.0-64-bit.zip",
             "x":{
                 "mingw64/bin/git.exe":"git/git.exe",
                 "mingw64/bin/libiconv-2.dll":"git/libiconv-2.dll",
@@ -5687,9 +5687,9 @@
                 "mingw64/bin/libwinpthread-1.dll":"git/libwinpthread-1.dll",
                 "mingw64/bin/zlib1.dll":"git/zlib1.dll"
             },
-            "ts":1776190998
+            "ts":1776702128
         }],
-        "ts":1776190998
+        "ts":1776702128
     },
     "bsab":{
         "p":"bsab.exe",
@@ -6987,6 +6987,14 @@
             "hashes/sine_mora.bhl"
         ]],
         "ts":1776102113
+    },
+    "sxm_hashes":{
+        "p":"hashes/sxm.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sxm.bhl",
+            "hashes/sxm.bhl"
+        ]],
+        "ts":1776974841
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",

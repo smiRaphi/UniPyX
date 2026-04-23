@@ -842,7 +842,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if t in CODS: c = CODS[t]
                 elif t == 'Dying Light RPACK': c = 'RPACK_' + open(i,'rb').read(4).decode('ascii')
                 elif t == 'Frogwares 0000 Package': c = '0000_package' + ('_2' if open(i,'rb').read(8)[7] == 7 else '')
-                else: raise Exception('No mapped codes for ' + t)
+                else:
+                    p.kill()
+                    raise Exception('No mapped codes for ' + t)
 
                 id = dirname(i)
                 cd = listdir(id)

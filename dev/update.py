@@ -126,8 +126,6 @@ def supdate(c:Cache,k:str,inf:dict):
                 try: ts = c.srcht(r'</a> \((\d+/\d+/\d{4})\)','%m/%d/%Y','http://takeda-toshiya.my.coocan.jp/msdos/index.html')
                 except httpx.ConnectError: time.sleep(0.5)
             else: ts = 0
-        elif u.startswith('https://github.com/horsicq/Detect-It-Easy/releases/download/Beta/'):
-            ts = ft(str(time.gmtime().tm_year),'%Y')
         elif u == "https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip":
             ct = time.gmtime()
             ts = ft(f'{ct.tm_year}.{ct.tm_mon:02d}.{ct.tm_mday:02d}','%Y.%m.%d')
@@ -138,7 +136,7 @@ def supdate(c:Cache,k:str,inf:dict):
             if repo not in ('allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'):
                 s = '<p><strong>This page is taking too long to load.</strong></p>'
                 while '<p><strong>This page is taking too long to load.</strong></p>' in s:
-                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex'):
+                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex','horsicq/DIE-engine'):
                         s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                     elif repo in ():
                         s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])

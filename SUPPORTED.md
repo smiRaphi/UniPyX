@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 889
+# Supported Formats: 894
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -336,7 +336,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (445)
+## Various (450)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -683,6 +683,7 @@ SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |
 Shrek Smash n' Crash Racing Pack | .dat | Custom |
+Silent Hill PAK | .pak | Custom |
 Sine Mora EX BIN | .bin | Custom |
 Sinergy GUT | .gut | Custom |
 Siren 2 EVD | .evd | Custom |
@@ -708,6 +709,10 @@ String16BE Data | * | Custom |
 STXT Language Data | .stxt | Custom |
 Stylus Config Export | .json | Custom |
 Sumo Digital XPAC | .xpac | Custom |
+Sunday vs. Magazine FARC | .fah+.fac .fab | Custom |
+Sunday vs. Magazine TARC | .tpk | Custom |
+Sunday vs. Magazine BACKground PacK | .bpk .epk | Custom |
+Sunday vs. Magazine CHARacter PacK | .cpk | Custom |
 Super Mario Maker Level | .bin | Custom |
 Super Monkey Ball SPG2 | .spg2 | Custom |
 Super Monkey Ball Tip 'n Tilt PAK | .pak | Custom |
