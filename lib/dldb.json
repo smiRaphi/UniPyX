@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1776636000
+            "ts":1776895200
         }],
-        "ts":1776636000
+        "ts":1776895200
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -112,21 +112,21 @@
     "die":{
         "p":"DiE/diec.exe",
         "fs":[{
-            "u":"https://github.com/horsicq/DIE-engine/releases/download/3.20/die_win64_portable_3.20_x64.zip",
+            "u":"https://github.com/horsicq/DIE-engine/releases/download/3.21/die_win64_portable_3.21_x64.zip",
             "x":{
                 "die/diec.exe":"DiE/diec.exe",
                 "die/Qt5Core.dll":"DiE/Qt5Core.dll",
                 "die/Qt5Script.dll":"DiE/Qt5Script.dll"
             },
-            "ts":1776724505
+            "ts":1776804164
         },{
             "u":"https://github.com/horsicq/Detect-It-Easy/releases/download/current-database/db.zip",
             "x":{
                 "*":"DiE"
             },
-            "ts":1776722400
+            "ts":1776981600
         }],
-        "ts":1776724505
+        "ts":1776981600
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -201,10 +201,10 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":24631341004,
-            "ts":1776722788
+            "nightly_run":24790577846,
+            "ts":1777024445
         }],
-        "ts":1776722788
+        "ts":1777024445
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -514,13 +514,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/5d/dc/dolphin-master-2603-312-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/14/2a/dolphin-master-2603-316-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1776615825
+            "ts":1776910425
         }],
-        "ts":1776615825
+        "ts":1776910425
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2708,14 +2708,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_20_ceeeaa54_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_04_23_2287790c_32.zip",
             "x":{
-                "RenderDoc_2026_04_20_ceeeaa54_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_04_20_ceeeaa54_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_04_23_2287790c_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_04_23_2287790c_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1776636000
+            "ts":1776895200
         }],
-        "ts":1776636000
+        "ts":1776895200
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2752,10 +2752,10 @@
     "kanzi":{
         "p":"Kanzi.exe",
         "fs":[[
-            "https://github.com/flanglet/kanzi-cpp/releases/download/2.5.2/Kanzi64.exe",
+            "https://github.com/flanglet/kanzi-cpp/releases/download/2.5.1/Kanzi64.exe",
             "Kanzi.exe"
         ]],
-        "ts":1775314115
+        "ts":1773501789
     },
     "ppmd":{
         "p":"PPMd.exe",
@@ -5573,7 +5573,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-19/WolvenKit.Console-8.17.5-nightly.2026-04-19.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-04-23/WolvenKit.Console-8.17.5-nightly.2026-04-23.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5626,9 +5626,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1776594029
+            "ts":1776940225
         }],
-        "ts":1776594029
+        "ts":1776940225
     },
     "noodle":{
         "p":"oo2core_win64.dll",

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 894
+# Supported Formats: 895
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -212,7 +212,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (119)
+## Executables/Packers/Installers (120)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -287,6 +287,7 @@ Lua Bytecode | .lua .luac | [unluac](https://sourceforge.net/project/unluac/), [
 LZEXE | .exe .com | [deark](https://github.com/activescott/deark) |
 MASM Installer | .exe | Custom + [7-Zip](https://7-zip.org/) |
 MSCAB SFX | .exe | [7-Zip](https://7-zip.org/), Input (/X), Input (/T), Input (-extract) |
+Multimedia Fusion 2.0 | .exe | Custom |
 Neobook Executable | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Netcrypt | .exe | Custom |
 NSIS Installer | .exe | [7-Zip](https://7-zip.org/), [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |

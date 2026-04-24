@@ -1494,5 +1494,166 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.close()
             if fnd and not nmsbz and not nms: return
         case 'SecuROM': raise NotImplementedError
+        case 'Multimedia Fusion 2.0':
+            TMAP = {
+                0x1122:'Preview'} | {
+                0x2222+ix:x for ix,x in enumerate(('MiniHeader','AppHeader','AppName','Author','MenuBar','ExtensionsPath','ExtensionsMini','FrameItems','GlobalEvents',
+                                          'FrameHandles','ExtensionData','ExtraExtensions','EditorFilename','TargetFilename','HelpFile','TransitionFile','GlobalValues',
+                                          'GlobalStrings','Extensions','AppIcon','IsDemo','SerialNumber','BinaryFiles','MenuImages','About','Copyright','GlobalValueNames',
+                                          'GlobalStringNames','MovementExtensions','FrameItems','ExeOnly','AppHeaderExtra','Protection','ShaderBank','BluRayAppOptions',
+                                          'ExtendedHeader','AppCodePage','FrameOffset','AdMobID','2249','Html5Preloader','AndroidMenu','VirtualKeysToChar','CharEncoding',
+                                          'PreloaderTouchMsg','EngineVer','2250','AppLanguage','WUAOOptions','ObjectHeaders','ObjectNames','ObjectShaders',
+                                          'ObjectProperties','ObjectPropOffsets','TrueTypeFontInfo','TrueTypeFontBank','DX9ShaderBank','225B','225C','PlayerControls',
+                                          'AppIcon','225F','2260','2261'))} | {
+                0x3333+ix:x for ix,x in enumerate(('Frame','FrameHeader','FrameName','FramePassword','FramePalette','FrameInstances','FrameFadeInStuff','FrameFadeOutStuff',
+                                          'FrameTransitionIn','FrameTransitionOut','FrameEvents','FramePlayHeader','FrameExtraItems','FrameExtraInstances',
+                                          'FrameLayers','FrameRect','FrameDemoPath','FrameSeed','FrameLayerEffects','FrameBluRayOptions','FrameMoveTimer',
+                                          'FrameMosaicTable','FrameEffects','FrameRuntimeOptions','FrameWuaOptions','FrameHandle'))} | {
+                0x4444+ix:x for ix,x in enumerate(('ObjectInfoHeader','ObjectInfoName','ObjectCommon','4447','ObjectInfoShader','ObjectAnimations','ObjectShapes'))} | {
+                0x5555:'ImageOffsets',0x5556:'FontOffsets',0x5557:'SoundOffsets',0x5558:'MusicOffsets',0x6665:'BankOffsets',
+                0x6666:'ImageBank',0x6667:'FontBank',0x6668:'SoundBank',0x6669:'MusicBank',
+                0x7EEE:'Fusion3Seed',0x7F7F:'Last',
+            }
+            iszl = lambda d: d[0] == 0x78 and d[1] in {0x01,0x5E,0x9C,0xDA}
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import EXE,File,decompress,decrypt
+            from multiprocessing.pool import ThreadPool
+            f = EXE(i)
+            f.seek(f.ovl_off)
+
+            h = f.read(4)
+            unp = False # h == b'wwww' # only for non exe
+            if h == b'wwww': v = 2
+            elif h in {b'\x7F\x7F\0\0',b'\x2C\x22\0\0'}:
+                if f.read(4) == b'I\x87G\x12': v = 2
+                else: v = 1.5
+            elif h[:2] == b'\1\0': v = 1.1
+            else: raise NotImplementedError('Unknown version')
+            if v != 2: raise NotImplementedError(f'Unsupported version v{v}')
+            anc = 'anaconda_' if v == 1.5 else ''
+
+            if v > 1.5:
+                f.seek(f.ovl_off + 0x1C)
+                c = f.readu32()
+                for _ in range(c):
+                    fn = f.readutf16(f.readu16())
+                    f.skip(4)
+                    s = f.readu32()
+                    if s > 6:
+                        zl = iszl(f.read(2))
+                        f.back(2)
+                    else: zl = False
+                    writefile(o + '/' + fn,f.decompress(s,anc + ('zlib' if zl else 'none')))
+
+            hn = f.reads(4,'ascii')
+            rtv,rtsv = f.readu16(),f.readu16()
+            prv,prb = f.readu32(),f.readu32()
+            if rtv != 169:
+                if prb < 280: v = 2.1 if prv == 1 else 2
+            else: v = 1.5
+            enc = 'utf-16' if hn != 'PAME' else 'ascii'
+
+            if v != 2: raise NotImplementedError(f'Unsupported version v{v}')
+            anc = 'anaconda_' if v == 1.5 else ''
+
+            c = 0
+            kids = {}
+            fs = []
+            while (f.pos + 8) < f.size:
+                id = f.readu16()
+                fl = f.readu16()
+                s = f.readu32()
+                fs.append((c,f.pos,id,fl,s))
+                if id in {0x2224,0x222E,0x223B,0x224F}:
+                    assert not fl & 2
+                    d = f.readc(s)
+                    if fl & 1:
+                        d = d[8:]
+                        assert d[0] == 0x78,hex(f.pos - s - 8)
+                        d = decompress(d,anc + ('zlib' if iszl(d) else 'deflate'))
+                    if fl >> 2: raise NotImplementedError(f'Unknown flag {bin(fl)} @ {f.pos - s - 8}')
+                    kids[id] = d
+                else: f.skip(s)
+                c += 1
+
+            if 0x224F in kids:
+                d = kids.pop(0x224F)
+                assert len(d) == 12
+                prb = int.from_bytes(d[:4],'little')
+            if prb > 285 or unp: ko = (0x2224,0x223B,0x222E)
+            else: ko = (0x222E,0x2224,0x223B)
+            key = decrypt(b''.join(kids.pop(x,b'') for x in ko),'mmfs_key')
+
+            ofis = {}
+            for ix,of,id,fl,s in fs:
+                f.seek(of)
+                d = f.readc(s)
+
+                if s > 0:
+                    if fl & 2:
+                        if fl & 1: d = d[4:]
+                        d = decrypt(d,'mmfs_286' if prb > 285 else 'mmfs_285',key,id)
+                        if fl & 1: d = d[4:]
+                    if fl & 1:
+                        if not fl & 2: d = d[8:]
+                        assert d[0] == 0x78,hex(of - 8)
+                        d = decompress(d,anc + ('zlib' if iszl(d) else 'deflate'))
+                    if fl >> 2: raise NotImplementedError(f'Unknown flag {bin(fl)} @ {of - 8}')
+                fn = f'{o}/$Chunks/{ix:03d}.{TMAP.get(id,f"{id:04X}")}'
+                writefile(fn,d)
+
+                if id in {0x5555,0x5556,0x5557,0x5558,
+                          0x6666,0x6667,0x6668,0x6669}:
+                    ofis[id] = fn
+
+            p = ThreadPool()
+            prcs = []
+            for bid in range(4):
+                if not (bid + 0x5555) in ofis or not (bid + 0x6666) in ofis: continue
+                od = File(ofis[bid + 0x5555],endian=f._end)
+                dd = File(ofis[bid + 0x6666],endian=f._end)
+                offs = sorted(set([od.readu32() - 0x104 for _ in range(od.size//4)]))
+                del od
+                while offs and offs[0] < 1: offs.pop(0)
+                if not offs:
+                    del dd
+                    continue
+                offs.append(dd.size)
+                def dec(id,d,bfn,bid):
+                    fn = ''
+                    if bid in {0,1,3}:
+                        d = d[8:]
+                        d = decompress(d,('zlib' if iszl(d) else 'deflate') if len(d) > 6 else 'none')
+                    elif bid == 2:
+                        d = d[12:]
+                        flg = d[0] & 0x20
+                        d = d[8:]
+                        nl = int.from_bytes(d[:4],'little')
+                        d = d[4:]
+                        if not flg:
+                            s = int.from_bytes(d[:4],'little')
+                            d = decompress(d[4:4+s],'zlib' if iszl(d[4:]) else 'deflate')
+                        if enc == 'utf-16': nl *= 2
+                        fn = d[:nl]
+                        while fn[-2 if enc == 'utf-16' else -1:] == b'\0\0': fn = fn[:-2 if enc == 'utf-16' else -1]
+                        fn,d = fn.decode('utf-16le' if enc == 'utf-16' else enc),d[nl:]
+                        if fn: fn += '_'
+                    writefile(f'{bfn}_ext/{fn}{id:03d}.{("image","font","wav","music")[bid]}',d)
+
+                for ix in range(len(offs) - 1):
+                    dd.seek(offs[ix])
+                    id = dd.readu32()
+                    if bid == 0 and prb >= 284: id -= 1
+                    elif bid == 1 and v >= 2 and prb < 284: id += 1
+                    elif bid in {2,3} and v >= 2.5: id -= 1
+                    prcs.append(p.apply_async(dec,(id,dd.readc(offs[ix+1] - offs[ix] - 4),ofis[bid + 0x6666],bid)))
+                del dd
+            for pc in prcs: pc.get()
+            p.close()
+            p.join()
+
+            f.close()
+            if listdir(o): return
 
     return 1

@@ -15,6 +15,7 @@ def reflecti(v:int,w:int):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
+def rotate8(v:int): return ((v << 7) & maskb(1)) | (v >> 1)
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
@@ -473,6 +474,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = GDEFLATE.DecompressData(ibuf,isz,obuf,us)
             if r == 0: raise ValueError('Failed to decompress')
             return bytes(obuf)
+        case 'anaconda_deflate': return ananconda_decompress(i)
+        case 'anaconda_zlib':
+            if i[1] & 0x20: i = i[6:]
+            else: i = i[2:]
+            return ananconda_decompress(i)
     raise NotImplementedError(algo)
 CRC8 = {   #  poly,init,xor ,reflect
  'tech_3250':(0x1D,0xFF,0x00,True ),
@@ -666,6 +672,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             return (len(i) << 32) | zlib.crc32(i,value=kwargs.get('value') or 0)
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
+MMFS_DEC = {}
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
@@ -802,6 +809,39 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             key = [iv[3],key[0],iv[1],key[1],iv[0],key[2],iv[2],key[3]]
             for ix,b in enumerate(iv[4:]): key[ix % 8] ^= b
             return decrypt(i,'xor',bytes(key))
+        case 'mmfs'|'mmfs_285'|'mmfs_286':
+            assert type(key) == bytes
+            if not key in MMFS_DEC:
+                dec = bytearray(range(0x100))
+                hv = kp = ix2 = 0
+                for ix in range(0x100):
+                    hv = rotate8(hv)
+                    if hv == key[kp]: hv = kp = 0
+                    ix2 = (ix2 + (hv ^ key[kp]) + dec[ix]) & maskb(1)
+                    dec[ix2],dec[ix] = dec[ix],dec[ix2]
+                    kp += 1
+                MMFS_DEC[key] = dec
+
+            d = bytearray(i)
+            if algo == 'mmfs_286' and iv & 1:
+                if isinstance(iv,int): iv = iv.to_bytes(2,'little')
+                assert len(iv) == 2
+                d[0] ^= iv[0] ^ iv[1]
+
+            tmp = MMFS_DEC[key].copy()
+            ix1 = ix2 = 0
+            for ix in range(len(i)):
+                ix1 = (ix1 + 1) & maskb(1)
+                ix2 = (ix2 + tmp[ix1]) & maskb(1)
+                tmp[ix1],tmp[ix2] = tmp[ix2],tmp[ix1]
+                d[ix] ^= tmp[(tmp[ix1] + tmp[ix2]) & maskb(1)]
+
+            return bytes(d)
+        case 'mmfs_key':
+            key = bytearray(i.replace(b'\0',b''))[:128] + b'\0'*128
+            if len(i) < 255: key[len(i) + 1] = sum(b * 2 for b in i) & maskb(1)
+            return bytes(key)
+
     raise NotImplementedError(algo)
 
 class Huffman:
@@ -1140,6 +1180,159 @@ def lz4_fast_decompress(d:bytes,usize:int=None):
     except IndexError: pass
         
     return bytes(ob[:usize])
+class AnacondaDecoder:
+    def __init__(self,d:bytes):
+        self.d = d
+        self.p = 0
+        self.bit_accum = 0
+        self.cnb = 0
+        self.o = bytearray()
+
+    def _get_bits(self,bits:int):
+        while self.cnb < bits:
+            if self.p >= len(self.d): raise EOFError("Unexpected end of compressed data stream")
+            self.bit_accum |= (self.d[self.p] << self.cnb)
+            self.cnb += 8
+            self.p += 1
+
+        val = self.bit_accum & ((1 << bits) - 1)
+        self.bit_accum >>= bits
+        self.cnb -= bits
+        return val
+    def _gen_huffman_table(self,syms:int,lngs:list[int]):
+        lngc = [0] * 0x10
+        for length in lngs:
+            if length > 0: lngc[length] += 1
+        fstc = [0] * 0x10
+        for i in range(1, 16): fstc[i] = (fstc[i - 1] + lngc[i - 1]) << 1
+
+        tbl = [0] * 0x800
+        ix = 0
+        for i in range(1, 16):
+            code_limit = 1 << i
+            next_code = fstc[i] + lngc[i]
+            next_index = ix + (code_limit - fstc[i])
+
+            for j in range(syms):
+                if lngs[j] == i:
+                    tbl[ix] = j
+                    ix += 1
+            for j in range(next_code, code_limit):
+                tbl[ix] = ~next_index
+                ix += 1
+                next_index += 2
+
+        return tbl
+    def _get_huff(self,tbl:list[int]):
+        bp = 0
+        ix = 0
+        while True:
+            if self.cnb <= bp:
+                if self.p >= len(self.d): raise EOFError("Unexpected end of compressed data stream")
+                self.bit_accum |= (self.d[self.p] << self.cnb)
+                self.cnb += 8
+
+            b = (self.bit_accum >> bp) & 1
+            bp += 1
+            ix += b
+
+            if tbl[ix] >= 0: break
+            ix = ~tbl[ix]
+
+        self.bit_accum >>= bp
+        self.cnb -= bp
+        return tbl[ix]
+
+    def decode(self) -> bytes:
+        final = False
+        codelen_order = [18,17,16,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+
+        while not final:
+            block_type_raw = self._get_bits(4)
+            final = (block_type_raw >> 3) != 0
+            block_type = block_type_raw & mask(3)
+
+            type_map = {7:0,5:1,6:2}
+            block_type = type_map.get(block_type, 3)
+
+            if block_type == 3: raise ValueError("Invalid Anaconda block type encountered")
+
+            if block_type == 0:
+                self.cnb = 0
+                self.bit_accum = 0
+                lng = self._get_bits(16)
+
+                self.o.extend(self.d[self.p:self.p + lng])
+                self.p += lng
+                continue
+
+            if block_type == 2:
+                literal_count = self._get_bits(5) + 0x101
+                distance_count = self._get_bits(5) + 1
+                code_len_count = self._get_bits(4) + 4
+
+                cdln = [0] * 19
+                for i in range(code_len_count):
+                    cdln[codelen_order[i]] = self._get_bits(3)
+                code_len_table = self._gen_huffman_table(19, cdln)
+
+                lengths = [0] * (literal_count + distance_count)
+                c = 0
+                while c < literal_count + distance_count:
+                    sym = self._get_huff(code_len_table)
+                    if sym < 16:
+                        lengths[c] = sym
+                        c += 1
+                    elif sym == 16:
+                        repeat_count = self._get_bits(2) + 3
+                        val = lengths[c - 1] if c else 0
+                        for _ in range(repeat_count):
+                            lengths[c] = val
+                            c += 1
+                    elif sym == 17:
+                        repeat_count = self._get_bits(3) + 3
+                        for _ in range(repeat_count):
+                            lengths[c] = 0
+                            c += 1
+                    elif sym == 18:
+                        repeat_count = self._get_bits(7) + 11
+                        for _ in range(repeat_count):
+                            lengths[c] = 0
+                            c += 1
+
+                lit_tbl = self._gen_huffman_table(literal_count, lengths[:literal_count])
+                dist_tbl = self._gen_huffman_table(distance_count, lengths[literal_count:])
+            else:
+                fix_lit_lng = [8]*0x90 + [9]*0x70 + [7]*0x18 + [8]*8
+                fix_dist_lng = [5]*0x20
+                lit_tbl = self._gen_huffman_table(0x120, fix_lit_lng)
+                dist_tbl = self._gen_huffman_table(0x20, fix_dist_lng)
+
+            while True:
+                sym = self._get_huff(lit_tbl)
+                if sym < 0x100: self.o.append(sym)
+                elif sym == 0x100: break
+                else:
+                    if sym <= 0x108: rep_l = (sym - 0x101) + 3
+                    elif sym <= 0x11C:
+                        lng_bits = (sym - 0x105) // 4
+                        rep_l = self._get_bits(lng_bits) + 3 + ((4 + ((sym - 0x109) & 3)) << lng_bits)
+                    elif sym == 0x11D: rep_l = 0x102
+                    else: raise ValueError("Invalid length symbol encountered.")
+
+                    dist_sym = self._get_huff(dist_tbl)
+                    if dist_sym <= 3: dist = dist_sym + 1
+                    elif dist_sym <= 29:
+                        dist_bits = (dist_sym - 2) // 2
+                        dist = self._get_bits(dist_bits) + 1 + ((2 + (dist_sym & 1)) << dist_bits)
+                    else: raise ValueError("Invalid distance symbol encountered.")
+
+                    if dist > len(self.o): raise ValueError("Invalid distance calculation; exceeds available output buffer.")
+
+                    for _ in range(rep_l): self.o.append(self.o[-dist])
+
+        return bytes(self.o)
+def ananconda_decompress(data:bytes): return AnacondaDecoder(data).decode()
 
 def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None):
     crc = init if value is None else (value ^ xor)
