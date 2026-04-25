@@ -33,6 +33,7 @@ PlayStation 4 SELF | * | https://www.playstation.com/en-us/support/hardware/ps4/
 SecuROM | .exe | https://archive.org/download/The_Great_Escape_USA | ? | https://www.cdmediaworld.com/hardware/cdrom/cd_utils_8.shtml#UnSecuromNT | detected
 Warp | .exe | ? | https://github.com/dgiagio/warp | ? |
 Pixar USD Crate | .usd .usdc | RTX Remix | https://openusd.org/ | https://openusd.org/release/toolset.html#usdcat | detected
+CD-i Realtime File | .rti .rtf .rtr | CD-i games | [interview](#cd-i-rtf-dev-interview)<br>http://www.icdia.co.uk/docs/cdi_may94_r2.pdf<br>http://www.icdia.co.uk/sw_disc/index.html | https://github.com/ogarvey/OGLibCD-iRS |
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
@@ -40,3 +41,20 @@ Pixar USD Crate | .usd .usdc | RTX Remix | https://openusd.org/ | https://openus
 - lib/file.py:crc_hash DJB2
 - lib/file.py:crc_hash City/Farm Hash
 - lib/file.py:crc_hash Blake3
+- RE Engine PAK: ree.unpacker -> Custom
+- Xenoblade Chronicles X DE ARH2: xbxdetool -> Custom
+
+
+### CD-i RTF dev interview:
+> Q: what is a .rtr file?
+>
+> A:
+> The .rtr format is different from the rtf, it's basically a "script" to build an rtf and will not be found on any disc (although the extension .rtr is sometimes used, but the format will be rtf).<br>
+> Try the rfd tool in MAC/TOOLS/rfd on the CDISC4 disc, the rfd.doc file talks about rtr files (you can open the disc image with IsoBuster).<br>
+> There's also something called rrb which seems to be something similar. Never used either of those, we built our disc images using "master" and rtf files using "green" or "master -g" (which takes the same syntax), and these use textual script files (description is somewhere on ICDIA as well).
+
+> Q: does the rtf format have any standards at all for file separation or is it completely up to the developers and whatever scripts they made? And if so, is there maybe some common/standard script?
+> 
+> A:
+> Rtf is basically just raw disc sectors so only the green book restrictions apply, and for custom data formats you’re on your own. I do not think there is a standard script, we at least didn’t use one. There might be be some studio-specific common formats, e.g. the “blocks” format used by SPC, but those are invariably very flexible (otherwise they could not be “common”).<br>
+> Green book suggests placing different “subfiles” in different channels within a record (terminated by an EOR bit in the submode byte), using the TRG bit for triggers and using the coding byte to indicate the data type. However, except for real-time played audio the coding byte is completely ignored by the system so developers often played games with it or didn’t properly set it. The submode, on the other hand, specifies actual behavior so is normally set correctly.

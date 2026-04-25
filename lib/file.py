@@ -389,7 +389,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             lvl = i[13]
             if 10 < lvl < 1: raise ValueError(f'invalid uclpack level ({lvl})')
             blks = int.from_bytes(i[14:18],'big')
-            if not itc and 0x800000 < blks < 0x400: raise ValueError(f'invalid uclpack block size ({blks})')
+            if (not itc) and (0x800000 < blks or blks < 0x400): raise ValueError(f'invalid uclpack block size ({blks})')
 
             p = 0x12
             ics = len(i)
@@ -1079,7 +1079,7 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
             c = d.get_bits(bit_width)
             if c is None or c == eof: break
             seq = dic[c]
-            d.append(seq)
+            o.append(seq)
             prev_seq = seq
             continue
 
@@ -1087,13 +1087,13 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
         elif c == nxt: seq = prev_seq + prev_seq[:1]
         else: raise ValueError(f"Invalid LZW code encountered: {c}")
 
-        d.append(seq)
+        o.append(seq)
         if nxt < max_dict:
             dic[nxt] = prev_seq + seq[:1]
             nxt += 1
         prev_seq = seq
 
-    return b"".join(d)
+    return b"".join(o)
 def ash0_decompress(i:bytes):
     if len(i) < 12 or i[:4] != b'ASH0': return b''
     decomp_size = int.from_bytes(i[5:8],'big')

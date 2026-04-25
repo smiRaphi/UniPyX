@@ -837,7 +837,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                writefile(f'{o}/{fe[0]}',f.readc(fe[2]))
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
 
             f.close()
             if fs: return
@@ -1167,7 +1167,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import decompress
             d = readfile(i).split(b'ASH0')[1:]
             assert len(d) == 4
-            for ix,n in ((0,'thumbnail0.tnl'),(1,'course_data.cdt'),(2,'course_data_sub.cdt'),(3,'thumbnail1.tnl')):
+            for ix,n in enumerate(('thumbnail0.tnl','course_data.cdt','course_data_sub.cdt','thumbnail1.tnl')):
                 dd = decompress(b'ASH0' + d[ix],'ash0')
                 writefile(o + '/' + n,dd)
             return
