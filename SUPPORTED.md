@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 895
+# Supported Formats: 896
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -337,7 +337,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (450)
+## Various (451)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -675,6 +675,7 @@ Roblox Flag Cache | .cache | Custom |
 ROFS Volume | .cvm | [cvm_tool](https://github.com/mchubby/RE-games-attic/tree/master/sega-nextech/cvm_tool%20%5Broxfan%5D) -> ISO |
 RouterOS Package | .npk | [npkpy](https://pypi.org/project/npkPy/) |
 RPG Maker Archive | ??? | Custom |
+RTL Ski Jumping 2002 PAK | .pak | Custom |
 RTX Remix Package | .pkg | Custom |
 Safari WebArchive | ??? | [pywebarchive](https://pypi.org/project/pywebarchive/) |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |

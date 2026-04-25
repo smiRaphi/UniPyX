@@ -112,5 +112,26 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'RTL Ski Jumping 2002 PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decode
+            f = File(i,endian='<')
+
+            f.seek(4)
+            c = f.readu32()*0x800//0x50
+            f.seek(0)
+            fs = []
+            for _ in range(c):
+                zs,off = f.readu32(),f.readu32()
+                if off == 0: break
+                f.skip(4)
+                fs.append((zs,off * 0x800,f.readu32(),decode(f.read(0x40).rstrip(b'\0'),'latin-1c')))
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[3],f.decompress(fe[0],'rtl_lz' if fe[0] != fe[2] else 'none'))
+
+            f.close()
+            if fs: return
 
     return 1

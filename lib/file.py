@@ -428,6 +428,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if cs == len(i): cs -= 8
             if cs != len(i) - 8: raise ValueError("Invalid compressed size")
             return lzss8_decompress(i[8:8+cs],usize=us)
+        case 'rtl_lz': return rtl_lz_decompress(i,usize=kwargs.get('usize'))
 
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
@@ -1333,6 +1334,51 @@ class AnacondaDecoder:
 
         return bytes(self.o)
 def ananconda_decompress(data:bytes): return AnacondaDecoder(data).decode()
+def rtl_lz_decompress(i:bytes,usize:int=None):
+    if usize is None: usize,i = int.from_bytes(i[:8],byteorder="little"),i[8:]
+
+    p = 0
+    o = bytearray()
+    while len(o) < usize:
+        tok = i[p];p += 1
+        if 0x20 > tok:
+            if tok == 0:
+                tok = i[p];p += 1
+                if tok == 0:
+                    s = int.from_bytes(i[p:p + 2],'little');p += 2
+                    if s == 0: break
+                    o.extend(i[p:p + s]);p += s
+                else:
+                    tok += 0x1F
+                    o.extend(i[p:p + tok]);p += tok
+            else: o.extend(i[p:p + tok]);p += tok
+        elif 0x40 > tok >= 0x20:
+            c = tok - 0x20
+            if c == 0:
+                tok = i[p];p += 1
+                c = tok + 0x20
+            o.extend([0]*c)
+        elif 0x80 > tok >= 0x40:
+            tok4 = tok & 0x0F
+            if tok4 == 0:
+                l = int.from_bytes(i[p:p + 2],'little');p += 2
+                of = int.from_bytes(i[p:p + 2],'little');p += 2
+                while tok & 0x30:
+                    o.append(i[p]);p += 1
+                    tok -= 0x10
+                o.extend(o[-l-of+1:(-of+1) or None])
+            else:
+                of = int.from_bytes(i[p:p + 2],'little');p += 2
+                while tok & 0x30:
+                    o.append(i[p]);p += 1
+                    tok -= 0x10
+                o.extend(o[-of-tok4-2+1:(-of+1) or None])
+        elif tok >= 0x80:
+            if tok & 0x40: o.extend(i[p:p + 2]);p += 2
+            of = (tok & 0x3F)*2 + 2
+            o.extend(o[-of:(-of+2) or None])
+
+    return bytes(o)
 
 def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None):
     crc = init if value is None else (value ^ xor)
@@ -1420,7 +1466,9 @@ def tea_decrypt(i:bytes,k:bytes,le=False):
     for ix in range(0,len(i),2): i[ix:ix+2] = dec_blk(i[ix:ix+2])
     return struct.pack(f'{e}{len(i)}I',*i)
 
-N64CHM = (
+def __chmr(*i:tuple[int,int]): return set(sum([list(range(a,b)) for a,b in i],[]))
+CHMS = {
+'n64mpak':(
     '\0' + '\0'*14 + ' '
     '0123456789ABCDEF'
     'GHIJKLMNOPQRSTUV'
@@ -1431,12 +1479,32 @@ N64CHM = (
     'ムメモヤユヨラリルレロワガギグゲ'
     'ゴザジズゼゾダヂヅデドバビブベボ'
     'パピプペポ'
+),'n64mpak?r':__chmr((1,0x0F),(149,0x100)),
+'latin1c':(
+    '\0' + 'ÿ'*0x1F +\
+    ' !"#$%&\'()*+,-./'
+    '0123456789:;<=>?'
+    '@ABCDEFGHIJKLMNO'
+    'PQRSTUVWXYZ[\\]^_'
+    '`abcdefghijklmno'
+    'pqrstuvwxyz{|}~▒'\
+    +'▯'*0x20+\
+    ' ¡¢£¤¥¦§¨©ª«¬—®¯'
+    '°±²³´µ¶·¸¹º»¼½¾¿'
+    'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ'
+    'ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß'
+    'àáâãäåæçèéêëìíîï'
+    'ðñòóôõö÷øùúûüýþÿ'
 )
-def decode_n64_mpak(i:bytes):
+}
+def decode(i:bytes,algo:str):
+    algo = algo.lower().replace('-','').replace('_','')
+    ct = CHMS[algo]
+    it = CHMS.get(algo + '?r',set())
     o = []
-    for b in i:
-        assert b < len(N64CHM) and (b >= 0x0F or b == 0)
-        o.append(N64CHM[b])
+    for ix,b in enumerate(i):
+        if b in it: raise UnicodeDecodeError(algo,i,ix,ix+1,'invalid character')
+        o.append(ct[b])
     return ''.join(o)
 
 import os,time

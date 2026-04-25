@@ -357,6 +357,11 @@
         "rs":"Silent Hill PAK","s":1
     },
     {
+        "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["str0",16,64,7],["n0",4,80],["n0",4,84],["n0",4,88],["n0",4,92],["str0",96,64,7],
+             ["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(4),'little');f.seek(80);o=(o+2047)//2048+fo\nfor _ in range((fo-1)*2048//80):\n cs=(int.from_bytes(f.read(4),'little')+2047)//2048;co=int.from_bytes(f.read(4),'little')\n if o!=co:return\n o+=cs;f.seek(72,1)\nreturn True"]],
+        "rs":"RTL Ski Jumping 2002 PAK"
+    },
+    {
         "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]<=f.read(1)[0]"]],
         "rs":"BCH","s":1
     },
