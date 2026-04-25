@@ -19,7 +19,10 @@ def rotate8(v:int): return ((v << 7) & maskb(1)) | (v >> 1)
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
-        if type(f) == str: f = open(f,mode.rstrip('b') + 'b')
+        self.name = None
+        if type(f) == str:
+            self.name = f
+            f = open(f,mode.rstrip('b') + 'b')
         elif type(f) == bytes: f = io.BytesIO(f)
         self._f = f
         self._end = endian

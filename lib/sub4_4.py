@@ -133,5 +133,106 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'mTropolis MPL':
+            if db.print_try: print('Trying with custom extractor')
+            from datetime import datetime
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu16() == 1 and f.readu16() == 0xA5A5 and f.readu16() == 0xAA55
+            f.padc(2)
+
+            OFS = {}
+            def get_fl(id) -> File:
+                if id not in OFS:
+                    dn = dirname(i)
+                    bn = OFS[-1].replace('\0',str(id))
+                    pcs = [dn + '/' + x for x in listdir(dn) if noext(x).upper() == bn and x.lower().endswith('.mpx')]
+                    if pcs: OFS[id] = File(pcs[0],endian=f._end)
+                    else:
+                        print(f'WARNING: {dirname(i)}/{bn}.* not found! skipping entries')
+                        OFS[id] = None
+                return OFS[id]
+
+            FS = []
+            def readb(f:File):
+                id = f.readu32()
+                f.skip(6)
+                s = f.readu32()
+                ep = f.pos + s
+
+                match id:
+                    case 1000:
+                        stc = f.readu32()
+                        f.skip(2)
+                        sgc = f.readu16()
+                        for _ in range(stc):
+                            n = f.readc(0x10).rstrip(b'\0').decode('ascii')
+                            ct,cd = f.readu16('>'),f.readu16('>')
+                            tm = datetime(1980 + ((cd >> 9) & 0x7F),(cd >> 5) & 0xF,cd & 0x1F,(ct >> 11) & 0x1F,(ct >> 5) & 0x3F,(ct & 0x1F) * 2)
+                            assert f.readc(4) == b'eStr'
+                            FS.append((n,f.readu16(),f.readu32(),f.readu32(),tm.timestamp()))
+                            assert sgc >= FS[-1][1] > 0
+
+                        cid = f.readu32()
+                        assert str(cid) in tbasename(i)
+                        OFS[-1] = tbasename(i).replace(str(cid),'\0')
+                        OFS[cid] = f
+                    case 1002:
+                        while f.pos < ep: readpb(f)
+                    case _: raise NotImplementedError(f'{id} ({s}) {f.name} @ 0x{f.pos - 14:08X}')
+
+                if ep > f.pos: f.seek(ep)
+            def readpb(f:File):
+                f.padc(2)
+                f.seek(f.readu32())
+                readb(f)
+
+            readpb(f)
+            for ix,fe in enumerate(FS):
+                cf = get_fl(fe[1])
+                if not cf: continue
+                cf.seek(fe[2])
+                if fe[3] == 0: continue
+                fn = f'{o}/{ix:03d}.{fe[0]}'
+                writefile(fn,cf.readc(fe[3]))
+                set_ctime(fn,fe[4])
+
+            for x in OFS:
+                if x != -1 and OFS[x]: OFS[x].close()
+            if FS: return
+        case 'mTropolis MDM':
+            TMAP = {
+                1:'spr',
+                3:'anim',
+                4:'snd',
+                5:'pal',
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'MDM!' and f.readu16() == f.readu16() == 0x100
+
+            f.seek(f.readu32())
+            f.padc(8)
+            f.skip(4)
+            c = f.readu32()
+            while f:
+                if f.reads32() == -1: break
+            else:
+                f.close()
+                return 1
+
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32(),f.readu32(),f.readu32()))
+                f.padc(4)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[2])
+                writefile(f'{o}/{ix:02d}.{TMAP.get(fe[1],f"{fe[1]:02d}")}',f.readc(fe[0]))
+
+            f.close()
+            if fs: return
 
     return 1

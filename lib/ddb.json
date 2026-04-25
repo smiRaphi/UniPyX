@@ -362,6 +362,10 @@
         "rs":"RTL Ski Jumping 2002 PAK"
     },
     {
+        "d":[["isat","MDM!\\0\\1\\0\\1",0],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);d=f.seek(int.from_bytes(f.read(4),'little'));return f.read(8)==b'\\0'*8 and(d+8+int.from_bytes(f.read(4),'little'))==(d+56+int.from_bytes(f.read(4),'little')*16)==s"]],
+        "rs":"mTropolis MDM","s":1
+    },
+    {
         "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]<=f.read(1)[0]"]],
         "rs":"BCH","s":1
     },
