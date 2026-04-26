@@ -321,5 +321,50 @@ def extract4_4(inp:str,out:str,t:str):
             sys.setrecursionlimit(rcbkv)
             f.close()
             if listdir(o): return
+        case 'Xenoblade Chronicles X DE ARH2':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,HashLib
+            hl = HashLib.dl('xbxde',db,fmt=lambda x:x.lower(),encoding='ascii')
+            f = File(i,endian='<')
+            assert f.read(4) == b'arh2'
+
+            c = f.readu32()
+            a = f.readu32()
+            f.padc(4)
+            fs = [(f.readu64(),f.readu32(),f.readu32()) for _ in range(c)]
+            f.close()
+
+            fd = File(noext(i) + '.ard',endian=f._end)
+            hl.wait()
+            for fe in fs:
+                fn = hl.get(fe[0])
+                if fe[1] != fe[2]:
+                    bp = fd.pos
+                    if fd.read(4) != b'xbc1' or fe[1] <= 0x30:
+                        if fe[2] == 0:
+                            fd.back(4)
+                            d = fd.readc(fe[1])
+                        else: raise ValueError(f'Invalid xbc1 header size={fe[1]} usize={fe[2]} @ 0x{bp:08X}')
+                    else:
+                        ct = fd.readu32()
+                        us = fd.readu32() or fe[2]
+                        assert fe[2] == 0 or fe[2] == us,f'{fe[2]} != {us} @ 0x{bp:08X}'
+                        zs = fd.readu32()
+                        fd.skip(0x20)
+                        d = fd.decompress(zs,(0,'zlib',0,'zstd')[ct],usize=us)
+                        assert len(d) == us,f'{us} != {len(d)} @ 0x{bp:08X}'
+                        fd.seek(bp + fe[1])
+                else: d = fd.readc(fe[1])
+                if not fn:
+                    fn = f'$unk/{fe[0]:016X}.'
+                    if d[:4] in {b'xbc1','arh2',b'LAHD',b'LAFT',b'LAGP',b'CES\0',b'CEA\0',b'efb0',b'HCPS',b'DLGT'}: fn += d[:3].decode('ascii').lower()
+                    elif d[:4] in {b'BC\0\0',b'SB  '}: fn += d[:2].decode('ascii').lower()
+                    elif d[:4] == b'1RAS': fn += 'ras'
+                    else: fn += guess_ext(d)
+                writefile(o + '/' + fn,d)
+                fd.align(a)
+
+            fd.close()
+            if fs: return
 
     return 1

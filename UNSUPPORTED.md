@@ -42,8 +42,6 @@ CD-i Realtime File | .rti .rtf .rtr | CD-i games | [interview](#cd-i-rtf-dev-int
 - lib/file.py:crc_hash City/Farm Hash
 - lib/file.py:crc_hash Blake3
 - RE Engine PAK: ree.unpacker -> Custom
-- Xenoblade Chronicles X DE ARH2: xbxdetool -> Custom
-
 
 ### CD-i RTF dev interview:
 > Q: what is a .rtr file?

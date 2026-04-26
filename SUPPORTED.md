@@ -781,7 +781,7 @@ X-Files Resources | ??? | Custom |
 Xbox FArc | .fa | Custom |
 Xbox XB Compressed | .xb * | xbdecompress |
 XBP | .xbp | [xbp.bms](https://reshax.com/topic/18058-ripping-sounds-from-fuzion-frenzy-xbox/) |
-Xenoblade Chronicles X DE ARH2 | .arh+.ard | [XbxDeTool](https://github.com/Nenkai/XbxDeTool) |
+Xenoblade Chronicles X DE ARH2 | .arh+.ard | Custom |
 Xenonauts PFP | .pfp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 XNB | .xnb | [xnb.bms](https://mirror.aluigi.org/bms/xnb.bms) |
 XNB Dictionary | ??? | Custom |
