@@ -366,5 +366,69 @@ def extract4_4(inp:str,out:str,t:str):
 
             fd.close()
             if fs: return
+        case 'Harry Potter and the Deathly Hallows BIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            ss = f.readu32()
+            c = f.readu32()
+            sd = {f.readu32():f.read0s('ascii') for _ in range(c)}
+            f.seek(4 + ss)
+            f.skip(f.readu32()*4)
+
+            c = f.readu32()
+            fs = []
+            uc = 0
+            for _ in range(c):
+                fe = [f.readu32()]
+                f.skip(4)
+                fe.append(f.readu32())
+                f.skip(4)
+                fe.append(f.readu32())
+                sk = f.readu32()
+                uc += f.readu32()
+                f.padc(12)
+                if not sk: fs.append(fe)
+
+            f.skip(uc * 4)
+            for fe in fs:
+                ex,fn = sd[fe[0]].split(':',1)
+                fn += '.' + ex
+                if fe[2]: writefile(f'{o}/{fn}.header',f.readc(fe[2]))
+                writefile(o + '/' + fn,f.readc(fe[1]))
+                f.skip(-fe[1]%0x10)
+
+            f.close()
+            if fs: return
+        case 'Project IGI Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'ILFF'
+
+            ep = f.readu32()
+            f.skip(8)
+            assert f.read(4) == b'IRES'
+            fn = None
+            while f.pos < ep:
+                bn = f.read(4)
+                bs = f.readu32()
+                f.skip(4)
+                s = f.readu32()
+                if s == 0: s = bs
+                else: s -= 0x10
+                bp = f.pos
+
+                if bn == b'NAME': fn = f.readc(bs).rstrip(b'\0').decode('ascii').replace(':','/')
+                elif bn == b'BODY':
+                    assert fn is not None
+                    writefile(o + '/' + fn,f.readc(bs))
+                    fn = None
+                else: raise NotImplementedError(f'{bn.decode("ascii")} @ 0x{bp-0x10:08X}')
+                f.seek(bp + s)
+
+            f.close()
+            if listdir(o): return
 
     return 1

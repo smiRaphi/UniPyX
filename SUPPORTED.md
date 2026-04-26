@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 899
+# Supported Formats: 901
 
 ## "Common" Archives/Compressors/Encodings (136)
 Name | Extension(s) | Extractor(s) | Comment
@@ -337,7 +337,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (454)
+## Various (456)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -518,6 +518,7 @@ Haemimont Games HPK | .hpk | [Game Extractor Server](https://github.com/Sembianc
 Halloween Harry Bank | .bnk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Harry Potter and Prisoner of Azkaban IDS | .ids | Custom |
 Harry Potter and Prisoner of Azkaban SDT | .sdt | Custom |
+Harry Potter and the Deathly Hallows BIN | .bin | Custom |
 Harry Potter: Quidditch World Cup CCD | .ccd | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Hatch Game Engine HATCH | .hatch | Custom | 
 Hatch Game Engine HMAP | .hmap | Custom |
@@ -650,6 +651,7 @@ PlayStation SFO | .sfo | Custom |
 PlayStation Trophy File | .trp | Custom |
 PlayStation V2 Trophy File | .ucp | Custom |
 Pokemon FSYS | .fsys | [gcfsysd](https://www.hcs64.com/vgm_ripping.html) |
+Project IGI Resource | .res | Custom |
 PS2 Memory Card | ??? | [mymc](http://www.csclub.uwaterloo.ca:11068/mymc/) |
 PS3/PSV PUP | .pup | Custom |
 Pseudo Interactive PIX | .pix | Custom |

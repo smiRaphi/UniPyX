@@ -914,6 +914,10 @@
         "rs":"CSI NY GRF","s":1
     },
     {
+        "d":[["s%",4],["isatS","\\0",4,8],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');f.seek(o+3)\nif f.read(1)!=b'\\0':return\nc1=int.from_bytes(f.read(4),'little');f.seek(c1*4,1);return (c1+int.from_bytes(f.read(4),'little'))==c"]],
+        "rs":"Harry Potter and the Deathly Hallows BIN"
+    },
+    {
         "d":[["isat","\\x7F\\x43\\x4E\\x54\\x40\\0\\0\\1",0],["isat","\\0\\0\\1",5],["isin",["\\0","\\x40"],4]],
         "rs":"PS4 PKG","s":1
     },
