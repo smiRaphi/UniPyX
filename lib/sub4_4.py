@@ -234,5 +234,92 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Lego Creator QUBE':
+            rcbkv = sys.getrecursionlimit()
+            sys.setrecursionlimit(20000)
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            DN = set()
+            def readv(mx:int):
+                ty = f.reads(1,'ascii')
+                match ty:
+                    case 'i': return f.readu32()
+                    case 's': return f.readu16()
+                    case '[':
+                        l = f.readu32()
+                        sty = f.reads(1,'ascii')
+                        if not sty in 'B': raise NotImplementedError(f'{ty}.{sty} @ 0x{f.pos-6:08X}')
+                        v = f.readc(l)
+                        return v
+                    case '@':
+                        v = []
+                        while f.pos < mx: v.append(readv(mx))
+                        return v
+                    case 'B':
+                        l = f.readu8()
+                        v = []
+                        for _ in range(l):
+                            if f.pos >= mx: break
+                            v.append(readv(mx))
+                        return v
+                    case 'F': return f.readf32()
+                    case 'D': return f.readf64()
+                    case '\0': return None
+                    case _: raise NotImplementedError(f'{ty} @ 0x{f.pos-1:08X}')
+            def readb(p:list[str]):
+                bp = f.pos
+                ty = f.readu16() & 0x7FFF
+                if ty != 15 and bp in DN: return
+                DN.add(bp)
+                f.skip(2)
+                s = f.readu32()
+                ep = bp + s
+                if f.readu32(): return
+                f.skip(4)
+                r = []
+                while f.pos < ep: r.append(readv(ep))
+
+                match ty:
+                    case 1:
+                        assert len(r) == 1 and type(r[0]) == list
+                        r = r[0]
+                        assert r[3].to_bytes(4,'little') == b'QUBE'
+
+                        f.seek(r[6])
+                        ep = r[6]+r[7]
+                        v = []
+                        while f.pos < ep: v.append(readv(ep))
+                        for ix,x in enumerate(v[2:]):
+                            f.seek(x)
+                            readb(p + [f'{ix:02d}'])
+                    case 2:
+                        if None in r:
+                            n = r[-1]
+                            assert type(n) == bytes,f'{ty} @ 0x{bp:08X}'
+                            if len(p) > 1: p.pop()
+                            p.append(n.rstrip(b'\0').decode('ascii'))
+                            assert p[-1].isprintable()
+                        mkdir('/'.join(p))
+                        for ix,x in enumerate(r):
+                            if x is None: break
+                            if x < BP or x >= f.size: continue
+                            f.seek(x)
+                            readb(p + [f'{ix:02d}'])
+                    case 15:
+                        if len(r) == 3 and type(r[2]) == bytes and r[0] == len(r[2]): writefile('/'.join(p) + '.' + guess_ext(r[2]),r[2])
+                        else: writefile('/'.join(p) + '.unk.txt',repr(r).replace('[','[\n').replace(']','\n]').encode('utf-8'))
+                    case _: raise NotImplementedError(f'{ty} @ 0x{bp:08X}')
+
+            f.seek(4)
+            BP = f.readu32()
+            f.seek(0)
+            readb([o])
+
+            sys.setrecursionlimit(rcbkv)
+            f.close()
+            if listdir(o): return
 
     return 1

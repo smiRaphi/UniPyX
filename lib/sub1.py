@@ -1,61 +1,5 @@
 from .main import *
 
-CTTR = {
-    'application/octet-stream':'bin',
-    'application/epub+zip':'epub',
-    'application/javascript':'js',
-    'application/java-archive':'jar',
-    'audio/mpeg':'mp3',
-    'audio/vorbis':'ogg',
-    'binary/octet-stream':'bin',
-    'image/jpeg':'jpg',
-    'image/svg+xml':'svg',
-    'image/vnd.adobe.photoshop':'psd',
-    'image/vnd.microsoft.icon':'ico',
-    'image/dicom-rle':'dcm',
-    'image/heic-sequence':'heic',
-    'image/heif-sequence':'heif',
-    'image/tiff-fx':'tif',
-    'image/tiff':'tif',
-    'model/gltf-binary':'gltf',
-    'model/gltf+json':'gltf',
-    'model/step+xml':'step',
-    'model/step+zip':'step',
-    'model/step-xml+zip':'step',
-    'model/vnd.gs-gdl':'gdl',
-    'model/vnd.moml+xml':'moml',
-    'model/vnd.usdz+zip':'usdz',
-    'model/vnd.valve.source.compiled-map':'bsp',
-    'model/x3d-vrml':'x3d',
-    'model/x3d+xml':'x3d',
-    'model/x3d+fastinfoset':'x3d',
-    'multipart/alternative':'bin',
-    'multipart/appledouble':'_',
-    'multipart/byteranges':'bin',
-    'multipart/digest':'bin',
-    'multipart/encrypted':'bin',
-    'multipart/form-data':'bin',
-    'multipart/header-set':'txt',
-    'multipart/mixed':'bin',
-    'multipart/multilingual':'txt',
-    'multipart/related':'bin',
-    'multipart/report':'bin',
-    'multipart/signed':'bin',
-    'multipart/x-mixed-replace':'bin',
-    'multipart/parallel':'bin',
-    'multipart/voice-message':'vpm',
-    'multipart/vnd.bint.med-plus':'bmed',
-    'text/plain':'txt',
-    'text/javascript':'js',
-    'text/ecmascript':'js',
-    'text/tab-separated-values':'tsv',
-    'video/3gpp':'3gp',
-    'video/matroska':'mkv',
-    'video/matroska-3d':'mkv',
-    'video/mpeg':'mpg',
-    'video/mpeg4-generic':'mp4',
-}
-
 def extract1(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
@@ -773,15 +717,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             fn = fn.strip().split()[0]
                             of += unquote_to_bytes(fn).decode(enc.decode('latin-1'))
                         else: of += unquote_to_bytes(rfn).decode('latin-1')
-            elif 'content-type' in hd:
-                of += tbasename(i) + '.'
-                ct = hd['content-type'].decode('latin-1').split(';')[0].lower()
-                if ct in CTTR: ct = CTTR[ct]
-                else:
-                    ct = ct.split('/')[1].split('+')[-1]
-                    if ct.startswith('x-'): ct = ct[2:]
-                    if ct.startswith('vnd.'): ct = ct[4:]
-                of += ct
+            elif 'content-type' in hd: of += tbasename(i) + '.' + mime2ext(hd['content-type'])
             else: of += basename(i)
 
             writefile(of,d)
@@ -936,15 +872,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                                     rfn = rfn.strip().split()[0]
                                     fn = unquote_to_bytes(rfn).decode(enc.decode('latin-1'))
                                 else: fn = unquote_to_bytes(rfn).decode('latin-1')
-                    elif 'content-type' in rhd:
-                        fn = 'content.'
-                        ct = rhd['content-type'].split(';')[0].lower()
-                        if ct in CTTR: ct = CTTR[ct]
-                        else:
-                            ct = ct.split('/')[1].split('+')[-1]
-                            if ct.startswith('x-'): ct = ct[2:]
-                            if ct.startswith('vnd.'): ct = ct[4:]
-                        fn += ct
+                    elif 'content-type' in rhd: fn = 'content.' + mime2ext(rhd['content-type'])
                     else: fn = 'content.bin'
 
                     ll = min(int(rhd.get('content-length',bp + p)),p-(f.tell()-bp))

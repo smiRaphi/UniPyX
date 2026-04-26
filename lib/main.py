@@ -818,6 +818,70 @@ def guess_ext_nds(d:bytes):
 
     return ext
 
+MIMEMP = {
+    'application/octet-stream':'bin',
+    'application/epub+zip':'epub',
+    'application/javascript':'js',
+    'application/java-archive':'jar',
+    'audio/mpeg':'mp3',
+    'audio/vorbis':'ogg',
+    'binary/octet-stream':'bin',
+    'image/jpeg':'jpg',
+    'image/svg+xml':'svg',
+    'image/vnd.adobe.photoshop':'psd',
+    'image/vnd.microsoft.icon':'ico',
+    'image/dicom-rle':'dcm',
+    'image/heic-sequence':'heic',
+    'image/heif-sequence':'heif',
+    'image/tiff-fx':'tif',
+    'image/tiff':'tif',
+    'model/gltf-binary':'gltf',
+    'model/gltf+json':'gltf',
+    'model/step+xml':'step',
+    'model/step+zip':'step',
+    'model/step-xml+zip':'step',
+    'model/vnd.gs-gdl':'gdl',
+    'model/vnd.moml+xml':'moml',
+    'model/vnd.usdz+zip':'usdz',
+    'model/vnd.valve.source.compiled-map':'bsp',
+    'model/x3d-vrml':'x3d',
+    'model/x3d+xml':'x3d',
+    'model/x3d+fastinfoset':'x3d',
+    'multipart/alternative':'bin',
+    'multipart/appledouble':'_',
+    'multipart/byteranges':'bin',
+    'multipart/digest':'bin',
+    'multipart/encrypted':'bin',
+    'multipart/form-data':'bin',
+    'multipart/header-set':'txt',
+    'multipart/mixed':'bin',
+    'multipart/multilingual':'txt',
+    'multipart/related':'bin',
+    'multipart/report':'bin',
+    'multipart/signed':'bin',
+    'multipart/x-mixed-replace':'bin',
+    'multipart/parallel':'bin',
+    'multipart/voice-message':'vpm',
+    'multipart/vnd.bint.med-plus':'bmed',
+    'text/plain':'txt',
+    'text/javascript':'js',
+    'text/ecmascript':'js',
+    'text/tab-separated-values':'tsv',
+    'video/3gpp':'3gp',
+    'video/matroska':'mkv',
+    'video/matroska-3d':'mkv',
+    'video/mpeg':'mpg',
+    'video/mpeg4-generic':'mp4',
+}
+def mime2ext(m:str):
+    if type(m) == bytes: m = m.decode('latin-1')
+    m = m.split(';')[0].lower()
+    if m in MIMEMP: return MIMEMP[m]
+    m = m.split('/')[1].split('+')[-1]
+    if m.startswith('x-'): m = m[2:]
+    if m.startswith('vnd.'): m = m[4:]
+    return m
+
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
     out = cleanp(out)
