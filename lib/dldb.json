@@ -5732,6 +5732,15 @@
     "xxhash":{
         "pip":"xxhash"
     },
+    "tapclean":{
+        "p":"TAPClean.exe",
+        "fs":[{
+            "u":"https://master.dl.sourceforge.net/project/tapclean/tapclean/TAPClean%200.38/tapclean-0.38-win.zip?viasf=1",
+            "x":{
+                "TAPClean.exe":"TAPClean.exe"
+            }
+        }]
+    },
     "wasm2c":{
         "p":"wasm2c.exe",
         "fs":[{

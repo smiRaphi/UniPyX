@@ -152,7 +152,7 @@ Atari ATR | .atr | [atr](https://github.com/jhallen/atari-tools) |
 Banjo Kazooie N64 ROM | .z64 | [bk_extract](https://github.com/MittenzHugg/bk_tools) |
 C64 IMG | .img .dsk .c64 | [c1541](https://github.com/VICE-Team/svn-mirror) |
 C64 LiBRary | .lbr | [DirMaster](https://style64.org/dirmaster) |
-C64 Tape | .tap | [DirMaster](https://style64.org/dirmaster) |
+C64 Tape | .tap | [TAPClean](https://sourceforge.net/projects/tapclean/) |
 CPC Plus IMG | ??? | Custom |
 Donkey Kong Banana Kingdom | ??? | Custom |
 Dr. Mario 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Dr. Mario 64 decomp YAML](https://github.com/AngheloAlf/drmario64/tree/master/config) |

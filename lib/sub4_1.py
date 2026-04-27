@@ -1741,8 +1741,4 @@ def extract4_1(inp:str,out:str,t:str):
                 json.dump(ob,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
 
-        case _:
-            from lib.sub4_2 import extract4_2
-            return extract4_2(inp,o,t)
-
     return 1

@@ -1,5 +1,12 @@
 from .main import *
 
+C64TM = {
+    'C64 ROM-TAPE HEADER':'header',
+    'PRG':'prg',
+    'C64 ROM-TAPE DATA':'dat',
+    'OCEAN/IMAGINE F1':'f1.prg',
+}
+
 def extract2(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
@@ -430,9 +437,45 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'ZArchive':
             run(['zarchive',i,o])
             if listdir(o): return
-        case 'C64 Tape'|'C64 LiBRary':
+        case 'C64 LiBRary':
             run(['dirmaster','/e',i],cwd=o)
             if listdir(o): return
+        case 'C64 Tape':
+            td = TmpDir(path=o)
+            tf = TmpFile('.exe',path=td.p)
+            tf.link(db.get('tapclean'))
+            if db.print_try: print('Trying with tapclean')
+            run([tf.p,'-t',i,'-doprg'],print_try=False)
+            tf.destroy()
+            if exists(td + '/tcreport.txt') and exists(td + '/prg') and listdir(td + '/prg'):
+                r = readfile(td + '/tcreport.txt','r')
+                for x in r.split('\n---------------------------------\n')[1:]:
+                    x = x.split('\n')
+                    assert x[0].startswith('Seq. no.: ') and x[1].startswith('File Type: '),seq
+                    seq = int(x[0][10:])
+                    ty = x[1][11:]
+                    if ty == 'PAUSE': continue
+                    assert x[3].startswith('LA: $'),seq
+                    dt = x[3].split()
+                    if x[4].startswith('File Name: '):
+                        rfn = x[4][11:]
+                        fn = f' [{"".join(x if x.isalnum() else "_" for x in rfn)}]'
+                    else: rfn = fn = ''
+
+                    fn = f'{td}/prg/{seq:03d} ({dt[1][1:]}-{dt[3][1:]}){fn}.prg'
+                    assert exists(fn),seq
+
+                    rp = ""
+                    dty = None
+                    for l in x:
+                        if l.startswith(' - File ID : REPEAT'): rp = "_REPEAT"
+                        elif l.startswith(' - DATA FILE type : '): dty = l[20:]
+
+                    nfn = f'{o}/{rfn}{"_" if rfn else ""}{seq:03d}{rp}.{C64TM.get(dty,C64TM.get(ty,ty))}'
+                    mv(fn,nfn)
+                td.destroy()
+                if listdir(o): return
+            td.destroy()
         case 'Encrypted GD-ROM':
             from bin.sgkey import SGKeys
 

@@ -2423,9 +2423,6 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
 
-        case _:
-            from lib.sub4_4 import extract4_4
-            return extract4_4(i,o,t)
     return 1
 
 def dnasoft_lzss_decrypt(i:bytes):

@@ -2145,8 +2145,4 @@ def extract4_2(inp:str,out:str,t:str):
 
                 return quickbms('luigi_mansion_dict')
 
-        case _:
-            from lib.sub4_3 import extract4_3
-            return extract4_3(inp,o,t)
-
     return 1

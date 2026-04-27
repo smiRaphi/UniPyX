@@ -2376,8 +2376,4 @@ def extract4(inp:str,out:str,t:str) -> bool:
             writefile(o + '/' + tbasename(i) + '.txt',d)
             return
 
-        case _:
-            from lib.sub4_1 import extract4_1
-            return extract4_1(i,o,t)
-
     return 1
