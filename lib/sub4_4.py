@@ -472,5 +472,36 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Gizmo Studios BOLT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'BOLT'
+
+            f.seek(0x18)
+            fdo = f.readu32()
+            f.seek(0x10)
+            ds = []
+            for _ in range(fdo//0x10-1):
+                f.skip(1)
+                c = f.readu24('>')
+                f.skip(4)
+                ds.append((c,f.readu32()))
+                f.padc(4)
+
+            for dix,de in enumerate(ds):
+                f.seek(de[1])
+                fs = []
+                for _ in range(de[0]):
+                    f.skip(4)
+                    fs.append((f.readu32(),f.readu32(),f.readu32()))
+
+                for fe in fs:
+                    f.seek(fe[1])
+                    d = f.read(fe[0]) # not f.readc!
+                    writefile(f'{o}/{dix:02d}/{fe[2]:08X}.{guess_ext(d)}',d)
+
+            f.close()
+            if ds: return
 
     return 1

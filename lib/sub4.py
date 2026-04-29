@@ -797,7 +797,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'The Sims FAR'|'Quake PAK'|'Quake 3D WAD'|'Agon Game Archive'|'Alien Vs Predator FFL'|'Allods 2 Rage Of Mages Resource'|\
              'American Conquest 2 GSC'|'ASCARON Entertainment CPR'|'Halloween Harry Bank'|'Battlezone 2 PAK'|'Dark Reign 2 ZWP'|\
-             'BioWare Entity Resource'|'Bloodrayne POD'|'Gizmo Studios BOLT'|'Broderbund Mohawk MHK'|'Chasm BIN'|'Novalogic PFF'|\
+             'BioWare Entity Resource'|'Bloodrayne POD'|'Broderbund Mohawk MHK'|'Chasm BIN'|'Novalogic PFF'|\
              'CI Games DPK'|'Creative Assembly PFH0'|'Dark Reign FTG'|'Destan 3DN'|'Digital Illusions PDT'|'7 Studios FS'|\
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
@@ -808,7 +808,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
                 'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
                 'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
-                'Gizmo Studios BOLT':'BLT_BOLT','Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
+                'Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
                 'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Digital Illusions PDT':'PDT_PDT1','Dynamix DYN':'DYN_DYNAMIX',
                 'Earth And Beyond MIX':'MIX_MIX1','Electronic Arts LIB':'LIB_EALIB','Empire Earth 1 SSA':'SSA_RASS','Ensemble Studios DRS':'DRS',
                 'Etherlords 2 Resource':'RES_8|RES','F.E.A.R. LTAR':'ARCH00_LTAR','Final Fantasy 7 LGP':'LGP','Holistic Design MUK':'MUK_MUKFILE',

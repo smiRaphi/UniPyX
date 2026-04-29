@@ -48,7 +48,7 @@ class File:
         return self.readc(n).decode(encoding)
     def readc(self,n:int=None):
         d = self.read(n)
-        if n is not None and len(d) != n: raise EOFError(f"Unexpected EOF @ 0x{self.pos - len(d):08X} - 0x{self.pos - len(d) + n:08X}")
+        if n is not None and len(d) != n: raise EOFError(f"Unexpected EOF ({len(d)} != {n}) @ 0x{self.pos - len(d):08X} - 0x{self.pos - len(d) + n:08X}")
         return d
     def padc(self,n:int): 
         if sum(self.readc(n)): raise ValueError(f"Unexpected Value in padding @ 0x{self.pos - n:08X} - 0x{self.pos:08X}")

@@ -513,7 +513,7 @@ GBA ADS MMSTR | .mmstr | [load_from_mmstr.py](https://github.com/Matt-Hurd/GBAVi
 GC opening.bnr | .bnr | [bnrtool](https://github.com/xchellx/bnrtool) |
 GDED Binary Format | .gde | Custom |
 GIANTS Archive | .gar | [gar.bms](https://github.com/TheMorc/LS09-things/blob/main/gar.bms) |
-Gizmo Studios BOLT | .blt | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Gizmo Studios BOLT | .blt | Custom |
 Glacier PKG Def | ??? | [rpkg](https://github.com/glacier-modding/RPKG-Tool) |
 Glacier RPKG | .rpkg | [rpkg](https://github.com/glacier-modding/RPKG-Tool) |
 God of Thunder Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/desktop/) |
