@@ -134,9 +134,13 @@
         "iso 9660 cd-rom filesystem data"
     ],
     "IMG":[
-        "generic pc disk image (ntfs)",
         "generic pc disk image",
-        "msx-dos disk image",
+        "msx-dos disk image"
+    ],
+    "NTFS":[
+        "generic pc disk image (ntfs)"
+    ],
+    "Master Boot Record":[
         "master boot record dump"
     ],
     "Floppy Image":[
@@ -313,8 +317,9 @@
         "cexe v10a additional",
         "cexe 10a"
     ],
-    "SZDD":[
-        "microsoft szdd compressed (haruhiko okumura's lzss)"
+    "Microsoft SZDD":[
+        "microsoft szdd compressed (haruhiko okumura's lzss)",
+        "ms compress archive data"
     ],
     "ACE":[
         "ace",
@@ -588,7 +593,9 @@
     "CPIO":[
         "cpio archive (portable)",
         "cpio archive (portable old)",
-        "cpio archive (portable new)"
+        "cpio archive (portable new)",
+        "cpio archive (byte swapped binary)",
+        "byte-swapped cpio archive"
     ],
     "BOA Constrictor":[
         "boa constrictor archiver compressed archive"
@@ -699,9 +706,11 @@
         "mpq",
         "mpq archive - blizzard game data"
     ],
-    "SWF":[
+    "Shockwave Flash":[
         "macromedia flash player compressed movie",
-        "small web format"
+        "small web format",
+        "macromedia flash player movie",
+        "macromedia flash data"
     ],
     "IPS32 Patch":[
         "ips32 patch"
@@ -781,6 +790,7 @@
     "MacBinary":[
         "macbinary",
         "macbinary 2",
+        "macbinary ii",
         "macintosh application (macbinary)"
     ],
     "Compact Pro":[
@@ -1072,7 +1082,8 @@
     "CramFS":[
         "cramfs",
         "cramfs rom filesystem package (little endian)",
-        "cramfs rom filesystem package (big endian)"
+        "cramfs rom filesystem package (big endian)",
+        "linux compressed rom file system data"
     ],
     "Creative Assembly PFH0":[
         "creative assembly game resource data"
@@ -1556,5 +1567,37 @@
     ],
     "Project IGI Resource":[
         "project igi resource data"
+    ],
+    "RPM Package":[
+        "rpm package (generic)",
+        "rpm v3.0 bin i386/x86_64"
+    ],
+    "Unix Fast Filesystem":[
+        "unix fast file system [v1] (big-endian)"
+    ],
+    "PowerPacker":[
+        "power packer 2.0 compressed data",
+        "powerpacker compressed (v2.0)"
+    ],
+    "OS/2 Installation Package":[
+        "os/2 installation package/archive"
+    ],
+    "TTComp":[
+        "ttcomp archive compressed (bink-4k)",
+        "ttcomp archive data"
+    ],
+    "Macromedia Director":[
+        "macromedia director protected movie (mac)",
+        "macromedia director project"
+    ],
+    "Relic Chunky Container":[
+        "relic chunky container - game data"
+    ],
+    "Microsoft Comic Chat Character":[
+        "microsoft chat character"
+    ],
+    "Microsoft Compound Document":[
+        "composite document file v2 document",
+        "generic ole2 / multistream compound"
     ]
 }

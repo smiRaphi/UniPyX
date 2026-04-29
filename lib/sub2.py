@@ -1458,7 +1458,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     raise NotImplementedError('VPK0: https://github.com/decompals/crunch64/issues/1')
                 return
         case 'Final Fantasy X 2 ISO':
-            run(['7z','x',i,'-o' + o + '\\$ISO'])
+            zip7(i,o + '\\$ISO','ISO')
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')

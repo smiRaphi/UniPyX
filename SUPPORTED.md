@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 901
+# Supported Formats: 911
 
-## "Common" Archives/Compressors/Encodings (136)
+## "Common" Archives/Compressors/Encodings (144)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -22,11 +22,11 @@ ALZip | .alz | [ALZip](https://altools.co.kr/product/ALZIP) |
 AMGC | .amgc | [AMGC](https://www.sac.sk/download/pack/amgc22.zip) |
 Amiga XPK | .xpk | [Ancient](https://github.com/temisu/ancient) |
 AmiPack | ??? | [unar](https://theunarchiver.com/command-line) |
-Apple Disk Image | .img .iso .dsk | [hfsexplorer](https://github.com/unsound/hfsexplorer), [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
+Apple Disk Image | .img .iso .dsk .dmg | [hfsexplorer](https://github.com/unsound/hfsexplorer), [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 Apple DOS IMG | .img .dsk | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
 Apple Partition Map | .apm .iso | [7-Zip](https://7-zip.org/) -> ISO/Apple Disk Image |
 AppleSingle | * | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/) |
-AR | .a .ar .lib | [AR](https://packages.msys2.org/packages/mingw-w64-x86_64-binutils) |
+AR | .a .ar .lib | [AR](https://packages.msys2.org/packages/mingw-w64-x86_64-binutils), [7-Zip](https://7-zip.org/) |
 AR7 | .ar7 | [AR7](http://cd.textfiles.com/640swstudio/COMPRESS/AR712.ZIP) |
 ARG | .arg | [ARG](https://www.sac.sk/download/pack/arg.zip) |
 ARJ | .arj | [7-Zip](https://7-zip.org/) |
@@ -56,7 +56,7 @@ Cloop IMG | .img | [qemu-img](https://www.qemu.org/download/) -> IMG |
 Compact | ??? | [Ancient](https://github.com/temisu/ancient) |
 Compact Pro | ??? | [unar](https://theunarchiver.com/command-line) |
 Compaq QRST IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
-Compressed ISO | .ciso | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
+Compressed ISO | .ciso .cso | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
 CopyQM IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
 CP Shrink | ??? | [deark](https://entropymine.com/deark/) |
 CPC IMG | .img | [Amstrad CPC Explorer](https://github.com/muckypaws/AmstradDSKExplorer) |
@@ -70,7 +70,7 @@ DIET | * | [deark](https://entropymine.com/deark/) |
 DietDisk | * | [DietDisk](http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP) |
 CUE + BIN | .cue+.bin | [Aaru](https://github.com/aaru-dps/Aaru), [bin2iso](https://gitlab.com/bunnylin/bin2iso) + [7-Zip](https://7-zip.org/) |
 Disk Doubler | ??? | [unar](https://theunarchiver.com/command-line) |
-DiskDupe IMG | ??? | [7-Zip](https://7-zip.org/) |
+DiskDupe IMG | .ddi | [7-Zip](https://7-zip.org/) |
 DOS Backup | ??? | [deark](https://entropymine.com/deark/) |
 DOS IMG | .img .dsk | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 DWC | .dwc | [DWC](https://www.sac.sk/download/pack/dwc-a510.exe) |
@@ -102,28 +102,36 @@ LZ4 | .lz4 | [lz4](https://pypi.org/project/lz4/) |
 LZIP | .lz | [7-Zip](https://7-zip.org/) + [Lzip7z](https://www.tc4shell.com/en/7zip/lzip/) |
 LZMA | .lzma | [lzma](https://docs.python.org/3/library/lzma.html) |
 MacBinary | ??? | [unar](https://theunarchiver.com/command-line) |
+Master Boot Record | .mbr | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
+Microsoft Comic Chat Character | .avd .bgb | 
+Microsoft Compound Document | ??? | [7-Zip](https://7-zip.org/) |
+Microsoft SZDD | .??_ | [7-Zip](https://7-zip.org/) |
 Motorola S-Record | .srec | Custom |
 MSCAB | .cab | [7-Zip](https://7-zip.org/) + file name correction |
 Nero CD IMG | .nrg | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
+NTFS | .ntfs .img | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 PDF | .pdf | [xpdf](https://www.xpdfreader.com/download.html) |
 PeaZip | .pea | [peazip](https://github.com/peazip/PeaZip) |
+PowerPacker | .pp | [unar](https://theunarchiver.com/command-line), [Ancient](https://github.com/temisu/ancient) |
+OS/2 Installation Package | .pak .pkg | [deark](https://entropymine.com/deark/) |
 RAR | .rar .exe | [unrar](https://bioruebe.com/dev/uniextract/)([src](https://www.win-rar.com/)), [7-Zip](https://7-zip.org/) |
 Rob Northen Compression | .rnc | [Ancient](https://github.com/temisu/ancient) |
 Roxio Toast IMG | .img .dsk | [hfsexplorer](https://github.com/unsound/hfsexplorer), [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
+RPM Package | .rpm | [7-Zip](https://7-zip.org/) |
 SCP Flux | .scp | [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 Shifted ISO | .iso | Custom -> ISO |
 SquashFS | ??? | [7-Zip](https://7-zip.org/) |
 Stirling Compressed | ??? | [deark](https://entropymine.com/deark/) |
 Stripped TAR | .tar .mgw | Custom | TAR with CRC, permissions & attributes set to 0
 StuffIt | .sit | [unar](https://theunarchiver.com/command-line) |
-SWF | .swf | [7-Zip](https://7-zip.org/) |
-SZDD | ??? | [7-Zip](https://7-zip.org/) |
 TAR | .tar | [7-Zip](https://7-zip.org/) |
 The Compressor | ??? | [deark](https://entropymine.com/deark/) |
+TTComp | .??_ | [ttdecomp](https://www.exelana.com/techie/c/ttdecomp.html) |
 Turbo Range Coder | .trc | [Turbo Range Coder](https://github.com/powturbo/Turbo-Range-Coder) |
 UDF | .udf | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 UFA | .ufa | [UFA](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 UHARC | .uha .uhc | [UHARC](https://www.sac.sk/download/pack/uharc06b.zip) |
+Unix Fast Filesystem | .fs | [Aaru](https://github.com/aaru-dps/Aaru) |
 UUencoded | .uu .uue | Custom + [binascii](https://docs.python.org/3/library/binascii.html) |
 VHD | .vhd | [7-Zip](https://7-zip.org/) |
 VirtualBox Disk Image | .vdi | [7-Zip](https://7-zip.org/) |
@@ -212,7 +220,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (120)
+## Executables/Packers/Installers (121)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -239,7 +247,7 @@ C64 TBC MultiCompactor | .prg | [unp64](https://iancoog.altervista.org/)
 C64 Time Cruncher | .prg | [unp64](https://iancoog.altervista.org/)
 Casio BE-300 Package | ??? | Custom |
 CEBE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
-CExe | .exe | [ResourceExtractor](https://github.com/rgl/ResourceExtractor) -> SZDD/ZLIB |
+CExe | .exe | [ResourceExtractor](https://github.com/rgl/ResourceExtractor) -> Microsoft SZDD/ZLIB |
 Cheat Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Chromium Delta Update | ??? | [android-ota-extractv](https://github.com/tobyxdd/android-ota-payload-extractor) |
 COM RLE Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
@@ -317,6 +325,7 @@ RJCrush | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/
 SCRNCH | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Setup Factory Installer | .exe | [Total Observer](https://bioruebe.com/dev/uniextract/)(src?), [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
 Shell Archive | .sh .shar ` ` | Custom |
+Shockwave Flash | .swf | [ffdec](https://github.com/jindrapetrik/jpexs-decompiler) |
 Shrinker Packed | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 SpaceMaker | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Steam DRM | .exe | [Steamless](https://github.com/atom0s/Steamless) |
@@ -337,7 +346,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (456)
+## Various (457)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -670,6 +679,7 @@ RE Engine PAK | .pak | [REE.Unpacker](https://github.com/Ekey/REE.PAK.Tool) |
 Red Baron VOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)), Custom |
 REDengine Archive | .archive | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 REDengine W2ResourCe | [a lot](https://wiki.redmodding.org/cyberpunk-2077-modding/for-mod-creators-theory/files-and-what-they-do/file-formats#w2rc-file-format-table) | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
+Relic Chunky Container | .rgt .rsh .wtp .fda .sgb .whm .whe | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Remedy BIN+RMDP | .bin+.rmdp | [remedy_bin_rmdp.bms](https://mirror.aluigi.org/bms/remedy_bin_rmdp.bms) |
 RenderDoc Capture | .rdc | [RenderDoc](https://renderdoc.org/) |
 RenderWare Texture Dictionary | .txd | [rwexporter](https://github.com/AmyrAhmady/rwexporter) |

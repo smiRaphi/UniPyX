@@ -65,9 +65,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
         return r
 
     match t:
-        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'SZDD'|'LZIP'|'CPIO'|'Asar'|'SWF'|'ARJZ'|\
-             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer':
-            _,_,e = run(['7z','x',i,'-o' + o,'-aou'])
+        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'Microsoft SZDD'|'LZIP'|'CPIO'|'Asar'|'ARJZ'|\
+             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer'|'RPM Package'|\
+             'Microsoft Compound Document':
+            _,_,e = zip7(i,o,t)
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
                 mkdir(o)
@@ -78,7 +79,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in ('xz','BZip2','LZIP'): return fix_tar(o)
+                elif t in ('Z','xz','BZip2','LZIP'): return fix_tar(o)
                 else: return
         case 'ZSTD':
             if db.print_try: print('Trying with compression.zstd')
@@ -153,7 +154,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'LHARC':
             run(['lha','xf','--extract-broken-archive','-w=' + o,i])
             if listdir(o): return
-            run(['7z','x',i,'-o' + o,'-aou'])
+            zip7(i,o,t)
             if listdir(o): return
         case 'PDF':
             run(['pdfdetach','-saveall','-o',o + '\\out',i])
@@ -162,7 +163,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if listdir(o + '/html'): return
             remove(o + '/html')
         case 'Nero CD IMG':
-            run(['7z','x','-tnrg',i,'-o' + o,'-aou'])
+            zip7(i,o,t)
             for ix,f in enumerate(listdir(o)):
                 tf = o + f'/{ix:02d}' + extname(f).lower()
                 to = o + f'\\{ix:02d}'
@@ -172,31 +173,27 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if extract1(tf,to,'ISO'): remove(to)
                     else: remove(tf)
             if listdir(o): return
-        case 'CDI'|'Aaru'|'ACT Apricot IMG':
-            osj = OSJump()
-            osj.jump(dirname(i))
-            td = 'tmp' + os.urandom(8).hex()
-            run(['aaru','filesystem','extract',i,td])
-            osj.back()
-            td = dirname(i) + '\\' + td
-            if exists(td) and listdir(td):
+        case 'Aaru'|'CDI'|'ACT Apricot IMG'|'Unix Fast Filesystem':
+            td = TmpDir(path=o,mdir=False)
+            run(['aaru','filesystem','extract',i,basename(td.p)],cwd=o)
+            if exists(td.p) and listdir(td.p):
                 ret = False
-                for td1 in listdir(td):
+                for td1 in listdir(td.p):
                     td1 = td + '/' + td1
                     if listdir(td1):
                         copydir(td1 + '/' + listdir(td1)[0],o)
                         ret = True
-                remove(td)
+                td.destroy()
                 if ret: return
-            remove(td)
-        case 'ISO'|'IMG'|'Floppy Image'|'UDF'|'DOS IMG':
+            td.destroy()
+        case 'ISO'|'IMG'|'Floppy Image'|'UDF'|'DOS IMG'|'NTFS'|'Master Boot Record':
             _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
             iso_udf = t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e
 
             if not iso_udf and not extract1(i,o,'Aaru'): return
 
             bd = listdir(o)
-            run(['7z','x',i,'-o' + o,'-aou'])
+            zip7(i,o,t)
             if exists(o):
                 for f in listdir(o):
                     if f not in bd: return
@@ -264,7 +261,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'Apple Partition Map':
             _,e,_ = run(['7z','l','-tAPM',i],print_try=False)
             if 'ERRORS:\nUnexpected end of archive' in e and '0.Apple_partition_map' in e:
-                run(['7z','x','-tAPM',i,'-o' + o,'-aou'])
+                zip7(i,o,t)
                 fs = listdir(o)
                 if len(fs) > 1:
                     for f in fs:
@@ -332,7 +329,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'ZIP'|'InstallShield Setup ForTheWeb':
             if open(i,'rb').read(2) == b'MZ':
-                run(['7z','x',i,'-o' + o,'-aoa'])
+                zip7(i,o,'ZIP',True)
                 if os.path.exists(o + '/_INST32I.EX_'):
                     if fix_isinstext(o): return
                 elif os.path.exists(o + '/Disk1/ikernel.ex_'):
@@ -343,8 +340,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
             else:
                 run(['unzip','-q','-o',i,'-d',o])
                 if listdir(o): return
-                run(['7z','x',i,'-o' + o,'-aoa'])
+                zip7(i,o,'ZIP',True)
                 if listdir(o): return
+                if db.print_try: print('Trying with zipfile')
                 import zipfile
                 try:
                     with zipfile.ZipFile(i,'r') as z: z.extractall(o)
@@ -396,7 +394,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         return
             f.close()
 
-            run(['7z','x',i,'-o' + o,'-aoa'])
+            zip7(i,o,t,True)
             if listdir(o):
                 if len(listdir(o)) == 1 and open(o + '/' + listdir(o),'rb').read(10) == b'WARC/1.0\r\n':
                     extract1(o + '/' + listdir(o)[0],o,'Web ARchive')
@@ -412,9 +410,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 return
         case 'VirtualBox Disk Image':
             td = TmpDir(path=o)
-            run(['7z','x',i,'-o' + td,'-aoa'])
+            zip7(i,td,t,True)
             if os.path.exists(td + '/1.img'):
-                run(['7z','x',td + '/1.img','-o' + o,'-aoa'])
+                zip7(td + '/1.img','-o' + o,None,True)
                 td.destroy()
                 if listdir(o): return
             td.destroy()
@@ -423,7 +421,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if i.lower().endswith('-m4ckd0ge_repack.rar'): cmd += ['-pM4CKD0GE']
             run(cmd + [i])
             if listdir(o): return
-            run(['7z','x',i,'-o' + o,'-aou'])
+            zip7(i,o,t)
             if listdir(o): return
         case 'StuffIt'|'AmiPack':
            e,_,_ = run(['unar','-f','-o',o,i])
@@ -486,13 +484,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'AR':
             run(['ar','x',i],cwd=o)
             if listdir(o): return
+            zip7(i,o,t,True)
+            if listdir(o): return
         case 'ARQ': return msdos(['arq','-x',i,'*',o])
         case 'XX34': return msdos(['xx34','D',i],tmpi=True,cwd=o)
         case 'UHARC':
             dosbox(['uharcd','x',i])
             if listdir(o): return
         case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup'|\
-             'EPOC App Info'|'EPOC Install Package'|'GEM Resource':
+             'EPOC App Info'|'EPOC Install Package'|'GEM Resource'|'OS/2 Installation Package'|'Microsoft Comic Chat Character':
             od = rldir(o)
             run(["deark","-od",o,'-a',i])
             for x in rldir(o):
@@ -501,9 +501,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in (3,4,5) and xb.split('.')[1].isdigit():
                     rn = xb.split('.',2)[2]
                     if rn == 'bin':
-                        if '.' in i and i[-1] == '_': mv(o + '/' + fs[0],o + '/' + basename(i[:-1]))
+                        if '.' in i[-4:] and i[-1] == '_': mv(o + '/' + fs[0],o + '/' + basename(i[:-1]))
                         else: mv(o + '/' + fs[0],o + '/' + tbasename(i))
-                    elif len(rn) > 3: move(x,dirname(x) + '\\' + rn)
+                    elif len(rn.split('.')) > 1: mv(x,dirname(x) + '\\' + rn)
+                    else: mv(x,o + '\\' + xb[7:])
             fs = listdir(o)
             if fs: return
         case 'ZOO':
@@ -657,6 +658,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'AppleSingle'|'CrLZH'|'Crunch':
             if not extract1(i,o,'StuffIt'): return # unar
             if not extract1(i,o,'DIET'): return # deark
+        case 'PowerPacker':
+            if not extract1(i,o,'StuffIt'): return # unar
+            if not extract1(i,o,'Amiga XPK'): return # ancient
         case 'BinHex':
             if not extract1(i,o,'AppleSingle'): return # unar & deark
             if not extract1(i,o,'7z'): return # 7z
@@ -942,6 +946,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if ob:
                 json.dump(ob,xopen(f'{o}/{tbasename(i)}.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
+        case 'TTComp':
+            of = o + '/' + (basename(i)[:-1] if i[-1] == '_' and len(extname(i)) in {3,4} else tbasename(i))
+            run(['ttdecomp',i,of])
+            if exists(of) and getsize(of): return
 
     return 1
 

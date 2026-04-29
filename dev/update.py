@@ -62,6 +62,8 @@ GFMTS = {
     'WolvenKit/WolvenKit-nightly-releases':lambda tag:f'WolvenKit.Console-{tag}.zip',
     'widberg/bff':lambda tag:f'bff-windows-{tag}.zip',
     'git-for-windows/git':lambda tag:f'MinGit-{tag[1:].split(".windows.")[0]}-64-bit.zip',
+    'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_26.0.0_{tag}.zip',
+    'ProjectorRays/ProjectorRays':lambda tag:f'projectrrays-{tag[1:]}.exe',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -136,7 +138,7 @@ def supdate(c:Cache,k:str,inf:dict):
             if repo not in ('allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'):
                 s = '<p><strong>This page is taking too long to load.</strong></p>'
                 while '<p><strong>This page is taking too long to load.</strong></p>' in s:
-                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex','horsicq/DIE-engine'):
+                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex','horsicq/DIE-engine','jindrapetrik/jpexs-decompiler'):
                         s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                     elif repo in ():
                         s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
@@ -239,6 +241,19 @@ def supdate(c:Cache,k:str,inf:dict):
             ts = ft(s[1],'%Y-%m-%d')
             if ts > ots:
                 nu = 'https://renderdoc.org' + s[2]
+                if nu != u:
+                    u = nu
+                    bdir = u.split('/')[-1].rsplit('.',1)[0]
+                    for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
+                else: ts = 0
+        elif dom == 'iancoog.altervista.org':
+            s = c.get('http://iancoog.altervista.org/',verify=False)
+            bn = u.split('/')[-1]
+            if bn.startswith('unp64_'):
+                m = re.search(r'<a href="(C/unp64_v?\d+\.(?:rar|7z|zip))">UNP64 \d+\.\d+(?: - (\d{4}\.\d\d\.\d\d) build)?',s)
+                if m[2]: ts = ft(m[2],'%Y.%m.%d')
+                else: ts = t()
+                nu = 'http://iancoog.altervista.org/' + m[1]
                 if nu != u:
                     u = nu
                     bdir = u.split('/')[-1].rsplit('.',1)[0]

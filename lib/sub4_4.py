@@ -430,5 +430,22 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'Golden Tee Fore! BIG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            while f:
+                fn = f.read(f.readu16()).decode('utf-8').replace(':\\','\\',1)
+                t = f.readu8()
+                assert t in (1,2)
+                if t == 1: mkdir(o + '/' + fn)
+                elif t == 2: writefile(o + '/' + fn,f.read(f.readu32()))
+            if listdir(o): return
+        case 'UMD Data':
+            if db.print_try: print('Trying with custom extractor')
+            d = readfile(i).replace(b'\0',b' ').replace(b'|',b'\n')
+            writefile(o + '/' + tbasename(i) + '.txt',d)
+            return
 
     return 1

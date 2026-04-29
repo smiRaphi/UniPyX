@@ -2138,6 +2138,7 @@
     },
     {
         "rq":["IFF Data",false],
+        "rqr":["Generic RIFX container (little-endian)",false],
         "d":[["n0",4,0],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little');return s==(f.seek(0,2)-8)"]],
         "rs":"bsc-m03"
     },

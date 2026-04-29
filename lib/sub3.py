@@ -120,10 +120,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['qtifw-devtool','dump',i,o])
             if listdir(o): return
 
-            run(['7z','x',i,'-o' + o,'-aoa'])
+            zip7(i,o,None,True)
             if listdir(o) and not exists(o + '/.rsrc'): return
         case 'MSCAB SFX':
-            run(['7z','x',i,'-o' + o,'-aoa'])
+            zip7(i,o,t,True)
             if listdir(o) and not exists(o + '/.rsrc'): return
             remove(o)
             mkdir(o)
@@ -167,7 +167,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 sleep(0.1)
             else: prc.kill()
         case 'NSIS Installer':
-            run(['7z','x',i,'-o' + o,'-aoa'])
+            zip7(i,o,t,True)
             if listdir(o) and not exists(o + '/.rsrc'): return
             rmtree(o)
             mkdir(o)
@@ -268,12 +268,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
             copydir(td,o,True)
             td.destroy()
             if listdir(o): return
-            run(['7z','x',i,'-o' + o,'-aoa'])
+            zip7(i,o,t,True)
             if listdir(o): return
         case 'MSP':
             run(['msix',i,'/out',o,'/ext'])
             if listdir(o): return
-            run(['7z','x',i,'-o' + o,'-aoa'])
+            zip7(i,o,t,True)
             if listdir(o): return
         case 'Setup Factory Installer':
             if not quickbms('totalobserver'):
@@ -429,7 +429,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     elif xr: remove(o + f'/{ix}.exe')
                 return
         case 'Resource DLL':
-            run(['7z','x',i,'-o' + o,'-aou'])
+            zip7(i,o,t,True)
             if exists(o + '/.rsrc'):
                 copydir(o + '/.rsrc',o,True)
                 return
@@ -463,7 +463,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     ar,_ = analyze(tf.p,True)
 
                     td = TmpDir()
-                    if ('SZDD' in ar and not extract(tf.p,td.p,'SZDD')) or ('ZLIB' in ar and not extract(tf.p,td.p,'ZLIB')):
+                    if ('SZDD' in ar and not extract(tf.p,td.p,'Microsoft SZDD')) or ('ZLIB' in ar and not extract(tf.p,td.p,'ZLIB')):
                         otf = td.p + '\\' + listdir(td.p)[0]
                         if open(otf,'rb').read(8) == b'MZ\x90\0\3\0\0\0': mv(otf,o + '/' + x.split('/')[1] + '.exe')
                         else: mv(otf,o + '/' + x.split('/')[1])
@@ -1471,7 +1471,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(tf.p,f.read(f.secs['.data'][1]))
             f.close()
 
-            run(['7z','x',tf.p,'-o' + o,'-aoa'])
+            zip7(tf,o,None,True)
             tf.destroy()
             if listdir(o): return
         case 'Tixati Installer':
@@ -1654,6 +1654,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
             p.join()
 
             f.close()
+            if listdir(o): return
+        case 'Shockwave Flash':
+            if db.print_try: print('Trying with ffdec')
+            from multiprocessing import cpu_count
+            _,_,r = run(['java','-jar',db.get('ffdec'),'-config',f'loopMedia=false,parallelSpeedUpThreadCount={cpu_count()}','-format','frame:gif','-select','1-250','-exportTimeout','65','-export','all,xfl',o,i],print_try=False)
+            if 'java.lang.Exception' in r:
+                print(r)
+                return 1
+            for x in listdir(o):
+                if not listdir(o + '/' + x): remove(o + '/' + x)
+            if exists(o + '/xfl') and len(listdir(o + '/xfl')) == 1: copydir(o + '/xfl/' + listdir(o + '/xfl')[0],o + '/xfl',True,True)
             if listdir(o): return
 
     return 1

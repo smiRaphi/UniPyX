@@ -286,7 +286,7 @@ def analyze(inp:str,raw=False):
                             for sp in (' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( ','*ACM'): x = x.split(sp)[0]
                             for sp in ('Structure : ','use : ','stub : ','EP Generic : '): x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
-                            if x and x.lower() not in ('genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip') and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
+                            if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','no sec. cab.7z.zip [deb. 02','2010 (e8'} and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)
 
                 yrep = db.update('yara')
@@ -310,11 +310,12 @@ def analyze(inp:str,raw=False):
         elif t.startswith('doom patch PWAD data containing'): tst.append('doom patch PWAD data')
         elif t.startswith('Delphi compiled form \''): tst.append('Delphi compiled form')
         elif t.startswith('cannot open ') and t.endswith(' (No such file or directory)'): pass
+        elif t.startswith('byte-swapped cpio archive; '): tst.append('byte-swapped cpio archive')
         else: tst.append(t)
     ts = tst
 
     ts = [MSPCR.sub(' ',x.strip()) for x in ts if x.strip()]
-    if any(x in ts for x in ('Commodore 64 BASIC V2 program','Commodore C64 program')):
+    if any(x in ts for x in {'Commodore 64 BASIC V2 program','Commodore C64 program'}):
         _,o,_ = db.run(['unp64','-i',inp])
         ts.append(o.strip().split(' : ',1)[1].split(', unpacker=')[0].strip())
         if ts[-1] == '(Unknown)': ts.pop(-1)
@@ -603,6 +604,7 @@ def hookshot(cmd:list,redirect:dict,**kwargs):
     r = db.run(['hookshot',scr] + cmd[1:],print_try=False,**kwargs)
     remove(hks,pwc,pw3,pw6)
     return r
+
 def fix_isinstext(o:str,oi:str=None):
     ret = True
     oi = oi or o
@@ -728,6 +730,7 @@ def fix_cab2(o:str):
             try: mv(o + '/' + f,o + '/' + fn)
             except PermissionError: pass
             else: break
+
 def guess_ext(d:bytes) -> str:
     if not d: return 'null'
     s = len(d)
@@ -885,6 +888,67 @@ def mime2ext(m:str):
     if m.startswith('x-'): m = m[2:]
     if m.startswith('vnd.'): m = m[4:]
     return m
+
+ZIP7MP = {
+    '7z':'7z',
+    'ARJ':'Arj',
+    'Asar':'Asar',
+    'Base64':'Base64',
+    'BinHex':'BinHex',
+    'MSCAB':'Cab',
+    'Windows Help File':'Chm',
+    'Microsoft Compound Document':'Compound',
+    'CPIO':'Cpio',
+    'CramFS':'CramFS',
+    'EXT':'Ext',
+    'ISO':'Iso',
+    'MacBinary':'MacBinary',
+    'RAR':'Rar',
+    'RPM Package':'Rpm',
+    'Shockwave Flash':'SWF',
+    'SquashFS':'SquashFS',
+    'UDF':'Udf',
+    'BZip2':'bzip2',
+    'XAR':'Xar',
+    'VHD':'VHD',
+    'yEnc':'YEnc',
+    'Z':'Z',
+    'GZIP':'gzip',
+    'Error Code Modeler':'ecm',
+    'Apple Partition Map':'APM',
+    'UUencoded':'uue',
+    'xz':'xz',
+    'ZSTD':'zstd',
+    'TAR':'tar',
+    'ZIP':'zip',
+    'LZIP':'lzip',
+    'LZMA':'lzma',
+    'Nero CD IMG':'nrg',
+    'Apple Disk Image':'Dmg',
+    'LHARC':'Lzh',
+    'Microsoft SZDD':'MsLZ',
+    'NTFS':'ntfs',
+    'MSCAB SFX':'Cab',
+    'NSIS Installer':'Nsis',
+    'MSI':'Compound',
+    'MSP':'Compound',
+    'ARJZ':'Arj',
+    'AR':'Ar',
+    'VirtualBox Disk Image':'VDI',
+    'Master Boot Record':'MBR',
+    'DiskDupe IMG':'FAT',
+    'Compressed ISO':'cso',
+    'Resource DLL':'PE',
+    'Floppy Image':None,
+    'Google Update Installer':None,
+    'JFD IMG':None,
+    'IMG':None,
+    None:None,
+}
+def zip7(i:str,o:str,t:str,overwrite=False):
+    if t in ZIP7MP: t = ZIP7MP[t]
+    else: raise ValueError(f'{t} is not mapped in ZIP7MP')
+    return db.run(['7z','x',i,'-o' + o,'-ao' + ('a' if overwrite else 'u')] + (['-t' + t] if t else []))
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet

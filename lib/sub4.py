@@ -802,7 +802,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
-             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|'Frogwares 0000 Package'|'MMFW Resource'|\
+             'LithTech Resource'|'Doom Engine WAD'|'Dying Light RPACK'|'Frogwares 0000 Package'|'MMFW Resource'|'Relic Chunky Container'|\
              'GE:Build Engine Group'|'GE:Descent HOG'|'GE:Team17 EPF'|'GE:Red Baron VOL':
             CODS = {
                 'The Sims FAR':'FAR_FAR','Quake PAK':'PAK_PACK','Quake 3D WAD':'WAD_IWAD','Agon Game Archive':'SFL_SFL10','Alien Vs Predator FFL':'FFL_RFFL',
@@ -815,7 +815,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',
                 'Highway Pursuit HPDT':'HD_HPDT','Xenonauts PFP':'PFP_PFPK','LithTech Resource':'LPS_LITHTECH','Doom Engine WAD':'WAD_IWAD',
                 'UE3 Package':'UE3_727|UE3_648|UE3_607|UE3_584|UE3_576|UE3_575|UE3_564|UE3_547|UE3_539|UE3_512|UE3_507|UE3_871|UE3_868|UE3_807|UE3_805|UE3_451|UE3_Generic|UE3_Texture2D_Generic|UE3_Texture2D_547|UE3_Texture2D_539|UE3_Texture2D_512|UE3_Texture2D_451|UE3_Texture2D_507|UE3_Texture2D_871|UE3_Texture2D_868|UE3_Texture2D_807|UE3_Texture2D_648|UE3_Texture2D_584|UE3_Texture2D_576|UE3_Texture2D_575',
-                'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3','MMFW Resource':'MMP_MMFW',
+                'Novalogic PFF':'PFF_PFF3','7 Studios FS':'FS_3','MMFW Resource':'MMP_MMFW','Relic Chunky Container':'RSH_RELICCHUNKY',
                 'GE:Red Baron VOL':'VOL_VOL','GE:Build Engine Group':'GRP_KEN','GE:Descent HOG':'HOG_DHF','GE:Team17 EPF':'EPF_EPFS',
             }
 
@@ -853,6 +853,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if r.status_code == 200 and r.json().get('files'):
                     for f in listdir(id):
                         if f not in cd and f.startswith(tbasename(i) + '_ge_decompressed') and f.endswith(extname(i)): remove(id + '/' + f)
+                    for f in rldir(o):
+                        bn = tbasename(f)
+                        if len(bn) == 19 and bn.startswith('Unnamed File ') and bn[13:].isdigit(): mv(f,dirname(f) + f'/{bn[13:].lstrip("0").zfill(3)}{extname(f)}')
                     return
                 elif r.status_code == 400 and r.json().get('error','').startswith('Unknown plugin code: '): raise Exception(r.json()['error'])
             except httpx.ReadTimeout: p.kill()
@@ -2358,22 +2361,5 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if oc:
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(oc),'w')
                 return
-        case 'Golden Tee Fore! BIG':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-
-            while f:
-                fn = f.read(f.readu16()).decode('utf-8').replace(':\\','\\',1)
-                t = f.readu8()
-                assert t in (1,2)
-                if t == 1: mkdir(o + '/' + fn)
-                elif t == 2: writefile(o + '/' + fn,f.read(f.readu32()))
-            if listdir(o): return
-        case 'UMD Data':
-            if db.print_try: print('Trying with custom extractor')
-            d = readfile(i).replace(b'\0',b' ').replace(b'|',b'\n')
-            writefile(o + '/' + tbasename(i) + '.txt',d)
-            return
 
     return 1

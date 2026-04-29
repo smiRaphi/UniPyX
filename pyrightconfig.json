@@ -9,6 +9,7 @@
         "./bin/sarc.py",
         "./bin/splat64",
         "./bin/Torch",
+        "./bin/graalvm",
     ],
     "typeCheckingMode": "off"
 }
