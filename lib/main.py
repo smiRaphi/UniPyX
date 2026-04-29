@@ -74,8 +74,9 @@ def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
     if 'b' in m: return open(f,m,**kwargs)
     return open(f,m,encoding=encoding,newline=newline,**kwargs)
 def readfile(f:str,m='rb',encoding='utf-8',newline=None,**kwargs) -> bytes|str:
-    if 'b' in m: o = open(f,m,**kwargs)
-    else: o = open(f,m,encoding=encoding,newline=newline,**kwargs)
+    assert 'r' in m or '+' in m
+    if 'b' in m: o = xopen(f,m,**kwargs)
+    else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
     r = o.read()
     o.close()
     return r
@@ -192,6 +193,18 @@ class OSJump:
     def __init__(self): self.p = os.getcwd()
     def jump(self,i): os.chdir(str(i))
     def back(self): os.chdir(self.p)
+def make_env():
+    env = os.environ.copy()
+    td = TmpDir()
+    env['USERPROFILE'] = td.p
+    env['HOMEDRIVE'] = td.p[:2]
+    env['HOMEPATH'] = td.p[2:]
+    env['APPDATA'] = td.p + '\\AppData\\Roaming'
+    env['LOCALAPPDATA'] = td.p + '\\AppData\\Local'
+    env['TEMP'] = td.p + '\\AppData\\Local\\Temp'
+    env['TMP'] = env['TEMP']
+    return env,td
+
 def _neof(f):
     b = bool(f.read(1))
     if b: f.seek(-1,1)
@@ -245,7 +258,7 @@ def analyze(inp:str,raw=False):
         for wt in {'InstallShield setup',}:
             if wt in ts: ts.remove(wt)
     _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
-    ts += [x.split(',')[0].split(' created: ')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
+    ts += [x.split(',')[0].split(' created: ')[0].split('\u00BF\u0074\u2593\u256C\u2551\u2567\u00F1\u2219')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
     if isdir(inp): typ = 'directory'
     else:
@@ -311,6 +324,7 @@ def analyze(inp:str,raw=False):
         elif t.startswith('Delphi compiled form \''): tst.append('Delphi compiled form')
         elif t.startswith('cannot open ') and t.endswith(' (No such file or directory)'): pass
         elif t.startswith('byte-swapped cpio archive; '): tst.append('byte-swapped cpio archive')
+        elif t.startswith('ISO 9660 CD-ROM filesystem data \''): tst.append('ISO 9660 CD-ROM filesystem data')
         else: tst.append(t)
     ts = tst
 

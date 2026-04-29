@@ -95,7 +95,7 @@
         "rs":"InstallShield MSI","s":1
     },
     {
-        "rqr":"Win16 NE executable (generic)",
+        "rqr":["Win16 NE executable (generic)","Win16 InstallShield Self-Extracting Executable"],
         "d":["isat","InstallShield Self-Extracting Stub Program",943],
         "rs":"InstallShield Setup","s":1
     },
@@ -1484,6 +1484,10 @@
     {
         "d":[["isat","LAG\\0\\0\\0\\0\\0",0],["str0",8,16,4],["isin",["\\x01\\0\\0\\0","\\x02\\0\\0\\0"],32],["n0",4,24],["n0",4,28],["n0",4,36]],
         "rs":"Orange Juice LAG","s":1
+    },
+    {
+        "d":[["isat","SuperScape (c) New Dimension International Ltd.\\0\\0\\n\\n\\rVRT file",0],["isat","\\0\\0\\0\\0.VRT\\0\\0",240],["contain","\\n\\r\\x1A\\0\\0\\0",[64,160]],["n0",4,248]],
+        "rs":"SuperScape VRT","s":1
     },
     {
         "d":[["isin",["DATA","MENU","STRD","SEDT"],0],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);c=int.from_bytes(f.read(4),'little')*4+20;o=int.from_bytes(f.read(4),'little')\nif c!=o and (c+(-c%16))==o:return\nf.seek(c-4);l=int.from_bytes(f.read(4),'little')-s;return l<=0 and l>-10"]],

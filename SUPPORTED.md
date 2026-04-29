@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 911
+# Supported Formats: 913
 
-## "Common" Archives/Compressors/Encodings (144)
+## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -22,6 +22,7 @@ ALZip | .alz | [ALZip](https://altools.co.kr/product/ALZIP) |
 AMGC | .amgc | [AMGC](https://www.sac.sk/download/pack/amgc22.zip) |
 Amiga XPK | .xpk | [Ancient](https://github.com/temisu/ancient) |
 AmiPack | ??? | [unar](https://theunarchiver.com/command-line) |
+Apple DiskCopy | .img ` ` | Custom -> Apple Disk Image/IMG |
 Apple Disk Image | .img .iso .dsk .dmg | [hfsexplorer](https://github.com/unsound/hfsexplorer), [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 Apple DOS IMG | .img .dsk | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
 Apple Partition Map | .apm .iso | [7-Zip](https://7-zip.org/) -> ISO/Apple Disk Image |
@@ -346,7 +347,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (457)
+## Various (458)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -734,6 +735,7 @@ Super Mario Maker Level | .bin | Custom |
 Super Monkey Ball SPG2 | .spg2 | Custom |
 Super Monkey Ball Tip 'n Tilt PAK | .pak | Custom |
 Super Monkey Ball Tip 'n Tilt String Data | ??? | Custom |
+SuperScape VRT | .vca | Custom |
 Surreal Software SRSC | .adu .mdu .odu .qdu .sdu .tdu .xdu .lvl .ldu .vdu | Custom |
 Taiko no Tatsujin Data 1 | ??? | Custom |
 Taiko no Tatsujin Data 2 | ??? | Custom |

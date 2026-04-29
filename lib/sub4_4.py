@@ -447,5 +447,30 @@ def extract4_4(inp:str,out:str,t:str):
             d = readfile(i).replace(b'\0',b' ').replace(b'|',b'\n')
             writefile(o + '/' + tbasename(i) + '.txt',d)
             return
+        case 'SuperScape VRT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            msgs = [x for x in f.read(0xE0).split(b'\x1A')[0].split(b'\0') if x]
+            for ix,x in enumerate(msgs): writefile(f'{o}/$message{ix}.txt',x)
+
+            f.skip(0x10)
+            assert f.readu32() == 0 and f.read(4) == b'.VRT'
+            f.padc(2)
+            c = f.readu32()
+            f.skip(4)
+            fs = []
+            for _ in range(c+1):
+                fn = f.read0s('ascii')
+                f.align(2)
+                fs.append((fn,f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
 
     return 1

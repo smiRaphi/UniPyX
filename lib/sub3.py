@@ -320,7 +320,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             d.append(f.read(12))
                             d.append((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
                             d.append(b'\0\0')
-                            writefile(o + '/' + fn,decompress(b''.join(d),'zip'))
+                            writefile(o + '/' + fn,decompress(b''.join(d),'zip',out=1))
                         else: f.seek(-3,1)
                 f.close()
                 if listdir(o):
@@ -1658,7 +1658,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Shockwave Flash':
             if db.print_try: print('Trying with ffdec')
             from multiprocessing import cpu_count
-            _,_,r = run(['java','-jar',db.get('ffdec'),'-config',f'loopMedia=false,parallelSpeedUpThreadCount={cpu_count()}','-format','frame:gif','-select','1-250','-exportTimeout','65','-export','all,xfl',o,i],print_try=False)
+            env,td = make_env()
+            _,_,r = run(['java','-jar',db.get('ffdec'),'-config',f'loopMedia=false,parallelSpeedUpThreadCount={cpu_count()}','-format','frame:gif','-select','1-250','-exportTimeout','65','-export','all,xfl',o,i],print_try=False,env=env)
+            td.destroy()
             if 'java.lang.Exception' in r:
                 print(r)
                 return 1

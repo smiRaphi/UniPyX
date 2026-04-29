@@ -288,6 +288,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             ce = os.environ.copy()
             ce['PATH'] += ';' + dirname(db.get('hfsexplorer'))
+            oo = listdir(o)
             for p in range(ps):
                 if db.print_try: print('Trying with hfsexplorer/unhfs')
                 cop = o + (f'\\{p}' if ps > 1 else '')
@@ -296,9 +297,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if 'Failed to create directory ' in e: return 1
                 if exists(cop) and not listdir(cop): rmdir(cop)
             if not exists(o): mkdir(o)
-            if listdir(o): return
+            if listdir(o) and listdir(o) != oo: return
 
             return extract(i,o,'ISO')
+        case 'Apple DiskCopy':
+            if db.print_try: print('Trying with custom extractor')
+            tf = TmpFile('.img',path=o)
+            writefile(tf,readfile(i)[0x84:])
+            for ty in ('IMG','Apple Disk Image'):
+                if not extract1(tf.p,o,ty): break
+            else: mv(tf.p,o + '/' + tbasename(i) + '.img')
+            tf.destroy()
+            return
         case 'Error Code Modeler':
             tf = TmpFile('.iso',path=o)
             run(['unecm',i,tf])

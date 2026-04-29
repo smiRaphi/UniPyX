@@ -145,7 +145,8 @@
     ],
     "Floppy Image":[
         "anex86 pc98 floppy image (generic)",
-        "fm towns bootable disk image"
+        "fm towns bootable disk image",
+        "pc formatted floppy with no filesystem"
     ],
     "Apple Disk Image":[
         "disk image",
@@ -1599,5 +1600,9 @@
     "Microsoft Compound Document":[
         "composite document file v2 document",
         "generic ole2 / multistream compound"
+    ],
+    "Apple DiskCopy":[
+        "diskcopy 4.2 1440k mfm disk image",
+        "apple diskcopy 4.2 image"
     ]
 }
