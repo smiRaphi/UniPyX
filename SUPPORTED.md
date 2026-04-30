@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 913
+# Supported Formats: 914
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -347,7 +347,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (458)
+## Various (459)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -539,6 +539,7 @@ Highway Pursuit HPDT | .hpdt | [Game Extractor Server](https://github.com/Sembia
 HMM Packfile | ??? | [hmmunpack](https://github.com/ross-spencer/hmmunpack) |
 Holistic Design MUK | .muk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Hollow Knight Save | ??? | Custom |
+Hornby BSF | .bsf | Custom |
 Hostile Waters MNG | .mng | [na_game_tool](https://nihav.org/game_tool.html) |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |

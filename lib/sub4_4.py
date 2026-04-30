@@ -503,5 +503,48 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if ds: return
+        case 'Hornby BSF':
+            KEY = 0xBB
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decrypt
+            f = File(i,endian='<')
+            assert f.read(4) == b'BSF\0'
+            f.skip(0x14)
+
+            c = 0
+            while f:
+                ep = f.pos
+                assert f.read(4) == b'BLK\0'
+                n = f.read(4).rstrip(b'\0').decode('ascii')
+                s = f.readu32()
+                ds = f.readu32()
+                assert (s-0x48) == ds
+                ep += s
+
+                f.skip(15)
+                fn = f.read(0x29)[:0x20]
+                fn = fn[:1] + fn[1:].split(b'\0')[0]
+                assert len(fn) >= 2 and fn[1] != KEY,f'Empty file name @ {ep-s}'
+                fn = o + '/' + decrypt(fn,'hornby',KEY,0x7F).rstrip(b'\0').decode('ascii') + '.' + n
+
+                writefile(fn,f.readc(ds))
+                if n == 'STR':
+                    f.seek(ep - ds + 0x10)
+                    sc = f.readu32()
+                    ofs = [f.readu32() for _ in range(sc)]
+                    bp = f.pos
+                    ob = []
+                    for of in ofs:
+                        f.seek(bp + of)
+                        ob.append(f.read0s('ascii'))
+                    if ob: writefile(fn + '.txt','\n'.join(ob),'w')
+
+                f.seek(ep)
+                c += 1
+                if n == 'END': break
+
+            f.close()
+            if c: return
 
     return 1

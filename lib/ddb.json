@@ -1490,6 +1490,10 @@
         "rs":"SuperScape VRT","s":1
     },
     {
+        "d":[["isat","BSF\\0",0],["isat","BLK\\0SCO\\0",24],["isat","BSF\\0",84],["isat","BLK\\0END\\0\\x48\\0\\0\\0\\0\\0\\0\\0",-72],["py","f=open(inp,'rb');f.seek(32);return (int.from_bytes(f.read(4),'little')-72)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Hornby BSF","s":1
+    },
+    {
         "d":[["isin",["DATA","MENU","STRD","SEDT"],0],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);c=int.from_bytes(f.read(4),'little')*4+20;o=int.from_bytes(f.read(4),'little')\nif c!=o and (c+(-c%16))==o:return\nf.seek(c-4);l=int.from_bytes(f.read(4),'little')-s;return l<=0 and l>-10"]],
         "rs":"Metal Slug 3D PAK"
     },

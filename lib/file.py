@@ -845,6 +845,17 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             key = bytearray(i.replace(b'\0',b''))[:128] + b'\0'*128
             if len(i) < 255: key[len(i) + 1] = sum(b * 2 for b in i) & maskb(1)
             return bytes(key)
+        case 'hornby':
+            if len(i) < 2: return b''
+
+            if type(key) == bytes: key = key[0]
+            if type(iv) == bytes: iv = iv[0]
+            msk = iv or 0xFF
+            o = bytearray(i)
+            o[1] ^= key
+            for ix in range(len(o)-1):
+                o[ix+1] = o[ix] ^ (o[ix+1] & msk)
+            return bytes(o[1:])
 
     raise NotImplementedError(algo)
 
