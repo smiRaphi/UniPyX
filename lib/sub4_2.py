@@ -1018,12 +1018,6 @@ def extract4_2(inp:str,out:str,t:str):
             of.close()
             f.close()
             if fs: return
-        case 'Batman AC Resource':
-            raise NotImplementedError
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import EXE
-            f = EXE(i)
-            f.seek(f.reco)
         case 'Mini Metro Sound Bytes':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

@@ -5832,6 +5832,9 @@
     "dnfile":{
         "pip":"dnfile"
     },
+    "nefile":{
+        "pip":"nefile"
+    },
     "amitools":{
         "p":"amitools/__init__.py",
         "fs":[{

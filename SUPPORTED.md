@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 915
+# Supported Formats: 916
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -221,7 +221,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (121)
+## Executables/Packers/Installers (122)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -314,6 +314,7 @@ VISE Installer | .exe | [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
 Wise Installer | .exe | [E_WISE](https://bioruebe.com/dev/uniextract/)(src?) |
 MSI | .msi | [lessmsi](https://github.com/activescott/lessmsi), MSIExec (Windows), [7-Zip](https://7-zip.org/) |
 MSP | .msp | [MsiX](http://www.windowswiki.info/2009/02/19/how-to-extract-msumspmsiexe-files-from-the-command-line/), [7-Zip](https://7-zip.org/) |
+NE Resource DLL | .rsc .dll | Custom |
 Netopsystems FEAD | .exe | Input (/nos_ne) |
 PACKWIN | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Pascal Script Binary | .bin | [Inno Setup Decompiler](https://web.archive.org/web/20170201213810/http://vdisasm.com/isd/) |

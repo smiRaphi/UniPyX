@@ -101,8 +101,13 @@
     },
     {
         "rqr":"Win64 Executable (generic)",
-        "d":["py","f=open(inp,'rb')\nf.seek(0x3C)\nf.seek(int.from_bytes(f.read(4),'little'))\nf.seek(6,1)\nss = int.from_bytes(f.read(2),'little')\nf.seek(12,1)\nf.seek(int.from_bytes(f.read(2),'little') + 2,1)\nfor _ in range(ss):\n\tif f.read(8) == b'.qtmimed':return True\n\telse:f.seek(32,1)"],
+        "d":["py","f=open(inp,'rb');f.seek(60);f.seek(int.from_bytes(f.read(4),'little')+6);ss=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1)\nfor _ in range(ss):\n if f.read(8)==b'.qtmimed':return True\n f.seek(32,1)"],
         "rs":"Qt IFW","s":1
+    },
+    {
+        "rqr":["DOS Executable Borland C++","Win16 NE executable (generic)",true],
+        "d":[["py","f=open(inp,'rb');f.seek(60);f.seek(int.from_bytes(f.read(4),'little')+6)\nif int.from_bytes(f.read(2),'little')>40:return\nf.seek(4,1)\nif (f.read(1)[0]&243)!=1 or(f.read(1)[0]>>2)!=32:return\nf.seek(4,1)\nif sum(f.read(2)):return\nf.seek(16,1);return f.read(2)!=f.read(2)"]],
+        "rs":"NE Resource DLL"
     },
     {
         "rqr":null,
@@ -421,11 +426,6 @@
         "rs":"Sonic BINA","s":1},{
         "d":[["isat","\\0",18],["isat","\\0\\01BBINA",20],["isatS","\\0",4,12],["isatS","\\0",4,28],["isin",["\\0","\\1"],19],["n0",4,0],["n0",4,4]],
         "rs":"Sonic BINA","s":1
-    },
-    {
-        "rqr":"Win16 NE executable (generic)",
-        "d":[["isat","\\x01\\x83",140],["contain","\\x1ABatman AC Resource Library\\0\\0\\0",[272,2048]]],
-        "rs":"Batman AC Resource","s":1
     },
     {
         "rqr":"Visual Studio 2005",

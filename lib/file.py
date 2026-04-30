@@ -268,10 +268,21 @@ def ext_exe(i:str,dotnet=False):
         import dnfile
         return dnfile.dnPE(i)
     else:
-        import pefile
-        r = pefile.PE(i)
-        r.SECTIONS = {s.Name.rstrip(b'\0').decode(errors='ignore'):s for s in r.sections}
-        return r
+        f = open(i,'rb')
+        f.seek(0x3C)
+        f.seek(int.from_bytes(f.read(4),'little'))
+        t = f.read(2)
+        f.close()
+
+        if t == b'PE':
+            import pefile
+            r = pefile.PE(i)
+            r.SECTIONS = {s.Name.rstrip(b'\0').decode(errors='ignore'):s for s in r.sections}
+            return r
+        elif t == b'NE':
+            import nefile
+            return nefile.NE(i)
+        else: raise NotImplementedError(t.decode(errors='ignore'))
 
 OODLE = None
 GDEFLATE = None

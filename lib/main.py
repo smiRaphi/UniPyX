@@ -302,13 +302,13 @@ def analyze(inp:str,raw=False):
                             if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','no sec. cab.7z.zip [deb. 02','2010 (e8'} and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)
 
-                yrep = db.update('yara')
-                yp = dirname(yrep[0])
-                if yrep[1]:
-                    db.run([yp + '/yarac.exe','-w',yp + '/packers_peid.yar',yp + '/packers_peid.yarc'])
-                    remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
-                err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
-                if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
+            yrep = db.update('yara')
+            yp = dirname(yrep[0])
+            if yrep[1]:
+                db.run([yp + '/yarac.exe','-w',yp + '/packers_peid.yar',yp + '/packers_peid.yarc'])
+                remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
+            err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
+            if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
 
             dprc.wait()
             o = dprc.stdout.read().decode('cp437')

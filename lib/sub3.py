@@ -1668,5 +1668,20 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if not listdir(o + '/' + x): remove(o + '/' + x)
             if exists(o + '/xfl') and len(listdir(o + '/xfl')) == 1: copydir(o + '/xfl/' + listdir(o + '/xfl')[0],o + '/xfl',True,True)
             if listdir(o): return
+        case 'NE Resource DLL':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import ext_exe
+            f = ext_exe(i)
+
+            def getr(p,t):
+                if type(t) == dict:
+                    for k in t: getr(f'{p}/{k}',t[k])
+                else:
+                    d = t.data.read()
+                    writefile(f'{p}.{guess_ext(d)}',d)
+            getr(o,f.resource_table.resources)
+
+            del f
+            if listdir(o): return
 
     return 1
