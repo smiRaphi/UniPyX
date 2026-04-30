@@ -827,8 +827,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 MMFS_DEC[key] = dec
 
             d = bytearray(i)
-            if algo == 'mmfs_286' and iv & 1:
-                if isinstance(iv,int): iv = iv.to_bytes(2,'little')
+            if iv is None: iv = b'\0\0'
+            elif isinstance(iv,int): iv = iv.to_bytes(2,'little')
+            if algo == 'mmfs_286' and iv[0] & 1:
                 assert len(iv) == 2
                 d[0] ^= iv[0] ^ iv[1]
 

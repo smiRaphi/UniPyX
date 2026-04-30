@@ -546,5 +546,26 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'Detective Instinct: Farewell, My Beloved Encrypted DIP':
+            KEY = readfile(db.get('difmb_dip_key'))
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decrypt
+            f = File(decrypt(readfile(i),'xor',KEY),endian='>')
+            del KEY
+
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32(),f.read(f.readu32()).rstrip(b'\0').decode('utf-8')) for _ in range(c)]
+            for fe in fs:
+                fn = o + '/' + fe[2]
+                if fe[0] & 0x20: fn += '.external'
+                if fe[0] & 2:
+                    mkdir(fn)
+                    continue
+                else: d = f.readc(fe[1])
+                writefile(fn,d)
+
+            del f
+            if fs: return
 
     return 1

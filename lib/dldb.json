@@ -6998,6 +6998,12 @@
         ]],
         "ts":1777206982
     },
+    "difmb_dip_key":{
+        "p":"difmb_dip_key.bin",
+        "fs":[
+        "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/difmb_dip_key.bin"
+        ]
+    },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",
         "fs":[[
