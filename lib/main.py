@@ -20,9 +20,13 @@ DOSMAX = {
 }
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
-basename,dirname,splitext,abspath = os.path.basename,os.path.dirname,os.path.splitext,os.path.abspath
+basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
 rename = os.rename
 getsize,listdir = os.path.getsize,os.listdir
+def splitext(i:str):
+    bn = basename(i)
+    if bn[0] == '.': return i[:-len(bn)],bn
+    return os.path.splitext(i)
 def tbasename(i:str): return splitext(basename(str(i)))[0]
 def extname(i:str): return splitext(str(i))[1]
 def noext(i:str): return splitext(str(i))[0]

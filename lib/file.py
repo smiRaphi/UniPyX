@@ -63,6 +63,9 @@ class File:
                 break
             o += d
         return bytes(o)
+    def readall(self):
+        self.seek(0)
+        return self.read(self.size)
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -185,14 +188,15 @@ class File:
     @property
     def pos(self): return self.tell()
     @property
-    def size(self):
-        p = self.pos
-        r = self.seek(0,2)
-        self.seek(p)
-        return r
+    def size(self): return self._size
 
-    def update_size(self): self._size = self.tell()
-    def __len__(self): return self._size
+    def update_size(self,current=True):
+        if current: self._size = self.tell()
+        else:
+            p = self.tell()
+            self._size = self.seek(0,2)
+            self.seek(p)
+    def __len__(self): return self.size
     def __bool__(self): return self.pos < self.size
 class BitReader:
     def __init__(self,d:bytes):

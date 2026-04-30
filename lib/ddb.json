@@ -1265,6 +1265,14 @@
         "rs":"StarFlyers Bulk File Index"
     },
     {
+        "d":[["isat","\\2\\2\\x05\\0\\1\\0\\0\\0\\0\\0\\x04\\0",0],["isat","\\x06\\0",16],["isat","\\x07\\0",26],["isat","\\x08\\0",36],["isat","\\x09\\0",46],["n0",2,12],["n0",4,18],["n0",4,28],["n0",4,32],["n0",4,38],["n0",4,48],["n0",4,52],
+             ["py","if not exists(splitext(inp)[0]+'.dbb'):return\nf=open(inp,'rb');f.seek(12);c=int.from_bytes(f.read(2),'little');f.seek(32)\nif (c*16)!=int.from_bytes(f.read(4),'little'):return\nf.seek(52);return (c*11)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Endless Interactive IN2+DBB","s":1},{
+        "d":[["isat","\\0\\0\\1\\0\\0\\0\\1\\0",0],["isat","\\0\\0\\1\\0\\0\\0\\1\\0",256],["isatS","\\0",4,8],["isatS","\\0",24,24],["isatS","\\0",4,264],["n0",1,48],["str",49,5],
+             ["py","if not exists(splitext(inp)[0]+'.in2'):return\nf=open(inp,'rb');f.seek(48)\nif basename(inp).encode('ascii').lower()!=f.read(f.read(1)[0]).lower():return\nf.seek(f.read(1)[0]*18+21,1);return (int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big'))==f.seek(0,2)"]],
+        "rs":"Endless Interactive IN2+DBB","s":1
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0\\0\\x03\\0\\0",0],["isat","\\0\\0\\0\\x30",12],["isatS","\\0",8,40],["n0",4,8],["n0",4,32],["n0",4,36]],
         "rs":"Phineas And Ferb WAD"
     },

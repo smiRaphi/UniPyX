@@ -612,5 +612,99 @@ def extract4_4(inp:str,out:str,t:str):
 
             [f.close() for f in ofs.values() if f]
             if listdir(o): return
+        case 'Endless Interactive IN2+DBB':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+
+            def fix_mp4(f:File,gp:int,fn:str):
+                stco = None
+                def readb(p=None):
+                    nonlocal stco
+                    bp = f.pos
+                    s = f.readu32()
+                    n = ((p + '/') if p else '') + f.read(4).decode('ascii')
+                    if s == 1: s = f.readu64()
+                    elif s == 0: s = f.size - bp
+                    ep = bp + s
+
+                    if n in {'moov','moov/trak','moov/trak/mdia','moov/trak/mdia/minf','moov/trak/mdia/minf/dinf','moov/trak/mdia/minf/stbl'}:
+                        while f.pos < ep:
+                            if readb(n): return True
+                    elif n == 'moov/trak/mdia/minf/dinf/dref':
+                        assert f.readu8() == f.readu24() == 0
+                        c = f.readu32()
+                        for _ in range(c):
+                            if readb(n): return True
+                    elif n == 'moov/trak/mdia/minf/dinf/dref/alis':
+                        assert f.readu8() == 0
+                        fl = f.readu24()
+                        assert fl in {0,1}
+                        return not fl
+                    elif n == 'moov/trak/mdia/minf/stbl/stco':
+                        assert f.readu8() == f.readu24() == 0
+                        stco = f.pos
+
+                    f.seek(ep)
+
+                while f:
+                    if readb(): break
+                else:
+                    if stco is None: return
+                    f.seek(stco)
+                    c = f.readu32()
+                    for _ in range(c):
+                        v = f.readu32()
+                        f.back(4)
+                        assert v >= gp,f"0x{v:08X} < 0x{gp:08X} {fn}"
+                        f.writeu32(v-gp)
+
+                    writefile(f'{noext(fn)}.fixed{extname(fn)}',f.readall())
+                    del f
+
+            f = File(noext(i) + '.in2',endian='<')
+            fd = File(noext(i) + '.dbb',endian='>')
+            assert f.readu32() == 0x50202 and f.readu32() == 1
+            f.padc(2)
+
+            fd.seek(0x30)
+            fd.skip(fd.readu8())
+            c = fd.readu8()
+            fd.skip(1+c*0x12)
+            fd.padc(0x10)
+            fd.skip(4+4)
+            bo = fd.readu32()
+
+            tc = f.readu16()
+            fc = f.readu16()
+            f.skip(2)
+            ts = {f.readu16():(f.readu32(),f.readu32()) for _ in range(tc)}
+            assert 7 in ts and 9 in ts
+            assert ts[7][1] == (fc*0x10) and ts[9][1] == (fc*11)
+
+            f.seek(ts[9][0])
+            fs = []
+            for _ in range(fc):
+                f.skip(2)
+                fs.append((f.readu32(),f.readu32()))
+                f.skip(1)
+
+            f.seek(ts[7][0])
+            for _ in range(fc):
+                fn = f.read(12).rstrip(b'\0').decode('ascii')
+                assert fn and fn.isprintable()
+                id = f.readu16()
+                fn = o + '/' + fn
+                if exists(fn): fn = f'{noext(fn)}.{id:04d}{extname(fn)}'
+
+                fe = fs[id-1]
+                assert f.readu16() == 1
+                fd.seek(bo + fe[0])
+                d = fd.readc(fe[1])
+                writefile(fn,d)
+                if d[4:8] == b'mdat': fix_mp4(File(d,endian='>'),fe[0],fn)
+
+            f.close()
+            fd.close()
+            if c: return
 
     return 1
