@@ -567,5 +567,50 @@ def extract4_4(inp:str,out:str,t:str):
 
             del f
             if fs: return
+        case 'StarFlyers Bulk File Index':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            offs = [f.readu32() for _ in range(c)]
+
+            ofs = {}
+            fs = []
+            for of in offs:
+                f.seek(of)
+                f.skip(2)
+                to = f.readu32()
+                sn = f.read0s('ascii')
+                f.seek(to)
+                c = f.readu32()
+                offs2 = [f.readu32() for _ in range(c)]
+
+                for of2 in offs2:
+                    f.seek(of2)
+                    if sn == '*bulkFiles':
+                        id = f.readu32()
+                        assert id not in ofs or ofs[id] is None
+                        f.skip(14)
+                        fn = dirname(i) + '/' + f.read0s('ascii')
+                        #if not exists(fn): print('WARNING:',fn,'not found, skipping entries')
+                        ofs[id] = open(fn,'rb') if exists(fn) else None
+                    else:
+                        fe = [f.readu32(),f.readu32(),f.readu32()]
+                        f.padc(6)
+                        fe.append(sn + '/' + f.read0s('ascii'))
+                        fs.append(fe)
+            f.close()
+            if all(of is None for of in ofs.values()):
+                print('0 referenced *.bul files found')
+                return 1
+
+            for fe in fs:
+                if ofs[fe[0]] is None: continue
+                ofs[fe[0]].seek(fe[1])
+                writefile(o + '/' + fe[3],ofs[fe[0]].read(fe[2]).split(b'\0',1)[1])
+
+            [f.close() for f in ofs.values() if f]
+            if listdir(o): return
 
     return 1
