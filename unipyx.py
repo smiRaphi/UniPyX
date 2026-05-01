@@ -4,6 +4,8 @@ if __name__ == '__main__':
     from sys import argv,exit
 
     if argv[1:] == ['-clean']:
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
         import re
         from shutil import rmtree
         assert os.path.exists('.gitignore'),".gitignore does not exist"
@@ -17,16 +19,27 @@ if __name__ == '__main__':
                 for y in os.listdir(p):
                     tp = x + '/' + y
                     if tp in nr: continue
-                    if os.path.isfile(p + '/' + y): os.remove(p + '/' + y)
+                    if os.path.isfile(p + '/' + y):
+                        os.chmod(p + '/' + y,128)
+                        os.remove(p + '/' + y)
                     else: rmtree(p + '/' + y)
                 if not os.listdir(p): os.rmdir(p)
 
         exit()
     elif argv[1:] == ['-pip']:
-        from lib.dldb import DLDB
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+        from lib.dldb import DLDB,pip
         db = DLDB()
-        for x in db.pdb:
-            if not db.pdb[x].get('old'): db.pip(x)
+        pl = []
+        pn = []
+        for x,y in db.pdb.items():
+            if y.get('old'): continue
+            pn.append(x)
+            pl.append(y['pip'])
+        print('Downloading:')
+        print(', '.join(pn))
+        pip(*pl)
         exit()
 
     scan = '-os' in argv

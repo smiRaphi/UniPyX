@@ -105,8 +105,8 @@
         "rs":"Qt IFW","s":1
     },
     {
-        "rqr":["DOS Executable Borland C++","Win16 NE executable (generic)",true],
-        "d":[["py","f=open(inp,'rb');f.seek(60);f.seek(int.from_bytes(f.read(4),'little')+6)\nif int.from_bytes(f.read(2),'little')>40:return\nf.seek(4,1)\nif (f.read(1)[0]&243)!=1 or(f.read(1)[0]>>2)!=32:return\nf.seek(4,1)\nif sum(f.read(2)):return\nf.seek(16,1);return f.read(2)!=f.read(2)"]],
+        "rqr":["Win16 NE executable (generic)","MS-DOS executable"],
+        "d":[["isat","MZP",0],["py","f=open(inp,'rb');f.seek(60);f.seek(int.from_bytes(f.read(4),'little'))\nif f.read(2)!=b'NE':return\nf.seek(4,1)\nif int.from_bytes(f.read(2),'little')>40:return\nf.seek(4,1)\nif (f.read(1)[0]&243)!=1 or(f.read(1)[0]>>2)!=32:return\nf.seek(4,1)\nif sum(f.read(2)):return\nf.seek(16,1);return f.read(2)!=f.read(2)"]],
         "rs":"NE Resource DLL"
     },
     {

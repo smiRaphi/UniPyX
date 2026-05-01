@@ -547,7 +547,7 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Detective Instinct: Farewell, My Beloved Encrypted DIP':
-            KEY = readfile(db.get('difmb_dip_key'))
+            KEY = readfile(db.get('difmb_dip_key')) # external file because 256KB
 
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,decrypt
