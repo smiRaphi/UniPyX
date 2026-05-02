@@ -615,7 +615,7 @@ def extract4_4(inp:str,out:str,t:str):
 
             [f.close() for f in ofs.values() if f]
             if listdir(o): return
-        case 'Endless Interactive IN2+DBB':
+        case 'Endless Interactive IN2+DBB'|'Endless Interactive IN1+DBB':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
 
@@ -662,10 +662,11 @@ def extract4_4(inp:str,out:str,t:str):
                 writefile(f'{noext(fn)}.fixed{extname(fn)}',f.readall())
                 del f
 
-            f = File(noext(i) + '.in2',endian='<')
+            f = File(noext(i) + '.in' + t[21])
+            f._end = {0x101:'>',0x202:'<'}[f.readu16()]
             fd = File(noext(i) + '.dbb',endian='>')
-            assert f.readu32() == 0x50202 and f.readu32() == 1
-            f.padc(2)
+            assert f.readu16() == 5 and f.readu16() == 1
+            f.padc(4)
 
             fd.seek(0x30)
             fd.skip(fd.readu8())
@@ -717,7 +718,7 @@ def extract4_4(inp:str,out:str,t:str):
                 d = fd.readc(x[1])
                 fn = f'{o}/$left/{ix:03d}.{guess_ext(d)}'
                 writefile(fn,d)
-                if d[4:8] == b'mdat': fix_mp4(File(d,endian='>'),fe[0],fn)
+                if d[4:8] == b'mdat': fix_mp4(File(d,endian='>'),x[0],fn)
                 c += 1
 
             f.close()

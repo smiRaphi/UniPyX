@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 920
+# Supported Formats: 921
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -348,7 +348,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (464)
+## Various (465)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -485,6 +485,7 @@ EBAB Animation Data | .ebab | Custom |
 Electronic Arts LIB | .lib | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Empire Earth 1 SSA | .ssa | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Encrypted Arsenal MTC+MDF | .mtc+.mdf | Custom |
+Endless Interactive IN1+DBB | .in1+.dbb | Custom |
 Endless Interactive IN2+DBB | .in2+.dbb | Custom | holy shit I hate quicktime
 Ensemble Studios DRS | .drs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Escal Compressed | * | [na_game_tool](https://nihav.org/game_tool.html) |
