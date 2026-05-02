@@ -37,7 +37,6 @@ CD-i Realtime File | .rti .rtf .rtr | CD-i games | [interview](#cd-i-rtf-dev-int
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
 - lib/file.py:crc_hash SipHash
-- lib/file.py:crc_hash DJB2
 - lib/file.py:crc_hash City/Farm Hash
 - lib/file.py:crc_hash Blake3
 - RE Engine PAK: ree.unpacker -> Custom

@@ -392,7 +392,8 @@ def extract4_3(inp:str,out:str,t:str):
             return
         case 'Disney\'s Tarzan FSD':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             HL = HashLib.dl('tarzan',db,fmt=lambda x:x[:1022],encoding='ascii')
             f = File(i,endian='<')
 
@@ -615,10 +616,11 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Nemea File Archive':
-            KEY = 0xEE ^ (0x1E6 & 0xFF)
+            KEY = (0xEE,0x1E6 & 0xFF)
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='<')
             assert f.read(4) == b'NFA0'
 
@@ -632,7 +634,7 @@ def extract4_3(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 #if fe[2]: print(decrypt(f.read(4),'xor',KEY).hex(),fe[0],fe[1],hex(fe[2]));raise
-                writefile(o + '/' + fe[2],decrypt(f.read(fe[0]),'xor',KEY))
+                writefile(o + '/' + fe[2],decrypt(f.read(fe[0]),'dxor',*KEY))
 
             f.close()
             if fs: return
@@ -1028,7 +1030,8 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Archer Maclean\'s Mercury PAQ':
             CRCC = b"________________________________________________0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____________________________________________________________________________________________________________________________________"
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             HL = HashLib.dl('archer_mac_mercury',db,fmt=lambda x:x.translate(CRCC),encoding='ascii')
             f = File(i,endian='<')
             assert f.readu32() in {0x7D1,0xFEED}
@@ -1142,7 +1145,8 @@ def extract4_3(inp:str,out:str,t:str):
             return
         case 'SDFTool SDF.bin':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='>')
             assert f.read(4) == b'SDF0'
 
@@ -1230,7 +1234,8 @@ def extract4_3(inp:str,out:str,t:str):
             KEY = (0xB5,0x29,0x6C,0x96)
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt,decompress
+            from lib.file import decompress
+            from lib.crypto import decrypt
 
             if '_d.' in basename(i).lower(): iv = 'natives/STM/streaming/Roms/DecryptionRom/' + basename(i).replace('_d','_D')
             else: iv = 'natives/STM/streaming/Roms/' + basename(i)
@@ -1278,7 +1283,8 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             assert exists(noext(i) + '.trpfs')
             db.get('trpfs.fbs')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             HL = HashLib.dl('pokemon',db)
 
             fd = File(noext(i) + '.trpfs',endian='<')
@@ -1313,7 +1319,8 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Trinity PAK':
             if db.print_try: print('Trying with custom extractor')
             db.get('trpak.fbs')
-            from lib.file import decompress,HashLib
+            from lib.file import decompress
+            from lib.crypto import HashLib
             HL = HashLib.dl('pokemon',db)
 
             from bin.PokeDocs.trpak import TRPAK # type: ignore
@@ -1332,7 +1339,8 @@ def extract4_3(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Trinity GFLXPack':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             HL = HashLib.dl('pokemon',db)
 
             f = File(i,endian='<')
@@ -1457,7 +1465,8 @@ def extract4_3(inp:str,out:str,t:str):
         case 'PlayStation Encrypted SFM':
             if db.print_try: print('Trying with custom extractor')
             from Cryptodome.Cipher import AES
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
 
             dn = dirname(i)
             for _ in range(3):
@@ -1737,7 +1746,8 @@ def extract4_3(inp:str,out:str,t:str):
             if not any(rs): return
         case 'RTX Remix Package':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,crc_hash
+            from lib.file import File
+            from lib.crypto import crc_hash
             f = File(i,endian='<')
             assert f.read(4) == b'\x0D\xD0\xAD\xBA' and f.readu32() == 1
 
@@ -1819,7 +1829,8 @@ def extract4_3(inp:str,out:str,t:str):
                 writefile(sdk,sdky + sdiv)
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='>')
             h = decrypt(f.readc(0xF0C0),'aes_cbc',sdky,sdiv)
             writefile(o + '/$SYS/header.bin',h)
@@ -1970,7 +1981,8 @@ def extract4_3(inp:str,out:str,t:str):
             if d: return
         case 'Sumo Digital XPAC':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             HL = HashLib.dl('sumo_xpac',db,fmt=lambda x:x.upper().replace(b'/',b'\\'),encoding='utf-8')
 
             bak = {
@@ -2334,7 +2346,8 @@ def extract4_3(inp:str,out:str,t:str):
             if ofs: return
         case 'Sunday vs. Magazine FARC':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
 
             HL = HashLib.dl('sxm',db,fmt=lambda x:x.lower().replace('\\','/'),encoding='ascii')
             f = File(i,endian='<')
@@ -2426,7 +2439,7 @@ def extract4_3(inp:str,out:str,t:str):
     return 1
 
 def dnasoft_lzss_decrypt(i:bytes):
-    from lib.file import decrypt
+    from lib.crypto import decrypt
     KEY = b'\xe4\x81\xd4\xed\x17\xd4\x41\x62\xfa\x5c\xe9\x95\xae\x25\x2f\xd0\x98\xc0\x14\xce\xd9\xa7\x42\xf9\x9f\xfa\x8d\x38\x2b\x2a\x13\x6a\x26\xe0\xd9\x70\x8e\xab\xb5\xf1\x8e\x77\xed\x80\x9b\x1c\xaf\x51\x91\x8d\x68\x00\x61\xb2\x46\x3d'
 
     assert i[:4] == b'LZSS'

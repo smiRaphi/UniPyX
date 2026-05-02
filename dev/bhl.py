@@ -5,7 +5,7 @@ iFMT = lambda x:x #'/'+x.replace('\\','/').lstrip('/') # x: str
 import os,sys
 argv = sys.argv
 sys.path.append(os.getcwd())
-from lib.file import HashLib
+from lib.crypto import HashLib
 
 if argv[1] == 'd':
     h = HashLib(argv[2],fmt=FMT,encoding=ENC).loadb()

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 919
+# Supported Formats: 920
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -348,7 +348,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (463)
+## Various (464)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -702,6 +702,7 @@ Safari WebArchive | ??? | [pywebarchive](https://pypi.org/project/pywebarchive/)
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
 SDFTool SDF.bin | .bin | Custom |
+Selene Pack | .pack | Custom |
 SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |

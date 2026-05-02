@@ -8,7 +8,7 @@ FL = [os.path.join(FAC,x) for x in os.listdir(FAC) if x.endswith(('.fah','.fab',
 import sys
 if sys.argv[1:] == ['x']:
     import subprocess
-    from lib.file import HashLib
+    from lib.crypto import HashLib
     bhl = 'bin/hashes/sxm.bhl'
     if os.path.exists(bhl): os.remove(bhl)
     hl = HashLib.new(bhl,'sxm',fmt=lambda i:i.lower().replace(b'\\',b'/'),encoding='ascii')
@@ -28,7 +28,8 @@ if sys.argv[1:] == ['x']:
                 if os.path.exists(p[1]): cl.remove(p[2])
     sys.exit()
 
-from lib.file import File,sxm_hash
+from lib.file import File
+from lib.crypto import sxm_hash
 
 HL = set()
 for fe in FL:

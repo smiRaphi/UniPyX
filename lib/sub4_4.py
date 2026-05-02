@@ -323,7 +323,8 @@ def extract4_4(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Xenoblade Chronicles X DE ARH2':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             hl = HashLib.dl('xbxde',db,fmt=lambda x:x.lower(),encoding='ascii')
             f = File(i,endian='<')
             assert f.read(4) == b'arh2'
@@ -507,7 +508,8 @@ def extract4_4(inp:str,out:str,t:str):
             KEY = 0xBB
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='<')
             assert f.read(4) == b'BSF\0'
             f.skip(0x14)
@@ -550,7 +552,8 @@ def extract4_4(inp:str,out:str,t:str):
             KEY = readfile(db.get('difmb_dip_key')) # external file because 256KB
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(decrypt(readfile(i),'xor',KEY),endian='>')
             del KEY
 
@@ -763,10 +766,55 @@ def extract4_4(inp:str,out:str,t:str):
             KEY = 0x28
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt
+            from lib.crypto import decrypt
             of = f'{o}/{tbasename(i)}.bundle'
             writefile(of,decrypt(readfile(i),'xor',KEY))
             r = extract(of,o,'Unity Bundle')
             return
+        case 'Selene Pack':
+            KEYS = (b'Selene.Default.Password',b'PackPass')
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            from lib.crypto import decrypt
+            from multiprocessing.pool import ThreadPool
+            f = File(i,endian='<')
+            assert f.read(4) == b'KCAP'
+
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                fn = f.read(0x40).rstrip(b'\0').decode('shift-jis')
+                assert fn,f.pos-0x40
+                f.skip(8)
+                fs.append((fn,f.readu32(),f.readu32(),f.readu32()))
+                assert fs[-1][3] in {0,1}
+
+            if any(fe[3] for fe in fs):
+                wav = [fe for fe in fs if fe[3] == 1 and fe[0].lower().endswith('.wav') and fe[2] >= 4]
+                assert wav,"Can't guess key"
+                wav = wav[0]
+                f.seek(wav[1])
+                d = f.readc(4)
+                for k in KEYS: # this also initializes all key tables!!! which would otherwise cause Threading issues
+                    if decrypt(d,'selene',k) == b'RIFF':
+                        key = k
+                        break
+                else: raise RuntimeError('Unknown key')
+
+            def writed(d,fn,flg):
+                if flg: d = decrypt(d,'selene',key)
+                writefile(o + '/' + fn,d)
+            p = ThreadPool()
+            pcs = []
+            for fe in fs:
+                f.seek(fe[1])
+                pcs.append(p.apply_async(writed,(f.readc(fe[2]),fe[0],fe[3])))
+            for pc in pcs: pc.get()
+            p.close()
+            p.join()
+
+            f.close()
+            if fs: return
 
     return 1

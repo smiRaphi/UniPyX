@@ -506,7 +506,8 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Petroglyph MEG':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt,crc_hash
+            from lib.file import File
+            from lib.crypto import decrypt,crc_hash
             f = File(i,endian='<')
 
             fnc = f.readu32()
@@ -633,7 +634,8 @@ def extract4_2(inp:str,out:str,t:str):
             if c: return
         case 'Hatch Game Engine HATCH':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib,decrypt
+            from lib.file import File
+            from lib.crypto import HashLib,decrypt
             HL = HashLib.dl('sonic_galactic_demo2',db)
             f = File(i,endian='<')
             assert f.read(5) == b'HATCH' and f.readu24() == 1
@@ -864,7 +866,8 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Lucas Arts Bundle':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='>')
 
             doff = None
@@ -1095,7 +1098,8 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Novalogic Resource':
             KEYS = {b'\xAD\xDE\xED\xAC',b'\x2D\xDE\xED\xAC\xAD\xDE\xED\xAC\xAD\xDE\xED\xAC'}
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='<')
             assert f.read(12) == b'RESOURCE2xxx'
             c = f.readu32()
@@ -1479,7 +1483,8 @@ def extract4_2(inp:str,out:str,t:str):
             }
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib,decompress
+            from lib.file import File,decompress
+            from lib.crypto import HashLib
             from multiprocessing.pool import ThreadPool
             HL = HashLib.dl('ssbu',db)
             f = File(i,endian='<')
@@ -1714,7 +1719,8 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Feral Header Library':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,crc_hash
+            from lib.file import File
+            from lib.crypto import crc_hash
             f = File(i,endian='<')
             assert f.read(4) == b'BILH'
             if (24+f.readu32()+f.readu64()) == f.size: ver = 1

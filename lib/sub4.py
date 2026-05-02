@@ -366,7 +366,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Teardown Encrypted':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt
+            from lib.crypto import decrypt
             d = decrypt(readfile(i),'dxor',
                         b"599Cc51887A8cb0C20F9CdE34cf9e0A535E5cAd1C26c7b562596ACC207Ae9A0bfB3E3161f31af5bEf1c2f064b3628174D83BF6E0739D9D6918fD9C2Eba02D5aD",
                         b"0C3b676fe8d7188Cde022F71632830F36b98b181aD48Fed160006eA59")
@@ -384,7 +384,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             )
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt,decompress,crc_hash
+            from lib.file import File,decompress
+            from lib.crypto import decrypt,crc_hash
             from multiprocessing.pool import ThreadPool
             f = File(i,endian='<')
             f.seek(-max(x[0] for x in VS))
@@ -728,7 +729,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Hollow Knight Save':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt
+            from lib.crypto import decrypt
             from base64 import b64decode
 
             f = open(i,'rb')

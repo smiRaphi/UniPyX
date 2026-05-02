@@ -1046,7 +1046,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Netcrypt':
             if db.print_try: print('Trying with custom extractor')
             import base64
-            from lib.file import EXE,decrypt
+            from lib.file import EXE
+            from lib.crypto import decrypt
 
             x = EXE(i)
             x.seek(x.secs['.text'][0])
@@ -1391,7 +1392,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'CryptPE BinTable.h':
             if db.print_try: print('Trying with custom extractor')
             import re,ast
-            from lib.file import decrypt,decompress
+            from lib.file import decompress
+            from lib.crypto import decrypt
 
             inf = open(i).read()
             s = int(re.search(r'static size_t file_size *= *(\d+);',inf)[1])
@@ -1404,7 +1406,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'CryptPE':
             if db.print_try: print('Trying with custom extractor')
             import re
-            from lib.file import decrypt,decompress,EXE
+            from lib.file import decompress,EXE
+            from lib.crypto import decrypt
             f = EXE(i)
 
             ds = f.secs['.data'][1] - 0x80 - 0x20 - 0x10 - 0x30
@@ -1517,7 +1520,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             iszl = lambda d: d[0] == 0x78 and d[1] in {0x01,0x5E,0x9C,0xDA}
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import EXE,File,decompress,decrypt
+            from lib.file import EXE,File,decompress
+            from lib.crypto import decrypt
             from multiprocessing.pool import ThreadPool
             f = EXE(i)
             f.seek(f.ovl_off)

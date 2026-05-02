@@ -170,7 +170,8 @@ def extract4_1(inp:str,out:str,t:str):
         case 'MediaMobile PAK':
             if db.print_try: print('Trying with custom extractor')
             txt = re.compile(r'^[А-Яа-яЁё0-9\s\.,!\?"\'\-—\(\)]*$')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='>')
 
             c = f.readu32()
@@ -472,7 +473,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'HMM Encrypted Snapshot': raise NotImplementedError
         case 'JDownloader2 Encrypted Subconfig'|'JDownloader2 Encrypted Accounts':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt
+            from lib.crypto import decrypt
             if t == 'JDownloader2 Encrypted Subconfig':k = b'\x01\x02\x11\x01\x01T\x01\x01\x01\x01\x12\x01\x01\x01"\x01'
             elif t == 'JDownloader2 Encrypted Accounts':k = b'\x01\x06\x04\x05\x02\x07\x04\x03\x0c=\x0eK\xfe\xf9\xd4!'
 
@@ -1094,7 +1095,8 @@ def extract4_1(inp:str,out:str,t:str):
             dbf.close()
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt,crc_hash
+            from lib.file import File
+            from lib.crypto import decrypt,crc_hash
             fd = open(noext(i) + '.mdf','rb')
             hsh = crc_hash(fd.read(0x1000),'sha256')
             assert hsh in bdb
@@ -1296,7 +1298,8 @@ def extract4_1(inp:str,out:str,t:str):
             else: tf.destroy()
         case 'Smiles Fortune Hunters PAK':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(i,endian='<')
             assert f.read(8) == b'Ver 1.0.'
 
@@ -1309,7 +1312,8 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'ODAU Zip':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import decrypt,decompress
+            from lib.file import decompress
+            from lib.crypto import decrypt
             if decompress(decrypt(readfile(i),'xor',0xA5),'zip',o=o): return
         case 'Siren 2 SLPK ROM':
             if db.print_try: print('Trying with custom extractor')
@@ -1527,7 +1531,8 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'Sinergy GUT':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decrypt
+            from lib.file import File
+            from lib.crypto import decrypt
             f = File(inp,endian='<')
 
             msg = b''
@@ -1692,7 +1697,8 @@ def extract4_1(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Sine Mora EX BIN':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,HashLib
+            from lib.file import File
+            from lib.crypto import HashLib
             HL = HashLib.dl('sine_mora',db)
             f = File(inp,endian='<')
 

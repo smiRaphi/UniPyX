@@ -1,5 +1,6 @@
 import os
-from lib.file import sdbm,File
+from lib.file import File
+from lib.crypto import sdbm
 
 P = r"<dir>"
 HL = []

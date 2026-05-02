@@ -1,6 +1,7 @@
 import struct,io,os
 from hashlib import pbkdf2_hmac,md5,sha1,sha256
-from lib.file import File,align,decrypt
+from lib.file import File,align
+from lib.crypto import decrypt
 _File = File
 
 BASED = os.path.dirname(os.path.abspath(__file__)) + '/tmd_'
