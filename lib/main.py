@@ -756,7 +756,7 @@ def guess_ext(d:bytes) -> str:
 
     ext = 'bin'
     if d[:4] == b'\x89PNG': ext = 'png'
-    elif d[:4] == b'RIFF': ext = 'wav'
+    elif d[:4] == b'RIFF' and d[8:12] == b'WAVE': ext = 'wav'
     elif d[:4] == b'OggS': ext = 'ogg'
     elif d[:4] == b'fLaC': ext = 'flac'
     elif d[:4] == b'MThd': ext = 'mid'
@@ -770,6 +770,7 @@ def guess_ext(d:bytes) -> str:
     elif d[:4] == b'FORM' and d[8:12] == b'AIFF': ext = 'aif'
     elif d[6:10] == b'JFIF': ext = 'jpg'
     elif d[-0x12:] == b'TRUEVISION-XFILE.\0': ext = 'tga'
+    elif d[4:8] == b'mdat' and d[int.from_bytes(d[0:4],'big')+4:int.from_bytes(d[0:4],'big')+8] == b'moov': ext = 'mp4'
     elif d[:4] == b'\0\0\1\xBA' and\
          d[4] >> 6 == 0b01 and d[4] & 4 and\
          d[6] & 4 and d[8] & 4 and d[9] & 1 and\
