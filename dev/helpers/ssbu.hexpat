@@ -59,7 +59,7 @@ struct di {
 };
 struct dof {
     u64 off;
-    u32 unk_size;
+    u32 dec_size;
     u32 size;
     u32 sub_dat_start_idx;
     u32 sub_dat_count;

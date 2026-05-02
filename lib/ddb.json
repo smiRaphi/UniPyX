@@ -1273,6 +1273,10 @@
         "rs":"Endless Interactive IN2+DBB","s":1
     },
     {
+        "d":[["s%",2048],["isat","\\0\\1\\0\\0",16],["isatS","\\xFF",4,0],["isatS","\\0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(4),'little')-1);return f.read(4)==b'SSCN'"]],
+        "rs":"Blood Will Tell Osamu Tezuka's Dororo LBI","s":1
+    },
+    {
         "d":[["isat","\\0\\0\\0\\0\\0\\x03\\0\\0",0],["isat","\\0\\0\\0\\x30",12],["isatS","\\0",8,40],["n0",4,8],["n0",4,32],["n0",4,36]],
         "rs":"Phineas And Ferb WAD"
     },
@@ -1627,7 +1631,11 @@
     {
         "d":[["isat","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x16\\0\\0\\0\\0",0],
              ["isat","\\0\\0\\0\\0\\0\\0\\0\\x0020",40]],
-        "rs":"Unity Assets","s":1
+        "rs":"Unity Assets"
+    },
+    {
+        "d":[["isat","\\x7D\\x46\\x41\\x5C\\x51\\x6E\\x7B\\x28\\x28\\x28",0],["isat","\\x06",13],["contain","\\x06",[15,4]],["contain","\\x28\\x1A\\x18",[17,6]]],
+        "rs":"DDLC+ Encrypted Unity Bundle","s":1
     },
     {
         "d":[["isat","-==--==--==--==-",0 ],

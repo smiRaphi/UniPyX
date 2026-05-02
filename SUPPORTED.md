@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 918
+# Supported Formats: 919
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -348,7 +348,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (462)
+## Various (463)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -449,6 +449,7 @@ Dark Reign FTG | .ftg | [Game Extractor Server](https://github.com/Sembiance/dex
 Data MP4 | .mp4 | Custom | MP4 File with file appended to guid section, used to circumvent upload limits on discord
 Davilex Games IDX+IMG | .idx+.img | [davilex_games.bms](https://mirror.aluigi.org/bms/davilex_games.bms) |
 DBS Database | .dbs | Custom |
+DDLC+ Encrypted Unity Bundle | .cy | Custom -> Unity Bundle |
 DDR DAT | .dat | Custom |
 Death End re:Quest 2 GDAT | .dat | Custom |
 Death End re:Quest 2 ZLIB | \* | Custom |

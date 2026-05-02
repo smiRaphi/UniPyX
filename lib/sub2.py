@@ -150,6 +150,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
         case 'Switch NSP'|'Switch NCA'|'Switch XCI':
+            import re
+
             st = {'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t]
             for k in ('prod','dev'):
                 bcd = ['hac2l','-t',st,'--disablekeywarns','-k',db.get(k+'keys'),'--titlekeys=' + dirname(db.get(k+'keys')) + '\\title.keys']
@@ -160,13 +162,15 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if ' MetaType=Patch ' in e and not ' MetaType=App ' in e:
                     pinf = re.search(r'ProgramId=([\dA-F]+), Version=0x([\dA-F]+),',e)
                     pid,pv = pinf[1],int(pinf[2],16)
+                    pbf = []
                     for x in listdir(dirname(i)):
-                        if pid in x and x.endswith('.nsp'):
+                        if x != basename(i) and pid in x and x.endswith('.nsp'):
                             try: v = int(re.search(r'v(\d+)(?:\b|_)(?!\.)',x)[1])
                             except: v = 0
-                            if v < pv: bf = dirname(i) + '\\' + x;break
-                    else: return 1
-                    bcd.append('--base' + st + '=' + bf)
+                            if v < pv: pbf.append((v,dirname(i) + '\\' + x))
+                    if not pbf: return 1
+                    pbf.sort(key=lambda x:x[0])
+                    bcd.append('--base' + st + '=' + pbf[0][1])
 
                 if run(bcd + [i])[0] == 0xc0000005: raise ValueError('Access violation (0xc0000005/3221225477)')
                 if listdir(o) and exists(o + '/ExeFS') and exists(o + '/RomFS') and listdir(o + '/ExeFS') and listdir(o + '/RomFS'): return

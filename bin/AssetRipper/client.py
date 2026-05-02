@@ -1,5 +1,6 @@
 import httpx,os,json,subprocess,re
 from shutil import rmtree
+from time import sleep
 
 BDIR = os.path.dirname(os.path.realpath(__file__))
 def dumps(i): return json.dumps(i,ensure_ascii=False,separators=(',',':'))
@@ -42,7 +43,11 @@ class Client:
         self.test(True)
     def end(self):
         if self.p: self.p.kill()
-        if os.path.exists(BDIR + '/temp'): rmtree(BDIR + '/temp')
+        if os.path.exists(BDIR + '/temp'):
+            while True:
+                try: rmtree(BDIR + '/temp')
+                except PermissionError: sleep(0.1)
+                else: break
     def log(self): return self.p.stdout.read().decode(),self.p.stderr.read().decode()
     def __del__(self): self.end()
 

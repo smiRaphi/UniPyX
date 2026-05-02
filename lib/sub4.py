@@ -180,6 +180,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['unpsarc',i,o])
             if listdir(o): return
         case 'Unity Bundle':
+            db.get('assetripper')
             if db.print_try: print('Trying with assetripper')
             from bin.AssetRipper.client import extract as AsR_extract
             r = AsR_extract(i,o)
@@ -193,7 +194,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
                 tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
                 with open(tf,'wb') as f:
-                    for x in sorted(fs,key=lambda x:x[1]): f.write(open(x[0],'rb').read())
+                    for x in sorted(fs,key=lambda x:x[1]): f.write(readfile(x[0]))
                 r = extract(tf,o,'Unity Bundle')
                 remove(tf)
             else: r = extract(i,o,'Unity Bundle')

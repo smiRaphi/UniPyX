@@ -1515,14 +1515,20 @@ def extract4_2(inp:str,out:str,t:str):
                 assert not tc[1] and tb.readu32() == tb.readu32() == 0x10
             rc = (tb.readu8(),tb.readu8())
             tb.padc(2)
+            if v == 1: v = (1,0,0)
+            else:
+                v = tuple(reversed((tb.readu8(),tb.readu8(),tb.readu8())))
+                tb.padc(1)
+                cs.extend([tb.readu32(),tb.readu32()])
+                tb.skip(8)
+                cs.extend([tb.readu32(),tb.readu32()])
 
             fs = []
             sfs = []
-            if v == 1:
+            if v == (1,0,0):
                 # cs: DirC, FiC1, FiNmC, SuFiC1, LasTabC, HsDirC, FiInfC, FiC2, SuFiC2
-                # c1: mov, p1, p2, mus
+                # c1: QDirC, StrmHsC, StrmFiIdxC, StrmOffC
                 c1 = [tb.readu32() for _ in range(4)]
-
                 tb.skip(12 * c1[0]+
                         8  * c1[1])
 
@@ -1575,27 +1581,109 @@ def extract4_2(inp:str,out:str,t:str):
                     if sf[4] & 8 or sf[4] & 0x40: continue
 
                     didx = dil[fe[1]]
-                    n = HL.get(fe[0],f'$unk/{fe[0]:10X}.bin').replace(':/','/').replace(':','_')
+                    n = sub_path(HL.get(fe[0],f'$unk/{fe[0]:10X}.bin').replace(':/','/'))
                     if fe[2]:
-                        for rix in range(rc[1]):
+                        for rix in range(rc[0]): # was rc[1], have to test at some point
                             sf = sfinf[fe[2] + rix]
                             fs.append((f'${rgm[rix]}/{n}',file_seco + dofs[didx + 1 + rix] + sf[0],sf[1],sf[2],sf[4]))
                     else: fs.append((n,file_seco + dofs[didx] + sf[0],sf[1],sf[2],sf[4]))
                     assert (fs[-1][1]+fs[-1][2]) <= file_syso#,fe[-1]
 
                 for fe in Sn2h:
-                    n = HL.get(fe[0],f'$unk_strm/{fe[0]:10X}.bin').replace(':/','/').replace(':','_')
+                    n = sub_path(HL.get(fe[0],f'$unk_strm/{fe[0]:10X}.bin').replace(':/','/'))
                     if fe[2] in {1,2}:
                         for rix in range(5 if fe[2] == 2 else rc[1]):
                             sfs.append((f'${rgm[rix]}/{n}',*So[Si2f[fe[1] + rix]]))
                     else: sfs.append((n,*So[Si2f[fe[1]]]))
+            elif v >= (5,0,0):
+                # cs: FiInfPthC, FiInfIdxC, DirC, DirOffC1, HsDirC, FiInfC, FiInfSubIdxC, FiDatC1, DirOffC2, FiDatC2, XDir, XC1, XC2, XSubC
 
+                rgm = []
+                ctm = {}
+                for ix in range(rc[0]):
+                    rgm.append(REGS.get(tb.readu32(),f'unk_R{ix}'))
+                    ct = tb.readu32()
+                    cix = tb.readu32()
+                    ctm[cix] = REGS.get(ct,f'unk_C{cix}')
+
+                # c1: QDirC, StrmHsC, StrmFiIdxC, StrmOffC
+                c1 = [tb.readu32() for _ in range(4)]
+                tb.skip(12 * c1[0]+
+                        8  * c1[1])
+
+                # path, idx, flgs
+                Sn2h = tuple([(tb.readu40(),tb.readu24(),tb.readu32()) for _ in range(c1[1])])
+                Si2f = tuple([tb.readu32() for _ in range(c1[2])])
+                So = tuple([(tb.readu64(),tb.readu64()) for _ in range(c1[3])])
+
+                # c2: HsIdxGrpC, BuckC
+                c2 = (tb.readu32(),tb.readu32())
+                tb.skip(8 * c2[1]+
+                        8 * c2[0])
+
+                fps = []
+                for _ in range(cs[0]):
+                    fps.append((tb.readu40(),tb.readu24()))
+                    tb.skip(0x18)
+                fps = tuple(fps)
+
+                fifix = []
+                for _ in range(cs[1]):
+                    tb.skip(4)
+                    fifix.append(tb.readu32())
+                fifix = tuple(fifix)
+                tb.skip(8    * cs[2]+
+                        0x34 * cs[2])
+
+                dofs = []
+                for _ in range(cs[3]+cs[8]+cs[10]):
+                    dofs.append(tb.readu64())
+                    tb.skip(4*5)
+                dofs = tuple(dofs)
+                tb.skip(8 * cs[4])
+
+                finf = []
+                for _ in range(cs[5]+cs[9]+cs[11]):
+                    tb.skip(8)
+                    finf.append((tb.readu32(),tb.readu32()))
+                finf = tuple(finf)
+                finf2d = tuple([(tb.readu32(),tb.readu32(),tb.readu24(),tb.readu8()) for _ in range(cs[6]+cs[9]+cs[12])])
+                fds = tuple([(tb.readu32() << 2,tb.readu32(),tb.readu32(),tb.readu32()) for _ in range(cs[7]+cs[9]+cs[13])])
+
+                HL.wait()
+                def add_fs(n,fd,fe):
+                    sf = fds[fd[1]]
+                    if sf[3] & 1:
+                        assert sf[3] & 2 and sf[1] > 4,f'{sf} {fd} {fe[0]} {hex(fe[1])} {n}'
+                    off = file_seco + dofs[fd[0]] + sf[0]
+                    assert (off+sf[1]) <= file_syso
+                    fs.append((n,off,sf[1],sf[2],sf[3]))
+                for fp in fps:
+                    fe = finf[fifix[fp[1]]]
+                    if fe[1] & 0x10: continue
+                    n = sub_path(HL.get(fp[0],f'$unk/{fp[0]:10X}.bin').replace(':/','/'))
+                    fd = finf2d[fe[0]]
+                    while fe[1] & 0x10:
+                        fe = finf[fd[2]]
+                        fd = finf2d[fe[0]]
+
+                    if fe[1] & 0x8000:
+                        for rix in range(rc[0]): add_fs(f'${rgm[rix]}/{n}',finf2d[fe[0] + 1 + rix],fe)
+                    elif fe[1] & 0x10000:
+                        for cix in range(rc[1]): add_fs(f'${ctm[cix]}/{n}',finf2d[fe[0] + 1 + cix],fe)
+                    else: add_fs(n,fd,fe)
+
+                for fe in Sn2h:
+                    n = sub_path(HL.get(fe[0],f'$unk_strm/{fe[0]:10X}.bin').replace(':/','/'))
+                    if fe[2] in {1,2}:
+                        for rix in range(5 if fe[2] == 2 else rc[1]):
+                            sfs.append((f'${rgm[rix]}/{n}',*So[Si2f[fe[1] + rix]]))
+                    else: sfs.append((n,*So[Si2f[fe[1]]]))
             else:
-                tb.seek(0)
-                writefile(o + f'/$TABLE{v}.bin',tb.read())
+                v = '.'.join(map(str,v))
+                writefile(o + f'/$TABLE_v{v}.bin',tb.readall())
                 raise NotImplementedError(v)
-                v = tb.readu32()
-            tb.close()
+            del tb
 
             def writed(d,fe):
                 if fe[4] & 1:
@@ -1604,7 +1692,7 @@ def extract4_2(inp:str,out:str,t:str):
                             d = decompress(d,'zstd')
                             assert len(d) == fe[3]
                         except:
-                            writefile(o + '/$ERROR.bin',d)
+                            writefile(f'{o}/$ERROR/{fe[0]}.bin',d)
                             print(f'{fe[0]}: {fe[2]} ({fe[3]}) @ 0x{fe[1]:X} ({bin(fe[4])[2:]})')
                             raise
                     else: raise NotImplementedError(bin(fe[4])[2:].zfill(8) + '\n' + d[:0x10].hex(' ').upper())

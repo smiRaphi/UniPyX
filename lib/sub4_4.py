@@ -706,5 +706,67 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if c: return
+        case 'Blood Will Tell Osamu Tezuka\'s Dororo LBI':
+            raise NotImplementedError
+            from lib.file import File
+            f = File(i,endian='<')
+
+            def reado(assrt=True):
+                of = f.readu32()
+                if assrt: assert of
+                if of: of -= 1
+                else: of = None
+                return of
+            def readv(fnc=f.readu32,assrt=True,**kwargs) -> int:
+                v = reado(assrt)
+                cp = f.pos
+                if v is None: return None
+                f.seek(v)
+                r = fnc(**kwargs)
+                f.seek(cp)
+                return r
+
+            f.skip(8)
+            o1,o2 = reado(),reado()
+            f.seek(o1)
+            assert f.read(4) == b'SSCN'
+            f.skip(12)
+            c = f.readu32()
+            f.seek(o2)
+
+            f.seek(reado() + 4)
+            ty = f.readu32()
+            assert ty in {4,0x1F}
+
+            if ty == 4:
+                f.seek(o2 + (c+3)*4)
+                ofs = [(f'{ix:02d}',readv()) for ix in range(c)]
+
+            for dn,of in ofs:
+                f.seek(of)
+                assert f.readu32() == 0x1000
+                f.skip(0x28)
+                c = f.readu32()
+                fs = []
+                for _ in range(c):
+                    fs.append((f.readu16()*0x10,f.readu16(),of+f.readu32()))
+                    f.padc(3)
+                    f.skip(5)
+
+                for fe in fs:
+                    f.seek(fe[2])
+                    writefile(f'{o}/{dn}/{fe[1]:05d}.bin',f.readc(fe[0]))
+
+            f.close()
+            if ofs: return
+        case 'DDLC+ Encrypted Unity Bundle':
+            KEY = 0x28
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decrypt
+            of = f'{o}/{tbasename(i)}.bundle'
+            writefile(of,decrypt(readfile(i),'xor',KEY))
+            r = extract(of,o,'Unity Bundle')
+            return
 
     return 1
