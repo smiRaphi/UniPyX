@@ -207,6 +207,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Metroid Samus Returns PKG': return quickbms('metroid_sr_3ds')
         case 'DDR DAT':
             if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
 
             d = dirname(i)
             for _ in range(3):
@@ -216,76 +217,56 @@ def extract4(inp:str,out:str,t:str) -> bool:
             mf = d + '/' + re.search(r'cdrom0:\\(.+);\d+\n',open(d + '/SYSTEM.CNF').read())[1]
             if not exists(mf): return 1
 
-            f = open(mf,'rb')
-            size = f.seek(0,2)
-            f.seek(0)
+            f = File(mf,endian='<')
             if f.read(4) != b'\x7FELF': return 1
 
-            def read32(): return int.from_bytes(f.read(4),'little')
-            def skip(n): f.seek(n,1)
-            def cs(): return size-f.tell()
-            def reads(max=0xFF):
-                t = b''
-                for _ in range(max):
-                    t += f.read(1)
-                    if t[-1] == 0: break
-                return t
-            def testb():
-                b = f.read(1)
-                if b: f.seek(-1,1)
-                return bool(b)
-
             f.seek(0x38)
-            hsize = read32()
-            load = read32()
+            hsize = f.readu32()
+            load = f.readu32()
             f.seek(load)
 
             ENTRY_SIZE = 4 * 11
             def read_table(ver=0) -> float:
-                fs = read32()
-                if fs == 0 or (fs*(ENTRY_SIZE + (4 if ver == 0 else 0))) > cs(): return -1
+                fs = f.readu32()
+                if fs == 0 or (fs*(ENTRY_SIZE + (4 if ver == 0 else 0))) > (f.size - f.tell()): return -1
 
                 tab = []
-                for i in range(fs):
-                    if read32() != i: return -2 # ID
-                    t = read32()
-                    if t > 0xFF: return -3
-                    if t > 0x10: return -3.1 # type
-                    if i == 0 and t != 1: return -3.2
-                    if ver == 1: skip(4)
+                for ix in range(fs):
+                    if f.readu32() != ix: return -2 # ID
+                    ty = f.readu32()
+                    if ty > 0xFF: return -3
+                    if ty > 0x10: return -3.1 # type
+                    if ix == 0 and ty != 1: return -3.2
+                    if ver == 1: f.skip(4)
 
-                    s = read32()
+                    s = f.readu32()
                     if s == 0: return -4 # size
-                    o = read32() * 0x800
+                    o = f.readu32() * 0x800
 
-                    no = read32()
+                    no = f.readu32()
                     if no == 0: return -6.1 # name offset
                     no = no - load + hsize
                     if no < 0 or no > size: return -6 # name offset
 
-                    skip(4) # hash
-                    if read32() not in (0x7D6,0x7D5): return -8 # ?
+                    f.skip(4) # hash
+                    if f.readu32() not in (0x7D6,0x7D5): return -8 # ?
                     for _ in range(4):
-                        if read32() > 0xFF: return -9 # small values
+                        if f.readu32() > 0xFF: return -9 # small values
 
                     pos = f.tell()
                     f.seek(no)
-                    n = reads()
+                    n = f.readu(max=0xFF,include=True)
                     if n[-1] != 0: return -10
                     try: n = n[:-1].decode('ascii')
-                    except: return -10
+                    except UnicodeDecodeError: return -10
                     f.seek(pos)
 
-                    tab.append({
-                        'o':o,
-                        's':s,
-                        'n':n or f'0x{i:x}.bin'
-                    })
+                    tab.append((o,s,n or f'{ix:03d}.bin'))
 
                 return tab
 
             tabs = []
-            while testb():
+            while f:
                 cp = f.tell()
                 r = read_table()
                 if type(r) == list:
@@ -296,7 +277,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     f.seek(cp+4)
 
             f.seek(load)
-            while testb():
+            while f:
                 cp = f.tell()
                 r = read_table(1)
                 if type(r) == list:
@@ -305,18 +286,18 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 else:
                     #if r <= -8: print('v1',f'0x{cp:X}',f'0x{f.tell()-4:X}',r)
                     f.seek(cp+4)
+            f.close()
 
             ds = getsize(i)
-            for t in tabs:
-                lt = max([x['o'] + x['s'] for x in t])
+            for tb in tabs:
+                lt = max([x[0] + x[1] for x in tb])
                 if lt == ds:
-                    for xf in t:
-                        f.seek(xf['o'])
-                        os.makedirs(o + '/' + os.path.dirname(xf['n']),exist_ok=True)
-                        writefile(o + '/' + xf['n'],f.read(xf['s']))
-                    f.close()
+                    fd = open(i,'rb')
+                    for xf in tb:
+                        fd.seek(xf[0])
+                        writefile(o + '/' + xf[2],fd.read(xf[1]))
+                    fd.close()
                     return
-            f.close()
         case 'Allegro DAT':
             run(['allegro_dat','-e','-o',o + '\\',i,'*\\'])
             if listdir(o): return
@@ -800,7 +781,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'The Sims FAR'|'Quake PAK'|'Quake 3D WAD'|'Agon Game Archive'|'Alien Vs Predator FFL'|'Allods 2 Rage Of Mages Resource'|\
              'American Conquest 2 GSC'|'ASCARON Entertainment CPR'|'Halloween Harry Bank'|'Battlezone 2 PAK'|'Dark Reign 2 ZWP'|\
              'BioWare Entity Resource'|'Bloodrayne POD'|'Broderbund Mohawk MHK'|'Chasm BIN'|'Novalogic PFF'|\
-             'CI Games DPK'|'Creative Assembly PFH0'|'Dark Reign FTG'|'Destan 3DN'|'Digital Illusions PDT'|'7 Studios FS'|\
+             'CI Games DPK'|'Creative Assembly PFH0'|'Dark Reign FTG'|'Destan 3DN'|'7 Studios FS'|\
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
@@ -811,7 +792,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
                 'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
                 'Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
-                'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Digital Illusions PDT':'PDT_PDT1','Dynamix DYN':'DYN_DYNAMIX',
+                'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Dynamix DYN':'DYN_DYNAMIX',
                 'Earth And Beyond MIX':'MIX_MIX1','Electronic Arts LIB':'LIB_EALIB','Empire Earth 1 SSA':'SSA_RASS','Ensemble Studios DRS':'DRS',
                 'Etherlords 2 Resource':'RES_8|RES','F.E.A.R. LTAR':'ARCH00_LTAR','Final Fantasy 7 LGP':'LGP','Holistic Design MUK':'MUK_MUKFILE',
                 'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',

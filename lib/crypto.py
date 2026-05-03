@@ -204,6 +204,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
             return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
         case 'tea'|'tea_be'|'tea_le': return tea_decrypt(i,key,le=algo == 'tea_le')
+        case 'tea_pad'|'tea_pad_be'|'tea_pad_le':
+            lo = len(i) % 8
+            return tea_decrypt(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
 
         case 'hatch':
             d = bytearray(i)

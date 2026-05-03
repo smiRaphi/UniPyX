@@ -843,6 +843,28 @@ def guess_ext_nds(d:bytes):
     else: ext = guess_ext(d)
 
     return ext
+def guess_ext_163(d:bytes):
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
+
+    ext = None
+    if d[:12] == b'CocosStudio-UI': ext = 'coc'
+    elif d[1:5] == b'KTX ': ext = 'ktx'
+    elif d[:4] in {b'VANT',b'MDMP',b'NTRK'}: ext = d[:4].decode('ascii').lower()
+    elif d[:4] == b'RGIS': ext = 'gis'
+    elif d[:4] == b'BKHD': ext = 'bnk'
+    elif d[:3] in {b'hit',b'PKM',b'PVR'}: ext = d[:3].decode('ascii').lower()
+    elif s < 0x100000 and not b'\0' in d:
+        try: assert d.decode('utf-8').replace('\r','').replace('\n','').replace('\t','').isprintable()
+        except: pass
+        else:
+            if d[:1] == b'{': ext = 'json'
+            elif d[:1] == b'<': ext = 'xml'
+            else: ext = 'txt'
+    if not ext: ext = guess_ext(d)
+
+    return ext
 
 MIMEMP = {
     'application/octet-stream':'bin',

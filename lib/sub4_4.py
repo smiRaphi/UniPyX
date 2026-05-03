@@ -831,5 +831,111 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Konami NKP':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'NKP\x1A'
+
+            eo = f.readu32()
+            f.padc(4)
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            fs.append((0,eo))
+
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe[0])
+                fn = f.read0s('ascii')
+                f.seek(fe[1])
+                writefile(o + '/' + fn,f.readc(fs[ix+1][1]-fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Neox Package':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'NXPK'
+
+            c = f.readu32()
+            f.padc(8);f.skip(4)
+            f.seek(f.readu32())
+            fs = []
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.readu32(),f.readu32(),f.readu64(),f.readu32()))
+                assert fs[-1][4] & 0xFFFF in {0,1,2} and not fs[-1][4] >> 16,f.pos
+
+            for fe in fs:
+                f.seek(fe[0])
+                d = f.decompress(fe[1],('zlib' if fe[1] != fe[2] else 'none','zlib','lz4')[fe[4] & 0xFFFF],usize=fe[2])
+                writefile(f'{o}/{fe[3]:016X}.{guess_ext_163(d)}',d)
+
+            f.close()
+            if fs: return
+        case 'Digital Illusions PDT':
+            KEY = b'THEEVENTHORIZONS'
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decompress
+            from lib.crypto import decrypt
+            from multiprocessing.pool import ThreadPool
+            f = File(i,endian='<')
+            assert f.read(4) == b'PDI1'
+
+            c = max(f.readu32(),f.readu32())
+            f.skip(4)
+            do = f.readu32()
+            bo = f.readu32()
+            f.seek(do)
+            fs = []
+            dns = []
+            for ix in range(c):
+                ft = f.readu16()
+                if not ft:
+                    f.skip(0x42)
+                    continue
+                ids = [f.reads16() for _ in range(5)]
+                fe = (f.readu32()+bo,f.readu32())
+                fn = f.read(0x2C).rstrip(b'\0').decode('latin-1')
+                f.skip(4)
+
+                if ft & 4:
+                    assert ft == 4,f.pos - 0x44
+                    lid = ids[1]
+                    if lid == -1: lid = ids[2]
+                    if lid == -1: lid = c
+                    dns.append((lid,fn))
+                else:
+                    assert (ft >> 1) == 12,f.pos - 0x44
+                    dn = [x[1] for x in dns if ix < x[0]]
+                    fs.append(('/'.join(dn) + '/' + fn,fe[0],fe[1],ft))
+
+            def writed(d,fe):
+                # don't trust compressed flag
+                if fe[3] & 1 or\
+                   (d[:4] == b'CDI1' and not d[8] and not d[9] and not d[11] and not d[10] & 0b11101110):
+                    assert d[:4] == b'CDI1'
+                    assert not d[8] and not d[9]
+                    assert not d[11] and not d[10] & 0b11101110
+                    us = int.from_bytes(d[4:8],'little')
+                    fl = d[10]
+                    d = d[12:]
+                    if fl & 0x10: d = decrypt(d,'tea_pad_le',KEY)
+                    if fl & 1: d = decompress(d,'lzss8',usize=us)
+                    d = d[:us]
+                    assert len(d) == us,fe[0]
+                writefile(o + '/' + fe[0],d)
+            p = ThreadPool()
+            pcs = []
+            for fe in fs:
+                f.seek(fe[1])
+                pcs.append(p.apply_async(writed,(f.readc(fe[2]),fe)))
+            for pc in pcs: pc.get()
+            p.close()
+            p.join()
+
+            f.close()
+            if fs: return
 
     return 1

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 921
+# Supported Formats: 922
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -348,7 +348,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (465)
+## Various (466)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -462,7 +462,7 @@ Destan 3DN | .3dn | [Game Extractor Server](https://github.com/Sembiance/dexvert
 Destruction Derby 2 DirInfo | ` ` | Custom |
 Detective Instinct: Farewell, My Beloved Encrypted DIP | .dip | Custom |
 Digimon Story Lost Evolution PAK | .pak | Custom |
-Digital Illusions PDT | .pdt | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Digital Illusions PDT | .pdt .dta .pdo .pdw | Custom|
 Direct Storage Archive | .psarc | [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |
 Disney Games Archive | .pod | Custom |
 Disney Raw Strings | ??? | Custom |
@@ -564,8 +564,9 @@ Jikan de Fantasia JRZ | .jrz | Custom |
 Kamen Rider Atsume BIN | .bin | Custom |
 Karma Studios Lang | ??? | Custom |
 Konami DPG | .dpg | Custom |
-Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
 Konami FireBeat LZSS | * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
+Konami NKP | .nkp | Custom |
 L.A. Noire BIG | .big.ps3 | Custom |
 Lego Creator QUBE | .q | Custom | highly WIP
 LEGO JAM | .jam | [legoracer_jam.bms](https://mirror.aluigi.org/bms/legoracer_jam.bms) |

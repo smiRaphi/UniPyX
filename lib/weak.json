@@ -23,5 +23,6 @@
 "T'SoundSystem Source (with rem)",
 "Bio-Rad Image(s) bitmap",
 "Sierra AGI music format",
-"a.out VAX demand paged (first page unmapped) pure executable not stripped"
+"a.out VAX demand paged (first page unmapped) pure executable not stripped",
+"VAX COFF executable"
 ]

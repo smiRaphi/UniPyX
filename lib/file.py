@@ -52,13 +52,15 @@ class File:
         return d
     def padc(self,n:int): 
         if sum(self.readc(n)): raise ValueError(f"Unexpected Value in padding @ 0x{self.pos - n:08X} - 0x{self.pos:08X}")
-    def readu(self,c=b'\0',max=None,chks=0x100):
+    def readu(self,c=b'\0',max=None,chks=0x100,include=False):
+        if not max is None and max < chks: chks = max
+
         o = bytearray()
         while max is None or len(o) < max:
             d = self.read(chks)
             p = d.find(c)
             if p != -1 or len(d) != chks:
-                o += d[:p]
+                o += d[:p + (1 if include else 0)]
                 self.back(len(d) - p - 1)
                 break
             o += d
@@ -139,8 +141,8 @@ class File:
         if v & 1: return -(v >> 1) - 1
         return v >> 1
 
-    def read0s(self,encoding:str=None) -> bytes|str:
-        r = self.readu()
+    def read0s(self,encoding:str=None,max:int=None,chks=0x100) -> bytes|str:
+        r = self.readu(max=max,chks=chks)
         if encoding is not None: r = r.decode(encoding)
         return r
     def readutf16(self,l:int): return self.readc(l * 2).decode('utf-16' + UTFENDM[self._end])
@@ -439,6 +441,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
             return lzw_decompress(i,**args)
+        case 'rtl_lz': return rtl_lz_decompress(i,usize=kwargs.get('usize'))
+
         case 'avlz':
             if len(i) < 8: raise ValueError("Not enough data to decompress")
             cs = int.from_bytes(i[:4],'little')
@@ -447,7 +451,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if cs == len(i): cs -= 8
             if cs != len(i) - 8: raise ValueError("Invalid compressed size")
             return lzss8_decompress(i[8:8+cs],usize=us)
-        case 'rtl_lz': return rtl_lz_decompress(i,usize=kwargs.get('usize'))
 
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
