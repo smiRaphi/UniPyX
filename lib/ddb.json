@@ -1300,6 +1300,10 @@
         "rs":"Delta Studio YSCE"
     },
     {
+        "d":[["isat","\\x0A\\0\\0\\0ENCRYPTED\\0",4],["isin",["\\x04\\0\\0\\0TEA\\0"],18],["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');f.seek(o);return f.read(4)==b'\\1\\0\\0\\0' and not (f.seek(0,2)-4-o)%8"]],
+        "rs":"Six Guns Encrypted Save","s":1
+    },
+    {
         "d":[["s%",2048],["isat","\\0\\1\\0\\0",16],["isatS","\\xFF",4,0],["isatS","\\0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(4),'little')-1);return f.read(4)==b'SSCN'"]],
         "rs":"Blood Will Tell Osamu Tezuka's Dororo LBI","s":1
     },

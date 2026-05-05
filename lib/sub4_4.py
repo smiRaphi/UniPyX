@@ -1044,5 +1044,22 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'Six Guns Encrypted Save':
+            KEY = b'\x15\x24\x11\x1C\x6F\x31\xD4\x64\x61\x20\x02\x32\xC0\x44\x99\xB0'
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            from lib.crypto import decrypt
+            f = File(i,endian='<')
+
+            hs = f.readu32()
+            assert f.read(f.readu32()) == b'ENCRYPTED\0'
+            enc = f.read(f.readu32()).rstrip(b'\0').decode('ascii')
+            assert enc == 'TEA'
+            f.seek(hs)
+            assert f.readu32() == 1
+            writefile(o + '/' + basename(i),decrypt(f.read(),'tea_le',KEY))
+            f.close()
+            return
 
     return 1
