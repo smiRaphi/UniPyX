@@ -3,7 +3,7 @@ import struct,io,sys
 ENDMAP = {'<':'little','>':'big','-':'big'}
 UTFENDM = {'<':'le','>':'be','-':'be'}
 
-def align(n:int,blocksize:int): return -n % blocksize
+def align(n:int,blocksize:int): return -n % (blocksize or 1)
 def swap32(i:bytes):
     c = len(i) // 4
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))

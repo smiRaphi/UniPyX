@@ -852,24 +852,45 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Neox Package':
+            CAL = (0,'zlib','lz4','zstd')
+            EAL = ('none','xor','rc4','aes','cxor')
+            HAL = (0,0,'murmur3_32')
+
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decompress
+            from lib.crypto import decrypt,maskb
             f = File(i,endian='<')
             assert f.read(4) == b'NXPK'
 
             c = f.readu32()
-            f.padc(8);f.skip(4)
+            f.padc(4)
+            tea = f.readu32()
+            if tea != 0: raise NotImplementedError(f'Encrypted TOC {EAL[tea] if tea < len(EAL) else "?"} (0x{tea:02X})')
+            f.skip(4)
             f.seek(f.readu32())
+
             fs = []
             for _ in range(c):
-                f.skip(4)
-                fs.append((f.readu32(),f.readu32(),f.readu32(),f.readu64(),f.readu32()))
-                assert fs[-1][4] & 0xFFFF in {0,1,2} and not fs[-1][4] >> 16,f.pos
+                # 0       |1  |2 |3 |4    |5    |6  |7
+                # name_crc|off|zs|us|crc_z|crc_u|cal|eal
+                fs.append([f.readu32() for _ in range(6)] + [f.readu16(),f.readu16()])
+                assert fs[-1][6] in {0,1,2,3} and fs[-1][7] in {0,4},f.pos - 0x1C
 
             for fe in fs:
-                f.seek(fe[0])
-                d = f.decompress(fe[1],('zlib' if fe[1] != fe[2] else 'none','zlib','lz4')[fe[4] & 0xFFFF],usize=fe[2])
-                writefile(f'{o}/{fe[3]:016X}.{guess_ext_163(d)}',d)
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                if fe[7] == 5:
+                    r,c = fe[3],fe[5]
+                    if fe[1] <= 0x80: off,pks = 0,fe[1]
+                    else:
+                        off = (r >> 1) % (fe[1] - 0x80)
+                        pks = (((c << 1) & maskb(4)) % 0x60) + 0x20
+                    d = d[:off] + decrypt(d[off:off+pks],'cxor',(r ^ c) & 0xFF,off) + d[off+pks:]
+                elif fe[7] != 0: raise NotImplementedError(f'Unimplemented encryption {EAL[fe[7]] if fe[7] < len(EAL) else "?"} (0x{fe[7]:02X})')
+
+                if fe[6] == 0: d = decompress(d,'zlib' if fe[2] != fe[3] else 'none',usize=fe[3])
+                else: d = decompress(d,CAL[fe[6]],usize=fe[3])
+                writefile(f'{o}/{fe[0]:08X}.{guess_ext_163(d)}',d)
 
             f.close()
             if fs: return
@@ -937,5 +958,91 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Camelot ARC': raise NotImplementedError
+        case 'Natsume LZS':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'LZS\0' and f.readu8() == 5
+
+            wl = f.readu8()
+            bpu = f.readu8()
+            assert not bpu % 8
+            f.padc(1)
+            hs = f.readu32()
+            us = f.readu32()
+            zs = f.readu32()
+            f.skip(4)
+            f.padc(1)
+            mwl = f.readu8()
+            f.padc(6)
+            fn = f.read(hs - 0x20).split(b'\0')[0].decode('ascii')
+            writefile(o + '/' + fn,f.decompress(zs - hs,'lzss16',usize=us,words=bpu//8,mword=mwl,))
+            f.close()
+            return
+        case 'Delta Studio YSCE':
+            TYPS = ('Geometry','Bone','Group','Plane','Instance','Empty','Armature','Light')
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.reads32()
+            cvbo = 0
+            for _ in range(c):
+                on = f.read(0x40).split(b'\0')[0].decode('latin-1')
+                inf = [f.read(0x40).split(b'\0')[0].decode('latin-1'),f.reads32(),f.reads32(),f.reads32(),f.reads32()]
+                ty = f.reads32()
+                assert ty >= 0,f.pos
+
+                ob = []
+                for ix,fln in enumerate(('Material','Model Index','Parent Index','Parent Instance Index','Skeleton Index')): ob.append(f'{fln}: {inf[ix]}')
+                ob.append(f'Type: {TYPS[ty] if ty < len(TYPS) else "?"} ({ty})\n')
+                ob.append(f'Position: {f.readf32()} {f.readf32()} {f.readf32()}')
+                ob.append(f'Orientation Euler: {f.readf32()} {f.readf32()} {f.readf32()}')
+                ob.append(f'Orientation Quaternion: {f.readf32()} {f.readf32()} {f.readf32()} {f.readf32()}')
+                ob.append(f'Scale: {f.readf32()} {f.readf32()} {f.readf32()}')
+                ob.append(f'Min Extreme: {f.readf32()} {f.readf32()} {f.readf32()}')
+                ob.append(f'Max Extreme: {f.readf32()} {f.readf32()} {f.readf32()}\n')
+                ob.append(f'UV Channels: {f.reads32()}')
+                vc = f.reads32()
+                ob.append(f'Vertex Count: {vc}')
+                fc = f.reads32()
+                ob.append(f'Face Count: {fc}')
+                bc = f.reads32()
+                ob.append(f'Bone Count: {bc}')
+                ob.append(f'Max Bones Per Vertex: {f.reads32()}')
+                fls = f.readu32()
+                ob.append(f'Flags: {fls:05b}')
+                vds = f.reads32()
+                ob.append(f'Vertex Data Size: {vds}')
+
+                fn = f'{o}/{inf[1]:03d}_{sub_path(on,slash=True)}.' + TYPS[ty] if ty < len(TYPS) else f'Undefined{ty:02d}'
+                if vc:
+                    strd = vds // vc
+                    f.skip(-cvbo % strd)
+                cvbo += vds
+                bo = f.pos
+                writefile(fn + '.bin',f.read(vds + 2*fc*3))
+                writefile(fn + '_info.txt','\n'.join(ob),'w')
+                if ty == 0:
+                    obj = [f'o {on}']
+                    for ix in range(vc):
+                        f.seek(bo + ix*strd)
+                        obj.append(f'v {f.readf32()} {f.readf32()} {f.readf32()}')
+                        f.skip(4)
+                        if fls & 8: obj.append(f'vt {f.readf32()} {f.readf32()}')
+                        if fls & 2:
+                            obj.append(f'vn {f.readf32()} {f.readf32()} {f.readf32()}')
+                            f.skip(4)
+                    f.seek(bo + vds)
+                    for _ in range(fc):
+                        vs = (f.readu16()+1,f.readu16()+1,f.readu16()+1)
+                        obj.append(f'f {vs[0]}/{vs[0]}/{vs[0]} {vs[1]}/{vs[1]}/{vs[1]} {vs[2]}/{vs[2]}/{vs[2]}')
+                    writefile(fn + '.obj','\n'.join(obj),'w')
+
+            f.close()
+            if c: return
 
     return 1

@@ -1288,6 +1288,18 @@
         "rs":"Neox Package","s":1
     },
     {
+        "d":[["isat","CRA.\\0\\2\\0\\1",0],["n0",4,8],["n0",4,12],["n0",8,16],["n0",4,24],["n0",4,28],["contain","\\1\\0\\2\\0.ARC",[16384,16384]]],
+        "rs":"Camelot ARC","s":1
+    },
+    {
+        "d":[["isat","LZS\\0\\x05",0],["isat","\\0",7],["isat","\\0",24],["isatS","\\0",6,26],["isin",["\\x08","\\x10","\\x20"],6],["n0",1,5],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",1,25],["str0e",32,64,6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"Natsume LZS","s":1
+    },
+    {
+        "d":[["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07"],148],["isatS","\\0",4,132],["isatS","\\xFF",8,136],["isatS","\\0",3,149],["isatS","\\0",3,249],["n0",4,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(248);return not f.read(1)[0]&224 and (4+c*270)<=f.seek(0,2)"]],
+        "rs":"Delta Studio YSCE"
+    },
+    {
         "d":[["s%",2048],["isat","\\0\\1\\0\\0",16],["isatS","\\xFF",4,0],["isatS","\\0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(4),'little')-1);return f.read(4)==b'SSCN'"]],
         "rs":"Blood Will Tell Osamu Tezuka's Dororo LBI","s":1
     },

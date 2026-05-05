@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 922
+# Supported Formats: 924
 
 ## "Common" Archives/Compressors/Encodings (145)
 Name | Extension(s) | Extractor(s) | Comment
@@ -348,7 +348,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (466)
+## Various (468)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -457,6 +457,7 @@ Deathloop Resource | .resource | Custom + [deathloop.bms](https://mirror.aluigi.
 Def Jam Fight For NY: The Takeover PAKN | .pakn | Custom |
 DEL CUTSEQ | ??? | Custom |
 DelphiX Picture Collection | .dxc | Custom -> Borland Form |
+Delta Studio YSCE | .ysce | Custom |
 Descent HOG | .hog | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Destan 3DN | .3dn | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Destruction Derby 2 DirInfo | ` ` | Custom |
@@ -607,6 +608,7 @@ mTropolis MPL | .mpl | Custom |
 NCAA Gamebreaker PG | .pg | Custom |
 NDS Sound Data | .sdat | [ndssntext](https://gbatemp.net/download/nds-sound-extractor.28818/) |
 NeoBook Cartoon | .nbc | Custom |
+Neox Package | .npk | Custom |
 Nemea File Archive | .bin | Custom |
 New York Race KIX+KBF | .kix+.kbf | Custom |
 Nexas New PAC | .pac | [GARbro](https://github.com/crskycode/GARbro) |

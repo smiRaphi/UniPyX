@@ -116,6 +116,11 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             d = bytearray(i)
             for ix in range(len(i)): key = d[ix] = d[ix] ^ key
             return bytes(d)
+        case 'cxor':
+            if type(key) == bytes: key = key[0]
+            if iv is None: iv = 0
+            if type(iv) == bytes: iv = iv[0]
+            return bytes(i[x] ^ ((key + x + iv) & 0xFF) for x in range(len(i)))
         case 'dxor':
             if (type(key) == int or len(key) == 1) and (type(iv) == int or len(iv) == 1):
                 if type(key) != int: key = key[0]

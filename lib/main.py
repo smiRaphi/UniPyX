@@ -277,10 +277,13 @@ def analyze(inp:str,raw=False):
 
     if isfile(inp):
         f = open(inp,'rb')
-        if f.read(2) == b'MZ':
-            f.seek(0x3C)
-            f.seek(int.from_bytes(f.read(4),'little'))
-            pe = f.read(4) == b'PE\0\0'
+        tg = f.read(4)
+        if tg[:2] == b'MZ' or tg == b'\x7fELF':
+            if tg[:2] == b'MZ':
+                f.seek(0x3C)
+                f.seek(int.from_bytes(f.read(4),'little'))
+                pe = f.read(4) == b'PE\0\0'
+            else: pe = False
             f.close()
 
             dpth = db.get('die')
@@ -304,7 +307,7 @@ def analyze(inp:str,raw=False):
                             for sp in ('Structure : ','use : ','stub : ','EP Generic : '): x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
                             if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','no sec. cab.7z.zip [deb. 02','2010 (e8'} and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
-                               x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()): ts.append(x)
+                               x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()) and not (len(x) == 15 and x[:4] == 'exe ' and x[12] == '-' and x[13:].isdigit() and all(x in '0123456789ABCDEF' for x in x[4:12])): ts.append(x)
 
             yrep = db.update('yara')
             yp = dirname(yrep[0])
@@ -856,11 +859,19 @@ def guess_ext_163(d:bytes):
     elif d[:4] == b'BKHD': ext = 'bnk'
     elif d[:3] in {b'hit',b'PKM',b'PVR'}: ext = d[:3].decode('ascii').lower()
     elif s < 0x100000 and not b'\0' in d:
-        try: assert d.decode('utf-8').replace('\r','').replace('\n','').replace('\t','').isprintable()
-        except: pass
-        else:
-            if d[:1] == b'{': ext = 'json'
-            elif d[:1] == b'<': ext = 'xml'
+        txt = None
+        for ec in ('utf-8','gb2312'):
+            try:
+                tx = d.decode(ec).replace('\r','')
+                assert tx.replace('\n','').replace('\t','').isprintable()
+            except: pass
+            else:
+                txt = tx
+                break
+        if not txt is None:
+            if txt[0] == '{': ext = 'json'
+            elif txt[0] == '<': ext = 'xml'
+            elif txt[:7] == 'float4 ' or any(x in txt[:0x1000] for x in {'uniform vec4 ','float ','return float4(','\tvec4 ','\tfloat4 ',' #define ',' attribute vec4 ','out vec4 ','};\nstruct ','precision mediump float;','};\nfloat4 ',') in vec4 ','void main()\n{\n','\tfloat3 '}): ext = 'glsl'
             else: ext = 'txt'
     if not ext: ext = guess_ext(d)
 
