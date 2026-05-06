@@ -590,6 +590,14 @@
         "rs":"Trinity GFLXPack","s":1
     },
     {
+        "d":[["isat","1TAD",-12],["n0",16,-28],["n0",4,-8],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(s-8)\nif int.from_bytes(f.read(4),'little')>=s:return\no=int.from_bytes(f.read(4),'little');f.seek(s-o);return (o+int.from_bytes(f.read(4),'little')*6)<s"]],
+        "rs":"Temple of Elemental Evil DAT","s":1
+    },
+    {
+        "d":[["isat","HGRZ",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');o=c*4+12\nif (o+-o%256)!=int.from_bytes(f.read(4),'little'):return\nf.seek(o-4);return int.from_bytes(f.read(4),'little')==s"]],
+        "rs":"ZUN GRZ","s":1
+    },
+    {
         "d":[["isat","BILH",0],["isat","\\0\\0",10],["isatS","\\xFF",8,16],["n0",8,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(4),'little'))==s"]],
         "rs":"Feral Header Library","s":1},{
         "d":[["isat","BILH",0],["isat","\\0\\0",14],["isatS","\\xFF",8,16],["n0",4,4],["n0",8,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(8),'little'))==s"]],
@@ -1595,6 +1603,12 @@
         "rs":"Apple Disk Image"
     },
     {
+        "t":"text",
+        "rqr":"E-Mail message (Var. 2)",
+        "d":[["contain","diff --git a/",[120,3500]],["contain","--- a/",[130,3500]],["contain","+++ b/",[135,3500]]],
+        "rs":"Diff Patch"
+    },
+    {
         "rqr":null,
         "d":["isat","CTPK",0],
         "rs":"CTPK","s":1
@@ -1650,7 +1664,7 @@
         "rs":"Dzip","s":1
     },
     {
-        "d":[["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["py","f=open(inp,'rb');f.seek(2);return f.read(1)[0]&6!=6"]],
+        "d":[["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f=open(inp,'rb');f.seek(2);return f.read(1)[0]&6!=6"]],
         "rs":"ZLIB"
     },
     {

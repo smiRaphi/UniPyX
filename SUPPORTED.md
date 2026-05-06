@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 925
+# Supported Formats: 928
 
-## "Common" Archives/Compressors/Encodings (145)
+## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -70,6 +70,7 @@ DAR | .dar | [DAR](https://sourceforge.net/projects/dar/) |
 DIET | * | [deark](https://entropymine.com/deark/) |
 DietDisk | * | [DietDisk](http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP) |
 CUE + BIN | .cue+.bin | [Aaru](https://github.com/aaru-dps/Aaru), [bin2iso](https://gitlab.com/bunnylin/bin2iso) + [7-Zip](https://7-zip.org/) |
+Diff Patch | .diff .patch | Custom |
 Disk Doubler | ??? | [unar](https://theunarchiver.com/command-line) |
 DiskDupe IMG | .ddi | [7-Zip](https://7-zip.org/) |
 DOS Backup | ??? | [deark](https://entropymine.com/deark/) |
@@ -348,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (469)
+## Various (471)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -756,6 +757,7 @@ Transformers: Devastation DAT | .dat .dtt | Custom |
 Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Teardown Encrypted | .tde | Custom |
+Temple of Elemental Evil DAT | .dat | Custom |
 The Great Escape DAT | .dat | Custom |
 The Indian In The Cupboard Data | .dta | Custom |
 The Mummy Returns PAK | .ps2 | Custom |
@@ -819,6 +821,7 @@ Zeebo PLZP | .plzp | Custom |
 Zeebo Resources | ??? | Custom |
 ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | * | Custom |
+ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
 ## Compression Enthusiasts/One-Off Formats (123)

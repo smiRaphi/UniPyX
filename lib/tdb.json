@@ -28,7 +28,9 @@
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
         "amiga whdload package (lha compressed)",
-        "lha"
+        "lha",
+        "lha archive",
+        "lha self-extracting 16bit dos executable"
     ],
     "RAR":[
         "winrar self extracting archive (4.x-5.x)",
@@ -1598,5 +1600,8 @@
     "Apple DiskCopy":[
         "diskcopy 4.2 1440k mfm disk image",
         "apple diskcopy 4.2 image"
+    ],
+    "Diff Patch":[
+        "diff output text"
     ]
 }

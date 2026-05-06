@@ -1061,5 +1061,58 @@ def extract4_4(inp:str,out:str,t:str):
             writefile(o + '/' + basename(i),decrypt(f.read(),'tea_le',KEY))
             f.close()
             return
+        case 'Temple of Elemental Evil DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,'rb',endian='<')
+            f.seek(-12)
+            assert f.read(4) == b'1TAD'
+
+            f.skip(4)
+            f.seek(-f.readu32())
+            c = f.readu32()
+            fs = []
+            ds = {-1:o}
+            for ix in range(c):
+                fn = f.read(f.readu32()).rstrip(b'\0').decode('ascii')
+                f.skip(4)
+                ty = f.readu32()
+                assert ty in {1,2,0x400},f.pos-4
+
+                if ty == 0x400: f.skip(12)
+                else: fe = [f.readu32(),f.readu32(),f.readu32()]
+
+                pix = f.reads32()
+                assert pix in ds,f.pos-4
+                fn = ds[pix] + '/' + fn
+                f.skip(8)
+
+                if ty == 0x400: ds[ix] = fn
+                else: fs.append(fe + [ty,fn])
+
+            for fe in fs:
+                f.seek(fe[2])
+                writefile(fe[4],f.decompress(fe[0],(0,'none','zlib')[fe[3]],usize=fe[1]))
+
+            f.close()
+            if fs: return
+        case 'ZUN GRZ':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,'rb',endian='<')
+            assert f.read(4) == b'HGRZ'
+
+            c = f.readu32()
+            fs = [f.readu32() for _ in range(c+1)]
+            for ix in range(c):
+                f.seek(fs[ix])
+                d = f.readc(fs[ix+1]-fs[ix])
+                if d[:4] in {b'HGRX',b'HGRZ',b'HGRF',b'BFNT'}: ex = d[1:4].decode('ascii').lower()
+                elif d[:7] == b'ZN\x1A\0\0\0\0': ex = 'grp'
+                else: ex = guess_ext(d)
+                writefile(f'{o}/{ix:02d}.{ex}',d)
+
+            f.close()
+            if c: return
 
     return 1

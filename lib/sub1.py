@@ -960,6 +960,67 @@ def extract1(inp:str,out:str,t:str) -> bool:
             of = o + '/' + (basename(i)[:-1] if i[-1] == '_' and len(extname(i)) in {3,4} else tbasename(i))
             run(['ttdecomp',i,of])
             if exists(of) and getsize(of): return
+        case 'Diff Patch':
+            if db.print_try: print('Trying with custom extractor')
+            f = open(i,encoding='utf-8')
+
+            ix = 0
+            fs = {}
+            l = f.readline()
+            while True:
+                cc = ''
+                while True:
+                    if not l: break
+                    if l.startswith('--- '): break
+                    cc += l
+                    l = f.readline()
+                if not l: break
+                writefile(f'{o}/$comments/{ix:03d}.txt',cc,'w')
+                ix += 1
+
+                mip = l[4:-1]
+                l = f.readline()
+                assert l.startswith('+++ ')
+                plp = l[4:-1]
+                if not mip in fs: fs[mip] = []
+                if not plp in fs: fs[plp] = []
+
+                l = f.readline()
+                while True:
+                    if not l.startswith('@@ '): break
+                    ml,pl = l[3:-1].split('@@',1)[0].strip().split()
+                    assert ml[0] == '-' and pl[0] == '+'
+                    mlo = int(ml[1:].split(',',1)[0])
+                    plo = int(pl[1:].split(',',1)[0])
+                    mb = []
+                    pb = []
+                    while True:
+                        l = f.readline()
+                        if not l: break
+                        if l[0] == ' ':
+                            mb.append(l[1:-1])
+                            pb.append(l[1:-1])
+                        elif l[0] == '-': mb.append(l[1:-1])
+                        elif l[0] == '+': pb.append(l[1:-1])
+                        else: break
+                    if l == "\\ No newline at end of file\n": l = f.readline()
+                    else:
+                        mb.append('')
+                        pb.append('')
+
+                    fs[mip].append((mlo,mb))
+                    fs[plp].append((plo,pb))
+            f.close()
+
+            if '/dev/null' in fs: fs.pop('/dev/null')
+            for x in fs:
+                ls = []
+                for yo,yd in fs[x]:
+                    if (yo+len(yd)) > len(ls): ls.extend(['']*(yo+len(yd)-len(ls)))
+                    for ix,l in enumerate(yd): ls[yo+ix] = l
+                writefile(o + '/' + x,'\n'.join(ls),'w')
+
+            if fs: return
 
     return 1
 

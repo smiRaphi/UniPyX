@@ -1148,7 +1148,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
-                d = decompress(f.read(fs[ix+1][1]-fe[1]),'lzss',usize=fe[0])
+                d = decompress(f.read(fs[ix+1][1]-fe[1]),'lzss_win',usize=fe[0])
                 writefile(f'{o}/{ix:02d}.{guess_ext(d)}',d)
 
             f.close()

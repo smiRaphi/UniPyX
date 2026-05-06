@@ -36,7 +36,7 @@ class File:
     def seek(self,n:int,whence=0) -> int:
         if n < 0 and whence in {0,2}:
             whence = 0
-            n += self._size
+            n += self.size
         return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
     def tell(self) -> int: return self._f.tell() - self._start_pos
     def close(self): self._f.close()
@@ -435,7 +435,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return bytes(o)
 
         case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
-        case 'lzss': return lzss_decompress(i,usize=kwargs['usize'])
+        case 'lzss_win': return lzss_win_decompress(i,**kwargs)
+        case 'lzss': return lzss_decompress(i,usize=kwargs['usize'],**kwargs)
         case 'lzss8': return lzss8_decompress(i,usize=kwargs['usize'])
         case 'lzss16': return lzss16_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
@@ -547,7 +548,22 @@ class Huffman:
 
         return bytes(out)
 def huffman_decompress(i:bytes,usize:int,padding=False): return Huffman(BitReader(i)).unpack(usize,padding)
-def lzss_decompress(i:bytes,usize:int=None):
+def lzss_decompress(i:bytes,usize:int=None,lens=4,offs=12,minl=3):
+    d = BitReader(i)
+    ob = bytearray()
+    while usize is None or len(ob) < usize:
+        flg = d.get_bit()
+        if flg is None: break
+        if flg:
+            b = d.get_bits(8)
+            ob.append(b)
+        else:
+            l = d.get_bits(lens) + minl
+            of = len(ob) - (d.get_bits(offs) + 1)
+            if of < 0: of = 0
+            for x in range(l): ob.append(ob[of + x])
+    return bytes(ob)[:usize]
+def lzss_win_decompress(i:bytes,usize:int=None):
     d = BitReader(i)
     ob = bytearray()
     win = bytearray(0x2000)
