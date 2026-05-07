@@ -1050,6 +1050,16 @@
         "rs":"SDFTool SDF.bin","s":1
     },
     {
+        "d":[["isat","file",0],["isin",["\\x01\\0\\0\\0","\\x03\\0\\0\\0"],4],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f=open(inp,'rb');f.seek(12);uc=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')*4+int.from_bytes(f.read(4),'little');f.seek(32);nl=int.from_bytes(f.read(4),'little');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
+        "rs":"Eutechnyx CDFILES.DAT+AR","s":1
+    },
+    {
+        "d":[["isat","ARC0",0],["isat","\\xFF\\0\\0\\0",76],["isatS","\\0",12,64],["isat","\\0",-1],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(48+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (64+c*16+o+s+-s%1024)in{f.seek(0,2),f.seek(0,2)-1024}"]],
+        "rs":"Eutechnyx ARC","s":1},{
+        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(112+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (128+c*16+o+s)==f.seek(0,2)"]],
+        "rs":"Eutechnyx ARC","s":1
+    },
+    {
         "rqr":"Nintendo 64 ROM image (",
         "d":["hash","2DAD57E9D8E4F4164BFC76370983D79B",0,4096],
         "rs":"Dr. Mario 64 N64 ROM","s":1
@@ -1664,7 +1674,7 @@
         "rs":"Dzip","s":1
     },
     {
-        "d":[["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f=open(inp,'rb');f.seek(2);return f.read(1)[0]&6!=6"]],
+        "d":[["size",[8,null]],["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f=open(inp,'rb');f.seek(2);fl=f.read(1)[0]\nif fl&6==6 or (not fl&6 and fl>>3):return\nif fl&1 and not fl&6:return int.from_bytes(f.read(2),'big')==(~int.from_bytes(f.read(2),'big')&0xFFFF)==(f.seek(0,2)-11)\nreturn ((fl>>3)<286 and(f.read(1)[0]&31)<30)if fl&6 else(int.from_bytes(f.read(2),'big')==(~int.from_bytes(f.read(2),'big')&0xFFFF))"]],
         "rs":"ZLIB"
     },
     {

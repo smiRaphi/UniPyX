@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 928
+# Supported Formats: 930
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (471)
+## Various (473)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -494,6 +494,8 @@ Escal Compressed | * | [na_game_tool](https://nihav.org/game_tool.html) |
 eSMART Data | ??? | Custom |
 eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Eutechnyx ARC | .arc | Custom |
+Eutechnyx CDFILES.DAT+AR | .dat+.ar | Custom |
 Exient XPK | .xpk | [nfshp2010wii.bms](https://mirror.aluigi.org/bms/nfshp2010wii.bms), [angry_birds_go.bms](https://aluigi.org/bms/angry_birds_go.bms), [xpk2.bms](https://aluigi.org/bms/xpk2.bms), [angry_birds_starwars.bms](https://aluigi.org/bms/angry_birds_starwars.bms) |
 F.E.A.R. LTAR | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Amusement Vision LZ | .lz | Custom |

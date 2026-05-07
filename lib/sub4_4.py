@@ -1114,5 +1114,137 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'Eutechnyx CDFILES.DAT+AR':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,'rb',endian='<')
+            assert f.read(4) == b'file'
+            v = f.readu32()
+            assert v in {1,3}
+
+            f.skip(4) # unk float (2)
+            uc = f.readu32() + f.readu32() + f.readu32()*4 + f.readu32()
+            fc = f.readu32()
+            anl = f.readu32()
+            bs = f.readu32()
+            nc = f.readu32()
+            f.skip(4 + uc)
+            an = dirname(i) + '/' + basename(f.read(anl).rstrip(b'\0').decode('ascii'))
+            assert exists(an),an
+
+            offs = [f.readu32()*bs for _ in range(fc)]
+            szs = [f.readu32() for _ in range(fc)]
+            nof = [f.readu32() for _ in range(nc)]
+            ids = {}
+            for ix in range(nc):
+                id,ty = f.readu24(),f.readu8()
+                if ty == 0x20: continue
+                if ty == 0:
+                    if id != 0: raise NotImplementedError(f.pos-4)
+                    continue
+                assert ty in {0,0x40},f'unknown type {ty} @ 0x{f.pos-4:06X}'
+                if id in ids and ids[id][1] == 0x40:
+                    assert ty in {0,0x20},'file overwrite'
+                    continue
+                ids[id] = (ix,ty)
+
+            ns = []
+            if v == 3:
+                f.skip(4*nc) # null on PC
+                rnc = f.readu32()
+                nsz = f.readu32()
+                rno = [f.readu32() for _ in range(rnc)]
+                rns = []
+                bo = f.pos
+                for of in rno:
+                    f.seek(bo + of)
+                    rns.append(f.read0s('ascii'))
+
+                bo = f.seek(bo + nsz)
+                for of in nof:
+                    f.seek(bo + of)
+                    fn = ''
+                    bs = f.read0s()
+                    p = 0
+                    while p < len(bs):
+                        nix = bs[p];p+=1
+                        if nix >= 0x80 and p < len(bs): nix = ((nix & 0x7F) << 8) | bs[p];p+=1
+                        fn += rns[nix-1]
+                    ns.append(fn)
+            elif v == 1:
+                bo = f.pos
+                for of in nof:
+                    f.seek(bo + of)
+                    ns.append(f.read0s('ascii'))
+            f.close()
+
+            if an.lower().endswith('0.ar'):
+                fds = []
+                bn = an[:-4]
+                for ix in range(10):
+                    n = bn + f'{ix}.ar'
+                    if not exists(n): break
+                    fds.append(open(n,'rb'))
+            else: fds = [open(an,'rb')]
+
+            for ix in range(fc):
+                dix = ids[ix]
+                if dix[1] != 0x40: continue
+
+                if ix > 0 and offs[ix] == 0: fds.pop(0).close()
+                fds[0].seek(offs[ix])
+                d = fds[0].read(szs[ix])
+                assert len(d) == szs[ix],f'offset {offs[ix]} too big'
+                writefile(o + '/' + ns[dix[0]],d)
+
+            for fd in fds: fd.close()
+            if fc: return
+        case 'Eutechnyx ARC':
+            TYM = {
+                -1:'Directory',
+                -3:'StringTable',
+                1:'image',
+                2:'material',
+                7:'null',
+                15:'faces',
+                16:'verts',
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,'rb',endian='<')
+            assert f.read(3) == b'ARC'
+            v = f.reads(1,'ascii')
+
+            c = f.readu32()
+            fs = []
+            if v == '0': bo = 0x40
+            elif v in 'XPC': bo = 0x80
+            else: raise NotImplementedError(v)
+
+            f.seek(bo)
+            bo += c*0x10
+            for _ in range(c):
+                f.skip(4)
+                fs.append((f.readu32(),f.reads32(),f.reads8(),f.readu24('>')))
+
+            assert fs[-1][2] == -3
+            sto = fs[-1][0] + bo
+            drn = ''
+            for ix,fe in enumerate(fs):
+                if fe[1] == -1: fn = f'{ix:03d}'
+                else:
+                    f.seek(sto + fe[1])
+                    fn = sub_path(f.read0s('ascii'))
+
+                if fe[2] == -1:
+                    drn += '/' + fn
+                    mkdir(o + '/' + drn)
+                if fe[2] != 0: fn += '.' + TYM.get(fe[2],f'{fe[2]:02X}')
+                f.seek(bo + fe[0])
+                writefile(o + '/' + drn + '/' + fn,f.readc(fe[3]))
+
+            f.close()
+            if fs: return
 
     return 1
