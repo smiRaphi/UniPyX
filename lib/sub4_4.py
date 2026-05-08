@@ -1278,5 +1278,31 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if listdir(o): return
+        case 'K2 ConnectFile':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            from lib.crypto import decrypt
+            f = File(i,'rb',endian='<')
+            assert f.read(0x14) == b'ConnectFile Version '
+
+            f.seek(0)
+            k1 = (f.readu32() ^ 0xFFFFFFFF).to_bytes(4,'little')
+            f.seek(0x18)
+            do = f.readu32() ^ int.from_bytes(k1,'little')
+            ft = File(decrypt(f.readc(do - 0x1C),'xor',k1),endian=f._end)
+            c = ft.readu32()
+            szs = [ft.readu32() for _ in range(c)]
+            offs = [ft.readu32() for _ in range(c)]
+            fns = [ft.readc(0x2C).rstrip(b'\0').decode('utf-8') for _ in range(c)]
+            del ft
+            assert offs[0] != 0 # bo = do if offs[0] == 0 else 0
+
+            for ix in range(c):
+                f.seek(offs[ix])
+                d = f.readc(szs[ix])
+                writefile(o + '/' + fns[ix],decrypt(d,'xor',(szs[ix] ^ 0xFFFFFFFF).to_bytes(4,'little')))
+
+            f.close()
+            if c: return
 
     return 1

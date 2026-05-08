@@ -1060,6 +1060,10 @@
         "rs":"Eutechnyx ARC","s":1
     },
     {
+        "d":[["isat","ConnectFile Version ",0],["isat",".",21],["n0",4,-4],["py","f=open(inp,'rb');k=int.from_bytes(f.read(4),'little');f.seek(20)\nif not(f.read(2)[:1]+f.read(2)).isdigit():return\nk^=0xFFFFFFFF;o=int.from_bytes(f.read(4),'little')^k;c=int.from_bytes(f.read(4),'little')^k;c=c*52+32;return (c+-c%2048)==o"]],
+        "rs":"K2 ConnectFile","s":1
+    },
+    {
         "d":[["isat","\\0\\0",8],["isatS","\\0",16,16],["isin",["NNNN","ZZZ4"],56],["n0",1,6],["n0",4,32],["n0",2,38],["n0",4,40],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=f.read(3);f.seek(32);return (32+int.from_bytes(f.read(4),'little'))==s and c==f.read(3)"]],
         "rs":"Messiah Image Resource"
     },

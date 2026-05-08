@@ -645,7 +645,7 @@ HASHTS = {
     'sha224':28,'sha256':32,'sha384':48,'sha512':64,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,
     'sha512_224':28,'sha512_256':32,
-    'blake2b':32,'blake2s':16,
+    'blake2b':64,'blake2s':32,
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
     'tarzan':4,'luas':4,'sxm':8,'hash40':5,

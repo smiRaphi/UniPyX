@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 932
+# Supported Formats: 933
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (475)
+## Various (476)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -566,6 +566,7 @@ Iron Sky GPK | .gpk | Custom |
 JDownloader2 Encrypted Accounts | .ejs | Custom |
 JDownloader2 Encrypted Subconfig | .ejs | Custom |
 Jikan de Fantasia JRZ | .jrz | Custom |
+K2 ConnectFile | .con | Custom |
 Kamen Rider Atsume BIN | .bin | Custom |
 Karma Studios Lang | ??? | Custom |
 Konami DPG | .dpg | Custom |
