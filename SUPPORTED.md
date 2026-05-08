@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 930
+# Supported Formats: 932
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (473)
+## Various (475)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -409,6 +409,7 @@ Blade Runner TLK/MIX | .tlk .mix | Custom |
 Blitz Games Archive | ??? | [blitz_games.bms](https://mirror.aluigi.org/bms/blitz_games.bms) |
 Bloodrayne POD | .pod | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Blur PAK | .pak | [blur.bms](https://mirror.aluigi.org/bms/blur.bms) |
+Bomberman Wars IDX+BIN | .idx+.bin | Custom |
 Borland Form | .dfm | [dfm2txt](https://github.com/Sembiance/dexvert/blob/37a7da64dfd630b79046144f0c413f9c2084b122/qemu/win2k/data/app/dfm2txt/dfm2txt.exe)(src?) + Custom |
 Braveheart BLB 2.0 | .bml | Custom |
 Broderbund Mohawk MHK | .mhk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -589,6 +590,7 @@ Ludia Dir | .dir | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
 Marmalade Resource Group | .group.bin | Custom |
 MediaMobile PAK | .pak | Custom |
+Messiah Image Resource | .1 | Custom |
 Metal Slug 3D PAK | .pak | Custom |
 Metroid Prime 4 RFRM ENUM | ??? | Custom |
 Metroid Prime 4 RFRM MSBT | ??? | Custom -> Nintendo MSBT |

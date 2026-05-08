@@ -1060,6 +1060,14 @@
         "rs":"Eutechnyx ARC","s":1
     },
     {
+        "d":[["isat","\\0\\0",8],["isatS","\\0",16,16],["isin",["NNNN","ZZZ4"],56],["n0",1,6],["n0",4,32],["n0",2,38],["n0",4,40],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=f.read(3);f.seek(32);return (32+int.from_bytes(f.read(4),'little'))==s and c==f.read(3)"]],
+        "rs":"Messiah Image Resource"
+    },
+    {
+        "d":[["s%",32],["ext","idx"],["isatS","\\0",4,24],["n0",4,28],["str0",0,24,5],["py","d=splitext(inp)[0]+'.bin'\nif not exists(d):return\ns=getsize(d)\nif s%2048:return\nf=open(inp,'rb');f.seek(f.seek(0,2)-8);o=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little');return (o+-o%2048)==s"]],
+        "rs":"Bomberman Wars IDX+BIN"
+    },
+    {
         "rqr":"Nintendo 64 ROM image (",
         "d":["hash","2DAD57E9D8E4F4164BFC76370983D79B",0,4096],
         "rs":"Dr. Mario 64 N64 ROM","s":1

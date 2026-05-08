@@ -1246,5 +1246,37 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Messiah Image Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x26)
+            c = f.readu16()
+            for ix in range(c):
+                s = f.readu32() - 0x14
+                w,h = f.readu16(),f.readu16()
+                f.skip(8)
+                ct = f.read(4)
+                if ct == b'ZZZ4': us = f.readu32();s -= 4
+                else: us = 0
+                writefile(f'{o}/{ix:02d}_{w}x{h}.rgba8',f.decompress(s,{b'NNNN':'none',b'ZZZ4':'lz4'}[ct],usize=us))
+
+            f.close()
+            if c: return
+        case 'Bomberman Wars IDX+BIN':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(noext(i)+'.idx',endian='<')
+            fd = File(noext(i)+'.bin')
+
+            while f:
+                fn = f.read(0x18).rstrip(b'\0').decode('ascii')
+                fd.seek(f.readu32())
+                writefile(o + '/' + fn,fd.readc(f.readu32()))
+
+            f.close()
+            fd.close()
+            if listdir(o): return
 
     return 1
