@@ -1050,14 +1050,18 @@
         "rs":"SDFTool SDF.bin","s":1
     },
     {
-        "d":[["isat","file",0],["isin",["\\x01\\0\\0\\0","\\x03\\0\\0\\0"],4],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f=open(inp,'rb');f.seek(12);uc=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')*4+int.from_bytes(f.read(4),'little');f.seek(32);nl=int.from_bytes(f.read(4),'little');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
+        "d":[["isat","file",0],["isin",["\\1\\0\\0\\0","\\x03\\0\\0\\0"],4],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0","\\2\\0\\0\\0"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f=open(inp,'rb');f.seek(12);uc=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')*4+int.from_bytes(f.read(4),'little');f.seek(32);nl=int.from_bytes(f.read(4),'little');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
+        "rs":"Eutechnyx CDFILES.DAT+AR","s":1},{
+        "d":[["isat","file",0],["isin",["\\0\\0\\0\\1","\\0\\0\\0\\x03"],4],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\2"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f=open(inp,'rb');f.seek(12);uc=int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')*4+int.from_bytes(f.read(4),'big');f.seek(32);nl=int.from_bytes(f.read(4),'big');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
         "rs":"Eutechnyx CDFILES.DAT+AR","s":1
     },
     {
         "d":[["isat","ARC0",0],["isat","\\xFF\\0\\0\\0",76],["isatS","\\0",12,64],["isat","\\0",-1],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(48+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (64+c*16+o+s+-s%1024)in{f.seek(0,2),f.seek(0,2)-1024}"]],
         "rs":"Eutechnyx ARC","s":1},{
-        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(112+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (128+c*16+o+s)==f.seek(0,2)"]],
-        "rs":"Eutechnyx ARC","s":1
+        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isatS","\\0",16,112],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(112+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (128+c*16+o+s)==f.seek(0,2)"]],
+        "rs":"Eutechnyx ARC","s":1},{
+        "d":[["s%",128],["isat","ARCN",0],["isat","\\0\\0\\0\\0\\xDE\\xC0\\xDE\\xC0",112],["n0",4,4],["n0",4,120],["n0",4,128],["py","f=open(inp,'rb');f.seek(120);s=int.from_bytes(f.read(4),'little');return s<int.from_bytes(f.read(4),'little')and(128+s+-s%128)==f.seek(0,2)"]],
+        "rs":"Eutechnyx Compressed ARC","s":1
     },
     {
         "d":[["isat","ConnectFile Version ",0],["isat",".",21],["n0",4,-4],["py","f=open(inp,'rb');k=int.from_bytes(f.read(4),'little');f.seek(20)\nif not(f.read(2)[:1]+f.read(2)).isdigit():return\nk^=0xFFFFFFFF;o=int.from_bytes(f.read(4),'little')^k;c=int.from_bytes(f.read(4),'little')^k;c=c*52+32;return (c+-c%2048)==o"]],

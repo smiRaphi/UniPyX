@@ -1119,7 +1119,12 @@ def extract4_4(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,'rb',endian='<')
             assert f.read(4) == b'file'
+
             v = f.readu32()
+            if v >> 24:
+                f.back(4)
+                f._end = '>'
+                v = f.readu32()
             assert v in {1,3}
 
             f.skip(4) # unk float (2)
@@ -1137,14 +1142,12 @@ def extract4_4(inp:str,out:str,t:str):
             nof = [f.readu32() for _ in range(nc)]
             ids = {}
             for ix in range(nc):
-                id,ty = f.readu24(),f.readu8()
-                if ty == 0x20: continue
-                if ty == 0:
-                    if id != 0: raise NotImplementedError(f.pos-4)
-                    continue
-                assert ty in {0,0x40},f'unknown type {ty} @ 0x{f.pos-4:06X}'
+                if f._end == '>': ty,id = f.readu8(),f.readu24()
+                else: id,ty = f.readu24(),f.readu8()
+                if ty in {0,0x20}: continue
+                assert ty == 0x40,f'unknown type 0x{ty:02X} @ 0x{f.pos-4:06X}'
                 if id in ids and ids[id][1] == 0x40:
-                    assert ty in {0,0x20},'file overwrite'
+                    assert ty != 0x40,'file overwrite'
                     continue
                 ids[id] = (ix,ty)
 
@@ -1216,10 +1219,10 @@ def extract4_4(inp:str,out:str,t:str):
             assert f.read(3) == b'ARC'
             v = f.reads(1,'ascii')
 
-            c = f.readu32()
+            c = f.readu32('>' if v == 'N' else '<')
             fs = []
             if v == '0': bo = 0x40
-            elif v in 'XPC': bo = 0x80
+            elif v in 'XPCN': bo = 0x80
             else: raise NotImplementedError(v)
 
             f.seek(bo)
@@ -1246,6 +1249,18 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Eutechnyx Compressed ARC':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,'rb')
+            assert f.read(3) == b'ARC'
+            v = f.reads(1,'ascii')
+
+            assert v == 'N'
+            f.seek(0x74)
+            assert f.read(4) == b'\xDE\xC0\xDE\xC0'
+            zs,us = f.readu32('<'),f.readu32('<')
         case 'Messiah Image Resource':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
