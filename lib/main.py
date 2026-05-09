@@ -771,7 +771,7 @@ def guess_ext(d:bytes) -> str:
     elif d[:0x14] == b'Creative Voice File\x1A': ext = 'voc'
     elif d[:0x17] == b'Kaydara FBX Binary  \0\x1A\0': ext = 'fbx'
     elif d[:4] == b'FORM' and d[8:12] == b'AIFF': ext = 'aif'
-    elif d[6:10] == b'JFIF': ext = 'jpg'
+    elif d[:3] == b'\xFF\xD8\xFF' and ((d[3] == 0xE0 and d[6:11] == b'JFIF\0') or (d[3] == 0xE1 and d[6:11] == b'Exif\0')): ext = 'jpg'
     elif d[-0x12:] == b'TRUEVISION-XFILE.\0': ext = 'tga'
     elif d[4:8] == b'mdat' and d[int.from_bytes(d[0:4],'big')+4:int.from_bytes(d[0:4],'big')+8] == b'moov': ext = 'mp4'
     elif d[:4] == b'\0\0\1\xBA' and\

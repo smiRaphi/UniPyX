@@ -1319,5 +1319,56 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'Cause of Death EXP':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(5) == b'CSPUD'
+
+            c = f.readu32()
+            fs = [(f.readu16(),f.readu32()) for _ in range(c)]
+
+            for fe in fs:
+                f.seek(fe[1])
+                zs,us,cf = f.readu32(),f.readu32(),f.readu32()
+                assert cf in {0,1},fe[1]
+                d = f.decompress(zs,('none','lzma')[cf],usize=us)
+                writefile(f'{o}/{fe[0]}.{guess_ext(d)}',d)
+
+            f.close()
+            if fs: return
+        case 'Macross: Do You Remember Love? GKO':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            fs = [(f.read(0x10).rstrip(b'\0').decode('ascii'),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Macross: Do You Remember Love? PUD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(2)
+            c = f.readu16()
+            for ix in range(c):
+                w,h = f.readu16(),f.readu16()
+                f.skip(6)
+                ty = f.readu16()
+                assert ty in {0,1}
+                if ty == 0: d = f.readc(f.readu32())
+                else:
+                    us,zs = f.readu32(),f.readu32()
+                    d = f.decompress(zs,'lzss8',usize=us)
+                writefile(f'{o}/{ix:03d}_{w}x{h}.pal{int((len(d)/(w*h))*8)}',d)
+
+            f.close()
+            if c: return
 
     return 1

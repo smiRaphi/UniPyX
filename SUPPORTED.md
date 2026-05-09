@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 933
+# Supported Formats: 936
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (476)
+## Various (479)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -422,6 +422,7 @@ Bureau 13 GL | .gl | [na_game_tool](https://nihav.org/game_tool.html) |
 Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
+Cause of Death EXP | .exp | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Cheat Engine Cheat Table | .ct | Custom |
 Chrome PAK | .pak | [chrome-pak](https://github.com/myfreeer/chrome-pak-customizer) |
@@ -588,6 +589,8 @@ Lucas Learning DAT | .dat | Custom |
 Lucas Arts Bundle | .bdl | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |
+Macross: Do You Remember Love? GKO | .gko | Custom |
+Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
 Marmalade Resource Group | .group.bin | Custom |
 MediaMobile PAK | .pak | Custom |
