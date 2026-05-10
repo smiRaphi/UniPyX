@@ -1361,5 +1361,51 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if c: return
+        case 'WWE Raw XPK+D.BIN+F.BIN':
+            if db.print_try: print('Trying with custom extractor')
+            bn = noext(i)
+            if i.lower().endswith('.bin'): bn = bn[:-2]
+            from lib.file import File
+            f = File(bn + '_D.BIN',endian='<')
+
+            fns = []
+            def reade(p):
+                while f:
+                    ty = f.readu16()
+                    if ty == 0: break
+                    nl = f.readu16()
+                    v = f.readu32()
+                    n = p + '/' + f.reads(nl,'ascii')
+                    f.padc(1)
+                    if ty == 1: fns.append((v,n))
+                    else:
+                        mkdir(n)
+                        cp = f.pos
+                        f.seek(v)
+                        reade(n)
+                        f.seek(cp)
+
+            f.seek(12)
+            f.seek(f.readu32())
+            reade(o)
+            f.close()
+            if not fns: return 1
+
+            f = File(bn + '_F.BIN',endian=f._end)
+            f.seek(12)
+            fs = []
+            while f:
+                fs.append((f.readu32(),f.readu32()))
+                f.skip(4) # something to do with images, sometimes WxH in u16 be, sometimes ???
+            f.close()
+            if not fs: return 1
+
+            f = File(bn + '.XPK',endian=f._end)
+            for fe in fns:
+                f.seek(fs[fe[0]][0])
+                writefile(fe[1],f.readc(fs[fe[0]][1]))
+
+            f.close()
+            if fns and fs: return
 
     return 1

@@ -1342,6 +1342,10 @@
         "rs":"Natsume LZS","s":1
     },
     {
+        "d":[["n0",4,0],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,10],["py","b=splitext(inp)[0][:-2 if inp.lower().endswith('.bin') else None]\nif not exists(b+'.xpk')or not exists(b+'_d.bin')or not exists(b+'_f.bin'):return\nreturn open(b+'.xpk','rb').read(10)==open(b+'_d.bin','rb').read(10)==open(b+'_f.bin','rb').read(10)"]],
+        "rs":"WWE Raw XPK+D.BIN+F.BIN"
+    },
+    {
         "d":[["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07"],148],["isatS","\\0",4,132],["isatS","\\xFF",8,136],["isatS","\\0",3,149],["isatS","\\0",3,249],["n0",4,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(248);return not f.read(1)[0]&224 and (4+c*270)<=f.seek(0,2)"]],
         "rs":"Delta Studio YSCE"
     },

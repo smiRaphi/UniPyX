@@ -122,10 +122,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if type(iv) == bytes: iv = iv[0]
             return bytes(i[x] ^ ((key + x + iv) & 0xFF) for x in range(len(i)))
         case 'dxor':
-            if (type(key) == int or len(key) == 1) and (type(iv) == int or len(iv) == 1):
-                if type(key) != int: key = key[0]
-                if type(iv) != int: iv = iv[0]
-                return decrypt(i,'xor',key ^ iv)
+            if type(key) == int: key = (key,)
+            if type(iv) == int: iv = (iv,)
+            if len(key) == len(iv) == 1: return decrypt(i,'xor',key[0] ^ iv[0])
             else: return bytes(i[x] ^ key[x % len(key)] ^ iv[x % len(iv)] for x in range(len(i)))
         case 'inv'|'invert': return bytes(x ^ 0xFF for x in i)
         case 'roll':
@@ -181,7 +180,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             obj = ChaCha20_Poly1305.new(key,iv)
             if 'tag' in kwargs: tag = kwargs['tag']
             else: tag = i[-16:]
-            if tag: return obj.decrypt_and_verify(i[:-16],tag)
+            if tag: return obj.decrypt_and_verify(i[:-16 if not 'tag' in kwargs else None],tag)
             return obj.decrypt(i)
         case 'rc4'|'arc4':
             from Cryptodome.Cipher import ARC4
@@ -296,8 +295,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             msk = iv or 0xFF
             o = bytearray(i)
             o[1] ^= key
-            for ix in range(len(o)-1):
-                o[ix+1] = o[ix] ^ (o[ix+1] & msk)
+            for ix in range(len(o)-1): o[ix+1] = o[ix] ^ (o[ix+1] & msk)
             return bytes(o[1:])
         case 'selene':
             assert type(key) in {bytes,str,int}
