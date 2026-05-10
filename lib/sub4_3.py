@@ -1650,7 +1650,7 @@ def extract4_3(inp:str,out:str,t:str):
                 us,zs = f.readu32(),f.readu32()
                 f.skip(ces - 12)
 
-                d = f.decompress(zs,('none',0,0,'lzss16',0,1,0,'zlib')[ct],usize=us,big_endian=f._end == '>')
+                d = f.decompress(zs,('none',0,0,'lzss16c',0,1,0,'zlib')[ct],usize=us,big_endian=f._end == '>')
                 f.align(align)
 
                 f._end = be

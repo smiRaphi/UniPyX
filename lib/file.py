@@ -436,9 +436,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
         case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'lzss_win': return lzss_win_decompress(i,**kwargs)
-        case 'lzss': return lzss_decompress(i,usize=kwargs['usize'],**kwargs)
+        case 'lzss':
+            assert 'usize' in kwargs
+            return lzss_decompress(i,**kwargs)
         case 'lzss8': return lzss8_decompress(i,usize=kwargs['usize'])
-        case 'lzss16': return lzss16_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
+        case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
             return lzw_decompress(i,**args)
@@ -452,6 +454,41 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if cs == len(i): cs -= 8
             if cs != len(i) - 8: raise ValueError("Invalid compressed size")
             return lzss8_decompress(i[8:8+cs],usize=us)
+        case 'natsume_lzs':
+            if len(i) < 0x1C: raise ValueError("Not enough data to decompress")
+            if i[:4] != b'LZS\0': raise ValueError("Invalid header")
+            if i[4] != 5: raise NotImplementedError(f'Unknown version {i[4]}')
+
+            lens = i[5]
+            sm = mask(lens)
+            units = i[6]
+            assert not units%8 and units
+            units //= 8
+            assert not i[7]
+            min_words = i[0x19]
+
+            flgp = int.from_bytes(i[8:12],'little')
+            litp = int.from_bytes(i[12:0x10],'little')
+            us = (int.from_bytes(i[0x10:0x14],'little') // units) * units
+
+            o = bytearray()
+            while len(o) < us:
+                fs = int.from_bytes(i[flgp:flgp+2],'little');flgp += 2
+                for _ in range(0x10):
+                    if fs & 1: o.extend(i[litp:litp+units]);litp += units
+                    else:
+                        w = int.from_bytes(i[flgp:flgp+2],'little');flgp += 2
+                        s = (w & sm) + min_words
+                        of = w >> lens
+
+                        for _ in range(s):
+                            dof = len(o) - of*units
+                            o.extend(o[dof:dof+units])
+                    if len(o) >= us: break
+                    fs >>= 1
+
+            if i[0x18]: o.extend(i[0x1C:0x1C+i[0x18]])
+            return bytes(o)
 
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
@@ -623,7 +660,7 @@ def lzss8_decompress(i:bytes,usize:int=None,win_size=0x1000,threshold=3,maxm=18)
         f >>= 1
 
     return bytes(ob)
-def lzss16_decompress(i:bytes,usize:int=None,big_endian=False):
+def lzss16c_decompress(i:bytes,usize:int=None,big_endian=False):
     pos = 0
 
     def ru8():
@@ -632,7 +669,6 @@ def lzss16_decompress(i:bytes,usize:int=None,big_endian=False):
         b = i[pos]
         pos += 1
         return b
-
     def ru16():
         b1 = ru8()
         if b1 is None: return

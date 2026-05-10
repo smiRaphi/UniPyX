@@ -35,7 +35,6 @@ Pixar USD Crate | .usd .usdc | RTX Remix | https://openusd.org/ | https://openus
 CD-i Realtime File | .rti .rtf .rtr | CD-i games | [interview](#cd-i-rtf-dev-interview)<br>http://www.icdia.co.uk/docs/cdi_may94_r2.pdf<br>http://www.icdia.co.uk/sw_disc/index.html | https://github.com/ogarvey/OGLibCD-iRS |
 Camelot ARC | ` ` | Mario Golf Super Rush | https://x.com/_Ninji/status/1408533891976204292 | ? | detected
 Camelot Obfuscated NRO | ` ` | Mario Golf Super Rush | https://x.com/_Ninji/status/1408533891976204292 | https://gist.github.com/Treeki/d467b4d29c934f37afada6c7c41f5624 |
-Natsume LZS | .paz | Kamen Rider Battle: Ganbaride Card Battle Taisen | ? | https://github.com/Nisto/lzsd/blob/master/lzsd_nds.c | detected
 Eutechnyx Compressed ARC | .arc | Street Racing Syndicate GameCube | ? | ? | detected
 
 ## Other Todos

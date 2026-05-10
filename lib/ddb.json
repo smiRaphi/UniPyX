@@ -1338,7 +1338,7 @@
         "rs":"Camelot ARC","s":1
     },
     {
-        "d":[["isat","LZS\\0\\x05",0],["isat","\\0",7],["isat","\\0",24],["isatS","\\0",6,26],["isin",["\\x08","\\x10","\\x20"],6],["n0",1,5],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",1,25],["str0e",32,64,6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","LZS\\0\\x05",0],["isat","\\0",7],["isat","\\0\\0",26],["isin",["\\x08","\\x10","\\x20"],6],["n0",1,5],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",1,25],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);hs=int.from_bytes(f.read(4),'little');f.seek(20);\nif int.from_bytes(f.read(4),'little')!=s:return\nreturn (28+f.read(1)[0])<=hs"]],
         "rs":"Natsume LZS","s":1
     },
     {

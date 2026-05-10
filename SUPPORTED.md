@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 936
+# Supported Formats: 937
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (479)
+## Various (480)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -614,6 +614,7 @@ Monsters Inc. Scream Team Training WAD | .wad | Custom |
 Motocross Mania DAT | .dat | [e_biker.bms](https://mirror.aluigi.org/bms/e_biker.bms) |
 mTropolis MDM | .q3 | Custom |
 mTropolis MPL | .mpl | Custom |
+Natsume LZS | .paz * | Custom |
 NCAA Gamebreaker PG | .pg | Custom |
 NDS Sound Data | .sdat | [ndssntext](https://gbatemp.net/download/nds-sound-extractor.28818/) |
 NeoBook Cartoon | .nbc | Custom |

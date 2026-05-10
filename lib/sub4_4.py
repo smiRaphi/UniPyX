@@ -960,26 +960,17 @@ def extract4_4(inp:str,out:str,t:str):
             if fs: return
         case 'Camelot ARC': raise NotImplementedError
         case 'Natsume LZS':
-            raise NotImplementedError
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='<')
-            assert f.read(4) == b'LZS\0' and f.readu8() == 5
+            from lib.file import decompress
+            d = readfile(i)
+            assert d[:4] == b'LZS\0' and d[4] == 5
 
-            wl = f.readu8()
-            bpu = f.readu8()
-            assert not bpu % 8
-            f.padc(1)
-            hs = f.readu32()
-            us = f.readu32()
-            zs = f.readu32()
-            f.skip(4)
-            f.padc(1)
-            mwl = f.readu8()
-            f.padc(6)
-            fn = f.read(hs - 0x20).split(b'\0')[0].decode('ascii')
-            writefile(o + '/' + fn,f.decompress(zs - hs,'lzss16',usize=us,words=bpu//8,mword=mwl,))
-            f.close()
+            hs = int.from_bytes(d[8:12],'little')
+            p = 0x1C + d[0x18]
+            if not d[0x18] and not sum(d[0x1C:0x20]): p += 4
+            if p >= hs: fn = basename(i)
+            else: fn = d[p:hs].split(b'\0')[0].decode('ascii')
+            writefile(o + '/' + fn,decompress(d,'natsume_lzs'))
             return
         case 'Delta Studio YSCE':
             TYPS = ('Geometry','Bone','Group','Plane','Instance','Empty','Armature','Light')
