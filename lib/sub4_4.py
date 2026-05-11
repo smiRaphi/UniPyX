@@ -114,7 +114,8 @@ def extract4_4(inp:str,out:str,t:str):
             if fs: return
         case 'RTL Ski Jumping 2002 PAK':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,decode
+            from lib.file import File
+            from lib.crypto import decode
             f = File(i,endian='<')
 
             f.seek(4)
@@ -1407,5 +1408,34 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fns and fs: return
+        case 'Wizards of a Waverly Place XPF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu32() == 0xBADBEEF1
+
+            dc = f.readu8()
+            ds = []
+            for _ in range(dc):
+                fn = f.readutf16(f.readu16())
+                ds.append((fn,f.readu32()))
+                f.padc(4)
+            bp = f.pos
+
+            fnc = f.readu16()
+            fns = {}
+            for _ in range(fnc):
+                id = f.readu16()
+                fns[id] = f.readutf16(f.readu16())
+
+            fc = f.readu16()
+            ids = [f.readu16() for _ in range(fc)]
+            fs = [(f.reads16(),f.reads16(),f.readu32() + bp) for _ in range(fc)]
+            fs.sort(key=lambda x:x[2])
+            fs.append((0,0,f.size))
+
+            for ix in range(fc):
+                f.seek(fs[ix][2])
+                writefile(o + '/' + fns[ix],)
 
     return 1

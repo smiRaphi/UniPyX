@@ -1,4 +1,5 @@
 import struct
+from lib.unipyxx import X
 
 def swap32(i:bytes):
     c = len(i) // 4
@@ -84,25 +85,12 @@ class MT19937:
         y = _i32(y ^ _i32(y >> 18))
 
         return y
-def tea_decrypt(i:bytes,k:bytes,le=False):
-    e = '<' if le else '>'
-    if type(i) == bytes: i = struct.unpack(f'{e}{len(i)//4}I',i)
-    if type(k) == bytes: k = struct.unpack(f'{e}4I',k)
-    i = list(i)
-    assert len(k) == 4 and not len(i) % 2
 
-    DLT = 0x9e3779b9
-    def dec_blk(i):
-        v0,v1 = i[0],i[1]
-        sv = (DLT * 32) & maskb(4)
-        for _ in range(32):
-            v1 = (v1 - (((v0 << 4) + k[2]) ^ (v0 + sv) ^ ((v0 >> 5) + k[3]))) & maskb(4)
-            v0 = (v0 - (((v1 << 4) + k[0]) ^ (v1 + sv) ^ ((v1 >> 5) + k[1]))) & maskb(4)
-            sv = (sv - DLT) & maskb(4)
-        return v0,v1
-
-    for ix in range(0,len(i),2): i[ix:ix+2] = dec_blk(i[ix:ix+2])
-    return struct.pack(f'{e}{len(i)}I',*i)
+UPXX = None
+def uxx():
+    global UPXX
+    if UPXX is None: UPXX = X()
+    return UPXX
 
 MMFS_DEC = {}
 SELENE_DEC = {}
@@ -207,10 +195,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             c = pow(int.from_bytes(i,'little' if algo == 'rsa_inv_le' else 'big'),k.e,k.n)
             R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
             return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
-        case 'tea'|'tea_be'|'tea_le': return tea_decrypt(i,key,le=algo == 'tea_le')
+        case 'tea'|'tea_be'|'tea_le': return uxx().decrypt_tea(i,key,le=algo == 'tea_le')
         case 'tea_pad'|'tea_pad_be'|'tea_pad_le':
             lo = len(i) % 8
-            return tea_decrypt(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
+            return uxx().decrypt_tea(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
 
         case 'hatch':
             d = bytearray(i)
@@ -226,7 +214,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             for ix in range(ln):
                 v = d[ix]
                 v ^= xr ^ l2[idx2];idx2 += 1
-                if swp: v = ((v & mask(4)) << 4) | (v >> 4)
+                if swp: v = ((v & 0x0F) << 4) | (v >> 4)
                 v ^= l1[idx1];idx1 += 1
                 d[ix] = v
 
@@ -238,7 +226,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                     idx1 = 0
                     swp = not swp
                 else:
-                    xr = (xr + 2) & mask(7)
+                    xr = (xr + 2) & 0x7F
                     if swp:
                         swp = 0
                         idx1 = xr % 7

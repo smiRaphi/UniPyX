@@ -32,8 +32,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0'|'TREVA SDPC'|'Konami FireBeat LZSS':
+        case 'Nintendo LZ40'|'Nintendo LZ60'|'TREVA SDPC'|'Konami FireBeat LZSS':
             of = o + '\\' + tbasename(i)
+            if db.print_try: print('Trying with auracomp')
             auracomp(i,of,{
                 "Nintendo LZ10":"nintendo-lz10",
                 "Nintendo LZ11":"nintendo-lz11",
@@ -46,14 +47,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 "Konami FireBeat LZSS":"lzss+gcz",
             }[t])
             if exists(of) and getsize(of):
-                if t in ('Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'):
-                    xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
-
+                if t in {'Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'}:
                     tg = open(of,'rb').read(4)
-                    if tg in xm:
+                    if tg in NINARC:
                         tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
                         rename(of,tp)
-                        r = extract(tp,o,xm[tg])
+                        r = extract(tp,o,NINARC[tg])
                         if r: rename(tp,of)
                         else:
                             while True:
@@ -61,6 +60,30 @@ def extract4(inp:str,out:str,t:str) -> bool:
                                 except PermissionError: sleep(0.1)
                                 else: break
                 return
+        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = decompress(readfile(i),{
+                'Nintendo LZ10':'lz10',
+                'Nintendo LZ11':'lz11',
+                'Nintendo BLZ':'blz',
+                'Nintendo Yay0':'yay0',
+                'Nintendo Yaz0':'yaz0',
+            }[t])
+
+            if d[:4] in NINARC:
+                tf = f'{o}\\tmp{os.urandom(6).hex()}.{d[:4].decode().lower()}'
+                writefile(tf,d)
+                del d
+                r = extract(tf,o,NINARC[d[:4]])
+                if r: mv(tf,o + '/' + tbasename(i))
+                else:
+                    while True:
+                        try: remove(tf)
+                        except PermissionError: sleep(0.1)
+                        else: break
+            else: writefile(o + '/' + tbasename(i),d)
+            return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])
             remove(o + '/wszst-setup.txt')
@@ -2322,27 +2345,5 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 mkdir(dirname(p))
                 run(['renderdoccmd','extract','--file=' + p,'--section=' + s,i],print_try=False)
             if rldir(o): return
-        case 'Nintendo Mario Party Message':
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,endian='>')
-
-            f.skip(8)
-            fo = f.readu32()
-            f.seek(0)
-
-            ses = []
-            while f.pos < fo:
-                f.skip(8)
-                ses.append((f.readu32(),f.readu32()))
-
-            oc = []
-            for off,idx in ses:
-                f.seek(off)
-                oc.append(f'{idx:04}:\n{f.read0s().decode("shift-jis")}')
-
-            if oc:
-                writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(oc),'w')
-                return
 
     return 1

@@ -1,4 +1,5 @@
 import struct,io,sys
+from lib.unipyxx import X
 
 ENDMAP = {'<':'little','>':'big','-':'big'}
 UTFENDM = {'<':'le','>':'be','-':'be'}
@@ -293,6 +294,11 @@ def ext_exe(i:str,dotnet=False):
 OODLE = None
 GDEFLATE = None
 UCL = None
+UPXX = None
+def uxx():
+    global UPXX
+    if UPXX is None: UPXX = X()
+    return UPXX
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     global OODLE,GDEFLATE,UCL
     match algo:
@@ -350,7 +356,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lz4_frame':
             import lz4.frame
             return lz4.frame.decompress(i)
-        case 'lz4_fast': return lz4_fast_decompress(i,usize=kwargs['usize'])
+        case 'lz4_fast': return uxx().decompress_lz4_fast(i,usize=kwargs['usize'])
 
         case 'lzo'|'lzo1x'|'lzo1y':
             if 'db' in kwargs: kwargs['db'].get('lzo')
@@ -434,18 +440,47 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if dcrc and crc != int.from_bytes(i[p:p+4],'big'): raise ValueError('CRC mismatch')
             return bytes(o)
 
-        case 'huffman': return huffman_decompress(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
+        case 'huffman': return uxx().decompress_huffman(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'lzss_win': return lzss_win_decompress(i,**kwargs)
         case 'lzss':
             assert 'usize' in kwargs
             return lzss_decompress(i,**kwargs)
-        case 'lzss8': return lzss8_decompress(i,usize=kwargs['usize'])
+        case 'lzss8': return uxx().decompress_lzss8(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
             return lzw_decompress(i,**args)
-        case 'rtl_lz': return rtl_lz_decompress(i,usize=kwargs.get('usize'))
+        case 'rtl_lz':
+            if 'usize' in kwargs: us = kwargs['usize']
+            else: us,i = int.from_bytes(i[:8],'little'),i[8:]
+            r = uxx().decompress_rtl_lz(i,usize=us)
+            if kwargs.get('verify',True): assert len(r) == us
+            return r
+        case 'lz10_raw': return uxx().decompress_lz10_raw(i,usize=kwargs['usize'])
+        case 'lz11_raw': return uxx().decompress_lz11_raw(i,usize=kwargs['usize'])
+        case 'blz_raw': return uxx().decompress_blz_raw(i,usize=kwargs['usize'])
 
+        case 'lz10':
+            assert i[0] == 0x10
+            us,i = int.from_bytes(i[1:4],'little'),i[4:]
+            if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
+            r = uxx().decompress_lz10_raw(i,usize=us)
+            if kwargs.get('verify',True): assert len(r) == us
+            return r
+        case 'lz11':
+            assert i[0] == 0x11
+            us,i = int.from_bytes(i[1:4],'little'),i[4:]
+            if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
+            r = uxx().decompress_lz11_raw(i,usize=us)
+            if kwargs.get('verify',True): assert len(r) == us
+            return r
+        case 'blz':
+            h = i[-8:]
+            cs = int.from_bytes(h[:3],'little')
+            us = int.from_bytes(h[4:8],'little') + cs
+            r = uxx().decompress_blz_raw(i[-cs:-h[3]],usize=us)
+            if kwargs.get('verify',True): assert len(r) == us
+            return r
         case 'avlz':
             if len(i) < 8: raise ValueError("Not enough data to decompress")
             cs = int.from_bytes(i[:4],'little')
@@ -453,7 +488,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             if cs == len(i): cs -= 8
             if cs != len(i) - 8: raise ValueError("Invalid compressed size")
-            return lzss8_decompress(i[8:8+cs],usize=us)
+            r = uxx().decompress_lzss8(i[8:8+cs],usize=us)
+            if kwargs.get('verify',True): assert len(r) == us
+            return r
         case 'natsume_lzs':
             if len(i) < 0x1C: raise ValueError("Not enough data to decompress")
             if i[:4] != b'LZS\0': raise ValueError("Invalid header")
@@ -542,49 +579,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return ananconda_decompress(i)
     raise NotImplementedError(algo)
 
-class Huffman:
-    TREE_SIZE = 512
-
-    def __init__(self,inp:BitReader):
-        self.inp = inp
-        self.lhs = [0] * self.TREE_SIZE
-        self.rhs = [0] * self.TREE_SIZE
-        self.token = 256
-
-    def create_tree(self):
-        bit = self.inp.get_bit()
-        
-        if bit is None: raise EOFError("Unexpected EOF in compressed stream")
-        elif bit != 0:
-            v = self.token
-            self.token += 1
-            if v >= self.TREE_SIZE: raise ValueError("Invalid stream, tree size exceeded")
-
-            self.lhs[v] = self.create_tree()
-            self.rhs[v] = self.create_tree()
-            return v
-        else:
-            v = self.inp.get_bits(8,True)
-            if v is None: raise EOFError("Unexpected EOF while reading leaf")
-            return v
-
-    def unpack(self,usize:int,padding=False):
-        self.token = 256
-        root = self.create_tree()
-        if padding: self.inp.reset()
-        out = bytearray()
-
-        for _ in range(usize):
-            sym = root
-            while sym >= 0x100:
-                bit = self.inp.get_bit()
-                if bit is None: return bytes(out)
-                if bit != 0: sym = self.rhs[sym]
-                else: sym = self.lhs[sym]
-            out.append(sym)
-
-        return bytes(out)
-def huffman_decompress(i:bytes,usize:int,padding=False): return Huffman(BitReader(i)).unpack(usize,padding)
 def lzss_decompress(i:bytes,usize:int=None,lens=4,offs=12,minl=3):
     d = BitReader(i)
     ob = bytearray()
@@ -623,43 +617,6 @@ def lzss_win_decompress(i:bytes,usize:int=None):
                 win[winp] = b
                 winp = (winp + 1) & mask(13)
     return bytes(ob)[:usize]
-def lzss8_decompress(i:bytes,usize:int=None,win_size=0x1000,threshold=3,maxm=18):
-    ob = bytearray()
-    ring = bytearray(win_size)
-    p = 0
-    rp = win_size - maxm
-    f = 0
-
-    while (usize is None or len(ob) < usize) and p < len(i):
-        if not f & 0xFF00:
-            if p >= len(i): break
-            f = i[p] | 0x8000;p += 1
-
-        if f & 1:
-            if p >= len(i): break
-            c = i[p];p += 1
-
-            ob.append(c)
-            ring[rp % win_size] = c
-            rp += 1
-        else:
-            if p + 1 >= len(i): break
-            b1 = i[p];p += 1
-            b2 = i[p];p += 1
-
-            idx = ((b2 & 0xF0) << 4) | b1
-            c = (b2 & 0x0F) + threshold
-
-            for ix in range(c):
-                if usize is not None and len(ob) >= usize: break
-                c = ring[(idx + ix) % win_size]
-                ob.append(c)
-                ring[rp % win_size] = c
-                rp += 1
-
-        f >>= 1
-
-    return bytes(ob)
 def lzss16c_decompress(i:bytes,usize:int=None,big_endian=False):
     pos = 0
 
@@ -855,43 +812,6 @@ def ash0_decompress(i:bytes):
         except: break
 
     return bytes(out)
-def lz4_fast_decompress(d:bytes,usize:int=None):
-    p = 0
-    ob = bytearray()
-
-    try:
-        while usize is None or len(ob) < usize:
-            tok = d[p]
-            p += 1
-
-            num_literals = tok >> 4
-            if num_literals == 0x0F:
-                while True:
-                    l = d[p]
-                    p += 1
-                    num_literals += l
-                    if l != 0xFF: break
-
-            ob.extend(d[p : p + num_literals])
-            p += num_literals
-
-            if usize is not None and len(ob) >= usize: break
-
-            off = d[p] | (d[p + 1] << 8)
-            p += 2
-
-            ml = (tok & 0x0F) + 4
-            if ml == 19:
-                while True:
-                    l = d[p]
-                    p += 1
-                    ml += l
-                    if l != 0xFF: break
-
-            for _ in range(ml): ob.append(ob[-off])
-    except IndexError: pass
-        
-    return bytes(ob[:usize])
 class AnacondaDecoder:
     def __init__(self,d:bytes):
         self.d = d
@@ -1045,48 +965,3 @@ class AnacondaDecoder:
 
         return bytes(self.o)
 def ananconda_decompress(data:bytes): return AnacondaDecoder(data).decode()
-def rtl_lz_decompress(i:bytes,usize:int=None):
-    if usize is None: usize,i = int.from_bytes(i[:8],byteorder="little"),i[8:]
-
-    p = 0
-    o = bytearray()
-    while len(o) < usize:
-        tok = i[p];p += 1
-        if 0x20 > tok:
-            if tok == 0:
-                tok = i[p];p += 1
-                if tok == 0:
-                    s = int.from_bytes(i[p:p + 2],'little');p += 2
-                    if s == 0: break
-                    o.extend(i[p:p + s]);p += s
-                else:
-                    tok += 0x1F
-                    o.extend(i[p:p + tok]);p += tok
-            else: o.extend(i[p:p + tok]);p += tok
-        elif 0x40 > tok >= 0x20:
-            c = tok - 0x20
-            if c == 0:
-                tok = i[p];p += 1
-                c = tok + 0x20
-            o.extend([0]*c)
-        elif 0x80 > tok >= 0x40:
-            tok4 = tok & 0x0F
-            if tok4 == 0:
-                l = int.from_bytes(i[p:p + 2],'little');p += 2
-                of = int.from_bytes(i[p:p + 2],'little');p += 2
-                while tok & 0x30:
-                    o.append(i[p]);p += 1
-                    tok -= 0x10
-                o.extend(o[-l-of+1:(-of+1) or None])
-            else:
-                of = int.from_bytes(i[p:p + 2],'little');p += 2
-                while tok & 0x30:
-                    o.append(i[p]);p += 1
-                    tok -= 0x10
-                o.extend(o[-of-tok4-2+1:(-of+1) or None])
-        elif tok >= 0x80:
-            if tok & 0x40: o.extend(i[p:p + 2]);p += 2
-            of = (tok & 0x3F)*2 + 2
-            o.extend(o[-of:(-of+2) or None])
-
-    return bytes(o)

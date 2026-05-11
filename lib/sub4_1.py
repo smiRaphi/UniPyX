@@ -1746,5 +1746,27 @@ def extract4_1(inp:str,out:str,t:str):
             if ob:
                 json.dump(ob,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
+        case 'Nintendo Mario Party Message':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            f.skip(8)
+            fo = f.readu32()
+            f.seek(0)
+
+            ses = []
+            while f.pos < fo:
+                f.skip(8)
+                ses.append((f.readu32(),f.readu32()))
+
+            oc = []
+            for off,idx in ses:
+                f.seek(off)
+                oc.append(f'{idx:04}:\n{f.read0s().decode("shift-jis")}')
+
+            if oc:
+                writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(oc),'w')
+                return
 
     return 1

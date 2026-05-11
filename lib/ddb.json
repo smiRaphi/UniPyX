@@ -1342,7 +1342,7 @@
         "rs":"Natsume LZS","s":1
     },
     {
-        "d":[["n0",4,0],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,10],["py","b=splitext(inp)[0][:-2 if inp.lower().endswith('.bin') else None]\nif not exists(b+'.xpk')or not exists(b+'_d.bin')or not exists(b+'_f.bin'):return\nreturn open(b+'.xpk','rb').read(10)==open(b+'_d.bin','rb').read(10)==open(b+'_f.bin','rb').read(10)"]],
+        "d":[["ext",[".xpk","_f.bin","_d.bin"]],["n0",4,0],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,10],["py","b=splitext(inp)[0][:-2 if inp.lower().endswith('.bin') else None]\nif not exists(b+'.xpk')or not exists(b+'_d.bin')or not exists(b+'_f.bin'):return\nreturn open(b+'.xpk','rb').read(10)==open(b+'_d.bin','rb').read(10)==open(b+'_f.bin','rb').read(10)"]],
         "rs":"WWE Raw XPK+D.BIN+F.BIN"
     },
     {
