@@ -1587,7 +1587,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 prb = int.from_bytes(d[:4],'little')
             if prb > 285 or unp: ko = (0x2224,0x223B,0x222E)
             else: ko = (0x222E,0x2224,0x223B)
-            key = decrypt(b''.join(kids.pop(x,b'') for x in ko),'mmfs_key')
+            key = b''.join(kids.pop(x,b'') for x in ko)
 
             ofis = {}
             for ix,of,id,fl,s in fs:
@@ -1596,12 +1596,14 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
                 if s > 0:
                     if fl & 2:
-                        if fl & 1: d = d[4:]
-                        d = decrypt(d,'mmfs_286' if prb > 285 else 'mmfs_285',key,id)
+                        if fl & 1:
+                            d = d[4:]
+                            if prb > 285 and id & 1: d = (d[0] ^ (id & 0xFF) ^ (id >> 8)).to_bytes(1) + d[1:]
+                        d = decrypt(d,'mmfs',key)
                         if fl & 1: d = d[4:]
                     if fl & 1:
                         if not fl & 2: d = d[8:]
-                        assert d[0] == 0x78,hex(of - 8)
+                        assert d[0] == 0x78,f'{d[:4]} @ 0x{of + 8:08X}'
                         d = decompress(d,anc + ('zlib' if iszl(d) else 'deflate'))
                     if fl >> 2: raise NotImplementedError(f'Unknown flag {bin(fl)} @ {of - 8}')
                 fn = f'{o}/$Chunks/{ix:03d}.{TMAP.get(id,f"{id:04X}")}'

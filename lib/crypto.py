@@ -4,87 +4,12 @@ from lib.unipyxx import X
 def swap32(i:bytes):
     c = len(i) // 4
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
-def mask(n:int): return (1 << n) - 1
-def maskb(n:int): return mask(n * 8)
 def reflecti(v:int,w:int):
     r = 0
     for _ in range(w):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
-def rotate8(v:int): return ((v << 7) & maskb(1)) | (v >> 1)
-
-def _i32(n: int) -> int:
-    n = n & 0xFFFFFFFF
-    if n & 0x80000000: return n - 0x100000000
-    return n
-class MT19937:
-    STATE_LENGTH = 624
-    STATE_M = 397
-    MATRIX_A = _i32(-1727483681)
-    TEMPERING_MASK_B = _i32(-1658038656)
-    TEMPERING_MASK_C = _i32(-272236544)
-
-    def __init__(self,seed:int):
-        self.MAG01 = [0,self.MATRIX_A]
-        self.m_table = [0] * self.STATE_LENGTH
-        self.m_pos = 0
-        self.s_rand(seed)
-
-    def s_rand(self,seed:int):
-        self.m_table[0] = _i32(seed)
-        for i in range(1, self.STATE_LENGTH):
-            last = self.m_table[i - 1]
-            mult = _i32(0x6C078965 * (last ^ (last >> 30)))
-            self.m_table[i] = _i32(i + mult)
-
-        self.m_pos = self.STATE_LENGTH
-
-    def rand(self) -> int:
-        if self.m_pos >= self.STATE_LENGTH:
-            i = 0
-
-            while i < self.STATE_LENGTH - self.STATE_M:
-                mt0 = self.m_table[i]
-                mt1 = self.m_table[i + 1]
-                x = mt0 ^ mt1
-
-                idx = (mt0 ^ x) & 1
-                y_shifted = _i32(_i32(mt0 ^ (x & mask(31))) >> 1)
-
-                self.m_table[i] = _i32(self.m_table[i + self.STATE_M] ^ self.MAG01[idx] ^ y_shifted)
-                i += 1
-
-            while i < self.STATE_LENGTH - 1:
-                mt0 = self.m_table[i]
-                mt1 = self.m_table[i + 1]
-                x = mt0 ^ mt1
-
-                idx = (mt0 ^ x) & 1
-                y_shifted = _i32(_i32(mt0 ^ (x & mask(31))) >> 1)
-
-                self.m_table[i] = _i32(self.m_table[i + self.STATE_M - self.STATE_LENGTH] ^ self.MAG01[idx] ^ y_shifted)
-                i += 1
-
-            mt_last = self.m_table[self.STATE_LENGTH - 1]
-            mt0 = self.m_table[0]
-
-            z = _i32(mt_last ^ ((mt0 ^ mt_last) & mask(31)))
-            idx = z & 1
-            z_shifted = _i32(z >> 1)
-
-            self.m_table[self.STATE_LENGTH - 1] = _i32(self.m_table[self.STATE_M - 1] ^ z_shifted ^ self.MAG01[idx])
-            self.m_pos = 0
-
-        y = self.m_table[self.m_pos]
-        self.m_pos += 1
-
-        y = _i32(y ^ _i32(y >> 11))
-        y = _i32(y ^ _i32((y << 7) & self.TEMPERING_MASK_B))
-        y = _i32(y ^ _i32((y << 15) & self.TEMPERING_MASK_C))
-        y = _i32(y ^ _i32(y >> 18))
-
-        return y
 
 UPXX = None
 def uxx():
@@ -93,27 +18,23 @@ def uxx():
     return UPXX
 
 MMFS_DEC = {}
-SELENE_DEC = {}
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
-            if type(key) == int: key = (key,)
-            return bytes(i[x] ^ key[x % len(key)] for x in range(len(i)))
-        case 'rxor':
-            if type(key) == bytes: key = key[0]
-            d = bytearray(i)
-            for ix in range(len(i)): key = d[ix] = d[ix] ^ key
-            return bytes(d)
+            if isinstance(key,int): key = key.to_bytes(1)
+            assert isinstance(key,bytes)
+            return uxx().decrypt_xor(i,key or b'\0')
+        case 'rxor': return uxx().decrypt_rxor(i,key or b'\0')
         case 'cxor':
-            if type(key) == bytes: key = key[0]
-            if iv is None: iv = 0
-            if type(iv) == bytes: iv = iv[0]
-            return bytes(i[x] ^ ((key + x + iv) & 0xFF) for x in range(len(i)))
+            if isinstance(key,int): key = key.to_bytes(1)
+            if isinstance(iv,bytes): iv = iv[0]
+            assert isinstance(key,bytes)
+            return uxx().decrypt_cxor(i,key or b'\0',iv or 0)
         case 'dxor':
-            if type(key) == int: key = (key,)
-            if type(iv) == int: iv = (iv,)
-            if len(key) == len(iv) == 1: return decrypt(i,'xor',key[0] ^ iv[0])
-            else: return bytes(i[x] ^ key[x % len(key)] ^ iv[x % len(iv)] for x in range(len(i)))
+            if type(key) == int: key = key.to_bytes(1)
+            if type(iv) == int: iv = iv.to_bytes(1)
+            assert isinstance(key,bytes) and isinstance(iv,bytes)
+            return uxx().decrypt_dxor(i,key or b'\0',iv or b'\0')
         case 'inv'|'invert': return bytes(x ^ 0xFF for x in i)
         case 'roll':
             if type(key) == int: key = (key,)
@@ -155,7 +76,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 assert len(iv) <= 16
                 bc = int.from_bytes(iv[8:16],'little') # using int.from_bytes instead of struct to support len(iv) != 16
             if bc is not None:
-                pctx[8],pctx[9] = bc & maskb(4),(bc >> 32) & maskb(4) # stream_state->input[8/9] = block count
+                pctx[8],pctx[9] = bc & 0xFFFFFFFF,(bc >> 32) & 0xFFFFFFFF # stream_state->input[8/9] = block count
 
             o = ctx.decrypt(i)
             if kwargs.get('return_block_count'): return o,pctx[8] | (pctx[9] << 32)
@@ -201,102 +122,23 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return uxx().decrypt_tea(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
 
         case 'hatch':
-            d = bytearray(i)
-            ln = len(i)
-            swp = 0
-
-            l1 = key * 4
-            idx1 = 0
-            l2 = crc_hash(ln.to_bytes(8,'little'),'crc32').to_bytes(4,'little')*4
-            idx2 = 8
-            xr = (ln >> 2) & mask(7)
-
-            for ix in range(ln):
-                v = d[ix]
-                v ^= xr ^ l2[idx2];idx2 += 1
-                if swp: v = ((v & 0x0F) << 4) | (v >> 4)
-                v ^= l1[idx1];idx1 += 1
-                d[ix] = v
-
-                if idx1 < 16:
-                    if idx2 > 12:
-                        idx2 = 0
-                        swp = not swp
-                elif idx2 <= 8:
-                    idx1 = 0
-                    swp = not swp
-                else:
-                    xr = (xr + 2) & 0x7F
-                    if swp:
-                        swp = 0
-                        idx1 = xr % 7
-                        idx2 = (xr % 12) +2
-                    else:
-                        swp = 1
-                        idx1 = (xr % 12) + 3
-                        idx2 = xr % 7
-
-            return bytes(d)
+            if isinstance(key,int): key = key.to_bytes(4,'little')
+            return uxx().decrypt_hatch(i,key)
         case 'capcom_mame':
             if type(iv) == str: iv = iv.encode('ascii')
             key = [iv[3],key[0],iv[1],key[1],iv[0],key[2],iv[2],key[3]]
             for ix,b in enumerate(iv[4:]): key[ix % 8] ^= b
             return decrypt(i,'xor',bytes(key))
-        case 'mmfs'|'mmfs_285'|'mmfs_286':
-            assert type(key) == bytes
-            if not key in MMFS_DEC:
-                dec = bytearray(range(0x100))
-                hv = kp = ix2 = 0
-                for ix in range(0x100):
-                    hv = rotate8(hv)
-                    if hv == key[kp]: hv = kp = 0
-                    ix2 = (ix2 + (hv ^ key[kp]) + dec[ix]) & maskb(1)
-                    dec[ix2],dec[ix] = dec[ix],dec[ix2]
-                    kp += 1
-                MMFS_DEC[key] = dec
-
-            d = bytearray(i)
-            if iv is None: iv = b'\0\0'
-            elif isinstance(iv,int): iv = iv.to_bytes(2,'little')
-            if algo == 'mmfs_286' and iv[0] & 1:
-                assert len(iv) == 2
-                d[0] ^= iv[0] ^ iv[1]
-
-            tmp = MMFS_DEC[key].copy()
-            ix1 = ix2 = 0
-            for ix in range(len(i)):
-                ix1 = (ix1 + 1) & maskb(1)
-                ix2 = (ix2 + tmp[ix1]) & maskb(1)
-                tmp[ix1],tmp[ix2] = tmp[ix2],tmp[ix1]
-                d[ix] ^= tmp[(tmp[ix1] + tmp[ix2]) & maskb(1)]
-
-            return bytes(d)
-        case 'mmfs_key':
-            key = bytearray(i.replace(b'\0',b''))[:128] + b'\0'*128
-            if len(i) < 255: key[len(i) + 1] = sum(b * 2 for b in i) & maskb(1)
-            return bytes(key)
+        case 'mmfs':
+            assert isinstance(key,bytes)
+            return uxx().decrypt_mmfs(i,key)
         case 'hornby':
-            if len(i) < 2: return b''
-
-            if type(key) == bytes: key = key[0]
-            if type(iv) == bytes: iv = iv[0]
-            msk = iv or 0xFF
-            o = bytearray(i)
-            o[1] ^= key
-            for ix in range(len(o)-1): o[ix+1] = o[ix] ^ (o[ix+1] & msk)
-            return bytes(o[1:])
+            if isinstance(iv,bytes): iv = iv[0]
+            assert isinstance(iv,int) and isinstance(key,bytes)
+            return uxx().decrypt_hornby(i,key or b'\0',iv or 0xFF)
         case 'selene':
-            assert type(key) in {bytes,str,int}
-            if type(key) == str:
-                seed = crc_hash(key.encode('shift-jis'),'crc32')
-                key = key.encode('utf-8')
-            elif type(key) == bytes: seed = crc_hash(key,'crc32')
-            if not seed in SELENE_DEC:
-                assert type(key) == bytes
-                rng = MT19937(seed)
-                SELENE_DEC[seed] = bytes([key[ix % len(key)] ^ ((rng.rand() >> 16) & 0xFF) for ix in range(0x10000)])
-
-            return decrypt(i,'xor',SELENE_DEC[seed])
+            assert isinstance(key,bytes)
+            return uxx().decrypt_selene(i,key or b'\0')
 
     raise NotImplementedError(algo)
 
@@ -351,7 +193,7 @@ def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None):
                 if crc & 1: crc = (crc >> 1) ^ poly
                 else: crc >>= 1
     else:
-        msk1,msk2,sv = 1 << (size - 1),mask(size),size - 8
+        msk1,msk2,sv = 1 << (size - 1),(1 << size) - 1,size - 8
         for b in i:
             crc ^= b << sv
             for _ in range(8):
@@ -365,28 +207,28 @@ def crc24(i:bytes,poly=0x864CFB,init=0xB7074CE,xor=0,reflect=False,value:int=Non
 def crc32(i:bytes,poly=0x04C11DB7,init=0xFFFFFFFF,xor=0xFFFFFFFF,reflect=True,value:int=None): return crc(i,32,poly,init,xor,reflect,value)
 def crc64(i:bytes,poly=0x42F0E1EBA9EA3693,init=0x0000000000000000,xor=0x0000000000000000,reflect=False,value:int=None): return crc(i,64,poly,init,xor,reflect,value)
 def fnv1_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
-    for b in i: offset = ((offset * prime) & maskb(8)) ^ b
+    for b in i: offset = ((offset * prime) & 0xFFFFFFFFFFFFFFFF) ^ b
     return offset
 def fnv1a_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
-    for b in i: offset = ((offset ^ b) * prime) & maskb(8)
+    for b in i: offset = ((offset ^ b) * prime) & 0xFFFFFFFFFFFFFFFF
     return offset
 def fnv1_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
-    for b in i: offset = ((offset * prime) & maskb(4)) ^ b
+    for b in i: offset = ((offset * prime) & 0xFFFFFFFF) ^ b
     return offset
 def fnv1a_32(i:bytes,prime=0x1000193,offset=0x811C9DC5):
-    for b in i: offset = ((offset ^ b) * prime) & maskb(4)
+    for b in i: offset = ((offset ^ b) * prime) & 0xFFFFFFFF
     return offset
 def bkdr(i:bytes,seed=131,init=0):
     h = init
-    for b in i: h = (h * seed + b) & maskb(4)
+    for b in i: h = (h * seed + b) & 0xFFFFFFFF
     return h
 def sdbm(i:bytes,seed=0x1003F,init=0):
     h = init
-    for b in i: h = ((h + b) * seed) & maskb(4)
+    for b in i: h = ((h + b) * seed) & 0xFFFFFFFF
     return h
 def djb2(i:bytes,init=5381):
     h = init
-    for b in i: h = (h * 33 + b) & maskb(4)
+    for b in i: h = (h * 33 + b) & 0xFFFFFFFF
     return h
 def tarzan_hash(i:bytes):
     o = 0
@@ -398,17 +240,17 @@ def tarzan_hash(i:bytes):
         shft += 8
         if shft > 24: shft = 0
         lng += 1
-    return (o + lng) & maskb(4)
+    return (o + lng) & 0xFFFFFFFF
 def luas_hash(i:bytes):
     stp = (len(i) >> 5) + 1
     o = p = len(i)
     while p >= stp:
-        o ^= (o * 0x20 + (o >> 2) + i[p - 1]) & maskb(4)
+        o ^= (o * 0x20 + (o >> 2) + i[p - 1]) & 0xFFFFFFFF
         p -= stp
     return o
 def sxm_hash(i:bytes):
     v = 0
-    for b in i: v = ((v * 137) + b) & maskb(8)
+    for b in i: v = ((v * 137) + b) & 0xFFFFFFFFFFFFFFFF
     return v
 
 CRC8 = {   #  poly,init,xor ,reflect
@@ -575,7 +417,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             fnc = djb2
         case 'murmur3'|'mmh3'|'murmur3_32'|'mmh3_32'|'murmur3_128'|'mmh3_128':
             import mmh3
-            return getattr(mmh3,f'mmh3_{"x64_128" if "128" in algo else "32"}_uintdigest')(i,kwargs.get('seed',0) & maskb(4))
+            return getattr(mmh3,f'mmh3_{"x64_128" if "128" in algo else "32"}_uintdigest')(i,kwargs.get('seed',0) & 0xFFFFFFFF)
         case 'xxh32'|'xxh64'|'xxh3_64'|'xxh128'|'xxh3_128':
             if algo == 'xxh128': algo = 'xxh3_128'
             import xxhash

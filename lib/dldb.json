@@ -6969,7 +6969,7 @@
         "ts":1775755622
     },
     "sonic_galactic_demo2_hashes":{
-        "p":"sonic_galactic_demo2",
+        "p":"hashes/sonic_galactic_demo2.bhl",
         "fs":[[
             "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sonic_galactic_demo2.bhl",
             "hashes/sonic_galactic_demo2.bhl"

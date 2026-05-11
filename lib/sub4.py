@@ -1,5 +1,7 @@
 from .main import *
 
+NINARC = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
+
 def auracomp(i:bytes|str,o:str|None,t:str):
     if type(i) == bytes:
         fi = TmpFile('.bin')

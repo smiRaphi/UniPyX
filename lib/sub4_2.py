@@ -667,16 +667,16 @@ def extract4_2(inp:str,out:str,t:str):
             for fe in fs:
                 f.seek(fe[1])
                 d = f.decompress(fe[4],'zlib' if fe[4] != fe[2] else 'none')
-                if fe[3]: d = decrypt(d,'hatch',fe[4])
+                if fe[3]: d = decrypt(d,'hatch',fe[0])
                 if fe[0] in HL: fn = HL[fe[0]]
                 elif fe[0] in bak: fn = '$unk/' + bak[fe[0]]
                 else:
-                    if d[:4] == b'SPR\0': ex += 'spr'
-                    elif d[:4] == b'TCOL': ex += 'tcol'
-                    elif d[:4] == b'HTVM': ex += 'ibc'
-                    elif d[:4] == b'HMAP': ex += 'hcm'
-                    elif d[:4] == b'HMDL': ex += 'hmdl'
-                    else: ex += guess_ext(d)
+                    if d[:4] == b'SPR\0': ex = 'spr'
+                    elif d[:4] == b'TCOL': ex = 'tcol'
+                    elif d[:4] == b'HTVM': ex = 'ibc'
+                    elif d[:4] == b'HMAP': ex = 'hcm'
+                    elif d[:4] == b'HMDL': ex = 'hmdl'
+                    else: ex = guess_ext(d)
                     fn = f'$unk/{fe[0]:08X}.{ex}'
                 writefile(o + '/' + fn,d)
             f.close()

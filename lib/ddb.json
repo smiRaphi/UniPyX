@@ -171,7 +171,7 @@
         "rs":"Bink Video EXE","s":1
     },
     {
-        "rqr":"PE32 executable for MS Windows 5.01 (GUI)",
+        "rqr":"Microsoft Visual C/C++",
         "d":["py","f=open(inp,'rb');f.seek(0x3C);f.seek(int.from_bytes(f.read(4),'little'));f.seek(6,1);c=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1);l=[]\nfor _ in range(c):f.seek(16,1);l.append(int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'));f.seek(16,1)\nf.seek(max(l));return f.read(4)in{b'wwww',b'\\x7F\\x7F\\0\\0',b',\"\\0\\0'} and f.read(4)==b'I\\x87G\\x12'"],
         "rs":"Multimedia Fusion 2.0"
     },
