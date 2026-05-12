@@ -1,5 +1,4 @@
 from lib.main import *
-from lib.sub4 import auracomp
 
 def extract4_1(inp:str,out:str,t:str):
     run = db.run
@@ -856,7 +855,7 @@ def extract4_1(inp:str,out:str,t:str):
             for ix,fe in enumerate(coffs[:-1]):
                 iix,off = fe
                 f.seek(off)
-                d = auracomp(f.read(coffs[ix+1][1]-off),None,'nintendo-lz11')
+                d = f.decompress(f.readc(coffs[ix+1][1]-off),'lz11')
                 assert d
                 writefile(o + '/' + ('common','eur-en','eur-fr','eur-de','eur-it','eur-es','eur-nl','eur-pt','eur-ru','jpn-jp','usa-en','usa-es','usa-pt')[iix] + '.bcmdl',d)
 

@@ -291,14 +291,16 @@ def ext_exe(i:str,dotnet=False):
             return nefile.NE(i)
         else: raise NotImplementedError(t.decode(errors='ignore'))
 
-OODLE = None
-GDEFLATE = None
-UCL = None
 UPXX = None
 def uxx():
     global UPXX
     if UPXX is None: UPXX = X()
     return UPXX
+
+OODLE = None
+GDEFLATE = None
+UCL = None
+NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     global OODLE,GDEFLATE,UCL
     match algo:
@@ -456,22 +458,17 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = uxx().decompress_rtl_lz(i,usize=us)
             if kwargs.get('verify',True): assert len(r) == us
             return r
-        case 'lz10_raw': return uxx().decompress_lz10_raw(i,usize=kwargs['usize'])
-        case 'lz11_raw': return uxx().decompress_lz11_raw(i,usize=kwargs['usize'])
-        case 'blz_raw': return uxx().decompress_blz_raw(i,usize=kwargs['usize'])
+        case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
+            if algo == 'lz60_raw': algo = 'lz40_raw'
+            return getattr(uxx(),'decompress_' + algo)(i,usize=kwargs['usize'])
 
-        case 'lz10':
-            assert i[0] == 0x10
+        case 'lz10'|'lz11'|'lz40'|'lz60':
+            id,fnc = NLZC[algo]
+            assert i[0] == id
+            fnc = getattr(uxx(),fnc)
             us,i = int.from_bytes(i[1:4],'little'),i[4:]
             if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
-            r = uxx().decompress_lz10_raw(i,usize=us)
-            if kwargs.get('verify',True): assert len(r) == us
-            return r
-        case 'lz11':
-            assert i[0] == 0x11
-            us,i = int.from_bytes(i[1:4],'little'),i[4:]
-            if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
-            r = uxx().decompress_lz11_raw(i,usize=us)
+            r = fnc(i,usize=us)
             if kwargs.get('verify',True): assert len(r) == us
             return r
         case 'blz':

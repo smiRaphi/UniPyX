@@ -81,6 +81,7 @@ class X:
         for e in (
             ('decompress_lz10_raw',(P(u8),szt,P(u8),sszt),    sszt,1),
             ('decompress_lz11_raw',(P(u8),szt,P(u8),sszt),    sszt,1),
+            ('decompress_lz40_raw',(P(u8),szt,P(u8),sszt),    sszt,1),
             ('decompress_blz_raw', (P(u8),szt,P(u8),sszt),    sszt,0),
             ('decompress_lz4_fast',(P(u8),szt,P(u8),sszt),    sszt,1),
             ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),    sszt,1),
@@ -374,18 +375,77 @@ EXPORT ssize_t decompress_lz11_raw(const uint8_t *restrict src, const size_t zsi
                 CHKi(0);
                 uint8_t b3 = src[ip++];
                 dist = ((b2 & 0x0F) << 8) | b3;
-                lng = (((b1 & 0x0F) << 4) | (b2 >> 4)) + 0x11;
+                lng = (((b1 & 0x0F) << 4) | (b2 >> 4)) + 0x10;
             } else if ((b1 >> 4) == 1) {
                 CHKi(1);
                 uint8_t b3 = src[ip++];
                 uint8_t b4 = src[ip++];
                 dist = ((b3 & 0x0F) << 8) | b4;
-                lng = (((b1 & 0x0F) << 12) | (b2 << 4) | (b3 >> 4)) + 0x111;
+                lng = (((b1 & 0x0F) << 12) | (b2 << 4) | (b3 >> 4)) + 0x110;
             } else {
                 dist = ((b1 & 0x0F) << 8) | b2;
-                lng = (b1 >> 4) + 1;
+                lng = b1 >> 4;
             }
             dist += 1;
+            lng += 1;
+            if (dist > op) break;
+            for (int i=0;i < lng;i++,op++) {
+                CHKo(0);
+                dst[op] = dst[op - dist];
+            }
+        } else {
+            CHKo(0);
+            dst[op++] = src[ip++];
+        }
+
+        f <<= 1;
+        fbl--;
+    }
+
+eof:
+    #undef CHKi
+    #undef CHKo
+    return op;
+}
+EXPORT ssize_t decompress_lz40_raw(const uint8_t *restrict src, const size_t zsize,
+                                         uint8_t *restrict dst, const ssize_t usize) {
+    size_t ip = 0;
+    ssize_t op = 0;
+    uint8_t f = 0;
+    int fbl = 0;
+
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    #define CHKo(n) if (usize != -1 && op + (n) >= usize) goto eof;
+
+    while (usize == -1 || op < usize) {
+        CHKi(0);
+        if (fbl <= 0) {
+            f = src[ip++];
+            CHKi(0);
+            fbl = 8;
+        }
+
+        if (f & 0x80) {
+            CHKi(1);
+            uint8_t b1 = src[ip++];
+            uint8_t b2 = src[ip++];
+            size_t dist,lng;
+
+            if ((b1 >> 4) == 0) {
+                CHKi(0);
+                uint8_t b3 = src[ip++];
+                dist = ((b2 & 0x0F) << 8) | b3;
+                lng = (((b1 & 0x0F) << 4) | (b2 >> 4)) + 0x10;
+            } else if ((b1 >> 4) == 1) {
+                CHKi(1);
+                uint8_t b3 = src[ip++];
+                uint8_t b4 = src[ip++];
+                dist = ((b3 & 0x0F) << 8) | b4;
+                lng = (((b1 & 0x0F) << 12) | (b2 << 4) | (b3 >> 4)) + 0x110;
+            } else {
+                dist = ((b1 & 0x0F) << 8) | b2;
+                lng = b1 >> 4;
+            }
             if (dist > op) break;
             for (int i=0;i < lng;i++,op++) {
                 CHKo(0);

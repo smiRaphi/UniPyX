@@ -1437,5 +1437,20 @@ def extract4_4(inp:str,out:str,t:str):
             for ix in range(fc):
                 f.seek(fs[ix][2])
                 writefile(o + '/' + fns[ix],)
+        case 'TREVA SDPC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = readfile(i)
+            assert d[:4] == b'SDPC'
+            us = int.from_bytes(d[4:8],'little')
+            writefile(o + '/' + tbasename(i),decompress(d[8:],'lzo1x',usize=us))
+            return
+        case 'Konami FireBeat LZSS':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = readfile(i)
+            us = int.from_bytes(d[:4],'little')
+            writefile(o + '/' + basename(i)[:-1 if i[-1] in 'zZ' else None],decompress(d[4:],'lzss8',usize=us))
+            return
 
     return 1

@@ -2,25 +2,6 @@ from .main import *
 
 NINARC = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
 
-def auracomp(i:bytes|str,o:str|None,t:str):
-    if type(i) == bytes:
-        fi = TmpFile('.bin')
-        writefile(fi.p,i)
-    else:
-        assert exists(i) and isfile(i)
-        fi = i
-    if o is None: of = TmpFile('.bin')
-    else:
-        assert not exists(o) or isfile(o)
-        of = o
-
-    db.run(['auracomp','-d','-i',fi,'-ou',of,'-o','-a','application/x-' + t],print_try=False)
-    if type(fi) == TmpFile: fi.destroy()
-    if o is None:
-        r = open(of.p,'rb').read()
-        of.destroy()
-        return r
-
 def extract4(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
@@ -34,40 +15,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case 'Nintendo LZ40'|'Nintendo LZ60'|'TREVA SDPC'|'Konami FireBeat LZSS':
-            of = o + '\\' + tbasename(i)
-            if db.print_try: print('Trying with auracomp')
-            auracomp(i,of,{
-                "Nintendo LZ10":"nintendo-lz10",
-                "Nintendo LZ11":"nintendo-lz11",
-                "Nintendo LZ40":"nintendo-lz40",
-                "Nintendo LZ60":"nintendo-lz60",
-                "Nintendo BLZ" :"blz",
-                "Nintendo Yay0":"nintendo-yay0",
-                "Nintendo Yaz0":"nintendo-yaz0",
-                "TREVA SDPC":"lzo+sdpc",
-                "Konami FireBeat LZSS":"lzss+gcz",
-            }[t])
-            if exists(of) and getsize(of):
-                if t in {'Nintendo LZ10','Nintendo LZ11','Nintendo LZ40','Nintendo LZ60','Nintendo BLZ','Nintendo Yay0','Nintendo Yaz0'}:
-                    tg = open(of,'rb').read(4)
-                    if tg in NINARC:
-                        tp = o + f'\\tmp{os.urandom(6).hex()}.{tg.decode().lower()}'
-                        rename(of,tp)
-                        r = extract(tp,o,NINARC[tg])
-                        if r: rename(tp,of)
-                        else:
-                            while True:
-                                try: remove(tp)
-                                except PermissionError: sleep(0.1)
-                                else: break
-                return
-        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
+        case 'Nintendo LZ10'|'Nintendo LZ11'|'Nintendo LZ40'|'Nintendo LZ60'|'Nintendo BLZ'|'Nintendo Yay0'|'Nintendo Yaz0':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
             d = decompress(readfile(i),{
                 'Nintendo LZ10':'lz10',
                 'Nintendo LZ11':'lz11',
+                'Nintendo LZ40':'lz40',
+                'Nintendo LZ60':'lz60',
                 'Nintendo BLZ':'blz',
                 'Nintendo Yay0':'yay0',
                 'Nintendo Yaz0':'yaz0',
@@ -1700,7 +1655,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'WarioWare Mega Party Game PAC':
             if db.print_try: print('Trying with custom extractor')
-            d = auracomp(readfile(i)[0x20:],None,'nintendo-yay0')
+            from lib.file import decompress
+            d = decompress(readfile(i)[0x20:],'yay0')
             if d:
                 writefile(o + '\\' + tbasename(i),d)
                 return

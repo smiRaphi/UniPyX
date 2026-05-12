@@ -571,7 +571,7 @@ K2 ConnectFile | .con | Custom |
 Kamen Rider Atsume BIN | .bin | Custom |
 Karma Studios Lang | ??? | Custom |
 Konami DPG | .dpg | Custom |
-Konami FireBeat LZSS | * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+Konami FireBeat LZSS | .gcz .exe | Custom |
 Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
 Konami NKP | .nkp | Custom |
 L.A. Noire BIG | .big.ps3 | Custom |
@@ -627,21 +627,21 @@ Nicktoons Gravjet Racing LIN | .lin | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |
 Nintendo ASH0 | .bin | Custom |
 Nintendo Binary YAML | .byml .byaml .yml .yaml | [byml-to-yaml](https://github.com/ArchLeaders/byml_to_yaml) |
-Nintendo BLZ | .blz .lz * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+Nintendo BLZ | .blz .lz * | Custom |
 Nintendo CTR Banner | .bnr | Custom |
 Nintendo Data ARChive | .arc .darc | [darc.py](https://github.com/LITTOMA/darctool) |
 Nintendo HARC+HIDX | .har+.hix | Custom |
-Nintendo LZ10 | .lz10 .lz * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
-Nintendo LZ11 | .lz11 .lz * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
-Nintendo LZ40 | .lz40 .lz * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
-Nintendo LZ60 | .lz60 .lz * | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+Nintendo LZ10 | .lz10 .lz * | Custom |
+Nintendo LZ11 | .lz11 .lz * | Custom |
+Nintendo LZ40 | .lz40 .lz * | Custom |
+Nintendo LZ60 | .lz60 .lz * | Custom |
 Nintendo Mario Party Message | ??? | Custom |
 Nintendo Message BMG | .bmg .mbmg | [ndspy/bmg.py](https://github.com/RoadrunnerWMC/ndspy/blob/master/ndspy/bmg.py) + Custom |
 Nintendo MSBT | .msb .msbt | [ce_msbt.py](https://github.com/Treeki/CylindricalEarth/blob/master/msbt.py) + Custom |
 Nintendo Puzzle Archive | ??? | Custom |
 Nintendo Table | ??? | Custom |
-Nintendo Yay0 | .yay0 | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
-Nintendo Yaz0 | .yaz0 .szs | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+Nintendo Yay0 | .yay0 | Custom |
+Nintendo Yaz0 | .yaz0 .szs | Custom |
 Nippon Ichi PS FS | .fs | Custom |
 NitroARC | .arc .narc | [Narchive](https://github.com/nickworonekin/narchive) |
 NMZIP | .nmzip | Custom |
@@ -780,7 +780,7 @@ Torus Ashen PackFile | .pf | Custom |
 Torus Ashen Strings | ??? | Custom |
 Torus Ashen ZLib | ??? | Custom |
 TotemTech Data | .dps | [bff](https://github.com/widberg/bff) |
-TREVA SDPC | .sdpc | [auracomp](https://github.com/Venomalia/AuroraLib.Compression) |
+TREVA SDPC | .sdpc | Custom |
 Trine FBQ | .fbq | Custom, [trine2.bms](https://mirror.aluigi.org/bms/trine2.bms) |
 Trinity GFLXPack | .gfpak | Custom |
 Trinity OnePack | .trpfs(+.trpfd) | Custom |

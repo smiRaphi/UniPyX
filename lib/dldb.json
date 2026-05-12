@@ -2864,31 +2864,6 @@
         }],
         "ts":0
     },
-    "auracomp":{
-        "p":"auracomp/auracomp.exe",
-        "fs":[{
-            "u":"https://github.com/Venomalia/AuroraLib.Compression/releases/download/2.0.0.0/auracomp_net472.zip",
-            "x":{
-                "auracomp.exe":"auracomp/auracomp.exe",
-                "auracomp.exe.config":"auracomp/auracomp.exe.config",
-                "AuroraLib.Compression.dll":"auracomp/AuroraLib.Compression.dll",
-                "AuroraLib.Compression.Nintendo.dll":"auracomp/AuroraLib.Compression.Nintendo.dll",
-                "AuroraLib.Compression.Sega.dll":"auracomp/AuroraLib.Compression.Sega.dll",
-                "AuroraLib.Compression-Extended.dll":"auracomp/AuroraLib.Compression-Extended.dll",
-                "AuroraLib.Core.dll":"auracomp/AuroraLib.Core.dll",
-                "AuroraLib.Core.Format.dll":"auracomp/AuroraLib.Core.Format.dll",
-                "K4os.Hash.xxHash.dll":"auracomp/K4os.Hash.xxHash.dll",
-                "System.Buffers.dll":"auracomp/System.Buffers.dll",
-                "System.Memory.dll":"auracomp/System.Memory.dll",
-                "System.Numerics.Vectors.dll":"auracomp/System.Numerics.Vectors.dll",
-                "System.Runtime.CompilerServices.Unsafe.dll":"auracomp/System.Runtime.CompilerServices.Unsafe.dll",
-                "System.Threading.Tasks.Extensions.dll":"auracomp/System.Threading.Tasks.Extensions.dll",
-                "ZstdSharp.dll":"auracomp/ZstdSharp.dll"
-            },
-            "ts":1775241307
-        }],
-        "ts":1775241307
-    },
     "bk_extract":{
         "p":"bk_extract.exe",
         "fs":[{
