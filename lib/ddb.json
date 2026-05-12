@@ -1159,6 +1159,10 @@
         "rs":"Sinergy GUT","s":1
     },
     {
+        "d":[["isat","\\x03",0],["isatS","\\0",19,1],["isatS","\\0",32,28],["n0",4,20],["n0",4,24],["n0",4,60],["n0",4,64],["n0",4,-4],["n0",4,-8],["n0",4,-12],["n0",4,-16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);o1,s1=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');f.seek(60);o2,s2=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little')\nif (o2+s2)!=s or not s2 in{s1,s1-8}:return\nf.seek(o2);o3,s3=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');return o3==int.from_bytes(f.read(4),'little')and (o3+s3)==o2"]],
+        "rs":"JumpStart SpyMasters Resource","s":1
+    },
+    {
         "d":["isat","IGHW\\0\\0\\0\\x02\\0\\0\\0\\x04\\0\\0\\0\\0",0],
         "rs":"Resistance Fall Of Man IGHW","s":1
     },
@@ -1344,6 +1348,10 @@
     {
         "d":[["ext",[".xpk","_f.bin","_d.bin"]],["n0",4,0],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,10],["py","b=splitext(inp)[0][:-2 if inp.lower().endswith('.bin') else None]\nif not exists(b+'.xpk')or not exists(b+'_d.bin')or not exists(b+'_f.bin'):return\nreturn open(b+'.xpk','rb').read(10)==open(b+'_d.bin','rb').read(10)==open(b+'_f.bin','rb').read(10)"]],
         "rs":"WWE Raw XPK+D.BIN+F.BIN"
+    },
+    {
+        "d":[["isat","\\xF1\\xEE\\xDB\\xBA",0],["n0",1,4],["n0",2,5],["py","f=open(inp,'rb');f.seek(4);c=f.read(1)[0]\nfor _ in range(c):\n f.seek(int.from_bytes(f.read(2),'little')*2,1)\n if not sum(f.read(4))or sum(f.read(4)):return\nreturn True"]],
+        "rs":"Wizards of a Waverly Place XPF","s":1
     },
     {
         "d":[["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07"],148],["isatS","\\0",4,132],["isatS","\\xFF",8,136],["isatS","\\0",3,149],["isatS","\\0",3,249],["n0",4,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(248);return not f.read(1)[0]&224 and (4+c*270)<=f.seek(0,2)"]],

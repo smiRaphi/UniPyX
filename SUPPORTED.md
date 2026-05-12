@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 937
+# Supported Formats: 938
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (480)
+## Various (481)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -541,7 +541,7 @@ Harry Potter and Prisoner of Azkaban IDS | .ids | Custom |
 Harry Potter and Prisoner of Azkaban SDT | .sdt | Custom |
 Harry Potter and the Deathly Hallows BIN | .bin | Custom |
 Harry Potter: Quidditch World Cup CCD | .ccd | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-Hatch Game Engine HATCH | .hatch | Custom | 
+Hatch Game Engine HATCH | .hatch | Custom |
 Hatch Game Engine HMAP | .hmap | Custom |
 Hell: A Cyberpunk Thriller Library | .pl .sl | [na_game_tool](https://nihav.org/game_tool.html) |
 High Impact Games WAD | .wad | [tjzip_dump.py](https://github.com/electrogecko/UYA_pyTools/blob/main/SM/tjzip_dump.py) + Custom |
@@ -567,6 +567,7 @@ Iron Sky GPK | .gpk | Custom |
 JDownloader2 Encrypted Accounts | .ejs | Custom |
 JDownloader2 Encrypted Subconfig | .ejs | Custom |
 Jikan de Fantasia JRZ | .jrz | Custom |
+JumpStart SpyMasters Resource | .res | Custom |
 K2 ConnectFile | .con | Custom |
 Kamen Rider Atsume BIN | .bin | Custom |
 Karma Studios Lang | ??? | Custom |

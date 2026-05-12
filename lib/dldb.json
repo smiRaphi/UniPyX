@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1777500000
+            "ts":1778536800
         }],
-        "ts":1777759200
+        "ts":1778536800
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -85,14 +85,14 @@
     "exeinfope":{
         "p":"ExeinfoPE/exeinfope.exe",
         "fs":[{
-            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.5/exeinfope.zip",
+            "u":"https://github.com/ExeinfoASL/ASL/releases/download/v0.0.9.7/exeinfope.zip",
             "x":{
                 "ExeinfoPE/exeinfope.exe":"ExeinfoPE/exeinfope.exe",
                 "ExeinfoPE/Ext_Detector.dll":"ExeinfoPE/Ext_Detector.dll"
             },
-            "ts":1771755567
+            "ts":1778092584
         }],
-        "ts":1771755567
+        "ts":1778092584
     },
     "yara":{
         "p":"yara/yara.exe",
@@ -124,9 +124,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1777845600
+            "ts":1778536800
         }],
-        "ts":1777845600
+        "ts":1778536800
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -201,15 +201,15 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":25062673683,
-            "ts":1777458853
+            "nightly_run":25364746461,
+            "ts":1778622643
         }],
-        "ts":1777458853
+        "ts":1778622643
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
         "fs":[{
-            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-b98f731bb0db30acb7a7886da6c25f6f1a64439c.zip",
+            "u":"https://nightly.link/jfdelnero/HxCFloppyEmulator/workflows/ccpp/main/hxcfloppyemulator-winx64-6f07739ba5bd8d354b7f482ce1b7a84b0b22bf15.zip",
             "x":{
                 "HxCFloppyEmulator_Software_win_x64.zip":{
                     "HxCFloppyEmulator_Software/Windows_x64/hxcfe.exe":"hxcfe/hxcfe.exe",
@@ -217,15 +217,15 @@
                     "HxCFloppyEmulator_Software/Windows_x64/libusbhxcfe.dll":"hxcfe/libusbhxcfe.dll"
                 }
             },
-            "nightly_run":22036378349,
-            "ts":1771321809
+            "nightly_run":25582587096,
+            "ts":1778622644
         },{
             "u":"https://softpres.org/_media/files:spsdeclib_5.1_windows.zip?id=download&cache=cache",
             "x":{
                 "capsimg_binary/x64/CAPSImg.dll":"hxcfe/CAPSImg.dll"
             }
         }],
-        "ts":1771321809
+        "ts":1778622644
     },
     "unar":{
         "p":"Unarchiver/unar.exe",
@@ -514,13 +514,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/d6/e7/dolphin-master-2603-354-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/f1/ca/dolphin-master-2603-375-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1777857742
+            "ts":1778533558
         }],
-        "ts":1777857742
+        "ts":1778533558
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -2259,13 +2259,13 @@
     "pea":{
         "p":"pea.exe",
         "fs":[{
-            "u":"https://github.com/peazip/PeaZip/releases/download/11.0.0/peazip_portable-11.0.0.WIN64.zip",
+            "u":"https://github.com/peazip/PeaZip/releases/download/11.1.0/peazip_portable-11.1.0.WIN64.zip",
             "x":{
-                "peazip_portable-11.0.0.WIN64/pea.exe":"pea.exe"
+                "peazip_portable-11.1.0.WIN64/pea.exe":"pea.exe"
             },
-            "ts":1775451247
+            "ts":1778481230
         }],
-        "ts":1775451247
+        "ts":1778481230
     },
     "icupkg":{
         "p":"icu4c/icupkg.exe",
@@ -2340,23 +2340,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46090/SDLVICE-3.10-win64-r46090.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46108/SDLVICE-3.10-win64-r46108.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46090/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46090/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46090/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46090/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46090/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46090/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46108/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46108/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46108/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46108/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46108/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46108/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1777898691
+            "ts":1778608127
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1777898691
+        "ts":1778608127
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2709,14 +2709,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_05_03_9c4dc886_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_05_11_6a97c6c1_32.zip",
             "x":{
-                "RenderDoc_2026_05_03_9c4dc886_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_05_03_9c4dc886_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_05_11_6a97c6c1_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_05_11_6a97c6c1_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1777759200
+            "ts":1778450400
         }],
-        "ts":1777759200
+        "ts":1778450400
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5513,7 +5513,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.17.5-nightly.2026-05-04/WolvenKit.Console-8.17.5-nightly.2026-05-04.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.18.1-nightly.2026-05-05/WolvenKit.Console-8.18.1-nightly.2026-05-05.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5566,9 +5566,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1777891395
+            "ts":1777977328
         }],
-        "ts":1777891395
+        "ts":1777977328
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5735,7 +5735,7 @@
     "ffdec":{
         "p":"jpexs/ffdec.jar",
         "fs":[{
-            "u":"https://github.com/jindrapetrik/jpexs-decompiler/releases/download/nightly3505/ffdec_26.0.0_nightly3505.zip",
+            "u":"https://github.com/jindrapetrik/jpexs-decompiler/releases/download/nightly3514/ffdec_26.0.0_nightly3514.zip",
             "x":{
                 "ffdec.jar":"jpexs/ffdec.jar",
                 "lib/ffdec_lib.jar":"jpexs/lib/ffdec_lib.jar",
@@ -5747,9 +5747,9 @@
                 "lib/gif.jar":"jpexs/lib/gif.jar",
                 "lib/flacomdoc.jar":"jpexs/lib/flacomdoc.jar"
             },
-            "ts":1777817610
+            "ts":1778434895
         }],
-        "ts":1777817610
+        "ts":1778434895
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -5764,24 +5764,26 @@
     "wasm2wat":{
         "p":"wasm2wat.exe",
         "fs":[{
-            "u":"https://github.com/WebAssembly/wabt/releases/download/1.0.40/wabt-1.0.40-windows-x64.tar.gz",
+            "u":"https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-windows-x64.tar.gz",
             "x":{
-                "wabt-1.0.40/bin/wasm2wat.exe":"wasm2wat.exe",
-                "wabt-1.0.40/bin/wasm-decompile.exe":"wasm-decompile.exe"
-            }
+                "wabt-1.0.41/bin/wasm2wat.exe":"wasm2wat.exe",
+                "wabt-1.0.41/bin/wasm-decompile.exe":"wasm-decompile.exe"
+            },
+            "ts":1778157141
         }],
-        "ts":0
+        "ts":1778157141
     },
     "wasm-decompile":{
         "p":"wasm-decompile.exe",
         "fs":[{
-            "u":"https://github.com/WebAssembly/wabt/releases/download/1.0.40/wabt-1.0.40-windows-x64.tar.gz",
+            "u":"https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-windows-x64.tar.gz",
             "x":{
-                "wabt-1.0.40/bin/wasm2wat.exe":"wasm2wat.exe",
-                "wabt-1.0.40/bin/wasm-decompile.exe":"wasm-decompile.exe"
-            }
+                "wabt-1.0.41/bin/wasm2wat.exe":"wasm2wat.exe",
+                "wabt-1.0.41/bin/wasm-decompile.exe":"wasm-decompile.exe"
+            },
+            "ts":1778157141
         }],
-        "ts":0
+        "ts":1778157141
     },
     "isd":{
         "p":"isd/PSUI.exe",
@@ -6621,14 +6623,14 @@
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
-            "u":"https://prodkeys.dev/wp-content/uploads/2026/03/Prodkeys-22.0.0.zip",
+            "u":"https://prodkeys.dev/wp-content/uploads/2026/05/ProdKeys-v22.1.0.zip",
             "x":{
                 "prod.keys":"prodkeys/prod.keys",
                 "title.keys":"prodkeys/title.keys"
             },
-            "ts":1774379085
+            "ts":1778180868
         }],
-        "ts":1774379085
+        "ts":1778180868
     },
     "devkeys":{
         "p":"prodkeys/dev.keys"

@@ -1409,6 +1409,7 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if fns and fs: return
         case 'Wizards of a Waverly Place XPF':
+            raise NotImplementedError
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
@@ -1451,6 +1452,38 @@ def extract4_4(inp:str,out:str,t:str):
             d = readfile(i)
             us = int.from_bytes(d[:4],'little')
             writefile(o + '/' + basename(i)[:-1 if i[-1] in 'zZ' else None],decompress(d[4:],'lzss8',usize=us))
+            return
+        case 'JumpStart SpyMasters Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu32() == 3
+
+            f.padc(0x10)
+            of1,sz1 = f.readu32(),f.readu32()
+            f.padc(0x20)
+            of2,sz2 = f.readu32(),f.readu32()
+            f.seek(of1)
+            fso = [(f.readu32(),f.readu32()) for _ in range(sz1//8)]
+            f.seek(of2)
+            ofs = [(f.readu32(),f.readu32()) for _ in range(sz2//8)]
+
+            fs = []
+            for of in ofs:
+                f.seek(of[0])
+                fse = fso[f.readu32()]
+                usz = f.readu32()
+                f.skip(4) # some float
+                flgs = f.readu32()
+                if flgs == 7: assert (usz - 2) == fse[1],f.pos
+                else: assert usz == fse[1],f.pos
+                fs.append((fse[0],fse[1],sub_path(f.read(f.readu32()).rstrip(b'\0').decode('ascii'))))
+
+            for fe in fs:
+                f.seek(fe[0])
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
+
+            f.close()
             return
 
     return 1
