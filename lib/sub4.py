@@ -191,19 +191,128 @@ def extract4(inp:str,out:str,t:str) -> bool:
             r = AsR_extract(i,o)
             if listdir(o) and r == 0: return
         case 'Unity Assets':
-            b = basename(i).lower()
-            if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
-                bn = b.rstrip('0123456789')
-                fs = []
-                for x in listdir(dirname(i)):
-                    if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
-                tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
-                with open(tf,'wb') as f:
-                    for x in sorted(fs,key=lambda x:x[1]): f.write(readfile(x[0]))
-                r = extract(tf,o,'Unity Bundle')
-                remove(tf)
-            else: r = extract(i,o,'Unity Bundle')
-            if not r: return
+            VMP = {
+                # Major, minor, build.build type (a-f = 0-5) + sub build
+                5: (1,2,0.50),
+                6: (2,1,0.50),
+                7: (3,0,0.10),
+                8: (3,0,0.50),
+                9: (3,5,0.50),
+                10:(5,0,0.01), # aunk1
+                11:(5,0,0.02), # aunk2
+                12:(5,0,0.03), # aunk3
+                13:(5,0,0.04), # aunk4
+                14:(5,0,0.10), # unk
+                15:(5,0,1.50),
+                16:(5,5,0.00), # a
+                17:(5,5,0.10), # unk
+                18:(2019,1,0.00), # a
+                19:(2019,1,1.10), # unk
+                20:(2019,2,0.50),
+                21:(2019,3,0.50),
+                22:(2020,1,0.50),
+            }
+            PMP = {ix:x for ix,x in enumerate((
+                'ValidPlayer',
+                'StandaloneOSXUniversal',
+                'StandaloneOSXPPC',
+                'StandaloneOSXIntel',
+                'StandaloneWinPlayer',
+                'WebPlayerLZMA',
+                'WebPlayerLZMAStreamed',
+                'Wii',
+                'iOS',
+                'PS3',
+                'Xbox360',
+                'Broadcom',
+                'Android',
+                'WinGLESEmu',
+                'WinGLES20Emu',
+                'GoogleNaCl', # Google Native Client
+                'StandaloneLinux',
+                'Flash',
+                'StandaloneWin64Player',
+                'WebGL',
+                'MetroPlayerX86', # Windows Store App
+                'MetroPlayerX64',
+                'MetroPlayerARM',
+                'StandaloneLinux64',
+                'StandaloneLinuxUniversal',
+                'WP8Player', # Windows Phone 8
+                'StandaloneOSXIntel64',
+                'BB10' # BlackBerry
+                'Tizen',
+                'PSP2', # PSVita
+                'PS4',
+                'PSM', # PSMobile
+                'XboxOne',
+                'SamsungTV',
+                'N3DS',
+                'WiiU',
+                'tvOS',
+                'Switch',
+                'Lumin',
+                'Stadia',
+                'CloudRendering',
+                'GameCoreXboxSeries',
+                'GameCoreXboxOne',
+                'PS5',
+                'EmbeddedLinux',
+                'QNX',
+                'VisionOS', # Apple Vision
+                'Switch2',
+                'Kepler',
+            ))} | {-2:'NoTarget',-1:'AnyPlayer'}
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            msz = f.readu32()
+            fsz = f.readu32()
+            v = f.reads32()
+            assert v >= 0
+            v = VMP[v]
+            dof = f.readu32()
+            if v >= (3,5,0.50):
+                end = f.readu8()
+                assert end in {0,1}
+                f.padc(3)
+            else: end = 0
+
+            if v >= (2020,1,0.50):
+                msz,fsz,dof = f.readu32(),f.readu64(),f.readu64()
+                f.skip(8)
+
+            f._end = '><'[end]
+            if v < (3,5,0.50): f.seek(fsz - msz)
+            if v >= (3,0,0.10):
+                vs = f.read0s('ascii')
+                vs = vs.split('.')
+                assert len(vs) == 3
+                lvp = [x.isdigit() for x in vs[2]].index(False)
+                v = (int(vs[0]),int(vs[1]),int(vs[2][:lvp]) + 'abcdef'.index(vs[2][lvp])/10 + int(vs[2][lvp+1:])/100)
+            if v >= (3,0,0.50): plat = f.reads32()
+            else: plat = -1
+
+            if v >= (5,0,0.02):
+                typs = f.readu8()
+                assert typs in {0,1}
+            else: typs = True
+
+            # b = basename(i).lower()
+            # if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
+            #     bn = b.rstrip('0123456789')
+            #     fs = []
+            #     for x in listdir(dirname(i)):
+            #         if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
+            #     tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
+            #     with open(tf,'wb') as f:
+            #         for x in sorted(fs,key=lambda x:x[1]): f.write(readfile(x[0]))
+            #     r = extract(tf,o,'Unity Bundle')
+            #     remove(tf)
+            # else: r = extract(i,o,'Unity Bundle')
+            # if not r: return
         case 'Rayman DCZ': return quickbms('rayman_dcz')
         case 'iQiyi PAK':
             run(['iqipack',i,o])
