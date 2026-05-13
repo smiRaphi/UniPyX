@@ -323,7 +323,7 @@
         "rs":"RetroStudio PAK"
     },
     {
-        "d":[["s%",4096],["ext","fah"],["isat","FARC\\0\\1\\0\\0",0],["isatS","\\0",8,12],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.fac'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);c=int.from_bytes(f.read(4),'little')*16+16;return (c+-c%4096)==s"]],
+        "d":[["s%",4096],["ext",".fah"],["isat","FARC\\0\\1\\0\\0",0],["isatS","\\0",8,12],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.fac'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);c=int.from_bytes(f.read(4),'little')*16+16;return (c+-c%4096)==s"]],
         "rs":"Sunday vs. Magazine FARC","s":1},{
         "d":[["isat","FARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (c*16+16)==int.from_bytes(f.read(4),'little')==int.from_bytes(f.read(4),'little')"]],
         "rs":"Sunday vs. Magazine FARC","s":1
@@ -452,7 +452,7 @@
     {
         "d":[["size",[2160,null]],["s%",16],["n0",4,0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["isatS","\\0",4,24],["n0",4,32],["n0",4,40],["n0",4,44],["isatS","\\0",4,52],["isatS","\\0",4,60],
              ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);a=int.from_bytes(f.read(4),'little')\nif s%a:return\nf.seek(12);c=int.from_bytes(f.read(4),'little')*32;to=int.from_bytes(f.read(4),'little')*a;tgo=int.from_bytes(f.read(4),'little')*a;f.seek(28);tgo+=int.from_bytes(f.read(4),'little')*4;fo=int.from_bytes(f.read(4),'little')*a\nif (s-(fo+32+-32%a))>2048 or(to+c+-c%a)!=fo:return\nf.seek(40);so=int.from_bytes(f.read(4),'little')*a\nif (tgo+-tgo%a)!=so:return\nso+=int.from_bytes(f.read(4),'little')\nif (so+-so%a)!=to:return\nf.seek(fo+4);return (s-(int.from_bytes(f.read(4),'little')*a))<=2048"]],
-        "rs":"The Mummy Returns PAK","s":1
+        "rs":"Blitz Games PAK","s":1
     },
     {
         "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
@@ -944,19 +944,21 @@
         "rs":"PlayStation Boot Package","s":1
     },
     {
-        "d":[["isat","XBIN",0],["isat","\\0",7],["isin",["4\\x12","\\x124"],4],["isin",["\\2","\\4","\\5"],6]],
-        "rs":"HAL XBIN","s":1
+        "d":[["isat","XBIN",0],["isat","\\0",7],["isin",["\\x34\\x12","\\x12\\x34"],4],["isin",["\\2","\\4","\\5"],6]],
+        "rs":"HAL XBIN"
     },
+        {
+            "rq":"HAL XBIN",
+            "d":[["contain","YAML",[16,8]],["py","f=open(inp,'rb');f.seek(4);e={18:'big',52:'little'}[f.read(2)[0]];v=f.read(2)[0];f.seek(20 if v>=4 else 16);return f.read(4)==b'YAML' and int.from_bytes(f.read(4),e)in{2,4,5}and int.from_bytes(f.read(4),e)in{1,2,3,4,5,6}"]],
+            "rs":"HAL XBIN YAML","s":1
+        },
+    {"rq":"HAL XBIN","rs":"HAL XBIN","s":1},
     {
         "d":[["isin",["\\x04\\x22\\x4D\\x18","\\x28\\xB5\\x2F\\xFD"],4],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');return s>=(f.seek(0,2)-0x14)"]],
-        "rs":"HAL Switch CMP","s":1
+        "rs":"HAL Switch CMP"
     },
     {
-        "d":[["isat","YAML",0],["isat","\\0\\0\\0",5],["isat","\\0\\0\\0",9],["isin",["\\2","\\4","\\5"],4]],
-        "rs":"HAL YAML","s":1
-    },
-    {
-        "d":[["ext","dat"],["s%",64],["n0",4,56],["n0",4,60],["py","b=dirname(inp)+'/'\nif not exists(b+'info.dat')or not exists(b+'game.dat'):return\nf=open(b+'info.dat','rb');k=f.read(0x10);e=sum(k)\ndef r(n):\n p=f.tell();d=f.read(n)\n if not e:return d\n return bytes(((~(x>>4|x<<4)&255)-k[(ix+p)%16])&255 for ix,x in enumerate(d))\nreturn not sum(r(32)) and not getsize(b+'game.dat')%(int.from_bytes(r(4),'big')or 128)and (int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big'))*64==getsize(b+'info.dat')"]],
+        "d":[["ext",".dat"],["s%",64],["n0",4,56],["n0",4,60],["py","b=dirname(inp)+'/'\nif not exists(b+'info.dat')or not exists(b+'game.dat'):return\nf=open(b+'info.dat','rb');k=f.read(0x10);e=sum(k)\ndef r(n):\n p=f.tell();d=f.read(n)\n if not e:return d\n return bytes(((~(x>>4|x<<4)&255)-k[(ix+p)%16])&255 for ix,x in enumerate(d))\nreturn not sum(r(32)) and not getsize(b+'game.dat')%(int.from_bytes(r(4),'big')or 128)and (int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big'))*64==getsize(b+'info.dat')"]],
         "rs":"Dr. Luigi INFO+GAME.dat","s":1
     },
     {
@@ -1084,7 +1086,7 @@
         "rs":"Messiah Image Resource"
     },
     {
-        "d":[["s%",32],["ext","idx"],["isatS","\\0",4,24],["n0",4,28],["str0",0,24,5],["py","d=splitext(inp)[0]+'.bin'\nif not exists(d):return\ns=getsize(d)\nif s%2048:return\nf=open(inp,'rb');f.seek(f.seek(0,2)-8);o=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little');return (o+-o%2048)==s"]],
+        "d":[["s%",32],["ext",".idx"],["isatS","\\0",4,24],["n0",4,28],["str0",0,24,5],["py","d=splitext(inp)[0]+'.bin'\nif not exists(d):return\ns=getsize(d)\nif s%2048:return\nf=open(inp,'rb');f.seek(f.seek(0,2)-8);o=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little');return (o+-o%2048)==s"]],
         "rs":"Bomberman Wars IDX+BIN"
     },
     {
@@ -1179,7 +1181,7 @@
         "rs":"Alter Echo RAD","s":1
     },
     {
-        "d":[["ext","nxd"],["s%",8192],["isat","FSM_v1.",8],["isin",["1","2"],15],["isin",["\\0","\\1"],0],["isin",["\\1\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\0"],4]],
+        "d":[["ext",".nxd"],["s%",8192],["isat","FSM_v1.",8],["isin",["1","2"],15],["isin",["\\0","\\1"],0],["isin",["\\1\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\0"],4]],
         "rs":"One Piece Battle Adventure NXD","s":1
     },
     {
@@ -2312,7 +2314,7 @@
     },
     {
         "rq":null,
-        "d":[["ext","gcz","exe"],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');v1=f.read(1)[0];s=f.seek(0,2);f.seek(-1,1);return v1&3==3 and u>s and f.read(1)[0]!=255"]],
+        "d":[["ext",[".gcz",".exe"]],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');v1=f.read(1)[0];s=f.seek(0,2);f.seek(-1,1);return v1&3==3 and u>s and f.read(1)[0]!=255"]],
         "rs":"Konami FireBeat LZSS"
     },
     {
@@ -2514,12 +2516,7 @@
     },
     {
         "rqr":null,
-        "d":["ext",".lz77"],
-        "rs":"LZ77"
-    },
-    {
-        "rqr":null,
-        "d":[["isat","\\0\\0",9],["isat","\\0\\0",25],["n0",4,0],["n0",4,4],["n0",4,12],["ext",[".xen",".ps2"]]],
+        "d":[["ext",[".xen",".ps2"]],["isat","\\0\\0",9],["isat","\\0\\0",25],["n0",4,0],["n0",4,4],["n0",4,12]],
         "rs":"Blitz Games Archive"
     },
     {
@@ -2634,10 +2631,6 @@
     {
         "d":["ext",[".ligru_v0_90",".ligru_v0_91",".ligru_v0_92"]],
         "rs":"Li-GRU"
-    },
-    {
-        "d":["ext",".xbp"],
-        "rs":"XBP"
     },
     {
         "d":["ext",[".snappy",".iwa"]],

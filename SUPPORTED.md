@@ -533,8 +533,9 @@ Golden Tee Fore! BIG | .big | Custom |
 Goosebumps CFS | .cfs | [na_game_tool](https://nihav.org/game_tool.html) |
 Groove World Archive | .grv | Custom |
 Gwtar | .gwtar.html | Custom -> TAR |
-HAL Switch CMP | .cmp | [kirbyswitch-decompress.bms](https://gamebanana.com/questions/25367) |
-HAL XBIN | .xbin | Custom |
+HAL Switch CMP | .cmp | Custom |
+HAL XBIN | .bin * | Custom |
+HAL XBIN YAML | .bin | Custom |
 Haemimont Games HPK | .hpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Halloween Harry Bank | .bnk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Harry Potter and Prisoner of Azkaban IDS | .ids | Custom |
@@ -734,7 +735,7 @@ SLUDGE Data File | .sludge | Custom |
 Smiles Fortune Hunters PAK | .pak | Custom |
 Smoking Car Productions Disk Cache | .hdf | Custom |
 Snoopy Vs. The Red Baron X | .xpc .xps | Custom |
-Sonic AMB | .amb | [sonic4.bms](https://mirror.aluigi.org/bms/sonic4.bms) |
+Sonic AMB | .amb | Custom |
 Sonic BINA | * | Custom |
 Sonic PAC | .pac | [HedgeArcPack](https://github.com/Radfordhound/HedgeLib) |
 Soulcalibur Legends NPAC | .npac | Custom |
@@ -770,7 +771,7 @@ Teardown Encrypted | .tde | Custom |
 Temple of Elemental Evil DAT | .dat | Custom |
 The Great Escape DAT | .dat | Custom |
 The Indian In The Cupboard Data | .dta | Custom |
-The Mummy Returns PAK | .ps2 | Custom |
+Blitz Games PAK | .ps2 .xbp | Custom |
 The Sims FAR | .far | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 THQ PAK | .pak | Custom |
 THQ Worms UTF Strings | ??? | Custom |
@@ -818,7 +819,6 @@ WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
 X-Files Resources | ??? | Custom |
 Xbox FArc | .fa | Custom |
 Xbox XB Compressed | .xb * | xbdecompress |
-XBP | .xbp | [xbp.bms](https://reshax.com/topic/18058-ripping-sounds-from-fuzion-frenzy-xbox/) |
 Xenoblade Chronicles X DE ARH2 | .arh+.ard | Custom |
 Xenonauts PFP | .pfp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 XNB | .xnb | [xnb.bms](https://mirror.aluigi.org/bms/xnb.bms) |

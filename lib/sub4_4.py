@@ -1485,5 +1485,65 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             return
+        case 'HAL XBIN YAML':
+            if db.print_try: print('Trying with custom extractor')
+            import yaml
+            from lib.file import File
+            f = File(i)
+            assert f.read(4) == b'XBIN'
+            f._end = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
+            v = f.readu8()
+            f.padc(1)
+            f.skip(8)
+            if v >= 4: f.skip(4)
+
+            assert f.read(4) == b'YAML'
+            V = f.readu32()
+            def reads():
+                of = (f.pos if V >= 5 else 0) + f.readu32()
+                p = f.pos
+                f.seek(of)
+                v = f.reads(f.readu32(),'utf-8')
+                f.seek(p)
+                return v
+            def readn(root=False):
+                if not root:
+                    of = (f.pos if V >= 5 else 0) + f.readu32()
+                    p = f.pos
+                    f.seek(of)
+                ty = f.readu32()
+                assert ty in {1,2,3,4,5,6},ty
+
+                match ty:
+                    case 1: v = f.reads32()
+                    case 2: v = f.readf32()
+                    case 3: v = f.readu32() != 0
+                    case 4: v = reads()
+                    case 5:
+                        c = f.readu32()
+                        sp = f.pos
+                        v = {}
+                        if V >= 4:
+                            f.skip(c * 8)
+                            ordr = [f.readu32() for _ in range(c)]
+                        else: ordr = list(range(c))
+
+                        for x in ordr:
+                            f.seek(sp + x * 8)
+                            k = reads()
+                            v[k] = readn()
+
+                        f.seek(sp + c * 8)
+                        if V >= 4: f.skip(c * 4)
+                    case 6:
+                        c = f.readu32()
+                        v = [readn() for _ in range(c)]
+                if not root: f.seek(p)
+                return v
+
+            ob = readn(True)
+            if ob:
+                yaml.dump(ob,xopen(o + '/' + tbasename(i) + '.yaml','w'),sort_keys=False,allow_unicode=True)
+                return
 
     return 1

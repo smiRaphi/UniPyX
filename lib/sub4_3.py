@@ -972,7 +972,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             return
-        case 'The Mummy Returns PAK':
+        case 'Blitz Games PAK':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')

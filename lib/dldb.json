@@ -5732,6 +5732,9 @@
         ],
         "ts":0
     },
+    "yaml":{
+        "pip":"PyYAML"
+    },
     "ffdec":{
         "p":"jpexs/ffdec.jar",
         "fs":[{
@@ -6290,14 +6293,6 @@
         ]],
         "ts":0
     },
-    "sonic4":{
-        "p":"BMS/sonic4.bms",
-        "fs":[[
-            "https://mirror.aluigi.org/bms/sonic4.bms",
-            "BMS/sonic4.bms"
-        ]],
-        "ts":0
-    },
     "cpk":{
         "p":"BMS/cpk.bms",
         "fs":[[
@@ -6329,15 +6324,6 @@
             "BMS/rayman_dcz.bms"
         ]],
         "ts":0
-    },
-    "xbp":{
-        "p":"BMS/xbp.bms",
-        "fs":[{
-            "u":".",
-            "x":{
-                "BMS/xbp.bms":"BMS/xbp.bms"
-            }
-        }]
     },
     "legoracer_jam":{
         "p":"BMS/legoracer_jam.bms",
@@ -6475,15 +6461,6 @@
         ]],
         "ts":0
     },
-    "kirbyswitch-decompress":{
-        "p":"BMS/KirbySwitch-Decompress.bms",
-        "fs":[{
-            "u":".",
-            "x":{
-                "BMS/KirbySwitch-Decompress.bms":"BMS/KirbySwitch-Decompress.bms"
-            }
-        }]
-    },
     "star_fox_zero_dat":{
         "p":"BMS/star_fox_zero_dat.bms",
         "fs":[[
@@ -6617,8 +6594,8 @@
         "fs":[{
             "u":"https://prodkeys.dev/wp-content/uploads/2026/05/ProdKeys-v22.1.0.zip",
             "x":{
-                "prod.keys":"prodkeys/prod.keys",
-                "title.keys":"prodkeys/title.keys"
+                "Keys-22.1.0/prod.keys":"prodkeys/prod.keys",
+                "Keys-22.1.0/title.keys":"prodkeys/title.keys"
             },
             "ts":1778180868
         }],

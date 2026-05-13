@@ -355,7 +355,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lz4'|'lz4_block':
             import lz4.block
             return lz4.block.decompress(i,uncompressed_size=(len(i) * 8) if kwargs.get('no_size') else kwargs['usize'])
-        case 'lz4_frame':
+        case 'lz4f'|'lz4_frame':
             import lz4.frame
             return lz4.frame.decompress(i)
         case 'lz4_fast': return uxx().decompress_lz4_fast(i,usize=kwargs['usize'])

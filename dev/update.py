@@ -215,7 +215,10 @@ def supdate(c:Cache,k:str,inf:dict):
             ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1],'%Y-%m-%dT%H:%M:%S%z')
             if ts > ots:
                 nu = re.search(r'href="(https?://prodkeys\.dev/wp\-content/uploads/\d{4}/\d{2}/[^"]+\.zip)"><span class="kb-svg-icon-wrap ',s)[1]
-                if nu != u: u = nu
+                if nu != u:
+                    u = nu
+                    v = 'Keys-' + u[:-4].split('-v',1)[1]
+                    for kx in list(f['x']): f['x'][v + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                 else: ts = 0
         elif dom == 'dl.xpdfreader.com':
             s = c.get('https://www.xpdfreader.com/download.html',verify=False)

@@ -126,7 +126,32 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['cpkextract',i,o])
             if listdir(o): return
         case 'CRI CPK': return quickbms('cpk')
-        case 'Sonic AMB': return quickbms('sonic4')
+        case 'Sonic AMB':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+            assert f.read(4) == b'#AMB'
+
+            f._end = '>' if f.readu8() == 0 else '<'
+            f.seek(0x10)
+            c = f.readu32()
+            iof = f.readu32()
+            f.skip(4)
+            f.seek(f.readu32())
+            fns = [f.readc(0x20).rstrip(b'\0').decode('ascii') for _ in range(c)]
+
+            f.seek(iof)
+            fs = []
+            for ix in range(c):
+                fs.append((f.readu32(),f.readu32(),fns[ix]))
+                assert f.reads32() == -1 and f.reads32() == 0,f.pos - 0x10
+
+            for fe in fs:
+                f.seek(fe[0])
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
         case 'Level5 ARC'|'Level5 XPCK':
             run(['3ds-xfsatool','-i',i,'-o',o,'-q'])
             if listdir(o): return
@@ -1811,26 +1836,30 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i)
-
             assert f.read(4) == b'XBIN'
             f._end = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
+
             v = f.readu8()
-            f.skip(1)
+            f.padc(1)
             s = f.readu32() - 0x10
             f.skip(4)
-            if v in (4,5):
+            if v >= 4:
                 f.skip(4)
                 s -= 4
 
             tst = f.read(4)
-            f.skip(-4)
+            f.back(4)
             try:tst = tst.decode('ascii').lower()
             except:tst = 'bin'
             writefile(o + '/' + tbasename(i) + '.' + tst,f.read(s))
             f.close()
             if s: return
-        case 'HAL Switch CMP': return quickbms('kirbyswitch-decompress')
-        case 'HAL YAML': raise NotImplementedError
+        case 'HAL Switch CMP':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import decompress
+            d = readfile(i)
+            writefile(o + '/' + tbasename(i),decompress(d[4:],{b'\x04\x22\x4D\x18':'lz4f',b'\x28\xB5\x2F\xFD':'zstd'}[d[4:8]]))
+            return
         case 'Dr. Luigi INFO+GAME.dat':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
