@@ -447,7 +447,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lzss':
             assert 'usize' in kwargs
             return lzss_decompress(i,**kwargs)
-        case 'lzss8': return uxx().decompress_lzss8(i,usize=kwargs['usize'])
+        case 'lzss0'|'lzss8': return uxx().decompress_lzss8(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}

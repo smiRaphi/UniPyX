@@ -35,13 +35,14 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if type(iv) == int: iv = iv.to_bytes(1)
             assert isinstance(key,bytes) and isinstance(iv,bytes)
             return uxx().decrypt_dxor(i,key or b'\0',iv or b'\0')
-        case 'inv'|'invert': return bytes(x ^ 0xFF for x in i)
+        case 'inv'|'invert': return uxx().decrypt_inv(i)
+        case 'swp4'|'swap4': return uxx().decrypt_swp4(i)
         case 'roll':
-            if type(key) == int: key = (key,)
-            return bytes((i[x] - key[x % len(key)]) & 0xFF for x in range(len(i)))
+            if type(key) == int: key = key.to_bytes(1)
+            return uxx().decrypt_roll(i,key or b'\0')
         case 'rolr':
-            if type(key) == int: key = (key,)
-            return bytes((i[x] + key[x % len(key)]) & 0xFF for x in range(len(i)))
+            if type(key) == int: key = key.to_bytes(1)
+            return uxx().decrypt_rolr(i,key or b'\0')
 
         case 'aes'|'aes_cbc'|'aes_ecb'|'aes_gcm':
             from Cryptodome.Cipher import AES

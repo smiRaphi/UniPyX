@@ -46,23 +46,21 @@ sszt = ctypes.c_ssize_t
 void = ctypes.c_void_p
 P = ctypes.POINTER
 
-def _xbase_func(fnc,src,usize):
+def _1base_func(fnc,src,usize):
     i = (u8 * len(src)).from_buffer_copy(src)
     o = (u8 * usize)()
     r = fnc(i,len(src),o,usize)
     return bytes(o)[:r]
-def _y1base_func(fnc,src,key):
+def _2base_func(fnc,src,key):
     i = (u8 * len(src)).from_buffer_copy(src)
     o = (u8 * len(src))()
     k = (u8 * len(key)).from_buffer_copy(key)
     fnc(i,len(src),o,k,len(key))
     return bytes(o)
-def _y2base_func(fnc,src,key,iv):
+def _3base_func(fnc,src):
     i = (u8 * len(src)).from_buffer_copy(src)
     o = (u8 * len(src))()
-    k = (u8 * len(key)).from_buffer_copy(key)
-    v = (u8 * len(iv)).from_buffer_copy(iv)
-    fnc(i,len(src),o,k,len(key),v,len(iv))
+    fnc(i,len(src),o)
     return bytes(o)
 
 class X:
@@ -87,6 +85,10 @@ class X:
             ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),    sszt,1),
             ('decompress_huffman', (P(u8),szt,P(u8),sszt,s32),sszt,0),
             ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),    sszt,1),
+            ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
+            ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
+            ('decrypt_roll' ,(P(u8),szt,P(u8),P(u8),szt),void,2),
+            ('decrypt_rolr' ,(P(u8),szt,P(u8),P(u8),szt),void,2),
             ('decrypt_xor'  ,(P(u8),szt,P(u8),P(u8),szt),void,2),
             ('decrypt_rxor' ,(P(u8),szt,P(u8),u8),void,0),
             ('decrypt_cxor' ,(P(u8),szt,P(u8),P(u8),szt),void,0),
@@ -104,11 +106,11 @@ class X:
 
             if e[3]:
                 if e[3] == 1:
-                    def wrapper(src,usize,_f=fnc): return _xbase_func(_f,src,usize)
+                    def wrapper(src,usize,_f=fnc): return _1base_func(_f,src,usize)
                 elif e[3] == 2:
-                    def wrapper(src,key,_f=fnc): return _y1base_func(_f,src,key)
+                    def wrapper(src,key,_f=fnc): return _2base_func(_f,src,key)
                 elif e[3] == 3:
-                    def wrapper(src,key,iv,_f=fnc): return _y2base_func(_f,src,key,iv)
+                    def wrapper(src,_f=fnc): return _3base_func(_f,src)
                 setattr(self,e[0],wrapper)
 
     def decompress_lz10_raw(src:bytes,usize:int) -> bytes: ...
@@ -129,6 +131,10 @@ class X:
         if r == -1: raise ValueError('Decompression failed')
         return bytes(o)[:r]
 
+    def decrypt_inv(src:bytes) -> bytes: ...
+    def decrypt_swp4(src:bytes) -> bytes: ...
+    def decrypt_roll(src:bytes,key:bytes) -> bytes: ...
+    def decrypt_rolr(src:bytes,key:bytes) -> bytes: ...
     def decrypt_xor(src:bytes,key:bytes) -> bytes: ...
 
     def decrypt_rxor(self,src:bytes,key:bytes|int) -> bytes:
@@ -783,6 +789,28 @@ error:
     return -1;
 }
 
+EXPORT void decrypt_inv(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {
+    for (size_t p=0;p < size;p++) dst[p] = ~src[p];
+}
+EXPORT void decrypt_swp4(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {
+    for (size_t p=0;p < size;p++) dst[p] = src[p] >> 4 | src[p] << 4;
+}
+EXPORT void decrypt_roll(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
+                         const uint8_t *restrict key, const size_t ksize) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        dst[p] = src[p] - key[kc++];
+        if (kc >= ksize) kc = 0;
+    }
+}
+EXPORT void decrypt_rolr(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
+                         const uint8_t *restrict key, const size_t ksize) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        dst[p] = src[p] + key[kc++];
+        if (kc >= ksize) kc = 0;
+    }
+}
 EXPORT void decrypt_xor(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
                         const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;

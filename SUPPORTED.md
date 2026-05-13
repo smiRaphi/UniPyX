@@ -479,7 +479,7 @@ Doom Database | ??? | Custom |
 Doom Engine WAD | .wad | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Doom Palettes | .pal | Custom |
 Dotemu INF+BIN | .inf+.bin | [InfBinRepacker](https://github.com/Hinoroni/InfBinRepacker) |
-Dr. Luigi ZALZ | .zalz | Custom + [dr_luigi_wiiu.bms](https://mirror.aluigi.org/bms/dr_luigi_wiiu.bms) |
+Dr. Luigi INFO+GAME.dat | .dat+.dat | Custom |
 Dragon UnPACKer 5 Plugin | .d5p | Custom |
 Dragon VDK IMG | .vdk | [dcopy](https://github.com/pulkomandy/ddosutils) |
 Dying Light RPACK | .rpack | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |

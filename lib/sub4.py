@@ -1831,54 +1831,42 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if s: return
         case 'HAL Switch CMP': return quickbms('kirbyswitch-decompress')
         case 'HAL YAML': raise NotImplementedError
-        case 'Dr. Luigi ZALZ':
-            from multiprocessing.pool import ThreadPool
-            f = open(i,'rb')
-            s = f.seek(0,2)
+        case 'Dr. Luigi INFO+GAME.dat':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            from lib.crypto import decrypt
+            inf = readfile(dirname(i) + '/INFO.dat')
+            if inf[0] != 0: inf = decrypt(decrypt(decrypt(inf,'swap4'),'inv'),'roll',inf[:0x10])
+            f = File(inf,endian='>')
+            del inf
+            fd = File(dirname(i) + '/GAME.dat',endian='>')
 
-            fs = []
-            lof = 0
-            for ix in range(s//0x80):
-                f.seek(ix*0x80)
-                if f.read(4) == b'ZALZ':
-                    fs.append((lof,(ix*0x80)-lof))
-                    lof = ix*0x80
-            fs.append((lof,s-lof))
+            f.skip(0x10)
+            f.padc(0x20)
+            al = f.readu32() or 0x80
+            hc,dc,fc = f.readu32(),f.readu32(),f.readu32()
+            f.seek(hc * 0x40)
 
-            p = ThreadPool()
-            fsl = len(fs)-1
-            for ix,fe in enumerate(fs[1:]):
-                f.seek(fe[0])
-                tf = TmpFile()
-                writefile(tf.p,f.read(fe[1]))
+            for _ in range(dc):
+                n = f.readc(0x30)
+                n = n[:f.readu32()].decode('ascii')
+                mkdir(o + '/' + n)
+                f.skip(12)
 
-                def extr(tf,ix):
-                    td = TmpDir()
-                    quickbms('dr_luigi_wiiu',tf.p,td.p,print_try=not ix)
-                    tf.destroy()
+            for _ in range(fc):
+                n = f.readc(0x30).rstrip(b'\0').decode('ascii')
+                fd.seek(f.readu32() * al)
+                f.skip(4) # size in blocks
+                zs,us = f.readu32(),f.readu32()
+                if zs != us:
+                    assert fd.read(4) == b'ZALZ' and fd.readu32() == us
+                    d = fd.decompress(zs - 8,'lzss0',usize=us)
+                else: d = fd.readc(zs)
+                writefile(o + '/' + n,d)
 
-                    tfo = td.p + '/' + listdir(td.p)[0]
-                    try:
-                        tg = open(tfo,'rb').read(8)
-                        tgf = tg[:4].decode('ascii')
-                        if not tgf.isupper():
-                            if tg == b'@echo of': tg = 'bat'
-                            else: raise
-                        else: tg = tgf.lower()
-                    except: tg = 'bin'
-                    mv(tfo,o + '/' + str(ix) + '.' + tg)
-                    td.destroy()
-                p.apply_async(extr,(tf,ix))
-
-            while len(listdir(o)) < fsl: sleep(0.1)
-            for _ in range(50):
-                try: p.join()
-                except ValueError:sleep(0.1)
-                else:break
-            else:p.terminate();p.join()
-            p.close()
-
-            if fs: return
+            del f
+            fd.close()
+            if fc: return
         case 'Bezel Shader Pack':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

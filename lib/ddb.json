@@ -956,8 +956,8 @@
         "rs":"HAL YAML","s":1
     },
     {
-        "d":[["s%",128],["isat","ZALZ",0],["n0",4,4]],
-        "rs":"Dr. Luigi ZALZ","s":1
+        "d":[["ext","dat"],["s%",64],["n0",4,56],["n0",4,60],["py","b=dirname(inp)+'/'\nif not exists(b+'info.dat')or not exists(b+'game.dat'):return\nf=open(b+'info.dat','rb');k=f.read(0x10);e=sum(k)\ndef r(n):\n p=f.tell();d=f.read(n)\n if not e:return d\n return bytes(((~(x>>4|x<<4)&255)-k[(ix+p)%16])&255 for ix,x in enumerate(d))\nreturn not sum(r(32)) and not getsize(b+'game.dat')%(int.from_bytes(r(4),'big')or 128)and (int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big'))*64==getsize(b+'info.dat')"]],
+        "rs":"Dr. Luigi INFO+GAME.dat","s":1
     },
     {
         "d":[["isat","GDAT",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*8+8)==int.from_bytes(f.read(4),'little')"]],

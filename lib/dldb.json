@@ -6484,14 +6484,6 @@
             }
         }]
     },
-    "dr_luigi_wiiu":{
-        "p":"BMS/dr_luigi_wiiu.bms",
-        "fs":[[
-            "https://mirror.aluigi.org/bms/dr_luigi_wiiu.bms",
-            "BMS/dr_luigi_wiiu.bms"
-        ]],
-        "ts":0
-    },
     "star_fox_zero_dat":{
         "p":"BMS/star_fox_zero_dat.bms",
         "fs":[[
