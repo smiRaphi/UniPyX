@@ -1619,5 +1619,50 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Metropolis Software ZAP':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.seek(-0x14)
+            assert f.readu8() == 0x31 and f.readu8() == 0x10 and f.readu16() == 0x2003 and f.readu32() in {4,5}
+
+            fs = []
+            def reade(p:str):
+                off = f.readu32()
+                rp = f.pos
+                f.seek(off)
+
+                dc,fc = f.readu16(),f.readu16()
+                foff = f.readu32()
+                bp = f.pos
+                ofs = [bp + f.readu32() for _ in range(dc)]
+                for of in ofs:
+                    f.seek(of)
+                    n = p + '/' + f.reads(f.readu8(),'ascii')
+                    reade(n)
+
+                f.seek(foff)
+                bp = f.pos
+                ofs = [bp + f.readu32() for _ in range(fc)]
+                for of in ofs:
+                    f.seek(of)
+                    n = p + '/' + f.reads(f.readu8(),'ascii')
+                    fe = [n,f.readu32(),f.readu32(),f.readu32()]
+                    f.skip(4) # ?
+                    f.padc(4)
+                    fe.append(f.readu32())
+                    fs.append(fe)
+
+                f.seek(rp)
+
+            f.skip(4)
+            reade(o)
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(fe[0],f.decompress(fe[3],'deflate' if fe[4] & 1 else 'none',usize=fe[2]))
+
+            f.close()
+            if fs: return
 
     return 1

@@ -1108,8 +1108,8 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i)
 
-            f.seek(-4,2)
-            f.seek(-f.readu32('<'),2)
+            f.seek(-4)
+            f.seek(-f.readu32('<'))
             f.skip(4)
             c = f.readu32('<')
             fs = []

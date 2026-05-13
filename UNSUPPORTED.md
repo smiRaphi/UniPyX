@@ -15,7 +15,6 @@ Atomik Cruncher | ? | ? | ? | http://aminet.net/package/util/pack/xfdmaster | de
 Encrypted Rclone Config | .conf | ARMGDDN | https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/obscure/obscure.go#L19<br>https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/crypt.go#L74 | ? | detected
 The Binding of Isaac Resource | ? | TBOI(Re) | ? | ? | detected
 Atari Masterpieces VPXH | ? | Atari Masterpieces | ? | ? | detected
-Metropolis Software ZAP | .zap | ? | ? | ? | detected
 Specnaz UFF/BFS | ? | ? | ? | ? | detected
 Metroid Prime 4 Save | ? | MP4 | ? | ? | detected
 PS3 Theme | .p3t | ? | ? | https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php | detected

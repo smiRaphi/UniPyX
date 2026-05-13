@@ -723,7 +723,7 @@ def extract4_2(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='<')
             assert f.read(4) == b'CRAB'
-            f.seek(-8,2)
+            f.seek(-8)
             f.seek(f.readu32())
             c = f.readu32()
 
@@ -1034,7 +1034,6 @@ def extract4_2(inp:str,out:str,t:str):
                 c += 1
             f.close()
             if c: return
-        case 'Metropolis Software ZAP': raise NotImplementedError
         case 'Def Jam Fight For NY: The Takeover PAKN':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

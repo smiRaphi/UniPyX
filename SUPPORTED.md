@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 940
+# Supported Formats: 941
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (483)
+## Various (484)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -604,6 +604,7 @@ Metroid Prime 4 RFRM ENUM | ??? | Custom |
 Metroid Prime 4 RFRM MSBT | ??? | Custom -> Nintendo MSBT |
 Metroid Prime 4 RFRM PACK | ??? | Custom |
 Metroid Samus Returns PKG | .pkg | [metroid_sr_3ds.bms](https://mirror.aluigi.org/bms/metroid_sr_3ds.bms) |
+Metropolis Software ZAP | .zap | Custom |
 Michigan: Report From Hell BIN | .bin | Custom |
 Michigan: Report From Hell LF | .lf | Custom |
 Minecraft PCK | .pck | [minecraft_pck.bms](https://mirror.aluigi.org/bms/minecraft_x360_pck.bms) |
