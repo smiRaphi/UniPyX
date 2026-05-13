@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 938
+# Supported Formats: 940
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -349,7 +349,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (481)
+## Various (483)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -397,6 +397,8 @@ Azito 3D Pack File | ??? | Custom |
 Azito 3D Pack Message | ??? | Custom |
 BackupMii NAND Image | ??? | Custom |
 Balko UFL Game Archive | .ufl | Custom |
+Bandai ARC | .arc | Custom |
+Bandai PKG | .pkg | Custom |
 Barbie: Riding Club Cache | .cache | Custom |
 Barbie: Riding Club OMF | .omf | Custom |
 Battlezone 2 PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |

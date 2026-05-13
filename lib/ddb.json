@@ -682,6 +682,14 @@
         "rs":"UTG Software DDD","s":1
     },
     {
+        "d":[["isat","BPK0",0],["isatS","\\0",2028,20],["isat","BDL0",2048],["isatS","\\0",20,2060],["isat","\\0",-1],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);s1,o1,s2,o2=[int.from_bytes(f.read(4),'little') for _ in range(4)]\nif (s1+o1)!=s and(s2+o2)!=o1:return\nf.seek(o1+4)\nif f.read(2)!=b'\\x18\\0':return\nf.seek(2,1);return int.from_bytes(f.read(4),'little')==o2 and not sum(f.read(8))and f.read(4)==b'.\\0\\0\\0'"]],
+        "rs":"Bandai PKG","s":1
+    },
+    {
+        "d":[["isat","BARC\\1\\0\\1\\0\\x20\\0\\0\\0",0],["isat","\\x0C\\0\\0\\0",20],["isatS","\\0",4,28],["n0",4,12],["n0",4,16],["n0",4,24],["n0",2,32],["n0",4,-4],["n0",4,-8],["n0",4,-12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return int.from_bytes(f.read(4),'little')==(int.from_bytes(f.read(4),'little')*int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "rs":"Bandai ARC","s":1
+    },
+    {
         "d":[["isat","TotemTech Data v1.73 (c) 1999-2002 Kalisto Entertainment - All right reserved",0],["isatS","\\0",179,77]],
         "rs":"TotemTech Data","s":1
     },

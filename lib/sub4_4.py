@@ -1545,5 +1545,79 @@ def extract4_4(inp:str,out:str,t:str):
             if ob:
                 yaml.dump(ob,xopen(o + '/' + tbasename(i) + '.yaml','w'),sort_keys=False,allow_unicode=True)
                 return
+        case 'Bandai PKG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'BPK0'
+
+            dsz,do = f.readu32(),f.readu32()
+
+            ds = []
+            def readd(p):
+                bp = f.pos
+                xs = f.readu16()
+                f.skip(2)
+                es = f.readu16()
+                f.skip(2)
+                of,s = f.readu32(),f.readu32()
+                f.padc(4)
+                n = p + '/' + f.readc(es - 0x14).rstrip(b'\0').decode('shift-jis')
+                if s: ds.append((of,n))
+                else: mkdir(n)
+
+                if xs:
+                    ep = bp + xs
+                    while f.pos < ep: readd(n)
+
+            ep = f.seek(do) + dsz
+            while f.pos < ep: readd(o)
+
+            fs = []
+            for de in ds:
+                f.seek(de[0])
+                c = f.readu32()//0x10
+                f.back(4)
+                for _ in range(c):
+                    sp = f.pos + f.readu32()
+                    f.skip(8)
+                    fs.append((sp,f.readu32(),de[1]))
+
+            for fe in fs:
+                f.seek(fe[0])
+                fn = fe[2] + '/' + f.read0s('shift-jis')
+                f.seek(fe[1])
+                assert f.read(4) == b'BDL0'
+                us,zs = f.readu32(),f.readu32()
+                f.padc(0x14)
+                writefile(fn,f.decompress(zs or us,'zlib' if zs else 'none'))
+
+            f.close()
+            if fs: return
+        case 'Bandai ARC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'BARC' and f.readu16() == f.readu16() == 1
+
+            hs = f.readu32()
+            assert 0x20 >= hs >= 0x1C
+            f.skip(4)
+            c = f.readu32()
+            assert f.readu32() == 12
+            of = f.readu32()
+            f.padc(hs - 0x20)
+            f.seek(of)
+            fs = [(f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+
+            for fe in fs:
+                f.seek(fe[2])
+                hs = f.readu16()
+                fn = f.readc(hs - 2).rstrip(b'\0').decode('shift-jis')
+                assert fe[1] and fe[0] != fe[1],fe
+                writefile(o + '/' + fn,f.decompress(fe[1],'zlib' if fe[0] != fe[1] else 'none'))
+
+            f.close()
+            if fs: return
 
     return 1
