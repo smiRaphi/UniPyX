@@ -7,8 +7,10 @@ from lib.crypto import crc_hash,HASHTS
 from sys import argv
 
 if len(argv) == 3:
-    s = int(argv[2])
-    hshs = [x for x in HASHTS if HASHTS[x] == s]
+    if argv[2].isdigit():
+        s = int(argv[2])
+        hshs = [x for x in HASHTS if HASHTS[x] == s]
+    else: hshs = [argv[2]]
 else: hshs = list(HASHTS)
 
 i = argv[1]

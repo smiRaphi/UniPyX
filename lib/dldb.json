@@ -6954,6 +6954,14 @@
         ]],
         "ts":1777206982
     },
+    "pivotal_hashes":{
+        "p":"hashes/pivotal.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pivotal.bhl",
+            "hashes/pivotal.bhl"
+        ]],
+        "ts":1778763157
+    },
     "difmb_dip_key":{
         "p":"difmb_dip_key.bin",
         "fs":[

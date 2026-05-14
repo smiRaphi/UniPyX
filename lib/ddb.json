@@ -510,6 +510,10 @@
         "rs":"Metropolis Software ZAP","s":1
     },
     {
+        "d":[["size",[16400,null]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",[24,32768]],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);fo=f.read(4);e='big' if int.from_bytes(fo,'little')>int.from_bytes(fo,'big') else 'little';fo=int.from_bytes(fo,e);o=fo+int.from_bytes(f.read(4),e)\nif fo%16 or fo>40960:return\nwhile f.tell()<fo:\n if not sum(f.read(4)):break\n fo=int.from_bytes(f.read(4),e)\n if fo!=o and fo<o and fo%16:return\n o=fo+int.from_bytes(f.read(4),e)\nreturn o==s"]],
+        "rs":"Pivotal Games DAT"
+    },
+    {
         "d":[["isat","PAKN",0],["isat","\\0\\0\\0\\0",68],["n0",4,4],["n0",4,8],["str0",12,56,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*64)==int.from_bytes(f.read(4),'little')"]],
         "rs":"Def Jam Fight For NY: The Takeover PAKN","s":1
     },
@@ -976,10 +980,6 @@
     {
         "d":[["isat","\\0\\0\\0\\1",40],["isat","BILZ",128],["isat","\\0\\0\\0\\x07\\x78",140],["isatS","\\0",24,16],["isatS","\\0",84,44],["n0",4,132],["n0",4,136],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(136);return (144+int.from_bytes(f.read(4),'big'))==s"]],
         "rs":"Death End re:Quest 2 ZLIB","s":1
-    },
-    {
-        "d":[["isat","\\0\\x80\\0\\0",4],["isatS","\\0",12,31188],["n0",4,0],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');lo=32768\nwhile sum(f.read(4)):\n if int.from_bytes(f.read(4),'little')!=lo:return\n lo+=int.from_bytes(f.read(4),'little')\nreturn lo==f.seek(0,2)"]],
-        "rs":"The Great Escape DAT"
     },
     {
         "d":[["isat","BEZSHAPK\\0\\0\\1\\0",0],["isin",["\\xFF\\xFE","\\xFE\\xFF"],12]],

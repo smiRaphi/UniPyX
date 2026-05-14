@@ -1,5 +1,5 @@
 ENC = 'ascii'
-FMT = lambda x:x.lower() # x: bytes
+FMT = lambda x:x # x: bytes
 iFMT = lambda x:x #'/'+x.replace('\\','/').lstrip('/') # x: str
 
 import os,sys

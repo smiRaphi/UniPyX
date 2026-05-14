@@ -447,6 +447,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'hash40':
             import zlib
             return (len(i) << 32) | zlib.crc32(i,value=kwargs.get('value') or 0)
+        case 'pivotal': fnc = uxx().hash_pivotal
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
 
@@ -477,7 +478,7 @@ HASHTS = {
     'blake2b':64,'blake2s':32,
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
-    'tarzan':4,'luas':4,'sxm':8,'hash40':5,
+    'tarzan':4,'luas':4,'sxm':8,'hash40':5,'pivotal':4,
 }
 class HashLib:
     def __init__(self,p:str,fmt=lambda x:x,encoding='utf-8'):

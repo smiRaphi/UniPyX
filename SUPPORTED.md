@@ -674,6 +674,7 @@ Petroglyph MEG | .meg | Custom |
 Petroglyph Zlib CH | .ch | Custom |
 Phineas And Ferb WAD | .wad | Custom |
 Piper SAGE | .sgo | Custom |
+Pivotal Games DAT | .dat | Custom |
 Pixelbite BAR | .bar | Custom |
 Pixelbite ZIP | ??? | Custom |
 PlayStation 3 Core OS Package | .pkg | [ps3_cosunpkg](https://github.com/wargio/ps3tools) |
@@ -772,7 +773,6 @@ Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Teardown Encrypted | .tde | Custom |
 Temple of Elemental Evil DAT | .dat | Custom |
-The Great Escape DAT | .dat | Custom |
 The Indian In The Cupboard Data | .dta | Custom |
 Blitz Games PAK | .ps2 .xbp | Custom |
 The Sims FAR | .far | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |

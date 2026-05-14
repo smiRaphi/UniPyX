@@ -62,6 +62,9 @@ def _3base_func(fnc,src):
     o = (u8 * len(src))()
     fnc(i,len(src),o)
     return bytes(o)
+def _4base_func(fnc,src):
+    i = (u8 * len(src)).from_buffer_copy(src)
+    return int(fnc(i,len(src)))
 
 class X:
     MMFS = {};SELENE = {}
@@ -85,6 +88,7 @@ class X:
             ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),    sszt,1),
             ('decompress_huffman', (P(u8),szt,P(u8),sszt,s32),sszt,0),
             ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),    sszt,1),
+
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_roll' ,(P(u8),szt,P(u8),P(u8),szt),void,2),
@@ -99,6 +103,8 @@ class X:
             ('init_mmfs',(P(u8),P(u8)),void,0),
             ('decrypt_mmfs',(P(u8),szt,P(u8)),void,0),
             ('init_selene',(P(u8),P(u8),szt,u32),void,0),
+
+            ('hash_pivotal',(P(u8),szt),u32,4),
         ):
             fnc = self.dll[e[0]]
             fnc.argtypes = e[1]
@@ -111,6 +117,8 @@ class X:
                     def wrapper(src,key,_f=fnc): return _2base_func(_f,src,key)
                 elif e[3] == 3:
                     def wrapper(src,_f=fnc): return _3base_func(_f,src)
+                elif e[3] == 4:
+                    def wrapper(src,_f=fnc): return _4base_func(_f,src)
                 setattr(self,e[0],wrapper)
 
     def decompress_lz10_raw(src:bytes,usize:int) -> bytes: ...
@@ -215,6 +223,7 @@ class X:
         self.dll.decrypt_xor(i,len(src),o,mk,len(mk))
         return bytes(o)
 
+    def hash_pivotal(self,src:bytes) -> int: ...
 '''*/
 
 #include <stdint.h>
@@ -953,6 +962,19 @@ EXPORT void init_selene(uint8_t *restrict dst, const uint8_t *restrict key, cons
         dst[i] = (uint8_t)(key[kc++] ^ (MT19937_rand(&mt) >> 16));
         if (kc >= ksize) kc = 0;
     }
+}
+
+EXPORT uint32_t hash_pivotal(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = 1;
+
+    for (size_t p=0;p < size;p++) {
+        uint8_t b = src[p];
+        for (int i=0;i < 8;i++) {
+            h = (h << 1) | (((h >> 21) ^ (h >> 1) ^ h ^ (h >> 31) ^ (b >> i)) & 1);
+        }
+    }
+
+    return h;
 }
 
 #ifdef __cplusplus

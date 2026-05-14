@@ -1664,5 +1664,49 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Pivotal Games DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.crypto import HashLib
+            hl = HashLib.dl('pivotal',db,encoding='ascii',fmt=lambda x:x.upper())
+            from lib.file import File
+            f = File(i)
+
+            f.seek(4)
+            vb = f.readu32('>')
+            f.back(4)
+            vl = f.readu32('<')
+            f._end = '>' if vb < vl else '<'
+            f.seek(4)
+            fo = f.readu32()
+            f.seek(0)
+
+            fs = []
+            while f.pos < fo:
+                fe = (f.readu32(),f.readu32(),f.readu32())
+                if not fe[0]: break
+                fs.append(fe)
+
+            hl.wait()
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                if fe[0] in hl: fn = hl.get(fe[0])
+                else:
+                    fn = f'$unk/{fe[0]:08X}.'
+                    if d[:4] == b'EOBJ': fn += 'evo'
+                    elif d[:4] == b'SLOC': fn += 'loc'
+                    elif d[:4] == b'imgf': fn += 'img'
+                    elif d[:9] == b'Version 7' and d[10:13] == b'\r\n"': fn += 'env'
+                    elif d[:11] == b'Version 4\r\n': fn += 'spl'
+                    elif d[:14] == b'"Loading Bar" ': fn += 'fas'
+                    elif b'// ' in d[:8] and b'REFX_' in d[:0x400]: fn += 'rfx'
+                    elif d[:12] == b'\2\0\0\0\x33\0\0\0\1\0\0\0' and d[12] in {0,2} and d[13:0x10] == b'\0\0\0': fn += 'prb'
+                    elif sum(d[:2]) and not sum(d[2:8]) and not sum(d[9:13]) and d[8] == 0x18: fn += 'oct'
+                    elif sum(d[:2]) and not sum(d[2:6]) and d[6:8] == b'\xCD\xCD' and not sum(d[9:13]) and d[8] == 0x14: fn += 'qtd'
+                    else: fn += guess_ext(d)
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
 
     return 1
