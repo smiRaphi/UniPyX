@@ -112,7 +112,7 @@ def supdate(c:Cache,k:str,inf:dict):
 
         ts = ots
         if u == '.': tts = -1
-        elif u in ('https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'):
+        elif u in {'https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'}:
             try:ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
             except httpx.ConnectTimeout:pass
             else:
@@ -135,10 +135,10 @@ def supdate(c:Cache,k:str,inf:dict):
         elif dom == 'github.com' and '/releases/download/' in u:
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-            if repo not in ('allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'):
+            if repo not in {'allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'}:
                 s = '<p><strong>This page is taking too long to load.</strong></p>'
                 while '<p><strong>This page is taking too long to load.</strong></p>' in s:
-                    if repo in ('aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex','horsicq/DIE-engine','jindrapetrik/jpexs-decompiler'):
+                    if repo in {'aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex','horsicq/DIE-engine','jindrapetrik/jpexs-decompiler'}:
                         s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + re.search(r'<a href="/[^/]+/[^/]+/releases/tag/([^"/]+)"',c.get(u.split('/releases/download/')[0] + '/releases'))[1])
                     elif repo in ():
                         s = c.get(u.split('/releases/download/')[0] + '/releases/tag/' + u.split('/')[7])
@@ -155,7 +155,7 @@ def supdate(c:Cache,k:str,inf:dict):
                     if u != nu:
                         if c.c.head(nu).status_code == 302:
                             u = nu
-                            if repo in ('VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip','upx/upx','WebAssembly/wabt'):
+                            if repo in {'VICE-Team/svn-mirror','samuelgr/Hookshot','samuelgr/Pathwinder','kubo/snzip','peazip/PeaZip','upx/upx','WebAssembly/wabt'}:
                                 bdir = u.split('/')[-1].rsplit('.',1)[0]
                                 if repo == 'WebAssembly/wabt': bdir = '-'.join(bdir.split('-')[:2])
                                 for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
@@ -295,7 +295,7 @@ def update():
 
 if __name__ == '__main__':
     from sys import argv
-    if len(argv) in (2,3) and argv[1] == 't':
+    if len(argv) in {2,3} and argv[1] == 't':
         if len(argv) == 2: print(t())
         else:
             if len(argv[2]) == 20 and argv[2][4] == argv[2][7] == '-' and argv[2][10] == 'T' and argv[2][13] == argv[2][16] == ':' and argv[2][19] == 'Z': print(ft(argv[2],'%Y-%m-%dT%H:%M:%SZ'))

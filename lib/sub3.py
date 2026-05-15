@@ -235,8 +235,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     for x in listdir(o):
                         p = o + '/' + x
                         if (isfile(p) and (x.startswith('goggame-') or x == 'install_script.iss')) or\
-                           (isdir(p)  and (x in ('tmp','embedded','__redist'))): mv(p,o + '/$INSFILES/' + x)
-                        elif isdir(p) and x in ('commonappdata','app'): copydir(p,o + '/$INSFILES',True)
+                           (isdir(p)  and x in {'tmp','embedded','__redist'}): mv(p,o + '/$INSFILES/' + x)
+                        elif isdir(p) and x in {'commonappdata','app'}: copydir(p,o + '/$INSFILES',True)
                         elif isdir(p) and x == '__support':
                             for xf in listdir(p):
                                 if xf == 'app': copydir(p + '/' + xf,o,True)
@@ -244,7 +244,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             rmdir(p)
                 else:
                     for x in listdir(o):
-                        if not x in ('app','$INSFILES'):
+                        if not x in {'app','$INSFILES'}:
                             if x == 'install_script.iss' and exists(o + '/$INSFILES/install_script.iss'): mv(o + '/' + x,o + '/$INSFILES/' + x[:-4] + '_2.iss')
                             else: mv(o + '/' + x,o + '/$INSFILES/' + x)
                     if exists(o + '/app'): copydir(o + '/app',o,True)
@@ -539,7 +539,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             assert bs > 0
 
             bat = f.read(bs)
-            assert f.readu8() in (0,1)
+            assert f.readu8() in {0,1}
             f.close()
 
             if len(bat.replace(b'\r',b'')) > 3519 and bat.startswith(b'set '):
@@ -651,7 +651,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                         xn,xv = xv.split('(',1)
                         xv,x = (xv + ' ' + x).split(') ',1)
                     else: xn,xv = xv,True
-                    if xn in ('sum','size','cmpsize','f'): xv = int(xv)
+                    if xn in {'sum','size','cmpsize','f'}: xv = int(xv)
                     ne[xn] = xv
                 if t == 'f':
                     fpos = ffpos = d.tell()
@@ -1011,7 +1011,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             remove(p + '/original_eac.bin',p + '/eac_.bin')
             copydir(p,o,True)
-            if open(o + '/EAC_Launcher_decrypted.dll','rb').read(4) in (b'MZ\x90\x00',b'\x7FELF'): return
+            if open(o + '/EAC_Launcher_decrypted.dll','rb').read(4) in {b'MZ\x90\x00',b'\x7FELF'}: return
         case 'Chromium Delta Update':
             run(['android-ota-extract',i],cwd=o)
             if listdir(o): return
@@ -1213,7 +1213,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 run(['java','-jar',db.get('unluac'),'--output',of,i],print_try=False)
             if exists(of) and getsize(of): return
 
-            if fv == 0 and mav == 5 and miv in (1,2,3): writefile(of,run([f'luadec{mav}{miv}','--',i],text=False)[1])
+            if fv == 0 and mav == 5 and miv in {1,2,3}: writefile(of,run([f'luadec{mav}{miv}','--',i],text=False)[1])
             if exists(of) and getsize(of): return
         case 'Bink Video EXE':
             if db.print_try: print('Trying with custom extractor')
@@ -1683,7 +1683,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if type(t) == dict:
                     for k in t: getr(f'{p}/{k}',t[k])
                 else:
-                    d = t.data.read()
+                    d = t.data
+                    if type(d) != bytes: d = d.read()
                     writefile(f'{p}.{guess_ext(d)}',d)
             getr(o,f.resource_table.resources)
 

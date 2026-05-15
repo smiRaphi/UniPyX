@@ -14,7 +14,7 @@ def extract4_4(inp:str,out:str,t:str):
 
             of = o + '/' + basename(i)
             while f:
-                n = f.read(4).decode('latin-1')
+                n = f.read(4).decode('ansi')
                 s = f.readu32()
                 ep = f.pos + s
 
@@ -440,7 +440,7 @@ def extract4_4(inp:str,out:str,t:str):
             while f:
                 fn = f.read(f.readu16()).decode('utf-8').replace(':\\','\\',1)
                 t = f.readu8()
-                assert t in (1,2)
+                assert t in {1,2}
                 if t == 1: mkdir(o + '/' + fn)
                 elif t == 2: writefile(o + '/' + fn,f.read(f.readu32()))
             if listdir(o): return
@@ -919,7 +919,7 @@ def extract4_4(inp:str,out:str,t:str):
                     continue
                 ids = [f.reads16() for _ in range(5)]
                 fe = (f.readu32()+bo,f.readu32())
-                fn = f.read(0x2C).rstrip(b'\0').decode('latin-1')
+                fn = f.read(0x2C).rstrip(b'\0').decode('ansi')
                 f.skip(4)
 
                 if ft & 4:
@@ -983,8 +983,8 @@ def extract4_4(inp:str,out:str,t:str):
             c = f.reads32()
             cvbo = 0
             for _ in range(c):
-                on = f.read(0x40).split(b'\0')[0].decode('latin-1')
-                inf = [f.read(0x40).split(b'\0')[0].decode('latin-1'),f.reads32(),f.reads32(),f.reads32(),f.reads32()]
+                on = f.read(0x40).split(b'\0')[0].decode('ansi')
+                inf = [f.read(0x40).split(b'\0')[0].decode('ansi'),f.reads32(),f.reads32(),f.reads32(),f.reads32()]
                 ty = f.reads32()
                 assert ty >= 0,f.pos
 
@@ -1708,5 +1708,64 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'CRI ACS File':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'ACSF'
+
+            f.skip(4) # file size
+            c = f.readu32()
+            f.skip(0x14) # u16 alignment + junk
+            fs = []
+            for _ in range(c):
+                f.skip(4) # ftype
+                fs.append((f.readc(0x10).rstrip(b'\0').decode('ascii'),f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'CRI DPF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            bs = f.read(4).rstrip(b'\0')
+            assert bs and bs.isdigit()
+            bs = int(bs)
+
+            f.skip(4)
+            dc,fc = f.readu32(),f.readu32()
+            if dc != 1: raise NotImplementedError
+            do,fo = f.readu32(),f.readu32()
+
+            f.seek(do)
+            if f.read(1) != b'\\' or sum(f.readc(15)): raise NotImplementedError
+            f.seek(fo)
+            fs = []
+            for _ in range(fc):
+                fs.append((f.readc(0x10).rstrip(b'\0').decode('ascii'),f.readu32()*bs,f.readu32()))
+                f.padc(8)
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Ludia GWTarget':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(4) == b'GWTg' and f.readu8() == 1
+
+            v = f.reads(f.readu32(),'ascii')
+            writefile(o + '/' + basename(i) + '.txt',f'{v}\n{f.readu32()}x{f.readu32()}','w')
+
+            f.close()
+            if not f: return
 
     return 1

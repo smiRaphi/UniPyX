@@ -310,7 +310,7 @@ def extract4_2(inp:str,out:str,t:str):
                 fn = f.read(0x10).rstrip(b'\0').decode('utf-8')
                 w,h = f.readu32(),f.readu32()
                 fmt = f.readu32()
-                if not fmt in (1,2): raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
+                if not fmt in {1,2}: raise NotImplementedError(f'Pixel format: 0x{fmt:2X}')
                 writefile(o + f'/{fn}_{w}x{h}.{(0,"rgba8","argb16")[fmt]}',f.read(f.readu32()))
             f.close()
             if listdir(o): return
@@ -387,7 +387,7 @@ def extract4_2(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) in (b'DATA',b'MENU',b'SEDT',b'STRD')
+            assert f.read(4) in {b'DATA',b'MENU',b'SEDT',b'STRD'}
             f.skip(8)
 
             c = f.readu32()
@@ -396,7 +396,7 @@ def extract4_2(inp:str,out:str,t:str):
                 f.seek(fs[ix])
                 d = f.read(fs[ix+1]-fs[ix])
                 if d[:4] == b'PK\0\x02': ext = 'pk'
-                elif d[:4] in (b'DATA',b'MENU',b'SEDT',b'STRD'): ext = 'pak'
+                elif d[:4] in {b'DATA',b'MENU',b'SEDT',b'STRD'}: ext = 'pak'
                 else: ext = guess_ext_ps2(d)
                 writefile(o + f'/{ix:02d}.{ext}',d)
             if fs: return
@@ -412,7 +412,29 @@ def extract4_2(inp:str,out:str,t:str):
             f.close()
             if listdir(o): return
         case 'Ludia Dir':
+            EXTM = {
+                'camera':'cam',
+                'data':'xml',
+                'font':'fon',
+                # 'light':'',
+                'localization':'loc',
+                'material':'mat',
+                'mesh':'msh',
+                'model':'mdl',
+                'prsAnimation':'anm',
+                'prscAnimation':'anm',
+                'scene3D':'scn',
+                # 'skeletonPrsAnimation':'',
+                'sound':'snd',
+                'sprite':'spt',
+                'texture':'tpl',
+                'textureSlot':'txs',
+                'vertexBuffer':'vtx',
+            }
+
             if db.print_try: print('Trying with custom extractor')
+            from lib.crypto import HashLib
+            hl = HashLib.dl('ludia',db,encoding='ascii')
             from lib.file import File
             f = File(inp,endian='>')
 
@@ -420,39 +442,34 @@ def extract4_2(inp:str,out:str,t:str):
             f.skip(0x1C)
             omp = {}
             for _ in range(co):
-                op = f.readu32()
+                dnh = f.readu32()
                 vop = f.readu32()
-                if vop == 1: omp[op] = f.pos + 0x18
-                elif vop != 0: print('Unknown offset map bool:',vop,op,f.pos-8)
+                if True or vop == 1: omp[dnh] = f.pos + 0x18
+                elif vop == 0: omp[op] = None
+                else: print('Unknown offset map bool:',vop,f.pos-8)
                 f.skip(f.readu32()+0x14)
 
             c = f.readu32()
             f.skip(0x1C)
             fs = []
             for _ in range(c):
-                fn = f.read(4).hex().upper()
-                fn = f.read(4).hex().upper() + '/' + fn
-                off = f.readu32()
-                if off == 0: off = 0x40
-                else: off = omp[off]
-                fs.append((off+f.readu32(),f.readu32(),fn))
+                fnh = f.readu32()
+                xnh = f.readu32()
+                dnh = f.readu32()
+                fs.append((omp[dnh]+f.readu32(),f.readu32(),dnh,fnh,xnh))
                 f.skip(12)
 
+            hl.wait()
             for fe in fs:
                 f.seek(fe[0])
                 d = f.read(fe[1])
-                if d[:6] == b'<root>' and (d[-7:] == b'</root>' or d[-8:] == b'</root>\t' or d[-9:] == b'</root>\r\n'): ext = 'xml'
-                elif d[:4] == b'\x00\x20\xAF\x30': ext = 'tpl'
-                elif len(d) == 0x38 and d[:4] == b'\x02\0\0\x02' and d[0x20:0x24] == b'\0\0\0\x02' and d[0x28:0x34] == b'\x3F\x80\0\0\x3F\x80\0\0\0\0\0\x01': ext = 'mat'
-                elif len(d) == 0x1C and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x84\xDF\x2E\x3D': ext = 'spt'
-                elif len(d) in (0x3C,0x20) and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x9E\x44\xEB\xDC' and d[0x14:0x18] == b'\0\0\0\0' and d[0x1C:0x1F] == b'\0\0\0' and d[0x1F] in (0,1): ext = 'txs'
-                elif len(d) == 0x70 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x11\xB7\x85\xc4': ext = 'mdl'
-                elif len(d) == 0x6C and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x8A\xDE\x4F\xA6': ext = 'cam'
-                elif len(d) >= 0x2C and not len(d)%4 and len(d) <= 0x100 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x12\x0D\x26\x3D': ext = 'scn'
-                elif not len(d)%8 and d[:12] == b'\x02\0\0\x02\x07\xDA\x0B\x0C\x75\xBF\xBD\xE6': ext = 'vtx'
-                elif not len(d)%2 and d[:8] == b'\0\0\0\x02\0\0\0\x02' and d[11] and d[8:12] == d[12:16] == d[20:24]: ext = 'msh'
-                else: ext = 'bin'
-                writefile(o + f'/{fe[2]}.{ext}',d)
+                fn = o + '/'
+                if fe[2]: fn += hl.get(fe[2],f'{fe[2]:08X}') + '/'
+                if fe[3] in hl: fn += hl[fe[3]]
+                else:
+                    ex = hl.get(fe[4],f'{fe[4]:08X}')
+                    fn += hl.get(fe[3],f'{fe[3]:08X}') + '.' + EXTM.get(ex,ex)
+                writefile(fn,d)
             f.close()
             if fs: return
         case 'Mission Impossible 3 Data':
@@ -515,7 +532,7 @@ def extract4_2(inp:str,out:str,t:str):
             if fnc == fc: v = 1
             else:
                 assert fc == 0x3F7D70A4
-                assert fnc in (0x8FFFFFFF,0xFFFFFFFF)
+                assert fnc in {0x8FFFFFFF,0xFFFFFFFF}
                 AES = fnc == 0x8FFFFFFF
                 ds = f.readu32()
                 fnc = f.readu32()
@@ -730,7 +747,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = []
             for _ in range(c):
                 fs.append((f.readu32(),f.readu32(),f.readu8(),f.read(f.readu16())[:-1].decode('utf-8')))
-                assert fs[-1][2] in (0,1)
+                assert fs[-1][2] in {0,1}
                 f.skip(4)
 
             for fe in fs:
@@ -757,7 +774,7 @@ def extract4_2(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='<')
             ty = f.read(4)
-            assert ty in (b'FSTA',b'JAM2')
+            assert ty in {b'FSTA',b'JAM2'}
 
             tm = f.readu32()
             fo = f.readu32()
@@ -1183,7 +1200,7 @@ def extract4_2(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 d = f.read(fe[1])
-                if d[:4] in (b'GMDF',b'GMOF',b'GCIF','NPVS',b'UV\0\0',b'SCR\0'): ext = d[:4].rstrip(b'\0').decode('ascii').lower()
+                if d[:4] in {b'GMDF',b'GMOF',b'GCIF','NPVS',b'UV\0\0',b'SCR\0'}: ext = d[:4].rstrip(b'\0').decode('ascii').lower()
                 elif d == b'dummy': ext = 'dummy'
                 elif not fe[1]%0x10 and (4+int.from_bytes(d[:4],'little')*8+(-(4+int.from_bytes(d[:4],'little')*8)%0x10)) == int.from_bytes(d[4:8],'little'): ext = 'bin.pck'
                 elif d[0]+d[1] and not d[2] and d[3] == d[8] == 0x20 and not sum(d[4:8]) and d[9] == 2 and d[10] and d[11] and d[12] and d[13] and not d[14] and d[15].bit_count() == 1: ext = 'mdl'
@@ -1205,7 +1222,7 @@ def extract4_2(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 d = f.read(fe[1])
-                if d[:4] in (b'GMDF',b'GMOF',b'GCIF','NPVS',b'UV\0\0',b'SCR\0'): ext = d[:4].rstrip(b'\0').decode('ascii').lower()
+                if d[:4] in {b'GMDF',b'GMOF',b'GCIF','NPVS',b'UV\0\0',b'SCR\0'}: ext = d[:4].rstrip(b'\0').decode('ascii').lower()
                 elif d == b'dummy': ext = 'dummy'
                 elif d[0]+d[1] and not d[2] and d[3] == d[8] == 0x20 and not sum(d[4:8]) and d[9] == 2 and d[10] and d[11] and d[12] and d[13] and not d[14] and d[15].bit_count() == 1: ext = 'mdl'
                 else: ext = guess_ext_ps2(d)
@@ -1828,7 +1845,7 @@ def extract4_2(inp:str,out:str,t:str):
                             if (0x18+v1) == sss and not v2:
                                 fs = f.readu32()
                                 assert writefile(fn,ofs[ebf].read(fs)) == fs,f'{n}: {sss} @ 0x{f.pos-16:04X}'
-                                if n in ('LOCM','FSBF','TELI'): extract4_2(fn,dr,'Feral ' + n)
+                                if n in {'LOCM','FSBF','TELI'}: extract4_2(fn,dr,'Feral ' + n)
                                 elif n == 'LOCR': extract4_2(fn,dr,'Feral LOCM')
                             else: raise NotImplementedError(f'{n}: {sss} ({v1}|{v2}) @ 0x{f.pos-4:04X}')
 
@@ -2102,12 +2119,12 @@ def extract4_2(inp:str,out:str,t:str):
             fd = open(noext(i) + '.kbf','rb')
 
             def readd(p):
-                n = p + f.read(0x20).rstrip(b'\0').decode('latin-1') + '/'
+                n = p + f.read(0x20).rstrip(b'\0').decode('ansi') + '/'
                 mkdir(o + '/' + n)
                 c = f.readu32()
                 for _ in range(c):
                     ty = f.readu8()
-                    assert ty in (0,1)
+                    assert ty in {0,1}
                     f.skip(4)
                     of = f.readu32()
 
@@ -2119,9 +2136,9 @@ def extract4_2(inp:str,out:str,t:str):
                     elif ty == 1:
                         s = f.readu32()
                         fd.seek(of)
-                        fn = n + fd.read(0x20).rstrip(b'\0').decode('latin-1')
+                        fn = n + fd.read(0x20).rstrip(b'\0').decode('ansi')
                         cms = f.readu8()
-                        if cms: fn += '.' + f.read(cms).decode('latin-1')
+                        if cms: fn += '.' + f.read(cms).decode('ansi')
                         writefile(o + '/' + fn,fd.read(s))
             readd('')
 
@@ -2141,7 +2158,7 @@ def extract4_2(inp:str,out:str,t:str):
                 for _ in range(c):
                     fe = (f.read0s().decode('utf-8'),bo+f.readu32(),f.readu8(),f.readu32(),f.readu32())
                     f.skip(4)
-                    if fe[2] not in (1,4):
+                    if fe[2] not in {1,4}:
                         assert fe[2] == 0,"Unknown compression"
                         fs = []
                         break

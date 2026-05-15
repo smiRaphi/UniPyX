@@ -88,6 +88,7 @@ class X:
             ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),    sszt,1),
             ('decompress_huffman', (P(u8),szt,P(u8),sszt,s32),sszt,0),
             ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),    sszt,1),
+            ('decompress_ash0',    (P(u8),szt,P(u8)),         sszt,0),
 
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
@@ -136,7 +137,15 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * usize)()
         r = self.dll.decompress_huffman(i,len(src),o,usize,1 if padding else 0)
-        if r == -1: raise ValueError('Decompression failed')
+        if r == -1: raise RuntimeError('Decompression failed')
+        return bytes(o)[:r]
+    def decompress_ash0(self,src:bytes) -> bytes:
+        if len(src) <= 12 or src[:4] != b'ASH0': raise ValueError('Invalid data')
+        us = int.from_bytes(src[5:8],'big')
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * us)()
+        r = self.dll.decompress_ash0(i,len(src),o)
+        if r == -1: raise RuntimeError('Decompression failed')
         return bytes(o)[:r]
 
     def decrypt_inv(src:bytes) -> bytes: ...
@@ -319,6 +328,78 @@ int32_t MT19937_rand(MT19937 *restrict ctx) {
     y ^= (int32_t)(((uint32_t)y << 15) & ctx->TEMPERING_MASK_C);
     y ^= y >> 18;
     return y;
+}
+
+typedef struct {
+    const uint8_t* ptr;
+    const uint8_t* end;
+    uint8_t buf;
+    uint8_t bits;
+} BitReader;
+static inline void init_BitReader(BitReader *br, const uint8_t *ptr, const size_t size) {
+    br->ptr = ptr;
+    br->end = ptr + size;
+    br->buf = 0;
+    br->bits = 0;
+}
+static inline uint8_t get_bit(BitReader *br) {
+    if (!br->bits) {
+        if (br->ptr >= br->end) return 0;
+        br->buf = *(br->ptr++);
+        br->bits = 8;
+    }
+    br->bits--;
+    return (br->buf >> br->bits) & 1;
+}
+static inline uint32_t get_bits(BitReader *br, size_t n) {
+    uint32_t v = 0;
+    while (n > 0) {
+        if (!br->bits) {
+            if (br->ptr >= br->end) return v << n;
+            br->buf = *(br->ptr++);
+            br->bits = 8;
+        }
+        int s = (n < br->bits) ? n : br->bits;
+        v = (v << s) | ((br->buf >> (br->bits - s)) & ((1 << s) - 1));
+        br->bits -= s;
+        n -= s;
+    }
+    return v;
+}
+
+typedef struct {
+    int16_t l;
+    int16_t r; // -1 = leaf
+} HuffNode;
+static inline int read_hufftree(BitReader *br, int width, int max, HuffNode *tree) {
+    int root = 0;
+    int nodec = 1;
+    int16_t stack[0x800];
+    int stacki = 0;
+
+    while (1) {
+        if (get_bit(br)) {
+            if (nodec + 1 >= max * 2) return 0;
+            tree[root].l = nodec;
+            tree[root].r = nodec + 1;
+            stack[stacki++] = nodec + 1;
+            root = nodec;
+            nodec += 2;
+        } else {
+            tree[root].l = get_bits(br, width);
+            tree[root].r = -1;
+            if (!stacki) break;
+            root = stack[--stacki];
+        }
+    }
+    return 1;
+}
+static inline int get_huffcode(BitReader *br, HuffNode *tree) {
+    int node = 0;
+    while (tree[node].r != -1) {
+        node = (get_bit(br)) ? tree[node].r : tree[node].l;
+    }
+    return tree[node].l;
 }
 
 EXPORT ssize_t decompress_lz10_raw(const uint8_t *restrict src, const size_t zsize,
@@ -702,100 +783,53 @@ eof:
 }
 EXPORT ssize_t decompress_huffman(const uint8_t *restrict src, const size_t zsize,
                                         uint8_t *restrict dst, const ssize_t usize, const int padding) {
-    size_t ip = 0;
-    uint8_t _gb = 0;
-    uint8_t msk = 0;
+    BitReader br;
+    init_BitReader(&br, src, zsize);
+    HuffNode tree[512];
+    if (!read_hufftree(&br, 8, 256, tree)) return -1;
 
-    #define GET_BIT(ob) do { \
-        if (!msk) { \
-            if (ip >= zsize) goto error; \
-            _gb = src[ip++]; \
-            msk = 0x80; \
-        } \
-        ob = (_gb & msk) ? 1 : 0; \
-        msk >>= 1; \
-    } while(0)
-    #define GET_BITS(n,ov) do { \
-        ov = 0; \
-        for (int _i=0;_i < (n);_i++) { \
-            uint8_t _b; \
-            GET_BIT(_b); \
-            ov |= (_b << ((n) - 1 - _i)); \
-        } \
-    } while(0)
-
-    uint16_t tok = 0x100;
-    uint16_t lhs[0x200] = {0};
-    uint16_t rhs[0x200] = {0};
-    int root = -1;
-    int nstack[512];
-    int sstack[512];
-    int sp = 0;
-    int cur_par = -1;
-    int cur_side = 0;
-
-    while (1) {
-        uint8_t b;
-        GET_BIT(b);
-
-        uint16_t nodev;
-        if (b) {
-            nodev = tok++;
-            if (nodev >= 0x200) goto error;
-        } else GET_BITS(8,nodev);
-
-        if (cur_par == -1) root = nodev;
-        else if (cur_side) lhs[cur_par] = nodev;
-        else rhs[cur_par] = nodev;
-
-        if (b) {
-            if (cur_par != -1) {
-                nstack[sp] = cur_par;
-                sstack[sp] = cur_side;
-                sp++;
-            }
-
-            cur_par = nodev;
-            cur_side = 1;
-        } else {
-            if (cur_side) cur_side = 0;
-            else {
-                while (!cur_side && sp > 0) {
-                    sp--;
-                    cur_par = nstack[sp];
-                    cur_side = sstack[sp];
-                }
-                if (!cur_side && sp == 0) break;
-                if (cur_side) cur_side = 0;
-                else break;
-            }
-        }
-    }
-
-    if (padding) msk = 0;
+    if (padding) br.bits = 0;
 
     ssize_t op = 0;
     while (usize == -1 || op < usize) {
-        uint16_t sym = root;
-        while (sym >= 0x100) {
-            if (!msk && ip >= zsize) goto eof;
-            uint8_t b;
-            GET_BIT(b);
-            if (b) sym = rhs[sym];
-            else sym = lhs[sym];
-        }
-        dst[op++] = (uint8_t)sym;
+        if (br.bits == 0 && br.ptr >= br.end) break;
+        dst[op++] = (uint8_t)get_huffcode(&br, tree);
     }
 
-eof:
-    #undef GET_BIT
-    #undef GET_BITS
     return op;
+}
+EXPORT ssize_t decompress_ash0(const uint8_t *restrict src, const size_t zsize,
+                                     uint8_t *restrict dst) {
+    if (12 >= zsize) return -1;
 
-error:
-    #undef GET_BIT
-    #undef GET_BITS
-    return -1;
+    size_t usize = (src[5] << 16) | (src[6] << 8) | src[7];
+    size_t symo = (src[8] << 24) | (src[9] << 16) | (src[10] << 8) | src[11];
+    if (symo >= zsize) return -1;
+
+    BitReader symr,distr;
+    init_BitReader(&symr, src + 12, symo - 12);
+    init_BitReader(&distr, src + symo, zsize - symo);
+
+    HuffNode sym_tree[0x400];
+    HuffNode dist_tree[0x1000];
+    if (!read_hufftree(&symr ,9 ,0x200,sym_tree) ||
+        !read_hufftree(&distr,11,0x500,dist_tree)) return -1;
+
+    ssize_t op = 0;
+    while (op < usize) {
+        int sym = get_huffcode(&symr, sym_tree);
+        if (sym < 0x100) dst[op++] = (uint8_t)sym;
+        else {
+            size_t lng = sym - 0x100 + 3;
+            size_t dist = get_huffcode(&distr, dist_tree) + 1;
+            if (dist > op) return -1;
+            size_t cp = op - dist;
+            if (op + lng > usize) lng = usize - op;
+            for (size_t i=0;i < lng;i++) dst[op++] = dst[cp++];
+        }
+    }
+
+    return op;
 }
 
 EXPORT void decrypt_inv(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {

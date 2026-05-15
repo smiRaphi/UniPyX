@@ -114,7 +114,7 @@ def isvalid(p:str,reject_dirs=False):
         except OSError as e:
             if hasattr(e,'winerror'):
                 if e.winerror == 123: return False
-            elif e.errno in (errno.ENAMETOOLONG,errno.ERANGE): return False
+            elif e.errno in {errno.ENAMETOOLONG,errno.ERANGE}: return False
         except (TypeError,ValueError): return False
     return True
 SUB_PATH = str.maketrans({
@@ -303,8 +303,8 @@ def analyze(inp:str,raw=False):
                     for x in msplit(lg.split('\n')[0].split(' - ',1)[1],[' - [ ',' ] [ ',' ] - ',' [ ',' ] ',' stub : ',' Ovl like : ',' - ',' , ']):
                         if x == '( RESOURCES ONLY ! no CODE )': ts.append('Resources Only')
                         elif not x.startswith(('Buffer size : ','Size from sections : ','File corrupted or Buffer Error','x64 *Unknown ','*Unknown ','Stub : *Unknown ','EP Token : ','File is corrupted ','EP : ')):
-                            for sp in (' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( ','*ACM'): x = x.split(sp)[0]
-                            for sp in ('Structure : ','use : ','stub : ','EP Generic : '): x = x.split(sp)[-1]
+                            for sp in {' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( ','*ACM'}: x = x.split(sp)[0]
+                            for sp in {'Structure : ','use : ','stub : ','EP Generic : '}: x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
                             if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','no sec. cab.7z.zip [deb. 02','2010 (e8'} and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()) and not (len(x) == 15 and x[:4] == 'exe ' and x[12] == '-' and x[13:].isdigit() and all(x in '0123456789ABCDEF' for x in x[4:12])): ts.append(x)
@@ -659,7 +659,7 @@ def fix_isinstext(o:str,oi:str=None):
             for x in fs: remove(oi + '/' + x)
         else: remove(oi)
         for x in listdir(o):
-            if not isdir(o + '/' + x) or x.upper() in ('$_INST32I_EX_','$_INST16_EX_','$ENGINE32'): continue
+            if not isdir(o + '/' + x) or x.upper() in {'$_INST32I_EX_','$_INST16_EX_','$ENGINE32'}: continue
             while True:
                 try: copydir(o + '/' + x,o,True);break
                 except PermissionError: pass
@@ -796,8 +796,8 @@ def guess_ext_zeebo(d:bytes,hint:int=None):
     else: ext = guess_ext(d)
 
     if not hint is None:
-        if hint == 0 and ext not in ('png','jpg'): ext = 'image'
-        elif hint == 1 and ext not in ('wav','mid'): ext = 'audio'
+        if hint == 0 and ext not in {'png','jpg','bmp','tga','dds'}: ext = 'image'
+        elif hint == 1 and ext not in {'wav','mid','ogg'}: ext = 'audio'
         elif hint == 2: ext = 'txt'
 
     return ext
@@ -933,7 +933,7 @@ MIMEMP = {
     'video/mpeg4-generic':'mp4',
 }
 def mime2ext(m:str):
-    if type(m) == bytes: m = m.decode('latin-1')
+    if type(m) == bytes: m = m.decode('ansi')
     m = m.split(';')[0].lower()
     if m in MIMEMP: return MIMEMP[m]
     m = m.split('/')[1].split('+')[-1]

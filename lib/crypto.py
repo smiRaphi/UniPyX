@@ -184,23 +184,38 @@ def decode(i:bytes,algo:str):
         o.append(ct[b])
     return ''.join(o)
 
+CRC_LUT = {}
 def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None):
+    k = (poly,reflect,size)
+    mmsk = (1 << size) - 1
+    if not k in CRC_LUT:
+        lut = []
+        if reflect:
+            poly = reflecti(poly,size)
+            for b in range(256):
+                crc = b
+                for _ in range(8):
+                    if crc & 1: crc = (crc >> 1) ^ poly
+                    else: crc >>= 1
+                lut.append(crc)
+        else:
+            msk1,sv = 1 << (size - 1),size - 8
+            for b in range(256):
+                crc = b << sv
+                for _ in range(8):
+                    if crc & msk1: crc = (crc << 1) ^ poly
+                    else: crc <<= 1
+                    crc &= mmsk
+                lut.append(crc)
+        CRC_LUT[k] = tuple(lut)
+    lut = CRC_LUT[k]
+
     crc = init if value is None else (value ^ xor)
     if reflect:
-        poly = reflecti(poly,size)
-        for b in i:
-            crc ^= b
-            for _ in range(8):
-                if crc & 1: crc = (crc >> 1) ^ poly
-                else: crc >>= 1
+        for b in i: crc = (crc >> 8) ^ lut[(b ^ crc) & 0xFF]
     else:
-        msk1,msk2,sv = 1 << (size - 1),(1 << size) - 1,size - 8
-        for b in i:
-            crc ^= b << sv
-            for _ in range(8):
-                if crc & msk1: crc = (crc << 1) ^ poly
-                else: crc <<= 1
-                crc &= msk2
+        msk1,sv = 1 << (size - 1),size - 8
+        for b in i: crc = ((crc << 8) & mmsk) ^ lut[(b ^ (crc >> sv)) & 0xFF]
     return crc ^ xor
 def crc8(i:bytes,poly=0x7,init=0,xor=0,reflect=False,value:int=None): return crc(i,8,poly,init,xor,reflect,value)
 def crc16(i:bytes,poly=0x8005,init=0,xor=0,reflect=True,value:int=None): return crc(i,16,poly,init,xor,reflect,value)
@@ -321,6 +336,7 @@ CRC24 = {   # poly    , init   , xor    , reflect
 'interlaken':(0x328B63,0xFFFFFF,0xFFFFFF,False),
 }
 CRC32 = {   # poly      , init     , xor      , reflect
+    'ludia': (0x04C11DB7,0x00000000,0x00000000,True ),
     'jamcrc':(0x04C11DB7,0xFFFFFFFF,0x00000000,True ),
     'ieee':  (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'iso':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'iso_hdlc':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
     'adccp': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'pkzip':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'xz':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'v42':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
@@ -381,7 +397,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
              'crc32_mpeg2'|'crc32_posix'|'crc32_cksum'|'crc32_bzip2'|'crc32_aal5'|'crc32_dect_b'|'crc32b'|'crc32_mef'|\
              'crc32k'|'crc32_koopman'|'crc32_xfer'|'crc32_autosar'|'crc32c'|'crc32_castagnoli'|'crc32_iscsi'|\
              'crc32_base91_c'|'crc32_intrelaken'|'crc32_nvme'|'crc32d'|'crc32_base94'|'crc32_base94_d'|'crc32q'|\
-             'crc32_aixm'|'crc32_cd_rom_edc':
+             'crc32_aixm'|'crc32_cd_rom_edc'|'crc32_ludia':
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32[algo[5:].lstrip('_')]
             fnc = crc32
         case 'crc64_xz'|'crc64_go_ecma'|'crc64_ecma'|'crc64_ecma_182'|'crc64_we'|'crc64_redis'|'crc64_jones'|'crc64_ms'|\

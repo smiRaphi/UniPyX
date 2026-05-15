@@ -29,7 +29,7 @@ def extract4_1(inp:str,out:str,t:str):
             d = f.read()
             f.close()
             ob = []
-            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode({17:'latin-1',527:'utf-8',14:'ascii'}[unk]))
+            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode({17:'ansi',527:'utf-8',14:'ascii'}[unk]))
 
             writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
             if fs: return
@@ -84,8 +84,8 @@ def extract4_1(inp:str,out:str,t:str):
                 u1 = f.readu16()
                 if u1:
                     f.skip(-2)
-                    if not u1 in (1,2,4,6,9): return 1
-                    #assert u1 in (1,2,4,6,9),f'{u1} @ {f.pos//32768}.{f.pos % 32768}'
+                    if not u1 in {1,2,4,6,9}: return 1
+                    #assert u1 in {1,2,4,6,9},f'{u1} @ {f.pos//32768}.{f.pos % 32768}'
                     writefile(f'{o}/{c}_extra.bin',f.read(2+[None,0x10,0x1C,None,0x34,None,0x4C,None,None,0x70][u1]))
                     f.skip(2)
 
@@ -491,7 +491,7 @@ def extract4_1(inp:str,out:str,t:str):
             for ix in range(c):
                 d = f.read(f.readu32())
 
-                if d[0] in (0x11,0x40):
+                if d[0] in {0x11,0x40}:
                     tf = TmpFile()
                     writefile(tf.p,d)
                     of = o + f'\\{ix}.bin'
@@ -534,7 +534,7 @@ def extract4_1(inp:str,out:str,t:str):
                 def read(self,n=None):
                     p = self.tell()
                     d = self.f.read(n)
-                    if (n == 4 and p == 0) or (n == 2 and p == 4): d = d.decode('latin-1')
+                    if (n == 4 and p == 0) or (n == 2 and p == 4): d = d.decode('ansi')
                     return d
                 def close(self): self.f.close()
 
@@ -690,7 +690,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             soff0 = f.readu32()
             f.skip(-4)
-            if soff0 in (T0S,T0S-4): typ = 0
+            if soff0 in {T0S,T0S-4}: typ = 0
             elif soff0 == T1S: typ = 1
 
             seco = [f.readu32() for _ in range(4 if typ == 0 else 5)]
@@ -757,9 +757,9 @@ def extract4_1(inp:str,out:str,t:str):
                                 assert (k+size) <= csc
 
                                 v = cmds[k]
-                                if addr in (0x82,0x92,0x9a): w,h = v >> 16,v & 0xFFFF
-                                elif addr in (0x8e,0x96,0x9e): assert v == fmt
-                                elif addr in (0x85,0x86,0x87,0x88,0x89,0x8a,0x95,0x9d): texs.add(v)
+                                if addr in {0x82,0x92,0x9a}: w,h = v >> 16,v & 0xFFFF
+                                elif addr in {0x8e,0x96,0x9e}: assert v == fmt
+                                elif addr in {0x85,0x86,0x87,0x88,0x89,0x8a,0x95,0x9d}: texs.add(v)
 
                                 k += size
                         assert texs and w and h
@@ -773,7 +773,7 @@ def extract4_1(inp:str,out:str,t:str):
                             if h < 1: h = 1
 
                         for tix,ro in enumerate(sorted(list(texs))):
-                            if typ == 1 and fmt in (10,11) and ro < sec[4][1]: ro += sec[4][0]
+                            if typ == 1 and fmt in {10,11} and ro < sec[4][1]: ro += sec[4][0]
                             else: ro += sec[3][0]
 
                             f.seek(ro)
@@ -1685,7 +1685,7 @@ def extract4_1(inp:str,out:str,t:str):
             for ix,of in enumerate(fs[:-1]):
                 fd.seek(of)
                 d = fd.read(fs[ix+1]-of)
-                if d[:8] in (b'tgs\0\0\0\0\0',b'dlink128',b'lxdata\0\0',b'MCicon\0\0',b'spotobj\0',b'XMDF_4_0',b'texanm\0\0'):
+                if d[:8] in {b'tgs\0\0\0\0\0',b'dlink128',b'lxdata\0\0',b'MCicon\0\0',b'spotobj\0',b'XMDF_4_0',b'texanm\0\0'}:
                     ext = d[:8].rstrip(b'\0').decode('ascii').lower()
                     d = d[:int.from_bytes(d[0x10:0x10+4],'little')]
                 elif not sum(d): ext = 'null'

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 941
+# Supported Formats: 946
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -152,7 +152,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | [compression.zstd](https://docs.python.org/3/library/compression.zstd.html)/[backports.zstd](https://pypi.org/project/backports.zstd/) |
 
-## ROM Formats (66)
+## ROM Formats (68)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -192,6 +192,8 @@ NCSD | .cci .3ds | [3dstool](https://github.com/dnasdw/3dstool) |
 NDS | .nds .srl | [mdnds](https://github.com/Roughsketch/mdnds) |
 NES Remix ROM | ??? | Custom |
 Nintendo TMD | .tmd ` ` | Custom |
+NKit GameCube ISO | .nkit.iso | [DolphinTool](https://dolphin-emu.org/download/) |
+NKit Wii ISO | .nkit.iso | [DolphinTool](https://dolphin-emu.org/download/) |
 Pilotwings 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Pilotwings64Decomp YAML](https://github.com/gcsmith/Pilotwings64Decomp/tree/main/config)
 PlayStation APA IMG | .pfs | [pfs2tar](https://github.com/ps2homebrew/pfsshell) + [7-Zip](https://7-zip.org/) |
 PlayStation Boot Package | .pbp | Custom |
@@ -349,7 +351,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (484)
+## Various (487)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -438,7 +440,9 @@ Contact File Data | .dat | Custom |
 Cosmo Volume Game Archive | .vol | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 CPK | .cpk | [CpkExtract](https://github.com/1330-Studios/CPK-Extract) |
 Creative Assembly PFH0 | .pfh | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+CRI ACS File | .acs | Custom |
 CRI CPK | .cpk | [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
+CRI DPF | .dpf | Custom |
 Cryo BigFile | .big | [na_game_tool](https://nihav.org/game_tool.html) |
 CSI NY GRF | .grf | Custom |
 CTPK | .ctpk | [ctpktool](https://github.com/dnasdw/ctpktool) |
@@ -593,6 +597,7 @@ Lucas Learning DAT | .dat | Custom |
 Lucas Arts Bundle | .bdl | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |
+Ludia GWTarget | ` ` | Custom |
 Macross: Do You Remember Love? GKO | .gko | Custom |
 Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |

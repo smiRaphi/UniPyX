@@ -254,7 +254,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if no < 0 or no > size: return -6 # name offset
 
                     f.skip(4) # hash
-                    if f.readu32() not in (0x7D6,0x7D5): return -8 # ?
+                    if f.readu32() not in {0x7D6,0x7D5}: return -8 # ?
                     for _ in range(4):
                         if f.readu32() > 0xFF: return -9 # small values
 
@@ -667,9 +667,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f._end = '>'
                 fv = f.readu64()
 
-            assert fv in (1,2) # PS3,PSV
+            assert fv in {1,2} # PS3,PSV
 
-            if fv in (1,2): f.skip(8)
+            if fv in {1,2}: f.skip(8)
             segs = f.readu64()
             assert 0xFFFFFFFFFFF >= segs
             if fv == 1: f.skip(16)
@@ -684,7 +684,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if of[0] == 0x101:
                     xml = f.read(5)
                     f.skip(-5)
-                    if xml in (b'<xml ',b'<?xml'): n = 'license.xml'
+                    if xml in {b'<xml ',b'<?xml'}: n = 'license.xml'
                     else: n = 'resource.txt'
                 else: n = PUPMAP[fv].get(of[0],hex(of[0]))
                 tof = xopen(o + '/' + n,'wb')
@@ -884,7 +884,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     assert enc == 'hex'
                     return self.hex()
                 def startswith(self,prefix,start=None,end=None):
-                    if isinstance(prefix,str): prefix = prefix.encode('latin-1')
+                    if isinstance(prefix,str): prefix = prefix.encode('ansi')
                     return super().startswith(prefix, start, end)
                 def __getitem__(self,i):
                     if type(i) == slice: return self.__class__(super().__getitem__(i))
@@ -955,7 +955,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
                 tag = f.read(4)
                 f.skip(-4)
-                if tag[::-1] in (b'NCGR',b'NCLR',b'NSCR',b'NANR',b'NCBR',b'NCER',b'NFTR',b'MAPI'):
+                if tag[::-1] in {b'NCGR',b'NCLR',b'NSCR',b'NANR',b'NCBR',b'NCER',b'NFTR',b'MAPI'}:
                     ext = tag.decode()[::-1].lower()
                 elif tag == b'NARC': ext = 'narc'
                 else: ext = 'bin'
@@ -1006,7 +1006,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             ext = 'bin'
             if d[:4] == b'1LCR': ext = 'llcr'
             elif d[:4] == b'DTPK': ext = 'snd'
-            elif d[:4] == b'\0\1\0\0' and d[5:8] == b'\0\0\0' and d[4] in (3,1,7,0x11,0xb): ext = 'pol'
+            elif d[:4] == b'\0\1\0\0' and d[5:8] == b'\0\0\0' and d[4] in {3,1,7,0x11,0xb}: ext = 'pol'
             elif 0 < int.from_bytes(d[:4]) < 0xff and 0 < int.from_bytes(d) < 0xff and 0 < int.from_bytes(d[8:12]) < 0xff: ext = 'mot'
             elif (len(d) == 0x004800 and d[-4: ] == b'\xFF\xFF\xFF\xFF') or\
                  (len(d) == 0x1DED10 and d[  :4] == b'\x97Z+C'): ext = 'def'
@@ -1048,7 +1048,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if BTYPE != b'4WRT':
                         typ = f.read(4).strip(b'\0 \t\r\n')
 
-                        if BTYPE in (b'NSF1',b'NMF1') and typ[3:].isdigit(): typ = typ[:3]
+                        if BTYPE in {b'NSF1',b'NMF1'} and typ[3:].isdigit(): typ = typ[:3]
 
                         try: typ = '.' + typ.decode().lower()
                         except: typ = '.iff'
@@ -1072,7 +1072,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 elif name == b'WRCH' and BTYPE == b'NSF1':
                     f.skip(4)
                     while f.pos < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
-                elif name == b'NETN' and BTYPE in (b'NSF1',b'NMF1'):
+                elif name == b'NETN' and BTYPE in {b'NSF1',b'NMF1'}:
                     FNAMES.append(f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
 
                 elif name == b'RIdx' and BTYPE == b'IFRS':
@@ -1102,7 +1102,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 elif (name == b'DOCU' and BTYPE == b'4WRT') or (name == b'DOC ' and BTYPE == b'WORD'):
                     FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
                     cnt += 1
-                elif (name == b'PARA' and BTYPE == b'4WRT') or (name in (b'HEAD',b'FOOT',b'PARA') and BTYPE == b'WORD'):
+                elif (name == b'PARA' and BTYPE == b'4WRT') or (name in {b'HEAD',b'FOOT',b'PARA'} and BTYPE == b'WORD'):
                     FDATA['TXT'].write(b'\r\n')
 
                 elif name == b'TEXT' and BTYPE == b'4WRT':
@@ -1177,7 +1177,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             except: return 1
             inf = b''
             for f in npk.pck_cnt_list:
-                if f.cnt_id_name in ('PckReleaseTyp','CntArchitectureTag','PckDescription','PckEckcdsaHash'): inf += f.cnt_id_name[3:].encode() + b': ' + f.cnt_payload + b'\n'
+                if f.cnt_id_name in {'PckReleaseTyp','CntArchitectureTag','PckDescription','PckEckcdsaHash'}: inf += f.cnt_id_name[3:].encode() + b': ' + f.cnt_payload + b'\n'
                 elif f.cnt_id_name == 'CntZlibDompressedData': writefile(o + '/data.bin',decompress(f.cnt_payload,'zlib'))
                 elif f.cnt_id_name == 'CntSquashFsImage':
                     tf = o + '/cnt.squashsf'
@@ -2122,7 +2122,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             while f:
                 d = f.read(f.readu16())
                 try: d = d.decode('utf-8')
-                except UnicodeDecodeError: d = d.decode('latin-1')
+                except UnicodeDecodeError: d = d.decode('ansi')
                 if not d.replace('\n','').replace('\r','').replace('\t','').isprintable(): return 1
                 se.append(d)
             f.close()
@@ -2206,9 +2206,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 elif e[1] == 0x0304:
                     if d.endswith(b'\0\0'): d = d[:-2]
                     d = d.decode('utf-16le')
-                elif e[1] in (0x0004,0x0008,0x0010,0x0020,0x0104,0x0108,0x0110,0x0120,0x0404): d = int.from_bytes(d,'little')
+                elif e[1] in {0x0004,0x0008,0x0010,0x0020,0x0104,0x0108,0x0110,0x0120,0x0404}: d = int.from_bytes(d,'little')
                 elif e[1] == 0x0504: d = struct.unpack('<f',d)[0]
-                elif e[1] in (0x0000,0x0100): d = None
+                elif e[1] in {0x0000,0x0100}: d = None
 
                 oo[k] = d
             if oo:

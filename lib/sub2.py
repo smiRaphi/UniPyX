@@ -7,6 +7,18 @@ C64TM = {
     'OCEAN/IMAGINE F1':'f1.prg',
 }
 
+def clean_dol(id:str):
+    if len(listdir(id)) == 2 and exists(id + '/UPDATE'):
+        mv(id + '/UPDATE',id + '/$UPDATE')
+        clean_dol(id + '/$UPDATE')
+    if exists(id + '/DATA'): copydir(id + '/DATA',id,True,True)
+    assert exists(id + '/sys')
+    mv(id + '/sys',id + '/$SYS')
+    if exists(id + '/disc'): mv(id + '/disc',id + '/$SYS/disc')
+    for f in listdir(id):
+        if isfile(id + '/' + f): mv(id + '/' + f,id + '/$SYS/' + f)
+    if exists(id + '/files'): copydir(id + '/files',id,True,True)
+
 def extract2(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
@@ -19,24 +31,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
         return 1
 
     match t:
-        case 'RVZ':
+        case 'RVZ'|'NKit Wii ISO'|'NKit GameCube ISO':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
             if listdir(o):
-                if exists(o + '/DATA'):
-                    for sd in listdir(o):
-                        rename(o + '/' + sd + '/sys',o + '/' + sd + '/$SYS')
-                        for sf in listdir(o + '/' + sd):
-                            if sf in ['$SYS','files']: continue
-                            remove(o + '/' + sd + '/' + sf)
-                        copydir(o + '/' + sd + '/files',o + '/' + sd,True,reni=True)
-                        if sd == 'DATA': copydir(o + '/DATA',o,True,reni=True)
-                        else: rename(o + '/' + sd,o + '/$' + sd)
-                else:
-                    rename(o + '/sys',o + '/$SYS')
-                    while True:
-                        try: copydir(o + '/files',o,True)
-                        except PermissionError: pass
-                        else: break
+                clean_dol(o)
                 return
             tf = TmpFile('.iso')
             run(['dolphintool','convert','-u',gtmp('user'),'-i',i,'-o',tf,'-f','iso'])
@@ -56,8 +54,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'Wii ISO'|'GameCube ISO':
             run(['dolphintool','extract','-i',i,'-o',o,'-q'])
             if listdir(o):
-                rename(o + '/sys',o + '/$SYS')
-                copydir(o + '/files',o,True)
+                clean_dol(o)
                 return
             run(['wit','-q','X',i,'-p','-o','-E$','-d',o])
             fs = listdir(o)
@@ -313,7 +310,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             tmd = TMD(dr + '/' + tmd)
 
             if tmd.sigt == 1 and tmd.version == 0: cns = 'w'
-            elif tmd.sigt in (3,4,5) and tmd.version == 1: cns = '3'
+            elif tmd.sigt in {3,4,5} and tmd.version == 1: cns = '3'
             else: raise NotImplementedError(f'{tmd.signature.type:4X} {tmd.version}')
 
             if exists(dr + '/cetk'):
@@ -401,7 +398,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                         elif ncch:
                             if extract(ifl,odr,'NCCH CFA'): copy(ifl,odr + '.cfa')
                         else: copy(ifl,odr + '.bin')
-                    elif c.index in (1,2):
+                    elif c.index in {1,2}:
                         if extract2(ifl,odr,'NCCH CFA'): copy(ifl,odr + '.cfa')
                     else: copy(ifl,odr + '.bin')
             return
@@ -631,7 +628,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             f.seek(start)
             tag = f.read(3)
-            if tag in (b'NES',b'UNI'):
+            if tag in {b'NES',b'UNI'}:
                 if not name: name = tbasename(i)
                 name += '.' + tag.decode().lower()
             elif (tag+f.read(13)) == b'\x01*NINTENDO-HVC*\x01':
@@ -893,7 +890,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             c = 0
             while f:
-                t = f.read(4).decode('latin-1')
+                t = f.read(4).decode('ansi')
                 s = f.readu32()
                 if t == 'PAGE': ext = 'bin'
                 elif t == 'AUDI':
@@ -949,7 +946,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             inf = open(o + '/info.txt','w',encoding='utf-8')
             inf.write(f'PRG: {prgs} * 16kb\nCHR: {chrs} * 8kb\nTrainer: {tr} * 512 (0b{trb})\n\nMirror: {"H" if f6&1 else "V"}\nIgnore Mirror: {bool(f6&2)}\nBattery: {bool(f6&4)}\n')
-            if ines2 in (1,3): v = 0
+            if ines2 in {1,3}: v = 0
             elif ines2 == 2 and (f9 << 8) <= f.size: v = 2
             elif x: v = 0.7
             elif f10: v = 1.2
@@ -964,7 +961,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             elif mapr == 1: inf.write('Designation: SxROM\n')
             elif mapr == 4:
                 if prgs >= 8 and chrs >= 16:
-                    if (v in (1,1.1,1.2) and f8 != 1) or (v == 2 and f10&0xF0 != 7): inf.write('Designation: TLROM [128-512kb PRGROM]\n')
+                    if (v in {1,1.1,1.2} and f8 != 1) or (v == 2 and f10&0xF0 != 7): inf.write('Designation: TLROM [128-512kb PRGROM]\n')
                     elif f6&4: inf.write('Designation: TKROM [128-512kb PRGROM, 8kb PRGRAM]\n')
                     else: inf.write('Designation: TSROM [128-512kb PRGROM, 8kb PRGRAM, no battery]\n')
                 elif prgs == 4: inf.write('Designation: TBROM [64kb PRGROM]\n')
@@ -998,7 +995,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 elif mapr == 63:
                     if subm == 0: subn = 'NTDEC TH2xxx-x'
                     elif subm == 1: subn = '82-in-1'
-                elif mapr in (256,419):
+                elif mapr in {256,419}:
                     if subm == 0: subn = 'Normal'
                     elif subm == 1: subn = 'Waixing VT03'
                     elif subm == 2: subn = 'Nice Code VT02'
@@ -1075,7 +1072,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     inf.write(f'Extended Device: {EXTCON[expdev] if expdev in EXTCON else "?"} ({expdev} 0b{bin(expdev)[2:].zfill(4)})\n')
                 inf.write(f'Miscellaneous ROMs: {f14 & 0b11}\n')
                 inf.write(f'Expansion Device: {EXPDEV[f15] if f15 in EXPDEV else "?"} ({f15} 0b{bin(f15)[2:].zfill(6)})\n')
-            elif v in (1.1,1.2):
+            elif v in {1.1,1.2}:
                 inf.write(f'PRGRAM: {f8} * 8kb\n')
                 inf.write(f'TV System: {["NTSC","PAL"][f9]}\n')
                 if v == 1.2:
@@ -1153,7 +1150,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 ps = 0
                 while pp < len(pgs):
                     cp = pgs[pp];pp += 1
-                    assert cp not in (0,2,3,4)
+                    assert cp not in {0,2,3,4}
                     ps += 1
                     if cp == 1: break
                     pp = cp
@@ -1271,12 +1268,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'Mario Kart 64 N64 ROM'|'F-Zero X N64 ROM'|'Wonder Project J2 N64 ROM':
             f = open(i,'rb')
             f.seek(0x3B)
-            tg = f.read(4).decode('latin-1')
+            tg = f.read(4).decode('ansi')
             f.close()
             rt = t[:-8]
 
             if rt == 'Mario Kart 64' and tg == 'NKTE': scr = 'spaghettikart_yaml'
-            elif rt == 'F-Zero X' and tg in ('CFZE','CFZJ'): scr = 'fzerox_yaml'
+            elif rt == 'F-Zero X' and tg in {'CFZE','CFZJ'}: scr = 'fzerox_yaml'
             elif rt == 'Wonder Project J2' and tg ==  'NJ2J': scr = 'wonder_torch_yaml'
             else: raise NotImplementedError(t + ': ' + tg)
 
@@ -1353,7 +1350,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             f = open(i,'rb')
             f.seek(0x3B)
-            tg = f.read(4).decode('latin-1')
+            tg = f.read(4).decode('ansi')
             v = f.read(1)[0]
             if v != 0: tg += f':{(v & 0xF) + 1}.{v >> 4}'
             f.close()
@@ -1482,7 +1479,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.seek(fs[ix][0])
                 d = f.read((fs[ix+1][0] - fs[ix][0]) - fs[ix][1])
                 if d[:4] == b'VS\0\0': ext = 'vs'
-                elif d[6:9] in (b'BGM',b'EV0',b'MAP'): ext = d[6:9].decode('ascii').lower()
+                elif d[6:9] in {b'BGM',b'EV0',b'MAP'}: ext = d[6:9].decode('ascii').lower()
                 else: ext = guess_ext_ps2(d)
                 writefile(o + f'/{ix:04d}.{ext}',d)
 

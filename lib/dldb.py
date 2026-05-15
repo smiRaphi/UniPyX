@@ -130,7 +130,7 @@ class DLDB:
                             if not '.' in ex: ex = ''
                             elif ex.split('.')[-2] == 'tar': ex = '.tar.' + ex.split('.')[-1]
                             else: ex = '.' + ex.split('.')[-1]
-                        p = gtmp('.exe' if ex in ('run','inno','nsis') else ex)
+                        p = gtmp('.exe' if ex in {'run','inno','nsis'} else ex)
 
                     if e['u'] == '.': p,ex = self.bin_path + 'bin.7z','.7z'
                     elif 'github' in e: self.gh_dir(e['u'],self.bin_path + e['github'])
@@ -159,7 +159,7 @@ class DLDB:
             os.chdir(cd)
         return exei,up
     def ext(self,p:str,ex:str,xl:dict):
-        if ex in ('.zip','.nupkg'):
+        if ex in {'.zip','.nupkg'}:
             xall = False
             td = gtmp()
             with zipfile.ZipFile(p,'r') as z:
@@ -184,19 +184,19 @@ class DLDB:
                         d = z.read(tx)
                         xopen(self.bin_path + xl[tx],'wb').write(d)
             if xall: rmtree(td)
-        elif ex in ('.tgz','.tar.gz'):
+        elif ex in {'.tgz','.tar.gz'}:
             with tarfile.open(p,'r:gz') as z:
                 for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile(tx).read())
-        elif ex in ['.txz','.tar.xz']:
+        elif ex in {'.txz','.tar.xz'}:
             with tarfile.open(p,'r:xz') as z:
                 for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile(tx).read())
-        elif ex in ('.tzt','.tar.zst'):
+        elif ex in {'.tzt','.tar.zst'}:
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,p])
             with tarfile.open(td + '/' + os.listdir(td)[0],'r') as z:
                 for tx in xl: xopen(self.bin_path + xl[tx],'wb').write(z.extractfile(tx).read())
             rmtree(td)
-        elif ex in ('.7z','.arj','.zipx','nsis','.lha'):
+        elif ex in {'.7z','.arj','.zipx','nsis','.lha'}:
             td = gtmp()
             self.run(['7z','x','-y','-o' + td,'-aoa',p])
             for tx in xl: copy(td + '/' + tx,self.bin_path + xl[tx])

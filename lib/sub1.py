@@ -79,7 +79,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 db.print_try = opt
             if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in ('Z','xz','BZip2','LZIP'): return fix_tar(o)
+                elif t in {'Z','xz','BZip2','LZIP'}: return fix_tar(o)
                 else: return
         case 'ZSTD':
             if db.print_try: print('Trying with compression.zstd')
@@ -188,7 +188,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             td.destroy()
         case 'ISO'|'IMG'|'Floppy Image'|'UDF'|'DOS IMG'|'NTFS'|'Master Boot Record':
             _,e,_ = run(['aaru','filesystem','info',i],print_try=False)
-            iso_udf = t in ('ISO','UDF') and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e
+            iso_udf = t in {'ISO','UDF'} and 'As identified by ISO9660 Filesystem.' in e and 'Identified by 2 plugins' in e
 
             if not iso_udf and not extract1(i,o,'Aaru'): return
 
@@ -508,7 +508,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             for x in rldir(o):
                 if x in od: continue
                 xb = basename(x)
-                if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in (3,4,5) and xb.split('.')[1].isdigit():
+                if xb.startswith('output.') and len(xb.split('.')) > 2 and len(xb.split('.')[1]) in {3,4,5} and xb.split('.')[1].isdigit():
                     rn = xb.split('.',2)[2]
                     if rn == 'bin':
                         if '.' in i[-4:] and i[-1] == '_': mv(o + '/' + fs[0],o + '/' + basename(i[:-1]))
@@ -594,7 +594,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     try: inf = json.loads(run(['lsar','-json',i])[1].replace('\t',' ').replace('}\n  "lsarInnerFormatName"','},"lsarInnerFormatName"'))
                     except json.JSONDecodeError: pass
                     else:
-                        if inf['lsarEncoding'] not in ('macintosh','UTF-8'): cmd += ['-e','x-mac-japanese']
+                        if inf['lsarEncoding'] not in {'macintosh','UTF-8'}: cmd += ['-e','x-mac-japanese']
 
             run(cmd + ['-o',o,i])
             if listdir(o): return
@@ -646,7 +646,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 datal = int(l[1:1+2],16)
                 addr = int(l[3:3+4],16)
                 typ = int(l[7:7+2],16)
-                assert typ in (0,1),hex(datal)[2:].upper()
+                assert typ in {0,1},hex(typ)
 
                 if datal:
                     data = bytes.fromhex(l[9:9+2*datal])
@@ -662,6 +662,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 of = open(of + '.bin','wb')
                 for addr,data in fe:
                     if addr > of.seek(0,2): of.write(b'\xFF'*(addr-of.tell()))
+                    else: of.seek(addr)
                     of.write(data)
                 of.close()
             if fs: return
@@ -708,8 +709,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             from urllib.parse import unquote_to_bytes
             hd,d = readfile(i).split(b'\r\n\r\n',1)
-            hd = {x.split(b': ',1)[0].decode('latin-1'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
-            hds = {'$header':hd.split(b'\r\n')[0].decode('latin-1')} | {x:hd[x].decode('latin-1') for x in hd}
+            hd = {x.split(b': ',1)[0].decode('ansi'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
+            hds = {'$header':hd.split(b'\r\n')[0].decode('ansi')} | {x:hd[x].decode('ansi') for x in hd}
             hd = {x.lower():hd[x] for x in hd}
 
             of = o + '/'
@@ -721,7 +722,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fn[:1] == b'*':
                     enc,fn = fn[2:].strip().split(b"''",1)
                     fn = fn.strip().split()[0]
-                    of += unquote_to_bytes(fn).decode(enc.decode('latin-1'))
+                    of += unquote_to_bytes(fn).decode(enc.decode('ansi'))
                 else:
                     fn = fn[1:].strip()
                     if fn[:1] == b'"':
@@ -729,8 +730,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if b'; ' in fn and b'filename' in fn.lower() and b"''" in fn:
                             enc,fn = fn[2:].strip().split(b"''",1)
                             fn = fn.strip().split()[0]
-                            of += unquote_to_bytes(fn).decode(enc.decode('latin-1'))
-                        else: of += unquote_to_bytes(rfn).decode('latin-1')
+                            of += unquote_to_bytes(fn).decode(enc.decode('ansi'))
+                        else: of += unquote_to_bytes(rfn).decode('ansi')
             elif 'content-type' in hd: of += tbasename(i) + '.' + mime2ext(hd['content-type'])
             else: of += basename(i)
 
@@ -746,16 +747,16 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if l[0] != 'S': continue
                 l = l[1:].rstrip()
                 t = int(l[0])
-                if t in (4,5,6): continue
+                if t in {4,5,6}: continue
 
-                if t in (0,7,8,9): fs.append([])
-                if t in (0,1,2,3):
+                if t in {0,7,8,9}: fs.append([])
+                if t in {0,1,2,3}:
                     l = l[1:3+int(l[1:3],16)*2]
                     c,l = l[-2:],l[:-2]
                     if (0xFF - (sum(bytes.fromhex(l)) & 0xFF)) != int(c,16): print('Checksum error',l)
                     l = l[2:]
 
-                    if t in (0,1): a,l = l[:4],l[4:]
+                    if t in {0,1}: a,l = l[:4],l[4:]
                     elif t == 2: a,l = l[:6],l[6:]
                     elif t == 3: a,l = l[:8],l[8:]
 
@@ -774,6 +775,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 of = open(of + '.bin','wb')
                 for a,d in fe:
                     if a > of.seek(0,2): of.write(b'\xFF'*(a-of.tell()))
+                    of.seek(a)
                     of.write(d)
                 of.close()
             if fs: return
@@ -791,7 +793,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             while f:
                 fn = f.read(8)
                 if not fn[0]: break
-                if fn[0] in (5,0xE5): fn = fn[1:]
+                if fn[0] in {5,0xE5}: fn = fn[1:]
                 fn = fn.decode('ascii').rstrip()
                 ex = f.read(3).decode('ascii').rstrip()
                 if ex: fn += '.' + ex
@@ -845,6 +847,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'Web ARchive':
             if db.print_try: print('Trying with custom extractor')
+            import json
             from urllib.parse import unquote_to_bytes
             f = open(i,'rb')
 
@@ -860,7 +863,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 bfn = f'{o}/{hd["warc-type"]}/{tr[hd['warc-type']]}_'
                 if hd['warc-type'] == 'warcinfo':
                     json.dump(read_http_head(f.readline,int(hd['content-length']),idn=True),xopen(bfn + 'info.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
-                elif hd['warc-type'] in ('request','response'):
+                elif hd['warc-type'] in {'request','response'}:
                     p = int(hd['content-length'])
                     bp = f.tell()
                     gv = f.readline(p)
@@ -884,8 +887,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                                 if '; ' in rfn and 'filename' in rfn.lower() and "''" in rfn:
                                     enc,rfn = rfn[2:].strip().split("''",1)
                                     rfn = rfn.strip().split()[0]
-                                    fn = unquote_to_bytes(rfn).decode(enc.decode('latin-1'))
-                                else: fn = unquote_to_bytes(rfn).decode('latin-1')
+                                    fn = unquote_to_bytes(rfn).decode(enc.decode('ansi'))
+                                else: fn = unquote_to_bytes(rfn).decode('ansi')
                     elif 'content-type' in rhd: fn = 'content.' + mime2ext(rhd['content-type'])
                     else: fn = 'content.bin'
 
@@ -1034,12 +1037,12 @@ def read_http_head(readline,max:int=None,idn=False):
         if not l: break
         if idn and l[0] == 0x20:
             try: lr = l.decode('utf-8');assert lr.isprintable()
-            except: lr = l.decode('latin-1')
+            except: lr = l.decode('ansi')
             o[list(o)[-1]] += lr
             continue
         l = l.lstrip()
         if not l: break
         try: lr = l.decode('utf-8');assert lr.isprintable()
-        except: lr = l.decode('latin-1')
+        except: lr = l.decode('ansi')
         o[lr.split(': ',1)[0]] = lr.split(': ',1)[1]
     return o

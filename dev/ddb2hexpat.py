@@ -34,11 +34,11 @@ for x,i in enumerate(inp):
         o += f'\tchar {i[0]}_{x}[{len(rv)}]{coff(i[2],len(rv))}; // {i[1]}\n'
     elif i[0] == 'str':
         o += f'\tchar {i[0]}_{x}[{i[2]}]{coff(i[1],i[2])};\n'
-    elif i[0] in ('str0','str0e','str0nv'):
+    elif i[0] in {'str0','str0e','str0nv'}:
         o += f'\tchar {i[0]}_{x}[{i[2]}]{coff(i[1],i[2])}; {i[3]}\n'
     elif i[0] == 'n0':
         o += '\tu'
-        if i[1] in (1,2,3,4,6,8,12,16): o += f'{i[1]*8} {i[0]}_{x}'
+        if i[1] in {1,2,3,4,6,8,12,16}: o += f'{i[1]*8} {i[0]}_{x}'
         else: o += f'8 {i[0]}_{x}[{i[1]}]'
         o += f'{coff(i[2],i[1])}\n'
     elif i[0] == 'py':

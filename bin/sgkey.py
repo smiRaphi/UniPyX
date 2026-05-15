@@ -90,7 +90,7 @@ def makedb():
 
     o = open(__db__,'wb')
     for t,tid,key in re.findall(r'<tr>\n<td>[^<]+</td>\n<td>[^<]*</td>\n<td>([^<]+)</td>\n(?:<td>.*</td>\n){8}<td>([A-Z\d]+\-[A-Z\d]+)</td>\n(?:<td>.*</td>\n){14}<td>(?:0x)?([A-Fa-f\d]{16}|[A-Fa-f\d]{8})</td>\n',httpx.get('https://www.citylan.it/index.php/Naomi_-_Chihiro_-_Triforce').text):
-        if len(key) not in (8,16): continue
+        if len(key) not in {8,16}: continue
         if not t in TL:
             print(t,tid,'TL')
             continue
@@ -109,7 +109,7 @@ def makedb():
             o.write(tidn.encode('ascii'))
         else:
             if tbn in TID1: tidn = tidn[1:]
-            assert len(tidn) in (4,5),tid
+            assert len(tidn) in {4,5},tid
             o.write(bytes([tidb | (0x80 if len(tidn) == 5 else 0)]))
             if tbn in TIDB: o.write(int(tidn[:4]).to_bytes(2,'big'))
             else:

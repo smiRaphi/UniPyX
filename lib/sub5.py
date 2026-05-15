@@ -437,7 +437,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if not exists(scr): raise NotImplementedError(v)
             of = o + '/' + tbasename(i)
             if db.print_try: print('Trying with','ligru-compress_v' + v)
-            run([scr,'-d'] + (['-cuda'] if v not in ('0.91','0.90') else []) + [i,of],print_try=False)
+            run([scr,'-d'] + (['-cuda'] if v not in {'0.91','0.90'} else []) + [i,of],print_try=False)
             if exists(of) and getsize(of): return
         case '6pack':
             run(['6unpack',i],cwd=o)
@@ -509,7 +509,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             v = f.read(1).decode('ascii').strip()
             f.close()
 
-            scr = db.get('paq8k' + v + ('_lp2' if v in ('','2') else ''))
+            scr = db.get('paq8k' + v + ('_lp2' if v in {'','2'} else ''))
             if not exists(scr): raise NotImplementedError(v)
 
             run([scr,'-d',i,o])
@@ -547,7 +547,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             f.seek(5)
             v = f.read(3).split(b' ')[0].decode('ascii')
             f.close()
-            if v in ('','1'): v = '2'
+            if v in {'','1'}: v = '2'
             elif v == '10t': v = '10tlp2'
 
             scr = db.get('paq8o' + v)

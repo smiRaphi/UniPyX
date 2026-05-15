@@ -30,6 +30,7 @@ class File:
 
         self._start_pos = self._f.tell()
         self._size = self.seek(0,2)
+        self._end_pos = None
         self.seek(0)
 
     def read(self,n:int=None) -> bytes: return self._f.read(n)
@@ -40,7 +41,9 @@ class File:
             n += self.size
         return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
     def tell(self) -> int: return self._f.tell() - self._start_pos
-    def close(self): self._f.close()
+    def close(self):
+        self._end_pos = self.pos
+        self._f.close()
 
     def skip(self,n:int): return self.seek(n,1)
     def back(self,n:int): return self.skip(-n)
@@ -192,6 +195,8 @@ class File:
     def pos(self): return self.tell()
     @property
     def size(self): return self._size
+    @property
+    def closed(self) -> bool: return self._f.closed
 
     def update_size(self,current=True):
         if current: self._size = self.tell()
@@ -200,7 +205,11 @@ class File:
             self._size = self.seek(0,2)
             self.seek(p)
     def __len__(self): return self.size
-    def __bool__(self): return self.pos < self.size
+    def __bool__(self):
+        if self.closed:
+            if not self._end_pos is None: return self._end_pos < self.size
+            return False
+        return self.pos < self.size
 class BitReader:
     def __init__(self,d:bytes):
         self.d = d
@@ -384,8 +393,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                     UCL.InitUCL.restype = ctypes.c_int
 
                     for a in 'BDE':
-                        for f in ('','_Safe'):
-                            for s in ('8','LE16','LE32'):
+                        for f in {'','_Safe'}:
+                            for s in {'8','LE16','LE32'}:
                                 fn = getattr(UCL,f'DecompressNRV2{a}{f}_{s}')
                                 fn.argtypes = [ctypes.POINTER(ctypes.c_ubyte),ctypes.c_uint,ctypes.POINTER(ctypes.c_ubyte),ctypes.POINTER(ctypes.c_uint)]
                                 fn.restype = ctypes.c_int
@@ -527,7 +536,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
             return getattr(crunch64,algo).decompress(i)
-        case 'ash0': return ash0_decompress(i)
+        case 'ash0': return uxx().decompress_ash0(i)
 
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
             assert 'usize' in kwargs and (OODLE or kwargs.get('db'))
@@ -725,7 +734,7 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
             nxt = 0x100
 
     c = get_nxt()
-    if c in (None,eof): return b''
+    if c in {None,eof}: return b''
 
     o = []
     seq = dic[c]
@@ -756,59 +765,6 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
         prev_seq = seq
 
     return b"".join(o)
-def ash0_decompress(i:bytes):
-    if len(i) < 12 or i[:4] != b'ASH0': return b''
-    decomp_size = int.from_bytes(i[5:8],'big')
-    sym_offset = int.from_bytes(i[8:12],'big')
-    if sym_offset >= len(i): return b''
-
-    out = bytearray(decomp_size)
-    out_pos = 0
-    dist_reader = BitReader(i[sym_offset:])
-    sym_reader = BitReader(i[12:])
-
-    def read_tree(reader, width, max_nodes):
-        nodes = [(0,0)] * (max_nodes * 2)
-        root = 0
-        node_count = 1
-        stack = []
-        while True:
-            if reader.get_bit():
-                nodes[root] = (node_count, node_count + 1)
-                stack.append(node_count + 1)
-                root = node_count
-                node_count += 2
-            else:
-                nodes[root] = (reader.get_bits(width), None)
-                if not stack: break
-                root = stack.pop()
-        return nodes
-
-    try:
-        sym_tree = read_tree(sym_reader,9,1 << 9)
-        dist_tree = read_tree(dist_reader,11,1 << 11)
-    except: return b''
-
-    def get_huffman_code(reader,tree):
-        node = tree[0]
-        while node[1] is not None: node = tree[node[reader.get_bit() or 0]] 
-        return node[0]
-
-    while out_pos < decomp_size:
-        try:
-            sym = get_huffman_code(sym_reader,sym_tree)
-            if sym < 0x100: out[out_pos] = sym;out_pos += 1
-            else:
-                length = sym - 0x100 + 3
-                dist = get_huffman_code(dist_reader,dist_tree) + 1
-                copy_pos = out_pos - dist
-                for _ in range(length):
-                    if out_pos >= decomp_size: break
-                    out[out_pos] = out[copy_pos];out_pos += 1
-                    copy_pos += 1
-        except: break
-
-    return bytes(out)
 class AnacondaDecoder:
     def __init__(self,d:bytes):
         self.d = d

@@ -122,7 +122,7 @@ def extract4_3(inp:str,out:str,t:str):
                 elif not d: assert us == 0,ix
                 elif us != zs and d[:8] == b'\x00\xE9UCL\xFF\x01\x1A': pcs.append(p.apply_async(decc,(ix,us,d,'uclpack_itc')))
                 else:
-                    assert us in (0,zs),ix
+                    assert us in {0,zs},ix
                     pcs.append(p.apply_async(decc,(ix,us,d,'none')))
             for pc in pcs: pc.get()
             p.close()
@@ -384,7 +384,7 @@ def extract4_3(inp:str,out:str,t:str):
             s = f.readu32()
             ds = f.readu32()
 
-            if ct in (0x101,0x102): d = decompress(f.read(s),{0x101:'lzo1x',0x102:'lzo1y'}[ct],usize=ds,db=db)
+            if ct in {0x101,0x102}: d = decompress(f.read(s),{0x101:'lzo1x',0x102:'lzo1y'}[ct],usize=ds,db=db)
             else: raise NotImplementedError(hex(ct))
             f.close()
 
@@ -459,7 +459,7 @@ def extract4_3(inp:str,out:str,t:str):
             cs = {}
             while f:
                 p = f.pos
-                n = f.read(4).decode('latin-1')
+                n = f.read(4).decode('ansi')
                 if n == '\0\0\0\0': break
                 ep = f.readu32() + p
                 f.skip(8)
