@@ -2336,13 +2336,13 @@
     },
     {
         "rq":null,
-        "d":[["size",[11,62914560]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');return int.from_bytes(f.read(4),'little')>c and c in{f.seek(0,2),f.seek(0,2)-8}"]],
-        "rs":"Amusement Vision LZ"
+        "rqr":[".NET Framework","MS Visual C# / Basic.NET","NET executable","Microsoft Visual Studio NET",true],
+        "rs":".NET Executable"
     },
     {
         "rq":null,
-        "d":[["ext",[".gcz",".exe"]],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');v1=f.read(1)[0];s=f.seek(0,2);f.seek(-1,1);return v1&3==3 and u>s and f.read(1)[0]!=255"]],
-        "rs":"Konami FireBeat LZSS"
+        "d":[["size",[11,62914560]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');return int.from_bytes(f.read(4),'little')>c and c in{f.seek(0,2),f.seek(0,2)-8}"]],
+        "rs":"Amusement Vision LZ"
     },
     {
         "d":[["isin",["\\0\\0","\\0\\1","\\0\\4"],0],["n0",2,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(34);b=f.read(2);return s in{int.from_bytes(b,'little'),int.from_bytes(b,'big')}"]],
@@ -2353,11 +2353,6 @@
         "rs":"HTTP Response"
     },
     {
-        "d":[["isat","\\0\\0\\0\\0",256],
-             ["str0",0,256,2]],
-        "rs":"BBC Micro SSD"
-    },
-    {
         "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');s+=o;f.seek(o);return b'\\xA1'*4==f.read(4)and(s+-s%2048)==f.seek(0,2)"]],
         "rs":"Action Replay RAM Disk","s":1
     },
@@ -2365,11 +2360,6 @@
         "d":[["s%",2048],["ext",".dat"],["isat","MCicon\\0\\0",0],
              ["py","for n in('SLUS_201.73','SLPS_250.10','UNISON.ELF'):\n if exists(dirname(inp)+'/'+n):return True"]],
         "rs":"Unison DAT","s":1
-    },
-    {
-        "d":[["s%",2048],["ext",".dat"],
-             ["py","import re;d=dirname(inp)\nfor _ in range(3):\n\tif exists(d+'/SYSTEM.CNF'):break\n\td=dirname(d)\nelse:return False\nmf=re.search(r'cdrom0:\\\\(.+);\\d+\\n',readfile(d+'/SYSTEM.CNF','r'))[1]\nreturn exists(d+'/'+mf)"]],
-        "rs":"DDR DAT"
     },
     {
         "d":[["s%",2048],["size",[145408,null]],["isatS","\\xE0",356,143004],["isatS","\\0",22,142982],["isin",["\\1\\0","\\0\\0"],24],["n0",4,0],["n0",4,16],["str0",4,12,6],["py","f=open(inp,'rb');return int.from_bytes(f.read(4),'little')<=6500"]],
@@ -2382,6 +2372,21 @@
     {
         "d":[["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+4;return s==f.seek(0,2)"]],
         "rs":"Metroid Samus Returns PKG"
+    },
+    {
+        "d":[["isat","\\0\\0\\0\\0",256],
+             ["str0",0,256,2]],
+        "rs":"BBC Micro SSD"
+    },
+    {
+        "d":[["s%",2048],["ext",".dat"],
+             ["py","import re;d=dirname(inp)\nfor _ in range(3):\n\tif exists(d+'/SYSTEM.CNF'):break\n\td=dirname(d)\nelse:return False\nmf=re.search(r'cdrom0:\\\\(.+);\\d+\\n',readfile(d+'/SYSTEM.CNF','r'))[1]\nreturn exists(d+'/'+mf)"]],
+        "rs":"DDR DAT"
+    },
+    {
+        "rq":null,
+        "d":[["ext",[".gcz",".exe"]],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');v1=f.read(1)[0];s=f.seek(0,2);f.seek(-1,1);return v1&3==3 and u>s and f.read(1)[0]!=255"]],
+        "rs":"Konami FireBeat LZSS"
     },
     {
         "rqr":null,

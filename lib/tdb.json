@@ -1603,5 +1603,8 @@
     ],
     "Diff Patch":[
         "diff output text"
+    ],
+    "Microsoft .NET ResX":[
+        "microsoft .net xml resource template (utf-8)"
     ]
 }

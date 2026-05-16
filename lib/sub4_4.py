@@ -1485,7 +1485,6 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fes: return
-                
         case 'TREVA SDPC':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
@@ -1815,5 +1814,20 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if not f: return
+        case 'Microsoft .NET ResX':
+            if db.print_try: print('Trying with custom extractor')
+            import base64
+            import xml.etree.ElementTree as ET
+
+            tr = ET.parse(i)
+            for r in tr.getroot().iter('data'):
+                n,ty = r.get('name'),r.get('mimetype')
+                d = r.find('value').text 
+                if ty == 'application/x-microsoft.net.object.binary.base64': d,ex = base64.b64decode(d),'net.bin'
+                else: d,ex = d.encode('utf-8'),mime2ext(ty)
+                writefile(o + '/' + n + '.' + ex,d)
+
+            del tr
+            if listdir(o): return
 
     return 1

@@ -1690,5 +1690,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             del f
             if listdir(o): return
+        case '.NET Executable':
+            if db.print_try: print('Trying with ilspycmd')
+            run(['dotnet',db.get('ilspycmd'),'--disable-updatecheck','--nested-directories','-p','-o',o,i],getexe=False,print_try=False)
+            if listdir(o): return
 
     return 1

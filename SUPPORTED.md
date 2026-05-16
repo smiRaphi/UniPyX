@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 947
+# Supported Formats: 949
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -224,7 +224,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (122)
+## Executables/Packers/Installers (123)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Packer 1 | .exe | Custom |
@@ -351,10 +351,11 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (488)
+## Various (489)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
+.NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
 @N-Factory DAT | .dat | Custom |
 0Size24 Data | * | Custom |
 10,000 Bullets FILE.BIN | .bin | Custom |
@@ -612,6 +613,7 @@ Metroid Samus Returns PKG | .pkg | [metroid_sr_3ds.bms](https://mirror.aluigi.or
 Metropolis Software ZAP | .zap | Custom |
 Michigan: Report From Hell BIN | .bin | Custom |
 Michigan: Report From Hell LF | .lf | Custom |
+Microsoft .NET ResX | .resx | Custom |
 Minecraft PCK | .pck | [minecraft_pck.bms](https://mirror.aluigi.org/bms/minecraft_x360_pck.bms) |
 Mini Metro Sound Bytes | .bytes | Custom |
 MINICAT | .cat | Custom |

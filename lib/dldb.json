@@ -5735,6 +5735,36 @@
     "yaml":{
         "pip":"PyYAML"
     },
+    "ilspycmd":{
+        "p":"ilspycmd/ilspycmd.dll",
+        "fs":[{
+            "u":"https://globalcdn.nuget.org/packages/ilspycmd.10.0.1.8346.nupkg?packageVersion=10.0.1.8346",
+            "x":{
+                "tools/net10.0/any/ilspycmd.dll":"ilspycmd/ilspycmd.dll",
+                "tools/net10.0/any/ilspycmd.runtimeconfig.json":"ilspycmd/ilspycmd.runtimeconfig.json",
+                "tools/net10.0/any/ICSharpCode.Decompiler.dll":"ilspycmd/ICSharpCode.Decompiler.dll",
+                "tools/net10.0/any/McMaster.Extensions.Hosting.CommandLine.dll":"ilspycmd/McMaster.Extensions.Hosting.CommandLine.dll",
+                "tools/net10.0/any/McMaster.Extensions.CommandLineUtils.dll":"ilspycmd/McMaster.Extensions.CommandLineUtils.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Hosting.dll":"ilspycmd/Microsoft.Extensions.Hosting.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Hosting.Abstractions.dll":"ilspycmd/Microsoft.Extensions.Hosting.Abstractions.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Configuration.Abstractions.dll":"ilspycmd/Microsoft.Extensions.Configuration.Abstractions.dll",
+                "tools/net10.0/any/Microsoft.Extensions.DependencyInjection.Abstractions.dll":"ilspycmd/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+                "tools/net10.0/any/Microsoft.Extensions.DependencyInjection.dll":"ilspycmd/Microsoft.Extensions.DependencyInjection.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Configuration.dll":"ilspycmd/Microsoft.Extensions.Configuration.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Primitives.dll":"ilspycmd/Microsoft.Extensions.Primitives.dll",
+                "tools/net10.0/any/Microsoft.Extensions.FileProviders.Abstractions.dll":"ilspycmd/Microsoft.Extensions.FileProviders.Abstractions.dll",
+                "tools/net10.0/any/Microsoft.Extensions.FileProviders.Physical.dll":"ilspycmd/Microsoft.Extensions.FileProviders.Physical.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Configuration.FileExtensions.dll":"ilspycmd/Microsoft.Extensions.Configuration.FileExtensions.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Options.dll":"ilspycmd/Microsoft.Extensions.Options.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Logging.dll":"ilspycmd/Microsoft.Extensions.Logging.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Diagnostics.dll":"ilspycmd/Microsoft.Extensions.Diagnostics.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Logging.Abstractions.dll":"ilspycmd/Microsoft.Extensions.Logging.Abstractions.dll",
+                "tools/net10.0/any/Microsoft.Extensions.Diagnostics.Abstractions.dll":"ilspycmd/Microsoft.Extensions.Diagnostics.Abstractions.dll",
+                "tools/net10.0/any/NuGet.Versioning.dll":"ilspycmd/NuGet.Versioning.dll",
+                "tools/net10.0/any/ICSharpCode.ILSpyX.dll":"ilspycmd/ICSharpCode.ILSpyX.dll"
+            }
+        }]
+    },
     "ffdec":{
         "p":"jpexs/ffdec.jar",
         "fs":[{
