@@ -1409,35 +1409,83 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if fns and fs: return
         case 'Wizards of a Waverly Place XPF':
-            raise NotImplementedError
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
             assert f.readu32() == 0xBADBEEF1
 
-            dc = f.readu8()
-            ds = []
-            for _ in range(dc):
-                fn = f.readutf16(f.readu16())
-                ds.append((fn,f.readu32()))
-                f.padc(4)
+            vc = f.readu8()
+            vs = {}
+            for _ in range(vc):
+                n = f.readutf16(f.readu16())
+                vs[n] = f.readu32()
+                assert f.readu32() in {0,1},f.pos - 4
+            assert 'Engine' in vs
+
+            of = open(f'{o}/$header.txt','w',encoding='utf-8')
+            for k,v in vs.items(): of.write(f'{k}: {v}\n')
+            of.close()
+
+            v = vs['Engine']
             bp = f.pos
+            if v >= 0x10: f.skip(4)
+            nc = f.readu16()
+            ns = {}
+            if v >= 0x10:
+                for _ in range(nc):
+                    id = f.readu16()
+                    assert f.readu32().bit_count() == 1,f.pos - 4
+                    ns[id] = f.readutf16(f.readu16())
 
-            fnc = f.readu16()
-            fns = {}
-            for _ in range(fnc):
-                id = f.readu16()
-                fns[id] = f.readutf16(f.readu16())
+                if v >= 0x20:
+                    fec = f.readu16()
+                    feo = f.pos
+                    f.skip(fec * 8)
+                    oc = f.readu16()
+                    oo = f.pos
+                else:
+                    fec = f.readu16()
+                    oc = f.readu16()
+                    oo = f.pos
+                    xc = 6
+                    feo = oo + oc * (4+xc)
 
-            fc = f.readu16()
-            ids = [f.readu16() for _ in range(fc)]
-            fs = [(f.reads16(),f.reads16(),f.readu32() + bp) for _ in range(fc)]
-            fs.sort(key=lambda x:x[2])
-            fs.append((0,0,f.size))
+                f.seek(feo)
+                fes = [(ix,f.readu16(),f.reads16(),f.readu32() + bp) for ix in range(fec)]
+                fo = min([x[3] for x in fes])
 
-            for ix in range(fc):
-                f.seek(fs[ix][2])
-                writefile(o + '/' + fns[ix],)
+                f.seek(oo)
+                if v >= 0x20:
+                    xc = fo - f.pos
+                    assert not xc % 2 and not xc % oc
+                    xc = xc//oc - 4
+
+                ordr = {}
+                for _ in range(oc):
+                    nid = f.readu16()
+                    ordr[f.readu16()] = oc + 12 + nid
+                    f.skip(xc)
+            else:
+                for _ in range(nc):
+                    id = f.readu16()
+                    ns[id] = f.readutf16(f.readu16())
+
+                fc = f.readu16()
+                ordr = [fc + f.readu16() for _ in range(fc)]
+                fes = [(ix,f.readu16(),f.reads16(),f.readu32() + bp) for ix in range(fc)]
+
+            fes.sort(key=lambda x:x[3])
+            fes.append((0,0,0,f.size))
+            for ix in range(len(fes)-1):
+                fe = fes[ix]
+                f.seek(fe[3])
+                assert fe[2] <= 0,f'{fe} {f.read(4)}'
+                d = f.decompress(fes[ix+1][3] - fe[3],'lz11' if fe[2] < 0 else 'none')
+                writefile(f'{o}/{fe[0]:03d}.{guess_ext_nds(d)}',d)
+
+            f.close()
+            if fes: return
+                
         case 'TREVA SDPC':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 946
+# Supported Formats: 947
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -351,7 +351,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (487)
+## Various (488)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -824,6 +824,7 @@ WATCOM Archive | ??? | [WPACK](https://discmaster.textfiles.com/file/227/Gamers%
 WayForward PAK | .pak | Custom |
 Wii Exported Save Data | .bin | Custom |
 WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
+Wizards of a Waverly Place XPF | .xpf | Custom | no file names :c
 X-Files Resources | ??? | Custom |
 Xbox FArc | .fa | Custom |
 Xbox XB Compressed | .xb * | xbdecompress |

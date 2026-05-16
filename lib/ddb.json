@@ -1375,7 +1375,7 @@
         "rs":"WWE Raw XPK+D.BIN+F.BIN"
     },
     {
-        "d":[["isat","\\xF1\\xEE\\xDB\\xBA",0],["n0",1,4],["n0",2,5],["py","f=open(inp,'rb');f.seek(4);c=f.read(1)[0]\nfor _ in range(c):\n f.seek(int.from_bytes(f.read(2),'little')*2,1)\n if not sum(f.read(4))or sum(f.read(4)):return\nreturn True"]],
+        "d":[["isat","\\xF1\\xEE\\xDB\\xBA",0],["isat","\\x06\\0E\\0n\\0g\\0i\\0n\\0e\\0",5],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],23],["n0",1,4],["n0",4,19]],
         "rs":"Wizards of a Waverly Place XPF","s":1
     },
     {
