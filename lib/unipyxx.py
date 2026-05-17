@@ -39,8 +39,9 @@ if __name__ == '__main__': sys.exit(compile())
 
 import ctypes
 u8 = ctypes.c_uint8
+s8 = ctypes.c_int8
 u32 = ctypes.c_uint32
-s32 = ctypes.c_int
+u64 = ctypes.c_uint64
 szt = ctypes.c_size_t
 sszt = ctypes.c_ssize_t
 void = ctypes.c_void_p
@@ -65,6 +66,9 @@ def _3base_func(fnc,src):
 def _4base_func(fnc,src):
     i = (u8 * len(src)).from_buffer_copy(src)
     return int(fnc(i,len(src)))
+def _5base_func(fnc,src,seed):
+    i = (u8 * len(src)).from_buffer_copy(src)
+    return int(fnc(i,len(src),seed))
 
 class X:
     MMFS = {};SELENE = {}
@@ -80,15 +84,15 @@ class X:
 
         self.dll = ctypes.CDLL(DLLP)
         for e in (
-            ('decompress_lz10_raw',(P(u8),szt,P(u8),sszt),    sszt,1),
-            ('decompress_lz11_raw',(P(u8),szt,P(u8),sszt),    sszt,1),
-            ('decompress_lz40_raw',(P(u8),szt,P(u8),sszt),    sszt,1),
-            ('decompress_blz_raw', (P(u8),szt,P(u8),sszt),    sszt,0),
-            ('decompress_lz4_fast',(P(u8),szt,P(u8),sszt),    sszt,1),
-            ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),    sszt,1),
-            ('decompress_huffman', (P(u8),szt,P(u8),sszt,s32),sszt,0),
-            ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),    sszt,1),
-            ('decompress_ash0',    (P(u8),szt,P(u8)),         sszt,0),
+            ('decompress_lz10_raw',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lz11_raw',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lz40_raw',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_blz_raw', (P(u8),szt,P(u8),sszt),   sszt,0),
+            ('decompress_lz4_fast',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_huffman', (P(u8),szt,P(u8),sszt,s8),sszt,0),
+            ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_ash0',    (P(u8),szt,P(u8)),        sszt,0),
 
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
@@ -98,7 +102,7 @@ class X:
             ('decrypt_rxor' ,(P(u8),szt,P(u8),u8),void,0),
             ('decrypt_cxor' ,(P(u8),szt,P(u8),P(u8),szt),void,0),
             ('decrypt_dxor' ,(P(u8),szt,P(u8),P(u8),szt,P(u8),szt),void,0),
-            ('decrypt_tea'  ,(P(u8),szt,P(u8),P(u8),s32),void,0),
+            ('decrypt_tea'  ,(P(u8),szt,P(u8),P(u8),s8),void,0),
             ('decrypt_hatch',(P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_hornby',(P(u8),szt,u8,u8),void,0),
             ('init_mmfs',(P(u8),P(u8)),void,0),
@@ -106,6 +110,18 @@ class X:
             ('init_selene',(P(u8),P(u8),szt,u32),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
+            ('hash_super_fast_le',(P(u8),szt),u32,4),
+            ('hash_super_fast_be',(P(u8),szt),u32,4),
+            ('hash_elf',(P(u8),szt),u32,4),
+            ('hash_ap',(P(u8),szt),u32,4),
+            ('hash_murmur2_le',(P(u8),szt,u32),u32,5),
+            ('hash_murmur2_be',(P(u8),szt,u32),u32,5),
+            ('hash_murmur2A_le',(P(u8),szt,u32),u32,5),
+            ('hash_murmur2A_be',(P(u8),szt,u32),u32,5),
+            ('hash_murmur2_64A_le',(P(u8),szt,u32),u64,5),
+            ('hash_murmur2_64A_be',(P(u8),szt,u32),u64,5),
+            ('hash_murmur2_64B_le',(P(u8),szt,u32),u64,5),
+            ('hash_murmur2_64B_be',(P(u8),szt,u32),u64,5),
         ):
             fnc = self.dll[e[0]]
             fnc.argtypes = e[1]
@@ -120,6 +136,8 @@ class X:
                     def wrapper(src,_f=fnc): return _3base_func(_f,src)
                 elif e[3] == 4:
                     def wrapper(src,_f=fnc): return _4base_func(_f,src)
+                elif e[3] == 5:
+                    def wrapper(src,seed,_f=fnc): return _5base_func(_f,src,seed)
                 setattr(self,e[0],wrapper)
 
     def decompress_lz10_raw(src:bytes,usize:int) -> bytes: ...
@@ -233,6 +251,19 @@ class X:
         return bytes(o)
 
     def hash_pivotal(self,src:bytes) -> int: ...
+    def hash_super_fast_le(self,src:bytes) -> int: ...
+    def hash_super_fast_be(self,src:bytes) -> int: ...
+    def hash_elf(self,src:bytes) -> int: ...
+    def hash_ap(self,src:bytes) -> int: ...
+    def hash_murmur2_le(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2_be(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2A_le(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2A_be(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2_64A_le(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2_64A_be(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2_64B_le(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2_64B_be(self,src:bytes,seed:int) -> int: ...
+
 '''*/
 
 #include <stdint.h>
@@ -278,6 +309,62 @@ extern "C" {
         return ((x & 0xFF) << 24 | (x & 0xFF00) << 8 | (x & 0xFF0000) >> 8 | (x & 0xFF000000) >> 24);
     }
 #endif
+
+static inline uint16_t read16le(const uint8_t *restrict ptr) {
+    return ptr[0] | (ptr[1] << 8);
+}
+static inline uint16_t read16be(const uint8_t *restrict ptr) {
+    return ptr[1] | (ptr[0] << 8);
+}
+static inline uint32_t read32le(const uint8_t *restrict ptr) {
+    return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16) | ((uint32_t)ptr[3] << 24);
+}
+static inline uint32_t read32be(const uint8_t *restrict ptr) {
+    return ptr[3] | (ptr[2] << 8) | (ptr[1] << 16) | ((uint32_t)ptr[0] << 24);
+}
+static inline uint64_t read64le(const uint8_t *restrict ptr) {
+    return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16) | ((uint64_t)ptr[3] << 24) | ((uint64_t)ptr[4] << 32) | ((uint64_t)ptr[5] << 40) | ((uint64_t)ptr[6] << 48) | ((uint64_t)ptr[7] << 56);
+}
+static inline uint64_t read64be(const uint8_t *restrict ptr) {
+    return ptr[7] | (ptr[6] << 8) | (ptr[5] << 16) | ((uint64_t)ptr[4] << 24) | ((uint64_t)ptr[3] << 32) | ((uint64_t)ptr[2] << 40) | ((uint64_t)ptr[1] << 48) | ((uint64_t)ptr[0] << 56);
+}
+
+typedef struct {
+    const uint8_t* ptr;
+    const uint8_t* end;
+    uint8_t buf;
+    uint8_t bits;
+} BitReader;
+static inline void init_BitReader(BitReader *br, const uint8_t *ptr, const size_t size) {
+    br->ptr = ptr;
+    br->end = ptr + size;
+    br->buf = 0;
+    br->bits = 0;
+}
+static inline uint8_t get_bit(BitReader *br) {
+    if (!br->bits) {
+        if (br->ptr >= br->end) return 0;
+        br->buf = *(br->ptr++);
+        br->bits = 8;
+    }
+    br->bits--;
+    return (br->buf >> br->bits) & 1;
+}
+static inline uint32_t get_bits(BitReader *br, size_t n) {
+    uint32_t v = 0;
+    while (n > 0) {
+        if (!br->bits) {
+            if (br->ptr >= br->end) return v << n;
+            br->buf = *(br->ptr++);
+            br->bits = 8;
+        }
+        int s = (n < br->bits) ? n : br->bits;
+        v = (v << s) | ((br->buf >> (br->bits - s)) & ((1 << s) - 1));
+        br->bits -= s;
+        n -= s;
+    }
+    return v;
+}
 
 #define MT_N 624
 #define MT_M 397
@@ -328,43 +415,6 @@ int32_t MT19937_rand(MT19937 *restrict ctx) {
     y ^= (int32_t)(((uint32_t)y << 15) & ctx->TEMPERING_MASK_C);
     y ^= y >> 18;
     return y;
-}
-
-typedef struct {
-    const uint8_t* ptr;
-    const uint8_t* end;
-    uint8_t buf;
-    uint8_t bits;
-} BitReader;
-static inline void init_BitReader(BitReader *br, const uint8_t *ptr, const size_t size) {
-    br->ptr = ptr;
-    br->end = ptr + size;
-    br->buf = 0;
-    br->bits = 0;
-}
-static inline uint8_t get_bit(BitReader *br) {
-    if (!br->bits) {
-        if (br->ptr >= br->end) return 0;
-        br->buf = *(br->ptr++);
-        br->bits = 8;
-    }
-    br->bits--;
-    return (br->buf >> br->bits) & 1;
-}
-static inline uint32_t get_bits(BitReader *br, size_t n) {
-    uint32_t v = 0;
-    while (n > 0) {
-        if (!br->bits) {
-            if (br->ptr >= br->end) return v << n;
-            br->buf = *(br->ptr++);
-            br->bits = 8;
-        }
-        int s = (n < br->bits) ? n : br->bits;
-        v = (v << s) | ((br->buf >> (br->bits - s)) & ((1 << s) - 1));
-        br->bits -= s;
-        n -= s;
-    }
-    return v;
 }
 
 typedef struct {
@@ -782,7 +832,7 @@ eof:
     return op;
 }
 EXPORT ssize_t decompress_huffman(const uint8_t *restrict src, const size_t zsize,
-                                        uint8_t *restrict dst, const ssize_t usize, const int padding) {
+                                        uint8_t *restrict dst, const ssize_t usize, const int8_t padding) {
     BitReader br;
     init_BitReader(&br, src, zsize);
     HuffNode tree[512];
@@ -889,7 +939,7 @@ EXPORT void decrypt_dxor(const uint8_t *restrict src,  const size_t size, uint8_
     }
 }
 EXPORT void decrypt_tea(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
-                              uint8_t *restrict key, const int le) {
+                              uint8_t *restrict key, const int8_t le) {
     uint32_t *k = (uint32_t *)key;
     const uint32_t *inp = (uint32_t *)src;
     uint32_t *out = (uint32_t *)dst;
@@ -1009,6 +1059,367 @@ EXPORT uint32_t hash_pivotal(const uint8_t *restrict src, const size_t size) {
     }
 
     return h;
+}
+EXPORT uint32_t hash_super_fast_le(const uint8_t *restrict src, const size_t size) {
+    if (size == 0) return 0;
+
+    uint32_t h = (uint32_t)size;
+    uint8_t rem = size & 3;
+    size_t len = size >> 2;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        h += read16le(s);s+=2;
+        h = (h << 16) ^ ((read16le(s) << 11) ^ h);s+=2;
+        h += h >> 11;
+    }
+
+    switch (rem) {
+        case 3:
+            h += read16le(s);s+=2;
+            h ^= (h << 16) ^ ((uint32_t)(int8_t)s[0] << 18);
+            h += h >> 11;
+            break;
+        case 2:
+            h += read16le(s);s+=2;
+            h ^= h << 11;
+            h += h >> 17;
+            break;
+        case 1:
+            h += (uint32_t)(int8_t)s[0];
+            h ^= h << 10;
+            h += h >> 1;
+            break;
+    }
+
+    h ^= h << 3;
+    h += h >> 5;
+    h ^= h << 4;
+    h += h >> 17;
+    h ^= h << 25;
+    h += h >> 6;
+
+    return h;
+}
+EXPORT uint32_t hash_super_fast_be(const uint8_t *restrict src, const size_t size) {
+    if (size == 0) return 0;
+
+    uint32_t h = (uint32_t)size;
+    uint8_t rem = size & 3;
+    size_t len = size >> 2;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        h += read16be(s);s+=2;
+        h = (h << 16) ^ ((read16be(s) << 11) ^ h);s+=2;
+        h += h >> 11;
+    }
+
+    switch (rem) {
+        case 3:
+            h += read16be(s);s+=2;
+            h ^= (h << 16) ^ ((uint32_t)(int8_t)s[0] << 18);
+            h += h >> 11;
+            break;
+        case 2:
+            h += read16be(s);s+=2;
+            h ^= h << 11;
+            h += h >> 17;
+            break;
+        case 1:
+            h += (uint32_t)(int8_t)s[0];
+            h ^= h << 10;
+            h += h >> 1;
+            break;
+    }
+
+    h ^= h << 3;
+    h += h >> 5;
+    h ^= h << 4;
+    h += h >> 17;
+    h ^= h << 25;
+    h += h >> 6;
+
+    return h;
+}
+EXPORT uint32_t hash_elf(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = 0;
+    uint32_t hi;
+    for (size_t p=0;p < size;p++) {
+        h = (h << 4) + src[p];
+        if (hi = h & 0xf0000000)
+            h ^= hi >> 24;
+        h &= ~hi;
+    }
+    return h;
+}
+EXPORT uint32_t hash_ap(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = 0xAAAAAAAA;
+    for (size_t p=0;p < size;p++) {
+        h ^= ((p & 1) == 0) ? (  (h <<  7) ^  src[p] * (h >> 3)) :
+                              (~((h << 11) + (src[p] ^ (h >> 5))));
+    }
+    return h;
+}
+#define MURMUR2_32_M 0x5bd1e995
+EXPORT uint32_t hash_murmur2_le(const uint8_t *restrict src, const size_t size, const uint32_t seed) {
+    uint32_t h = seed ^ (uint32_t)size;
+    uint8_t rem = size & 3;
+    size_t len = size >> 2;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint32_t k = read32le(s);s+=4;
+        k *= MURMUR2_32_M;
+        k ^= k >> 24;
+        h = (h * MURMUR2_32_M) ^ (k * MURMUR2_32_M);
+    }
+
+    switch (rem) {
+        case 3: h ^= s[2] << 16;
+        case 2: h ^= s[1] << 8;
+        case 1: h ^= s[0];
+                h *= MURMUR2_32_M;
+    }
+
+    h ^= h >> 13;
+    h *= MURMUR2_32_M;
+    h ^= h >> 15;
+    return h;
+}
+EXPORT uint32_t hash_murmur2_be(const uint8_t *restrict src, const size_t size, const uint32_t seed) {
+    uint32_t h = seed ^ (uint32_t)size;
+    uint8_t rem = size & 3;
+    size_t len = size >> 2;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint32_t k = read32be(s);s+=4;
+        k *= MURMUR2_32_M;
+        k ^= k >> 24;
+        h = (h * MURMUR2_32_M) ^ (k * MURMUR2_32_M);
+    }
+
+    switch (rem) {
+        case 3: h ^= s[2] << 16;
+        case 2: h ^= s[1] << 8;
+        case 1: h ^= s[0];
+                h *= MURMUR2_32_M;
+    }
+
+    h ^= h >> 13;
+    h *= MURMUR2_32_M;
+    h ^= h >> 15;
+    return h;
+}
+EXPORT uint32_t hash_murmur2A_le(const uint8_t *restrict src, const size_t size, const uint32_t seed) {
+    uint32_t h = seed;
+    uint8_t rem = size & 3;
+    size_t len = size >> 2;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint32_t k = read32le(s);s+=4;
+        k *= MURMUR2_32_M;
+        k ^= k >> 24;
+        h = (h * MURMUR2_32_M) ^ (k * MURMUR2_32_M);
+    }
+
+    uint32_t t = 0;
+    switch (rem) {
+        case 3: t ^= s[2] << 16;
+        case 2: t ^= s[1] << 8;
+        case 1: t ^= s[0];
+    }
+
+    t *= MURMUR2_32_M;
+    t ^= t >> 24;
+    h = (h * MURMUR2_32_M) ^ (t * MURMUR2_32_M);
+    uint32_t l = (uint32_t)size;
+    l *= MURMUR2_32_M;
+    l ^= l >> 24;
+    h = (h * MURMUR2_32_M) ^ (l * MURMUR2_32_M);
+
+    h ^= h >> 13;
+    h *= MURMUR2_32_M;
+    h ^= h >> 15;
+
+    return h;
+}
+EXPORT uint32_t hash_murmur2A_be(const uint8_t *restrict src, const size_t size, const uint32_t seed) {
+    uint32_t h = seed;
+    uint8_t rem = size & 3;
+    size_t len = size >> 2;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint32_t k = read32be(s);s+=4;
+        k *= MURMUR2_32_M;
+        k ^= k >> 24;
+        h = (h * MURMUR2_32_M) ^ (k * MURMUR2_32_M);
+    }
+
+    uint32_t t = 0;
+    switch (rem) {
+        case 3: t ^= s[2] << 16;
+        case 2: t ^= s[1] << 8;
+        case 1: t ^= s[0];
+    }
+
+    t *= MURMUR2_32_M;
+    t ^= t >> 24;
+    h = (h * MURMUR2_32_M) ^ (t * MURMUR2_32_M);
+    uint32_t l = (uint32_t)size;
+    l *= MURMUR2_32_M;
+    l ^= l >> 24;
+    h = (h * MURMUR2_32_M) ^ (l * MURMUR2_32_M);
+
+    h ^= h >> 13;
+    h *= MURMUR2_32_M;
+    h ^= h >> 15;
+
+    return h;
+}
+#define MURMUR2_64_M 0xc6a4a7935bd1e995
+EXPORT uint64_t hash_murmur2_64A_le(const uint8_t *restrict src, const size_t size, const uint64_t seed) {
+    uint64_t h = seed ^ ((uint64_t)size * MURMUR2_64_M);
+    uint8_t rem = size & 7;
+    size_t len = size >> 3;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint64_t k = read64le(s);s+=8;
+        k *= MURMUR2_64_M;
+        k ^= k >> 47;
+        h = (h ^ (k * MURMUR2_64_M)) * MURMUR2_64_M;
+    }
+
+    switch (rem) {
+        case 7: h ^= (uint64_t)s[6] << 48;
+        case 6: h ^= (uint64_t)s[5] << 40;
+        case 5: h ^= (uint64_t)s[4] << 32;
+        case 4: h ^= (uint64_t)s[3] << 24;
+        case 3: h ^= s[2] << 16;
+        case 2: h ^= s[1] << 8;
+        case 1: h ^= s[0];
+                h *= MURMUR2_64_M;
+    }
+
+    h ^= h >> 47;
+    h *= MURMUR2_64_M;
+    h ^= h >> 47;
+    return h;
+}
+EXPORT uint64_t hash_murmur2_64A_be(const uint8_t *restrict src, const size_t size, const uint64_t seed) {
+    uint64_t h = seed ^ ((uint64_t)size * MURMUR2_64_M);
+    uint8_t rem = size & 7;
+    size_t len = size >> 3;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint64_t k = read64be(s);s+=8;
+        k *= MURMUR2_64_M;
+        k ^= k >> 47;
+        h = (h ^ (k * MURMUR2_64_M)) * MURMUR2_64_M;
+    }
+
+    switch (rem) {
+        case 7: h ^= (uint64_t)s[6] << 48;
+        case 6: h ^= (uint64_t)s[5] << 40;
+        case 5: h ^= (uint64_t)s[4] << 32;
+        case 4: h ^= (uint64_t)s[3] << 24;
+        case 3: h ^= s[2] << 16;
+        case 2: h ^= s[1] << 8;
+        case 1: h ^= s[0];
+                h *= MURMUR2_64_M;
+    }
+
+    h ^= h >> 47;
+    h *= MURMUR2_64_M;
+    h ^= h >> 47;
+    return h;
+}
+EXPORT uint64_t hash_murmur2_64B_le(const uint8_t *restrict src, const size_t size, const uint64_t seed) {
+    uint32_t h1 = (uint32_t)seed ^ (uint32_t)size;
+    uint32_t h2 = (uint32_t)(seed >> 32);
+    uint8_t rem = size & 7;
+    size_t len = size >> 3;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint32_t k1 = read32le(s);s+=4;
+        k1 *= MURMUR2_32_M;
+        k1 ^= k1 >> 24;
+        h1 = (h1 * MURMUR2_32_M) ^ (k1 * MURMUR2_32_M);
+        uint32_t k2 = read32le(s);s+=4;
+        k2 *= MURMUR2_32_M;
+        k2 ^= k2 >> 24;
+        h2 = (h2 * MURMUR2_32_M) ^ (k2 * MURMUR2_32_M);
+    }
+
+    if (rem >= 4) {
+        uint32_t k1 = read32le(s);s+=4;
+        k1 *= MURMUR2_32_M;
+        k1 ^= k1 >> 24;
+        h1 = (h1 * MURMUR2_32_M) ^ (k1 * MURMUR2_32_M);
+        rem -= 4;
+    }
+
+    switch (rem) {
+        case 3: h2 ^= s[2] << 16;
+        case 2: h2 ^= s[1] << 8;
+        case 1: h2 ^= s[0];
+                h2 *= MURMUR2_32_M;
+    }
+
+    h1 ^= h2 >> 18;h1 *= MURMUR2_32_M;
+    h2 ^= h1 >> 22;h2 *= MURMUR2_32_M;
+    h1 ^= h2 >> 17;h1 *= MURMUR2_32_M;
+    h2 ^= h1 >> 19;h2 *= MURMUR2_32_M;
+
+    uint64_t h = h1;
+    return (h << 32) | h2;
+}
+EXPORT uint64_t hash_murmur2_64B_be(const uint8_t *restrict src, const size_t size, const uint64_t seed) {
+    uint32_t h1 = (uint32_t)seed ^ (uint32_t)size;
+    uint32_t h2 = (uint32_t)(seed >> 32);
+    uint8_t rem = size & 7;
+    size_t len = size >> 3;
+    const uint8_t *restrict s = src;
+
+    for (;len > 0;len--) {
+        uint32_t k1 = read32be(s);s+=4;
+        k1 *= MURMUR2_32_M;
+        k1 ^= k1 >> 24;
+        h1 = (h1 * MURMUR2_32_M) ^ (k1 * MURMUR2_32_M);
+        uint32_t k2 = read32be(s);s+=4;
+        k2 *= MURMUR2_32_M;
+        k2 ^= k2 >> 24;
+        h2 = (h2 * MURMUR2_32_M) ^ (k2 * MURMUR2_32_M);
+    }
+
+    if (rem >= 4) {
+        uint32_t k1 = read32be(s);s+=4;
+        k1 *= MURMUR2_32_M;
+        k1 ^= k1 >> 24;
+        h1 = (h1 * MURMUR2_32_M) ^ (k1 * MURMUR2_32_M);
+        rem -= 4;
+    }
+
+    switch (rem) {
+        case 3: h2 ^= s[2] << 16;
+        case 2: h2 ^= s[1] << 8;
+        case 1: h2 ^= s[0];
+                h2 *= MURMUR2_32_M;
+    }
+
+    h1 ^= h2 >> 18;h1 *= MURMUR2_32_M;
+    h2 ^= h1 >> 22;h2 *= MURMUR2_32_M;
+    h1 ^= h2 >> 17;h1 *= MURMUR2_32_M;
+    h2 ^= h1 >> 19;h2 *= MURMUR2_32_M;
+
+    uint64_t h = h1;
+    return (h << 32) | h2;
 }
 
 #ifdef __cplusplus

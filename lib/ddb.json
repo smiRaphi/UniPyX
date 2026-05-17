@@ -377,6 +377,11 @@
         "rs":"RTL Ski Jumping 2002 PAK"
     },
     {
+        "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["str0",16,48,7],["n0",4,64],["n0",4,68],["n0",4,72],["n0",4,76],["str0",80,48,7],
+             ["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(4),'little');f.seek(64);o=(o+2047)//2048+fo\nfor _ in range((fo-1)*2048//64):\n cs=(int.from_bytes(f.read(4),'little')+2047)//2048;co=int.from_bytes(f.read(4),'little')\n if o!=co:return\n o+=cs;f.seek(56,1)\nreturn True"]],
+        "rs":"RTL Ski Jumping 2001 PAK"
+    },
+    {
         "d":[["isat","MDM!\\0\\1\\0\\1",0],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);d=f.seek(int.from_bytes(f.read(4),'little'));return f.read(8)==b'\\0'*8 and(d+8+int.from_bytes(f.read(4),'little'))==(d+56+int.from_bytes(f.read(4),'little')*16)==s"]],
         "rs":"mTropolis MDM","s":1
     },

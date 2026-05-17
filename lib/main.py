@@ -306,7 +306,7 @@ def analyze(inp:str,raw=False):
                             for sp in {' -> OVL Offset : ',' > section : ',' , size : ','Warning : ',' ( ','*ACM'}: x = x.split(sp)[0]
                             for sp in {'Structure : ','use : ','stub : ','EP Generic : '}: x = x.split(sp)[-1]
                             x = x.strip(' ,!:;-()[]')
-                            if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','no sec. cab.7z.zip [deb. 02','2010 (e8'} and not x.lower().endswith(' sections') and not x.replace('-','').replace('.','').isdigit() and\
+                            if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','2010 (e8'} and not x.lower().endswith((' sections',' [deb. 02')) and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()) and not (len(x) == 15 and x[:4] == 'exe ' and x[12] == '-' and x[13:].isdigit() and all(x in '0123456789ABCDEF' for x in x[4:12])): ts.append(x)
 
             yrep = db.update('yara')
@@ -319,7 +319,8 @@ def analyze(inp:str,raw=False):
 
             dprc.wait()
             o = dprc.stdout.read().decode('cp437')
-            ts += [x.split('[')[0].split('(')[0].strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
+            die = [x.strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
+            ts += die + [x.split('[')[0].split('(')[0] for x in die]
         else: f.close()
 
     ts = [x for x in ts if not x in WEAK]

@@ -185,7 +185,7 @@ def decode(i:bytes,algo:str):
     return ''.join(o)
 
 CRC_LUT = {}
-def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None):
+def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None) -> int:
     k = (poly,reflect,size)
     mmsk = (1 << size) - 1
     if not k in CRC_LUT:
@@ -222,6 +222,13 @@ def crc16(i:bytes,poly=0x8005,init=0,xor=0,reflect=True,value:int=None): return 
 def crc24(i:bytes,poly=0x864CFB,init=0xB7074CE,xor=0,reflect=False,value:int=None): return crc(i,24,poly,init,xor,reflect,value)
 def crc32(i:bytes,poly=0x04C11DB7,init=0xFFFFFFFF,xor=0xFFFFFFFF,reflect=True,value:int=None): return crc(i,32,poly,init,xor,reflect,value)
 def crc64(i:bytes,poly=0x42F0E1EBA9EA3693,init=0x0000000000000000,xor=0x0000000000000000,reflect=False,value:int=None): return crc(i,64,poly,init,xor,reflect,value)
+def fletcher(i:bytes,size:int):
+    msk = (1 << size) - 1
+    s1,s2 = 0,0
+    for b in i:
+        s1 = (s1 + b) & msk
+        s2 = (s2 + s1) & msk
+    return (s2 << size) | s1
 def fnv1_64(i:bytes,prime=0x100000001B3,offset=0xCBF29CE484222645):
     for b in i: offset = ((offset * prime) & 0xFFFFFFFFFFFFFFFF) ^ b
     return offset
@@ -244,8 +251,22 @@ def sdbm(i:bytes,seed=0x1003F,init=0):
     return h
 def djb2(i:bytes,init=5381):
     h = init
-    for b in i: h = (h * 33 + b) & 0xFFFFFFFF
+    for b in i: h = ((h << 5) + h + b) & 0xFFFFFFFF
     return h
+def djb2a(i:bytes,init=5381):
+    h = init
+    for b in i: h = (((h << 5) + h) ^ b) & 0xFFFFFFFF
+    return h
+def joaat(i:bytes,init=0):
+    h = init
+    for b in i:
+        h = (h + b) & 0xFFFFFFFF
+        h = (h + (h << 10)) & 0xFFFFFFFF
+        h ^= (h >> 6)
+
+    h = (h + (h << 3)) & 0xFFFFFFFF
+    h ^= (h >> 11)
+    return (h + (h << 15)) & 0xFFFFFFFF
 def tarzan_hash(i:bytes):
     o = 0
     shft = 0
@@ -370,7 +391,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'crc24': fnc = crc24
         case 'crc32'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip':
             import zlib
-            fnc = zlib.crc32
+            return zlib.crc32(i,kwargs.get('value') or 0)
         case 'crc64': fnc = crc64
         case 'crc8_tech_3250'|'crc8_gsm'|'crc8_gsm_a'|'crc8_mifare_mad'|'crc8_icode'|'crc8_hitag'|\
              'crc8_j1850'|'crc8_sae_j1850'|'crc8_rohc'|'crc8_smbus'|'crc8_atm'|'crc8_itu'|'crc8_i432_1'|\
@@ -432,6 +453,39 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'djb2_rtl':
             i = i[::-1]
             fnc = djb2
+        case 'djb2a'|'djb2a_ltr': fnc = djb2a
+        case 'djb2a_rtl':
+            i = i[::-1]
+            fnc = djb2a
+        case 'joaat': fnc = joaat
+        case 'super_fast'|'super_fast_le': fnc = uxx().hash_super_fast_le
+        case 'super_fast_be': fnc = uxx().hash_super_fast_be
+        case 'elf'|'pjw': fnc = uxx().hash_elf
+        case 'aphash': fnc = uxx().hash_ap
+        case 'murmur2'|'mmh2'|'murmur2_32'|'mmh2_32'|'murmur2_le'|'mmh2_le'|'murmur2_32_le'|'mmh2_32_le':
+            fnc = uxx().hash_murmur2_le
+            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+        case 'murmur2_be'|'mmh2_be'|'murmur2_32_be'|'mmh2_32_be':
+            fnc = uxx().hash_murmur2_be
+            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+        case 'murmur2a'|'mmh2a'|'murmur2_32a'|'mmh2_32a'|'murmur2a_le'|'mmh2a_le'|'murmur2_32a_le'|'mmh2_32a_le':
+            fnc = uxx().hash_murmur2A_le
+            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+        case 'murmur2a_be'|'mmh2a_be'|'murmur2_32a_be'|'mmh2_32a_be':
+            fnc = uxx().hash_murmur2A_be
+            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+        case 'murmur2_64'|'mmh2_64'|'murmur2_64a'|'mmh2_64a'|'murmur2_64_le'|'mmh2_64_le'|'murmur2_64a_le'|'mmh2_64a_le':
+            fnc = uxx().hash_murmur2_64A_le
+            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+        case 'murmur2_64_be'|'mmh2_64_be'|'murmur2_64a_be'|'mmh2_64a_be':
+            fnc = uxx().hash_murmur2_64A_be
+            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+        case 'murmur2_64b'|'mmh2_64b'|'murmur2_64b_le'|'mmh2_64b_le':
+            fnc = uxx().hash_murmur2_64B_le
+            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+        case 'murmur2_64b_be'|'mmh2_64b_be':
+            fnc = uxx().hash_murmur2_64B_be
+            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
         case 'murmur3'|'mmh3'|'murmur3_32'|'mmh3_32'|'murmur3_128'|'mmh3_128':
             import mmh3
             return getattr(mmh3,f'mmh3_{"x64_128" if "128" in algo else "32"}_uintdigest')(i,kwargs.get('seed',0) & 0xFFFFFFFF)
@@ -462,7 +516,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'sxm': fnc = sxm_hash
         case 'hash40':
             import zlib
-            return (len(i) << 32) | zlib.crc32(i,value=kwargs.get('value') or 0)
+            return (len(i) << 32) | zlib.crc32(i,kwargs.get('value') or 0)
         case 'pivotal': fnc = uxx().hash_pivotal
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
@@ -484,6 +538,16 @@ HASHTS = {
     'fnv1_64':8,'fnv1a_64':8,
     'bkdr':4,'bkdr_ltr':4,'bkdr_rtl':4,
     'sdbm':4,'sdbm_ltr':4,'sdbm_rtl':4,
+    'djb2':4,'djb2_ltr':4,'djb2_rtl':4,
+    'djb2a':4,'djb2a_ltr':4,'djb2a_rtl':4,
+    'joaat':4,
+    'super_fast':4,'super_fast_le':4,'super_fast_be':4,
+    'elf':4,'pjw':4,
+    'aphash':4,
+    'murmur2':4,'mmh2':4,'murmur2_32':4,'mmh2_32':4,'murmur2_le':4,'mmh2_le':4,'murmur2_32_le':4,'mmh2_32_le':4,'murmur2_be':4,'mmh2_be':4,'murmur2_32_be':4,'mmh2_32_be':4,
+    'murmur2a':4,'mmh2a':4,'murmur2_32a':4,'mmh2_32a':4,'murmur2a_le':4,'mmh2a_le':4,'murmur2_32a_le':4,'mmh2_32a_le':4,'murmur2a_be':4,'mmh2a_be':4,'murmur2_32a_be':4,'mmh2_32a_be':4,
+    'murmur2_64':8,'mmh2_64':8,'murmur2_64a':8,'mmh2_64a':8,'murmur2_64_le':8,'mmh2_64_le':8,'murmur2_64a_le':8,'mmh2_64a_le':8,'murmur2_64_be':8,'mmh2_64_be':8,'murmur2_64a_be':8,'mmh2_64a_be':8,
+    'murmur2_64b':8,'mmh2_64b':8,'murmur2_64b_le':8,'mmh2_64b_le':8,'murmur2_64b_be':8,'mmh2_64b_be':8,
     'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,

@@ -112,21 +112,25 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
-        case 'RTL Ski Jumping 2002 PAK':
+        case 'RTL Ski Jumping 2001 PAK'|'RTL Ski Jumping 2002 PAK':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             from lib.crypto import decode
             f = File(i,endian='<')
 
+            fnl = 0x30 if t == 'RTL Ski Jumping 2001 PAK' else 0x40
+
             f.seek(4)
-            c = f.readu32()*0x800//0x50
+            c = f.readu32()*0x800//(0x10+fnl)
             f.seek(0)
             fs = []
             for _ in range(c):
                 zs,off = f.readu32(),f.readu32()
                 if off == 0: break
                 f.skip(4)
-                fs.append((zs,off * 0x800,f.readu32(),decode(f.read(0x40).rstrip(b'\0'),'latin-1c')))
+                fs.append((zs,off * 0x800,f.readu32(),decode(f.readc(fnl).rstrip(b'\0'),'latin-1c')))
+
+            if t == 'RTL Ski Jumping 2001 PAK': assert all(fe[0] == fe[2] for fe in fs)
 
             for fe in fs:
                 f.seek(fe[1])

@@ -10,6 +10,7 @@ if len(argv) == 3:
     if argv[2].isdigit():
         s = int(argv[2])
         hshs = [x for x in HASHTS if HASHTS[x] == s]
+        assert hshs
     else: hshs = [argv[2]]
 else: hshs = list(HASHTS)
 
@@ -29,11 +30,12 @@ DN = set()
 cs = []
 for x in hshs:
     crc = crc_hash(i,x)
-    if crc in DN: continue
-    DN.add(crc)
+    if (HASHTS[x],crc) in DN: continue
+    DN.add((HASHTS[x],crc))
     cs.append((x,crc))
 
 mx = max([len(x) for x in hshs])
-cs.sort(key=lambda x:x[1])
+cs.sort(key=lambda x:(HASHTS[x[0]],x[1]))
 for x,crc in cs:
-    print(f'{x.ljust(mx)} | {hex(crc)[2:].upper().zfill(HASHTS[x]*2)}')
+    cb = crc.to_bytes(HASHTS[x],'big')
+    print(f'{x.ljust(mx)} | {crc:0{HASHTS[x]*2}X}')
