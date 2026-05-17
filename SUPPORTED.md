@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 950
+# Supported Formats: 952
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -352,7 +352,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (490)
+## Various (492)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -527,6 +527,8 @@ Frogwares 0000 Package | .0000 | [Game Extractor Server](https://github.com/Semb
 FrontPage Theme | ??? | Custom |
 Gabriel Knight 3 Barn | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 GameMaker Archive | .win .unx .ios .droid .psp .3ds .symbian | [UndertaleModTool](https://github.com/UnderminersTeam/UndertaleModTool) + [Scripts/Resource Exporters/ExportAll*.csx](https://github.com/UnderminersTeam/UndertaleModTool/tree/master/UndertaleModTool/Scripts/Resource%20Exporters) |
+GameZ Reader Archive | .zbd | Custom |
+GameZ Texture Archive | .zbd | Custom |
 GBA ADS MMSTR | .mmstr | [load_from_mmstr.py](https://github.com/Matt-Hurd/GBAVideoDecomp/blob/master/InternalELF/research_scripts/load_from_mmstr.py) |
 GC opening.bnr | .bnr | [bnrtool](https://github.com/xchellx/bnrtool) |
 GDED Binary Format | .gde | Custom |

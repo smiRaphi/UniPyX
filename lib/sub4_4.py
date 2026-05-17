@@ -1833,5 +1833,86 @@ def extract4_4(inp:str,out:str,t:str):
 
             del tr
             if listdir(o): return
+        case 'MotoGP ARK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.crypto import HashLib
+            hl = HashLib.dl('motog',encoding='ascii')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.padc(4);f.skip(4)
+            c = f.readu32()
+            assert f.readu32() == 0x10
+            f.padc(4);f.skip(4)
+            fs = [(f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+
+            hl.wait()
+            for fe in fs:
+                assert not (fe[0] >> 1)
+                f.seek(fe[1])
+                if fe[0] & 1:
+                    assert fe[2] > 4
+                    us = f.readu32()
+                    d = f.decompress(fe[2] - 4,'lzss0',usize=us)
+                else: d = f.readc(fe[2])
+
+                if fe[3] in hl: fn = hl.get(fe[3])
+                else:
+                    ex = None
+                    if 0x20 < len(d) < 0x6000:
+                        try: assert d.decode('ascii').replace('\r','').replace('\n','').isprintable()
+                        except: ex = None
+                        else: ex = 'txt'
+                    fn = f'{fe[3]:08X}.{ex or guess_ext(d)}'
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
+        case 'GameZ Reader Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.seek(-8)
+            assert f.readu32() == 1
+
+            c = f.readu32()
+            f.seek(c*-0x94-8)
+            fs = []
+            for _ in range(c):
+                fe = (f.readu32(),f.readu32())
+                fn = f.readc(0x40).rstrip(b'\0')
+                assert len(fn) != 0x40 and not b'\0' in fn
+                fs.append((fe[0],fe[1],fn.decode('ascii')))
+                f.skip(0x4c) # memory junk?
+
+            for fe in fs:
+                f.seek(fe[0])
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'GameZ Texture Archive':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu32() == 0 and f.readu32() == 1
+
+            ic,c = f.readu32(),f.readu32()
+            f.padc(8)
+            fs = []
+            for _ in range(c):
+                fs.append((f.readc(0x20).rstrip(b'\0').decode('ascii'),f.readu32()))
+                if ic: assert f.readu32() < ic,f.pos
+                else: assert f.reads32() == -1,f.pos
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,f.size))
+
+            for ix in range(c):
+                f.seek(fs[ix][1])
+                writefile(o + '/' + fs[ix][0],f.readc(fs[ix+1][1] - fs[ix][1]))
+
+            f.close()
+            if fs: return
+        case 'GameZ Asset Archive': raise NotImplementedError
 
     return 1

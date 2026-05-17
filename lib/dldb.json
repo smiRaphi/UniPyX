@@ -6998,7 +6998,15 @@
             "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/ludia.bhl",
             "hashes/ludia.bhl"
         ]],
-        "ts":1778763157
+        "ts":1778882223
+    },
+    "motogp_hashes":{
+        "p":"hashes/motogp.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/motogp.bhl",
+            "hashes/motogp.bhl"
+        ]],
+        "ts":1778882223
     },
     "difmb_dip_key":{
         "p":"difmb_dip_key.bin",
