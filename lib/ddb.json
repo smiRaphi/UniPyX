@@ -474,12 +474,14 @@
         "rs":"Archer Maclean's Mercury PAQ"
     },
     {
-        "d":[["isat","0MFS",0],["n0",4,4],["n0",4,-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(4);f.seek(int.from_bytes(f.read(4),'big'));c=int.from_bytes(f.read(4),'big');return c>1 and f.read(12)==b'mCTy\\0\\0\\0\\1\\xFF\\xFF\\xFB\\xA9'"]],
-        "rs":"Barbie: Riding Club OMF","s":1
-    },
-    {
         "d":[["isat","\\r\\n",10],["str",0,10],["py","f=open(inp,'rb');s=f.read(12)\nif len(s)!=12 or not s.endswith(b'\\r\\n') or not s[:10].rstrip(b' ').isdigit():return\nf.seek(int(s.rstrip()),1)\nwhile 1:\n s0,s1,s2=f.read(12),f.read(34),f.read(6)\n if not s0:break\n if len(s0+s1+s2)!=52 or not(s0[10:]==s1[32:]==s2[4:]==b'\\r\\n')or not s0[:10].rstrip(b' ').isdigit():return\n try:assert(s1[:32]+s2[:4]).decode('ascii').isprintable()\n except:return\n f.seek(int(s0.rstrip()),1)\nreturn True"]],
         "rs":"Barbie: Riding Club Cache"
+    },
+    {
+        "d":[["isat","0MFS",0],["n0",4,4],["n0",4,-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(4);f.seek(int.from_bytes(f.read(4),'big'));c=int.from_bytes(f.read(4),'big');return c>1 and f.read(12)==b'mCTy\\0\\0\\0\\1\\xFF\\xFF\\xFB\\xA9'"]],
+        "rs":"Open Media Toolkit Formatted Stream","s":1},{
+        "d":[["isin",["0MF3","0MF2"],0],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);f.seek(int.from_bytes(f.read(4),'big'));return sum(f.read(4))and sum(f.read(4))and sum(f.read(4))"]],
+        "rs":"Open Media Toolkit Formatted Stream","s":1
     },
     {
         "d":[["size",[2160,null]],["s%",16],["n0",4,0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["isatS","\\0",4,24],["n0",4,32],["n0",4,40],["n0",4,44],["isatS","\\0",4,52],["isatS","\\0",4,60],

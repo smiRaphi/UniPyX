@@ -1,6 +1,6 @@
 from lib.main import *
 
-BARBIE_XMP = {
+OMTFS_XMP = {
     'mCTy':'mCTy',
     'WAVE':'wav',
     'SMK1':'smk',
@@ -1392,11 +1392,12 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
-        case 'Barbie: Riding Club OMF':
+        case 'Open Media Toolkit Formatted Stream':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='>')
-            assert f.read(4) == b'0MFS'
+            v = {b'0MFS':1,b'0MF2':2,b'0MF3':3}[f.read(4)]
+            assert v in {1,2,3}
 
             f.seek(f.readu32())
             dc = f.readu32()
@@ -1407,37 +1408,58 @@ def extract4_3(inp:str,out:str,t:str):
                 assert n.isprintable()
                 c = f.readu32()
                 for _ in range(c):
-                    fs.append((n,f.reads32(),f.readu32(),f.readu32()))
-                    if n == 'mCTy': mcs.append(fs[-1][2])
+                    fe = [n,f.reads32(),f.readu32(),f.readu32()]
+                    if v >= 2:
+                        fe.append(f.reads(f.readu8(),'ascii'))
+                        if v >= 3: fe.append(f.readu16())
+                        else: fe.append(0)
+                        fs.append(fe)
+                    elif v == 0:
+                        fs.append(fe)
+                        if n == 'mCTy': mcs.append(fs[-1][2])
             xc = f.readu32()
             xfs = [(f.readu32(),f.readu32()) for _ in range(xc)]
 
-            nm = {}
-            for m in mcs:
-                f.seek(m)
-                dc = f.readu32()
-                for _ in range(dc):
-                    n = f.readc(4).decode('ascii')
-                    assert n.isprintable()
-                    if not n in nm: nm[n] = {}
-                    f.padc(2)
-                    c = f.readu32()
-                    for _ in range(c):
-                        id = f.reads32()
-                        nm[n][id] = f.readc(f.readu8()).decode('ascii')
+            if v == 0:
+                nm = {}
+                for m in mcs:
+                    f.seek(m)
+                    dc = f.readu32()
+                    for _ in range(dc):
+                        n = f.readc(4).decode('ascii')
+                        assert n.isprintable()
+                        if not n in nm: nm[n] = {}
+                        f.padc(2)
+                        c = f.readu32()
+                        for _ in range(c):
+                            id = f.reads32()
+                            nm[n][id] = f.readc(f.readu8()).decode('ascii')
 
             for fe in fs:
-                if fe[0] == '0HDR':
-                    try:
-                        fn = fe[1].to_bytes(4,'big',signed=True).decode('ascii')
-                        assert fn.isprintable()
-                    except: fn = str(fe[1])
-                elif fe[0] in nm and fe[1] in nm[fe[0]]: fn = fe[0] + '/' + nm[fe[0]][fe[1]]
-                else: fn = f'${fe[0]}/{fe[1]}'
-                fn += '.' + BARBIE_XMP.get(fe[0],fe[0])
-
                 f.seek(fe[2])
-                writefile(o + '/' + fn,f.readc(fe[3]))
+                if v == 1:
+                    if fe[0] == '0HDR':
+                        try:
+                            fn = fe[1].to_bytes(4,'big',signed=True).decode('ascii')
+                            assert fn.isprintable()
+                        except: fn = str(fe[1])
+                    elif fe[0] in nm and fe[1] in nm[fe[0]]: fn = fe[0] + '/' + nm[fe[0]][fe[1]]
+                    else: fn = f'${fe[0]}/{fe[1]}'
+                    d = f.readc(fe[3])
+                else:
+                    if fe[5]: us = f.readu32()
+                    else: us = None
+                    d = f.decompress(fe[3] - (4 if fe[5] else 0),{0:'none',6:'zlib'}[fe[5]],usize=us)
+
+                    if fe[0] == '0HDR':
+                        try:
+                            fn = fe[1].to_bytes(4,'big',signed=True).decode('ascii')
+                            assert fn.isprintable()
+                        except: fn = str(fe[1])
+                    else: fn = fe[0] + '/' + (fe[4] or str(fe[1]))
+                fn += '.' + OMTFS_XMP.get(fe[0],fe[0])
+
+                writefile(o + '/' + fn,d)
             for ix,fe in enumerate(xfs):
                 f.seek(fe[0])
                 writefile(f'{o}/$unk/{ix:02d}.bin',f.readc(fe[1]))
@@ -1457,7 +1479,7 @@ def extract4_3(inp:str,out:str,t:str):
                     fn = f.readc(34).rstrip().decode('ascii')
                     x = f.readc(6).rstrip().decode('ascii')
                     assert fn.isprintable() and x.isprintable()
-                    fn = f'{x}/{fn}.{BARBIE_XMP.get(x,x)}'
+                    fn = f'{x}/{fn}.{OMTFS_XMP.get(x,x)}'
                 writefile(o + '/' + fn,f.readc(s))
 
             f.close()

@@ -403,7 +403,6 @@ Balko UFL Game Archive | .ufl | Custom |
 Bandai ARC | .arc | Custom |
 Bandai PKG | .pkg | Custom |
 Barbie: Riding Club Cache | .cache | Custom |
-Barbie: Riding Club OMF | .omf | Custom |
 Battlezone 2 PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 BCH | .bch | Custom |
 Bethesda BSA | .bsa | [BSA Browser](https://github.com/AlexxEG/BSA_Browser) |
@@ -475,10 +474,10 @@ Detective Instinct: Farewell, My Beloved Encrypted DIP | .dip | Custom |
 Digimon Story Lost Evolution PAK | .pak | Custom |
 Digital Illusions PDT | .pdt .dta .pdo .pdw | Custom|
 Direct Storage Archive | .psarc | [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |
+Disney's Tarzan FSD | .fsd | Custom |
 Disney Games Archive | .pod | Custom |
 Disney Raw Strings | ??? | Custom |
 Disney Resource | ??? | Custom |
-Disney's Tarzan FSD | .fsd | Custom |
 DJarc | .dja | Custom |
 Doom 3 Xbox GFC+GOB | .gfc+.gob | [RazbSbor](https://www.moddb.com/downloads/gob-globald3tfull-unpacker)([src](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) |
 Doom 3 Xbox Graph | .d3tfull | [RazbSbor](https://www.moddb.com/downloads/gob-globald3tfull-unpacker)([src](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) |
@@ -670,6 +669,7 @@ One Piece Battle Adventure FSM | .apf .pac | Custom |
 One Piece Battle Adventure NXD | .nxd | Custom |
 One Piece Straw Wars Pirate Defense Resource | ??? | Custom |
 Opalium Engine PAK | .opk .obp .ovp .osp | Custom |
+Open Media Toolkit Formatted Stream | .omt | Custom |
 Orange Juice Encrypted | .dat | [qpcrypt](https://github.com/jwilins/qptk) |
 Orange Juice LAG | .lag | Custom |
 Other Ocean Interactive ARC | .arc | Custom |
