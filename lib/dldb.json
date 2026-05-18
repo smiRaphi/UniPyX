@@ -7000,6 +7000,14 @@
         ]],
         "ts":1778882223
     },
+    "apetec_hashes":{
+        "p":"hashes/apetec.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/apetec.bhl",
+            "hashes/apetec.bhl"
+        ]],
+        "ts":1778882223
+    },
     "motogp_hashes":{
         "p":"hashes/motogp.bhl",
         "fs":[[

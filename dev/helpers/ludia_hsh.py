@@ -1,6 +1,6 @@
 from lib.crypto import crc_hash
 
-P = r"C:\Users\grego\Downloads\1,000,000 Pyramid, Th\1,000,000 Pyramid, The (USA).nkit"
+P = r"<path>"
 
 BL = {
     "vuccqp.mem",

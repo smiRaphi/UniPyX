@@ -1914,5 +1914,61 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'GameZ Asset Archive': raise NotImplementedError
+        case 'APETEC AIF':
+            CRCC = b"________________________________________________0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____________________________________________________________________________________________________________________________________".replace(b'_',b'\0')
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.crypto import HashLib
+            hl = HashLib.dl('apetec',db,fmt=lambda i:i[:0x40].translate(CRCC),encoding='ascii')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(4)
+            f.seek(f.readu32())
+            fs = []
+            def reade(p):
+                h = f.readu32()
+                p = p + [h]
+                do,fo = f.readu32(),f.readu32()
+                dc,fc = f.readu16(),f.readu16()
+                assert not bool(do) ^ bool(dc) and not bool(fo) ^ bool(fc)
+                op = f.pos
+
+                fs.append((p,-1))
+                if dc:
+                    f.seek(do)
+                    for _ in range(dc): reade(p)
+                if fc:
+                    f.seek(fo)
+                    for _ in range(fc):
+                        fs.append((p + [f.readu32()],f.readu32(),f.readu32()))
+                        f.padc(4)
+
+                f.seek(op)
+
+            reade([])
+
+            hl.wait()
+            hl.db[0] = ''
+            for fe in fs:
+                pn = o + '/' + '/'.join([hl.get(h,f'{h:08X}') for h in fe[0][:-1]]) + '/'
+                if fe[1] == -1:
+                    mkdir(pn + hl.get(fe[0][-1],f'{fe[0][-1]:08X}'))
+                    continue
+
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                if fe[0][-1] in hl: fn = hl.get(fe[0][-1])
+                else:
+                    fn = f'{fe[0][-1]:08X}.'
+                    if d[:4] == b'TIM2': fn += 'tm2'
+                    elif d[:4] == b'AUS ': fn += 'aus'
+                    elif d[:4] == b'LANG': fn += 'lng'
+                    elif d[:4] == b'MZ\x90\0': fn += 'exe'
+                    else: fn += guess_ext(d)
+                writefile(pn + fn,d)
+
+            f.close()
+            if fs: return
 
     return 1

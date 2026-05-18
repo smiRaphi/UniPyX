@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 952
+# Supported Formats: 953
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -352,7 +352,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (492)
+## Various (493)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -387,6 +387,7 @@ American Conquest 2 GSC | .gsc | [Game Extractor Server](https://github.com/Semb
 AMOS Memory Bank | ??? | Custom |
 AmusementMakers Project B.G. Archive | ??? | Custom |
 Anna-Marie Archive | ??? | Custom |
+APETEC AIF | .aif .bin | Custom |
 Arc System Works PAC | .pac | [arcsys.bms](https://aluigi.org/bms/arcsys.bms) |
 Archer Maclean's Mercury PAQ | .paq | Custom |
 Artech DAT | .dat | Custom |

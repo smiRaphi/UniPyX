@@ -1,7 +1,7 @@
 from lib.crypto import crc_hash
 
 import os
-D = r"C:\Users\grego\Downloads\conflictdesertstorm\conflictdesertstorm_pc_dat\mission3"
+D = r"<path>"
 if not os.path.exists(D + '/$unk'): exit()
 L = [int(x.split('.')[0],16) for x in os.listdir(D + '/$unk')]
 

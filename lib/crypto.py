@@ -419,7 +419,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
              'crc32k'|'crc32_koopman'|'crc32_xfer'|'crc32_autosar'|'crc32c'|'crc32_castagnoli'|'crc32_iscsi'|\
              'crc32_base91_c'|'crc32_intrelaken'|'crc32_nvme'|'crc32d'|'crc32_base94'|'crc32_base94_d'|'crc32q'|\
              'crc32_aixm'|'crc32_cd_rom_edc'|'crc32_ludia':
-            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32[algo[5:].lstrip('_')]
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32[algo[5 + (1 if algo[5] == '_' else 0):]]
             fnc = crc32
         case 'crc64_xz'|'crc64_go_ecma'|'crc64_ecma'|'crc64_ecma_182'|'crc64_we'|'crc64_redis'|'crc64_jones'|'crc64_ms'|\
              'crc64_go_iso'|'crc64_nvme':

@@ -769,6 +769,7 @@ def guess_ext(d:bytes) -> str:
     elif d[:4] == b'\x7FELF': ext = 'elf'
     elif d[:4] == b'DDS ': ext = 'dds'
     elif d[:4] == b'\x1BLua': ext = 'luac'
+    elif d[:4] == b'8BPS': ext = 'psd'
     elif d[:0x14] == b'Creative Voice File\x1A': ext = 'voc'
     elif d[:0x17] == b'Kaydara FBX Binary  \0\x1A\0': ext = 'fbx'
     elif d[:4] == b'FORM' and d[8:12] == b'AIFF': ext = 'aif'

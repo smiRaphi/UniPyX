@@ -451,6 +451,10 @@
         "rs":"Purple Moon Resource PRD+PRS","s":1
     },
     {
+        "d":[["s%",2048],["isat","\\x10\\0\\0\\0",4],["isatS","\\0",12,8],["n0",4,0],["n0",8,20],["n0",4,28],["n0",4,32],["py","f=open(inp,'rb');ts=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o+8);o=sum(f.read(4));f.seek(2,1)\nif bool(o)^bool(sum(f.read(2))):return\nf.seek(ts-12);o=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little');return not sum(f.read(4))and (o+-o%2048)==s"]],
+        "rs":"APETEC AIF"
+    },
+    {
         "d":[["isat","BINA",0],["isat","L",7],["isat","\\1\\0\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'little')==s"]],
         "rs":"Sonic BINA","s":1},{
         "d":[["isat","BINA",0],["isat","B",7],["isat","\\0\\1\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'big')==s"]],
