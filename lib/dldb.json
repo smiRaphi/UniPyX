@@ -702,17 +702,6 @@
         ],
         "ts":0
     },
-    "ctpktool":{
-        "p":"ctpktool/ctpktool.exe",
-        "fs":[{
-            "u":"https://github.com/dnasdw/ctpktool/releases/download/v1.1.2/ctpktool.zip",
-            "x":{
-                "ctpktool.exe":"ctpktool/ctpktool.exe",
-                "PVRTexLib.dll":"ctpktool/PVRTexLib.dll"
-            }
-        }],
-        "ts":0
-    },
     "jwudtool":{
         "p":"JWUDTool.jar",
         "fs":[[

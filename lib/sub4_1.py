@@ -1,5 +1,22 @@
 from lib.main import *
 
+CTRPIXM = (
+    ("rgba8888",32),
+    ("rgb888",24),
+    ("rgba5551",16),
+    ("rgb565",16),
+    ("rgba4444",16),
+    ("la88",16),
+    ("hl88",16),
+    ("l8",8),
+    ("a8",8),
+    ("la44",8),
+    ("l4",4),
+    ("a4",4),
+    ("etc1",4),
+    ("etc1_a4",8),
+)
+
 def extract4_1(inp:str,out:str,t:str):
     run = db.run
     i = inp
@@ -483,28 +500,16 @@ def extract4_1(inp:str,out:str,t:str):
             return
         case 'Azito 3D Pack File':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decompress
             f = File(i,endian='<')
 
             assert f.read(0x10) == b'PACK_FILE\0\0\0\0\0\0\0'
             c = f.readu32()
             for ix in range(c):
-                d = f.read(f.readu32())
-
-                if d[0] in {0x11,0x40}:
-                    tf = TmpFile()
-                    writefile(tf.p,d)
-                    of = o + f'\\{ix}.bin'
-                    run(['lzx','-d',tf.p,of],print_try=False)
-                    if exists(of) and getsize(of):
-                        tg = open(of,'rb').read(4)
-                        try: tg = tg.decode('ascii')
-                        except: pass
-                        else:
-                            if tg.isalpha(): mv(of,o + f'/{ix}.{tg}')
-                    else: mv(tf.p,of)
-                    tf.destroy()
-                else: writefile(o + f'/{ix}.bin',d)
+                d = f.readc(f.readu32())
+                if d[0] == 0x11: d = decompress(d,'lz11')
+                elif d[0] == 0x40: d = decompress(d,'lz40')
+                writefile(o + f'/{ix:03d}.{guess_ext_3ds(d)}',d)
 
             f.close()
             if c: return
@@ -668,22 +673,6 @@ def extract4_1(inp:str,out:str,t:str):
 
             T0S = 8 + 4*5 + 4*7 + 4
             T1S = 8 + 4*6 + 4*8 + 4
-            FMTS = (
-                ("rgba8888",32),
-                ("rgb888",24),
-                ("rgba5551",16),
-                ("rgb565",16),
-                ("rgba4444",16),
-                ("la88",16),
-                ("hl88",16),
-                ("l8",8),
-                ("a8",8),
-                ("la44",8),
-                ("l4",4),
-                ("a4",4),
-                ("etc1",4),
-                ("etc1_a4",8),
-            )
 
             assert f.read(4) == b'BCH\0'
             f.skip(4)
@@ -763,21 +752,16 @@ def extract4_1(inp:str,out:str,t:str):
 
                                 k += size
                         assert texs and w and h
-                        nb2 = f'_{w}x{h}.{FMTS[fmt][0]}'
-                        siz = 0
-                        for _ in range(mips):
-                            siz += (w * h * FMTS[fmt][1]) // 8
-                            w >>= 1
-                            h >>= 1
-                            if w < 1: w = 1
-                            if h < 1: h = 1
+                        nb2 = f'.{CTRPIXM[fmt][0]}'
+                        mps = [((w >> x) * (h >> x) * CTRPIXM[fmt][1]) // 8 for x in range(mips)]
 
                         for tix,ro in enumerate(sorted(list(texs))):
                             if typ == 1 and fmt in {10,11} and ro < sec[4][1]: ro += sec[4][0]
                             else: ro += sec[3][0]
-
                             f.seek(ro)
-                            writefile(nb1 + (f'_{tix}' if len(texs) > 1 else '') + nb2,f.read(siz))
+
+                            for mix in range(mips):
+                                writefile(nb1 + f'_m{mix}' + (f'_{tix}' if len(texs) > 1 else '') + f'_{w >> mix}x{h >> mix}' + nb2,f.read(mps[mix]))
                 elif ix == 6:
                     xall = False
                     for off in offs:
@@ -1767,5 +1751,37 @@ def extract4_1(inp:str,out:str,t:str):
             if oc:
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(oc),'w')
                 return
+        case 'CTPK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'CTPK' and f.readu16() == 1
+
+            c = f.readu16()
+            do = f.readu32()
+            f.skip(8)
+            so = f.readu32()
+            f.padc(8)
+            f.seek(so)
+            si = [list(f.readc(4)) for _ in range(c)]
+            fs = []
+            f.seek(0x20)
+            for ix in range(c):
+                fe = [f.readu32(),f.readu32(),f.readu32() + do,f.readu32(),f.readu16(),f.readu16(),f.readu8()]
+                assert fe[3] < len(CTRPIXM)
+                if si[ix][0] != 0xFF: assert si[ix][0] == fe[3]
+                f.skip(7)
+                fs.append(fe + [f.readu32()])
+
+            for fe in fs:
+                f.seek(fe[0])
+                fn = f.read0s('ansi')
+                f.seek(fe[2])
+                for ix in range(fe[6]):
+                    s = ((fe[4] >> ix) * (fe[5] >> ix) * CTRPIXM[fe[3]][1]) // 8
+                    writefile(f'{o}/{fn}_m{ix}_{fe[4] >> ix}x{fe[5] >> ix}.{CTRPIXM[fe[3]][0]}',f.readc(s))
+
+            f.close()
+            if fs: return
 
     return 1

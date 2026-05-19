@@ -1117,7 +1117,7 @@
         "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isatS","\\0",16,112],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(112+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (128+c*16+o+s)==f.seek(0,2)"]],
         "rs":"Eutechnyx ARC","s":1},{
         "d":[["s%",128],["isat","ARCN",0],["isat","\\0\\0\\0\\0\\xDE\\xC0\\xDE\\xC0",112],["n0",4,4],["n0",4,120],["n0",4,128],["py","f=open(inp,'rb');f.seek(120);s=int.from_bytes(f.read(4),'little');return s<int.from_bytes(f.read(4),'little')and(128+s+-s%128)==f.seek(0,2)"]],
-        "rs":"Eutechnyx Compressed ARC","s":1
+        "rs":"Eutechnyx ARC","s":1
     },
     {
         "d":[["isat","ConnectFile Version ",0],["isat",".",21],["n0",4,-4],["py","f=open(inp,'rb');k=int.from_bytes(f.read(4),'little');f.seek(20)\nif not(f.read(2)[:1]+f.read(2)).isdigit():return\nk^=0xFFFFFFFF;o=int.from_bytes(f.read(4),'little')^k;c=int.from_bytes(f.read(4),'little')^k;c=c*52+32;return (c+-c%2048)==o"]],
@@ -1723,8 +1723,7 @@
         "rs":"Diff Patch"
     },
     {
-        "rqr":null,
-        "d":["isat","CTPK",0],
+        "d":[["isat","CTPK\\1\\0",0],["isat","\\0\\0\\0",45],["isatS","\\0",8,24],["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07","\\x08","\\x09","\\x0A","\\x0B","\\x0C","\\x0D"],44],["n0",2,6],["n0",4,8],["n0",4,16],["n0",4,20],["n0",4,32],["n0",4,36],["n0",2,48],["n0",2,50]],
         "rs":"CTPK","s":1
     },
     {

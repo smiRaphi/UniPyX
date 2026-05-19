@@ -1214,13 +1214,22 @@ def extract4_4(inp:str,out:str,t:str):
             f = File(i,'rb',endian='<')
             assert f.read(3) == b'ARC'
             v = f.reads(1,'ascii')
+            if v == 'N': f._end = '>'
 
-            c = f.readu32('>' if v == 'N' else '<')
+            c = f.readu32()
             fs = []
             if v == '0': bo = 0x40
-            elif v in 'XPCN': bo = 0x80
+            elif v in 'XPC': bo = 0x80
+            elif v == 'N': bo = 0
             else: raise NotImplementedError(v)
 
+            if v == 'N':
+                f.seek(0x74)
+                assert f.readu32('<') == 0xC0DEC0DE
+                zs,us = f.readu32('<'),f.readu32('<')
+                d = f.decompress(zs,'lzo1x',usize=us,db=db)
+                f.close()
+                f = File(d,endian=f._end)
             f.seek(bo)
             bo += c*0x10
             for _ in range(c):
@@ -1245,18 +1254,6 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
-        case 'Eutechnyx Compressed ARC':
-            raise NotImplementedError
-            if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
-            f = File(i,'rb')
-            assert f.read(3) == b'ARC'
-            v = f.reads(1,'ascii')
-
-            assert v == 'N'
-            f.seek(0x74)
-            assert f.read(4) == b'\xDE\xC0\xDE\xC0'
-            zs,us = f.readu32('<'),f.readu32('<')
         case 'Messiah Image Resource':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File

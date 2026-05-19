@@ -447,7 +447,7 @@ CRI CPK | .cpk | [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
 CRI DPF | .dpf | Custom |
 Cryo BigFile | .big | [na_game_tool](https://nihav.org/game_tool.html) |
 CSI NY GRF | .grf | Custom |
-CTPK | .ctpk | [ctpktool](https://github.com/dnasdw/ctpktool) |
+CTPK | .ctpk | Custom |
 Culpa Innata SFS | .sfs | Custom |
 D.N.A. Softwares LZSS | * | Custom |
 D.N.A. Softwares Pack | .p .mus | Custom |

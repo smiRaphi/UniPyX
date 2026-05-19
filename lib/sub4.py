@@ -31,7 +31,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if d[:4] in NINARC:
                 tf = f'{o}\\tmp{os.urandom(6).hex()}.{d[:4].decode().lower()}'
                 writefile(tf,d)
-                del d
                 r = extract(tf,o,NINARC[d[:4]])
                 if r: mv(tf,o + '/' + tbasename(i))
                 else:
@@ -40,6 +39,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                         except PermissionError: sleep(0.1)
                         else: break
             else: writefile(o + '/' + tbasename(i),d)
+            del d
             return
         case 'U8'|'RARC':
             run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])
@@ -174,9 +174,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for x in ofl: ofl[x].close()
             return
         case 'NUB2': return quickbms('nus3_nub2')
-        case 'CTPK':
-            run(['ctpktool','-efd',i,o])
-            if listdir(o): return
         case 'XBP': return quickbms('xbp')
         case 'Bezel Archive': return quickbms('vroom_scne')
         case 'PlayStation Archive':
