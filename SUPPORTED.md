@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 953
+# Supported Formats: 954
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -352,7 +352,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (493)
+## Various (494)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -412,6 +412,7 @@ Bezel Shader Pack | ??? | Custom |
 BioWare Entity Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Blade Runner TLK/MIX | .tlk .mix | Custom |
 Blitz Games Archive | ??? | [blitz_games.bms](https://mirror.aluigi.org/bms/blitz_games.bms) |
+Blitz Games PAK | .ps2 .xbp | Custom |
 Bloodrayne POD | .pod | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Blur PAK | .pak | [blur.bms](https://mirror.aluigi.org/bms/blur.bms) |
 Bomberman Wars IDX+BIN | .idx+.bin | Custom |
@@ -785,7 +786,7 @@ Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game E
 Teardown Encrypted | .tde | Custom |
 Temple of Elemental Evil DAT | .dat | Custom |
 The Indian In The Cupboard Data | .dta | Custom |
-Blitz Games PAK | .ps2 .xbp | Custom |
+The Pagemaster DAT | .dat | Custom |
 The Sims FAR | .far | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 THQ PAK | .pak | Custom |
 THQ Worms UTF Strings | ??? | Custom |

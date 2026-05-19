@@ -463,6 +463,10 @@
         "rs":"Sonic BINA","s":1
     },
     {
+        "d":[["s%",8],["isat","XMBF\\1\\1\\0\\0",0],["isat","\\x10\\0\\0\\0",388],["hash","05D455038854CE42AF6989FEE11AF60D5E8F60A5",0,384],["n0",4,384],["n0",4,392],["n0",4,396],["py","if not exists(splitext(inp)[0]+'.big'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(16);o=f.seek(int.from_bytes(f.read(4),'little'));c1,hs,c2,fo=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');return c1==c2 and (hs+c1*8)==fo and(o+fo+c2*32)==s"]],
+        "rs":"Alone in the Dark FAT+BIG","s":1
+    },
+    {
         "rqr":"Visual Studio 2005",
         "d":[["isat",".rdata\\0\\0",528],["isat","\\0\\xC0\\0\\0",544],["isat","\\0\\x30\\0\\0",584],["hash","1E9D83E375386F3410BDF3C23FB176CF63AF12FE",4192,4400],["contain","BZh91AY&SY",[327680,49152]]],
         "rs":"Tixati Installer"
@@ -507,6 +511,10 @@
     {
         "d":[["s%",2048],["size",[4096,null]],["isatS","\\0",8,0],["isatS","\\0",8,16],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');f.seek(8);o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');s=f.seek(20)+c*20\nif (s+-s%2048)!=o:return\nfor _ in range(c):\n if sum(f.read(4))or not sum(f.read(4))or int.from_bytes(f.read(4),'little')%2048 or f.read(4)!=f.read(4):return\nreturn not sum(f.read(o-f.tell()))"]],
         "rs":"Sumo Digital XPAC"
+    },
+    {
+        "d":[["s%",2048],["isat","\\0\\x10\\0\\0",20],["contain",".DEF\\0",[0,16]],["n0",4,16],["n0",4,20],["n0",4,40],["n0",4,44],["str0",0,16,5],["str0",24,16,5],["py","f=open(inp,'rb');f.seek(16);s=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(4),'little')\nif fo%2048 or fo>65536:return\nf.seek(fo-24)\nif sum(f.read(24)):return\no=fo+s+-s%2048\nf.seek(24)\nfor _ in range(fo//24-1):\n if not sum(f.read(16)):break\n s=int.from_bytes(f.read(4),'little')\n if o!=int.from_bytes(f.read(4),'little'):return\n o+=s+-s%2048\nreturn True"]],
+        "rs":"The Pagemaster DAT"
     },
     {
         "d":["isat","DP2\\x1A0001",0],

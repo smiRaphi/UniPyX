@@ -1970,5 +1970,63 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Alone in the Dark FAT+BIG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(noext(i) + '.fat',endian='<')
+            fd = File(noext(i) + '.big')
+            assert f.read(4) == b'XMBF' and f.readu32() == 0x101
+            
+            f.skip(8)
+            bo = f.readu32()
+            f.seek(bo)
+            c = f.readu32()
+            ho = bo + f.readu32()
+            assert f.readu32() == c,f.pos - 4
+            fo = bo + f.readu32()
+
+            f.seek(ho)
+            hs = [f.readu64() for _ in range(c)]
+            f.seek(fo)
+            for ix in range(c):
+                s = f.readu64() # zsize
+                assert s == f.readu64(),f.pos - 8 # usize
+                f.skip(8) # padded size
+                fd.seek(f.readu64())
+                d = fd.readc(s)
+                writefile(f'{o}/{hs[ix]:016X}.{guess_ext(d)}',d)
+
+            f.close()
+            fd.close()
+            if c: return
+        case 'The Pagemaster DAT':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            while f:
+                bo = f.pos
+                f.seek(bo + 0x14)
+                fo = bo + f.readu32()
+                f.seek(bo)
+                fs = []
+                while f.pos < fo:
+                    fn = f.readc(0x10).rstrip(b'\0').decode('ascii')
+                    if not fn: break
+                    fs.append((fn,f.readu32(),f.readu32() + bo))
+                if not fs: break
+
+                assert fs[0][0].lower().endswith('.def')
+                dn = fs[0][0][:-4]
+
+                for fe in fs:
+                    f.seek(fe[2])
+                    writefile(f'{o}/{dn}/{fe[0]}',f.readc(fe[1]))
+
+                f.seek(max([x[1] + x[2] for x in fs]))
+                f.align(0x800)
+
+            f.close()
+            if listdir(o): return
 
     return 1
