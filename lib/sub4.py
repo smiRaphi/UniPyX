@@ -511,7 +511,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 else: raise NotImplementedError(fe['c'])
 
                 writefile(fe['fn'],d)
-                if 'ts' in fe: set_ctime(fe['fn'],fe['ts'])
+                if 'ts' in fe: set_ftime(fe['fn'],fe['ts'])
 
             pcs = []
             for fe in fs:

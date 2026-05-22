@@ -1020,6 +1020,10 @@
         "rs":"Dr. Luigi INFO+GAME.dat","s":1
     },
     {
+        "d":["isat","\\x4F\\x9F\\x39\\x77\\xBE\\xDE\\x0D\\xD7\\xD9\\xE7\\x9E",0],
+        "rs":"Seal Online EDT","s":1
+    },
+    {
         "d":[["isat","GDAT",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*8+8)==int.from_bytes(f.read(4),'little')"]],
         "rs":"Death End re:Quest 2 GDAT","s":1
     },
@@ -1120,6 +1124,10 @@
         "rs":"Eutechnyx ARC","s":1
     },
     {
+        "d":[["isat","ARCPACK",0],["isin",["\\0","\\x17"],7],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return s==int.from_bytes(f.read(4),'little')"]],
+        "rs":"PlayPond Pack","s":1
+    },
+    {
         "d":[["isat","ConnectFile Version ",0],["isat",".",21],["n0",4,-4],["py","f=open(inp,'rb');k=int.from_bytes(f.read(4),'little');f.seek(20)\nif not(f.read(2)[:1]+f.read(2)).isdigit():return\nk^=0xFFFFFFFF;o=int.from_bytes(f.read(4),'little')^k;c=int.from_bytes(f.read(4),'little')^k;c=c*52+32;return (c+-c%2048)==o"]],
         "rs":"K2 ConnectFile","s":1
     },
@@ -1138,6 +1146,10 @@
     {
         "d":[["isat","\\0\\0",12],["isin",["\\0\\0","\\1\\0"],10],["n0",2,2],["n0",2,4],["n0",2,6],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(2),'little')*int.from_bytes(f.read(2),'little');f.seek(16);ds=int.from_bytes(f.read(4),'little');return s in{ds,ds*2}"]],
         "rs":"Macross: Do You Remember Love? PUD"
+    },
+    {
+        "d":[["s%",16],["isat","\\x07\\0\\0\\0",0],["isat","\\1\\0\\0\\0",12],["isatS","\\0",8,40],["isat","\\0",-1],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.000'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif s!=int.from_bytes(f.read(4),'little'):return\nc=int.from_bytes(f.read(4),'little');f.seek(16);return (4+c*28)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Robots BIN+000"
     },
     {
         "d":[["isat","\\0\\0",8],["isatS","\\0",16,16],["isin",["NNNN","ZZZ4"],56],["n0",1,6],["n0",4,32],["n0",2,38],["n0",4,40],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=f.read(3);f.seek(32);return (32+int.from_bytes(f.read(4),'little'))==s and c==f.read(3)"]],
@@ -2418,7 +2430,7 @@
         "rs":"DDR DAT"
     },
     {
-        "rq":null,
+        "rqr":null,
         "d":[["ext",[".gcz",".exe"]],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');v1=f.read(1)[0];s=f.seek(0,2);f.seek(-1,1);return v1&3==3 and u>s and f.read(1)[0]!=255"]],
         "rs":"Konami FireBeat LZSS"
     },

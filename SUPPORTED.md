@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 954
+# Supported Formats: 956
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -146,7 +146,7 @@ YAC | .yac .yc | [YAC](https://www.sac.sk/download/pack/yac102.zip) |
 Yamazaki Zipper | .yz | [yzdec](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/yz1/deepf106.zip)(src?) |
 yEnc | .ntx .yenc | [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 Z | .z | [7-Zip](https://7-zip.org/) |
-ZIP | .zip .zipx .exe | [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) |
+ZIP | .zip .zipx .exe | Custom, [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) |
 ZLIB | .zlib | [zlib](https://docs.python.org/3/library/zlib.html) |
 ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https://bioruebe.com/dev/uniextract/)(src?) |
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
@@ -352,7 +352,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (494)
+## Various (496)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -688,6 +688,7 @@ Piper SAGE | .sgo | Custom |
 Pivotal Games DAT | .dat | Custom |
 Pixelbite BAR | .bar | Custom |
 Pixelbite ZIP | ??? | Custom |
+PlayPond Pack | .pack | Custom |
 PlayStation 3 Core OS Package | .pkg | [ps3_cosunpkg](https://github.com/wargio/ps3tools) |
 PlayStation 3 Signed Package | .pkg | [ps3_unpkg](https://github.com/wargio/ps3tools) |
 PlayStation Archive | .psarc | [PS3 4.50 SDK-YLoD [450_001].7z/psarc](https://archive.org/download/ps3_sdks), [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |
@@ -724,6 +725,7 @@ Resistance Fall Of Man IGHW | .ighw | Custom |
 RetroStudio PAK | .pak | [PakTool](https://www.dropbox.com/scl/fi/exp8xazcfiqlmf7zk7s9g/PakTool.rar?rlkey=w23jpu9a66j6ws13d95jkjc3a&e=1&dl=0)(src?) |
 Reverse Computer Screen | .rcs | [RCS](https://github.com/einar-saukas/RCS) |
 Roblox Flag Cache | .cache | Custom |
+Robots BIN+000 | .bin+.000 | Custom |
 ROFS Volume | .cvm | [cvm_tool](https://github.com/mchubby/RE-games-attic/tree/master/sega-nextech/cvm_tool%20%5Broxfan%5D) -> ISO |
 RouterOS Package | .npk | [npkpy](https://pypi.org/project/npkPy/) |
 RPG Maker Archive | ??? | Custom |

@@ -347,17 +347,212 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 elif listdir(o): return
                 run(['garbro','-x',i],cwd=o)
                 if listdir(o): return
-            else:
-                run(['unzip','-q','-o',i,'-d',o])
-                if listdir(o): return
-                zip7(i,o,'ZIP',True)
-                if listdir(o): return
-                if db.print_try: print('Trying with zipfile')
-                import zipfile
-                try:
-                    with zipfile.ZipFile(i,'r') as z: z.extractall(o)
-                except: pass
-                else: return
+                return 1
+
+            ZKEYM = (
+                ({'item.edt','seal.sys','sealres.dll','quest.edt'},b''), # unk key for Seal Online
+            )
+            ZFMTM = {
+                0:'none',
+                1:'shrunk',
+                2:'reduce',
+                3:'reduce',
+                4:'reduce',
+                5:'reduce',
+                6:'implode',
+                8:'deflate',
+                9:'deflate64',
+                12:'bzip2',
+                14:'lzma_zip',
+                16:'cmpsc',
+                18:'terse',
+                19:'lz77z',
+                20:'zstd',
+                93:'zstd',
+                94:'mp3',
+                95:'xz',
+                96:'jpeg',
+                97:'wavpack',
+                98:'ppmd'
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decompress,pdosdate
+            from lib.crypto import decrypt,crc_hash
+            f = File(i,endian='<')
+            f.seek(-0x10015)
+            d = f.read(0x10015)
+            bp = f.size - len(d)
+            po = len(d)
+            while True:
+                p = d.rfind(b'PK\x05\x06',None,po)
+                if p == -1: return 1
+                po = p
+                f.seek(bp + p + 4 + 4)
+                rc = f.read(2)
+                if rc != f.read(2): continue
+                of,sz = f.readu32(),f.readu32()
+                if of == 0xFFFFFFFF and rc == b'\xFF\xFF': raise NotImplementedError('Zip64')
+                if (of + sz) <= (bp + p): break
+
+            f.seek(bp + p + 4)
+            if sum(f.read(4)): raise NotImplementedError('Multi file zip')
+            c = f.readu16()
+            f.skip(2)
+            cds,cdo = f.readu32(),f.readu32()
+            cmt = f.readc(f.readu16()).rstrip(b'\0')
+            if cmt: writefile(o + '/$comment.txt',cmt)
+
+            # fe: file entry
+            # - cv: create version
+            # - xv: extract version
+            # - fl: flags
+            # - ct: compression type
+            # - ts: timestamp, tuple = FILETIME, int = unix
+            #   - m: modified
+            #   - a: accessed
+            #   - c: created
+            # - zs: compressed size
+            # - us: uncompressed size
+            # - crc: crc32
+            # - dsk: disk/file number
+            # - ia: internal attributes
+            # - xa: external attributes
+            # - of: offset
+            # - n: name
+            # - cm: comment
+
+            f.seek(cdo)
+            fs = []
+            for _ in range(c):
+                assert f.read(4) == b'PK\1\2'
+                fe = {
+                    'cv':f.readu16(),
+                    'xv':f.readu16(),
+                    'fl':f.readu16(),
+                    'ct':f.readu16(),
+                    'ts':{},
+                }
+                assert not fe['fl'] & 0x9780
+                if fe['fl'] & 0x2000: raise NotImplementedError('Encrypted CD')
+                ct,cd = f.readu16(),f.readu16()
+                try: fe['ts']['m'] = unix2filetime(pdosdate(cd,ct))
+                except ValueError: pass
+                fe['crc'] = f.readu32()
+                fe['chk'] = (cd >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
+                fe['zs'],fe['us'] = f.readu32(),f.readu32()
+                nl,xl,cml = f.readu16(),f.readu16(),f.readu16()
+                fe['dsk'] = f.readu16()
+                fe['ia'] = f.readu16()
+                fe['xa'] = f.readu32()
+                fe['of'] = f.readu32()
+                fe['n'] = f.readc(nl).rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'ascii')
+
+                ep = f.pos + xl
+                while (f.pos + 4) < ep:
+                    tg,s = f.readc(2),f.readu16()
+                    xep = f.pos + s
+                    match tg:
+                        case b'\0\0': pass # empty
+                        case b'\1\0': # Zip64
+                            assert s >= 0x10
+                            fe['us'],fe['zs'] = f.readu64(),f.readu64()
+                            if s > 0x10:
+                                assert s >= 0x18
+                                fe['of'] = f.readu64()
+                            if s > 0x18:
+                                assert s >= 0x1C
+                                fe['dsk'] = f.readu32()
+                        case b'\x0A\0': # NTFS
+                            assert s >= 0x20
+                            f.padc(4)
+                            assert f.readu16() == 1 and f.readu16() == 0x18,f.pos
+                            ts = f.readu64() # FILETIME
+                            if ts: fe['ts']['m'] = ts
+                            ts = f.readu64()
+                            if ts: fe['ts']['a'] = ts
+                            ts = f.readu64()
+                            if ts: fe['ts']['c'] = ts
+                        case b'\x23\x11': # ?, seen in Forza Horizon 6
+                            pass # u32 data offset
+                        case b'UT':
+                            assert s >= 1
+                            utfl = f.readu8()
+                            assert not utfl >> 3
+                            for ix,mn in enumerate('mac'):
+                                if (f.pos + 4) > xep: break
+                                if utfl & (1 << ix):
+                                    ts = f.readu32()
+                                    if ts: fe['ts'][mn] = unix2filetime(ts)
+                        case b'UX': # Unix
+                            assert s >= 8
+                            ts = f.readu32()
+                            if ts: fe['ts']['a'] = unix2filetime(ts)
+                            ts = f.readu32()
+                            if ts: fe['ts']['m'] = unix2filetime(ts)
+                            # optional u16 UID & u16 GID
+                        case b'ux': # New Unix
+                            pass # u16 tag (?), u16 len (?), u8 v, u8 UIDlen, u8 UID[UIDlen], u8 GIDlen, u8 GID[GIDlen]
+                        case _: raise NotImplementedError(f'{repr(tg)[1:]} @ 0x{f.pos - 4:08X}')
+                    f.seek(xep)
+                f.seek(ep)
+                fe['cm'] = f.readc(cml)
+                if fe['xa'] & 0x10: mkdir(o + '/' + fe['n'])
+                else: fs.append(fe)
+
+            if any(fe['fl'] & 1 for fe in fs):
+                nl = set([fe['n'].lower() for fe in fs])
+                for pk in ZKEYM:
+                    if all(x in nl for x in pk[0]):
+                        KEY = pk[1]
+                        break
+                else:
+                    raise ValueError('No key for zip file')
+
+            for fe in fs:
+                f.seek(fe['of'])
+                assert f.read(4) == b'PK\3\4'
+                v = f.readu16()
+                assert f.readu16() == fe['fl'] and f.readu16() == fe['ct']
+                f.skip(4)
+                assert f.readu32() == fe['crc'] and f.readu32() == fe['zs'] and f.readu32() == fe['us']
+                f.skip(f.readu16() + f.readu16())
+
+                d = f.readc(fe['zs'])
+                if fe['fl'] & 1:
+                    d = decrypt(d,'zipcrypto',KEY)
+                    assert d[11] == fe['chk']
+                    d = d[12:]
+
+                if fe['ct'] == 22: # Forza
+                    raise NotImplementedError('Forza encryption')
+                    assert len(d) >= 0x24
+                    iv,pad,mach,d = d[:0x10],int.from_bytes(d[0x10:0x14],'little'),d[0x14:0x24],d[0x24:]
+                    
+                else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
+                if fe['crc']: assert crc_hash(d,'crc32') == fe['crc']
+                fn = o + '/' + fe['n']
+                writefile(fn,d)
+                if 'c' in fe['ts']:
+                    ts = fe['ts']['c']
+                    if isinstance(fe['ts']['c'],tuple): ts = ts[0]
+                    if ts: set_ftime(fn,ts,not isinstance(fe['ts']['c'],tuple))
+                ts = (0,0)
+                if 'm' in fe['ts']: ts = fe['ts']['m']
+
+            f.close()
+            if fs: return
+
+            run(['unzip','-q','-o',i,'-d',o])
+            if listdir(o): return
+            zip7(i,o,'ZIP',True)
+            if listdir(o): return
+            import zipfile
+            if db.print_try: print('Trying with zipfile')
+            try:
+                with zipfile.ZipFile(i,'r') as z: z.extractall(o)
+            except: pass
+            else: return
         case 'ZLIB':
             if db.print_try: print('Trying with zlib')
             import zlib
@@ -781,8 +976,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'Bootable FAT16 IMG':
             if db.print_try: print('Trying with custom extractor')
-            from datetime import datetime
-            from lib.file import File
+            from lib.file import File,pdosdate
             f = File(i,endian='<')
 
             f.seek(0xA0B)
@@ -817,10 +1011,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else:
                     ct = f.readu16()
                     cd = f.readu16()
-                tm = datetime(1980 + ((cd >> 9) & 0x7F),(cd >> 5) & 0xF,cd & 0x1F,(ct >> 11) & 0x1F,(ct >> 5) & 0x3F,(ct & 0x1F) * 2)
-                if sum(rcd): tm = tm.replace(microsecond=rcd[0] * 1000000)
 
-                fs.append((fn,f.readu16(),f.readu32(),tm.timestamp()))
+                fs.append((fn,f.readu16(),f.readu32(),pdosdate(cd,ct,rcd[0] if sum(rcd) else 0)))
 
             csf = []
             for fe in fs:
@@ -832,7 +1024,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             for fe in fs:
                 f.seek((fe[1]+1) * cs)
                 writefile(o + '/' + fe[0],f.read(fe[2]))
-                if fe[3]: set_ctime(o + '/' + fe[0],fe[3])
+                if fe[3]: set_ftime(o + '/' + fe[0],fe[3])
             if fs: return
         case 'Base64':
             if db.print_try: print('Trying with base64')

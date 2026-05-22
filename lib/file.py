@@ -1,4 +1,5 @@
 import struct,io,sys
+from datetime import datetime
 from lib.unipyxx import X
 
 ENDMAP = {'<':'little','>':'big','-':'big'}
@@ -17,6 +18,12 @@ def reflecti(v:int,w:int):
         v >>= 1
     return r
 def rotate8(v:int): return ((v << 7) & maskb(1)) | (v >> 1)
+def pdosdate(d:int,t:int,ms=0):
+    assert d.bit_length() <= 16 and t.bit_length() <= 16
+    if d == 0: d = 0x21
+    dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
+    if ms: dt.replace(microsecond=ms*1000000)
+    return dt.timestamp()
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
@@ -39,6 +46,7 @@ class File:
         if n < 0 and whence in {0,2}:
             whence = 0
             n += self.size
+            if n < 0: n = 0
         return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
     def tell(self) -> int: return self._f.tell() - self._start_pos
     def close(self):
@@ -47,16 +55,16 @@ class File:
 
     def skip(self,n:int): return self.seek(n,1)
     def back(self,n:int): return self.skip(-n)
-    def reads(self,n:int,encoding='utf-8'):
-        if encoding == 'utf-16': return self.readutf16(n)
-        return self.readc(n).decode(encoding)
     def readc(self,n:int=None):
         d = self.read(n)
         if n is not None and len(d) != n: raise EOFError(f"Unexpected EOF ({len(d)} != {n}) @ 0x{self.pos - len(d):08X} - 0x{self.pos - len(d) + n:08X}")
         return d
     def padc(self,n:int): 
         if sum(self.readc(n)): raise ValueError(f"Unexpected Value in padding @ 0x{self.pos - n:08X} - 0x{self.pos:08X}")
-    def readu(self,c=b'\0',max=None,chks=0x100,include=False):
+    def reads(self,n:int,encoding='utf-8'):
+        if encoding == 'utf-16': return self.readutf16(n)
+        return self.readc(n).decode(encoding)
+    def readu(self,c=b'\0',max=None,chks=0x80,include=False):
         if not max is None and max < chks: chks = max
 
         o = bytearray()
@@ -64,10 +72,10 @@ class File:
             d = self.read(chks)
             p = d.find(c)
             if p != -1 or len(d) != chks:
-                o += d[:p + (1 if include else 0)]
+                o.extend(d[:p + (1 if include else 0)])
                 self.back(len(d) - p - 1)
                 break
-            o += d
+            o.extend(d)
         return bytes(o)
     def readall(self):
         self.seek(0)
@@ -348,6 +356,14 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             elif kwargs.get('usize') is not None: i = i[:5] + kwargs['usize'].to_bytes(8,'little') + i[13:]
             return lzma.LZMADecompressor(format=lzma.FORMAT_ALONE).decompress(i)
         case 'lzma_us32'|'lzma_alone_us32': return decompress(i[:9] + b'\0'*4 + i[9:],'lzma_alone',*args,**kwargs)
+        case 'lzma_zip':
+            import lzma
+            if len(i) <= 4: return b''
+            ps = int.from_bytes(i[2:4],'little')
+            if len(i) <= 4 + ps: return b''
+
+            return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[
+                   lzma._decode_filter_properties(lzma.FILTER_LZMA1,i[4:4+ps])]).decompress(i[4+ps:])
         case 'xz':
             import lzma
             return lzma.LZMADecompressor(format=lzma.FORMAT_XZ).decompress(i)

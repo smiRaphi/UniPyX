@@ -94,7 +94,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return obj.decrypt(i)
         case 'rc4'|'arc4':
             from Cryptodome.Cipher import ARC4
-            return ARC4.new(key).decrypt(i)
+            return ARC4.new(key,drop=iv or 0).decrypt(i)
         case 'rsa'|'rsa_le':
             from Cryptodome.PublicKey import RSA
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
@@ -133,10 +133,14 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'mmfs':
             assert isinstance(key,bytes)
             return uxx().decrypt_mmfs(i,key)
+        case 'rc4_pp'|'rc4_playpond':
+            assert isinstance(key,bytes)
+            return uxx().decrypt_rc4_playpond(i,key,iv or 0)
         case 'hornby':
+            iv = iv or 0xFF
             if isinstance(iv,bytes): iv = iv[0]
             assert isinstance(iv,int) and isinstance(key,bytes)
-            return uxx().decrypt_hornby(i,key or b'\0',iv or 0xFF)
+            return uxx().decrypt_hornby(i,key or b'\0',iv)
         case 'selene':
             assert isinstance(key,bytes)
             return uxx().decrypt_selene(i,key or b'\0')
@@ -641,3 +645,77 @@ class HashLib:
     def __contains__(self,v:str|int):
         if type(v) == str: v = self.crc(v)
         return v in self.db
+
+def _kl_interpt(f:File|list):
+    if isinstance(f,File): t = f.readu8()
+    elif isinstance(f,int): t = f
+    else: t = f[0]
+    match t:
+        case 0: return (None, lambda f:None,lambda f,v:0)
+        case 1: return (int,  lambda f:f.readvlq(),lambda f,v:f.writevlq(v))
+        case 2: return (bytes,lambda f:f.readc(f.readvlq()),lambda f,v:f.writevlq(len(v)) + f.write(v))
+        case 3: return (str,  lambda f:f.read0s('utf-8'),lambda f,v:f.write(v.encode('utf-8') + b'\0'))
+        case 64:
+            l = f.readvlq()
+            return (bytes,lambda f:f.readc(l),lambda f,v:f.write(v))
+        case 65:
+            l = f.readu8()
+            return (int,lambda f:f.unpacki(l),lambda f,v:f.packi(v,l))
+    raise ValueError
+
+class KeyLib:
+    def __init__(self,p:str):
+        self.p = os.path.abspath(p)
+        self.db = {}
+        self.scheme = []
+        self.name_scheme = None
+
+    @classmethod
+    def new(cls,p:str,scheme:tuple[type],name=None):
+        c = cls(p)
+        c.scheme = scheme
+        c.name_flag = name
+        return c
+    @classmethod
+    def dl(cls,p:str,db): return cls(db.get(p + '_keys')).load()
+    def load(self):
+        if os.path.exists(self.p):
+            assert os.path.isfile(self.p)
+            f = File(self.p,'rb',endian='>')
+            self.name_flag = _kl_interpt(f)
+
+            sc = f.readu8()
+            self.scheme = [_kl_interpt(f) for _ in range(sc)]
+
+            c = f.readvlq()
+            for ix in range(c):
+                sch = self.scheme.copy()
+                if self.name_flag: k = sch.pop(0)[2](f)
+                else: k = ix
+                self.db[k] = [x[2](f) for x in sch]
+            f.close()
+
+        return self
+    def save(self):
+        f = File(self.p,'wb',endian='>')
+        f.writeu8(1 if self.name_flag else 0)
+        f.writeu8(len(self.scheme))
+        f.write(bytes(x[3] for x in self.scheme))
+        f.writevlq(len(self.db))
+        for k,v in self.db.items():
+            sch = self.scheme.copy()
+            if self.name_flag: sch.pop(0)[1](f,k)
+            for x in v: sch.pop(0)[1](f,x)
+        f.close()
+
+    def add(self,v,k=None):
+        if k is None: assert not self.name_flag
+        sch = self.scheme.copy()
+        if self.name_flag: assert isinstance(k,sch.pop(0)[0])
+        else: k = len(self.db)
+        for x in v: assert isinstance(x,sch.pop(0)[0])
+        self.db[k] = v
+    def get(self,k,default=None) -> str: return self.db.get(k,default)
+    def __getitem__(self,k): return self.db[k]
+    def __contains__(self,k): return k in self.db
+    def __len__(self): return len(self.db)

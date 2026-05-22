@@ -3,7 +3,8 @@
 ---
 Usage: `python unipyx.py <input> [<output dir>]`
 
-Requires a somewhat new version (3.10+) of python (I've only tested old versions on 3.11, newer ones on 3.13 & current ones on 3.14 and everything on windows).
+Requires a somewhat new version (3.10+) of python (Currently only gets tested with 3.14.X).
+Only made on work on x64 Windows for now. (Linux is completly untested but would probably not work even under Wine)
 
 [Supported Formats](./SUPPORTED.md)
 

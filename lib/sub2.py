@@ -748,7 +748,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
                         if 'DATETIME=' in finf:
                             ft = mktime(strptime(finf.split('DATETIME=')[1].split()[0],'%Y%m%d%H%M%S'))
-                            set_ctime(f,ft)
+                            set_ftime(f,ft)
                 return
         case 'C64 IMG':
             run(['c1541'],stdin=f'attach "{i}"\nextract\nquit\n',cwd=o)

@@ -41,6 +41,7 @@ import ctypes
 u8 = ctypes.c_uint8
 s8 = ctypes.c_int8
 u32 = ctypes.c_uint32
+u16 = ctypes.c_uint16
 u64 = ctypes.c_uint64
 szt = ctypes.c_size_t
 sszt = ctypes.c_ssize_t
@@ -58,6 +59,11 @@ def _2base_func(fnc,src,key):
     k = (u8 * len(key)).from_buffer_copy(key)
     fnc(i,len(src),o,k,len(key))
     return bytes(o)
+def _21base_func(fnc,src,key):
+    b = (u8 * len(src)).from_buffer_copy(src)
+    k = (u8 * len(key)).from_buffer_copy(key)
+    fnc(b,len(src),k,len(key))
+    return bytes(b)
 def _3base_func(fnc,src):
     i = (u8 * len(src)).from_buffer_copy(src)
     o = (u8 * len(src))()
@@ -108,6 +114,10 @@ class X:
             ('init_mmfs',(P(u8),P(u8)),void,0),
             ('decrypt_mmfs',(P(u8),szt,P(u8)),void,0),
             ('init_selene',(P(u8),P(u8),szt,u32),void,0),
+            ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
+            ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2.1),
+            ('decrypt_forza_roundA_block',(P(u8),P(u8),P(u8)),void,0),
+            ('decrypt_forza_roundB_block',(P(u8),P(u8),P(u8)),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
             ('hash_super_fast_le',(P(u8),szt),u32,4),
@@ -132,6 +142,8 @@ class X:
                     def wrapper(src,usize,_f=fnc): return _1base_func(_f,src,usize)
                 elif e[3] == 2:
                     def wrapper(src,key,_f=fnc): return _2base_func(_f,src,key)
+                elif e[3] == 2.1:
+                    def wrapper(src,key,_f=fnc): return _21base_func(_f,src,key)
                 elif e[3] == 3:
                     def wrapper(src,_f=fnc): return _3base_func(_f,src)
                 elif e[3] == 4:
@@ -171,6 +183,7 @@ class X:
     def decrypt_roll(src:bytes,key:bytes) -> bytes: ...
     def decrypt_rolr(src:bytes,key:bytes) -> bytes: ...
     def decrypt_xor(src:bytes,key:bytes) -> bytes: ...
+    def decrypt_zipcrypto(src:bytes,key:bytes) -> bytes: ...
 
     def decrypt_rxor(self,src:bytes,key:bytes|int) -> bytes:
         if isinstance(key,bytes): key = key[0]
@@ -249,6 +262,25 @@ class X:
         o = (u8 * len(src))()
         self.dll.decrypt_xor(i,len(src),o,mk,len(mk))
         return bytes(o)
+    def decrypt_rc4_playpond(self,src:bytes,key:bytes,drop:int=0) -> bytes:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_rc4_playpond(b,len(src),k,len(key),drop)
+        return bytes(b)
+    def decrypt_forza_roundA_block(self,src:bytes,key:bytes,table:bytes) -> bytes:
+        assert len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        t = (u8 * len(table)).from_buffer_copy(table)
+        self.dll.decrypt_forza_roundA_block(b,k,t)
+        return bytes(b)
+    def decrypt_forza_roundB_block(self,src:bytes,key:bytes,table:bytes) -> bytes:
+        assert len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        t = (u8 * len(table)).from_buffer_copy(table)
+        self.dll.decrypt_forza_roundB_block(b,k,t)
+        return bytes(b)
 
     def hash_pivotal(self,src:bytes) -> int: ...
     def hash_super_fast_le(self,src:bytes) -> int: ...
@@ -1046,6 +1078,110 @@ EXPORT void init_selene(uint8_t *restrict dst, const uint8_t *restrict key, cons
         dst[i] = (uint8_t)(key[kc++] ^ (MT19937_rand(&mt) >> 16));
         if (kc >= ksize) kc = 0;
     }
+}
+EXPORT void decrypt_rc4_playpond(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize, const size_t drop) {
+    uint8_t S[0x100];
+    for (size_t i=0;i < 0x100;i++) S[i] = i;
+
+    uint8_t j = 0;
+    size_t kc = 0;
+    for (size_t ix=0;ix < 0x100;ix++) {
+        for (size_t i=0;i < 0x100;i++) {
+            j += S[i] + key[kc];
+            uint8_t b = S[j];
+            S[j] = S[i];
+            S[i] = b;
+            kc += 1;
+            if (kc >= ksize) kc = 0;
+        }
+    }
+
+    j = 0;
+    uint8_t i = 0;
+    for (size_t ix=0;ix < drop;ix++) {
+        i += 1;
+        j += S[i];
+        uint8_t b = S[j];
+        S[j] = S[i];
+        S[i] = b;
+    }
+
+    for (size_t p=0;p < size;p++) {
+        i += 1;
+        j += S[i];
+        uint8_t b = S[j];
+        S[j] = S[i];
+        S[i] = b;
+        buf[p] ^= S[(S[i] + S[j]) & 0xFF];
+    }
+}
+EXPORT void decrypt_zipcrypto(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize) {
+    uint32_t crc32t[0x100];
+    for (size_t i=0;i < 0x100;i++) {
+        uint32_t c = i;
+        for (size_t j=0;j < 8;j++) {
+            if (c & 1) c = (c >> 1) ^ 0xEDB88320;
+            else c = c >> 1;
+        }
+        crc32t[i] = c;
+    }
+    #define crc32(crc,b) ((crc) >> 8) ^ crc32t[((crc) ^ (b)) & 0xFF]
+
+    uint32_t k0 = 0x12345678;
+    uint32_t k1 = 0x23456789;
+    uint32_t k2 = 0x34567890;
+
+    #define mix(b) \
+        k0 = crc32(k0,(b));\
+        k1 += (k0 & 0xFF);\
+        k1 = k1 * 0x8088405 + 1;\
+        k2 = crc32(k2,k1 >> 24);
+
+    for (size_t p=0;p < ksize;p++)
+        mix(key[p]);
+
+    for (size_t p=0;p < size;p++) {
+        uint32_t k = k2 | 2;
+        buf[p] ^= (k * (k^1)) >> 8;
+        mix(buf[p]);
+    }
+
+    #undef crc32
+    #undef mix
+}
+EXPORT void decrypt_forza_roundA_block(uint8_t *restrict buf, const uint8_t *restrict key, const uint8_t *restrict table) {
+    const uint32_t *k = (uint32_t *)key;
+    const uint32_t *t = (uint32_t *)table;
+    #define get_t(x) t[0x100 * (x) + buf[(x)]]
+
+    uint32_t tmp[4];
+    tmp[0] = get_t(0) ^ get_t(5) ^ get_t(10) ^ get_t(15) ^ k[0];
+    tmp[1] = get_t(3) ^ get_t(4) ^ get_t(9 ) ^ get_t(14) ^ k[1];
+    tmp[2] = get_t(2) ^ get_t(7) ^ get_t(8 ) ^ get_t(13) ^ k[2];
+    tmp[3] = get_t(1) ^ get_t(6) ^ get_t(11) ^ get_t(12) ^ k[3];
+
+    #undef get_t
+    buf[0] = tmp[0];
+    buf[1] = tmp[1];
+    buf[2] = tmp[2];
+    buf[3] = tmp[3];
+}
+EXPORT void decrypt_forza_roundB_block(uint8_t *restrict buf, const uint8_t *restrict key, const uint8_t *restrict table) {
+    const uint32_t *k = (uint32_t *)key;
+    const uint32_t *t = (uint32_t *)table;
+    #define get_t(x) t[0x100 * (x) + buf[(x)]]
+
+    uint32_t tmp[4];
+    tmp[0] = get_t(0) ^ get_t(7) ^ get_t(10) ^ get_t(13) ^ k[0];
+    tmp[1] = get_t(1) ^ get_t(4) ^ get_t(11) ^ get_t(14) ^ k[1];
+    tmp[2] = get_t(2) ^ get_t(5) ^ get_t(8 ) ^ get_t(15) ^ k[2];
+    tmp[3] = get_t(3) ^ get_t(6) ^ get_t(9 ) ^ get_t(12) ^ k[3];
+
+    #undef get_t
+    buf[0] = tmp[0];
+    buf[1] = tmp[1];
+    buf[2] = tmp[2];
+    buf[3] = tmp[3];
 }
 
 EXPORT uint32_t hash_pivotal(const uint8_t *restrict src, const size_t size) {

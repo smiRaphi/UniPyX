@@ -35,6 +35,8 @@ Camelot ARC | ` ` | Mario Golf Super Rush | https://x.com/_Ninji/status/14085338
 Camelot Obfuscated NRO | ` ` | Mario Golf Super Rush | https://x.com/_Ninji/status/1408533891976204292 | https://gist.github.com/Treeki/d467b4d29c934f37afada6c7c41f5624 |
 GameZ Asset Archive | .zbd | https://discmaster.textfiles.com/search?format=gameZAssetsArchive&dedup=dedup | ? | ? | detected
 GameZ Interpreter Script | .zbd | https://discmaster.textfiles.com/search?format=gameZInterpreterScript&dedup=dedup | ? | ? | detected
+Forza ZIP | .zip | Forza | ? | https://github.com/Doliman100/ForzaTech-crypto-tool | regular zip + custom compression/encryption type
+Seal Online EDT | .edt | Seal Online | ? | https://reshax.com/topic/161-old-mmorpg-file-encryption/?&_rid=15412#findComment-715 | detected
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

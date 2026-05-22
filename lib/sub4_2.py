@@ -805,7 +805,7 @@ def extract4_2(inp:str,out:str,t:str):
                     f.skip(0x18)
                     d = f.read(s)
                 writefile(o + f'/{dn}{fe[1]}',d)
-                set_ctime(o + f'/{dn}{fe[1]}',tm)
+                set_ftime(o + f'/{dn}{fe[1]}',tm)
             f.close()
             if fs: return
         case 'High Impact Games WAD':
@@ -987,7 +987,7 @@ def extract4_2(inp:str,out:str,t:str):
                         if dr: [reade(pn + '/' + n) for _ in range(s-2)]
                         else:
                             writefile(pn + '/' + n,f.read(s))
-                            set_ctime(pn + '/' + n,tm)
+                            set_ftime(pn + '/' + n,tm)
                     reade(o)
                 else: raise NotImplementedError(f'Platform: 0x{p:08X}')
 
@@ -1954,7 +1954,7 @@ def extract4_2(inp:str,out:str,t:str):
                 if f.splt.get('eof'): break
             of.close()
             for f in fsd.values(): f.close()
-            if fsd[fc].splt.get('t'): set_ctime(of.name,fsd[fc].splt['t'])
+            if fsd[fc].splt.get('t'): set_ftime(of.name,fsd[fc].splt['t'])
             return
         case 'Palm MemoPad Archive':
             TYPS = ('none','int','float','date','alpha','cstr','bool','bitFlags','repeatEvent')

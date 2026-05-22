@@ -156,17 +156,32 @@ def sanitize_relative(p:str):
     if p[-1] not in '\\/' and r[-1] in '\\/': r = r[:-1]
     elif p[-1] != r[-1]: r = r[:-1] + p[-1]
     return r
-def set_ctime(p:str,t:int,unix=True):
+def unix2filetime(t:int): return t * 10000000 + 116444736000000000
+def filetime2unix(t:int): return t / 10000000 - 116444736000000000
+def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
+    if ct is None: ct = 0
+    if mt is None: mt = ct
+    if at is None: at = mt
+
     try:
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)
-        if unix: wt = int(t * 10000000 + 116444736000000000)
-        else: wt = t
-        ft = wintypes.FILETIME(wt & 0xFFFFFFFF,wt >> 32)
-        ctypes.windll.kernel32.SetFileTime(h,ctypes.byref(ft),None,None)
+        if unix:
+            wct = unix2filetime(ct)
+            wat = unix2filetime(at)
+            wmt = unix2filetime(mt)
+        else: wct,wat,wmt = ct,at,mt
+        fct = wintypes.FILETIME(wct & 0xFFFFFFFF,wct >> 32)
+        fat = wintypes.FILETIME(wat & 0xFFFFFFFF,wat >> 32)
+        fmt = wintypes.FILETIME(wmt & 0xFFFFFFFF,wmt >> 32)
+        ctypes.windll.kernel32.SetFileTime(h,ctypes.byref(fct),ctypes.byref(fat),ctypes.byref(fmt))
         ctypes.windll.kernel32.CloseHandle(h)
     except: pass
-    if not unix: t = t / 10000000 - 116444736000000000
-    os.utime(p,(t,t))
+    else: return
+
+    if not unix:
+        at = filetime2unix(at)
+        mt = filetime2unix(mt)
+    os.utime(p,(at,mt))
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'
 def gtmp(suf=''): return TMP + 'tmp' + os.urandom(8).hex() + suf
@@ -605,7 +620,8 @@ def extract(inp:str,out:str,t:str) -> bool:
     return 1
 def hookshot(cmd:list,redirect:dict,**kwargs):
     scr = cmd[0]
-    if not 'print_try' in kwargs or kwargs.pop('print_try'): print('Trying with',scr)
+    if kwargs.get('print_try',db.print_try): print('Trying with',scr)
+    if 'print_try' in kwargs: kwargs.pop('print_try')
     scr = db.get(scr)
     hks = scr + '.hookshot'
     open(hks,'w').close()

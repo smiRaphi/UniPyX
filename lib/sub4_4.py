@@ -108,7 +108,7 @@ def extract4_4(inp:str,out:str,t:str):
                 fn = f'{o}/{fe[0]}.{ex}'
                 writefile(fn,d)
                 if fe[2] > 0:
-                    set_ctime(fn,fe[2])
+                    set_ftime(fn,fe[2])
 
             f.close()
             if fs: return
@@ -140,8 +140,7 @@ def extract4_4(inp:str,out:str,t:str):
             if fs: return
         case 'mTropolis MPL':
             if db.print_try: print('Trying with custom extractor')
-            from datetime import datetime
-            from lib.file import File
+            from lib.file import File,pdosdate
             f = File(i,endian='<')
             assert f.readu16() == 1 and f.readu16() == 0xA5A5 and f.readu16() == 0xAA55
             f.padc(2)
@@ -173,9 +172,8 @@ def extract4_4(inp:str,out:str,t:str):
                         for _ in range(stc):
                             n = f.readc(0x10).rstrip(b'\0').decode('ascii')
                             ct,cd = f.readu16('>'),f.readu16('>')
-                            tm = datetime(1980 + ((cd >> 9) & 0x7F),(cd >> 5) & 0xF,cd & 0x1F,(ct >> 11) & 0x1F,(ct >> 5) & 0x3F,(ct & 0x1F) * 2)
                             assert f.readc(4) == b'eStr'
-                            FS.append((n,f.readu16(),f.readu32(),f.readu32(),tm.timestamp()))
+                            FS.append((n,f.readu16(),f.readu32(),f.readu32(),pdosdate(cd,ct)))
                             assert sgc >= FS[-1][1] > 0
 
                         cid = f.readu32()
@@ -200,7 +198,7 @@ def extract4_4(inp:str,out:str,t:str):
                 if fe[3] == 0: continue
                 fn = f'{o}/{ix:03d}.{fe[0]}'
                 writefile(fn,cf.readc(fe[3]))
-                set_ctime(fn,fe[4])
+                set_ftime(fn,fe[4])
 
             for x in OFS:
                 if x != -1 and OFS[x]: OFS[x].close()
@@ -2025,5 +2023,78 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'PlayPond Pack':
+            KEYS = {
+                0:(b'786!N21.422525E39.826212@PiracyIsASin',0xFF),
+                #0x17:(,0xFF),
+            }
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decompress
+            from lib.crypto import decrypt
+            f = File(i,endian='<')
+            assert f.read(7) == b'ARCPACK'
+            v = f.readu8()
+            assert v in KEYS,v
+
+            f.skip(8)
+            c,ifs = f.readu32(),f.readu32()
+            f.skip(0x34)
+            fi = File(decrypt(f.readc(ifs),'rc4_pp',*KEYS[v]),endian=f._end)
+            for _ in range(c):
+                fn = fi.readc(fi.readu32()).rstrip(b'\0').decode('ascii')
+                f.seek(fi.readu32())
+                us,zs = fi.readu32(),fi.readu32()
+                d = decrypt(f.readc(zs),'rc4_pp',KEYS[v][0],(zs & 0xFFF) + 0xFF)
+                writefile(o + '/' + fn,decompress(d,'zlib',usize=us))
+
+            f.close()
+            del fi
+            if c: return
+        case 'Seal Online EDT': raise NotImplementedError
+        case 'Robots BIN+000':
+            if db.print_try: print('Trying with custom extractor')
+            import re
+            from lib.file import File
+            f = File(i,endian='<')
+            fd = File(noext(i) + '.000')
+            assert f.readu32() == 7
+
+            f.skip(4)
+            c = f.readu32()
+            assert f.readu32() == 1
+            f.skip(4) # offset - 0x10 to fake file name table (it's just random garbage)
+
+            f.seek(0x14)
+            fs = []
+            for _ in range(c):
+                s = f.readu32() # fake size > 0x800
+                id = f.readu32()
+                f.skip(12) # ? is also in most file headers
+                fs.append((id,f.readu64(),s)) # not sure if u64 or u32 + padding
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,fd.size))
+
+            fnm = {}
+            for ix,fe in enumerate(fs[:-1]):
+                if fe[0] >> 24 == 0x81 and (fs[ix+1][1] - fe[1]) > 0x13:
+                    fd.seek(fe[1])
+                    if fd.readc(0x12) != b'/* Schema: 0002 */': continue
+                    d = fd.readc(fs[ix+1][1] - fe[1] - (-fe[2] % 0x800) - 0x13).decode('utf-8')
+                    fnm |= {int(x[1],16):x[0] for x in re.findall(r'#define ([^\s]+)\s+0x([a-fA-F0-9]{8})',d)}
+
+            for ix,fe in enumerate(fs[:-1]):
+                fd.seek(fe[1])
+                d = fd.readc(fs[ix+1][1] - fe[1] - (-fe[2] % 0x800))
+                fn = o + '/' + fnm.get(fe[0],f'{fe[0]:08X}') + '.'
+                if d[:4] == b'MOEG': fn += 'geo'
+                elif d[:4] == b'MUSX': fn += 'mus'
+                elif b'/* Schema: ' in d[:0x40] or b'/* HT_Sound */' in d[:0x40]: fn += 'h'
+                else: fn += guess_ext(d)
+                writefile(fn,d)
+
+            f.close()
+            fd.close()
+            if c: return
 
     return 1

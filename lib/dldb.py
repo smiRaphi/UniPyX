@@ -40,7 +40,12 @@ class DLDB:
         self.pdb = {x:self.db[x] for x in self.db if 'pip' in self.db[x]}
         for x in self.pdb: self.db.pop(x)
 
-        if os.path.exists(self.udbp): self.udb = json.load(xopen(self.udbp))
+        if os.path.exists(self.udbp):
+            try: self.udb = json.load(xopen(self.udbp))
+            except json.decoder.JSONDecodeError:
+                print('WARNING: download cache is invalid, deleting')
+                os.remove(self.udbp)
+                self.udb = {}
         else: self.udb = {}
         if not 'httpx' in self.udb: self.udb['httpx'] = int(time())
 
