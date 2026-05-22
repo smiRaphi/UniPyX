@@ -1694,5 +1694,21 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with ilspycmd')
             run(['dotnet',db.get('ilspycmd'),'--disable-updatecheck','--nested-directories','-p','-o',o,i],getexe=False,print_try=False)
             if listdir(o): return
+        case 'QuickBMS XML Script':
+            if db.print_try: print('Trying with custom extractor')
+            import re
+            from html import unescape
+            d = readfile(i,'r').strip()
+            assert d.startswith('<bms') and d.endswith('</bms>')
+            d = d[:-6]
+            hd = re.search(r'^<bms(\s+([\w_]+="[^"\n]*"\s*)+)?\s*>',d)
+            assert hd
+            hd = hd[0]
+            d = d[len(hd):].strip()
+
+            atrs = [f'# {x[0]}={unescape(x[1])}' for x in re.findall(r'([\w_]+)="([^"\n]*)"',hd)]
+            if atrs: d = '\n'.join(atrs) + '\n\n' + unescape(d)
+            writefile(f'{o}/{tbasename(i)}.bms',d,'w')
+            if d: return
 
     return 1

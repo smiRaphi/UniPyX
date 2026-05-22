@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 957
+# Supported Formats: 958
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -224,7 +224,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (123)
+## Executables/Packers/Installers (124)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -314,6 +314,7 @@ PMWLite | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/
 PyInstaller | .exe | [pyinstxtractor-ng](https://github.com/pyinstxtractor/pyinstxtractor-ng) |
 Python Compiled Module | .pyc | [pycdc](https://github.com/extremecoders-re/decompyle-builds) |
 Qt IFW | .exe | [QtInstallerFramework](https://download.qt.io/official_releases/qt-installer-framework/4.8.1/), [7-Zip](https://7-zip.org/) |
+QuickBMS XML Script | .bms | Custom |
 VISE Installer | .exe | [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
 Wise Installer | .exe | [E_WISE](https://bioruebe.com/dev/uniextract/)(src?) |
 MSI | .msi | [lessmsi](https://github.com/activescott/lessmsi), MSIExec (Windows), [7-Zip](https://7-zip.org/) |
@@ -689,7 +690,7 @@ Piper SAGE | .sgo | Custom |
 Pivotal Games DAT | .dat | Custom |
 Pixelbite BAR | .bar | Custom |
 Pixelbite ZIP | ??? | Custom |
-PlayPond Pack | .pack | Custom |
+PlayPond Pack | .pack .dat | Custom |
 PlayStation 3 Core OS Package | .pkg | [ps3_cosunpkg](https://github.com/wargio/ps3tools) |
 PlayStation 3 Signed Package | .pkg | [ps3_unpkg](https://github.com/wargio/ps3tools) |
 PlayStation Archive | .psarc | [PS3 4.50 SDK-YLoD [450_001].7z/psarc](https://archive.org/download/ps3_sdks), [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |

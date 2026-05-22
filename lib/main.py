@@ -1,4 +1,8 @@
-import re,json,ast,os,errno,sys,subprocess,hashlib,ctypes,shutil
+import sys
+if sys.version_info < (3,13):
+    raise RuntimeError("Python 3.13+ is required")
+
+import re,json,ast,os,errno,subprocess,hashlib,ctypes,shutil
 from time import sleep
 from ctypes import wintypes
 from shutil import rmtree,copytree,copyfile
