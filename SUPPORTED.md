@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 956
+# Supported Formats: 957
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -352,7 +352,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (496)
+## Various (497)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -406,6 +406,7 @@ Bandai PKG | .pkg | Custom |
 Barbie: Riding Club Cache | .cache | Custom |
 Battlezone 2 PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 BCH | .bch | Custom |
+Berkeley Systems SRF | .srf | Custom |
 Bethesda BSA | .bsa | [BSA Browser](https://github.com/AlexxEG/BSA_Browser) |
 Bezel Archive | .bea | [vroom_scne.bms](https://mirror.aluigi.org/bms/vroom_scne.bms) |
 Bezel Shader Pack | ??? | Custom |

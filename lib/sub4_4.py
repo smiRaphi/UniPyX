@@ -140,7 +140,7 @@ def extract4_4(inp:str,out:str,t:str):
             if fs: return
         case 'mTropolis MPL':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File,pdosdate
+            from lib.file import File
             f = File(i,endian='<')
             assert f.readu16() == 1 and f.readu16() == 0xA5A5 and f.readu16() == 0xAA55
             f.padc(2)
@@ -148,6 +148,7 @@ def extract4_4(inp:str,out:str,t:str):
             OFS = {}
             def get_fl(id) -> File:
                 if id not in OFS:
+                    assert -1 in OFS
                     dn = dirname(i)
                     bn = OFS[-1].replace('\0',str(id))
                     pcs = [dn + '/' + x for x in listdir(dn) if noext(x).upper() == bn and x.lower().endswith('.mpx')]
@@ -171,14 +172,13 @@ def extract4_4(inp:str,out:str,t:str):
                         sgc = f.readu16()
                         for _ in range(stc):
                             n = f.readc(0x10).rstrip(b'\0').decode('ascii')
-                            ct,cd = f.readu16('>'),f.readu16('>')
-                            assert f.readc(4) == b'eStr'
-                            FS.append((n,f.readu16(),f.readu32(),f.readu32(),pdosdate(cd,ct)))
+                            f.skip(8) # memory junk
+                            FS.append((n,f.readu16(),f.readu32(),f.readu32()))
                             assert sgc >= FS[-1][1] > 0
 
                         cid = f.readu32()
-                        assert str(cid) in tbasename(i)
-                        OFS[-1] = tbasename(i).replace(str(cid),'\0')
+                        if str(cid) in tbasename(i):
+                            OFS[-1] = tbasename(i).replace(str(cid),'\0')
                         OFS[cid] = f
                     case 1002:
                         while f.pos < ep: readpb(f)
@@ -198,7 +198,6 @@ def extract4_4(inp:str,out:str,t:str):
                 if fe[3] == 0: continue
                 fn = f'{o}/{ix:03d}.{fe[0]}'
                 writefile(fn,cf.readc(fe[3]))
-                set_ftime(fn,fe[4])
 
             for x in OFS:
                 if x != -1 and OFS[x]: OFS[x].close()
@@ -2096,5 +2095,30 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if c: return
+        case 'Berkeley Systems SRF':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            assert f.read(4) == b'srf1'
+
+            f.skip(4)
+            hs = f.readu32()
+            fs = []
+            while f.pos < hs:
+                bn = f.reads(4,'ascii')
+                assert bn.isprintable()
+                c = f.readu32()
+                for _ in range(c): fs.append((bn + str(f.readu32()),f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                if d[:4] == b'RLID': ex = 'rli'
+                elif d[:0x2C] == b'\0\1\0\1\0\x05\0\0\0\x80\0\1\x80\x51\0\0\0\0\0\x14\0\0\0\0\0\0\0\1\x56\x22\0\0\0\0\0\0\0\0\0\0\xFE\x3C\0\0': ex = 'snd'
+                else: ex = guess_ext(d)
+                writefile(f'{o}/{fe[0]}.{ex}',d)
+
+            f.close()
+            if fs: return
 
     return 1

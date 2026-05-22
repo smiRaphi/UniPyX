@@ -16,9 +16,7 @@ fn format_dos_time(std::time::DOSTime time) {
 using b;
 struct se {
     char name[0x10];
-    be std::time::DOSTime time [[format("format_dos_time")]];
-    be std::time::DOSDate date [[format("format_dos_date")]];
-    char type[4];
+    padding[8]; // memory junk
     u16 seg_id;
     u32 off;
     u32 size;
