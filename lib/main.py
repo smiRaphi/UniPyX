@@ -879,6 +879,25 @@ def guess_ext_3ds(d:bytes):
     else: ext = guess_ext(d)
 
     return ext
+def guess_ext_xbox(d:bytes):
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
+
+    if d[:4] == b'RIFF' and d[8:12] == b'XWMA': ext = 'xwma'
+    elif d[:4] == b'XPR2': ext = 'xprx'
+    elif d[:4] == b'XPR\0': ext = 'xpr'
+    elif d[:4] == b'XBEH': ext = 'xbe'
+    elif d[:4] == b'XEX2': ext = 'xex'
+    elif b'Microsoft (R) Xbox 360 Shader Compiler 2.' in d[:0x600]:
+        p = d.find(b'Microsoft (R) Xbox 360 Shader Compiler 2.')
+        st = d[p-7:p-1]
+        if st == b'vs_3_0': ext = 'xvu'
+        elif st == b'ps_3_0': ext = 'xpu'
+        else: ext = 'xsh'
+    else: ext = guess_ext(d)
+
+    return ext
 def guess_ext_163(d:bytes):
     if not d: return 'null'
     s = len(d)

@@ -1152,6 +1152,10 @@
         "rs":"Robots BIN+000"
     },
     {
+        "d":[["isat","\\x03\\0\\0\\0",0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little')\nif (8+c*26)>s:return\nf.seek(int.from_bytes(f.read(4),'little'),1);z=int.from_bytes(f.read(4),'little');f.seek(8,1);o=int.from_bytes(f.read(4),'little')\nif (8+c*26)>o or(o+z)>s:return\nf.seek(o-16);z=int.from_bytes(f.read(4),'little');f.seek(8,1);return (int.from_bytes(f.read(4),'little')+z)==s"]],
+        "rs":"Tom Clancy's Ghost Recon GLB"
+    },
+    {
         "d":[["isat","\\0\\0",8],["isatS","\\0",16,16],["isin",["NNNN","ZZZ4"],56],["n0",1,6],["n0",4,32],["n0",2,38],["n0",4,40],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=f.read(3);f.seek(32);return (32+int.from_bytes(f.read(4),'little'))==s and c==f.read(3)"]],
         "rs":"Messiah Image Resource"
     },
@@ -2354,6 +2358,10 @@
         "rs":"QuARK","s":1
     },
     {
+        "d":[["isat","PACK\\1\\0\\0\\0",0],["isat","\\0",-1],["isatS","\\0",8,24],["n0",4,8],["n0",4,12],["n0",4,40],["n0",4,44],["py","if not exists(splitext(inp)[0]+'.dat'):return\nf=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (c*16)==int.from_bytes(f.read(4),'little')"]],
+        "rs":"RTL Ski Jumping 2004 DIR+DAT","s":1
+    },
+    {
         "rqr":"Quake archive",
         "d":[["isat","PACK",0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))<s"]],
         "rs":"Quake PAK","s":1
@@ -2448,6 +2456,11 @@
         "rq":null,
         "d":[["isin",["\\x80","\\x81","\\x82","\\x83","\\x84"],1],["isat","\\0",3]],
         "rs":"ACB"
+    },
+    {
+        "rq":null,
+        "rqr":"Z-Code V3 adventure for Infocom Z-Machine",
+        "rs":"Z-Code"
     },
     {
         "rq":null,

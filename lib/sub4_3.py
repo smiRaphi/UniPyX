@@ -96,16 +96,10 @@ def extract4_3(inp:str,out:str,t:str):
                 if ex is None:
                     if len(d) > 0x80 and d[0x70:0x80] == b'mdl_Detail\0\0\0\0\0\0': ex = 'mdl'
                     elif len(d) >= 0x90 and d[0x70:0x90] == b'polySurfaceShape3\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' or d[0x80:0x90] == b'polySurfaceShape3\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0': ex = 'shp3'
-                    elif b'Microsoft (R) Xbox 360 Shader Compiler 2.' in d[:0x600]:
-                        p = d.find(b'Microsoft (R) Xbox 360 Shader Compiler 2.')
-                        st = d[p-7:p-1]
-                        if st == b'vs_3_0': ex = 'xvu'
-                        elif st == b'ps_3_0': ex = 'xpu'
-                        else: ex = '!!!'
-                    elif d[:4] in {b'XPR2',b'XMD\0'}: ex = d[:3].decode('ascii').lower()
+                    elif d[:4] == b'XMB\0': ex = 'xmb'
                     elif d[:4] in {b'KBDS',b'DNBW'}: ex = d[:4].decode('ascii').lower()
                     elif b'Shape\0' in d[0x110:0x130]: ex = 'shp'
-                    else: ex = guess_ext(d)
+                    else: ex = guess_ext_xbox(d)
                 writefile(f'{o}/{ix:04d}.{ex}',d)
 
             pcs = []

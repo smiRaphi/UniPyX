@@ -364,10 +364,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 9:'deflate64',
                 12:'bzip2',
                 14:'lzma_zip',
+                15:'oodle', # unofficial, used by "New World: Aeternum", untested
                 16:'cmpsc',
                 18:'terse',
                 19:'lz77z',
-                20:'zstd',
+                20:'zstd', # deprecated
                 93:'zstd',
                 94:'mp3',
                 95:'xz',

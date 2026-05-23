@@ -1830,7 +1830,7 @@ def extract4_4(inp:str,out:str,t:str):
         case 'MotoGP ARK':
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import HashLib
-            hl = HashLib.dl('motog',encoding='ascii')
+            hl = HashLib.dl('motogp',db,fmt=lambda x:x.lower(),encoding='ascii')
             from lib.file import File
             f = File(i,endian='<')
 
@@ -2105,8 +2105,10 @@ def extract4_4(inp:str,out:str,t:str):
             hs = f.readu32()
             fs = []
             while f.pos < hs:
-                bn = f.reads(4,'ascii')
-                assert bn.isprintable()
+                bn = f.readc(4)
+                try: assert bn.decode('ascii').isprintable()
+                except: bn = bn.lstrip(b'\0').hex().upper()
+                else: bn = bn.decode('ascii')
                 c = f.readu32()
                 for _ in range(c): fs.append((bn + str(f.readu32()),f.readu32(),f.readu32()))
 
@@ -2119,6 +2121,44 @@ def extract4_4(inp:str,out:str,t:str):
                 writefile(f'{o}/{fe[0]}.{ex}',d)
 
             f.close()
+            if fs: return
+        case 'Tom Clancy\'s Ghost Recon GLB':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.readu32() == 3
+
+            c = f.readu32()
+            fs = [(f.reads(f.readu32(),'utf-8'),f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                assert fe[3] in {0,1}
+                f.seek(fe[4])
+                d = f.decompress(fe[1],('none','bpe')[fe[3]],usize=fe[2])
+                writefile(o + '/' + fe[0],d)
+
+            f.close()
+            if fs: return
+        case 'RTL Ski Jumping 2004 DIR+DAT':
+            raise NotImplementedError('compression')
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            fd = File(noext(i) + '.dat')
+            assert f.read(4) == b'PACK' and f.readu32() == 1
+
+            c = f.readu32() - 1
+            sof = f.readu32()
+            fs = [(f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(sof + fe[3])
+                fn = f.read0s('ansi')
+                assert fn.isprintable()
+                fd.seek(fe[2])
+                writefile(o + '/' + fn,fd.decompress(fe[0],'' if fe[0] != fe[1] else 'none',usize=fe[1]))
+
+            f.close()
+            fd.close()
             if fs: return
 
     return 1

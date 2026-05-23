@@ -99,6 +99,7 @@ class X:
             ('decompress_huffman', (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_ash0',    (P(u8),szt,P(u8)),        sszt,0),
+            ('decompress_bpe',     (P(u8),szt,P(u8),sszt),   sszt,1),
 
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
@@ -157,6 +158,7 @@ class X:
     def decompress_lz4_fast(src:bytes,usize:int) -> bytes: ...
     def decompress_lzss8(src:bytes,usize:int) -> bytes: ...
     def decompress_rtl_lz(src:bytes,usize:int) -> bytes: ...
+    def decompress_bpe(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)
@@ -823,6 +825,14 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
                 CHKi(3);
                 uint16_t l = src[ip] | (src[ip + 1] << 8);ip += 2;
                 uint16_t o = src[ip] | (src[ip + 1] << 8);ip += 2;
+                if (o != 0) o -= 1;
+                if (o > op) o = 0;
+                if (o + l > op) {
+                    if (l > op) {
+                        o = 0;
+                        l = op;
+                    } else o = op - l;
+                }
                 while (b & 0x30) {
                     CHKi(0);CHKo(0);
                     dst[op++] = src[ip++];
@@ -830,20 +840,28 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
                 }
                 for (int i=0;i < l;i++,op++) {
                     CHKo(0);
-                    dst[op] = dst[op - o - l + 1];
+                    dst[op] = dst[op - o - l];
                 }
             } else {
                 CHKi(1);
+                uint8_t l = (b & 0x0F) + 2;
                 uint16_t o = src[ip] | (src[ip + 1] << 8);ip += 2;
-                uint16_t l = (b & 0x0F) + 2;
+                if (o != 0) o -= 1;
+                if (o > op) o = 0;
+                if (o + l > op) {
+                    if (l > op) {
+                        o = 0;
+                        l = op;
+                    } else o = op - l;
+                }
                 while (b & 0x30) {
-                    CHKi(0);
+                    CHKi(0);CHKo(0);
                     dst[op++] = src[ip++];
                     b -= 0x10;
                 }
                 for (int i=0;i < l;i++,op++) {
                     CHKo(0);
-                    dst[op] = dst[op - o - l + 1];
+                    dst[op] = dst[op - o - l];
                 }
             }
         } else {
@@ -852,7 +870,9 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
                 dst[op++] = src[ip++];
                 dst[op++] = src[ip++];
             }
+            CHKo(1);
             uint8_t o = (b & 0x3F)*2 + 2;
+            if (o > op) o = op;
             dst[op] = dst[op - o];op++;
             dst[op] = dst[op - o];op++;
         }
@@ -908,6 +928,55 @@ EXPORT ssize_t decompress_ash0(const uint8_t *restrict src, const size_t zsize,
             size_t cp = op - dist;
             if (op + lng > usize) lng = usize - op;
             for (size_t i=0;i < lng;i++) dst[op++] = dst[cp++];
+        }
+    }
+
+    return op;
+}
+EXPORT ssize_t decompress_bpe(const uint8_t *restrict src, const size_t zsize,
+                                    uint8_t *restrict dst, const ssize_t usize) {
+    if (usize == 0) return 0;
+    if (zsize < 2) return -1;
+    uint8_t ls[0x100];
+    uint8_t rs[0x100];
+    uint16_t pc = 0;
+    size_t ip = 0;
+
+    while (ip < zsize) {
+        uint8_t l = src[ip++];
+        if (!l) break;
+
+        if (ip >= zsize) return -1;
+        uint8_t r = src[ip++];
+        ls[pc] = l;
+        rs[pc++] = r;
+        if (pc >= 0x100) break;
+    }
+
+    uint16_t tokb = 0x100 - pc;
+    ssize_t op = 0;
+    uint8_t stack[0x200];
+    uint16_t sp = 0;
+
+    while (ip < zsize && (op < usize || usize == -1)) {
+        size_t chk_end = ip + 1;
+        if (src[ip]) chk_end += src[ip++];
+        else {
+            chk_end += src[ip + 1] | (src[ip + 2] << 8);ip += 3;
+        }
+
+        if (chk_end > zsize) chk_end = zsize;
+
+        while ((ip < chk_end || sp > 0) && (op < usize || usize == -1)) {
+            uint8_t v;
+            if (sp > 0) v = stack[--sp];
+            else v = src[ip++];
+
+            if (v >= tokb) {
+                if (sp + 2 > 0x200) return -1;
+                stack[sp++] = rs[v - tokb];
+                stack[sp++] = ls[v - tokb];
+            } else dst[op++] = v;
         }
     }
 

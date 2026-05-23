@@ -289,6 +289,10 @@ def luas_hash(i:bytes):
         o ^= (o * 0x20 + (o >> 2) + i[p - 1]) & 0xFFFFFFFF
         p -= stp
     return o
+def java_hash(i:bytes):
+    h = 0
+    for b in i: h = (h * 31 + b) & 0xFFFFFFFF
+    return h
 def sxm_hash(i:bytes):
     v = 0
     for b in i: v = ((v * 137) + b) & 0xFFFFFFFFFFFFFFFF
@@ -517,6 +521,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
 
         case 'tarzan': fnc = tarzan_hash
         case 'luas': fnc = luas_hash
+        case 'java': fnc = java_hash
         case 'sxm': fnc = sxm_hash
         case 'hash40':
             import zlib
@@ -562,7 +567,7 @@ HASHTS = {
     'blake2b':64,'blake2s':32,
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
-    'tarzan':4,'luas':4,'sxm':8,'hash40':5,'pivotal':4,
+    'tarzan':4,'luas':4,'sxm':8,'hash40':5,'pivotal':4,'java':4,
 }
 class HashLib:
     def __init__(self,p:str,fmt=lambda x:x,encoding='utf-8'):
@@ -651,16 +656,18 @@ def _kl_interpt(f:File|list):
     elif isinstance(f,int): t = f
     else: t = f[0]
     match t:
-        case 0: return (None, lambda f:None,lambda f,v:0)
-        case 1: return (int,  lambda f:f.readvlq(),lambda f,v:f.writevlq(v))
-        case 2: return (bytes,lambda f:f.readc(f.readvlq()),lambda f,v:f.writevlq(len(v)) + f.write(v))
-        case 3: return (str,  lambda f:f.read0s('utf-8'),lambda f,v:f.write(v.encode('utf-8') + b'\0'))
+        case 0: return (None, lambda f:None,lambda f,v:0,t)
+        case 1: return (int,  lambda f:f.readvlq(),lambda f,v:f.writevlq(v),t)
+        case 2: return (bytes,lambda f:f.readc(f.readvlq()),lambda f,v:f.writevlq(len(v)) + f.write(v),t)
+        case 3: return (str,  lambda f:f.read0s('utf-8'),lambda f,v:f.write(v.encode('utf-8') + b'\0'),t)
         case 64:
-            l = f.readvlq()
-            return (bytes,lambda f:f.readc(l),lambda f,v:f.write(v))
+            if isinstance(f,File): l = f.readvlq()
+            else: l = f[1]
+            return (bytes,lambda f:f.readc(l),lambda f,v:f.write(v),t,l)
         case 65:
-            l = f.readu8()
-            return (int,lambda f:f.unpacki(l),lambda f,v:f.packi(v,l))
+            if isinstance(f,File): l = f.readu8()
+            else: l = f[1]
+            return (int,lambda f:f.unpacki(l),lambda f,v:f.packi(v,l),t,l)
     raise ValueError
 
 class KeyLib:
@@ -668,13 +675,13 @@ class KeyLib:
         self.p = os.path.abspath(p)
         self.db = {}
         self.scheme = []
-        self.name_scheme = None
+        self.name_flag = None
 
     @classmethod
     def new(cls,p:str,scheme:tuple[type],name=None):
         c = cls(p)
-        c.scheme = scheme
-        c.name_flag = name
+        c.scheme = [_kl_interpt(x) for x in scheme]
+        c.name_flag = _kl_interpt(name or 0)
         return c
     @classmethod
     def dl(cls,p:str,db): return cls(db.get(p + '_keys')).load()
@@ -698,9 +705,12 @@ class KeyLib:
         return self
     def save(self):
         f = File(self.p,'wb',endian='>')
-        f.writeu8(1 if self.name_flag else 0)
+        f.writeu8(self.name_flag[3])
         f.writeu8(len(self.scheme))
-        f.write(bytes(x[3] for x in self.scheme))
+        for x in self.scheme:
+            f.writeu8(x[3])
+            if x[3] == 64: f.writevlq(x[4])
+            elif x[3] == 65: f.writeu8(x[4])
         f.writevlq(len(self.db))
         for k,v in self.db.items():
             sch = self.scheme.copy()

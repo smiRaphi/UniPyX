@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 958
+# Supported Formats: 959
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -296,7 +296,7 @@ JS P.A.C.K.E.R. | .js | [js-beautify packer](https://github.com/beautifier/js-be
 JS MyObfuscate.com | .js | [js-beautify myobfuscate](https://github.com/beautifier/js-beautify/blob/main/python/jsbeautifier/unpackers/myobfuscate.py) + Custom |
 LGLZ | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 LM-T2E | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
-Lua Bytecode | .lua .luac | [unluac](https://sourceforge.net/project/unluac/), [luadec51-3](https://github.com/viruscamp/luadec) |
+Lua Bytecode | .lua .luac .lc | [unluac](https://sourceforge.net/project/unluac/), [luadec51-3](https://github.com/viruscamp/luadec) |
 LZEXE | .exe .com | [deark](https://github.com/activescott/deark) |
 MASM Installer | .exe | Custom + [7-Zip](https://7-zip.org/) |
 MSCAB SFX | .exe | [7-Zip](https://7-zip.org/), Input (/X), Input (/T), Input (-extract) |
@@ -353,7 +353,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (497)
+## Various (498)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -629,6 +629,7 @@ Moe Cure Net FileList | ` ` | Custom |
 Monolith Productions LTAR | ??? | [shadow_of_mordor.bms](https://mirror.aluigi.org/bms/shadow_of_mordor.bms), [condemned2.bms](https://mirror.aluigi.org/bms/condemned2.bms), [fear.bms](https://mirror.aluigi.org/bms/fear.bms) |
 Monsters Inc. Scream Team Training WAD | .wad | Custom |
 Motocross Mania DAT | .dat | [e_biker.bms](https://mirror.aluigi.org/bms/e_biker.bms) |
+MotoGP ARK | .ark | Custom |
 mTropolis MDM | .q3 | Custom |
 mTropolis MPL | .mpl | Custom |
 Natsume LZS | .paz * | Custom |
