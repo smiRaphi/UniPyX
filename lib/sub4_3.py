@@ -2434,13 +2434,12 @@ def extract4_3(inp:str,out:str,t:str):
 
     return 1
 
+DNAKEY = bytes.fromhex('E481D4ED17D44162FA5CE995AE252FD098C014CED9A742F99FFA8D382B2A136A26E0D9708EABB5F18E77ED809B1CAF51918D680061B2463D')
 def dnasoft_lzss_decrypt(i:bytes):
     from lib.crypto import decrypt
-    KEY = b'\xe4\x81\xd4\xed\x17\xd4\x41\x62\xfa\x5c\xe9\x95\xae\x25\x2f\xd0\x98\xc0\x14\xce\xd9\xa7\x42\xf9\x9f\xfa\x8d\x38\x2b\x2a\x13\x6a\x26\xe0\xd9\x70\x8e\xab\xb5\xf1\x8e\x77\xed\x80\x9b\x1c\xaf\x51\x91\x8d\x68\x00\x61\xb2\x46\x3d'
-
     assert i[:4] == b'LZSS'
     rs = int.from_bytes(i[4:8],'little')
-    return decrypt(i[8:8+rs+-rs%8],'blowfish_le',KEY)[:rs]
+    return decrypt(i[8:8+rs+-rs%8],'blowfish_le',DNAKEY)[:rs]
 def sxm_block(inp,o:str,hint=None):
     from lib.file import File
     f:File = inp
