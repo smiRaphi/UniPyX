@@ -199,10 +199,17 @@ def supdate(c:Cache,k:str,inf:dict):
                 u = bu + ms[0]
         elif dom == 'dl.dolphin-emu.org':
             s = c.get('https://dolphin-emu.org/download/')
+            if '<title>Establishing a secure connection ...</title>' in s:
+                print('Input "view-source:https://dolphin-emu.org/download/" page:')
+                s = ''
+                while 1:
+                    try: s += input(': ')
+                    except EOFError: break
             m = re.search(r'href="/download/dev/[^"]+">[^<]+</a></td>\s*<td class="reldate" title="([^"Z\.]+)[^"]*">[^<]*</td>\s*.+\s*</tr>\s*<tr class="download">\s*.+\s*<td class="download-links".*>\s*<a href="(https://[^"]+-x64\.7z)"',s)
-            ts = ft(m[1],'%Y-%m-%dT%H:%M:%S')
-            if m[2] != u: u = m[2]
-            else: ts = 0
+            if m:
+                ts = ft(m[1],'%Y-%m-%dT%H:%M:%S')
+                if m[2] != u: u = m[2]
+                else: ts = 0
         elif dom.endswith('.wiimm.de'):
             s = c.get(f'https://{dom}/download.html')
             m = re.search(r'<a href="(/download/[^"]+-cygwin64\.zip)">[^<\n]*</a>[^,\n]+, (\d{4}-\d\d-\d\d)',s)

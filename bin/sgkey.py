@@ -32,7 +32,7 @@ class SGKeys:
         self.t = t
         self.load()
     def load(self):
-        if not os.path.exists(__db__): makedb()
+        if not os.path.exists(__db__) or not os.path.getsize(__db__): makedb()
 
         i = open(__db__,'rb')
         self._db = {}
@@ -88,8 +88,9 @@ def makedb():
         "Triforce GD-ROM": "T",
     }
 
+    r = httpx.get('https://www.citylan.it/index.php/Naomi_-_Chihiro_-_Triforce',timeout=60)
     o = open(__db__,'wb')
-    for t,tid,key in re.findall(r'<tr>\n<td>[^<]+</td>\n<td>[^<]*</td>\n<td>([^<]+)</td>\n(?:<td>.*</td>\n){8}<td>([A-Z\d]+\-[A-Z\d]+)</td>\n(?:<td>.*</td>\n){14}<td>(?:0x)?([A-Fa-f\d]{16}|[A-Fa-f\d]{8})</td>\n',httpx.get('https://www.citylan.it/index.php/Naomi_-_Chihiro_-_Triforce').text):
+    for t,tid,key in re.findall(r'<tr>\n<td>[^<]+</td>\n<td>[^<]*</td>\n<td>([^<]+)</td>\n(?:<td>.*</td>\n){8}<td>([A-Z\d]+\-[A-Z\d]+)</td>\n(?:<td>.*</td>\n){14}<td>(?:0x)?([A-Fa-f\d]{16}|[A-Fa-f\d]{8})</td>\n',r.text):
         if len(key) not in {8,16}: continue
         if not t in TL:
             print(t,tid,'TL')

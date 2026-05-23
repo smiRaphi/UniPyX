@@ -504,10 +504,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if not drvs: return 1
 
             for f in drvs:
-                tf = f + '.dec'
+                tf = o + '\\' + basename(f) + '.dec'
                 run(['chdecrypt',f,tf,key.hex().upper()])
                 assert exists(tf)
-                od = f + '_ext'
+                od = tbasename(f) + '_ext'
                 if t == 'C':
                     assert open(tf,'rb').read(4) == b'FATX',basename(tf)
                     mkdir(od)

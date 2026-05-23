@@ -105,7 +105,7 @@ LZIP | .lz | [7-Zip](https://7-zip.org/) + [Lzip7z](https://www.tc4shell.com/en/
 LZMA | .lzma | [lzma](https://docs.python.org/3/library/lzma.html) |
 MacBinary | ??? | [unar](https://theunarchiver.com/command-line) |
 Master Boot Record | .mbr | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
-Microsoft Comic Chat Character | .avd .bgb | 
+Microsoft Comic Chat Character | .avd .bgb | [deark](https://entropymine.com/deark/) |
 Microsoft Compound Document | ??? | [7-Zip](https://7-zip.org/) |
 Microsoft SZDD | .??_ | [7-Zip](https://7-zip.org/) |
 Motorola S-Record | .srec | Custom |
