@@ -90,16 +90,17 @@ class X:
 
         self.dll = ctypes.CDLL(DLLP)
         for e in (
-            ('decompress_lz10_raw',(P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_lz11_raw',(P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_lz40_raw',(P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_blz_raw', (P(u8),szt,P(u8),sszt),   sszt,0),
-            ('decompress_lz4_fast',(P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_lzss8',   (P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_huffman', (P(u8),szt,P(u8),sszt,s8),sszt,0),
-            ('decompress_rtl_lz',  (P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_ash0',    (P(u8),szt,P(u8)),        sszt,0),
-            ('decompress_bpe',     (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lz10_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lz11_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lz40_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_blz_raw',  (P(u8),szt,P(u8),sszt),   sszt,0),
+            ('decompress_lz4_fast', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lzss0_lsb',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lzss0_msb',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
+            ('decompress_rtl_lz',   (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
+            ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
 
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
@@ -156,9 +157,10 @@ class X:
     def decompress_lz10_raw(src:bytes,usize:int) -> bytes: ...
     def decompress_lz11_raw(src:bytes,usize:int) -> bytes: ...
     def decompress_lz4_fast(src:bytes,usize:int) -> bytes: ...
-    def decompress_lzss8(src:bytes,usize:int) -> bytes: ...
+    def decompress_lzss0_lsb(src:bytes,usize:int) -> bytes: ...
+    def decompress_lzss0_msb(src:bytes,usize:int) -> bytes: ...
     def decompress_rtl_lz(src:bytes,usize:int) -> bytes: ...
-    def decompress_bpe(src:bytes,usize:int) -> bytes: ...
+    def decompress_graw_bpe(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)
@@ -349,6 +351,12 @@ static inline uint16_t read16le(const uint8_t *restrict ptr) {
 }
 static inline uint16_t read16be(const uint8_t *restrict ptr) {
     return ptr[1] | (ptr[0] << 8);
+}
+static inline uint32_t read24le(const uint8_t *restrict ptr) {
+    return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16);
+}
+static inline uint32_t read24be(const uint8_t *restrict ptr) {
+    return ptr[2] | (ptr[1] << 8) | (ptr[0] << 16);
 }
 static inline uint32_t read32le(const uint8_t *restrict ptr) {
     return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16) | ((uint32_t)ptr[3] << 24);
@@ -728,36 +736,34 @@ eof:
     #undef CHKo
     return op;
 }
-EXPORT ssize_t decompress_lzss8(const uint8_t *restrict src, const size_t zsize,
-                                      uint8_t *restrict dst, const ssize_t usize) {
+EXPORT ssize_t decompress_lzss0_lsb(const uint8_t *restrict src, const size_t zsize,
+                                          uint8_t *restrict dst, const ssize_t usize) {
     size_t ip = 0;
     ssize_t op = 0;
     uint8_t f = 0;
-    int fbl = 0;
+    int8_t fbl = 0;
 
     #define CHKi(n) if (ip + (n) >= zsize) goto eof;
     #define CHKo(n) if (usize != -1 && op + (n) >= usize) goto eof;
 
     while (usize == -1 || op < usize) {
-        CHKi(0);
         if (fbl <= 0) {
-            f = src[ip++];
             CHKi(0);
+            f = src[ip++];
             fbl = 8;
         }
 
         if (f & 1) {
-            CHKo(0);
+            CHKi(0);CHKo(0);
             dst[op++] = src[ip++];
-        }
-        else {
+        } else {
             CHKi(1);
             uint8_t b1 = src[ip++];
             uint8_t b2 = src[ip++];
 
-            size_t dist = (op - 18 - (((b2 & 0xF0) << 4) | b1)) & 0xFFF;
-            if (dist == 0) dist = 0x1000;
-            size_t lng = (b2 & 0x0F) + 3;
+            uint16_t dist = (op - 18 - (((b2 & 0xF0) << 4) | b1)) & 0xFFF;
+            if (!dist) dist = 0x1000;
+            uint8_t lng = (b2 & 0x0F) + 3;
 
             for (int i=0;i < lng;i++,op++) {
                 CHKo(0);
@@ -766,6 +772,50 @@ EXPORT ssize_t decompress_lzss8(const uint8_t *restrict src, const size_t zsize,
         }
 
         f >>= 1;
+        fbl--;
+    }
+
+eof:
+    #undef CHKi
+    #undef CHKo
+    return op;
+}
+EXPORT ssize_t decompress_lzss0_msb(const uint8_t *restrict src, const size_t zsize,
+                                          uint8_t *restrict dst, const ssize_t usize) {
+    size_t ip = 0;
+    ssize_t op = 0;
+    uint8_t f = 0;
+    int8_t fbl = 0;
+
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    #define CHKo(n) if (usize != -1 && op + (n) >= usize) goto eof;
+
+    while (usize == -1 || op < usize) {
+        if (fbl <= 0) {
+            CHKi(0);
+            f = src[ip++];
+            fbl = 8;
+        }
+
+        if (f & 0x80) {
+            CHKi(0);CHKo(0);
+            dst[op++] = src[ip++];
+        } else {
+            CHKi(1);
+            uint8_t b1 = src[ip++];
+            uint8_t b2 = src[ip++];
+
+            uint8_t lng = (b1 & 0x0F) + 3;
+            uint16_t dist = (op - 18 - (((b1 & 0xF0) << 4) | b2)) & 0xFFF;
+            if (!dist) dist = 0x1000;
+
+            for (int i=0;i < lng;i++,op++) {
+                CHKo(0);
+                dst[op] = (op < dist) ? 0 : dst[op - dist];
+            }
+        }
+
+        f <<= 1;
         fbl--;
     }
 
@@ -791,7 +841,7 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
                 b = src[ip++];
                 if (b == 0) {
                     CHKi(1);
-                    uint16_t s = src[ip] | (src[ip + 1] << 8);ip += 2;
+                    uint16_t s = read16le(src+ip);ip += 2;
                     if (s == 0) break;
                     for (int i=0;i < s;i++) {
                         CHKi(0);CHKo(0);
@@ -823,8 +873,8 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
         } else if (0x80 > b) {
             if ((b & 0x0F) == 0) {
                 CHKi(3);
-                uint16_t l = src[ip] | (src[ip + 1] << 8);ip += 2;
-                uint16_t o = src[ip] | (src[ip + 1] << 8);ip += 2;
+                uint16_t l = read16le(src+ip);ip += 2;
+                uint16_t o = read16le(src+ip);ip += 2;
                 if (o != 0) o -= 1;
                 if (o > op) o = 0;
                 if (o + l > op) {
@@ -845,7 +895,7 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
             } else {
                 CHKi(1);
                 uint8_t l = (b & 0x0F) + 2;
-                uint16_t o = src[ip] | (src[ip + 1] << 8);ip += 2;
+                uint16_t o = read16le(src+ip);ip += 2;
                 if (o != 0) o -= 1;
                 if (o > op) o = 0;
                 if (o + l > op) {
@@ -904,8 +954,8 @@ EXPORT ssize_t decompress_ash0(const uint8_t *restrict src, const size_t zsize,
                                      uint8_t *restrict dst) {
     if (12 >= zsize) return -1;
 
-    size_t usize = (src[5] << 16) | (src[6] << 8) | src[7];
-    size_t symo = (src[8] << 24) | (src[9] << 16) | (src[10] << 8) | src[11];
+    uint32_t usize = read24be(src+5);
+    uint32_t symo = read32be(src+8);
     if (symo >= zsize) return -1;
 
     BitReader symr,distr;
@@ -933,50 +983,62 @@ EXPORT ssize_t decompress_ash0(const uint8_t *restrict src, const size_t zsize,
 
     return op;
 }
-EXPORT ssize_t decompress_bpe(const uint8_t *restrict src, const size_t zsize,
-                                    uint8_t *restrict dst, const ssize_t usize) {
+EXPORT ssize_t decompress_graw_bpe(const uint8_t *restrict src, const size_t zsize,
+                                         uint8_t *restrict dst, const ssize_t usize) {
     if (usize == 0) return 0;
-    if (zsize < 2) return -1;
-    uint8_t ls[0x100];
-    uint8_t rs[0x100];
-    uint16_t pc = 0;
     size_t ip = 0;
-
-    while (ip < zsize) {
-        uint8_t l = src[ip++];
-        if (!l) break;
-
-        if (ip >= zsize) return -1;
-        uint8_t r = src[ip++];
-        ls[pc] = l;
-        rs[pc++] = r;
-        if (pc >= 0x100) break;
-    }
-
-    uint16_t tokb = 0x100 - pc;
     ssize_t op = 0;
-    uint8_t stack[0x200];
-    uint16_t sp = 0;
 
     while (ip < zsize && (op < usize || usize == -1)) {
-        size_t chk_end = ip + 1;
-        if (src[ip]) chk_end += src[ip++];
-        else {
-            chk_end += src[ip + 1] | (src[ip + 2] << 8);ip += 3;
+        uint8_t ls[0x100];
+        uint8_t rs[0x100];
+        for (uint16_t i=0;i < 0x100;i++) {
+            ls[i] = i;
+            rs[i] = 0;
         }
 
-        if (chk_end > zsize) chk_end = zsize;
+        uint16_t pc = 0;
+        while (pc < 0x100) {
+            if (ip >= zsize) return -1;
+            uint8_t c = src[ip++];
+            if (c > 0x7F) {
+                pc += c - 0x7F;
+                c = 0;
+            }
 
-        while ((ip < chk_end || sp > 0) && (op < usize || usize == -1)) {
-            uint8_t v;
-            if (sp > 0) v = stack[--sp];
-            else v = src[ip++];
+            for (uint16_t i=0;i <= c && pc < 0x100;i++,pc++) {
+                if (ip >= zsize) return -1;
 
-            if (v >= tokb) {
-                if (sp + 2 > 0x200) return -1;
-                stack[sp++] = rs[v - tokb];
-                stack[sp++] = ls[v - tokb];
-            } else dst[op++] = v;
+                uint8_t l = src[ip++];
+                ls[pc] = l;
+                if (l != pc) {
+                    if (ip >= zsize) return -1;
+                    rs[pc] = src[ip++];
+                }
+            }
+        }
+
+        if (ip + 2 > zsize) return -1;
+        uint16_t s = read16be(src+ip);ip += 2;
+        if (ip + s > zsize) return -1;
+
+        size_t ep = ip + s;
+        while (ip < ep && (op < usize || usize == -1)) {
+            uint8_t stack[0x2000];
+            uint16_t sp = 0;
+            stack[sp++] = src[ip++];
+
+            while (sp > 0 && (op < usize || usize == -1)) {
+                uint8_t v = stack[--sp];
+
+                if (ls[v] == v) dst[op++] = v;
+                else {
+                    if (sp + 2 > sizeof(stack)) return -1;
+
+                    stack[sp++] = rs[v];
+                    stack[sp++] = ls[v];
+                }
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 959
+# Supported Formats: 962
 
 ## "Common" Archives/Compressors/Encodings (146)
 Name | Extension(s) | Extractor(s) | Comment
@@ -353,7 +353,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (498)
+## Various (501)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -427,6 +427,7 @@ Build Engine RFF | .rff | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Bunny Pro. Das2 DPK | .dpk | Custom |
 Burut Creative Team PAK | .pak | [burut.bms](https://mirror.aluigi.org/bms/burut.bms) |
 Bureau 13 GL | .gl | [na_game_tool](https://nihav.org/game_tool.html) |
+Cabela's Legendary Adventures ARC | .arc | Custom |
 Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
@@ -642,6 +643,7 @@ New York Race KIX+KBF | .kix+.kbf | Custom |
 Nexas New PAC | .pac | [GARbro](https://github.com/crskycode/GARbro) |
 Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/KillzXGaming/NLG-File-Editor-Tool), [NlgFileTool MFF](https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper), [luigi_mansion_dict.bms](https://mirror.aluigi.org/bms/luigi_mansion_dict.bms) |
 Nicktoons Gravjet Racing LIN | .lin | Custom |
+Ninja Shadow of Darkness PAK | .pak | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |
 Nintendo ASH0 | .bin | Custom |
 Nintendo Binary YAML | .byml .byaml .yml .yaml | [byml-to-yaml](https://github.com/ArchLeaders/byml_to_yaml) |
@@ -797,6 +799,7 @@ THQ PAK | .pak | Custom |
 THQ Worms UTF Strings | ??? | Custom |
 THQ Worms Resources | ??? | Custom |
 Tiled TMX/TSX | .tmx .tsx | Custom |
+Tom Clancy's Ghost Recon GLB | .glb | Custom |
 Torque HHA | .hha | Custom |
 Torus Ashen PackFile | .pf | Custom |
 Torus Ashen Strings | ??? | Custom |

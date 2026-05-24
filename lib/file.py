@@ -318,6 +318,7 @@ OODLE = None
 GDEFLATE = None
 UCL = None
 NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
+LHZC = {f'lh{x}':f'-lh{x}-'.encode('ansi') for x in {0,5,6,7}}
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     global OODLE,GDEFLATE,UCL
     match algo:
@@ -335,7 +336,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import bz2
             return bz2.decompress(i)
         case 'zip':
-            import io
             from zipfile import ZipFile
             z = ZipFile(io.BytesIO(i))
 
@@ -348,6 +348,22 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 r = z.namelist()
             else: r = {n:z.read(n) for n in z.namelist()}
             z.close()
+            return r
+        case 'lh0'|'lh5'|'lh6'|'lh7':
+            import lzhlib
+
+            class info: pass
+            info.compress_type = LHZC[algo]
+            info.compress_size = len(i)
+            info.file_size = kwargs['usize']
+            info.CRC = 0
+            fin,fout = io.BytesIO(i),io.BytesIO()
+
+            s = lzhlib.LZHDecodeSession(fin,fout,info)
+            while not s.do_next(): pass
+            fout.seek(0)
+            r = fout.read(s.output_pos)
+            del s,fout,fin
             return r
 
         case 'lzma'|'lzma_alone':
@@ -468,11 +484,13 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return bytes(o)
 
         case 'huffman': return uxx().decompress_huffman(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
+        case 'graw_bpe': return uxx().decompress_graw_bpe(i,usize=kwargs['usize'])
         case 'lzss_win': return lzss_win_decompress(i,**kwargs)
         case 'lzss':
             assert 'usize' in kwargs
             return lzss_decompress(i,**kwargs)
-        case 'lzss0'|'lzss8': return uxx().decompress_lzss8(i,usize=kwargs['usize'])
+        case 'lzss0'|'lzss0_lsb': return uxx().decompress_lzss0_lsb(i,usize=kwargs['usize'])
+        case 'lzss0_msb': return uxx().decompress_lzss0_msb(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
@@ -510,7 +528,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             if cs == len(i): cs -= 8
             if cs != len(i) - 8: raise ValueError("Invalid compressed size")
-            r = uxx().decompress_lzss8(i[8:8+cs],usize=us)
+            r = uxx().decompress_lzss0_lsb(i[8:8+cs],usize=us)
             if kwargs.get('verify',True): assert len(r) == us
             return r
         case 'natsume_lzs':

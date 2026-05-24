@@ -526,6 +526,10 @@
         "rs":"Glacier RPKG","s":1
     },
     {
+        "d":[["isat","VRAM-WAD",0],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2)-16;f.seek(8);return s==int.from_bytes(f.read(4),'little')"]],
+        "rs":"Ninja Shadow of Darkness PAK","s":1
+    },
+    {
         "d":["isat","\\0\\1\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\1\\0\\0\\0\\0\\0\\0\\0\\x06\\1\\0\\0\\0",0],
         "rs":"Hollow Knight Save","s":1
     },
@@ -1076,6 +1080,10 @@
     {
         "d":[["isat","NARC\\xFE\\xFF\\x00\\x01",0],["isat","\\x10\\x00\\x03\\x00BTAF",12],["n0",4,8],["n0",4,20],["n0",4,24]],
         "rs":"NitroARC","s":1
+    },
+    {
+        "d":[["s%",2048],["size",[4096,null]],["isat","ARC\\0\\0\\2\\0\\0",-2048],["isat","\\0\\x08\\0\\0",-2024],["isatS","\\0",2020,-2020],["isat","x",0],["n0",4,-2040],["n0",4,-2036],["n0",4,-2032],["n0",4,-2028],["py","f=open(inp,'rb');s=f.seek(-2048,2);f.seek(8,1);o=int.from_bytes(f.read(4),'little');f.seek(4,1);z=int.from_bytes(f.read(4),'little');f.seek(4,1);a=int.from_bytes(f.read(4),'little');return (o*a+z+-z%a)==s"]],
+        "rs":"Cabela's Legendary Adventures ARC","s":1
     },
     {
         "d":[["isat","DAT\\0",0],["isat","\\x20\\0\\0\\0",8],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,32],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');return(o+c*4)==int.from_bytes(f.read(4),'little')and(o+c*8)==int.from_bytes(f.read(4),'little')"]],

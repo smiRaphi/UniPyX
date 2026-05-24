@@ -7,7 +7,7 @@ def pip(*pkgs):
     return subprocess.run([sys.executable,'-m','pip','install'] + list(pkgs) + ['-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2).stdout.decode()
 
 try: import httpx
-except ImportError:
+except (ImportError,ModuleNotFoundError):
     pip('httpx')
     import httpx
 

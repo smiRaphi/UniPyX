@@ -945,7 +945,7 @@ def extract4_4(inp:str,out:str,t:str):
                     fl = d[10]
                     d = d[12:]
                     if fl & 0x10: d = decrypt(d,'tea_pad_le',KEY)
-                    if fl & 1: d = decompress(d,'lzss8',usize=us)
+                    if fl & 1: d = decompress(d,'lzss0',usize=us)
                     d = d[:us]
                     assert len(d) == us,fe[0]
                 writefile(o + '/' + fe[0],d)
@@ -1355,7 +1355,7 @@ def extract4_4(inp:str,out:str,t:str):
                 if ty == 0: d = f.readc(f.readu32())
                 else:
                     us,zs = f.readu32(),f.readu32()
-                    d = f.decompress(zs,'lzss8',usize=us)
+                    d = f.decompress(zs,'lzss0',usize=us)
                 writefile(f'{o}/{ix:03d}_{w}x{h}.pal{int((len(d)/(w*h))*8)}',d)
 
             f.close()
@@ -1496,7 +1496,7 @@ def extract4_4(inp:str,out:str,t:str):
             from lib.file import decompress
             d = readfile(i)
             us = int.from_bytes(d[:4],'little')
-            writefile(o + '/' + basename(i)[:-1 if i[-1] in 'zZ' else None],decompress(d[4:],'lzss8',usize=us))
+            writefile(o + '/' + basename(i)[:-1 if i[-1] in 'zZ' else None],decompress(d[4:],'lzss0',usize=us))
             return
         case 'JumpStart SpyMasters Resource':
             if db.print_try: print('Trying with custom extractor')
@@ -2123,7 +2123,6 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Tom Clancy\'s Ghost Recon GLB':
-            raise NotImplementedError
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
@@ -2134,7 +2133,7 @@ def extract4_4(inp:str,out:str,t:str):
             for fe in fs:
                 assert fe[3] in {0,1}
                 f.seek(fe[4])
-                d = f.decompress(fe[1],('none','bpe')[fe[3]],usize=fe[2])
+                d = f.decompress(fe[1],('none','graw_bpe')[fe[3]],usize=fe[2])
                 writefile(o + '/' + fe[0],d)
 
             f.close()
@@ -2160,5 +2159,36 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if fs: return
+        case 'Ninja Shadow of Darkness PAK':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(8) == b'VRAM-WAD'
+
+            zs,us = f.readu32(),f.readu32()
+            writefile(o + '/' + tbasename(i),f.decompress(zs,'lzss0_msb',usize=us))
+            f.close()
+            return
+        case 'Cabela\'s Legendary Adventures ARC':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.seek(-0x800)
+            assert f.read(4) == b'ARC\0' and f.readu32() == 0x200
+
+            of,us,zs,c,a = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            f.seek(of * a)
+            tf = File(f.decompress(zs,'zlib',usize=us),endian=f._end)
+            for _ in range(c):
+                assert tf.read(4) == b'ARCH',tf.pos
+                f.seek(tf.readu32() * a)
+                tf.skip(4) # size in blocks
+                us,zs = tf.readu32(),tf.readu32()
+                fl = tf.reads32()
+                writefile(o + '/' + tf.readc(tf.readu32()).rstrip(b'\0').decode('ascii'),f.decompress(zs,{0:'none',-1:'zlib'}[fl],usize=us))
+
+            del tf
+            f.close()
+            if c: return
 
     return 1
