@@ -101,6 +101,7 @@ class X:
             ('decompress_rtl_lz',   (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
             ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
@@ -400,12 +401,67 @@ static inline uint32_t get_bits(BitReader *br, size_t n) {
             br->buf = *(br->ptr++);
             br->bits = 8;
         }
+
         int s = (n < br->bits) ? n : br->bits;
         v = (v << s) | ((br->buf >> (br->bits - s)) & ((1 << s) - 1));
         br->bits -= s;
         n -= s;
     }
     return v;
+}
+static inline uint32_t get_bits_l(BitReader *br, size_t n) {
+    uint32_t v = 0;
+    size_t p = 0;
+    while (n > 0) {
+        if (!br->bits) {
+            if (br->ptr >= br->end) return v;
+            br->buf = *(br->ptr++);
+            br->bits = 8;
+        }
+
+        int s = (n < br->bits) ? n : br->bits;
+        v |= (br->buf & ((1 << s) - 1)) << p;
+        br->bits -= s;
+        br->buf >>= s;
+        n -= s;
+        p += s;
+    }
+    return v;
+}
+
+typedef struct {
+    int16_t l;
+    int16_t r; // -1 = leaf
+} HuffNode;
+static inline int read_hufftree(BitReader *br, int width, int max, HuffNode *tree) {
+    int root = 0;
+    int nodec = 1;
+    int16_t stack[0x800];
+    int stacki = 0;
+
+    while (1) {
+        if (get_bit(br)) {
+            if (nodec + 1 >= max * 2) return 0;
+            tree[root].l = nodec;
+            tree[root].r = nodec + 1;
+            stack[stacki++] = nodec + 1;
+            root = nodec;
+            nodec += 2;
+        } else {
+            tree[root].l = get_bits(br, width);
+            tree[root].r = -1;
+            if (!stacki) break;
+            root = stack[--stacki];
+        }
+    }
+    return 1;
+}
+static inline int get_huffcode(BitReader *br, HuffNode *tree) {
+    int node = 0;
+    while (tree[node].r != -1) {
+        node = (get_bit(br)) ? tree[node].r : tree[node].l;
+    }
+    return tree[node].l;
 }
 
 #define MT_N 624
@@ -457,41 +513,6 @@ int32_t MT19937_rand(MT19937 *restrict ctx) {
     y ^= (int32_t)(((uint32_t)y << 15) & ctx->TEMPERING_MASK_C);
     y ^= y >> 18;
     return y;
-}
-
-typedef struct {
-    int16_t l;
-    int16_t r; // -1 = leaf
-} HuffNode;
-static inline int read_hufftree(BitReader *br, int width, int max, HuffNode *tree) {
-    int root = 0;
-    int nodec = 1;
-    int16_t stack[0x800];
-    int stacki = 0;
-
-    while (1) {
-        if (get_bit(br)) {
-            if (nodec + 1 >= max * 2) return 0;
-            tree[root].l = nodec;
-            tree[root].r = nodec + 1;
-            stack[stacki++] = nodec + 1;
-            root = nodec;
-            nodec += 2;
-        } else {
-            tree[root].l = get_bits(br, width);
-            tree[root].r = -1;
-            if (!stacki) break;
-            root = stack[--stacki];
-        }
-    }
-    return 1;
-}
-static inline int get_huffcode(BitReader *br, HuffNode *tree) {
-    int node = 0;
-    while (tree[node].r != -1) {
-        node = (get_bit(br)) ? tree[node].r : tree[node].l;
-    }
-    return tree[node].l;
 }
 
 EXPORT ssize_t decompress_lz10_raw(const uint8_t *restrict src, const size_t zsize,
@@ -1038,6 +1059,115 @@ EXPORT ssize_t decompress_graw_bpe(const uint8_t *restrict src, const size_t zsi
                     stack[sp++] = rs[v];
                     stack[sp++] = ls[v];
                 }
+            }
+        }
+    }
+
+    return op;
+}
+
+typedef struct {
+    int16_t ls[0x4EA];
+    int16_t rs[0x4EA];
+    int16_t par[0x4EA];
+    uint16_t wg[0x4EA];
+    int dist_bits[6];
+    int dist_base[6];
+} d0llz3_AHuff;
+static void d0llz3_AHuff_update(d0llz3_AHuff *ah, int16_t n1, int16_t n2) {
+    while (1) {
+        int16_t p = ah->par[n1];
+        ah->wg[p] = ah->wg[n1] + ah->wg[n2];
+        if (p == 1) break;
+        n1 = p;
+        n2 = ah->ls[ah->par[n1]];
+        if (n2 == n1) n2 = ah->rs[ah->par[n1]];
+    }
+
+    if (ah->wg[1] == 2000) {
+        for (int16_t i=1;i < 0x4EA;i++)
+            ah->wg[i] >>= 1;
+    }
+}
+static int16_t d0llz_AHuff_get(BitReader *restrict br, d0llz3_AHuff *restrict ah) {
+    int16_t n = 1;
+    while (n < 0x275) {
+        if (get_bit(br)) n = ah->rs[n];
+        else n = ah->ls[n];
+    }
+    int16_t sym = n - 0x275;
+
+    int16_t p = ah->par[n];
+    ah->wg[n]++;
+    if (p != 1) {
+        int16_t sib = ah->ls[p];
+        if (sib == n) sib = ah->rs[p];
+        d0llz3_AHuff_update(ah,n,sib);
+
+        do {
+            p = ah->par[n];
+            int16_t pp = ah->par[p];
+            int16_t c = ah->ls[pp];
+            if (c == p) c = ah->rs[pp];
+
+            if (ah->wg[c] < ah->wg[n]) {
+                if (ah->ls[pp] == p) ah->ls[pp] = n;
+                else ah->rs[pp] = n;
+                if (ah->ls[p] == n) ah->ls[p] = c;
+                else ah->rs[p] = c;
+
+                ah->par[c] = p;
+                ah->par[n] = pp;
+                int16_t osib = ah->ls[p];
+                if (osib == c) osib = ah->rs[p];
+                d0llz3_AHuff_update(ah,c,osib);
+                n = c;
+            }
+            n = ah->par[n];
+            p = ah->par[n];
+        } while (p != 1);
+    }
+
+    return sym;
+}
+EXPORT ssize_t decompress_d0llz3(const uint8_t *restrict src, const size_t zsize,
+                                       uint8_t *restrict dst, const ssize_t usize) {
+    BitReader br;
+    init_BitReader(&br, src, zsize);
+
+    d0llz3_AHuff ah;
+    for (int8_t i=0,bs=4;i < 6;i++,bs+=2)
+        ah.dist_bits[i] = bs;
+    for (int16_t i=2;i < 0x4EA;i++) {
+        ah.par[i] = i / 2;
+        ah.wg[i] = 1;
+    }
+    for (int16_t i=1;i < 0x275;i++) {
+        ah.ls[i] = i * 2;
+        ah.rs[i] = i * 2 + 1;
+    }
+    ah.wg[1] = 0;
+
+    size_t bs = 0;
+    for (int8_t i=0;i < 6;i++,bs += (1 << ah.dist_bits[i]))
+        ah.dist_base[i] = bs;
+
+    ssize_t op = 0;
+
+    while (op < usize || usize == -1) {
+        int16_t sym = d0llz_AHuff_get(&br,&ah);
+        if (sym == 0x100) break;
+
+        if (sym < 0x100) dst[op++] = sym;
+        else {
+            int16_t grp = (sym - 0x101) / 0x3E;
+            int16_t len = sym - grp * 0x3E - 0xFE;
+            ssize_t dist = op - (get_bits_l(&br, ah.dist_bits[grp]) + len + ah.dist_base[grp]);
+            for (int16_t i=0;i < len && (op < usize || usize == -1);i++,dist++) {
+                uint8_t b;
+                if (dist < 0) b = 0;
+                else b = dst[dist];
+                dst[op++] = b;
             }
         }
     }

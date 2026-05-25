@@ -2190,5 +2190,35 @@ def extract4_4(inp:str,out:str,t:str):
             del tf
             f.close()
             if c: return
+        case 'Batman Raw Thrills LUX':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.skip(4)
+            c,of = f.readu32(),f.readu64()
+            f.padc(0x20)
+            assert f.read(4) == b'LUX!'
+            f.seek(of)
+
+            fs = []
+            for _ in range(c):
+                fs.append((f.readc(0x40).rstrip(b'\0').decode('ascii'),f.readu64(),f.readu64(),f.readu64()))
+                f.skip(8)
+                f.padc(0x20)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[2])
+                d = f.readc(fe[1])
+                if not fe[0]: fn = f'{ix:03d}.{guess_ext(d)}'
+                else:
+                    fn = fe[0].replace('.','/')
+                    if fn.split('/')[-1] in {'ts','tome','wav','mp3','txt'}: fn = '.'.join(fn.rsplit('/',1))
+                fn = o + '/' + fn
+                writefile(fn,d)
+                set_ftime(fn,fe[3],unix=False)
+
+            f.close()
+            if fs: return
 
     return 1

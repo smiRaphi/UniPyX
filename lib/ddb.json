@@ -1086,6 +1086,10 @@
         "rs":"Cabela's Legendary Adventures ARC","s":1
     },
     {
+        "d":[["s%",8],["isat","\\x21\\xE0\\x7A\\x42\\xAE\\x3D\\x3A\\x02",-8],["py","return not (getsize(inp)-8)%2048"]],
+        "rs":"Destroy All Humans! PKG","s":1
+    },
+    {
         "d":[["isat","DAT\\0",0],["isat","\\x20\\0\\0\\0",8],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,32],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');return(o+c*4)==int.from_bytes(f.read(4),'little')and(o+c*8)==int.from_bytes(f.read(4),'little')"]],
         "rs":"Transformers: Devastation DAT"
     },
@@ -1130,6 +1134,10 @@
         "rs":"Eutechnyx ARC","s":1},{
         "d":[["s%",128],["isat","ARCN",0],["isat","\\0\\0\\0\\0\\xDE\\xC0\\xDE\\xC0",112],["n0",4,4],["n0",4,120],["n0",4,128],["py","f=open(inp,'rb');f.seek(120);s=int.from_bytes(f.read(4),'little');return s<int.from_bytes(f.read(4),'little')and(128+s+-s%128)==f.seek(0,2)"]],
         "rs":"Eutechnyx ARC","s":1
+    },
+    {
+        "d":[["isat","LUX!",48],["isatS","\\0",32,16],["n0",4,4],["n0",8,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*128+int.from_bytes(f.read(8),'little'))==s"]],
+        "rs":"Batman Raw Thrills LUX","s":1
     },
     {
         "d":[["isat","ARCPACK",0],["isin",["\\0","\\x17"],7],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return s==int.from_bytes(f.read(4),'little')"]],
@@ -2241,7 +2249,7 @@
         "rs":"DOLPAK","s":1
     },
     {
-        "d":[["isat","\\0\\0\\1\\0\\0\\0\\x08\\xE0",0],["isatS","\\0",64,8],["isatS","\\0",64,80],["isat","\\0\\0\\x07\\xE0"],
+        "d":[["isat","\\0\\0\\1\\0\\0\\0\\x08\\xE0",0],["isatS","\\0",64,8],["isatS","\\0",64,80],["isat","\\0\\0\\x07\\xE0",144],
              ["isatS","\\0",72,152],["isatS","\\0",28,228]],
         "rs":"d0lLZ 3","s":1
     },

@@ -817,9 +817,22 @@ def extract3(inp:str,out:str,t:str) -> bool:
                                 for i in range(leng): dec.append(dec[off + i])
                             else: dec.append(f.readu8())
                     of.write(dec)
+            else: raise NotImplementedError(f'Version {ver}')
             while f.pos < (data0 + data0_size): dlz_dec_block()
             return
-        case 'd0lLZ 3': raise NotImplementedError
+        case 'd0lLZ 3':
+            raise NotImplementedError
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            f.seek(4)
+            d0o = f.readu32()
+            f.seek(0x94)
+            d0s = f.readu32()
+            f.seek(d0o)
+            writefile(o + '/' + basename(i),f.decompress(d0s,'d0llz3'))
+            return
         case 'Xamarin Compressed':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress

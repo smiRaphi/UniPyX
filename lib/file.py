@@ -572,6 +572,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return getattr(crunch64,algo).decompress(i)
         case 'ash0': return uxx().decompress_ash0(i)
 
+        case 'd0llz3': return uxx().decompress_d0llz3(i,kwargs.get('usize',len(i) * 0x10))
+
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
             assert 'usize' in kwargs and (OODLE or kwargs.get('db'))
             import ctypes
