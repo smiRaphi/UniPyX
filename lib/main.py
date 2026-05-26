@@ -23,6 +23,12 @@ DOSMAX = {
     "ipx":"false"
 }
 
+__FNCT = type(lambda:None)
+def asrt(c:bool,*r,err:Exception=ValueError):
+    if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
+    elif r: r = ' '.join(str(x) for x in r)
+    else: r = ''
+    if not c: raise err(r)
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
 rename = os.rename
@@ -63,7 +69,7 @@ def copydir(i:str,o:str,delete=False,reni=False):
     i = str(i)
     o = str(o)
     if reni:
-        assert delete
+        asrt(delete)
         ni = dirname(i) + '\\tmp' + os.urandom(8).hex()
         mv(i,ni)
         i = ni
@@ -82,7 +88,7 @@ def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
     if 'b' in m: return open(f,m,**kwargs)
     return open(f,m,encoding=encoding,newline=newline,**kwargs)
 def readfile(f:str,m='rb',encoding='utf-8',newline=None,**kwargs) -> bytes|str:
-    assert 'r' in m or '+' in m
+    asrt('r' in m or '+' in m)
     if 'b' in m: o = xopen(f,m,**kwargs)
     else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
     r = o.read()
@@ -110,7 +116,7 @@ def isvalid(p:str,reject_dirs=False):
 
     _,path = os.path.splitdrive(p)
     root = os.environ.get('HOMEDRIVE','C:') if sys.platform == 'win32' else os.path.sep
-    assert exists(root)
+    asrt(exists(root),err=FileNotFoundError)
 
     root = root.rstrip('\\/') + os.path.sep
     for pp in path.split(os.path.sep):
@@ -401,7 +407,7 @@ def analyze(inp:str,raw=False):
             if x[0] == 'py':
                 lc = {}
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile},locals=lc)
+                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile,'asrt':asrt},locals=lc)
                     ret = lc['check'](inp)
                 except:
                     print(xv['rs'] + ':')
@@ -916,7 +922,7 @@ def guess_ext_163(d:bytes):
         for ec in ('utf-8','gb2312'):
             try:
                 tx = d.decode(ec).replace('\r','')
-                assert tx.replace('\n','').replace('\t','').isprintable()
+                asrt(tx.replace('\n','').replace('\t','').isprintable())
             except: pass
             else:
                 txt = tx
@@ -1059,11 +1065,11 @@ def zip7(i:str,o:str,t:str,overwrite=False):
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
     out = cleanp(out)
-    #assert not exists(out),'Output directory already exists'
+    #asrt(not exists(out),'Output directory already exists')
     inp = cleanp(inp)
     if ts == None: ts = analyze(inp)
     if not ts:
-        if rs: assert ts,'Unknown file type'
+        if rs: asrt(ts,'Unknown file type')
         return
 
     for x in ts:
@@ -1076,7 +1082,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
             raise
         rmtree(out)
     else:
-        if rs: assert not rs,"Could not extract"
+        if rs: asrt(not rs,"Could not extract")
         return
     if not quiet: print('Extracted successfully to',out)
     return True

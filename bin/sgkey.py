@@ -57,7 +57,7 @@ class SGKeys:
         t = t or self.t
         if os.path.exists(key):
             if os.path.isdir(key): key = os.path.join(key,'IP.BIN')
-            assert os.path.exists(key) and os.path.isfile(key),key
+            if not(os.path.exists(key) and os.path.isfile(key),key): raise FileNotFoundError
 
             f = open(key,'rb')
             f.seek(0x40)
@@ -110,11 +110,11 @@ def makedb():
             o.write(tidn.encode('ascii'))
         else:
             if tbn in TID1: tidn = tidn[1:]
-            assert len(tidn) in {4,5},tid
+            if not len(tidn) in {4,5}: raise ValueError(tid)
             o.write(bytes([tidb | (0x80 if len(tidn) == 5 else 0)]))
             if tbn in TIDB: o.write(int(tidn[:4]).to_bytes(2,'big'))
             else:
-                assert int(tidn[:4]) <= 0xFF,tid
+                if int(tidn[:4]) > 0xFF: raise ValueError(tid)
                 o.write(bytes([int(tidn[:4])]))
             o.write(tidn[4:].encode())
         o.write(bytes.fromhex(key))

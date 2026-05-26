@@ -4,6 +4,8 @@ import os,sys
 from hashlib import sha256
 DLLP = os.path.splitext(__file__)[0] + ('.dll' if sys.platform == 'win32' else '.so')
 CH = sha256(open(__file__,'rb').read().split(b"'''*" b"/",1)[1]).digest()
+def asrt(c):
+    if not c: raise ValueError
 
 def compile(quiet=False):
     import sysconfig,subprocess
@@ -79,7 +81,7 @@ def _5base_func(fnc,src,seed):
 class X:
     MMFS = {};SELENE = {}
     def __init__(self):
-        assert os.path.exists(DLLP)
+        if not os.path.exists(DLLP): raise FileNotFoundError
         d = open(DLLP,'rb')
         d.seek(d.seek(0,2) - len(CH))
         ch = d.read(len(CH))
@@ -215,7 +217,7 @@ class X:
         else: self.dll.decrypt_dxor(i,len(src),o,k1,len(key1),k2,len(key2))
         return bytes(o)
     def decrypt_tea(self,src:bytes,key:bytes,le:bool=False) -> bytes:
-        assert len(key) == 0x10 and not len(src) % 8
+        asrt(len(key) == 0x10 and not len(src) % 8)
         i = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * 0x10).from_buffer_copy(key)
         o = (u8 * len(src))()
@@ -224,7 +226,7 @@ class X:
     def decrypt_hatch(self,src:bytes,key:bytes) -> bytes:
         from zlib import crc32
         if len(key) == 4: key = key*4
-        assert len(key) == 0x10
+        asrt(len(key) == 0x10)
         iv = crc32(len(src).to_bytes(8,'little')).to_bytes(4,'little')*4
 
         d = (u8 * len(src)).from_buffer_copy(src)
@@ -273,14 +275,14 @@ class X:
         self.dll.decrypt_rc4_playpond(b,len(src),k,len(key),drop)
         return bytes(b)
     def decrypt_forza_roundA_block(self,src:bytes,key:bytes,table:bytes) -> bytes:
-        assert len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000
+        asrt(len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000)
         b = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * len(key)).from_buffer_copy(key)
         t = (u8 * len(table)).from_buffer_copy(table)
         self.dll.decrypt_forza_roundA_block(b,k,t)
         return bytes(b)
     def decrypt_forza_roundB_block(self,src:bytes,key:bytes,table:bytes) -> bytes:
-        assert len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000
+        asrt(len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000)
         b = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * len(key)).from_buffer_copy(key)
         t = (u8 * len(table)).from_buffer_copy(table)

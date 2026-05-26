@@ -7,6 +7,7 @@
         "./bin/pip",
         "./out",
         "./bin/sarc.py",
+        "./bin/darc.py",
         "./bin/splat64",
         "./bin/Torch",
         "./bin/graalvm",

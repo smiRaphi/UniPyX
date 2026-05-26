@@ -19,10 +19,10 @@ class PS3Keys:
         i.close()
 
     def get(self,key:str) -> str|None:
-        assert os.path.exists(key) and os.path.isfile(key)
+        if not (os.path.exists(key) and os.path.isfile(key)): raise FileNotFoundError
         f = open(key,'rb')
         f.seek(0x800)
-        assert f.read(12) == b'PlayStation3'
+        if f.read(12) != b'PlayStation3': raise ValueError
         f.seek(4,1)
         key = f.read(0x20).strip().decode().replace('-','')
 

@@ -2,6 +2,13 @@ import struct,io,sys
 from datetime import datetime
 from lib.unipyxx import X
 
+__FNCT = type(lambda:None)
+def asrt(c:bool,*r,err:Exception=ValueError):
+    if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
+    elif r: r = ' '.join(str(x) for x in r)
+    else: r = ''
+    if not c: raise err(r)
+
 ENDMAP = {'<':'little','>':'big','-':'big'}
 UTFENDM = {'<':'le','>':'be','-':'be'}
 
@@ -19,7 +26,7 @@ def reflecti(v:int,w:int):
     return r
 def rotate8(v:int): return ((v << 7) & maskb(1)) | (v >> 1)
 def pdosdate(d:int,t:int,ms=0):
-    assert d.bit_length() <= 16 and t.bit_length() <= 16
+    asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
     if d == 0: d = 0x21
     dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
     if ms: dt.replace(microsecond=ms*1000000)
@@ -251,7 +258,7 @@ class EXE(File):
     def __init__(self,f):
         super().__init__(f,mode='r',endian='<')
 
-        assert self.read(2) == b'MZ'
+        asrt(self.read(2) == b'MZ')
         self.seek(0x3C)
         self.coff_off = self.readu32()
         self.seek(self.coff_off)
@@ -341,7 +348,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             om = kwargs.get('out',kwargs.get('o'))
             if type(om) == int and om == 1:
-                assert len(z.namelist()) == 1
+                asrt(len(z.namelist()) == 1)
                 r = z.read(z.namelist()[0])
             elif type(om) == str:
                 z.extractall(om)
@@ -414,7 +421,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'ucl_nrv2b'|'ucl_nrv2b_8'|'ucl_nrv2b_16'|'ucl_nrv2b_32'|\
              'ucl_nrv2d'|'ucl_nrv2d_8'|'ucl_nrv2d_16'|'ucl_nrv2d_32'|\
              'ucl_nrv2e'|'ucl_nrv2e_8'|'ucl_nrv2e_16'|'ucl_nrv2e_32':
-                assert 'usize' in kwargs and (UCL or kwargs.get('db'))
+                asrt('usize' in kwargs and (UCL or kwargs.get('db')))
                 UCLERR = {-ix:x for ix,x in enumerate(('OK','ERROR','OUT_OF_MEMORY','NOT_COMPRESSIBLE','INPUT_OVERRUN','OUTPUT_OVERRUN','LOOKBEHIND_OVERRUN','EOF_NOT_FOUND','INPUT_NOT_CONSUMED'))}
 
                 if algo in {'ucl_nrv2b','ucl_nrv2d','ucl_nrv2e'}: algo += '_8'
@@ -487,7 +494,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'graw_bpe': return uxx().decompress_graw_bpe(i,usize=kwargs['usize'])
         case 'lzss_win': return lzss_win_decompress(i,**kwargs)
         case 'lzss':
-            assert 'usize' in kwargs
+            asrt('usize' in kwargs)
             return lzss_decompress(i,**kwargs)
         case 'lzss0'|'lzss0_lsb': return uxx().decompress_lzss0_lsb(i,usize=kwargs['usize'])
         case 'lzss0_msb': return uxx().decompress_lzss0_msb(i,usize=kwargs['usize'])
@@ -499,7 +506,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if 'usize' in kwargs: us = kwargs['usize']
             else: us,i = int.from_bytes(i[:8],'little'),i[8:]
             r = uxx().decompress_rtl_lz(i,usize=us)
-            if kwargs.get('verify',True): assert len(r) == us
+            if kwargs.get('verify',True): asrt(len(r) == us)
             return r
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'
@@ -507,19 +514,19 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
         case 'lz10'|'lz11'|'lz40'|'lz60':
             id,fnc = NLZC[algo]
-            assert i[0] == id
+            asrt(i[0] == id)
             fnc = getattr(uxx(),fnc)
             us,i = int.from_bytes(i[1:4],'little'),i[4:]
             if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
             r = fnc(i,usize=us)
-            if kwargs.get('verify',True): assert len(r) == us
+            if kwargs.get('verify',True): asrt(len(r) == us)
             return r
         case 'blz':
             h = i[-8:]
             cs = int.from_bytes(h[:3],'little')
             us = int.from_bytes(h[4:8],'little') + cs
             r = uxx().decompress_blz_raw(i[-cs:-h[3]],usize=us)
-            if kwargs.get('verify',True): assert len(r) == us
+            if kwargs.get('verify',True): asrt(len(r) == us)
             return r
         case 'avlz':
             if len(i) < 8: raise ValueError("Not enough data to decompress")
@@ -529,7 +536,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if cs == len(i): cs -= 8
             if cs != len(i) - 8: raise ValueError("Invalid compressed size")
             r = uxx().decompress_lzss0_lsb(i[8:8+cs],usize=us)
-            if kwargs.get('verify',True): assert len(r) == us
+            if kwargs.get('verify',True): asrt(len(r) == us)
             return r
         case 'natsume_lzs':
             if len(i) < 0x1C: raise ValueError("Not enough data to decompress")
@@ -539,9 +546,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             lens = i[5]
             sm = mask(lens)
             units = i[6]
-            assert not units%8 and units
+            asrt(not units%8 and units)
             units //= 8
-            assert not i[7]
+            asrt(not i[7])
             min_words = i[0x19]
 
             flgp = int.from_bytes(i[8:12],'little')
@@ -575,7 +582,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'd0llz3': return uxx().decompress_d0llz3(i,kwargs.get('usize',len(i) * 0x10))
 
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
-            assert 'usize' in kwargs and (OODLE or kwargs.get('db'))
+            asrt('usize' in kwargs and (OODLE or kwargs.get('db')))
             import ctypes
             if not OODLE:
                 from ctypes import c_void_p,c_int,c_ssize_t,CFUNCTYPE
@@ -591,7 +598,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if r == 0: raise Exception('Failed to decompress')
             return o.raw[:r]
         case 'gdeflate':
-            assert GDEFLATE or kwargs.get('db')
+            asrt(GDEFLATE or kwargs.get('db'))
             import ctypes
             if not GDEFLATE:
                 GDEFLATE = ctypes.CDLL(kwargs['db'].get('gdeflate'))
@@ -599,7 +606,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 GDEFLATE.DecompressData.argtypes = [ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t]
                 GDEFLATE.DecompressData.restype = ctypes.c_int
 
-            assert i[:2] == b'\x04\xFB'
+            asrt(i[:2] == b'\x04\xFB')
             isz = len(i)
             bcc = int.from_bytes(i[2:4],'little')
             if not bcc: raise ValueError('Empty block count')

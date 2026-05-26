@@ -12,7 +12,7 @@ def clean_dol(id:str):
         mv(id + '/UPDATE',id + '/$UPDATE')
         clean_dol(id + '/$UPDATE')
     if exists(id + '/DATA'): copydir(id + '/DATA',id,True,True)
-    assert exists(id + '/sys')
+    asrt(exists(id + '/sys'),err=FileNotFoundError)
     mv(id + '/sys',id + '/$SYS')
     if exists(id + '/disc'): mv(id + '/disc',id + '/$SYS/disc')
     for f in listdir(id):
@@ -452,11 +452,11 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 r = readfile(td + '/tcreport.txt','r')
                 for x in r.split('\n---------------------------------\n')[1:]:
                     x = x.split('\n')
-                    assert x[0].startswith('Seq. no.: ') and x[1].startswith('File Type: '),seq
+                    asrt(x[0].startswith('Seq. no.: ') and x[1].startswith('File Type: '),seq)
                     seq = int(x[0][10:])
                     ty = x[1][11:]
                     if ty == 'PAUSE': continue
-                    assert x[3].startswith('LA: $'),seq
+                    asrt(x[3].startswith('LA: $'),seq)
                     dt = x[3].split()
                     if x[4].startswith('File Name: '):
                         rfn = x[4][11:]
@@ -464,7 +464,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     else: rfn = fn = ''
 
                     fn = f'{td}/prg/{seq:03d} ({dt[1][1:]}-{dt[3][1:]}){fn}.prg'
-                    assert exists(fn),seq
+                    asrt(exists(fn),seq,err=FileNotFoundError)
 
                     rp = ""
                     dty = None
@@ -506,10 +506,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for f in drvs:
                 tf = o + '\\' + basename(f) + '.dec'
                 run(['chdecrypt',f,tf,key.hex().upper()])
-                assert exists(tf)
+                asrt(exists(tf),err=FileNotFoundError)
                 od = tbasename(f) + '_ext'
                 if t == 'C':
-                    assert open(tf,'rb').read(4) == b'FATX',basename(tf)
+                    asrt(open(tf,'rb').read(4) == b'FATX',basename(tf))
                     mkdir(od)
                     extract(tf,od,'FATX')
                 elif t == 'T':
@@ -517,7 +517,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     tff.seek(28)
                     chk = tff.read(4) == b'\xC2\x33\x9F\x3D'
                     tff.close()
-                    assert chk,basename(tf)
+                    asrt(chk,basename(tf))
                     mkdir(od)
                     extract2(tf,od,'GameCube ISO')
                 elif t == 'N':
@@ -574,14 +574,14 @@ def extract2(inp:str,out:str,t:str) -> bool:
             f = File(i)
             f._end = {b'RIFF':'<',b'FFIR':'>'}[f.read(4)]
             f.skip(4)
-            assert f.read(4) == b'AMS!'
+            asrt(f.read(4) == b'AMS!')
             cns = {}
             while True:
                 cn = f.read(4)
                 if not cn: break
-                assert cn[:2] == b'cb' and cn[2:].isdigit()
+                asrt(cn[:2] == b'cb' and cn[2:].isdigit())
                 cns[int(cn[2:])] = f.read(f.readu32())
-            assert (len(cns)-1) == max(list(cns))
+            asrt((len(cns)-1) == max(list(cns)))
 
             of = open(o + '/' + tbasename(i) + '.bin','wb')
             for ix in range(1,len(cns)): of.write(cns[ix])
@@ -594,7 +594,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='<')
             if t == 'GBA ADS Video ROM': f.seek(0xE38)
             aoff = f.pos
-            assert f.read(4) == b'SFCD'
+            asrt(f.read(4) == b'SFCD')
 
             boff = f.readu16() + 8
             f.skip(2)
@@ -655,7 +655,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             while f:
                 blockt = f.readu8()
                 if blockt == 1:
-                    assert f.read(14) == b'*NINTENDO-HVC*'
+                    asrt(f.read(14) == b'*NINTENDO-HVC*')
                     f.skip(1)
                     disk_pos = f.pos - 0x10
 
@@ -772,7 +772,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i,endian='<')
 
-            assert f.read(4) == b'\0PBP'
+            asrt(f.read(4) == b'\0PBP')
             f.skip(4)
             offs = [f.readu32() for _ in range(8)] + [f.size]
             fs = [(offs[x],offs[x+1]-offs[x]) for x in range(8)]
@@ -828,7 +828,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             if f.read(13) != b'SimpleFlashFS':
                 f.seek(0x800000)
-                assert f.read(13) == b'SimpleFlashFS'
+                asrt(f.read(13) == b'SimpleFlashFS')
             f.skip(0x23 + 8)
             f.skip(f.readu32() - 0x3C)
 
@@ -854,7 +854,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i,endian='>')
 
-            assert f.read(4) == b'\xDE\xAD\xBE\xEF'
+            asrt(f.read(4) == b'\xDE\xAD\xBE\xEF')
             f.skip(2)
             fc = f.readu16()
             ss = f.readu16()
@@ -885,7 +885,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i,endian='<')
 
-            assert f.read(4) == b'STBX'
+            asrt(f.read(4) == b'STBX')
             f.skip(f.readu32())
 
             c = 0
@@ -896,7 +896,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 elif t == 'AUDI':
                     ext = 'wav'
                     f.skip(4)
-                    assert f.read(4) == b'RIFF'
+                    asrt(f.read(4) == b'RIFF')
                     f.skip(-4)
                     s -= 4
                 else: raise NotImplementedError(t)
@@ -931,7 +931,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'NES\x1A'
+            asrt(f.read(4) == b'NES\x1A')
 
             prgs = f.readu8()
             chrs = f.readu8()
@@ -1133,7 +1133,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if not f.readu8() & 2:
                     f.skip(0x17)
                     continue
-                try: gn = gnr.decode('ascii');assert gn.isprintable()
+                try: gn = gnr.decode('ascii');asrt(gn.isprintable())
                 except: gn = (gnr[:4].rstrip(b'\0') + gnr[4:].rstrip(b'\0')).hex().upper()
 
                 ppd = f.readu8()
@@ -1150,7 +1150,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 ps = 0
                 while pp < len(pgs):
                     cp = pgs[pp];pp += 1
-                    assert cp not in {0,2,3,4}
+                    asrt(cp not in {0,2,3,4})
                     ps += 1
                     if cp == 1: break
                     pp = cp
@@ -1281,7 +1281,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             run(['torch','o2r','-s',db.get(scr),'-d',o,i])
             if len(listdir(o)) == 2:
                 remove(o + '/torch.hash.yml')
-                assert listdir(o) == ['generic.o2r']
+                asrt(listdir(o) == ['generic.o2r'])
                 zipfile.ZipFile(o + '/generic.o2r').extractall(o)
                 remove(o + '/generic.o2r')
                 return
@@ -1390,7 +1390,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 class PathStub:
                     def __init__(self):pass
                     def open(self,mode):
-                        assert mode == 'wb'
+                        asrt(mode == 'wb')
                         return ob
 
                 p = os.getcwd()
@@ -1411,7 +1411,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 ob.seek(0)
                 idat = ob.getvalue()
                 del ob
-                assert len(idat)
+                asrt(idat)
 
             class StubProg:
                 def __init__(self,lst): self.__lst = lst

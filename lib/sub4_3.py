@@ -26,7 +26,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='<')
             fd = open(noext(i) + '.dat','rb')
-            assert f.read(4) == b'BLDh' and f.readu32() == 0
+            asrt(f.read(4) == b'BLDh' and f.readu32() == 0)
 
             fc = bs = 0
             fs = []
@@ -40,12 +40,12 @@ def extract4_3(inp:str,out:str,t:str):
                     f.skip(8)
                     bs = f.readu64()
                 elif n == b'inf ':
-                    assert fc and bs
+                    asrt(fc and bs)
                     for _ in range(fc):
                         fs.append([f.readu32()*bs,f.readu32(),f.readu32()])
                         f.skip(0x1C)
                 elif n == b'tbl ':
-                    assert fs
+                    asrt(fs)
                     for fe in fs: fe.append(f.read0s().decode('utf-8').lstrip('/'))
 
                 f.seek(ep)
@@ -55,8 +55,8 @@ def extract4_3(inp:str,out:str,t:str):
                 fd.seek(fe[0])
                 d = fd.read(fe[1])
                 if fe[2]:
-                    assert d[:4] == b'GARC',d[:4]
-                    assert d[8:12] == b'zlib',d[8:12]
+                    asrt(d[:4] == b'GARC',d[:4])
+                    asrt(d[8:12] == b'zlib',d[8:12])
                     d = File(d,endian=f._end)
                     d.skip(0x10)
 
@@ -70,7 +70,7 @@ def extract4_3(inp:str,out:str,t:str):
                             while (d.pos+0x11) < ep: ob.append(z.decompress(d.read(d.readu64())))
                         d.seek(ep)
                     del d
-                    assert ob,fe[0]
+                    asrt(ob,fe[0])
                     d = b''.join(ob)
                 writefile(o + '/' + fe[3],d)
             if fs: return
@@ -91,7 +91,7 @@ def extract4_3(inp:str,out:str,t:str):
                 if algo != 'none':
                     try: d = decompress(d,algo,db=db)
                     except EOFError: ex = 'ucl'
-                    else: assert len(d) == us
+                    else: asrt(len(d) == us)
 
                 if ex is None:
                     if len(d) > 0x80 and d[0x70:0x80] == b'mdl_Detail\0\0\0\0\0\0': ex = 'mdl'
@@ -113,10 +113,10 @@ def extract4_3(inp:str,out:str,t:str):
                 d = fd.read(zs)
 
                 if d and zs == us: raise NotImplementedError(ix)
-                elif not d: assert us == 0,ix
+                elif not d: asrt(us == 0,ix)
                 elif us != zs and d[:8] == b'\x00\xE9UCL\xFF\x01\x1A': pcs.append(p.apply_async(decc,(ix,us,d,'uclpack_itc')))
                 else:
-                    assert us in {0,zs},ix
+                    asrt(us in {0,zs},ix)
                     pcs.append(p.apply_async(decc,(ix,us,d,'none')))
             for pc in pcs: pc.get()
             p.close()
@@ -129,7 +129,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i)
-            assert f.read(4) == b'GRF\x05'
+            asrt(f.read(4) == b'GRF\x05')
 
             v = (b'\x01FRG',b'GRF\x01').index(f.read(4))
             if v == 0: f._end = '>'
@@ -156,7 +156,7 @@ def extract4_3(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
                 s = max(fs[ix+1][1]-fe[1],fe[2]) # don't trust file size fe[2]
-                assert fe[3] == 1,f'{fe[3]}: {d[:8].hex()}'
+                asrt(fe[3] == 1,f'{fe[3]}: {d[:8].hex()}')
                 writefile(o + '/' + fe[0],f.decompress(s,'zlib'))
 
             f.close()
@@ -165,7 +165,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(8) == b'Artech\0\0' and f.readu16() == 2 and f.readu16() == 3 and f.readu64() == 1
+            asrt(f.read(8) == b'Artech\0\0' and f.readu16() == 2 and f.readu16() == 3 and f.readu64() == 1)
 
             c = f.readu32()
             f.skip(4)
@@ -243,7 +243,7 @@ def extract4_3(inp:str,out:str,t:str):
                     f.back(8)
                     d.append(f.read(s))
 
-                try: tg = tg.decode('ascii');assert tg.isprintable()
+                try: tg = tg.decode('ascii');asrt(tg.isprintable())
                 except: ex = 'bin'
                 else: ex = tg.lower()
                 writefile(f'{o}/{ix:03d}.{ex}',b''.join(d))
@@ -256,7 +256,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'VOL '
+            asrt(f.read(4) == b'VOL ')
             ep = (f.readu32() & BMSK) + 8
 
             soff = 0
@@ -281,7 +281,7 @@ def extract4_3(inp:str,out:str,t:str):
                     fn = f.read0s().decode('ascii') + '.enc'
                 else: fn = f'{ix:03d}.bin'
                 f.seek(fe[1])
-                assert f.read(4) == b'VBLK'
+                asrt(f.read(4) == b'VBLK')
                 writefile(o + '/' + fn,f.read(f.readu32() & BMSK))
 
             f.close()
@@ -349,7 +349,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(9) == b'TBVolume\0'
+            asrt(f.read(9) == b'TBVolume\0')
 
             f.skip(2)
             c = f.readu16()
@@ -371,7 +371,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,decompress
             f = File(i,endian='<')
-            assert f.read(4) == b'PKX:'
+            asrt(f.read(4) == b'PKX:')
 
             f.skip(8)
             ct = f.readu32()
@@ -417,7 +417,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'DAT\0'
+            asrt(f.read(4) == b'DAT\0')
             c = f.readu32()
 
             oof = f.readu32()
@@ -448,7 +448,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(8) == b'Asura   '
+            asrt(f.read(8) == b'Asura   ')
 
             cs = {}
             while f:
@@ -590,7 +590,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'LF 2'
+            asrt(f.read(4) == b'LF 2')
 
             f.skip(4)
             c = f.readu32()
@@ -616,7 +616,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
-            assert f.read(4) == b'NFA0'
+            asrt(f.read(4) == b'NFA0')
 
             f.skip(4)
             c = f.readu32()
@@ -636,7 +636,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'PACK'
+            asrt(f.read(4) == b'PACK')
 
             c = f.readu32()
             fs = []
@@ -678,10 +678,10 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'HTSW'
+            asrt(f.read(4) == b'HTSW')
 
             c = f.readu32()
-            assert f.readu64() == 0
+            asrt(f.readu64() == 0)
             fs = [(f.readu32(),f.readu32()) for _ in range(c)]
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
@@ -694,7 +694,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(8) == b'BLB2.0\0\0'
+            asrt(f.read(8) == b'BLB2.0\0\0')
 
             f.skip(2)
             c = f.readu16()
@@ -725,7 +725,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File,decompress
             from multiprocessing.pool import ThreadPool
             f = File(i,endian='<')
-            assert f.read(0x10) == b'LG Res File v2\r\n'
+            asrt(f.read(0x10) == b'LG Res File v2\r\n')
 
             cm = f.read(0x60).split(b'\x1A')[0]
             if cm: writefile(f'{o}/$comment.txt',cm)
@@ -776,7 +776,7 @@ def extract4_3(inp:str,out:str,t:str):
             while not b'</script>' in d: d += f.read(0x1000)
             f.seek(len(d.split(b'</script>',1)[0]))
             d = f.read(0x100).decode('utf-8')
-            assert 'let overhead' in d
+            asrt('let overhead' in d)
 
             f.seek(int(re.search(r'let +overhead *= *parseInt\("(\d+)"\)',d)[1]))
             tf = TmpFile('.tar',path=o)
@@ -790,7 +790,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='>')
-            assert f.read(4) == b'\xB2\x28\xC6\x0A' and f.readu32() == 1
+            asrt(f.read(4) == b'\xB2\x28\xC6\x0A' and f.readu32() == 1)
 
             f.skip(8)
             c = f.readu32()
@@ -816,7 +816,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'IDCL'
+            asrt(f.read(4) == b'IDCL')
 
             v = f.readu32()
             unk = sum(f.read(4))
@@ -873,7 +873,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'SLB2'
+            asrt(f.read(4) == b'SLB2')
 
             f.skip(8)
             c = f.readu32()
@@ -926,7 +926,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.skip(3)
                 f._end = {b'L':'<',b'B':'>'}[f.read(1)]
                 f.skip(8)
-                assert f.read(4) == b'DATA'
+                asrt(f.read(4) == b'DATA')
                 f.skip(4)
                 de = f.readu32()
                 to = de + f.readu32()
@@ -941,7 +941,7 @@ def extract4_3(inp:str,out:str,t:str):
                 to = f.readu32()
                 te = f.readu32()
                 f.skip(8)
-                assert f.read(8) == b'\x00\x001BBINA'
+                asrt(f.read(8) == b'\x00\x001BBINA')
                 f.skip(4)
                 do = f.pos
                 to += do
@@ -987,7 +987,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.skip(4)
                 fe.extend([f.readu32(),f.readu32() + so])
                 htg = f.readu32()
-                assert htg in {0,1},f.pos
+                asrt(htg in {0,1},f.pos)
                 if htg: fe.append(f.readu32() + tgo)
                 else:
                     f.skip(4)
@@ -1028,14 +1028,14 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.crypto import HashLib
             HL = HashLib.dl('archer_mac_mercury',db,fmt=lambda x:x.translate(CRCC),encoding='ascii')
             f = File(i,endian='<')
-            assert f.readu32() in {0x7D1,0xFEED}
+            asrt(f.readu32() in {0x7D1,0xFEED})
 
             c = f.readu32()
             f.skip(8)
             fs = []
             for _ in range(c):
                 fs.append((f.readu32(),f.readu32(),f.readu32()))
-                assert f.readu32() == fs[-1][1],f.pos - 0x10
+                asrt(f.readu32() == fs[-1][1],f.pos - 0x10)
 
             HL.wait()
             for fe in fs:
@@ -1061,7 +1061,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'kcap' and f.readu32() == 1
+            asrt(f.read(4) == b'kcap' and f.readu32() == 1)
 
             f.skip(8)
             so = f.readu32()
@@ -1087,12 +1087,12 @@ def extract4_3(inp:str,out:str,t:str):
 
                 writefile(o + '/$signature.txt',js['version'],'w')
                 for x in js['blocks']:
-                    assert len(x) == 1 and 'resources' in x
+                    asrt(len(x) == 1 and 'resources' in x)
                     for fn in x['resources']:
-                        assert len(fn) == 1 and 'name' in fn
+                        asrt(len(fn) == 1 and 'name' in fn)
                         fn = fn['name']
                         rfn = glob.glob(glob.escape(td.p + '/' + fn.replace(':','_').replace('>','_')) + '.*')
-                        assert len(rfn) == 1
+                        asrt(len(rfn) == 1)
                         mv(rfn[0],o + '/' + fn.replace(':','').replace('>','/'))
 
                 td.destroy()
@@ -1132,7 +1132,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import decompress
             d = readfile(i).split(b'ASH0')[1:]
-            assert len(d) == 4
+            asrt(len(d) == 4)
             for ix,n in enumerate(('thumbnail0.tnl','course_data.cdt','course_data_sub.cdt','thumbnail1.tnl')):
                 dd = decompress(b'ASH0' + d[ix],'ash0')
                 writefile(o + '/' + n,dd)
@@ -1142,11 +1142,11 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='>')
-            assert f.read(4) == b'SDF0'
+            asrt(f.read(4) == b'SDF0')
 
             f.skip(4)
             c1 = f.readu32()
-            assert f.reads8() < 0
+            asrt(f.reads8() < 0)
             c2 = f.readu24()
             f.skip(2 + 3 + 3 + 8)
 
@@ -1160,13 +1160,13 @@ def extract4_3(inp:str,out:str,t:str):
             for ix in range(c2): of.write(f'{f.readc(0x10).hex()}\n')
             of.close()
 
-            assert f.readu8() == 1 and f.readu16() == 0
+            asrt(f.readu8() == 1 and f.readu16() == 0)
             writefile(o + '/hash.bin',f.readc(f.readu8() * 4))
-            assert f.readu8() == 1 and f.readu16() == 0
+            asrt(f.readu8() == 1 and f.readu16() == 0)
             d = f.readc(f.readu8() * 4)
             d = decrypt(d,'rsa_inv_le',0xd0c57d605d21c23b91000de888121741c3e2b8ba476b81b25123275b6b5c008b6b10abb59d357dd2fed5fea988940b94adc2136bb45c93d992b7102a5988033b73f6386ef9cce6bbc6dab03ba6e90a25976ef305a087302660475011c5ee50b8d44e1cc081d61273913664e1810abb97b93c1a6c0e6ebd8862d92ed88e62a450cd050dd4e212285128b453ef48711b0be4a0fc43bb8403efd57eda741644ee4cf64bc85187e0ee22fd3c61e4670eb19d47c99a3c9827219f0d4f6743f9fa27375deedf30dd2c17b5a6cd05339c399f2986e9c8919038a70c4f5fc2a760763e128818d1bb1c79a8d8a05d4401ac3004e5f64913a43c8cad637e94d478b63a27d2760105fdeadc8ff71914aaa9b9da29f35d294d4c23638f7f6170ba5358bc127f72c78b6bc4ce746cd350647c61f32dbdfc6135c1db2ec7c2ab9d914ed9a79b46c1ee57692b5fda14c1f0c0597a3c39414d7b8c519144c93dc72ab08b1c7a7b8e651cefcb1b3291128b4136d05abfe33af3568a163c7a839be864bc5abf3ac735fa33bb1ca45953f8431ed9fff2df07f0fbb5a071a462340463fcdfe79f9dee85e297115e1e5d077c414b2bf8523802fc7fd32a40e77cf8be6e0a115aa2709ba2c1fe04fadae81db12d0c71d5020c10f6a62f5e35f4a3d8ec0d3bf3dd914482cc39fd4e221e2feb39e23e0ef408954ef638b2d75e210ba0b6a473d526fc17588b,
                                        3,r=2)
-            assert d[:1] == b'\1'
+            asrt(d[:1] == b'\1')
             d = d[1:].split(b'\0',1)[1][::-1]
             writefile(o + '/signature.bin',d)
 
@@ -1184,7 +1184,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.readu8() == 0x3D and f.readu8() == 3
+            asrt(f.readu8() == 0x3D and f.readu8() == 3)
 
             v = f.readu16('>')
             if v > 0x0101: f.skip(2)
@@ -1249,7 +1249,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = []
             for _ in range(c):
                 fs.append((f.read(12).rstrip(b'\0').decode('ascii'),f.readu32()*0x800,f.readu32()*0x800))
-                assert f.readu16() in {0,1}
+                asrt(f.readu16() in {0,1})
             for fe in fs:
                 f.seek(fe[1])
                 writefile(o + '/' + fe[0],f.readc(fe[2]))
@@ -1275,14 +1275,14 @@ def extract4_3(inp:str,out:str,t:str):
             if fs: return
         case 'Trinity OnePack':
             if db.print_try: print('Trying with custom extractor')
-            assert exists(noext(i) + '.trpfs')
+            asrt(exists(noext(i) + '.trpfs'))
             db.get('trpfs.fbs')
             from lib.file import File
             from lib.crypto import HashLib
             HL = HashLib.dl('pokemon',db)
 
             fd = File(noext(i) + '.trpfs',endian='<')
-            assert fd.read(8) == b'ONEPACK\0'
+            asrt(fd.read(8) == b'ONEPACK\0')
 
             bo = fd.readu64()
             fd.seek(bo)
@@ -1290,7 +1290,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             from bin.PokeDocs.trpfs import TRPFS # type: ignore
             tfs = TRPFS.GetRootAs(fbuf)
-            assert tfs.FileOffsetsLength() == tfs.FileHashesLength()
+            asrt(tfs.FileOffsetsLength() == tfs.FileHashesLength())
             fs = [(tfs.FileOffsets(ix),tfs.FileHashes(ix)) for ix in range(tfs.FileOffsetsLength())]
             del tfs
             fs.append((bo,0))
@@ -1319,7 +1319,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             from bin.PokeDocs.trpak import TRPAK # type: ignore
             tpk = TRPAK.GetRootAs(readfile(i))
-            assert tpk.FileEntryLength() == tpk.FileHashesLength()
+            asrt(tpk.FileEntryLength() == tpk.FileHashesLength())
 
             HL.wait()
             for ix in range(tpk.FileEntryLength()):
@@ -1338,7 +1338,7 @@ def extract4_3(inp:str,out:str,t:str):
             HL = HashLib.dl('pokemon',db)
 
             f = File(i,endian='<')
-            assert f.read(8) == b'GFLXPACK'
+            asrt(f.read(8) == b'GFLXPACK')
 
             f.skip(8)
             fc,dc = f.readu32(),f.readu32()
@@ -1391,7 +1391,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='>')
             v = {b'0MFS':1,b'0MF2':2,b'0MF3':3}[f.read(4)]
-            assert v in {1,2,3}
+            asrt(v in {1,2,3})
 
             f.seek(f.readu32())
             dc = f.readu32()
@@ -1399,7 +1399,7 @@ def extract4_3(inp:str,out:str,t:str):
             mcs = []
             for _ in range(dc):
                 n = f.readc(4).decode('ascii')
-                assert n.isprintable()
+                asrt(n.isprintable())
                 c = f.readu32()
                 for _ in range(c):
                     fe = [n,f.reads32(),f.readu32(),f.readu32()]
@@ -1421,7 +1421,7 @@ def extract4_3(inp:str,out:str,t:str):
                     dc = f.readu32()
                     for _ in range(dc):
                         n = f.readc(4).decode('ascii')
-                        assert n.isprintable()
+                        asrt(n.isprintable())
                         if not n in nm: nm[n] = {}
                         f.padc(2)
                         c = f.readu32()
@@ -1435,7 +1435,7 @@ def extract4_3(inp:str,out:str,t:str):
                     if fe[0] == '0HDR':
                         try:
                             fn = fe[1].to_bytes(4,'big',signed=True).decode('ascii')
-                            assert fn.isprintable()
+                            asrt(fn.isprintable())
                         except: fn = str(fe[1])
                     elif fe[0] in nm and fe[1] in nm[fe[0]]: fn = fe[0] + '/' + nm[fe[0]][fe[1]]
                     else: fn = f'${fe[0]}/{fe[1]}'
@@ -1448,7 +1448,7 @@ def extract4_3(inp:str,out:str,t:str):
                     if fe[0] == '0HDR':
                         try:
                             fn = fe[1].to_bytes(4,'big',signed=True).decode('ascii')
-                            assert fn.isprintable()
+                            asrt(fn.isprintable())
                         except: fn = str(fe[1])
                     else: fn = fe[0] + '/' + (fe[4] or str(fe[1]))
                 fn += '.' + OMTFS_XMP.get(fe[0],fe[0])
@@ -1472,7 +1472,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else:
                     fn = f.readc(34).rstrip().decode('ascii')
                     x = f.readc(6).rstrip().decode('ascii')
-                    assert fn.isprintable() and x.isprintable()
+                    asrt(fn.isprintable() and x.isprintable())
                     fn = f'{x}/{fn}.{OMTFS_XMP.get(x,x)}'
                 writefile(o + '/' + fn,f.readc(s))
 
@@ -1495,7 +1495,7 @@ def extract4_3(inp:str,out:str,t:str):
                 return 1
 
             f = File(np,endian='>')
-            assert f.read(4) == b'\xD2\x94\xA0\x18' and f.readu32() == 1
+            asrt(f.read(4) == b'\xD2\x94\xA0\x18' and f.readu32() == 1)
             f.skip(8)
             es,ec = f.readu64(),f.readu64()
             f.skip(0x60)
@@ -1521,7 +1521,7 @@ def extract4_3(inp:str,out:str,t:str):
                     dc = decrypt(d,'aes_cbc',derk,div)
                     if dc[-1] > 16: continue
                     dc = dc[:-dc[-1]]
-                    try: assert dc.decode('utf-8').replace('\n','').replace('\r','').isprintable()
+                    try: asrt(dc.decode('utf-8').replace('\n','').replace('\r','').isprintable())
                     except: pass
                     else:
                         writefile(f'{o}/{tbasename(i)}.{extname(i)[2:]}',dc)
@@ -1531,7 +1531,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File,mask
             f = File(i,endian='<')
             f.padc(8)
-            assert f.read(4) == b'WAD!' and f.readu32() == 4
+            asrt(f.read(4) == b'WAD!' and f.readu32() == 4)
 
             f.skip(8)
             writefile(o + '/$description.txt',f.readc(0x80).rstrip(b'\0'))
@@ -1565,7 +1565,7 @@ def extract4_3(inp:str,out:str,t:str):
             for dix,pn in enumerate(pkns1):
                 xi,nl,no = pn
 
-                assert xi != 0x7E
+                asrt(xi != 0x7E)
                 if 0x77 <= xi <= 0x7D:
                     bxi,bnl,bno = pkns2[nl]
                     f.seek(sto + bno)
@@ -1578,7 +1578,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else:
                     f.seek(sto + no)
                     n = f.readc(nl).decode('ascii')
-                    assert n.isprintable()
+                    asrt(n.isprintable())
                     if xi != 0x7F: n += '.' + xs[xi]
                 pns.append(n)
 
@@ -1593,7 +1593,7 @@ def extract4_3(inp:str,out:str,t:str):
                 for ix in range(fc):
                     try:
                         fe = fds[fo+ix-fddlt]
-                        assert (fe[0]+fe[1]) < f.size
+                        asrt((fe[0]+fe[1]) < f.size)
                         f.seek(fe[1])
                     except:
                         print(f'{fo+ix-fddlt} ({fo}+{ix}-{fddlt}) / {len(fds)} @ {f.pos - 8}')
@@ -1606,7 +1606,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(8) == b'\x4F\xF3\x2F\xAC\0\0\1\0'
+            asrt(f.read(8) == b'\x4F\xF3\x2F\xAC\0\0\1\0')
 
             ss = f.readu32()
             c = f.readu32()
@@ -1614,7 +1614,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = []
             for _ in range(c):
                 fe = (0x10 + f.readu32(),0x10 + f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32())
-                assert fe[2] in {0,1},f.pos - 0x10
+                asrt(fe[2] in {0,1},f.pos - 0x10)
                 fs.append(fe)
 
             for fe in fs:
@@ -1634,9 +1634,9 @@ def extract4_3(inp:str,out:str,t:str):
 
             f._end = '>' if f.readu8() == 1 else '<'
             f.skip(7)
-            assert f.read(7) == b'FSM_v1.'
+            asrt(f.read(7) == b'FSM_v1.')
             v = f.read(1)[0]-0x30
-            assert v in {1,2},v
+            asrt(v in {1,2},v)
             f.back(14)
 
             if v == 1:
@@ -1647,7 +1647,7 @@ def extract4_3(inp:str,out:str,t:str):
                 align = f.readu16()
                 ces = 0x20
             tab_is = f.readu32()
-            assert tab_is in {0,1}
+            asrt(tab_is in {0,1})
             f.skip(8)
             c = f.readu32() + f.readu32()
             fes = f.readu32()
@@ -1660,8 +1660,8 @@ def extract4_3(inp:str,out:str,t:str):
 
                 f._end = '>' if f.readu8() == 1 else '<'
                 ct = f.readu8()
-                assert ct in {0,3,5,7},ct
-                assert ct != 5,f'{ct} not implemented (FUN_002ff030)'
+                asrt(ct in {0,3,5,7},ct)
+                asrt(ct != 5,f'{ct} not implemented (FUN_002ff030)')
                 f.skip(2)
                 us,zs = f.readu32(),f.readu32()
                 f.skip(ces - 12)
@@ -1696,7 +1696,7 @@ def extract4_3(inp:str,out:str,t:str):
                     ft.back(len(fn)+1)
                     try:
                         fn = fn.decode('ascii')
-                        assert fn.isprintable() and fn,fn
+                        asrt(fn.isprintable() and fn,fn)
                     except:
                         print(ft.pos)
                         raise
@@ -1720,9 +1720,9 @@ def extract4_3(inp:str,out:str,t:str):
             f.skip(1)
             aln = f.readu16()
             f.skip(4)
-            assert f.read(7) == b'FSM_v1.'
+            asrt(f.read(7) == b'FSM_v1.')
             v = f.read(1)[0]-0x30
-            assert v in {1,2},v
+            asrt(v in {1,2},v)
             if v == 1: aln = 0x20
 
             fc = f.readu32()
@@ -1765,7 +1765,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             from lib.crypto import crc_hash
             f = File(i,endian='<')
-            assert f.read(4) == b'\x0D\xD0\xAD\xBA' and f.readu32() == 1
+            asrt(f.read(4) == b'\x0D\xD0\xAD\xBA' and f.readu32() == 1)
 
             f.seek(f.readu64())
             ac,bc = f.readu16(),f.readu16()
@@ -1773,9 +1773,9 @@ def extract4_3(inp:str,out:str,t:str):
             blbs = []
             for _ in range(bc):
                 fe = [f.readu40(),f.readu8()]
-                assert fe[1] in {0,1}
+                asrt(fe[1] in {0,1})
                 f.padc(1)
-                assert f.readu8() == 0
+                asrt(f.readu8() == 0)
                 blbs.append(fe + [f.readu32(),f.readu32()])
             stb = [x.decode('utf-8') for x in f.read()[:-1].split(b'\0')]
 
@@ -1788,7 +1788,7 @@ def extract4_3(inp:str,out:str,t:str):
                     # seems to be some variation https://github.com/microsoft/DirectStorage/tree/main/GDeflate isn't able to decompress
                     d = f.decompress(blbs[ix][2],('none','none'#'gdeflate'
                                                   )[blbs[ix][1]],usize=a[2] | a[3] << 16,db=db)
-                    assert crc_hash(d,'crc32') == blbs[ix][3]
+                    asrt(crc_hash(d,'crc32') == blbs[ix][3])
                     writefile(bfn + ('' if isn else f'_{ix}') + xfn + ('.gd' if blbs[ix][1] else ''),d)
 
             f.close()
@@ -1840,7 +1840,7 @@ def extract4_3(inp:str,out:str,t:str):
             else:
                 import re
                 rg = re.findall(r'<code>([a-f\dA-F]{32})</code>',db.c.get('https://wiki.wiidatabase.de/wiki/SD-Key').text)
-                assert len(rg) == 2
+                asrt(len(rg) == 2)
                 sdky,sdiv = bytes.fromhex(rg[0]),bytes.fromhex(rg[1])
                 writefile(sdk,sdky + sdiv)
 
@@ -1859,18 +1859,18 @@ def extract4_3(inp:str,out:str,t:str):
             h.close()
 
             bks = f.readu32()
-            assert bks == 0x70 and f.read(2) == b'Bk' and f.readu16() == 1
+            asrt(bks == 0x70 and f.read(2) == b'Bk' and f.readu16() == 1)
             f.skip(4)
             c = f.readu32()
             f.skip(bks - 0x10)
             f.align(0x40)
 
             for _ in range(c):
-                assert f.read(4) == b'\x03\xAD\xF1\x7E'
+                asrt(f.read(4) == b'\x03\xAD\xF1\x7E')
                 s = f.readu32()
                 f.skip(2)
                 ty = f.readu8()
-                assert ty in {1,2}
+                asrt(ty in {1,2})
                 fn = f.readc(0x45).split(b'\0')[0].decode('utf-8')
                 iv = f.readc(0x10)
                 f.align(0x40)
@@ -1942,7 +1942,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'GDAT'
+            asrt(f.read(4) == b'GDAT')
 
             c = f.readu32()
             fs = [(f.readu32(),f.readu32()) for _ in range(c)]
@@ -1952,7 +1952,7 @@ def extract4_3(inp:str,out:str,t:str):
                 if ty[0] == 0:
                     try:
                         ty = ty[1:].decode('ascii')[::-1]
-                        assert ty.isprintable()
+                        asrt(ty.isprintable())
                     except: ty = 'bin'
                 else: ty = 'bin'
 
@@ -1981,12 +1981,12 @@ def extract4_3(inp:str,out:str,t:str):
             if ty[0] == 0:
                 try:
                     ty = ty[1:].decode('ascii')[::-1]
-                    assert ty.isprintable()
+                    asrt(ty.isprintable())
                 except: ty = extname(i)[1:]
             else: ty = extname(i)[1:]
 
             f.skip(0x7C)
-            assert f.read(4) == b'BILZ'
+            asrt(f.read(4) == b'BILZ')
             f.skip(4)
             zs = f.readu32()
             f.skip(4)
@@ -2036,7 +2036,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='<')
 
-            assert f.read(5) == b'DUPP\x1A'
+            asrt(f.read(5) == b'DUPP\x1A')
             v = f.readu8()
             f.skip(2)
 
@@ -2187,7 +2187,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             def readb(p:list):
                 bo = f.pos
-                assert f.read(4) == b'Ce\x87\x09'
+                asrt(f.read(4) == b'Ce\x87\x09')
                 pf = '/'.join([f'{x:02d}' for x in p])
                 f.skip(4)
                 c = f.readu16()
@@ -2216,7 +2216,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'PAK '
+            asrt(f.read(4) == b'PAK ')
 
             c = f.readu32()
             f.skip(8)
@@ -2271,10 +2271,10 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'RIFF'
+            asrt(f.read(4) == b'RIFF')
             ep = f.readu32() + f.pos
             typ = f.read(4).decode('ascii')
-            assert typ == 'SAGE'
+            asrt(typ == 'SAGE')
 
             FNM = {}
             def readb(typ):
@@ -2287,7 +2287,7 @@ def extract4_3(inp:str,out:str,t:str):
                         typ = f.read(4).decode('ascii')
                         while f.pos < ep: readb(typ)
                     case 'SWAV':
-                        assert bs == 0x58
+                        asrt(bs == 0x58)
                         fn = sub_path(f.read(0x50).rstrip(b'\0').decode('ascii'))
                         f.skip(4)
                         FNM[f.readu32()] = fn
@@ -2300,7 +2300,7 @@ def extract4_3(inp:str,out:str,t:str):
 
                     case 'RIFF':
                         f.back(8)
-                        assert f.pos in FNM
+                        asrt(f.pos in FNM)
                         writefile(o + '/' + FNM.pop(f.pos),f.read(bs + 8))
                     case 'DIB8':
                         fe = FNM.pop(f.pos - 8)
@@ -2320,7 +2320,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i,endian='<')
             f.padc(2)
-            assert f.readu16() == 1
+            asrt(f.readu16() == 1)
 
             f.skip(0x10)
             c = f.readu32()
@@ -2335,7 +2335,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.skip(4)
                 ty = f.read(4)[::-1].decode('ascii')
                 if ty == '\0\0\0\0': ty = 'text'
-                assert ty.isprintable()
+                asrt(ty.isprintable())
                 writefile(f'{o}/{id:03d}.{ty.lower()}',f.read(s))
 
             f.close()
@@ -2347,7 +2347,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             HL = HashLib.dl('sxm',db,fmt=lambda x:x.lower().replace('\\','/'),encoding='ascii')
             f = File(i,endian='<')
-            assert f.read(4) == b'FARC' and f.readu32() == 0x100
+            asrt(f.read(4) == b'FARC' and f.readu32() == 0x100)
 
             c = f.readu32()
             so = f.readu32()
@@ -2387,7 +2387,7 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Sunday vs. Magazine TARC'|'Sunday vs. Magazine EMIT':
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4).decode('ascii') == t[-4:]
+            asrt(f.read(4).decode('ascii') == t[-4:])
             f.back(4)
             r = sxm_block(f,o)
             f.close()
@@ -2403,7 +2403,7 @@ def extract4_3(inp:str,out:str,t:str):
                 else: bks[n] += 1
                 f.skip(4)
                 s = f.readu32()
-                assert s == f.readu32()
+                asrt(s == f.readu32())
                 ep = f.pos + s
 
                 match n:
@@ -2418,7 +2418,7 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Sunday vs. Magazine aeDAT':
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'aeDT'
+            asrt(f.read(4) == b'aeDT')
 
             f.padc(2)
             c = f.readu16()
@@ -2437,7 +2437,7 @@ def extract4_3(inp:str,out:str,t:str):
 DNAKEY = bytes.fromhex('E481D4ED17D44162FA5CE995AE252FD098C014CED9A742F99FFA8D382B2A136A26E0D9708EABB5F18E77ED809B1CAF51918D680061B2463D')
 def dnasoft_lzss_decrypt(i:bytes):
     from lib.crypto import decrypt
-    assert i[:4] == b'LZSS'
+    asrt(i[:4] == b'LZSS')
     rs = int.from_bytes(i[4:8],'little')
     return decrypt(i[8:8+rs+-rs%8],'blowfish_le',DNAKEY)[:rs]
 def sxm_block(inp,o:str,hint=None):
@@ -2447,16 +2447,16 @@ def sxm_block(inp,o:str,hint=None):
 
     match f.read(4).decode('ascii'):
         case 'TARC':
-            assert f.readu32() == 0x100
+            asrt(f.readu32() == 0x100)
             c = f.readu32()
-            assert f.readu32() != 0
+            asrt(f.readu32() != 0)
             fs = [(f.read(0x38).rstrip(b'\0').decode('ascii'),f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(p + fe[1])
                 writefile(o + '/' + fe[0],f.readc(fe[2]))
             return bool(fs)
         case 'EMIT':
-            assert f.readu32() == 0x101
+            asrt(f.readu32() == 0x101)
             c = f.readu32()
             f.seek(p + int.from_bytes(f.read(4),'little'))
             d = []

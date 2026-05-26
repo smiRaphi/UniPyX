@@ -275,10 +275,10 @@ class DLDB:
         out = out.strip('/')
         os.makedirs(out,exist_ok=True)
         if not 'refInfo' in d:
-            assert 'codeViewTreeRoute' in d
+            if not 'codeViewTreeRoute' in d: raise ValueError
             d = d['codeViewTreeRoute']
         if not 'repo' in d:
-            assert ' · ' in tit
+            if not ' · ' in tit: raise ValueError
             tit = tit.rsplit(' · ',1)[1]
             d['repo'] = {'ownerLogin':tit.split('/')[0],'name':tit.split('/')[1]}
         b = f'https://github.com/{d["repo"]["ownerLogin"]}/{d["repo"]["name"]}/tree/{d["refInfo"]["name"]}/'

@@ -310,12 +310,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             d.append(f.read(cs))
 
                             chhd = f.read(4)
-                            assert chhd == b'PK\1\2'
+                            asrt(chhd == b'PK\1\2')
                             d.append(chhd)
                             d.append(f.read(42+fnl))
 
                             chhd = f.read(4)
-                            assert chhd == b'PK\5\6'
+                            asrt(chhd == b'PK\5\6')
                             d.append(chhd)
                             d.append(f.read(12))
                             d.append((int.from_bytes(f.read(4),'little')).to_bytes(4,'little'))
@@ -424,7 +424,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if c:
                 for ix in range(c):
                     try: xr = main_extract(o + f'/{ix}.exe',o + f'/{ix}')
-                    except AssertionError: xr = False
+                    except ValueError: xr = False
                     if exists(o + f'/{ix}') and not listdir(o + f'/{ix}'): remove(o + f'/{ix}')
                     elif xr: remove(o + f'/{ix}.exe')
                 return
@@ -509,7 +509,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             f = File(i,endian='<')
             f.seek(0x178)
-            assert f.read(8) == b'.text\0\0\0'
+            asrt(f.read(8) == b'.text\0\0\0')
             f.skip(8)
             s,of = f.readu32(),f.readu32()
             eo = of + s - 8
@@ -523,7 +523,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     tmpl += 1
                     if tmpl == len(src): break
                 else: tmpl = 0
-            else: assert tmpl == len(src)
+            else: asrt(tmpl == len(src))
 
             f.skip(-39)
             sl = f.readu8()
@@ -531,27 +531,27 @@ def extract3(inp:str,out:str,t:str) -> bool:
             fn = f.read(sl-38)[:-1].decode('utf-16le')
             fn += f.read(f.readu8())[:-1].decode('utf-16le')
 
-            assert f.readu8() == 0x7D
+            asrt(f.readu8() == 0x7D)
             f.skip(0x7D)
 
             bs = f.readcompiu()
             bs -= 1
-            assert bs > 0
+            asrt(bs > 0)
 
             bat = f.read(bs)
-            assert f.readu8() in {0,1}
+            asrt(f.readu8() in {0,1})
             f.close()
 
             if len(bat.replace(b'\r',b'')) > 3519 and bat.startswith(b'set '):
                 st = re.search(rb'^set [a-z]{10}=s\r?\n%[a-z]{10}%et [a-z]{10}=e\r?\n%[a-z]{10}%%[a-z]{10}%t [a-z]{10}=t\r?\n',bat)
                 if st:
                     cr = st.end() > 87
-                    assert st.end() == (87 + (3 if cr else 0))
+                    asrt(st.end() == (87 + (3 if cr else 0)))
                     bat = bat[87 + (3 if cr else 0):]
 
                     mp = re.findall(rb'(?:%[a-z]{10}%){3} ([a-z]{10})=([a-z])\r?\ngoto [A-Z]{10}\r?\n(?:%[a-z]{10}%){3} [a-z]{10}=[a-z]\r?\n:[A-Z]{10}\r?\n',
                                     bat[:3432 + (104 if cr else 0)])
-                    assert len(mp) == 26
+                    asrt(len(mp) == 26)
                     bat = bat[3432 + (104 if cr else 0):]
                     for x in mp:
                         bat = bat.replace(b'%' + x[0] + b'%',x[1])
@@ -615,7 +615,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             for x in readfile(i,'r').strip().split('\n'):
                 x = x.strip() + ' '
                 t,x = x.split(' ',1)
-                assert t in 'fdl',t
+                asrt(t in 'fdl',t)
                 t = t
                 mode,x = x.split(' ',1)
                 mode = int(mode,8)
@@ -705,10 +705,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
                         if p2.strip() != path2.strip(): d.seek(fpos)
                     rs = ne['cmpsize'] if ne.get('cmpsize',0) > 0 else ne['size']
                     dat = d.read(rs)
-                    assert len(dat) == rs,d.name
+                    asrt(len(dat) == rs,d.name)
 
                     if ne.get('cmpsize',0) > 0:
-                        assert dat[:2] == b'\x1F\x9D'
+                        asrt(dat[:2] == b'\x1F\x9D')
                         tf = TmpFile('.z')
                         writefile(tf.p,dat)
                         _,dat,err = run(['7z','e','-so','-tZ',tf],text=False,print_try=pr7z)
@@ -773,7 +773,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             symlink(i,ti)
             run(['dolpak',ti])
             remove(ti)
-            assert exists(tf)
+            asrt(exists(tf),err=FileNotFoundError)
             extract(tf,o,'7z')
             remove(tf)
             if listdir(o): return
@@ -787,14 +787,14 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.seek(0xAC)
             data0_size = f.readu32()
             f.seek(data0)
-            assert f.read(3) == b'DLZ'
+            asrt(f.read(3) == b'DLZ')
             ver = f.readu8()
 
             of = open(o + '/' + basename(i),'wb')
             if ver == 2:
                 def dlz_dec_block():
                     size = f.readu32()
-                    assert size > 6
+                    asrt(size > 6)
                     epos = f.pos + size
                     f.skip(4)
 
@@ -808,10 +808,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
                                 tok0,tok1 = f.readu8(),f.readu8()
                                 oflags,leng,off = tok0 >> 4,(tok0 & 0x0F)+3,tok1
                                 err = f'0b{oflags:04b},{leng},{off} = 0x{tok0:02X}{tok1:02X} @ 0x{f.pos-2:04X}'
-                                assert off > 0,err
+                                asrt(off > 0,err)
                                 off = len(dec) - off + 1
                                 if off < 0:
-                                    assert off >= -16,err
+                                    asrt(off >= -16,err)
                                     dec += bytes(-off)
                                     off = 0
                                 for i in range(leng): dec.append(dec[off + i])
@@ -1036,7 +1036,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Python Compiled Module':
             err,r,_ = run(['pycdc',i],text=False)
-            assert not err
+            asrt(not err)
             writefile(o + '/' + tbasename(i) + '.py',r.split(b'\r\n',3)[3])
             return
         case 'Install Creator Pro':
@@ -1190,7 +1190,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i,endian='<')
 
-            assert f.read(4) == b'XBEH'
+            asrt(f.read(4) == b'XBEH')
             f.seek(0x104)
             boff = f.readu32()
             f.skip(0x14)
@@ -1214,7 +1214,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'Lua Bytecode':
             f = open(i,'rb')
-            assert f.read(4) == b'\x1bLua'
+            asrt(f.read(4) == b'\x1bLua')
             v = f.read(1)[0]
             fv = f.read(1)[0]
             f.close()
@@ -1259,9 +1259,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             import zlib
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(8) == b'idska32\x1A'
+            asrt(f.read(8) == b'idska32\x1A')
             f.skip(4)
-            assert f.read(4) == b'zlb\x1A'
+            asrt(f.read(4) == b'zlb\x1A')
             f.skip(6)
 
             of = open(o + '/' + basename(i),'wb')
@@ -1347,19 +1347,19 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,ext_exe
             e = ext_exe(i,dotnet=True)
-            assert len(e.net.resources) == 1 and e.net.resources[0].name == 'app.resources'
+            asrt(len(e.net.resources) == 1 and e.net.resources[0].name == 'app.resources')
 
             ffn = e.FileInfo[0][1].StringTable[0].entries[b'OriginalFilename'].decode('utf-8')
             # dnfile's resource parser seems to be broken?
             f = File(e.net.resources[0].data._data,endian='<')
             e.close()
 
-            assert f.read(4) == b'\xCE\xCA\xEF\xBE'
+            asrt(f.read(4) == b'\xCE\xCA\xEF\xBE')
             f.skip(4)
             f.skip(f.readu32())
             f.skip(4)
             c = f.readu32()
-            assert f.readu32() == 0
+            asrt(f.readu32() == 0)
             f.align(8)
             f.skip(4*c)
             nos = [f.readu32() for _ in range(c)]
@@ -1435,17 +1435,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if not adr in scmp: scmp[adr] = []
                 scmp[adr].append(c[1])
             cmps1 = [x for x in scmp if len(scmp[x]) == 2 and 0xFF in scmp[x] and 0xFD in scmp[x]]
-            assert len(cmps1) == 1
+            asrt(len(cmps1) == 1)
 
             cmps2 = [int.from_bytes(x[2:4],'little') for x in re.findall(b'\x81\xFF.[\0\1]\0\0',cod)]
             cmps2 = [x for x in cmps2 if 0x140 >= x >= 0x30]
-            assert len(cmps2) == 1
+            asrt(len(cmps2) == 1)
 
             movs = [int.from_bytes(x[1:5],'little') for x in re.findall(b'\xB9.{4}',cod)]
             movs = [x for x in movs if cmps1[0]*1.75 > x > cmps1[0]/2.5]
             cmps3 = [int.from_bytes(x[3:7],'little') for x in re.findall(b'\x49\x81\xF9.{4}',cod)]
             cmps3 = [x for x in cmps3 if x in movs]
-            assert len(cmps3) == 1
+            asrt(len(cmps3) == 1)
             del cod
 
             f.seek(f.secs['.data'][0] + 0x80)
@@ -1583,11 +1583,11 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 s = f.readu32()
                 fs.append((c,f.pos,id,fl,s))
                 if id in {0x2224,0x222E,0x223B,0x224F}:
-                    assert not fl & 2
+                    asrt(not fl & 2)
                     d = f.readc(s)
                     if fl & 1:
                         d = d[8:]
-                        assert d[0] == 0x78,hex(f.pos - s - 8)
+                        asrt(d[0] == 0x78,hex(f.pos - s - 8))
                         d = decompress(d,anc + ('zlib' if iszl(d) else 'deflate'))
                     if fl >> 2: raise NotImplementedError(f'Unknown flag {bin(fl)} @ {f.pos - s - 8}')
                     kids[id] = d
@@ -1596,7 +1596,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             if 0x224F in kids:
                 d = kids.pop(0x224F)
-                assert len(d) == 12
+                asrt(len(d) == 12)
                 prb = int.from_bytes(d[:4],'little')
             if prb > 285 or unp: ko = (0x2224,0x223B,0x222E)
             else: ko = (0x222E,0x2224,0x223B)
@@ -1616,7 +1616,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                         if fl & 1: d = d[4:]
                     if fl & 1:
                         if not fl & 2: d = d[8:]
-                        assert d[0] == 0x78,f'{d[:4]} @ 0x{of + 8:08X}'
+                        asrt(d[0] == 0x78,f'{d[:4]} @ 0x{of + 8:08X}')
                         d = decompress(d,anc + ('zlib' if iszl(d) else 'deflate'))
                     if fl >> 2: raise NotImplementedError(f'Unknown flag {bin(fl)} @ {of - 8}')
                 fn = f'{o}/$Chunks/{ix:03d}.{TMAP.get(id,f"{id:04X}")}'
@@ -1712,10 +1712,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             import re
             from html import unescape
             d = readfile(i,'r').strip()
-            assert d.startswith('<bms') and d.endswith('</bms>')
+            asrt(d.startswith('<bms') and d.endswith('</bms>'))
             d = d[:-6]
             hd = re.search(r'^<bms(\s+([\w_]+="[^"\n]*"\s*)+)?\s*>',d)
-            assert hd
+            asrt(hd)
             hd = hd[0]
             d = d[len(hd):].strip()
 
@@ -1753,14 +1753,14 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if len(xc) - pc > 3 and cut(x,16,16) == 0xe3a0:
                     v = imm12(x)
                     #print(hex(v),pos())
-                    assert v and v.bit_count() < 4 and not v & 0x3000,pos()
-                    assert cut(get(),8,24) == 0xEB and cut(get(),8,24) in {0xE2,0xE3}
+                    asrt(v and v.bit_count() < 4 and not v & 0x3000,pos())
+                    asrt(cut(get(),8,24) == 0xEB and cut(get(),8,24) in {0xE2,0xE3})
                     ob.append(f'DD000000 {v:08X}')
                     bts.append(v)
                     x = get()
                     end = None
                     if x != 0x08BD8010:
-                        assert cut(x,16,16) == 0x0A00,pos()
+                        asrt(cut(x,16,16) == 0x0A00,pos())
                         end = pc + cut(x,16) + 1
 
                     procc(pc)
@@ -1775,7 +1775,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     ob.append(f'D9000000 {v1:08X}')
                     x = get()
                     if cut(x,16,16) == 0xE6FF: x = get()
-                    assert cut(x,20,12) == 0xe1c23,pos()
+                    asrt(cut(x,20,12) == 0xe1c23,pos())
                     v2 += cut(x,8,4)
                     ob.append(f'D6000000 {v2:08X}')
                 elif len(xc) - pc > 3 and cut(x,20,12) == 0xe59f3 and cut(xc[pc],20,12) == 0xe59f1 and cut(xc[pc+1],16,16) == 0xe192:
@@ -1793,7 +1793,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     while cut(x,20,12) == 0xe2433:
                         v -= imm12(x)
                         x = get()
-                    assert cut(x,20,12) == 0xe7821,pos()
+                    asrt(cut(x,20,12) == 0xe7821,pos())
                     ob.append(f'D6000000 {v:08X}')
                 elif len(xc) - pc > 4 and cut(x,20,12) == 0xe59f3 and (cut(xc[pc],20,12) == 0xe59f3 or cut(xc[pc+1],20,12) == 0xe59f3):
                     v1 = getd(cut(x,8) + 4)
@@ -1802,10 +1802,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
                         v1 -= cut(x,12)
                         x = get()
                     ob.append(f'D9000000 {v1:08X}')
-                    assert cut(x,20,12) == 0xe59f3,pos()
+                    asrt(cut(x,20,12) == 0xe59f3,pos())
                     v2 = getd(cut(x,8) + 4)
                     x = get()
-                    assert cut(x,20,12) == 0xe5832,pos()
+                    asrt(cut(x,20,12) == 0xe5832,pos())
                     v2 += cut(x,12)
                     ob.append(f'D6000000 {v2:08X}')
                 elif x == 0xE8BD8010: return 1
@@ -1834,7 +1834,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 no = int.from_bytes(xd[:4],'little') - BA
                 n = d[no:].split(b'\0')[0]
                 if not n.startswith(b'Execute: '): continue
-                try: n = n[9:].decode('ascii');assert n.isprintable()
+                try: n = n[9:].decode('ascii');asrt(n.isprintable())
                 except: continue
 
                 ob = []

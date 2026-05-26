@@ -28,14 +28,14 @@ class Client:
             exe = BDIR + '\\'
             if os.path.exists('AssetRipper.GUI.Premium.exe'): exe += 'AssetRipper.GUI.Premium.exe'
             else: exe += 'AssetRipper.GUI.Free.exe'
-        assert os.path.exists(exe),'AssetRipper not found'
+        if not os.path.exists(exe): raise FileNotFoundError('AssetRipper not found')
 
         cmd = [exe,'--headless','--log=false']
         if port: cmd += [f'--port={port}']
         self.p = subprocess.Popen(cmd,stdout=-1,stderr=-1)
 
         while True:
-            assert not self.p.poll()
+            if self.p.poll(): raise ValueError
             l = self.p.stdout.readline()
             if l.strip().startswith(b'Now listening on: http'):
                 self.base = l.decode().strip().split(': ')[1] + '/'
@@ -72,12 +72,12 @@ class Client:
         r = self.get('',herr=False)
         h = r.headers
         rt = r.status_code == 200 and h.get('content-type') == 'text/html' and h.get('server') == 'Kestrel'
-        if rs: assert rt,'Bad Base Address'
+        if rs and not rt: raise ValueError('Bad Base Address')
         return rt
 
     def LoadFile(self,path:str):
         path = os.path.realpath(path)
-        assert os.path.exists(path) and os.path.isfile(path)
+        if not(os.path.exists(path) and os.path.isfile(path)): raise FileNotFoundError
         try: self.post('LoadFile',path=path)
         except httpx.ReadTimeout: pass
     def Reset(self): self.post('Reset')

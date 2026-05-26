@@ -33,7 +33,7 @@ class UEKeys:
 
     def get(self,guid:bytes|int):
         if type(guid) == bytes:
-            assert len(guid) == 0x10
+            if len(guid) != 0x10: raise ValueError(f'0x{len(guid):02X} != 0x10')
             guid = int.from_bytes(guid,'big')
         return self.db[guid]
     def __iter__(self): return iter(self.ldb)
@@ -65,7 +65,7 @@ def makedb():
         else:
             #print(unescape(m).encode('ansi'),'|' + n + '|' + k + '|')
             continue
-        assert len(k) == 0x20
+        if len(k) != 0x20: raise ValueError(f'0x{len(k):02X} != 0x20')
 
         if n in GUIDs:
             if not k in ks: ks[k] = []

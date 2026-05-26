@@ -439,7 +439,7 @@
         "rs":"Favorite Dear LKF","s":1
     },
     {
-        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')//2;f.seek(0);o=[int.from_bytes(f.read(2),'little')for _ in range(c)]\nif any(x%2 for x in o) or o in([0],[]):return\nfor of in o:\n f.seek(of);s=int.from_bytes(f.read(2),'little');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:assert b.decode('shift-jis').isprintable()\n except:return\nreturn True"]],
+        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')//2;f.seek(0);o=[int.from_bytes(f.read(2),'little')for _ in range(c)]\nif any(x%2 for x in o) or o in([0],[]):return\nfor of in o:\n f.seek(of);s=int.from_bytes(f.read(2),'little');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:asrt(b.decode('shift-jis').isprintable())\n except:return\nreturn True"]],
         "rs":"Favorite Dear MSG 1"
     },
     {
@@ -482,7 +482,7 @@
         "rs":"Archer Maclean's Mercury PAQ"
     },
     {
-        "d":[["isat","\\r\\n",10],["str",0,10],["py","f=open(inp,'rb');s=f.read(12)\nif len(s)!=12 or not s.endswith(b'\\r\\n') or not s[:10].rstrip(b' ').isdigit():return\nf.seek(int(s.rstrip()),1)\nwhile 1:\n s0,s1,s2=f.read(12),f.read(34),f.read(6)\n if not s0:break\n if len(s0+s1+s2)!=52 or not(s0[10:]==s1[32:]==s2[4:]==b'\\r\\n')or not s0[:10].rstrip(b' ').isdigit():return\n try:assert(s1[:32]+s2[:4]).decode('ascii').isprintable()\n except:return\n f.seek(int(s0.rstrip()),1)\nreturn True"]],
+        "d":[["isat","\\r\\n",10],["str",0,10],["py","f=open(inp,'rb');s=f.read(12)\nif len(s)!=12 or not s.endswith(b'\\r\\n') or not s[:10].rstrip(b' ').isdigit():return\nf.seek(int(s.rstrip()),1)\nwhile 1:\n s0,s1,s2=f.read(12),f.read(34),f.read(6)\n if not s0:break\n if len(s0+s1+s2)!=52 or not(s0[10:]==s1[32:]==s2[4:]==b'\\r\\n')or not s0[:10].rstrip(b' ').isdigit():return\n try:asrt((s1[:32]+s2[:4]).decode('ascii').isprintable())\n except:return\n f.seek(int(s0.rstrip()),1)\nreturn True"]],
         "rs":"Barbie: Riding Club Cache"
     },
     {
@@ -728,7 +728,7 @@
         "rs":"D.N.A. Softwares LZSS"
     },
     {
-        "d":[["size",[532,4294967295]],["isat","./",4],["isat","./",264],["n0",4,0],["str0e",4,256,7],["n0",4,260],["str0e",264,256,7],["n0",4,520],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=4+260*c\nfor _ in range(c):\n try:assert f.read(256).split(b'\\0')[0].decode('ascii').isprintable()\n except:return\n s+=int.from_bytes(f.read(4),'little')\nreturn s==f.seek(0,2)"]],
+        "d":[["size",[532,4294967295]],["isat","./",4],["isat","./",264],["n0",4,0],["str0e",4,256,7],["n0",4,260],["str0e",264,256,7],["n0",4,520],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=4+260*c\nfor _ in range(c):\n try:asrt(f.read(256).split(b'\\0')[0].decode('ascii').isprintable())\n except:return\n s+=int.from_bytes(f.read(4),'little')\nreturn s==f.seek(0,2)"]],
         "rs":"@N-Factory DAT"
     },
     {
@@ -1519,7 +1519,7 @@
     },
     {
         "d":[["size",[27,131072]],["isat","\\0",-1],["n0",4,0],["n0",4,4],
-             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big')\nif (c*23)>f.seek(0,2):return\nf.seek(4);d=dirname(inp)+'/'\nfor _ in range(c):\n s=int.from_bytes(f.read(4),'big');fn=f.read(s)\n if len(fn)!=s:return\n s=int.from_bytes(f.read(4),'big');n=f.read(s)\n if len(n)!=s:return\n try:assert not n or exists(d+n.decode('ascii'))or exists(d+n.decode('utf-8')+splitext(fn.decode('utf-8'))[1])\n except:return\n f.seek(8,1)\n if f.read(1)!=b'\\0':return\nreturn not f.read(1)"]],
+             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big')\nif (c*23)>f.seek(0,2):return\nf.seek(4);d=dirname(inp)+'/'\nfor _ in range(c):\n s=int.from_bytes(f.read(4),'big');fn=f.read(s)\n if len(fn)!=s:return\n s=int.from_bytes(f.read(4),'big');n=f.read(s)\n if len(n)!=s:return\n try:asrt(not n or exists(d+n.decode('ascii'))or exists(d+n.decode('utf-8')+splitext(fn.decode('utf-8'))[1]))\n except:return\n f.seek(8,1)\n if f.read(1)!=b'\\0':return\nreturn not f.read(1)"]],
         "rs":"Moe Cure Net FileList"
     },
     {
@@ -2024,7 +2024,7 @@
         "rs":"Unreal Engine Web Package","s":1
     },
     {
-        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:assert n.decode('utf-8').isprintable()\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:assert n.decode('utf-8').isprintable()\nexcept:return\nreturn True"]],
+        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:asrt(n.decode('utf-8').isprintable())\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:asrt(n.decode('utf-8').isprintable())\nexcept:return\nreturn True"]],
         "rs":"Impact Screensaver ILB"
     },
     {

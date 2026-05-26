@@ -140,14 +140,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if len(fn) != 100: break
                 fn = fn.rstrip(b'\0').decode('utf-8')
 
-                assert f.read(8*3) == (b'0000000\0'*3)
+                asrt(f.read(8*3) == (b'0000000\0'*3))
                 fs = int(f.read(11).decode('utf-8'),8)
 
-                assert f.read(22) == (b'\0' + b'0'*11 + b'\0' + b'0'*7 + b'\0 ')
+                asrt(f.read(22) == (b'\0' + b'0'*11 + b'\0' + b'0'*7 + b'\0 '))
                 f.seek(0xAC,1)
-                #assert sum(f.read(0xAC)) == 0,f.tell()
-                assert f.read(0x10) == (b'0000000\0'*2)
-                assert sum(f.read(0xA7)) == 0
+                #asrt(sum(f.read(0xAC)) == 0,f.tell())
+                asrt(f.read(0x10) == (b'0000000\0'*2))
+                asrt(sum(f.read(0xA7)) == 0)
 
                 writefile(o + '/' + fn,f.read(fs))
             return
@@ -271,12 +271,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             mkdir(od)
                             if not extract(f,od,'ISO'):
                                 remove(f,od)
-                                assert not exists(od)
+                                asrt(not exists(od))
                         elif f.endswith('.hfs'):
                             mkdir(od)
                             if not extract(f,od,'Apple Disk Image'):
                                 remove(f,od)
-                                assert not exists(od)
+                                asrt(not exists(od))
                     if listdir(o) != fs: return
                 remove(o)
                 mkdir(o)
@@ -426,7 +426,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             f.seek(cdo)
             fs = []
             for _ in range(c):
-                assert f.read(4) == b'PK\1\2'
+                asrt(f.read(4) == b'PK\1\2')
                 fe = {
                     'cv':f.readu16(),
                     'xv':f.readu16(),
@@ -434,8 +434,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     'ct':f.readu16(),
                     'ts':{},
                 }
-                assert not fe['fl'] & 0x9780
-                if fe['fl'] & 0x2000: raise NotImplementedError('Encrypted CD')
+                asrt(not fe['fl'] & 0x9780)
+                asrt(not fe['fl'] & 0x2000,'Encrypted CD',err=NotImplementedError)
                 ct,cd = f.readu16(),f.readu16()
                 try: fe['ts']['m'] = unix2filetime(pdosdate(cd,ct))
                 except ValueError: pass
@@ -456,18 +456,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     match tg:
                         case b'\0\0': pass # empty
                         case b'\1\0': # Zip64
-                            assert s >= 0x10
+                            asrt(s >= 0x10)
                             fe['us'],fe['zs'] = f.readu64(),f.readu64()
                             if s > 0x10:
-                                assert s >= 0x18
+                                asrt(s >= 0x18)
                                 fe['of'] = f.readu64()
                             if s > 0x18:
-                                assert s >= 0x1C
+                                asrt(s >= 0x1C)
                                 fe['dsk'] = f.readu32()
                         case b'\x0A\0': # NTFS
-                            assert s >= 0x20
+                            asrt(s >= 0x20)
                             f.padc(4)
-                            assert f.readu16() == 1 and f.readu16() == 0x18,f.pos
+                            asrt(f.readu16() == 1 and f.readu16() == 0x18,f.pos)
                             ts = f.readu64() # FILETIME
                             if ts: fe['ts']['m'] = ts
                             ts = f.readu64()
@@ -477,16 +477,16 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         case b'\x23\x11': # ?, seen in Forza Horizon 6
                             pass # u32 data offset
                         case b'UT':
-                            assert s >= 1
+                            asrt(s >= 1)
                             utfl = f.readu8()
-                            assert not utfl >> 3
+                            asrt(not utfl >> 3)
                             for ix,mn in enumerate('mac'):
                                 if (f.pos + 4) > xep: break
                                 if utfl & (1 << ix):
                                     ts = f.readu32()
                                     if ts: fe['ts'][mn] = unix2filetime(ts)
                         case b'UX': # Unix
-                            assert s >= 8
+                            asrt(s >= 8)
                             ts = f.readu32()
                             if ts: fe['ts']['a'] = unix2filetime(ts)
                             ts = f.readu32()
@@ -512,26 +512,26 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek(fe['of'])
-                assert f.read(4) == b'PK\3\4'
+                asrt(f.read(4) == b'PK\3\4')
                 v = f.readu16()
-                assert f.readu16() == fe['fl'] and f.readu16() == fe['ct']
+                asrt(f.readu16() == fe['fl'] and f.readu16() == fe['ct'])
                 f.skip(4)
-                assert f.readu32() == fe['crc'] and f.readu32() == fe['zs'] and f.readu32() == fe['us']
+                asrt(f.readu32() == fe['crc'] and f.readu32() == fe['zs'] and f.readu32() == fe['us'])
                 f.skip(f.readu16() + f.readu16())
 
                 d = f.readc(fe['zs'])
                 if fe['fl'] & 1:
                     d = decrypt(d,'zipcrypto',KEY)
-                    assert d[11] == fe['chk']
+                    asrt(d[11] == fe['chk'])
                     d = d[12:]
 
                 if fe['ct'] == 22: # Forza
                     raise NotImplementedError('Forza encryption')
-                    assert len(d) >= 0x24
+                    asrt(len(d) >= 0x24)
                     iv,pad,mach,d = d[:0x10],int.from_bytes(d[0x10:0x14],'little'),d[0x14:0x24],d[0x24:]
                     
                 else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
-                if fe['crc']: assert crc_hash(d,'crc32') == fe['crc']
+                if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'])
                 fn = o + '/' + fe['n']
                 writefile(fn,d)
                 if 'c' in fe['ts']:
@@ -565,7 +565,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'GZIP':
             f = open(i,'rb')
-            assert f.read(2) == b'\x1F\x8B'
+            asrt(f.read(2) == b'\x1F\x8B')
             if f.read(1) == b'\x08':
                 flgs = f.read(1)[0]
 
@@ -842,7 +842,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 datal = int(l[1:1+2],16)
                 addr = int(l[3:3+4],16)
                 typ = int(l[7:7+2],16)
-                assert typ in {0,1},hex(typ)
+                asrt(typ in {0,1},hex(typ))
 
                 if datal:
                     data = bytes.fromhex(l[9:9+2*datal])
@@ -981,7 +981,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='<')
 
             f.seek(0xA0B)
-            assert f.readu8() == 8
+            asrt(f.readu8() == 8)
             f.skip(0x14)
 
             fs = []
@@ -1031,7 +1031,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with base64')
             from base64 import b64decode
             d = b64decode(readfile(i,'r').strip().strip('=') + '===')
-            try: assert '\0' not in d.decode('utf-8')
+            try: asrt('\0' not in d.decode('utf-8'))
             except: ext = guess_ext(d)
             else:
                 if d.strip().startswith(b'{"') and d.strip().endswith(b'}'): ext = 'json'
@@ -1050,7 +1050,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 hd = read_http_head(f.readline)
                 hds = hd.copy()
                 hd = {k.lower():v for k,v in hd.items()}
-                assert 'warc-type' in hd and 'content-length' in hd
+                asrt('warc-type' in hd and 'content-length' in hd)
                 if not hd['warc-type'] in tr: tr[hd['warc-type']] = 0
 
                 bfn = f'{o}/{hd["warc-type"]}/{tr[hd['warc-type']]}_'
@@ -1138,7 +1138,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         d = f.read(l)
                         try:
                             b = d.decode('utf-8')
-                            assert b.isprintable()
+                            asrt(b.isprintable())
                         except:
                             b = f'${fc}.bin'
                             writefile(o + '/' + b,d)
@@ -1176,7 +1176,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 mip = l[4:-1]
                 l = f.readline()
-                assert l.startswith('+++ ')
+                asrt(l.startswith('+++ '))
                 plp = l[4:-1]
                 if not mip in fs: fs[mip] = []
                 if not plp in fs: fs[plp] = []
@@ -1185,7 +1185,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 while True:
                     if not l.startswith('@@ '): break
                     ml,pl = l[3:-1].split('@@',1)[0].strip().split()
-                    assert ml[0] == '-' and pl[0] == '+'
+                    asrt(ml[0] == '-' and pl[0] == '+')
                     mlo = int(ml[1:].split(',',1)[0])
                     plo = int(pl[1:].split(',',1)[0])
                     mb = []
@@ -1229,13 +1229,13 @@ def read_http_head(readline,max:int=None,idn=False):
         l = l.rstrip(b'\r\n')
         if not l: break
         if idn and l[0] == 0x20:
-            try: lr = l.decode('utf-8');assert lr.isprintable()
+            try: lr = l.decode('utf-8');asrt(lr.isprintable())
             except: lr = l.decode('ansi')
             o[list(o)[-1]] += lr
             continue
         l = l.lstrip()
         if not l: break
-        try: lr = l.decode('utf-8');assert lr.isprintable()
+        try: lr = l.decode('utf-8');asrt(lr.isprintable())
         except: lr = l.decode('ansi')
         o[lr.split(': ',1)[0]] = lr.split(': ',1)[1]
     return o

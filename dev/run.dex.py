@@ -7,11 +7,11 @@ from urllib.parse import unquote
 import lib.main
 
 url = sys.argv[1].strip('/') + '/'
-assert '://sembiance.com/' in url and url.startswith(('https://','http://'))
+if not('://sembiance.com/' in url and url.startswith(('https://','http://'))): raise ValueError
 div = int(sys.argv[2]) if len(sys.argv) > 2 else 3
 
 fs = re.findall(r'(?m)^<a href="([^"]+)">',httpx.get(url).text)
-assert len(fs)
+if not fs: raise ValueError
 
 f = fs[(len(fs)-1)//div]
 fn = os.path.abspath(unquote(f))

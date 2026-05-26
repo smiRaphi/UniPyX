@@ -10,7 +10,7 @@ if len(argv) == 3:
     if argv[2].isdigit():
         s = int(argv[2])
         hshs = [x for x in HASHTS if HASHTS[x] == s]
-        assert hshs
+        if not hshs: raise ValueError
     else: hshs = [argv[2]]
 else: hshs = list(HASHTS)
 

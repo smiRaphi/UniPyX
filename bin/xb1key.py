@@ -37,7 +37,7 @@ class XB1Keys:
         s = httpx.get('https://www.psdevwiki.com/ps3/User_talk:Zecoxao',headers={'user-agent':os.urandom(8).hex()}).text.replace('\r','')
 
         rodk = re.search(r'(?i)RedOdk\.odk"><span>edit source</span>.+\n<pre>([a-f\d \n]+)</pre>',s)
-        assert rodk
+        if not rodk: raise ValueError
         if rodk: self.add(bytes.fromhex(rodk[1]),odk='red')
 
         godk = re.search(r'(?i)GreenOdk\.odk"><span>edit source</span>.+\n<pre>([a-f\d \n]+)</pre>',s)
@@ -56,7 +56,7 @@ class XB1Keys:
             elif odk == 'green': self.godk = k[:32]
         else: self.db[k[:16]] = k[16:48]
     def add_license(self,path:str):
-        assert os.path.exists(path) and os.path.isfile(path),path
+        if not(os.path.exists(path) and os.path.isfile(path)): raise ValueError(path)
         xml = open(path,encoding='utf-8').read()
        
         lif = b64decode(getxv(xml,"SignedLicense")).decode()

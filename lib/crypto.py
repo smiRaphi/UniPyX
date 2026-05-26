@@ -1,6 +1,13 @@
 import struct
 from lib.unipyxx import X
 
+__FNCT = type(lambda:None)
+def asrt(c:bool,*r,err:Exception=ValueError):
+    if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
+    elif r: r = ' '.join(str(x) for x in r)
+    else: r = ''
+    if not c: raise err(r)
+
 def swap32(i:bytes):
     c = len(i) // 4
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
@@ -22,18 +29,18 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
             if isinstance(key,int): key = key.to_bytes(1)
-            assert isinstance(key,bytes)
+            asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_xor(i,key or b'\0')
         case 'rxor': return uxx().decrypt_rxor(i,key or b'\0')
         case 'cxor':
             if isinstance(key,int): key = key.to_bytes(1)
             if isinstance(iv,bytes): iv = iv[0]
-            assert isinstance(key,bytes)
+            asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_cxor(i,key or b'\0',iv or 0)
         case 'dxor':
             if type(key) == int: key = key.to_bytes(1)
             if type(iv) == int: iv = iv.to_bytes(1)
-            assert isinstance(key,bytes) and isinstance(iv,bytes)
+            asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
             return uxx().decrypt_dxor(i,key or b'\0',iv or b'\0')
         case 'inv'|'invert': return uxx().decrypt_inv(i)
         case 'swp4'|'swap4': return uxx().decrypt_swp4(i)
@@ -74,7 +81,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             bc = None
             if 'block_count' in kwargs: bc = kwargs['block_count']
             elif len(iv) > 8:
-                assert len(iv) <= 16
+                asrt(len(iv) <= 16)
                 bc = int.from_bytes(iv[8:16],'little') # using int.from_bytes instead of struct to support len(iv) != 16
             if bc is not None:
                 pctx[8],pctx[9] = bc & 0xFFFFFFFF,(bc >> 32) & 0xFFFFFFFF # stream_state->input[8/9] = block count
@@ -102,10 +109,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             elif type(key) == bytes and iv is None: k = RSA.import_key(key)
             else: raise NotImplementedError()
 
-            assert k.size_in_bytes() == len(i)
+            asrt(k.size_in_bytes() == len(i))
             return pow(int.from_bytes(i,'little' if algo == 'rsa_le' else 'big'),k.e,k.n).to_bytes(k.size_in_bytes(),'big')
         case 'rsa_inv'|'rsa_inv_le':
-            assert 'r' in kwargs
+            asrt('r' in kwargs)
 
             from Cryptodome.PublicKey import RSA
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
@@ -113,7 +120,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             elif type(key) == bytes and iv is None: k = RSA.import_key(key)
             else: raise NotImplementedError()
 
-            assert k.size_in_bytes() == len(i)
+            asrt(k.size_in_bytes() == len(i))
             c = pow(int.from_bytes(i,'little' if algo == 'rsa_inv_le' else 'big'),k.e,k.n)
             R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
             return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
@@ -131,18 +138,18 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             for ix,b in enumerate(iv[4:]): key[ix % 8] ^= b
             return decrypt(i,'xor',bytes(key))
         case 'mmfs':
-            assert isinstance(key,bytes)
+            asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_mmfs(i,key)
         case 'rc4_pp'|'rc4_playpond':
-            assert isinstance(key,bytes)
+            asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_rc4_playpond(i,key,iv or 0)
         case 'hornby':
             iv = iv or 0xFF
             if isinstance(iv,bytes): iv = iv[0]
-            assert isinstance(iv,int) and isinstance(key,bytes)
+            asrt(isinstance(iv,int) and isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_hornby(i,key or b'\0',iv)
         case 'selene':
-            assert isinstance(key,bytes)
+            asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_selene(i,key or b'\0')
 
     raise NotImplementedError(algo)
@@ -595,7 +602,7 @@ class HashLib:
 
     def load(self):
         if os.path.exists(self.p):
-            assert os.path.isfile(self.p)
+            asrt(os.path.isfile(self.p))
             self._load_thrd = Thread(target=self._load)
             self._load_thrd.start()
         return self
@@ -692,7 +699,7 @@ class KeyLib:
     def dl(cls,p:str,db): return cls(db.get(p + '_keys')).load()
     def load(self):
         if os.path.exists(self.p):
-            assert os.path.isfile(self.p)
+            asrt(os.path.isfile(self.p))
             f = File(self.p,'rb',endian='>')
             self.name_flag = _kl_interpt(f)
 
@@ -724,11 +731,11 @@ class KeyLib:
         f.close()
 
     def add(self,v,k=None):
-        if k is None: assert not self.name_flag
+        if k is None: asrt(not self.name_flag)
         sch = self.scheme.copy()
-        if self.name_flag: assert isinstance(k,sch.pop(0)[0])
+        if self.name_flag: asrt(isinstance(k,sch.pop(0)[0]),err=TypeError)
         else: k = len(self.db)
-        for x in v: assert isinstance(x,sch.pop(0)[0])
+        for x in v: asrt(isinstance(x,sch.pop(0)[0]),err=TypeError)
         self.db[k] = v
     def get(self,k,default=None) -> str: return self.db.get(k,default)
     def __getitem__(self,k): return self.db[k]

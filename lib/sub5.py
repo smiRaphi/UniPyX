@@ -141,7 +141,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 f.seek(0x2C,1)
                 for _ in range(3): f.seek(int.from_bytes(f.read(4),'little')*2,1)
                 f.seek(7,1)
-                assert f.read(5) == b'-sqx-'
+                asrt(f.read(5) == b'-sqx-')
                 f.seek(-12,1)
             else: f.seek(-2,1)
 
