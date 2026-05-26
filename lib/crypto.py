@@ -297,6 +297,10 @@ def sxm_hash(i:bytes):
     v = 0
     for b in i: v = ((v * 137) + b) & 0xFFFFFFFFFFFFFFFF
     return v
+def slf_hash(i:bytes):
+    h = 0
+    for b in i: h = (h * 33 + b) & 0xFFFFFFFF
+    return h
 
 CRC8 = {   #  poly,init,xor ,reflect
  'tech_3250':(0x1D,0xFF,0x00,True ),
@@ -523,6 +527,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'luas': fnc = luas_hash
         case 'java': fnc = java_hash
         case 'sxm': fnc = sxm_hash
+        case 'slf': fnc = slf_hash
         case 'hash40':
             import zlib
             return (len(i) << 32) | zlib.crc32(i,kwargs.get('value') or 0)
@@ -567,7 +572,7 @@ HASHTS = {
     'blake2b':64,'blake2s':32,
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
-    'tarzan':4,'luas':4,'sxm':8,'hash40':5,'pivotal':4,'java':4,
+    'tarzan':4,'luas':4,'sxm':8,'slf':4,'hash40':5,'pivotal':4,'java':4,
 }
 class HashLib:
     def __init__(self,p:str,fmt=lambda x:x,encoding='utf-8'):

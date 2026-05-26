@@ -1,5 +1,5 @@
 ENC = 'ascii'
-FMT = lambda x:x # x: bytes
+FMT = lambda x:x.lower() # x: bytes
 iFMT = lambda x:x #'/'+x.replace('\\','/').lstrip('/') # x: str
 
 import os,sys
@@ -9,8 +9,8 @@ from lib.crypto import HashLib
 
 if argv[1] == 'd':
     h = HashLib(argv[2],fmt=FMT,encoding=ENC).loadb()
-    for x in h.db:
-        print(hex(x)[2:].upper().zfill(h.hs*2) + ' | ' + h.db[x])
+    for x in sorted(h.db):
+        print(f'{x:0{h.hs*2}X} | {h.db[x]}')
     sys.exit()
 elif argv[1] == 'sd':
     h = HashLib(argv[2],fmt=FMT,encoding=ENC).loadb()

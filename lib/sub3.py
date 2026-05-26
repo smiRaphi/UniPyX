@@ -1723,5 +1723,140 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if atrs: d = '\n'.join(atrs) + '\n\n' + unescape(d)
             writefile(f'{o}/{tbasename(i)}.bms',d,'w')
             if d: return
+        case 'Gateshark2NTR Plugin':
+            # https://gbatemp.net/threads/release-gateshark2ntr.436504/
+            # https://github.com/phecdaDia/NTRClient/wiki/Gateshark
+            # https://developer.arm.com/documentation/ddi0406/c/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-instructions
+            # in: https://gbatemp.net/threads/release-gateshark2ntr.436504/post-8663350 out: https://gbatemp.net/threads/release-gateshark2ntr.436504/post-8664187
+            raise NotImplementedError
+            BA = 0x00100100
+            BMP = {1 << ix:x for ix,x in enumerate(('A','B','SE','ST','DR','DL','DU','DD','R','L','X','Y'))} | {0x4000:'ZL',0x8000:'ZR'}
+
+            def cut(i:int,s:int,o:int=0): return (i >> o) & ((1 << s) - 1)
+            def imm12(i:int):
+                v = cut(i,8)
+                r = cut(i,4,8) * 2
+                return cut((v >> r) | (v << (32 - r)),32)
+            def procc(pc:int) -> bool:
+                def pos(): return hex(of + pc*4 - 4 + BA)
+                def get():
+                    nonlocal pc
+                    x = xc[pc];pc += 1
+                    return x
+                def getd(o):
+                    o += pc * 4
+                    o -= len(xc) * 4
+                    return int.from_bytes(xd[o:o+4],'little')
+
+                x = get()
+                #print(hex(x))
+                if len(xc) - pc > 3 and cut(x,16,16) == 0xe3a0:
+                    v = imm12(x)
+                    #print(hex(v),pos())
+                    assert v and v.bit_count() < 4 and not v & 0x3000,pos()
+                    assert cut(get(),8,24) == 0xEB and cut(get(),8,24) in {0xE2,0xE3}
+                    ob.append(f'DD000000 {v:08X}')
+                    bts.append(v)
+                    x = get()
+                    end = None
+                    if x != 0x08BD8010:
+                        assert cut(x,16,16) == 0x0A00,pos()
+                        end = pc + cut(x,16) + 1
+
+                    procc(pc)
+                    ob.append('D0000000 00000000')
+                    if end: return procc(end)
+                    return 1
+                elif len(xc) - pc > 4 and cut(x,20,12) == 0xe59f3 and cut(xc[pc],20,12) == 0xe59f2 and cut(xc[pc+1],16,16) == 0xe153:
+                    v1 = getd(cut(x,8) + 4)
+                    v2 = getd(cut(get(),8) + 4)
+                    x = get()
+                    v1 -= (cut(x,4,8) << 4) | cut(x,4)
+                    ob.append(f'D9000000 {v1:08X}')
+                    x = get()
+                    if cut(x,16,16) == 0xE6FF: x = get()
+                    assert cut(x,20,12) == 0xe1c23,pos()
+                    v2 += cut(x,8,4)
+                    ob.append(f'D6000000 {v2:08X}')
+                elif len(xc) - pc > 3 and cut(x,20,12) == 0xe59f3 and cut(xc[pc],20,12) == 0xe59f1 and cut(xc[pc+1],16,16) == 0xe192:
+                    v1 = getd(cut(x,8) + 4)
+                    ob.append(f'D9000000 {v1:08X}')
+                    v2 = getd(cut(get(),8) + 4)
+                    ob.append(f'D6000000 {v2:08X}')
+                    x = get()
+                    while cut(x,16,16) != 0xe182: x = get()
+                elif len(xc) - pc > 3 and cut(x,20,12) == 0xe59f3 and cut(xc[pc],20,12) == 0xe7921:
+                    v = getd(cut(x,8) + 4)
+                    ob.append(f'D9000000 {v:08X}')
+                    pc += 1
+                    x = get()
+                    while cut(x,20,12) == 0xe2433:
+                        v -= imm12(x)
+                        x = get()
+                    assert cut(x,20,12) == 0xe7821,pos()
+                    ob.append(f'D6000000 {v:08X}')
+                elif len(xc) - pc > 4 and cut(x,20,12) == 0xe59f3 and (cut(xc[pc],20,12) == 0xe59f3 or cut(xc[pc+1],20,12) == 0xe59f3):
+                    v1 = getd(cut(x,8) + 4)
+                    x = get()
+                    if cut(x,20,12) == 0xe5132:
+                        v1 -= cut(x,12)
+                        x = get()
+                    ob.append(f'D9000000 {v1:08X}')
+                    assert cut(x,20,12) == 0xe59f3,pos()
+                    v2 = getd(cut(x,8) + 4)
+                    x = get()
+                    assert cut(x,20,12) == 0xe5832,pos()
+                    v2 += cut(x,12)
+                    ob.append(f'D6000000 {v2:08X}')
+                elif x == 0xE8BD8010: return 1
+
+            if db.print_try: print('Trying with custom extractor')
+            import re,struct
+            d = readfile(i)
+
+            bfp = re.search(b'(?s)[\x01-\xFF][\x10-\x1F]\x9F\xE5\x01\x00\xA0\xE3(...)\xEB',d)
+            bfp = bfp.start(1)//4 + int.from_bytes(bfp[1],'little')
+            fps = []
+            for ps in re.finditer(b'(?s)[\x01-\xFF][\x10-\x1F]\x9F\xE5\x01\x00\xA0\xE3(...)\xEB',d):
+                pfp = ps.start(1)//4 + int.from_bytes(ps[1],'little')
+                if pfp == bfp: fps.append(ps.start())
+
+            dss = []
+            obs = []
+            for ix,of in enumerate(fps):
+                cs = (int.from_bytes(d[of:of+2],'little') & 0xFFF) + 8
+                xc = d[of:of + cs]
+                if ix == len(fps) - 1: xd = d[of + cs:of + cs + max(dss) + 0x10]
+                else:
+                    xd = d[of + cs:fps[ix + 1]]
+                    dss.append(len(xd))
+
+                no = int.from_bytes(xd[:4],'little') - BA
+                n = d[no:].split(b'\0')[0]
+                if not n.startswith(b'Execute: '): continue
+                try: n = n[9:].decode('ascii');assert n.isprintable()
+                except: continue
+
+                ob = []
+                xc:tuple[int] = struct.unpack(f'<{len(xc)//4}I',xc)
+                bts = []
+                try: procc(3)
+                except: continue
+                if ob and ob[-1] == 'D0000000 00000000': ob.pop()
+                if bts:
+                    pbts = []
+                    dn = set()
+                    for b in bts:
+                        if b in dn: continue
+                        dn.add(b)
+                        pbts.append('+'.join([bn for pb,bn in BMP.items() if b & pb]))
+                    bts = f'({"/".join(pbts)}) '
+                else: bts = ''
+                obs.append(f'[{bts}{n}]\n{"\n".join(ob)}\n')
+
+            if obs:
+                print(obs)
+                #writefile(f'{o}/{tbasename(i)}.cht','\n'.join(obs),'w')
+                #return
 
     return 1

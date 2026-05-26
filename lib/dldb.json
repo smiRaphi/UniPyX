@@ -7009,6 +7009,14 @@
         ]],
         "ts":1778882223
     },
+    "spiderman3_hashes":{
+        "p":"hashes/spiderman3.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/spiderman3.bhl",
+            "hashes/spiderman3.bhl"
+        ]],
+        "ts":1778882223
+    },
     "difmb_dip_key":{
         "p":"difmb_dip_key.bin",
         "fs":[

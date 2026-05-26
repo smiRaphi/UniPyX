@@ -2220,5 +2220,85 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Spider-Man 3 Pack':
+            p = extname(i)[1:].lower()
+            if p.startswith('xe'): p = 'XE'
+            elif p.startswith('ps3'): p = 'PS3'
+            else: p = 'PC'
+
+            # struct filetype { # for FUN_00a19250
+            #     char *name;
+            #     char *name_plural;
+            #     int field2_0x8;
+            #     int field3_0xc;
+            #     int field4_0x10;
+            #     char id[4];
+            #     uint8_t field6_0x18;
+            #     uint8_t field7_0x19;
+            #     uint16_t padding;
+            #     int field9_0x1c;
+            #     int field10_0x20;
+            #     int field11_0x24;
+            #     char *PS3_ext;
+            #     char *PC_ext;
+            #     char *XE_ext;
+            #     char *PS3_path;
+            #     char *PC_path;
+            #     char *XE_path;
+            # };
+            TYM = (
+                p + 'ANIM',p + 'SKEL','ALS','ENT',
+                p + 'TEXTURE','CE','IFL','DESC','ENS',
+                'AB','EB','QP',p + 'SX',p + 'FONT',
+                'PANEL','TXT','ICN',p + 'MESH',
+                ('COLL' if p == 'PC' else 'COLB'),
+                p + 'CVX',p + 'PACK',p + 'ANIM', # scene_animation
+                p + 'AC',{'PS3':'IPU','PC':'AVI','XE':'XMV'}[p],
+                'CSV',p + 'MORPH','SIN',p + 'GV',p + 'SV',
+                'DSG','PATH','LANG','LIP','ENTEXT',
+                p + 'STCR','FX_CACHE','ASG','BAI',
+                'GBMAP','_REGIONID_','_RADIOMSG_',
+                '_IFC_ATTRBIUTE_','WPN','VDEPOT','CUT',
+                'SCG' + p,'LEGO_MAP' + p,'SM3_LIGHT' + p,
+                'BOX_TRIG_INF' + p,'TRAF_LT_INF' + p,
+                p + 'FX',p.lower() + 'fev',p.lower() + 'seb',
+                p + 'APK',p + 'STC','SPT','SEED','WIND',
+                ('BPE' if p == 'PC' else 'BPEB'),
+                'TILEMAP','PARTICLE','ENVIRONMENT',
+                'LIGHTBEHAVIOR','GRAPHICSOPTIONS',
+                'EFFECTCONTAINER','SMDECALMATERIAL',
+                'PHATPALETTE','COWBELL','MESHMAP',
+                'CLOUDTWEAK','CITYLODS','SMROADPARAM',
+                'ALLBUILDINGS','UIP3DW','UIP3DT',
+                'SMDECALPARAM','ADJUSTMENTLAYERSLIBRARY',
+                'OUTDOORS','DAYSKYCOLOR','NIGHTSKYCOLOR',
+                'PRELIGHT','SMBUILDINGLODPARAM',
+                'SMROADLODPARAM','SMRETROFITPARAM',
+            )
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.crypto import HashLib
+            hl = HashLib.dl('spiderman3',db,fmt=lambda x:x.lower(),encoding='ascii')
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x18)
+            f.seek(f.readu32())
+            assert f.read(8) == b'hsamxV4\x12'
+            f.skip(12)
+            uc = f.readu32()
+            f.skip(12)
+            c = f.readu32()
+            f.skip(0x310 + uc * 4)
+            fs = [(f.readu32(),f.readu32() - 1,f.readu32(),f.readu32()) for _ in range(c)]
+
+            hl.wait()
+            for fe in fs:
+                f.seek(fe[2])
+                fn = hl.get(fe[0],f'{fe[0]:08X}') + '.' + (TYM[fe[1]] if fe[1] < len(TYM) else f'{fe[1]:02X}')
+                writefile(o + '/' + fn,f.readc(fe[3]))
+
+            f.close()
+            if fs: return
 
     return 1

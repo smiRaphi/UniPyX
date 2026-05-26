@@ -1140,6 +1140,10 @@
         "rs":"Batman Raw Thrills LUX","s":1
     },
     {
+        "d":[["isat","hsamxV4\\x12",48],["isat","\\x30\\0\\0\\0",24],["isatS","\\0",12,36],["isatS","\\0",4,64],["isatS","\\0",4,80],["n0",4,28],["n0",4,56],["n0",4,84],["py","f=open(inp,'rb');f.seek(24);o=int.from_bytes(f.read(4),'little');f.seek(o+8);s=int.from_bytes(f.read(4),'little');f.seek(8,1);uc=int.from_bytes(f.read(4),'little')+1;f.seek(12,1);c=804+uc*4+int.from_bytes(f.read(4),'little')*16;return (c+-c%16)in(s,s-16,s-32,s-48)"]],
+        "rs":"Spider-Man 3 Pack","s":1
+    },
+    {
         "d":[["isat","ARCPACK",0],["isin",["\\0","\\x17"],7],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return s==int.from_bytes(f.read(4),'little')"]],
         "rs":"PlayPond Pack","s":1
     },
