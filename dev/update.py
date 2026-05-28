@@ -62,7 +62,7 @@ GFMTS = {
     'WolvenKit/WolvenKit-nightly-releases':lambda tag:f'WolvenKit.Console-{tag}.zip',
     'widberg/bff':lambda tag:f'bff-windows-{tag}.zip',
     'git-for-windows/git':lambda tag:f'MinGit-{tag[1:].split(".windows.")[0]}-64-bit.zip',
-    'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_26.0.0_{tag}.zip',
+    'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_{tag[7:]}.zip',
     'ProjectorRays/ProjectorRays':lambda tag:f'projectrrays-{tag[1:]}.exe',
 }
 NCHKS = {
