@@ -186,18 +186,21 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             f = File(noext(i) + '.dir',endian='<')
-            fd = open(noext(i) + '.wad','rb')
+            fd = File(noext(i) + '.wad')
 
             c = f.readu32()
-            for _ in range(c):
-                n = f.read(0x40).rstrip(b'\0').decode('utf-8')
-                s = f.readu32()
-                fd.seek(f.readu32() * 0x800)
-                writefile(o + '/' + n,fd.read(s))
-
+            fs = [(f.readc(0x20).rstrip(b'\0').decode('utf-8'),f.readc(0x20).rstrip(b'\0').decode('utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
             f.close()
+
+            asrt(fs and fs[0][3] == 0 and fs[0][2] != 0)
+            if len(fs) > 1 and fs[0][2] == fs[1][3]: m = 1
+            else: m = 0x800
+            for fe in fs:
+                fd.seek(fe[3] * m)
+                writefile(o + '/' + fe[1] + '/' + fe[0],fd.readc(fe[2]))
+
             fd.close()
-            if listdir(o): return
+            if fs: return
         case 'Harry Potter and Prisoner of Azkaban IDS':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
