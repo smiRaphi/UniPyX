@@ -63,7 +63,7 @@ def makedb():
         elif len(k) == 44 and k[-1] == '=' and all(c in B64C for c in k[:-1]): k = base64.b64decode(k)
         elif len(k) == 43 and all(c in B64C for c in k): k = base64.b64decode(k + '=')
         else:
-            #print(unescape(m).encode('ansi'),'|' + n + '|' + k + '|')
+            #print(unescape(m).encode('latin1'),'|' + n + '|' + k + '|')
             continue
         if len(k) != 0x20: raise ValueError(f'0x{len(k):02X} != 0x20')
 

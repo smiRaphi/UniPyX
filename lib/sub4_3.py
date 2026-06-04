@@ -456,7 +456,7 @@ def extract4_3(inp:str,out:str,t:str):
             cs = {}
             while f:
                 p = f.pos
-                n = f.read(4).decode('ansi')
+                n = f.read(4).decode('latin1')
                 if n == '\0\0\0\0': break
                 ep = f.readu32() + p
                 f.skip(8)

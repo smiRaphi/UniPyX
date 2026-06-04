@@ -333,7 +333,7 @@ CRC8 = {   #  poly,init,xor ,reflect
     'dvb_s2':(0xD5,0x00,0x00,False),
 }
 CRC16 = {   # poly  , init , xor  , reflect
-    'ansi':  (0x8005,0x0000,0x0000,True ),'ibm':(0x8005,0,0,True),'arc':(0x8005,0,0,True),'lha':(0x8005,0,0,True), # default
+    'latin1':  (0x8005,0x0000,0x0000,True ),'ibm':(0x8005,0,0,True),'arc':(0x8005,0,0,True),'lha':(0x8005,0,0,True), # default
     'maxim': (0x8005,0x0000,0xFFFF,True ),'maxim_dow':(0x8005,0,0xFFFF,True),
     'modbus':(0x8005,0xFFFF,0x0000,True ),
     'usb':   (0x8005,0xFFFF,0xFFFF,True ),

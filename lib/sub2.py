@@ -890,7 +890,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             c = 0
             while f:
-                t = f.read(4).decode('ansi')
+                t = f.read(4).decode('latin1')
                 s = f.readu32()
                 if t == 'PAGE': ext = 'bin'
                 elif t == 'AUDI':
@@ -1268,7 +1268,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'Mario Kart 64 N64 ROM'|'F-Zero X N64 ROM'|'Wonder Project J2 N64 ROM':
             f = open(i,'rb')
             f.seek(0x3B)
-            tg = f.read(4).decode('ansi')
+            tg = f.read(4).decode('latin1')
             f.close()
             rt = t[:-8]
 
@@ -1350,7 +1350,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             f = open(i,'rb')
             f.seek(0x3B)
-            tg = f.read(4).decode('ansi')
+            tg = f.read(4).decode('latin1')
             v = f.read(1)[0]
             if v != 0: tg += f':{(v & 0xF) + 1}.{v >> 4}'
             f.close()

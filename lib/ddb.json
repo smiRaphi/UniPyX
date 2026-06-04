@@ -13,7 +13,7 @@
     },
     {
         "rqr":["TERSE compressed data (PACK, U)","TERSE compressed data (PACK, V)","TERSE compressed data (SPACK, U)","TERSE compressed data (SPACK, V)"],
-        "d":["py","f=open(inp,'rb');v=f.read(1)[0]\nif v in {1,7}:return True\nif not v in {2,5}:return False\nf.seek(2);r1=int.from_bytes(f.read(2),'big');f.seek(8);r2=int.from_bytes(f.read(4),'big')\nreturn r1+r2!=0 and (r1==0 or r2==0 or r1==r2)"],
+        "d":["py","v=f.readi(1)\nif v in {1,7}:return True\nif not v in {2,5}:return False\nf.seek(2);r1=f.readi(2,'>');f.seek(8);r2=f.readi(4,'>')\nreturn r1+r2!=0 and(r1==0 or r2==0 or r1==r2)"],
         "rs":"TERSE"
     },
     {
@@ -44,6 +44,11 @@
         "rs":"MASM Installer"
     },
 
+    {
+        "t":"url",
+        "d":["isat","otpauth-migration://offline?data=",0],
+        "rs":"Google Authenticator Migration URL","s":1
+    },
     {
         "rq":"ISO",
         "d":["isat","PlayStation3\\0\\0\\0\\0",2048],
@@ -82,7 +87,7 @@
         "rs":"SCS Archive","s":1
     },
     {
-        "d":[["size",544788480],["py","return exists(dirname(inp) + '/SLES_534.81') or exists(dirname(inp) + '/SLPM_658.26')"]],
+        "d":[["size",544788480],["py","return exists(dirname(inp)+'/SLES_534.81')or exists(dirname(inp)+'/SLPM_658.26')"]],
         "rs":"10,000 Bullets FILE.BIN","s":1
     },
     {
@@ -92,8 +97,7 @@
     },
     {
         "rqr":"ISO 9660 CD image",
-        "d":[["isat","CVMH\\0\\0",0],
-             ["isat","ROFSROFSBLD ",52]],
+        "d":[["isat","CVMH\\0\\0",0],["isat","ROFSROFSBLD ",52]],
         "rs":"ROFS Volume","s":1
     },
     {
@@ -108,18 +112,17 @@
     },
     {
         "rqr":"Win64 Executable (generic)",
-        "d":["py","f=open(inp,'rb');f.seek(60);f.seek(int.from_bytes(f.read(4),'little')+6);ss=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1)\nfor _ in range(ss):\n if f.read(8)==b'.qtmimed':return True\n f.seek(32,1)"],
+        "d":["py","f.seek(60);f.seek(f.readi(4,'<')+6);ss=f.readi(2,'<');f.skip(12);f.skip(f.readi(2,'<')+2)\nfor _ in range(ss):\n if f.read(8)==b'.qtmimed':return True\n f.skip(32)"],
         "rs":"Qt IFW","s":1
     },
     {
         "rqr":["Win16 NE executable (generic)","MS-DOS executable"],
-        "d":[["isat","MZ",0],["isin",["P","*","!"],2],["py","f=open(inp,'rb');f.seek(60);f.seek(int.from_bytes(f.read(4),'little'))\nif f.read(2)!=b'NE':return\nf.seek(4,1)\nif int.from_bytes(f.read(2),'little')>40:return\nf.seek(4,1)\nif (f.read(1)[0]&243)!=1 or(f.read(1)[0]>>2)!=32:return\nf.seek(4,1)\nif sum(f.read(2)):return\nf.seek(16,1);return f.read(2)!=f.read(2)"]],
+        "d":[["isat","MZ",0],["isin",["P","*","!"],2],["py","f.seek(60);f.seek(f.readi(4,'<'))\nif f.read(2)!=b'NE':return\nf.skip(4)\nif f.readi(2,'<')>40:return\nf.skip(4)\nif (f.readi(1)&243)!=1 or(f.readi(1)>>2)!=32:return\nf.skip(4)\nif f.readi(2):return\nf.skip(16);return f.read(2)!=f.read(2)"]],
         "rs":"NE Resource DLL"
     },
     {
         "rqr":null,
-        "d":[["isat","\\xA7\\xED\\x96\\x0C\\x0F\\x0F\\x12\\x19\\x1C\\x1B\\x1E\\x20\\x22\\x26\\x2A\\xE5\\xE8\\x33\\x36\\x39\\x3C\\x3F\\x42\\x85\\x88\\x4B\\x4E\\x51\\x54\\x57\\x5A\\x5D",0],
-             ["isat","\\x0B\\x41\\x42\\x14\\xB4\\x87",552]],
+        "d":[["isat","\\xA7\\xED\\x96\\x0C\\x0F\\x0F\\x12\\x19\\x1C\\x1B\\x1E\\x20\\x22\\x26\\x2A\\xE5\\xE8\\x33\\x36\\x39\\x3C\\x3F\\x42\\x85\\x88\\x4B\\x4E\\x51\\x54\\x57\\x5A\\x5D",0],["isat","\\x0B\\x41\\x42\\x14\\xB4\\x87",552]],
         "rs":"Encrypted EAC Payload","s":1
     },
     {
@@ -169,17 +172,17 @@
     },
     {
         "rqr":"Win64 Executable (generic)",
-        "d":["py","f=open(inp,'rb');f.seek(0x3C);f.seek(int.from_bytes(f.read(4),'little'));f.seek(6,1);c=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1)\nfor _ in range(c):\n if f.read(8)==b'.rsrc\\0\\0\\0':f.seek(8,1);return int.from_bytes(f.read(4),'little')>=8000000\n else:f.seek(32,1)"],
+        "d":["py","f.seek(60);f.seek(f.readi(4,'<'));f.skip(6);c=f.readi(2,'<');f.skip(12);f.seek(f.readi(2,'<')+2,1)\nfor _ in range(c):\n if f.read(8)==b'.rsrc\\0\\0\\0':f.skip(8);return f.readi(4,'<')>=8000000\n else:f.seek(32,1)"],
         "rs":"Big EXE"
     },
     {
         "rqr":"Microsoft Visual C/C++",
-        "d":["py","f=open(inp,'rb');f.seek(0x3C);f.seek(int.from_bytes(f.read(4),'little'));f.seek(6,1);c=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1);l=[]\nfor _ in range(c):f.seek(16,1);l.append(int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'));f.seek(16,1)\nf.seek(max(l));return f.read(3)==b'BIK' and f.read(1)in b'fghi'"],
+        "d":["py","f.seek(60);f.seek(f.readi(4,'<'));f.skip(6);c=f.readi(2,'<');f.skip(12);f.seek(f.readi(2,'<')+2,1);l=[]\nfor _ in range(c):f.skip(16);l.append(f.readi(4,'<')+f.readi(4,'<'));f.skip(16)\nf.seek(max(l));return f.read(3)==b'BIK' and f.read(1)in b'fghi'"],
         "rs":"Bink Video EXE","s":1
     },
     {
         "rqr":"Microsoft Visual C/C++",
-        "d":["py","f=open(inp,'rb');f.seek(0x3C);f.seek(int.from_bytes(f.read(4),'little'));f.seek(6,1);c=int.from_bytes(f.read(2),'little');f.seek(12,1);f.seek(int.from_bytes(f.read(2),'little')+2,1);l=[]\nfor _ in range(c):f.seek(16,1);l.append(int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'));f.seek(16,1)\nf.seek(max(l));return f.read(4)in{b'wwww',b'\\x7F\\x7F\\0\\0',b',\"\\0\\0'} and f.read(4)==b'I\\x87G\\x12'"],
+        "d":["py","f.seek(60);f.seek(f.readi(4,'<'));f.skip(6);c=f.readi(2,'<');f.skip(12);f.seek(f.readi(2,'<')+2,1);l=[]\nfor _ in range(c):f.skip(16);l.append(f.readi(4,'<')+f.readi(4,'<'));f.skip(16)\nf.seek(max(l));return f.read(4)in{b'wwww',b'\\x7F\\x7F\\0\\0',b',\"\\0\\0'} and f.read(4)==b'I\\x87G\\x12'"],
         "rs":"Multimedia Fusion 2.0"
     },
     {
@@ -189,7 +192,7 @@
     },
     {
         "rqr":"vol-cosmo",
-        "d":[["isat","\\xA0\\x0F\\x00\\x00",12],["str0",0,12,4],["py","f=open(inp,'rb')\nfor _ in range(200):\n try:f.read(12).rstrip(b'\\0').decode('utf-8')\n except:break\n o=int.from_bytes(f.read(4),'little')\n if o<0xFA0 and o:break\n f.seek(4,1)\nelse:return True"]],
+        "d":[["isat","\\xA0\\x0F\\x00\\x00",12],["str0",0,12,4],["py","for _ in range(200):\n try:f.read(12).rstrip(b'\\0').decode('utf-8')\n except:break\n o=f.readi(4,'<')\n if o<0xFA0 and o:break\n f.skip(4)\nelse:return True"]],
         "rs":"Cosmo Volume Game Archive"
     },
     {
@@ -202,7 +205,7 @@
     },
     {
         "rqr":null,
-        "d":[["n0",4,0],["n0",4,4],["str0",12,15,1],["isin",["\\0","\\1","\\2"],27],["py","from zlib import crc32;f=open(inp,'rb');m=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');return crc32(f.read(m*32))==c"]],
+        "d":[["n0",4,0],["n0",4,4],["str0",12,15,1],["isin",["\\0","\\1","\\2"],27],["py","from zlib import crc32;m=f.readi(4,'<');c=f.readi(4,'<');return crc32(f.read(m*32))==c"]],
         "rs":"CP Shrink","s":1
     },
     {
@@ -222,7 +225,7 @@
         "rs":"Cloop IMG","s":1
     },
     {
-        "d":[["isat","MINICAT\\0",0],["py","f=open(inp,'rb');f.seek(0x14);s=int.from_bytes(f.read(4),'little');return s==f.seek(0,2)"]],
+        "d":[["isat","MINICAT\\0",0],["py","f.seek(0x14);return f.readi(4,'<')==fsz"]],
         "rs":"MINICAT","s":1
     },
     {
@@ -232,11 +235,11 @@
         "rs":"Anna-Marie Archive","s":1
     },
     {
-        "d":[["ext",[".bin",".rmdp",".packmeta"]],["py","b=splitext(inp)[0]+'.'\nif not (exists(b+'bin') and isfile(b+'bin') and exists(b+'rmdp') and isfile(b+'rmdp')):return\nf=open(b+'bin','rb')\nif f.read(1)[0]!=1:return\net=f.read(4);e='little' if int.from_bytes(et,'little')<int.from_bytes(et,'big') else 'big';s=f.seek(0,2);f.seek(13);return int.from_bytes(f.read(4),e)==1 and not sum(f.read(4)) and int.from_bytes(f.read(4),e)<s"]],
+        "d":[["ext",[".bin",".rmdp",".packmeta"]],["py","b=splitext(inp)[0]+'.'\nif not(exists(b+'bin')and isfile(b+'bin')and exists(b+'rmdp')and isfile(b+'rmdp')):return\nf=open(b+'bin','rb')\nif f.readi(1)!=1:return\net=f.read(4);e='<' if int.from_bytes(et,'little')<int.from_bytes(et,'big') else '>';f.seek(13);return f.readi(4,e)==1 and not f.readi(4)and f.readi(4,e)<fsz"]],
         "rs":"Remedy BIN+RMDP","s":1
     },
     {
-        "d":[["name","nand.bin"],["py","f=dirname(inp)+'/keys.bin'\nif not exists(f) or os.path.getsize(f)!=0x400:return\nreturn open(f,'rb').read(10)==b'BackupMii '"]],
+        "d":[["name","nand.bin"],["py","f=dirname(inp)+'/keys.bin'\nif not exists(f)or getsize(f)!=0x400:return\nreturn open(f,'rb').read(10)==b'BackupMii '"]],
         "rs":"BackupMii NAND Image","s":1
     },
     {
@@ -265,23 +268,23 @@
         "rs":"GC opening.bnr","s":1
     },
     {
-        "d":[["size",[8,2147483647]],["ext",".zx7"],["n0",3,0],["n0",3,-3],["py","t='100000000000000001';f=open(inp,'rb');d=''.join(bin(x)[2:].zfill(8)for x in f.read(4)[::-1])\nif d.rstrip('0').endswith(t)and not d.rsplit(t,1)[1].strip('0'):f.seek(0,2);f.seek(-1,1);return not f.read(1)[0]&1\nf.seek(0)\nif f.read(1)[0]&1:return\nf.seek(0,2);f.seek(-4,1);d=''.join(bin(x)[2:].zfill(8)for x in f.read(4));return d.rstrip('0').endswith(t)and not d.rsplit(t,1)[1].strip('0')"]],
+        "d":[["size",[8,2147483647]],["ext",".zx7"],["n0",3,0],["n0",3,-3],["py","t='100000000000000001';d=''.join(bin(x)[2:].zfill(8)for x in f.read(4)[::-1])\nif d.rstrip('0').endswith(t)and not d.rsplit(t,1)[1].strip('0'):f.seek(-1,2);return not f.readi(1)&1\nf.seek(0)\nif f.readi(1)&1:return\nf.seek(-4,2);d=''.join(bin(x)[2:].zfill(8)for x in f.read(4));return d.rstrip('0').endswith(t)and not d.rsplit(t,1)[1].strip('0')"]],
         "rs":"ZX7"
     },
     {
-        "d":[["size",[8,2147483647]],["ext",".zx0"],["n0",3,0],["n0",3,-3],["py","z=('100000000000000001','101010101010101011','110101010101010100','111111111111111110');f=open(inp,'rb');d=''.join(bin(x)[2:].zfill(8)for x in f.read(4)[::-1])\nif any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z):f.seek(0,2);f.seek(-1,1);return not f.read(1)[0]&1\nf.seek(0)\nif f.read(1)[0]&1:return\nf.seek(0,2);f.seek(-4,1);d=''.join(bin(x)[2:].zfill(8)for x in f.read(4));return any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z)"]],
+        "d":[["size",[8,2147483647]],["ext",".zx0"],["n0",3,0],["n0",3,-3],["py","z=('100000000000000001','101010101010101011','110101010101010100','111111111111111110');d=''.join(bin(x)[2:].zfill(8)for x in f.read(4)[::-1])\nif any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z):f.seek(-1,2);return not f.readi(1)&1\nf.seek(0)\nif f.readi(1)&1:return\nf.seek(-4,2);d=''.join(bin(x)[2:].zfill(8)for x in f.read(4));return any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z)"]],
         "rs":"ZX0"
     },
     {
-        "d":[["size",[8,2147483647]],["ext",".zx1"],["n0",3,0],["n0",3,-3],["py","t=(b'\\0\\1',b'\\xFF'*2);f=open(inp,'rb')\nif f.read(2)in t and f.read(1)[0]:f.seek(0,2);f.seek(-1,1);return not f.read(1)[0]&1\nf.seek(0)\nif f.read(1)[0]&1:return\nf.seek(0,2);f.seek(-3,1);return f.read(1)[0]and f.read(2)[::-1]in t"]],
+        "d":[["size",[8,2147483647]],["ext",".zx1"],["n0",3,0],["n0",3,-3],["py","t=(b'\\0\\1',b'\\xFF'*2)\nif f.read(2)in t and f.readi(1):f.seek(-1,2);return not f.readi(1)&1\nf.seek(0)\nif f.readi(1)&1:return\nf.seek(-3,2);return f.readi(1)and f.read(2)[::-1]in t"]],
         "rs":"ZX1"
     },
     {
-        "d":[["size",[8,2147483647]],["ext",".zx2"],["n0",3,0],["n0",3,-3],["py","f=open(inp,'rb')\nif f.read(1)==b'\\xFF' and f.read(1)[0]:f.seek(0,2);f.seek(-1,1);return not f.read(1)[0]&1\nf.seek(0)\nif f.read(1)[0]&1:return\nf.seek(0,2);f.seek(-2,1);return f.read(1)[0]and f.read(1)==b'\\xFF'"]],
+        "d":[["size",[8,2147483647]],["ext",".zx2"],["n0",3,0],["n0",3,-3],["py","if f.read(1)==b'\\xFF' and f.readi(1):f.seek(-1,2);return not f.readi(1)&1\nf.seek(0)\nif f.readi(1)&1:return\nf.seek(-2,2);return f.readi(1)and f.read(1)==b'\\xFF'"]],
         "rs":"ZX2"
     },
     {
-        "d":[["size",[8,2147483647]],["ext",".zx5"],["n0",3,0],["n0",3,-3],["py","z=('11000000000000000001','11001010101010101011','11010101010101010100','11011111111111111110');f=open(inp,'rb');d=''.join(bin(x)[2:].zfill(8)for x in f.read(4)[::-1])\nif any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z):f.seek(0,2);f.seek(-1,1);return not f.read(1)[0]&1\nf.seek(0)\nif f.read(1)[0]&1:return\nf.seek(0,2);f.seek(-4,1);d=''.join(bin(x)[2:].zfill(8)for x in f.read(4));return any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z)"]],
+        "d":[["size",[8,2147483647]],["ext",".zx5"],["n0",3,0],["n0",3,-3],["py","z=('11000000000000000001','11001010101010101011','11010101010101010100','11011111111111111110');d=''.join(bin(x)[2:].zfill(8)for x in f.read(4)[::-1])\nif any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z):f.seek(-1,2);return not f.readi(1)&1\nf.seek(0)\nif f.readi(1)&1:return\nf.seek(-4,2);d=''.join(bin(x)[2:].zfill(8)for x in f.read(4));return any(x in d and not d.rsplit(x,1)[1].strip('0')for x in z)"]],
         "rs":"ZX5"
     },
     {
@@ -289,19 +292,19 @@
         "rs":"Reverse Computer Screen"
     },
     {
-        "d":[["n0",1,-5],["n0",3,-8],["py","f=open(inp,'rb');s=f.seek(-8,2)+8;cs=int.from_bytes(f.read(3),'little');hs=f.read(1)[0]\nif hs<8 or s not in {cs+(-cs%4)+8,cs+(-cs%2)+hs}:return\nf.seek(-hs,2);return not f.read(hs-8).strip(b'\\xFF')"]],
+        "d":[["n0",1,-5],["n0",3,-8],["py","f.seek(-8,2);cs=f.readi(3,'<');hs=f.readi(1)\nif hs<8 or fsz not in {cs+(-cs%4)+8,cs+(-cs%2)+hs}:return\nf.seek(-hs,2);return not f.read(hs-8).strip(b'\\xFF')"]],
         "rs":"Nintendo BLZ"
     },
     {
-        "d":[["isat","\\x10",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'little');return ds>f.seek(0,2)"]],
+        "d":[["isat","\\x10",0],["isat","\\0",4],["n0",3,1],["py","f.seek(1);ds=f.readi(3,'<');return ds>fsz"]],
         "rs":"Nintendo LZ10"
     },
     {
-        "d":[["isat","\\x11",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'big');return ds>f.seek(0,2)"]],
+        "d":[["isat","\\x11",0],["isat","\\0",4],["n0",3,1],["py","f.seek(1);ds=f.readi(3,'>');return ds>fsz"]],
         "rs":"Nintendo LZ11"
     },
     {
-        "d":[["isat","\\x40",0],["isat","\\0",4],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);ds=int.from_bytes(f.read(3),'little');return ds>f.seek(0,2)"]],
+        "d":[["isat","\\x40",0],["isat","\\0",4],["n0",3,1],["py","f.seek(1);ds=f.readi(3,'<');return ds>fsz"]],
         "rs":"Nintendo LZ40"
     },
     {
@@ -318,11 +321,11 @@
     },
     {
         "rqr":"ISO Media",
-        "d":[["size",[3000,null]],["isat","moov",32],["py","f=open(inp,'rb');r32=lambda:int.from_bytes(f.read(4),'big')\ns=8\nfor ix in range(6):\n f.seek(s-8,1)\n s=r32()\n if f.read(4)!=(b'ftyp',b'moov',b'free',b'mdat',b'meta',b'uuid')[ix]:return\nreturn 3500>f.tell()>3000 and s>24"]],
+        "d":[["size",[3000,null]],["isat","moov",32],["py","s=8\nfor ix in range(6):\n f.seek(s-8,1)\n s=f.readi(4,'>')\n if f.read(4)!=(b'ftyp',b'moov',b'free',b'mdat',b'meta',b'uuid')[ix]:return\nreturn 3500>f.tell()>3000 and s>24"]],
         "rs":"Data MP4"
     },
     {
-        "d":[["isat","\\0",0],["isat","\\0\\0",4],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');fc=int.from_bytes(f.read(4),'big');fo=int.from_bytes(f.read(4),'big');return (8+fc*4)==fo"]],
+        "d":[["isat","\\0",0],["isat","\\0\\0",4],["n0",4,0],["n0",4,4],["py","fc,fo=f.readi(4,'>'),f.readi(4,'>');return (8+fc*4)==fo"]],
         "rs":"ZLARC"
     },
     {
@@ -330,29 +333,29 @@
         "rs":"RetroStudio PAK"
     },
     {
-        "d":[["s%",4096],["ext",".fah"],["isat","FARC\\0\\1\\0\\0",0],["isatS","\\0",8,12],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.fac'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);c=int.from_bytes(f.read(4),'little')*16+16;return (c+-c%4096)==s"]],
+        "d":[["s%",4096],["ext",".fah"],["isat","FARC\\0\\1\\0\\0",0],["isatS","\\0",8,12],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.fac'):return\nf.seek(8);c=f.readi(4,'<')*16+16;return (c+-c%4096)==fsz"]],
         "rs":"Sunday vs. Magazine FARC","s":1},{
-        "d":[["isat","FARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (c*16+16)==int.from_bytes(f.read(4),'little')==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","FARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,16],["py","f.seek(8);c=f.readi(4,'<');return (c*16+16)==f.readi(4,'<')==f.readi(4,'<')"]],
         "rs":"Sunday vs. Magazine FARC","s":1
     },
     {
-        "d":[["isat","TARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,72],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');f.seek(72);return (c*64+16)==o==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","TARC\\0\\1\\0\\0",0],["n0",4,8],["n0",4,12],["n0",4,72],["py","f.seek(8);c=f.readi(4,'<');o=f.readi(4,'<');f.seek(72);return (c*64+16)==o==f.readi(4,'<')"]],
         "rs":"Sunday vs. Magazine TARC","s":1
     },
     {
-        "d":[["s%",16],["size",[304,null]],["isat","EMIT\\1\\1\\0\\0",0],["isat","\\x10\\0\\0\\0",12],["n0",4,8],["str0",48,32,5],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')*288+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["s%",16],["size",[304,null]],["isat","EMIT\\1\\1\\0\\0",0],["isat","\\x10\\0\\0\\0",12],["n0",4,8],["str0",48,32,5],["py","f.seek(8);return(f.readi(4,'<')*288+f.readi(4,'<'))==fsz"]],
         "rs":"Sunday vs. Magazine EMIT","s":1
     },
     {
-        "d":[["s%",16],["isat","CHNK\\0\\0\\1\\0",0],["isat","BACK\\0\\1\\0\\0\\x10\\0\\0\\0\\x10\\0\\0\\0",16],["isat","TEXR\\0\\1\\0\\0",48],["isatS","\\0",8,8],["isatS","\\0",8,40],["n0",4,56],["n0",4,60],["py","f=open(inp,'rb');f.seek(56);return f.read(4)==f.read(4)"]],
+        "d":[["s%",16],["isat","CHNK\\0\\0\\1\\0",0],["isat","BACK\\0\\1\\0\\0\\x10\\0\\0\\0\\x10\\0\\0\\0",16],["isat","TEXR\\0\\1\\0\\0",48],["isatS","\\0",8,8],["isatS","\\0",8,40],["n0",4,56],["n0",4,60],["py","f.seek(56);return f.read(4)==f.read(4)"]],
         "rs":"Sunday vs. Magazine BACKground PacK","s":1
     },
     {
-        "d":[["s%",16],["isat","CHNK\\0\\0\\1\\0",0],["isat","CHAR\\0\\1\\0\\0\\x20\\0\\0\\0\\x20\\0\\0\\0",16],["isat","TEXR\\0\\1\\0\\0",64],["isatS","\\0",8,8],["isatS","\\0",8,40],["isatS","\\0",8,56],["n0",4,72],["n0",4,76],["py","f=open(inp,'rb');f.seek(72);return f.read(4)==f.read(4)"]],
+        "d":[["s%",16],["isat","CHNK\\0\\0\\1\\0",0],["isat","CHAR\\0\\1\\0\\0\\x20\\0\\0\\0\\x20\\0\\0\\0",16],["isat","TEXR\\0\\1\\0\\0",64],["isatS","\\0",8,8],["isatS","\\0",8,40],["isatS","\\0",8,56],["n0",4,72],["n0",4,76],["py","f.seek(72);return f.read(4)==f.read(4)"]],
         "rs":"Sunday vs. Magazine CHARacter PacK","s":1
     },
     {
-        "d":[["isat","aeDT\\0\\0",0],["isat","\\x40",8],["isatS","\\0",7,9],["n0",2,6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(6);c=int.from_bytes(f.read(2),'little');b=int.from_bytes(f.read(4),'little');f.seek(16+c*4)\nif int.from_bytes(f.read(4),'little')!=s:return\nc=f.seek(16)+c*4+4+c*32;return (c+-c%b)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","aeDT\\0\\0",0],["isat","\\x40",8],["isatS","\\0",7,9],["n0",2,6],["py","f.seek(6);c=f.readi(2,'<');b=f.readi(4,'<');f.seek(16+c*4)\nif f.readi(4,'<')!=fsz:return\nc=f.seek(16)+c*4+4+c*32;return (c+-c%b)==f.readi(4,'<')"]],
         "rs":"Sunday vs. Magazine aeDAT","s":1
     },
     {
@@ -360,41 +363,41 @@
         "rs":"LMPK","s":1
     },
     {
-        "d":[["isat","PAK_\\1\\0\\0\\0",0],["isat","\\0\\0",82],["isat","\\xFF\\xFF",96],["isatS","\\0",4,12],["n0",4,8],["str0",16,64,2],["n0",4,88],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little')*88+16;f.seek(88)\nif (c+-c%32768)!=int.from_bytes(f.read(4),'little'):return\ns=f.read(4);f.seek(4,1);return s==f.read(4)"]],
+        "d":[["isat","PAK_\\1\\0\\0\\0",0],["isat","\\0\\0",82],["isat","\\xFF\\xFF",96],["isatS","\\0",4,12],["n0",4,8],["str0",16,64,2],["n0",4,88],["py","f.seek(8);c=f.readi(4,'<')*88+16;f.seek(88)\nif (c+-c%32768)!=f.readi(4,'<'):return\ns=f.read(4);f.skip(4);return s==f.read(4)"]],
         "rs":"Silent Hill PAK","s":1
     },
     {
-        "d":[["isat","ACSF",0],["n0",4,4],["n0",4,8],["n0",2,12],["n0",4,52],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif int.from_bytes(f.read(4),'little')!=s:return\nc,a=32+int.from_bytes(f.read(4),'little')*28,int.from_bytes(f.read(2),'little');f.seek(52);return int.from_bytes(f.read(4),'little')==(c+-c%a)"]],
+        "d":[["isat","ACSF",0],["n0",4,4],["n0",4,8],["n0",2,12],["n0",4,52],["py","f.seek(4)\nif f.readi(4,'<')!=fsz:return\nc,a=32+f.readi(4,'<')*28,f.readi(2,'<');f.seek(52);return f.readi(4,'<')==(c+-c%a)"]],
         "rs":"CRI ACS File","s":1
     },
     {
-        "d":[["isat","64\\0\\0",0],["isat","\\x20\\x08\\0\\0",16],["isatS","\\0",40,24],["isatS","\\0",32,2048],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);eo,dc,fc,do,fo=[int.from_bytes(f.read(4),'little')for _ in range(5)];return (do+dc*32)==fo and (fo+fc*32)==eo"]],
+        "d":[["isat","64\\0\\0",0],["isat","\\x20\\x08\\0\\0",16],["isatS","\\0",40,24],["isatS","\\0",32,2048],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f.seek(4);eo,dc,fc,do,fo=[f.readi(4,'<')for _ in range(5)];return (do+dc*32)==fo and (fo+fc*32)==eo"]],
         "rs":"CRI DPF","s":1
     },
     {
         "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["str0",16,64,7],["n0",4,80],["n0",4,84],["n0",4,88],["n0",4,92],["str0",96,64,7],
-             ["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(4),'little');f.seek(80);o=(o+2047)//2048+fo\nfor _ in range((fo-1)*2048//80):\n cs=(int.from_bytes(f.read(4),'little')+2047)//2048;co=int.from_bytes(f.read(4),'little')\n if o!=co:return\n o+=cs;f.seek(72,1)\nreturn True"]],
+             ["py","o=f.readi(4,'<');fo=f.readi(4,'<');f.seek(80);o=(o+2047)//2048+fo\nfor _ in range((fo-1)*2048//80):\n cs=(f.readi(4,'<')+2047)//2048;co=f.readi(4,'<')\n if o!=co:return\n o+=cs;f.skip(72)\nreturn True"]],
         "rs":"RTL Ski Jumping 2002 PAK"
     },
     {
         "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["str0",16,48,7],["n0",4,64],["n0",4,68],["n0",4,72],["n0",4,76],["str0",80,48,7],
-             ["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(4),'little');f.seek(64);o=(o+2047)//2048+fo\nfor _ in range((fo-1)*2048//64):\n cs=(int.from_bytes(f.read(4),'little')+2047)//2048;co=int.from_bytes(f.read(4),'little')\n if o!=co:return\n o+=cs;f.seek(56,1)\nreturn True"]],
+             ["py","o=f.readi(4,'<');fo=f.readi(4,'<');f.seek(64);o=(o+2047)//2048+fo\nfor _ in range((fo-1)*2048//64):\n cs=(f.readi(4,'<')+2047)//2048;co=f.readi(4,'<')\n if o!=co:return\n o+=cs;f.skip(56)\nreturn True"]],
         "rs":"RTL Ski Jumping 2001 PAK"
     },
     {
-        "d":[["isat","\\1\\0\\0\\0",-8],["n0",4,-4],["n0",4,-156],["n0",4,-152],["str0",-148,64,6],["py","f=open(inp,'rb');s=f.seek(-4,2)-4;c=int.from_bytes(f.read(4),'little')\nif (c*148+12)>s:return\nf.seek(c*-148-8,2)\nif sum(f.read(4)):return\nf.seek(c*148-152,1);return(int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+c*148)==s"]],
+        "d":[["isat","\\1\\0\\0\\0",-8],["n0",4,-4],["n0",4,-156],["n0",4,-152],["str0",-148,64,6],["py","s=f.seek(-4,2)-4;c=f.readi(4,'<')\nif (c*148+12)>s:return\nf.seek(c*-148-8,2)\nif f.readi(4):return\nf.skip(c*148-152);return(f.readi(4,'<')+f.readi(4,'<')+c*148)==s"]],
         "rs":"GameZ Reader Archive"
     },
     {
-        "d":[["isat","\\0\\0\\0\\0\\1\\0\\0\\0",0],["isatS","\\0",8,16],["n0",4,12],["n0",4,56],["str0",24,32,4],["py","f=open(inp,'rb');f.seek(8);i=int.from_bytes(f.read(4),'little');c=24+int.from_bytes(f.read(4),'little')*40;f.seek(56);o=int.from_bytes(f.read(4),'little');id=int.from_bytes(f.read(4),'little',signed=True);return o in(c,c+5632) and(0<=id<i if i else id==-1)"]],
+        "d":[["isat","\\0\\0\\0\\0\\1\\0\\0\\0",0],["isatS","\\0",8,16],["n0",4,12],["n0",4,56],["str0",24,32,4],["py","f.seek(8);i=f.readi(4,'<');c=24+f.readi(4,'<')*40;f.seek(56);o=f.readi(4,'<');id=f.readi(4,'<',True);return o in(c,c+5632) and(0<=id<i if i else id==-1)"]],
         "rs":"GameZ Texture Archive"
     },
     {
-        "d":[["isat","\\x22\\x12\\x97\\x02",0],["isat","\\x24\\0\\0\\0",12],["isatS","\\0",8,36],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,24],["n0",4,32],["str0e",44,20,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);c=36+int.from_bytes(f.read(4),'little')*int.from_bytes(f.read(4),'little')\nif c!=int.from_bytes(f.read(4),'little'):return\nf.seek(24);c=int.from_bytes(f.read(4),'little');f.seek(32);return (int.from_bytes(f.read(4),'little')+c*196)<s"]],
+        "d":[["isat","\\x22\\x12\\x97\\x02",0],["isat","\\x24\\0\\0\\0",12],["isatS","\\0",8,36],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,24],["n0",4,32],["str0e",44,20,4],["py","f.seek(8);c=36+f.readi(4,'<')*f.readi(4,'<')\nif c!=f.readi(4,'<'):return\nf.seek(24);c=f.readi(4,'<');f.seek(32);return (f.readi(4,'<')+c*196)<fsz"]],
         "rs":"GameZ Asset Archive","s":1
     },
     {
-        "d":[["isat","MDM!\\0\\1\\0\\1",0],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);d=f.seek(int.from_bytes(f.read(4),'little'));return f.read(8)==b'\\0'*8 and(d+8+int.from_bytes(f.read(4),'little'))==(d+56+int.from_bytes(f.read(4),'little')*16)==s"]],
+        "d":[["isat","MDM!\\0\\1\\0\\1",0],["n0",4,8],["py","f.seek(8);d=f.seek(f.readi(4,'<'));return f.read(8)==b'\\0'*8 and(d+8+f.readi(4,'<'))==(d+56+f.readi(4,'<')*16)==fsz"]],
         "rs":"mTropolis MDM","s":1
     },
     {
@@ -402,7 +405,7 @@
         "rs":"Lego Creator QUBE","s":1
     },
     {
-        "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]<=f.read(1)[0]"]],
+        "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,12],["py","f.seek(4);return f.readi(1)<=f.readi(1)"]],
         "rs":"BCH","s":1
     },
     {
@@ -415,11 +418,11 @@
     },
     {
         "rqr":"Looking Glass Resource data",
-        "d":[["isat","LG Res File v2\\r\\n",0],["isatS","\\0",12,112],["n0",4,124],["py","f=open(inp,'rb');f.seek(124);f.seek(int.from_bytes(f.read(4),'little'));return sum(f.read(2))and f.read(4)==b'\\x80\\0\\0\\0'"]],
+        "d":[["isat","LG Res File v2\\r\\n",0],["isatS","\\0",12,112],["n0",4,124],["py","f.seek(124);f.seek(f.readi(4,'<'));return f.readi(2)and f.read(4)==b'\\x80\\0\\0\\0'"]],
         "rs":"Looking Glass Resource","s":1
     },
     {
-        "d":[["n0",2,0],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=0\nfor _ in range(c):\n while f.read(1)not in{b'\\0',b''}:pass\n if not f.read(1):return\n f.seek(-1,1)\n if f.tell()%2:f.seek(1,1)\n s+=int.from_bytes(f.read(2),'little')*32\ns+=f.tell();return s==f.seek(0,2)"]],
+        "d":[["n0",2,0],["str0e",2,32,3],["py","c=f.readi(2,'<');s=0\nfor _ in range(c):\n while f.read(1)not in{b'\\0',b''}:pass\n if not f.read(1):return\n f.seek(-1,1)\n if f.tell()%2:f.skip(1)\n s+=f.readi(2,'<')*32\ns+=f.tell();return s==fsz"]],
         "rs":"EBAB Animation Data"
     },
     {
@@ -427,23 +430,23 @@
         "rs":"STXT Language Data","s":1
     },
     {
-        "d":[["isat","\\xCB\\x32\\x3d\\xB5\\0\\0\\0\\0",0],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","\\xCB\\x32\\x3d\\xB5\\0\\0\\0\\0",0],["n0",4,16],["n0",4,20],["py","f.seek(16);return f.readi(4,'<')==fsz"]],
         "rs":"Adventure Time VOLume","s":1
     },
     {
-        "d":[["isat","KCAP",0],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],88],["n0",4,4],["n0",4,72],["n0",4,76],["n0",4,80],["str0",8,64,5],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=[int.from_bytes(f.read(84)[72:76],'little') for _ in range(c)];return f.tell()in o and all(x>=f.tell() for x in o)"]],
+        "d":[["isat","KCAP",0],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],88],["n0",4,4],["n0",4,72],["n0",4,76],["n0",4,80],["str0",8,64,5],["py","f.seek(4);c=f.readi(4,'<');o=[int.from_bytes(f.read(84)[72:76],'little') for _ in range(c)];return f.tell()in o and all(x>=f.tell() for x in o)"]],
         "rs":"Selene Pack","s":1
     },
     {
-        "d":[["size",[1024,4294967295]],["isat","+LKF",0],["isat","\\0\\0\\0\\0",48],["isatS","\\0",16,16],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,56],["n0",4,60],["str0",32,16,4],["py","f=open(inp,'rb');f.seek(8);b=f.read(4);f.seek(56);return b==f.read(4)"]],
+        "d":[["size",[1024,4294967295]],["isat","+LKF",0],["isat","\\0\\0\\0\\0",48],["isatS","\\0",16,16],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,56],["n0",4,60],["str0",32,16,4],["py","f.seek(8);b=f.read(4);f.seek(56);return b==f.read(4)"]],
         "rs":"Favorite Dear LKF","s":1
     },
     {
-        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')//2;f.seek(0);o=[int.from_bytes(f.read(2),'little')for _ in range(c)]\nif any(x%2 for x in o) or o in([0],[]):return\nfor of in o:\n f.seek(of);s=int.from_bytes(f.read(2),'little');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:asrt(b.decode('shift-jis').isprintable())\n except:return\nreturn True"]],
+        "d":[["size",[6,131074]],["s%",2],["n0",2,0],["py","c=f.readi(2,'<')//2;f.seek(0);o=[f.readi(2,'<')for _ in range(c)]\nif any(x%2 for x in o) or o in([0],[]):return\nfor of in o:\n f.seek(of);s=f.readi(2,'<');b=f.read(2)\n if b[1]<10:s=int.from_bytes(b,'little')\n else:f.seek(-2,1)\n b=f.read(s)\n if len(b)!=s or s%2 or s<2:return\n try:asrt(b.decode('shift-jis').isprintable())\n except:return\nreturn True"]],
         "rs":"Favorite Dear MSG 1"
     },
     {
-        "d":[["size",[50,106534]],["n0",2,0],["n0",2,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')\nif c>16382:return\nf.seek(4)\nif (c*4+6)!=int.from_bytes(f.read(2),'little'):return\nf.seek(c*4+2);return f.read(4)==(b'\\xFF'*4)"]],
+        "d":[["size",[50,106534]],["n0",2,0],["n0",2,4],["py","c=f.readi(2,'<')\nif c>16382:return\nf.seek(4)\nif (c*4+6)!=f.readi(2,'<'):return\nf.seek(c*4+2);return f.read(4)==(b'\\xFF'*4)"]],
         "rs":"Favorite Dear MSG 2"
     },
     {
@@ -451,19 +454,19 @@
         "rs":"Purple Moon Resource PRD+PRS","s":1
     },
     {
-        "d":[["s%",2048],["isat","\\x10\\0\\0\\0",4],["isatS","\\0",12,8],["n0",4,0],["n0",8,20],["n0",4,28],["n0",4,32],["py","f=open(inp,'rb');ts=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o+8);o=sum(f.read(4));f.seek(2,1)\nif bool(o)^bool(sum(f.read(2))):return\nf.seek(ts-12);o=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little');return not sum(f.read(4))and (o+-o%2048)==s"]],
+        "d":[["s%",2048],["isat","\\x10\\0\\0\\0",4],["isatS","\\0",12,8],["n0",4,0],["n0",8,20],["n0",4,28],["n0",4,32],["py","ts=f.readi(4,'<');o=f.readi(4,'<');f.seek(o+8);o=f.readi(4);f.skip(2)\nif bool(o)^bool(f.readi(2)):return\nf.seek(ts-12);o=f.readi(4,'<')+f.readi(4,'<');return not f.readi(4)and (o+-o%2048)==fsz"]],
         "rs":"APETEC AIF"
     },
     {
-        "d":[["isat","BINA",0],["isat","L",7],["isat","\\1\\0\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","BINA",0],["isat","L",7],["isat","\\1\\0\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f.seek(8);return f.readi(4,'<')==fsz"]],
         "rs":"Sonic BINA","s":1},{
-        "d":[["isat","BINA",0],["isat","B",7],["isat","\\0\\1\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'big')==s"]],
+        "d":[["isat","BINA",0],["isat","B",7],["isat","\\0\\1\\0\\0DATA",12],["isat","\\0\\0",38],["n0",4,8],["n0",4,20],["n0",4,24],["n0",4,32],["str",4,3],["py","f.seek(8);return f.readi(4,'>')==fsz"]],
         "rs":"Sonic BINA","s":1},{
         "d":[["isat","\\0",18],["isat","\\0\\01BBINA",20],["isatS","\\0",4,12],["isatS","\\0",4,28],["isin",["\\0","\\1"],19],["n0",4,0],["n0",4,4]],
         "rs":"Sonic BINA","s":1
     },
     {
-        "d":[["s%",8],["isat","XMBF\\1\\1\\0\\0",0],["isat","\\x10\\0\\0\\0",388],["hash","05D455038854CE42AF6989FEE11AF60D5E8F60A5",0,384],["n0",4,384],["n0",4,392],["n0",4,396],["py","if not exists(splitext(inp)[0]+'.big'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(16);o=f.seek(int.from_bytes(f.read(4),'little'));c1,hs,c2,fo=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');return c1==c2 and (hs+c1*8)==fo and(o+fo+c2*32)==s"]],
+        "d":[["s%",8],["isat","XMBF\\1\\1\\0\\0",0],["isat","\\x10\\0\\0\\0",388],["hash","05D455038854CE42AF6989FEE11AF60D5E8F60A5",0,384],["n0",4,384],["n0",4,392],["n0",4,396],["py","if not exists(splitext(inp)[0]+'.big'):return\nf.seek(16);o=f.seek(f.readi(4,'<'));c1,hs,c2,fo=f.readi(4,'<'),f.readi(4,'<'),f.readi(4,'<'),f.readi(4,'<');return c1==c2 and (hs+c1*8)==fo and(o+fo+c2*32)==fsz"]],
         "rs":"Alone in the Dark FAT+BIG","s":1
     },
     {
@@ -472,28 +475,28 @@
         "rs":"Tixati Installer"
     },
     {
-        "d":[["isat","\\1\\0\\1\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0\\x89PNG",32],["isatS","\\0",4,16],["n0",4,8],["n0",4,12],["n0",4,20],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);v=f.read(4)\nif v!=f.read(4):return\nf.seek(20)\nif v!=f.read(4):return\nv=int.from_bytes(v,'little')+int.from_bytes(f.read(4),'little');d=int.from_bytes(f.read(4),'little');return v==d and(d+36)==s"]],
+        "d":[["isat","\\1\\0\\1\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0\\x89PNG",32],["isatS","\\0",4,16],["n0",4,8],["n0",4,12],["n0",4,20],["n0",4,24],["n0",4,28],["py","f.seek(8);v=f.read(4)\nif v!=f.read(4):return\nf.seek(20)\nif v!=f.read(4):return\nv=int.from_bytes(v,'little')+f.readi(4,'<');d=f.readi(4,'<');return v==d and(d+36)==fsz"]],
         "rs":"-8 SysFile"
     },
     {
-        "d":[["isat","\\xD1\\x07\\0\\0",0],["n0",4,4],["n0",4,8],["isatS","\\0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little')*16+16\nif c!=int.from_bytes(f.read(4),'little'):return\nf.seek(24);return c==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","\\xD1\\x07\\0\\0",0],["n0",4,4],["n0",4,8],["isatS","\\0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,28],["py","f.seek(4);c=f.readi(4,'<')*16+16\nif c!=f.readi(4,'<'):return\nf.seek(24);return c==f.readi(4,'<')"]],
         "rs":"Archer Maclean's Mercury PAQ"},{
-        "d":[["isat","\\xED\\xFE\\0\\0",0],["n0",4,4],["isatS","\\0",8,8],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little')*16+16;f.seek(24);return c==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","\\xED\\xFE\\0\\0",0],["n0",4,4],["isatS","\\0",8,8],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,28],["py","f.seek(4);c=f.readi(4,'<')*16+16;f.seek(24);return c==f.readi(4,'<')"]],
         "rs":"Archer Maclean's Mercury PAQ"
     },
     {
-        "d":[["isat","\\r\\n",10],["str",0,10],["py","f=open(inp,'rb');s=f.read(12)\nif len(s)!=12 or not s.endswith(b'\\r\\n') or not s[:10].rstrip(b' ').isdigit():return\nf.seek(int(s.rstrip()),1)\nwhile 1:\n s0,s1,s2=f.read(12),f.read(34),f.read(6)\n if not s0:break\n if len(s0+s1+s2)!=52 or not(s0[10:]==s1[32:]==s2[4:]==b'\\r\\n')or not s0[:10].rstrip(b' ').isdigit():return\n try:asrt((s1[:32]+s2[:4]).decode('ascii').isprintable())\n except:return\n f.seek(int(s0.rstrip()),1)\nreturn True"]],
+        "d":[["isat","\\r\\n",10],["str",0,10],["py","s=f.read(12)\nif len(s)!=12 or not s.endswith(b'\\r\\n')or not s[:10].rstrip(b' ').isdigit():return\nf.skip(int(s.rstrip()))\nwhile 1:\n s0,s1,s2=f.read(12),f.read(34),f.read(6)\n if not s0:break\n if len(s0+s1+s2)!=52 or not(s0[10:]==s1[32:]==s2[4:]==b'\\r\\n')or not s0[:10].rstrip(b' ').isdigit():return\n try:asrt((s1[:32]+s2[:4]).decode('ascii').isprintable())\n except:return\n f.skip(int(s0.rstrip()))\nreturn True"]],
         "rs":"Barbie: Riding Club Cache"
     },
     {
-        "d":[["isat","0MFS",0],["n0",4,4],["n0",4,-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(4);f.seek(int.from_bytes(f.read(4),'big'));c=int.from_bytes(f.read(4),'big');return c>1 and f.read(12)==b'mCTy\\0\\0\\0\\1\\xFF\\xFF\\xFB\\xA9'"]],
+        "d":[["isat","0MFS",0],["n0",4,4],["n0",4,-4],["n0",4,-8],["py","f.seek(4);f.seek(f.readi(4,'>'));c=f.readi(4,'>');return c>1 and f.read(12)==b'mCTy\\0\\0\\0\\1\\xFF\\xFF\\xFB\\xA9'"]],
         "rs":"Open Media Toolkit Formatted Stream","s":1},{
-        "d":[["isin",["0MF3","0MF2"],0],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);f.seek(int.from_bytes(f.read(4),'big'));return sum(f.read(4))and sum(f.read(4))and sum(f.read(4))"]],
+        "d":[["isin",["0MF3","0MF2"],0],["n0",4,4],["py","f.seek(4);f.seek(f.readi(4,'>'));return f.readi(4)and f.readi(4)and f.readi(4)"]],
         "rs":"Open Media Toolkit Formatted Stream","s":1
     },
     {
         "d":[["size",[2160,null]],["s%",16],["n0",4,0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["isatS","\\0",4,24],["n0",4,32],["n0",4,40],["n0",4,44],["isatS","\\0",4,52],["isatS","\\0",4,60],
-             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);a=int.from_bytes(f.read(4),'little')\nif s%a:return\nf.seek(12);c=int.from_bytes(f.read(4),'little')*32;to=int.from_bytes(f.read(4),'little')*a;tgo=int.from_bytes(f.read(4),'little')*a;f.seek(28);tgo+=int.from_bytes(f.read(4),'little')*4;fo=int.from_bytes(f.read(4),'little')*a\nif (s-(fo+32+-32%a))>2048 or(to+c+-c%a)!=fo:return\nf.seek(40);so=int.from_bytes(f.read(4),'little')*a\nif (tgo+-tgo%a)!=so:return\nso+=int.from_bytes(f.read(4),'little')\nif (so+-so%a)!=to:return\nf.seek(fo+4);return (s-(int.from_bytes(f.read(4),'little')*a))<=2048"]],
+             ["py","f.seek(4);a=f.readi(4,'<')\nif fsz%a:return\nf.seek(12);c=f.readi(4,'<')*32;to=f.readi(4,'<')*a;tgo=f.readi(4,'<')*a;f.seek(28);tgo+=f.readi(4,'<')*4;fo=f.readi(4,'<')*a\nif (fsz-(fo+32+-32%a))>2048 or(to+c+-c%a)!=fo:return\nf.seek(40);so=f.readi(4,'<')*a\nif (tgo+-tgo%a)!=so:return\nso+=f.readi(4,'<')\nif (so+-so%a)!=to:return\nf.seek(fo+4);return (fsz-(f.readi(4,'<')*a))<=2048"]],
         "rs":"Blitz Games PAK","s":1
     },
     {
@@ -501,19 +504,19 @@
         "rs":"TREVA SDPC","s":1
     },
     {
-        "d":[["isat","FILELINK_____END\\0\\0\\0\\0",8],["n0",4,0],["n0",4,0],["py","f=open(inp,'rb');return not int.from_bytes(f.read(4),'little')%8"]],
+        "d":[["isat","FILELINK_____END\\0\\0\\0\\0",8],["n0",4,0],["n0",4,0],["py","return not f.readi(4,'<')%8"]],
         "rs":"WayForward PAK","s":1
     },
     {
-        "d":[["isat",".CC40TAD",4],["isat",".CC4HSERHSER",292],["isat","\\xFF",3,false],["ext",".dat",false],["py","inf=inp[:-3] + 'hdr'\nif not exists(inf):return\nf=open(inf,'rb');f.seek(4);return f.read(8)==b'.CC40TAD'"]],"qq":true,
+        "d":[["isat",".CC40TAD",4],["isat",".CC4HSERHSER",292],["isat","\\xFF",3,false],["ext",".dat",false],["py","inf=inp[:-3]+'hdr'\nif not exists(inf):return\nf=open(inf,'rb');f.seek(4);return f.read(8)==b'.CC40TAD'"]],"qq":true,
         "rs":"TTGames DAT","s":1
     },
     {
-        "d":[["s%",2048],["size",[4096,null]],["isatS","\\0",8,0],["isatS","\\0",8,16],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');f.seek(8);o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');s=f.seek(20)+c*20\nif (s+-s%2048)!=o:return\nfor _ in range(c):\n if sum(f.read(4))or not sum(f.read(4))or int.from_bytes(f.read(4),'little')%2048 or f.read(4)!=f.read(4):return\nreturn not sum(f.read(o-f.tell()))"]],
+        "d":[["s%",2048],["size",[4096,null]],["isatS","\\0",8,0],["isatS","\\0",8,16],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,28],["py","f.seek(8);o=f.readi(4,'<');c=f.readi(4,'<');s=f.seek(20)+c*20\nif (s+-s%2048)!=o:return\nfor _ in range(c):\n if f.readi(4)or not f.readi(4)or f.readi(4,'<')%2048 or f.read(4)!=f.read(4):return\nreturn not sum(f.read(o-f.tell()))"]],
         "rs":"Sumo Digital XPAC"
     },
     {
-        "d":[["s%",2048],["isat","\\0\\x10\\0\\0",20],["contain",".DEF\\0",[0,16]],["n0",4,16],["n0",4,20],["n0",4,40],["n0",4,44],["str0",0,16,5],["str0",24,16,5],["py","f=open(inp,'rb');f.seek(16);s=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(4),'little')\nif fo%2048 or fo>65536:return\nf.seek(fo-24)\nif sum(f.read(24)):return\no=fo+s+-s%2048\nf.seek(24)\nfor _ in range(fo//24-1):\n if not sum(f.read(16)):break\n s=int.from_bytes(f.read(4),'little')\n if o!=int.from_bytes(f.read(4),'little'):return\n o+=s+-s%2048\nreturn True"]],
+        "d":[["s%",2048],["isat","\\0\\x10\\0\\0",20],["contain",".DEF\\0",[0,16]],["n0",4,16],["n0",4,20],["n0",4,40],["n0",4,44],["str0",0,16,5],["str0",24,16,5],["py","f.seek(16);s=f.readi(4,'<');fo=f.readi(4,'<')\nif fo%2048 or fo>65536:return\nf.seek(fo-24)\nif sum(f.read(24)):return\no=fo+s+-s%2048\nf.seek(24)\nfor _ in range(fo//24-1):\n if not sum(f.read(16)):break\n s=f.readi(4,'<')\n if o!=f.readi(4,'<'):return\n o+=s+-s%2048\nreturn True"]],
         "rs":"The Pagemaster DAT"
     },
     {
@@ -526,7 +529,7 @@
         "rs":"Glacier RPKG","s":1
     },
     {
-        "d":[["isat","VRAM-WAD",0],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2)-16;f.seek(8);return s==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","VRAM-WAD",0],["n0",4,8],["n0",4,12],["py","f.seek(8);return (fsz-16)==f.readi(4,'<')"]],
         "rs":"Ninja Shadow of Darkness PAK","s":1
     },
     {
@@ -547,7 +550,7 @@
         "rs":"Shifted ISO"
     },
     {
-        "d":[["isat","Yay0",32],["isatS","\\0",28,4],["py","f=open(inp,'rb');b=f.read(4);f.seek(0x24);return b==f.read(4)"]],
+        "d":[["isat","Yay0",32],["isatS","\\0",28,4],["py","b=f.read(4);f.seek(36);return b==f.read(4)"]],
         "rs":"WarioWare Mega Party Game PAC","s":1
     },
     {
@@ -560,19 +563,19 @@
         "rs":"Metropolis Software ZAP","s":1
     },
     {
-        "d":[["size",[16400,null]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",[24,32768]],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);fo=f.read(4);e='big' if int.from_bytes(fo,'little')>int.from_bytes(fo,'big') else 'little';fo=int.from_bytes(fo,e);o=fo+int.from_bytes(f.read(4),e)\nif fo%16 or fo>40960:return\nwhile f.tell()<fo:\n if not sum(f.read(4)):break\n fo=int.from_bytes(f.read(4),e)\n if fo!=o and fo<o and fo%16:return\n o=fo+int.from_bytes(f.read(4),e)\nreturn o==s"]],
+        "d":[["size",[16400,null]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",[24,32768]],["py","f.seek(4);fo=f.read(4);e='big' if int.from_bytes(fo,'little')>int.from_bytes(fo,'big') else 'little';fo=int.from_bytes(fo,e);o=fo+int.from_bytes(f.read(4),e)\nif fo%16 or fo>40960:return\nwhile f.tell()<fo:\n if not f.readi(4):break\n fo=int.from_bytes(f.read(4),e)\n if fo!=o and fo<o and fo%16:return\n o=fo+int.from_bytes(f.read(4),e)\nreturn o==fsz"]],
         "rs":"Pivotal Games DAT"
     },
     {
-        "d":[["isat","PAKN",0],["isat","\\0\\0\\0\\0",68],["n0",4,4],["n0",4,8],["str0",12,56,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*64)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","PAKN",0],["isat","\\0\\0\\0\\0",68],["n0",4,4],["n0",4,8],["str0",12,56,4],["py","f.seek(4);c=f.readi(4,'<');return (c*64)==f.readi(4,'<')"]],
         "rs":"Def Jam Fight For NY: The Takeover PAKN","s":1
     },
     {
-        "d":[["isat","CRAB\\1\\0\\0\\0",0],["isat","CAOE",-4],["n0",4,-8],["py","f=open(inp,'rb');f.seek(-8,2);f.seek(int.from_bytes(f.read(4),'little'));return sum(f.read(4))and f.read(4)==b'\\x08\\0\\0\\0'"]],
+        "d":[["isat","CRAB\\1\\0\\0\\0",0],["isat","CAOE",-4],["n0",4,-8],["py","f.seek(-8,2);f.seek(f.readi(4,'<'));return f.readi(4)and f.read(4)==b'\\x08\\0\\0\\0'"]],
         "rs":"Pixelbite BAR","s":1
     },
     {
-        "d":[["isat","PxZP",0],["isat","x",12],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);z=int.from_bytes(f.read(4),'little');rs=int.from_bytes(f.read(4),'little');return z>rs and (rs+12)==s and not int.from_bytes(f.read(2),'big')%31"]],
+        "d":[["isat","PxZP",0],["isat","x",12],["n0",4,4],["n0",4,8],["py","f.seek(4);z=f.readi(4,'<');rs=f.readi(4,'<');return z>rs and (rs+12)==fsz and not f.readi(2,'>')%31"]],
         "rs":"Pixelbite ZIP","s":1
     },
     {
@@ -591,11 +594,11 @@
     {
         "rq":null,
         "t":"text",
-        "d":[["contain","\\r\\n",[1,7]],["contain","/|",[8,120]],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\nf=open(inp)\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split('|')\nif len(l)!=4 or l[1][-1]!='/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
+        "d":[["contain","\\r\\n",[1,7]],["contain","/|",[8,120]],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split(b'|')\nif len(l)!=4 or l[1][-1:]!=b'/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
         "rs":"Lucky Chicken TOC+HFF"
     },
     {
-        "d":[["s%",2048],["isat","PFW2",0],["isat","\\x08\\0\\0\\0\\0\\0\\0\\0",8],["n0",2,4],["n0",2,6],["n0",2,30],["str0",16,8,3],["str0",24,3,1],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(6);return (int.from_bytes(f.read(2),'little')*2048)==s"]],
+        "d":[["s%",2048],["isat","PFW2",0],["isat","\\x08\\0\\0\\0\\0\\0\\0\\0",8],["n0",2,4],["n0",2,6],["n0",2,30],["str0",16,8,3],["str0",24,3,1],["py","f.seek(6);return(f.readi(2,'<')*2048)==fsz"]],
         "rs":"PSX PFW","s":1
     },
     {
@@ -603,11 +606,11 @@
         "rs":"Specnaz UFF/BFS"
     },
     {
-        "d":[["isat","\\xFF\\x0A\\x00DELPHIXPICTURECOLLECTION\\x00\\x30\\x10",0],["isat","TPF0",34],["n0",4,30],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(30);return (34+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","\\xFF\\x0A\\x00DELPHIXPICTURECOLLECTION\\x00\\x30\\x10",0],["isat","TPF0",34],["n0",4,30],["py","f.seek(30);return(34+f.readi(4,'<'))==fsz"]],
         "rs":"DelphiX Picture Collection","s":1
     },
     {
-        "d":[["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2);f.seek(o);b=f.read(2)\nif b==b'\\0\\x10':return f.read(2)==b'\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s\nreturn b==b'\\0\\0' and(o+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["n0",4,0],["py","o=f.readi(4,'<');f.seek(o);b=f.readi(2,'<')\nif b==0x1000:return f.readi(2)==0 and(o+f.readi(4,'<'))==fsz\nreturn b==0 and(o+f.readi(4,'<'))==fsz"]],
         "rs":"Lucas Learning DAT"
     },
     {
@@ -616,7 +619,7 @@
     },
     {
         "d":[["isat","\\x20\\0\\0\\0\\x01\\0\\0\\0",0],["isin",["\\0\\0\\0\\0","ACOM","\\x43\\x51\\0\\0","\\x86\\x80\\0\\0","\\x02\\x10\\0\\0","\\x10\\x10\\0\\0","\\x6B\\x10\\0\\0","\\xDE\\x10\\0\\0","\\xB5\\x13\\0\\0","\\x14\\x14\\0\\0","\\x4D\\x14\\0\\0","\\xE4\\x14\\0\\0","\\xD8\\xF4\\0\\0","\\x02\\x00\\x01\\0","\\xe5\\x19\\0\\0","\\xd5\\x1e\\0\\0","\\x21\\x20\\0\\0","\\x42\\x4c\\x40\\x05"],8],
-             ["py","f=open(inp,'rb');f.seek(8);v=sum(f.read(4));return (sum(f.read(4))and sum(f.read(16)))if v else (not sum(f.read(4))and not sum(f.read(16)))"]],
+             ["py","f.seek(8);v=f.readi(4);return (f.readi(4)and sum(f.read(16)))if v else (not f.readi(4)and not sum(f.read(16)))"]],
         "rs":"Vulkan Pipeline Cache"
     },
     {
@@ -640,21 +643,21 @@
         "rs":"Trinity PAK"
     },
     {
-        "d":[["isat","GFLXPACK",0],["n0",4,16],["n0",4,20],["n0",8,24],["n0",8,32],["n0",8,40],["n0",8,48],["py","f=open(inp,'rb');f.seek(16);fc=int.from_bytes(f.read(4),'little');dc=int.from_bytes(f.read(4),'little');fo=int.from_bytes(f.read(8),'little')\nif (40+8*dc)!=int.from_bytes(f.read(8),'little')or(40+8*dc+8*fc)!=int.from_bytes(f.read(8),'little'):return\nf.seek(fo+16);return(fo+24*fc)==int.from_bytes(f.read(8),'little')"]],
+        "d":[["isat","GFLXPACK",0],["n0",4,16],["n0",4,20],["n0",8,24],["n0",8,32],["n0",8,40],["n0",8,48],["py","f.seek(16);fc=f.readi(4,'<');dc=f.readi(4,'<');fo=f.readi(8,'<')\nif (40+8*dc)!=f.readi(8,'<')or(40+8*dc+8*fc)!=f.readi(8,'<'):return\nf.seek(fo+16);return(fo+24*fc)==f.readi(8,'<')"]],
         "rs":"Trinity GFLXPack","s":1
     },
     {
-        "d":[["isat","1TAD",-12],["n0",16,-28],["n0",4,-8],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(s-8)\nif int.from_bytes(f.read(4),'little')>=s:return\no=int.from_bytes(f.read(4),'little');f.seek(s-o);return (o+int.from_bytes(f.read(4),'little')*6)<s"]],
+        "d":[["isat","1TAD",-12],["n0",16,-28],["n0",4,-8],["n0",4,-4],["py","f.seek(fsz-8)\nif f.readi(4,'<')>=fsz:return\no=f.readi(4,'<');f.seek(fsz-o);return (o+f.readi(4,'<')*6)<fsz"]],
         "rs":"Temple of Elemental Evil DAT","s":1
     },
     {
-        "d":[["isat","HGRZ",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');o=c*4+12\nif (o+-o%256)!=int.from_bytes(f.read(4),'little'):return\nf.seek(o-4);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","HGRZ",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(4);c=f.readi(4,'<');o=c*4+12\nif (o+-o%256)!=f.readi(4,'<'):return\nf.seek(o-4);return f.readi(4,'<')==fsz"]],
         "rs":"ZUN GRZ","s":1
     },
     {
-        "d":[["isat","BILH",0],["isat","\\0\\0",10],["isatS","\\xFF",8,16],["n0",8,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","BILH",0],["isat","\\0\\0",10],["isatS","\\xFF",8,16],["n0",8,4],["n0",4,12],["py","f.seek(4);return (24+f.readi(8,'<')+f.readi(4,'<'))==fsz"]],
         "rs":"Feral Header Library","s":1},{
-        "d":[["isat","BILH",0],["isat","\\0\\0",14],["isatS","\\xFF",8,16],["n0",4,4],["n0",8,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (24+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(8),'little'))==s"]],
+        "d":[["isat","BILH",0],["isat","\\0\\0",14],["isatS","\\xFF",8,16],["n0",4,4],["n0",8,8],["py","f.seek(4);return (24+f.readi(4,'<')+f.readi(8,'<'))==fsz"]],
         "rs":"Feral Header Library","s":1
     },
     {
@@ -666,15 +669,15 @@
         "rs":"Feral FSBF"
     },
     {
-        "d":[["size",[14,10485760]],["isat","\\0",-1],["n0",1,-2],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little')\nfor _ in range(c):\n f.seek(4,1);l=int.from_bytes(f.read(4),'little');d=f.read(l)\n if len(d)!=l:return\n try:d.decode('utf-8')\n except:return\n if f.read(1)!=b'\\0':return\nreturn f.read(1)==b''"]],
+        "d":[["size",[14,10485760]],["isat","\\0",-1],["n0",1,-2],["n0",4,0],["n0",4,4],["n0",4,8],["py","c=f.readi(4,'<')\nfor _ in range(c):\n f.skip(4);l=f.readi(4,'<');d=f.read(l)\n if len(d)!=l:return\n try:d.decode('utf-8')\n except:return\n if f.read(1)!=b'\\0':return\nreturn not f.read(1)"]],
         "rs":"Feral TELI"
     },
     {
-        "d":[["isat","EDIV",0],["isatS","\\0",8,4],["isatS","\\xFF",8,16],["isat","BIK",24],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return (24+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","EDIV",0],["isatS","\\0",8,4],["isatS","\\xFF",8,16],["isat","BIK",24],["n0",4,12],["py","f.seek(12);return (24+f.readi(4,'<'))==fsz"]],
         "rs":"Feral Bink Video","s":1
     },
     {
-        "d":[["size",[32,2147483648]],["isat","\\xAA\\xAA",6],["n0",4,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');l=int.from_bytes(f.read(4),'little')^0xAAAAAAAA;return len(f.read(l))==l and(int.from_bytes(f.read(4),'little')^0xAAAAAAAA)>(4+c*20)and f.read(4)==b'\\xAA\\xAA\\xAA\\xAA'"]],
+        "d":[["size",[32,2147483648]],["isat","\\xAA\\xAA",6],["n0",4,0],["py","c=f.readi(4,'<');l=f.readi(4,'<')^0xAAAAAAAA;return len(f.read(l))==l and(f.readi(4,'<')^0xAAAAAAAA)>(4+c*20)and f.read(4)==b'\\xAA\\xAA\\xAA\\xAA'"]],
         "rs":"Motocross Mania DAT"
     },
     {
@@ -682,7 +685,7 @@
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },
     {
-        "d":[["isat","PBG\\x1A",0],["n0",4,8],["n0",4,16],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');f.seek(16);return (12+c*12)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","PBG\\x1A",0],["n0",4,8],["n0",4,16],["py","f.seek(8);c=f.readi(4,'<');f.seek(16);return (12+c*12)==f.readi(4,'<')"]],
         "rs":"AmusementMakers Project B.G. Archive","s":1
     },
     {
@@ -695,7 +698,7 @@
         "rs":"DreamFactory 5 Resource","s":1
     },
     {
-        "d":[["isat","\\x0D\\xD0\\xAD\\xBA\\1\\0\\0\\0",0],["isat","\\0",-1],["n0",8,8],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(8),'little'));c1,c2=int.from_bytes(f.read(2),'little'),int.from_bytes(f.read(2),'little')\nif c1>c2:return\nf.seek(c1*20,1)\nif f.read(5)!=b'\\x10\\0\\0\\0\\0' or f.read(1)[0]>1 or f.read(1)[0]:return\nf.seek(1,1);return sum(f.read(4))and sum(f.read(4))"]],
+        "d":[["isat","\\x0D\\xD0\\xAD\\xBA\\1\\0\\0\\0",0],["isat","\\0",-1],["n0",8,8],["py","f.seek(8);f.seek(f.readi(8,'<'));c1,c2=f.readi(2,'<'),f.readi(2,'<')\nif c1>c2:return\nf.skip(c1*20)\nif f.read(5)!=b'\\x10\\0\\0\\0\\0' or f.readi(1)>1 or f.readi(1):return\nf.skip(1);return f.readi(4)and f.readi(4)"]],
         "rs":"RTX Remix Package","s":1
     },
     {
@@ -704,43 +707,43 @@
         "rs":"Monolith Productions LTAR","s":1
     },
     {
-        "d":[["s%",2048],["isat","LF",0],["n0",2,2],["n0",4,4],["py","f=open(inp,'rb');f.seek(2);c=4+int.from_bytes(f.read(2),'little')*8;return (c+2047)//2048==int.from_bytes(f.read(4),'little')"]],
+        "d":[["s%",2048],["isat","LF",0],["n0",2,2],["n0",4,4],["py","f.seek(2);c=4+f.readi(2,'<')*8;return (c+2047)//2048==f.readi(4,'<')"]],
         "rs":"Michigan: Report From Hell LF"
     },
     {
-        "d":[["s%",16],["size",[32,16777215]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');s=4+int.from_bytes(f.read(4),'little')*8;o=int.from_bytes(f.read(4),'little')\nif (s+(-s%16))!=o:return\nfs=int.from_bytes(f.read(4),'little')\nif (o+fs)!=int.from_bytes(f.read(4),'little'):return\nf.seek(s);return not sum(f.read(-s%16))"]],
+        "d":[["s%",16],["size",[32,16777215]],["n0",4,0],["n0",4,4],["py","s=4+f.readi(4,'<')*8;o=f.readi(4,'<')\nif (s+(-s%16))!=o:return\nfs=f.readi(4,'<')\nif (o+fs)!=f.readi(4,'<'):return\nf.seek(s);return not sum(f.read(-s%16))"]],
         "rs":"Michigan: Report From Hell BIN"
     },
     {
-        "d":[["isat","LF 2",0],["isat","\\x10\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');f.seek(16);fo=int.from_bytes(f.read(4),'little');return o==fo and (16+c*8)==(o<<2)"]],
+        "d":[["isat","LF 2",0],["isat","\\x10\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["py","f.seek(4);o=f.readi(4,'<');c=f.readi(4,'<');f.seek(16);fo=f.readi(4,'<');return o==fo and(16+c*8)==(o<<2)"]],
         "rs":"Contact File Data","s":1
     },
     {
-        "d":[["isat","NFA0\\1\\0\\0\\0",0],["n0",4,8],["isat","\\0",7],["py","f=open(inp,'rb');f.seek(8);return int.from_bytes(f.read(4),'little')<65536"]],
+        "d":[["isat","NFA0\\1\\0\\0\\0",0],["n0",4,8],["isat","\\0",7],["py","f.seek(8);return f.readi(4,'<')<65536"]],
         "rs":"Nemea File Archive","s":1
     },
     {
-        "d":[["isat","PACK",0],["n0",4,4],["str0",8,64,5],["n0",4,72],["n0",4,76],["n0",4,80],["n0",4,84],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little')*80+8;f.seek(80);return (c+-c%256)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","PACK",0],["n0",4,4],["str0",8,64,5],["n0",4,72],["n0",4,76],["n0",4,80],["n0",4,84],["py","f.seek(4);c=f.readi(4,'<')*80+8;f.seek(80);return(c+-c%256)==f.readi(4,'<')"]],
         "rs":"D.N.A. Softwares Pack"
     },
     {
-        "d":[["s%",8],["isat","LZSS",0],["n0",4,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);d=int.from_bytes(f.read(4),'little')+8;return (d+-d%8)==s"]],
+        "d":[["s%",8],["isat","LZSS",0],["n0",4,4],["py","f.seek(4);d=f.readi(4,'<')+8;return(d+-d%8)==fsz"]],
         "rs":"D.N.A. Softwares LZSS"
     },
     {
-        "d":[["size",[532,4294967295]],["isat","./",4],["isat","./",264],["n0",4,0],["str0e",4,256,7],["n0",4,260],["str0e",264,256,7],["n0",4,520],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=4+260*c\nfor _ in range(c):\n try:asrt(f.read(256).split(b'\\0')[0].decode('ascii').isprintable())\n except:return\n s+=int.from_bytes(f.read(4),'little')\nreturn s==f.seek(0,2)"]],
+        "d":[["size",[532,4294967295]],["isat","./",4],["isat","./",264],["n0",4,0],["str0e",4,256,7],["n0",4,260],["str0e",264,256,7],["n0",4,520],["py","c=f.readi(4,'<');s=4+260*c\nfor _ in range(c):\n try:asrt(f.read(256).split(b'\\0')[0].decode('ascii').isprintable())\n except:return\n s+=f.readi(4,'<')\nreturn s==fsz"]],
         "rs":"@N-Factory DAT"
     },
     {
-        "d":[["isat","HTSW",0],["isatS","\\0",8,8],["n0",4,4],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(20);l=int.from_bytes(f.read(4),'little')\nfor _ in range(c-1):\n if int.from_bytes(f.read(4),'little')!=l:return\n l=int.from_bytes(f.read(4),'little')\nreturn l==s"]],
+        "d":[["isat","HTSW",0],["isatS","\\0",8,8],["n0",4,4],["n0",4,16],["n0",4,20],["py","f.seek(4);c=f.readi(4,'<');f.seek(20);l=f.readi(4,'<')\nfor _ in range(c-1):\n if f.readi(4,'<')!=l:return\n l=f.readi(4,'<')\nreturn l==fsz"]],
         "rs":"UTG Software DDD","s":1
     },
     {
-        "d":[["isat","BPK0",0],["isatS","\\0",2028,20],["isat","BDL0",2048],["isatS","\\0",20,2060],["isat","\\0",-1],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);s1,o1,s2,o2=[int.from_bytes(f.read(4),'little') for _ in range(4)]\nif (s1+o1)!=s and(s2+o2)!=o1:return\nf.seek(o1+4)\nif f.read(2)!=b'\\x18\\0':return\nf.seek(2,1);return int.from_bytes(f.read(4),'little')==o2 and not sum(f.read(8))and f.read(4)==b'.\\0\\0\\0'"]],
+        "d":[["isat","BPK0",0],["isatS","\\0",2028,20],["isat","BDL0",2048],["isatS","\\0",20,2060],["isat","\\0",-1],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f.seek(4);s1,o1,s2,o2=[f.readi(4,'<') for _ in range(4)]\nif (s1+o1)!=fsz and(s2+o2)!=o1:return\nf.seek(o1+4)\nif f.read(2)!=b'\\x18\\0':return\nf.skip(2);return f.readi(4,'<')==o2 and not f.readi(8)and f.read(4)==b'.\\0\\0\\0'"]],
         "rs":"Bandai PKG","s":1
     },
     {
-        "d":[["isat","BARC\\1\\0\\1\\0\\x20\\0\\0\\0",0],["isat","\\x0C\\0\\0\\0",20],["isatS","\\0",4,28],["n0",4,12],["n0",4,16],["n0",4,24],["n0",2,32],["n0",4,-4],["n0",4,-8],["n0",4,-12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return int.from_bytes(f.read(4),'little')==(int.from_bytes(f.read(4),'little')*int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","BARC\\1\\0\\1\\0\\x20\\0\\0\\0",0],["isat","\\x0C\\0\\0\\0",20],["isatS","\\0",4,28],["n0",4,12],["n0",4,16],["n0",4,24],["n0",2,32],["n0",4,-4],["n0",4,-8],["n0",4,-12],["py","f.seek(12);return f.readi(4,'<')==(f.readi(4,'<')*f.readi(4,'<')+f.readi(4,'<'))==fsz"]],
         "rs":"Bandai ARC","s":1
     },
     {
@@ -748,11 +751,11 @@
         "rs":"TotemTech Data","s":1
     },
     {
-        "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'big')+8)==s"]],
+        "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f.seek(4);return (f.readi(4,'>')+8)==fsz"]],
         "rs":"Lucas Arts Bundle"
     },
     {
-        "d":[["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(-4,1);o=int.from_bytes(f.read(4),'little')\nif o%4 or o>=s or o<32:return\nf.seek(s-o)\nif f.read(4)!=b'\\x03\\0\\0\\0':return\nc=int.from_bytes(f.read(4),'little');f.seek(4,1)\nif sum(f.read(4))or(c*20+12)!=o:return\nus=int.from_bytes(f.read(4),'big');f.seek(4,1);s=int.from_bytes(f.read(4),'big');f.seek(4,1);d=int.from_bytes(f.read(4),'big')-((s or us)>>4);return d==0 or 0<d<16"]],
+        "d":[["n0",4,-4],["py","f.seek(-4,2);o=f.readi(4,'<')\nif o%4 or o>=fsz or o<32:return\nf.seek(fsz-o)\nif f.read(4)!=b'\\x03\\0\\0\\0':return\nc=f.readi(4,'<');f.skip(4)\nif f.readi(4)or(c*20+12)!=o:return\nus=f.readi(4,'>');f.skip(4);s=f.readi(4,'>');f.skip(4);d=f.readi(4,'>')-((s or us)>>4);return d<16"]],
         "rs":"L.A. Noire BIG"
     },
     {
@@ -764,7 +767,7 @@
         "rs":"Nintendo ASH0","s":1
     },
     {
-        "d":[["isatS","\\0",24,-28],["n0",4,-32],["n0",4,-4],["contain","END \\0\\0\\0\\0\\0\\0\\0\\0",[-64,32]],["py","f=open(inp,'rb');f.seek(0,2);f.seek(-4,1);b=f.read(4);f.seek(-32,1)\nif b!=f.read(4):return\nf.seek(int.from_bytes(b,'little'));return f.read(4)==b'STR ' and sum(f.read(4))"]],
+        "d":[["isatS","\\0",24,-28],["n0",4,-32],["n0",4,-4],["contain","END \\0\\0\\0\\0\\0\\0\\0\\0",[-64,32]],["py","f.seek(-4,2);b=f.read(4);f.seek(-32,1)\nif b!=f.read(4):return\nf.seek(int.from_bytes(b,'little'));return f.read(4)==b'STR ' and f.readi(4)"]],
         "rs":"7 Studios FS"
     },
     {
@@ -781,11 +784,11 @@
         "rs":"XNB Dictionary","s":1
     },
     {
-        "d":[["n0",1,0],["isat","\\0",1],["isat","\\0",-1],["str0e",2,32,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');b=b''\nfor _ in range(c):\n t=b''\n while 1:\n  b=f.read(1)\n  if not b:return\n  if b==b'\\0':break\n  t+=b\n try:t[1:].decode('ascii')\n except:return\nreturn not f.read(1)"]],
+        "d":[["n0",1,0],["isat","\\0",1],["isat","\\0",-1],["str0e",2,32,3],["py","c=f.readi(2,'<');b=b''\nfor _ in range(c):\n t=b''\n while 1:\n  b=f.read(1)\n  if not b:return\n  if b==b'\\0':break\n  t+=b\n try:t[1:].decode('ascii')\n except:return\nreturn not f.read(1)"]],
         "rs":"ID String0 Count8 Data"
     },
     {
-        "d":[["n0",3,0],["n0",2,3],["py","f=open(inp,'rb');f.seek(3);c=int.from_bytes(f.read(2),'little');o=int.from_bytes(f.read(2),'little');return (5+c*2)==o"]],
+        "d":[["n0",3,0],["n0",2,3],["py","f.seek(3);c=f.readi(2,'<');o=f.readi(2,'<');return (5+c*2)==o"]],
         "rs":"1941 Frozen Front Lang"
     },
     {
@@ -793,67 +796,67 @@
         "rs":"1941 Frozen Front Data","s":1
     },
     {
-        "d":[["size",[0,32768]],["py","if getsize(inp)==0:\n if not exists(inp+'0') or not exists(inp+'1'):return\n inp+='0'\nf=open(inp,'rb')\nif f.read(1)[0]:fs=int.from_bytes(f.read(2),'big')\nelif f.read(1)[0]:return\nelse:fs=-1\nif sum(f.read(2))or not sum(f.read(6)):return\ns=int.from_bytes(f.read(2),'big')\nif fs>=0 and s!=fs:return\nf.seek(s,1)\nb=f.read(2)\nreturn b and not b[0]and b[1]in(0,1,2,4)"]],
+        "d":[["size",[0,32768]],["py","if fsz==0:\n if not exists(inp+'0') or not exists(inp+'1'):return\n inp+='0'\nf=open(inp,'rb')\nif f.readi(1):fs=f.readi(2,'>')\nelif f.readi(1):return\nelse:fs=-1\nif f.readi(2)or not f.readi(6):return\ns=f.readi(2,'>')\nif fs>=0 and s!=fs:return\nf.skip(s)\nb=f.read(2)\nreturn b and not b[0]and b[1]in(0,1,2,4)"]],
         "rs":"Peggle Data"
     },
     {
-        "d":[["size",[8,32768]],["n0",2,0],["n0",1,-1],["n0",1,-2],["py","f=open(inp,'rb')\nwhile 1:\n s=f.read(2)\n if not s:break \n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn True"]],
+        "d":[["size",[8,32768]],["n0",2,0],["n0",1,-1],["n0",1,-2],["py","while 1:\n s=f.read(2)\n if not s:break \n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn True"]],
         "rs":"String16BE Data"
     },
     {
-        "d":[["size",[71,67484]],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');o=int.from_bytes(f.read(2),'little');s=f.seek(0,2)\nif s<(o+2+67):return\nf.seek(o);return (int.from_bytes(f.read(2),'little')+f.tell())==s"]],
+        "d":[["size",[71,67484]],["n0",2,0],["n0",2,2],["py","o=f.readi(2,'<')\nif fsz<(o+2+67):return\nf.seek(o);return (f.readi(2,'<')+f.tell())==fsz"]],
         "rs":"Air Adrenaline Data 1"},{
-        "d":[["size",[19,74883]],["n0",1,0],["n0",2,1],["n0",2,3],["py","f=open(inp,'rb');c=f.read(1)[0];o=int.from_bytes(f.read(2),'little')\nif (c*2+1)!=o:return\ns=f.seek(0,2);f.seek(c*2+1);return (int.from_bytes(f.read(2),'little')+f.tell()-1)==s"]],
+        "d":[["size",[19,74883]],["n0",1,0],["n0",2,1],["n0",2,3],["py","c=f.readi(1);o=f.readi(2,'<')\nif (c*2+1)!=o:return\nf.seek(c*2+1);return (f.readi(2,'<')+f.tell()-1)==fsz"]],
         "rs":"Air Adrenaline Data 2" 
     },
     {
-        "d":[["size",[10,65535]],["isat","\\0",-1],["n0",2,0],["n0",1,2],["n0",1,8],["n0",1,-2],["py","f=open(inp,'rb');s=int.from_bytes(f.read(2),'big')+1;c=f.read(1)[0];r=f.seek(0,2);return r==s and (8+c*3)<=r"]],
+        "d":[["size",[10,65535]],["isat","\\0",-1],["n0",2,0],["n0",1,2],["n0",1,8],["n0",1,-2],["py","s=f.readi(2,'>')+1;c=f.readi(1);return fsz==s and (8+c*3)<=fsz"]],
         "rs":"Karma Studios Lang"
     },
     {
-        "d":[["isat","\\0\\0\\0\\x08",0],["n0",4,4],["str0e",8,24,5],["py","f=open(inp,'rb');f.seek(4);es=int.from_bytes(f.read(4),'big');f.seek(32)\nif es%32 or int.from_bytes(f.read(4),'big')!=(8+es):return\ns=f.seek(0,2);f.seek(es);return (int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big'))==s"]],
+        "d":[["isat","\\0\\0\\0\\x08",0],["n0",4,4],["str0e",8,24,5],["py","f.seek(4);es=f.readi(4,'>');f.seek(32)\nif es%32 or f.readi(4,'>')!=(8+es):return\nf.seek(es);return (f.readi(4,'>')+f.readi(4,'>'))==fsz"]],
         "rs":"Cannons Tournament PAK"
     },
     {
-        "d":[["isat","\\1\\0",2],["isat","\\2\\0",10],["n0",2,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');return (c*8+2)==f.seek(0,2)"]],
+        "d":[["isat","\\1\\0",2],["isat","\\2\\0",10],["n0",2,0],["py","c=f.readi(2,'<');return (c*8+2)==fsz"]],
         "rs":"Doom Database"
     },
     {
-        "d":[["size",[36,32768]],["s%",4],["n0",4,0],["py","f=open(inp,'rb');es=int.from_bytes(f.read(4),'little');return (es+4)==f.seek(0,2) and not es%32"]],
+        "d":[["size",[36,32768]],["s%",4],["n0",4,0],["py","es=f.readi(4,'<');return (es+4)==fsz and not es%32"]],
         "rs":"Doom Palettes"
     },
     {
-        "d":[["isat","\\0\\0",0],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');return (4+c*4+sum(int.from_bytes(f.read(4),'big')for _ in range(c)))==f.seek(0,2)"]],
+        "d":[["isat","\\0\\0",0],["n0",4,0],["n0",4,4],["py","c=f.readi(4,'>');return (4+c*4+sum(f.readi(4,'>')for _ in range(c)))==fsz"]],
         "rs":"MediaMobile PAK"
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif o<8 or(o+67)>s:return\nf.seek(o-4);return int.from_bytes(f.read(4),'big')==s"]],
+        "d":[["n0",4,0],["n0",4,4],["py","o=f.readi(4,'>')\nif o<8 or(o+67)>fsz:return\nf.seek(o-4);return f.readi(4,'>')==fsz"]],
         "rs":"Taiko no Tatsujin Data 1"
     },
     {
-        "d":[["size",[5,16777215]],["n0",4,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=z=0\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
+        "d":[["size",[5,16777215]],["n0",4,0],["py","c=z=0\nwhile neof(f):\n d=f.read(4)\n if len(d)!=4:return\n d=int.from_bytes(d,'big')\n if (f.tell()+d)>fsz:return\n f.seek(d,1);c+=1\nreturn c>1"]],
         "rs":"Taiko no Tatsujin Data 2"},{
-        "d":[["size",[5,1048575]],["n0",2,0],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0);c=z=0\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if not d:zs+=1\n else:zs=0\n if zs>2 or(f.tell()+d)>s:return\n f.seek(d,1);c+=1\nreturn c>1"]],
+        "d":[["size",[5,1048575]],["n0",2,0],["py","c=z=0\nwhile neof(f):\n d=f.read(2)\n if len(d)!=2:return\n d=int.from_bytes(d,'big')\n if not d:zs+=1\n else:zs=0\n if zs>2 or(f.tell()+d)>fsz:return\n f.seek(d,1);c+=1\nreturn c>1"]],
         "rs":"Taiko no Tatsujin Data 3"
     },
     {
-        "d":[["size",[8,65535]],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');o=int.from_bytes(f.read(2),'little');s=f.seek(0,2)\nif o<2:return\nf.seek(o-2);return int.from_bytes(f.read(2),'little')==s"]],
+        "d":[["size",[8,65535]],["n0",2,0],["n0",2,2],["py","o=f.readi(2,'<');\nif o<2:return\nf.seek(o-2);return f.readi(2,'<')==fsz"]],
         "rs":"THQ Worms Resources"
     },
     {
-        "d":[["size",[19,32768]],["isat","\\0\\1",0],["n0",2,2],["py","f=open(inp,'rb')\nwhile 1:\n c=f.read(2)\n if c==b'\\0\\0':break\n if c!=b'\\0\\1':return\n s=f.read(2)\n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn f.tell()>10"]],
+        "d":[["size",[19,32768]],["isat","\\0\\1",0],["n0",2,2],["py","while 1:\n c=f.read(2)\n if c==b'\\0\\0':break\n if c!=b'\\0\\1':return\n s=f.read(2)\n if len(s)!=2:return\n s=int.from_bytes(s,'big')\n b=f.read(s)\n if len(b)!=s:return\n try:b.decode('utf-8')\n except:return\nreturn f.tell()>10"]],
         "rs":"THQ Worms UTF Strings"
     },
     {
-        "d":[["size",[19,268435455]],["isat","\\0\\0\\0\\0",7],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nif (int.from_bytes(f.read(4),'big')+4)!=s or f.read(1)[0]<2:return\nf.seek(11);b=f.read(4);f.seek(17);return b==f.read(4)"]],
+        "d":[["size",[19,268435455]],["isat","\\0\\0\\0\\0",7],["n0",4,0],["n0",1,4],["py","f.seek(0)\nif (f.readi(4,'>')+4)!=fsz or f.readi(1)<2:return\nf.seek(11);b=f.read(4);f.seek(17);return b==f.read(4)"]],
         "rs":"X-Files Resources"
     },
     {
-        "d":[["size",[44,268435455]],["isatS","\\0",24,8],["n0",4,0],["n0",2,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(2),'little');s=f.seek(0,2)\nif (o+c*12)!=s:return\nf.seek(o);return f.read(4)==b'\\x20\\0\\0\\0'"]],
+        "d":[["size",[44,268435455]],["isatS","\\0",24,8],["n0",4,0],["n0",2,4],["py","o=f.readi(4,'<');c=f.readi(2,'<')\nif (o+c*12)!=fsz:return\nf.seek(o);return f.read(4)==b'\\x20\\0\\0\\0'"]],
         "rs":"Atari Masterpieces Resources"
     },
     {
-        "d":[["size",[14,32768]],["n0",4,0],["n0",4,4],["n0",4,8],["isat","\\0",-1],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little')\nif (c*4+4)!=o:return\ns=f.seek(0,2);f.seek(o-4);o=int.from_bytes(f.read(4),'little');return (o+6)<s and (o+4+64)>s"]],
+        "d":[["size",[14,32768]],["n0",4,0],["n0",4,4],["n0",4,8],["isat","\\0",-1],["py","c=f.readi(4,'<');o=f.readi(4,'<')\nif (c*4+4)!=o:return\nf.seek(o-4);o=f.readi(4,'<');return (o+6)<fsz and (o+4+64)>fsz"]],
         "rs":"Atari Masterpieces Strings"
     },
     {
@@ -862,15 +865,15 @@
     },
     {
         "d":[["isat","PMAN",0],["isat","Copyright (c) ",8],["isin",["19","20"],22],["isat"," Torus Games Pty. Ltd.",26],["isatS","\\0",20,48],["isat","\\0\\0\\0\\0",76],["n0",4,4],["n0",4,68],["n0",4,72],
-             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(68);o=int.from_bytes(f.read(4),'little')\nif (64+16*c)!=o:return\nf.seek(o-12);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+             ["py","f.seek(4);c=f.readi(4,'<');f.seek(68);o=f.readi(4,'<')\nif (64+16*c)!=o:return\nf.seek(o-12);return (f.readi(4,'<')+f.readi(4,'<'))==fsz"]],
         "rs":"Torus Ashen PackFile","s":1
     },
     {
-        "d":[["isat","ZL",0],["isat","x",5],["py","f=open(inp,'rb');f.seek(5);return not int.from_bytes(f.read(2),'big')%31"]],
+        "d":[["isat","ZL",0],["isat","x",5],["py","f.seek(5);return not f.readi(2,'>')%31"]],
         "rs":"Torus Ashen ZLib","s":1
     },
     {
-        "d":[["size",[6,1485759]],["n0",4,0],["isat","\\0\\0",-2],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,-4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');d=f.read()[:-2].rsplit(b'\\0\\0')\nif len(d)!=c:return\ntry:b''.join(d).decode('utf-16le')\nexcept:return\nreturn True"]],
+        "d":[["size",[6,1485759]],["n0",4,0],["isat","\\0\\0",-2],["n0",2,4],["n0",2,6],["n0",2,8],["n0",2,-4],["py","c=f.readi(4,'<');d=f.read()[:-2].rsplit(b'\\0\\0')\nif len(d)!=c:return\ntry:b''.join(d).decode('utf-16le')\nexcept:return\nreturn True"]],
         "rs":"Torus Ashen Strings"
     },
     {
@@ -878,9 +881,9 @@
         "rs":"StormCE Library VFS","s":1
     },
     {
-        "d":[["isat","iiii",0],["isat","x",20],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little')+20;return f.seek(0,2)in(s,s+1024)"]],
+        "d":[["isat","iiii",0],["isat","x",20],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f.seek(4);s=f.readi(4,'<')+20;return fszin(s,s+1024)"]],
         "rs":"StormCE IIII","s":1},{
-        "d":[["isat","Yiii",0],["isat","x",12],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);fs=int.from_bytes(f.read(4),'little');return (s-256)<=(fs+12)<=s"]],
+        "d":[["isat","Yiii",0],["isat","x",12],["n0",4,4],["n0",4,8],["py","f.seek(8);fs=f.readi(4,'<');return (fsz-256)<=(fs+12)<=fsz"]],
         "rs":"StormCE IIII","s":1},{
         "d":[["isat","piii",0],["isat","x",16],["n0",4,4],["n0",4,8],["n0",4,12]],
         "rs":"StormCE IIII","s":1
@@ -929,7 +932,7 @@
     },
     {
         "rq":"CUE+BIN",
-        "d":["py","import re\nf = re.findall(r'\\n  TRACK \\d+ (.+)',readfile(inp,'r'))\nreturn len(f) == 3 and f[0] == 'MODE1/2352' and f[1] == 'AUDIO' and f[2] == 'MODE1/2352'"],
+        "d":["py","import re;f=re.findall(r'\\n  TRACK \\d+ (.+)',readfile(inp,'r'));return len(f)==3 and f[0]=='MODE1/2352' and f[1]=='AUDIO' and f[2]=='MODE1/2352'"],
         "rs":"GD-ROM CUE+BIN","s":1
     },
     {
@@ -958,11 +961,11 @@
         "rs":"NCCH CFA","s":1
     },
     {
-        "d":[["isat","PREF\\2\\0\\0\\0",0],["py","f=open(inp,'rb');f.seek(8);c=sum(int.from_bytes(f.read(4),'little') for _ in range(4));so=int.from_bytes(f.read(4),'little');return (28+c*8)==so"]],
+        "d":[["isat","PREF\\2\\0\\0\\0",0],["py","f.seek(8);c=sum(f.readi(4,'<')for _ in range(4));so=f.readi(4,'<');return (28+c*8)==so"]],
         "rs":"Sky CoTL Preferences","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0",1],["isin",["\\1","\\2","\\3"],0],["n0",4,4],["n0",4,8],["str0e",12,64,10],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);d=int.from_bytes(f.read(4),'little');f.seek(d-5);o=int.from_bytes(f.read(4),'little');f.seek(5,1);return 12+d+o+int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","\\0\\0\\0",1],["isin",["\\1","\\2","\\3"],0],["n0",4,4],["n0",4,8],["str0e",12,64,10],["py","f.seek(8);d=f.readi(4,'<');f.seek(d-5);o=f.readi(4,'<');f.seek(5,1);return 12+d+o+f.readi(4,'<')==fsz"]],
         "rs":"Trine FBQ","s":1
     },
     {
@@ -974,11 +977,11 @@
         "rs":"Wangan Midnight TOC+DAT","s":1
     },
     {
-        "d":[["s%",16],["isat","\\0\\0\\0\\0",16],["isat","\\0\\0\\0\\0",28],["n0",4,0],["n0",4,12],["n0",4,20],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');f.seek(8,1);s=int.from_bytes(f.read(4),'big');return (16+c*16)==f.seek(0,2)and exists(splitext(inp)[0]+'.dat')and getsize(splitext(inp)[0]+'.dat')==s"]],
+        "d":[["s%",16],["isat","\\0\\0\\0\\0",16],["isat","\\0\\0\\0\\0",28],["n0",4,0],["n0",4,12],["n0",4,20],["py","c=f.readi(4,'>');f.skip(8);s=f.readi(4,'>');return (16+c*16)==fsz and exists(splitext(inp)[0]+'.dat')and getsize(splitext(inp)[0]+'.dat')==s"]],
         "rs":"Import Tuner Challenge TOC+DAT","s":1
     },
     {
-        "d":[["s%",16],["isat","arh2",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",8,16],["py","if not exists(splitext(inp)[0]+'.ard'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*16+16)==s"]],
+        "d":[["s%",16],["isat","arh2",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",8,16],["py","if not exists(splitext(inp)[0]+'.ard'):return\nf.seek(4);return (f.readi(4,'<')*16+16)==fsz"]],
         "rs":"Xenoblade Chronicles X DE ARH2","s":1
     },
     {
@@ -986,7 +989,7 @@
         "rs":"CSI NY GRF","s":1
     },
     {
-        "d":[["s%",4],["isatS","\\0",4,8],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');c=int.from_bytes(f.read(4),'little');f.seek(o+3)\nif f.read(1)!=b'\\0':return\nc1=int.from_bytes(f.read(4),'little');f.seek(c1*4,1);return (c1+int.from_bytes(f.read(4),'little'))==c"]],
+        "d":[["s%",4],["isatS","\\0",4,8],["n0",4,0],["n0",4,4],["py","o=f.readi(4,'<');c=f.readi(4,'<');f.seek(o+3)\nif f.read(1)!=b'\\0':return\nc1=f.readi(4,'<');f.skip(c1*4);return (c1+f.readi(4,'<'))==c"]],
         "rs":"Harry Potter and the Deathly Hallows BIN"
     },
     {
@@ -1011,16 +1014,16 @@
     },
         {
             "rq":"HAL XBIN",
-            "d":[["contain","YAML",[16,8]],["py","f=open(inp,'rb');f.seek(4);e={18:'big',52:'little'}[f.read(2)[0]];v=f.read(2)[0];f.seek(20 if v>=4 else 16);return f.read(4)==b'YAML' and int.from_bytes(f.read(4),e)in{2,4,5}and int.from_bytes(f.read(4),e)in{1,2,3,4,5,6}"]],
+            "d":[["contain","YAML",[16,8]],["py","f.seek(4);e={18:'>',52:'<'}[f.read(2)[0]];v=f.read(2)[0];f.seek(20 if v>=4 else 16);return f.read(4)==b'YAML' and f.readi(4,e)in{2,4,5}and f.readi(4,e)in{1,2,3,4,5,6}"]],
             "rs":"HAL XBIN YAML","s":1
         },
     {"rq":"HAL XBIN","rs":"HAL XBIN","s":1},
     {
-        "d":[["isin",["\\x04\\x22\\x4D\\x18","\\x28\\xB5\\x2F\\xFD"],4],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');return s>=(f.seek(0,2)-0x14)"]],
+        "d":[["isin",["\\x04\\x22\\x4D\\x18","\\x28\\xB5\\x2F\\xFD"],4],["n0",4,0],["py","s=f.readi(4,'<');return s>=(fsz-20)"]],
         "rs":"HAL Switch CMP"
     },
     {
-        "d":[["ext",".dat"],["s%",64],["n0",4,56],["n0",4,60],["py","b=dirname(inp)+'/'\nif not exists(b+'info.dat')or not exists(b+'game.dat'):return\nf=open(b+'info.dat','rb');k=f.read(0x10);e=sum(k)\ndef r(n):\n p=f.tell();d=f.read(n)\n if not e:return d\n return bytes(((~(x>>4|x<<4)&255)-k[(ix+p)%16])&255 for ix,x in enumerate(d))\nreturn not sum(r(32)) and not getsize(b+'game.dat')%(int.from_bytes(r(4),'big')or 128)and (int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big'))*64==getsize(b+'info.dat')"]],
+        "d":[["ext",".dat"],["s%",64],["n0",4,56],["n0",4,60],["py","b=dirname(inp)+'/'\nif not exists(b+'info.dat')or not exists(b+'game.dat'):return\nf=open(b+'info.dat','rb');k=f.read(16);e=sum(k)\ndef r(n):\n p=f.tell();d=f.read(n)\n if not e:return d\n return bytes(((~(x>>4|x<<4)&255)-k[(ix+p)%16])&255 for ix,x in enumerate(d))\nreturn not sum(r(32)) and not getsize(b+'game.dat')%(int.from_bytes(r(4),'big')or 128)and (int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big')+int.from_bytes(r(4),'big'))*64==getsize(b+'info.dat')"]],
         "rs":"Dr. Luigi INFO+GAME.dat","s":1
     },
     {
@@ -1028,11 +1031,11 @@
         "rs":"Seal Online EDT","s":1
     },
     {
-        "d":[["isat","GDAT",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');return (c*8+8)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","GDAT",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(4);c=f.readi(4,'<');return (c*8+8)==f.readi(4,'<')"]],
         "rs":"Death End re:Quest 2 GDAT","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0\\1",40],["isat","BILZ",128],["isat","\\0\\0\\0\\x07\\x78",140],["isatS","\\0",24,16],["isatS","\\0",84,44],["n0",4,132],["n0",4,136],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(136);return (144+int.from_bytes(f.read(4),'big'))==s"]],
+        "d":[["isat","\\0\\0\\0\\1",40],["isat","BILZ",128],["isat","\\0\\0\\0\\x07\\x78",140],["isatS","\\0",24,16],["isatS","\\0",84,44],["n0",4,132],["n0",4,136],["py","f.seek(136);return (144+f.readi(4,'>'))==fsz"]],
         "rs":"Death End re:Quest 2 ZLIB","s":1
     },
     {
@@ -1044,11 +1047,11 @@
         "rs":"Nintendo MSBT","s":1
     },
     {
-        "d":[["isat","DAT\\0",0],["isatS","\\0",4,28],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nfor _ in range(5):\n b=int.from_bytes(f.read(4),'big')\n if b<32 or b>=s:return\nreturn True"]],
+        "d":[["isat","DAT\\0",0],["isatS","\\0",4,28],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["py","f.seek(4)\nfor _ in range(5):\n b=f.readi(4,'>')\n if b<32 or b>=fsz:return\nreturn True"]],
         "rs":"Star Fox DAT"
     },
     {
-        "d":[["s%",16],["isatS","\\xFF",4,20],["n0",4,0],["n0",4,8],["py","f=open(inp,'rb');f.seek(4);xc=int.from_bytes(f.read(4),'big');so=int.from_bytes(f.read(4),'big');xl=12+xc*12;xl+=-xl%8;f.seek(xl);return xl==so and not sum(f.read(8))"]],
+        "d":[["s%",16],["isatS","\\xFF",4,20],["n0",4,0],["n0",4,8],["py","f.seek(4);xc=f.readi(4,'>');so=f.readi(4,'>');xl=12+xc*12;xl+=-xl%8;f.seek(xl);return xl==so and not f.readi(8)"]],
         "rs":"Nintendo Table"
     },
     {
@@ -1056,7 +1059,7 @@
         "rs":"Nintendo Message BMG","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["str0",16,12,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');f.seek(8);return (4+c*0x18)==int.from_bytes(f.read(4),'big')"]],
+        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["str0",16,12,4],["py","c=f.readi(4,'>');f.seek(8);return (4+c*0x18)==f.readi(4,'>')"]],
         "rs":"Nintendo Puzzle Archive"
     },
     {
@@ -1066,11 +1069,11 @@
     },
     {
         "d":[["isat","\\0\\0\\0",0],["isat","\\0\\0\\0",4],["isat","\\0\\0\\0\\0",12],["isat","\\0\\0\\0\\0",-4],["isin",["\\x01","\\x02","\\x03","\\x06","\\x07","\\x08","\\x09"],3],["isin",["\\x00","\\x01","\\x02","\\x03","\\x04","\\x05","\\x06","\\x07","\\x08","\\x09"],7],
-             ["py","f=open(inp,'rb');fs=f.seek(0,2);f.seek(8);fo=int.from_bytes(f.read(4),'big')\nif fo<8 or fo%0x10 or (fo+5)>fs:return\nf.seek(fo-8);return (int.from_bytes(f.read(4),'big')+5)<=fs"]],
+             ["py","f.seek(8);fo=f.readi(4,'>')\nif fo<8 or fo%16 or(fo+5)>fsz:return\nf.seek(fo-8);return (f.readi(4,'>')+5)<=fsz"]],
         "rs":"Nintendo Mario Party Message"
     },
     {
-        "d":[["isat",":",3],["n0",2,0],["str",2,4],["py","f=open(inp,'rb');s=int.from_bytes(f.read(2),'little');s=f.read(s);t=f.read(1)[0]\ntry:s=s.decode('utf-8')\nexcept:return\nif s[-1] in '\\\\/':return t==1\nreturn t==2"]],
+        "d":[["isat",":",3],["n0",2,0],["str",2,4],["py","s=f.read(f.readi(2,'<'));t=f.readi(1)\ntry:s=s.decode('utf-8')\nexcept:return\nif s[-1] in '\\\\/':return t==1\nreturn t==2"]],
         "rs":"Golden Tee Fore! BIG"
     },
     {
@@ -1082,15 +1085,15 @@
         "rs":"NitroARC","s":1
     },
     {
-        "d":[["s%",2048],["size",[4096,null]],["isat","ARC\\0\\0\\2\\0\\0",-2048],["isat","\\0\\x08\\0\\0",-2024],["isatS","\\0",2020,-2020],["isat","x",0],["n0",4,-2040],["n0",4,-2036],["n0",4,-2032],["n0",4,-2028],["py","f=open(inp,'rb');s=f.seek(-2048,2);f.seek(8,1);o=int.from_bytes(f.read(4),'little');f.seek(4,1);z=int.from_bytes(f.read(4),'little');f.seek(4,1);a=int.from_bytes(f.read(4),'little');return (o*a+z+-z%a)==s"]],
+        "d":[["s%",2048],["size",[4096,null]],["isat","ARC\\0\\0\\2\\0\\0",-2048],["isat","\\0\\x08\\0\\0",-2024],["isatS","\\0",2020,-2020],["isat","x",0],["n0",4,-2040],["n0",4,-2036],["n0",4,-2032],["n0",4,-2028],["py","s=f.seek(-2048,2);f.skip(8);o=f.readi(4,'<');f.skip(4);z=f.readi(4,'<');f.skip(4);a=f.readi(4,'<');return (o*a+z+-z%a)==s"]],
         "rs":"Cabela's Legendary Adventures ARC","s":1
     },
     {
-        "d":[["s%",8],["isat","\\x21\\xE0\\x7A\\x42\\xAE\\x3D\\x3A\\x02",-8],["py","return not (getsize(inp)-8)%2048"]],
+        "d":[["s%",8],["isat","\\x21\\xE0\\x7A\\x42\\xAE\\x3D\\x3A\\x02",-8],["py","return not (fsz-8)%2048"]],
         "rs":"Destroy All Humans! PKG","s":1
     },
     {
-        "d":[["isat","DAT\\0",0],["isat","\\x20\\0\\0\\0",8],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,32],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');return(o+c*4)==int.from_bytes(f.read(4),'little')and(o+c*8)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","DAT\\0",0],["isat","\\x20\\0\\0\\0",8],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,32],["py","f.seek(4);c=f.readi(4,'<');o=f.readi(4,'<');return(o+c*4)==f.readi(4,'<')and(o+c*8)==f.readi(4,'<')"]],
         "rs":"Transformers: Devastation DAT"
     },
     {
@@ -1098,7 +1101,7 @@
         "rs":"Transformers: Devastation BXM"
     },
     {
-        "d":[["isat","PACu",0],["isin",["\\0\\0\\0\\0","\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0","\\x04\\0\\0\\0","\\x05\\0\\0\\0","\\x06\\0\\0\\0","\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(s-4);i=int.from_bytes(f.read(4),'little');return (76*c*2)>=i and (i+16)<s"]],
+        "d":[["isat","PACu",0],["isin",["\\0\\0\\0\\0","\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0","\\x04\\0\\0\\0","\\x05\\0\\0\\0","\\x06\\0\\0\\0","\\x07\\0\\0\\0"],8],["n0",4,4],["n0",4,-4],["py","f.seek(4);c=f.readi(4,'<');f.seek(fsz-4);i=f.readi(4,'<');return (76*c*2)>=i and (i+16)<fsz"]],
         "rs":"Nexas New PAC","s":1
     },
     {
@@ -1110,77 +1113,81 @@
         "rs":"Konami Python 2 Compression"
     },
     {
-        "d":[["isat","\\xB8\\xBE\\x9F\\x0D",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.bin'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","\\xB8\\xBE\\x9F\\x0D",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.bin'):return\nf.seek(4);return f.readi(4,'<')==fsz"]],
         "rs":"Dotemu INF+BIN","s":1
     },
     {
-        "d":[["isat","HAB0",0],["isat","\\0\\0\\0\\0",12],["isat","\\0\\0\\0\\0",32],["n0",4,8],["n0",2,20],["n0",2,22],["n0",4,24],["n0",4,28],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","HAB0",0],["isat","\\0\\0\\0\\0",12],["isat","\\0\\0\\0\\0",32],["n0",4,8],["n0",2,20],["n0",2,22],["n0",4,24],["n0",4,28],["py","f.seek(8);return f.readi(4,'<')==fsz"]],
         "rs":"Typing of the Dead HAB","s":1
     },
     {
-        "d":[["s%",16],["size",[96,null]],["isat","SDF0",0],["isat","\\x80",12],["isat","\\x01\\0\\0\\x0A",-560],["isat","\\x01\\0\\0\\x80",-516],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif f.read(1)[0]&0xF0:return\nf.seek(8);c1=int.from_bytes(f.read(4),'big');f.seek(13);c2=int.from_bytes(f.read(3),'big');return (32+c1*48+c2*16+560)==s and int.from_bytes(f.read(2),'big')<=c1"]],
+        "d":[["s%",16],["size",[96,null]],["isat","SDF0",0],["isat","\\x80",12],["isat","\\x01\\0\\0\\x0A",-560],["isat","\\x01\\0\\0\\x80",-516],["n0",4,4],["n0",4,8],["py","f.seek(4)\nif f.readi(1)&0xF0:return\nf.seek(8);c1=f.readi(4,'>');f.seek(13);c2=f.readi(3,'>');return (32+c1*48+c2*16+560)==fsz and f.readi(2,'>')<=c1"]],
         "rs":"SDFTool SDF.bin","s":1
     },
     {
-        "d":[["isat","file",0],["isin",["\\1\\0\\0\\0","\\x03\\0\\0\\0"],4],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0","\\2\\0\\0\\0"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f=open(inp,'rb');f.seek(12);uc=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')*4+int.from_bytes(f.read(4),'little');f.seek(32);nl=int.from_bytes(f.read(4),'little');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
+        "d":[["isat","file",0],["isin",["\\1\\0\\0\\0","\\x03\\0\\0\\0"],4],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0","\\2\\0\\0\\0"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f.seek(12);uc=f.readi(4,'<')+f.readi(4,'<')+f.readi(4,'<')*4+f.readi(4,'<');f.seek(32);nl=f.readi(4,'<');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
         "rs":"Eutechnyx CDFILES.DAT+AR","s":1},{
-        "d":[["isat","file",0],["isin",["\\0\\0\\0\\1","\\0\\0\\0\\x03"],4],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\2"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f=open(inp,'rb');f.seek(12);uc=int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')*4+int.from_bytes(f.read(4),'big');f.seek(32);nl=int.from_bytes(f.read(4),'big');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
+        "d":[["isat","file",0],["isin",["\\0\\0\\0\\1","\\0\\0\\0\\x03"],4],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1","\\0\\0\\0\\2"],20],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["py","f.seek(12);uc=f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')*4+f.readi(4,'>');f.seek(32);nl=f.readi(4,'>');f.seek(48+uc);n=f.read(nl).rstrip(b'\\0')\ntry:n=n.decode('ascii')\nexcept:return\nreturn n and n.isprintable()and exists(dirname(inp)+'/'+basename(n))"]],
         "rs":"Eutechnyx CDFILES.DAT+AR","s":1
     },
     {
-        "d":[["isat","ARC0",0],["isat","\\xFF\\0\\0\\0",76],["isatS","\\0",12,64],["isat","\\0",-1],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(48+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (64+c*16+o+s+-s%1024)in{f.seek(0,2),f.seek(0,2)-1024}"]],
+        "d":[["isat","ARC0",0],["isat","\\xFF\\0\\0\\0",76],["isatS","\\0",12,64],["isat","\\0",-1],["n0",4,4],["py","f.seek(4);c=f.readi(4,'<');f.seek(48+c*16)\nif f.readi(4):return\no=f.readi(4,'<')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=f.readi(3,'>');return (64+c*16+o+s+-s%1024)in{fsz,fsz-1024}"]],
         "rs":"Eutechnyx ARC","s":1},{
-        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isatS","\\0",16,112],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(112+c*16)\nif sum(f.read(4)):return\no=int.from_bytes(f.read(4),'little')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=int.from_bytes(f.read(3),'big');return (128+c*16+o+s)==f.seek(0,2)"]],
+        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isatS","\\0",16,112],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f.seek(4);c=f.readi(4,'<');f.seek(112+c*16)\nif f.readi(4):return\no=f.readi(4,'<')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=f.readi(3,'>');return (128+c*16+o+s)==fsz"]],
         "rs":"Eutechnyx ARC","s":1},{
-        "d":[["s%",128],["isat","ARCN",0],["isat","\\0\\0\\0\\0\\xDE\\xC0\\xDE\\xC0",112],["n0",4,4],["n0",4,120],["n0",4,128],["py","f=open(inp,'rb');f.seek(120);s=int.from_bytes(f.read(4),'little');return s<int.from_bytes(f.read(4),'little')and(128+s+-s%128)==f.seek(0,2)"]],
+        "d":[["s%",128],["isat","ARCN",0],["isat","\\0\\0\\0\\0\\xDE\\xC0\\xDE\\xC0",112],["n0",4,4],["n0",4,120],["n0",4,128],["py","f.seek(120);s=f.readi(4,'<');return s<f.readi(4,'<')and(128+s+-s%128)==fsz"]],
         "rs":"Eutechnyx ARC","s":1
     },
     {
-        "d":[["isat","LUX!",48],["isatS","\\0",32,16],["n0",4,4],["n0",8,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*128+int.from_bytes(f.read(8),'little'))==s"]],
+        "d":[["isat","LUX!",48],["isatS","\\0",32,16],["n0",4,4],["n0",8,8],["py","f.seek(4);return (f.readi(4,'<')*128+f.readi(8,'<'))==fsz"]],
         "rs":"Batman Raw Thrills LUX","s":1
     },
     {
-        "d":[["isat","hsamxV4\\x12",48],["isat","\\x30\\0\\0\\0",24],["isatS","\\0",12,36],["isatS","\\0",4,64],["isatS","\\0",4,80],["n0",4,28],["n0",4,56],["n0",4,84],["py","f=open(inp,'rb');f.seek(24);o=int.from_bytes(f.read(4),'little');f.seek(o+8);s=int.from_bytes(f.read(4),'little');f.seek(8,1);uc=int.from_bytes(f.read(4),'little')+1;f.seek(12,1);c=804+uc*4+int.from_bytes(f.read(4),'little')*16;return (c+-c%16)in(s,s-16,s-32,s-48)"]],
+        "d":[["isat","hsamxV4\\x12",48],["isat","\\x30\\0\\0\\0",24],["isatS","\\0",12,36],["isatS","\\0",4,64],["isatS","\\0",4,80],["n0",4,28],["n0",4,56],["n0",4,84],["py","f.seek(24);o=f.readi(4,'<');f.seek(o+8);s=f.readi(4,'<');f.skip(8);uc=f.readi(4,'<')+1;f.skip(12);c=804+uc*4+f.readi(4,'<')*16;return (c+-c%16)in(s,s-16,s-32,s-48)"]],
         "rs":"Spider-Man 3 Pack","s":1
     },
     {
-        "d":[["isat","ARCPACK",0],["isin",["\\0","\\x17"],7],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return s==int.from_bytes(f.read(4),'little')"]],
+        "d":[["s%",2048],["isat","BIGB",0],["isat","\\x9D\\0\\0\\0",8],["n0",4,4],["n0",4,136],["n0",4,140],["str0",16,64,0],["str0",80,40,0],["str0",144,256,17]],
+        "rs":"EA BIGB","s":1
+    },
+    {
+        "d":[["isat","ARCPACK",0],["isin",["\\0","\\x17"],7],["n0",4,12],["n0",4,16],["n0",4,20],["py","f.seek(12);return fsz==f.readi(4,'<')"]],
         "rs":"PlayPond Pack","s":1
     },
     {
-        "d":[["isat","ConnectFile Version ",0],["isat",".",21],["n0",4,-4],["py","f=open(inp,'rb');k=int.from_bytes(f.read(4),'little');f.seek(20)\nif not(f.read(2)[:1]+f.read(2)).isdigit():return\nk^=0xFFFFFFFF;o=int.from_bytes(f.read(4),'little')^k;c=int.from_bytes(f.read(4),'little')^k;c=c*52+32;return (c+-c%2048)==o"]],
+        "d":[["isat","ConnectFile Version ",0],["isat",".",21],["n0",4,-4],["py","k=f.readi(4,'<');f.seek(20)\nif not(f.read(2)[:1]+f.read(2)).isdigit():return\nk^=0xFFFFFFFF;o=f.readi(4,'<')^k;c=f.readi(4,'<')^k;c=c*52+32;return (c+-c%2048)==o"]],
         "rs":"K2 ConnectFile","s":1
     },
     {
-        "d":[["isat","CSPUD",0],["n0",4,5],["n0",4,11],["py","f=open(inp,'rb');f.seek(5);c=int.from_bytes(f.read(4),'big');f.seek(11);return (9+c*6)==int.from_bytes(f.read(4),'big')"]],
+        "d":[["isat","CSPUD",0],["n0",4,5],["n0",4,11],["py","f.seek(5);c=f.readi(4,'>');f.seek(11);return (9+c*6)==f.readi(4,'>')"]],
         "rs":"Cause of Death EXP","s":1
     },
     {
-        "d":[["isat","\\x10\\0\\0\\0",12],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],24],["isatS","\\0",4,0],["isatS","\\0",4,16],["n0",4,4],["n0",4,8],["n0",4,20],["n0",4,28],["n0",4,36],["py","f=open(inp,'rb');f.seek(4);o=f.read(4);c=int.from_bytes(f.read(4),'little');f.seek(20);return o==f.read(4)and(16+c*16)==int.from_bytes(o,'little')"]],
+        "d":[["isat","\\x10\\0\\0\\0",12],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],24],["isatS","\\0",4,0],["isatS","\\0",4,16],["n0",4,4],["n0",4,8],["n0",4,20],["n0",4,28],["n0",4,36],["py","f.seek(4);o=f.read(4);c=f.readi(4,'<');f.seek(20);return o==f.read(4)and(16+c*16)==int.from_bytes(o,'little')"]],
         "rs":"MotoGP ARK"
     },
     {
-        "d":[["n0",4,0],["n0",4,20],["str0",4,16,5],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(20);return (4+c*24)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["n0",4,0],["n0",4,20],["str0",4,16,5],["py","c=f.readi(4,'<');f.seek(20);return (4+c*24)==f.readi(4,'<')"]],
         "rs":"Macross: Do You Remember Love? GKO"
     },
     {
-        "d":[["isat","\\0\\0",12],["isin",["\\0\\0","\\1\\0"],10],["n0",2,2],["n0",2,4],["n0",2,6],["n0",4,16],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(2),'little')*int.from_bytes(f.read(2),'little');f.seek(16);ds=int.from_bytes(f.read(4),'little');return s in{ds,ds*2}"]],
+        "d":[["isat","\\0\\0",12],["isin",["\\0\\0","\\1\\0"],10],["n0",2,2],["n0",2,4],["n0",2,6],["n0",4,16],["py","f.seek(4);s=f.readi(2,'<')*f.readi(2,'<');f.seek(16);ds=f.readi(4,'<');return s in{ds,ds*2}"]],
         "rs":"Macross: Do You Remember Love? PUD"
     },
     {
-        "d":[["s%",16],["isat","\\x07\\0\\0\\0",0],["isat","\\1\\0\\0\\0",12],["isatS","\\0",8,40],["isat","\\0",-1],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.000'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif s!=int.from_bytes(f.read(4),'little'):return\nc=int.from_bytes(f.read(4),'little');f.seek(16);return (4+c*28)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["s%",16],["isat","\\x07\\0\\0\\0",0],["isat","\\1\\0\\0\\0",12],["isatS","\\0",8,40],["isat","\\0",-1],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.000'):return\nf.seek(4)\nif fsz!=f.readi(4,'<'):return\nc=f.readi(4,'<');f.seek(16);return (4+c*28)==f.readi(4,'<')"]],
         "rs":"Robots BIN+000"
     },
     {
-        "d":[["isat","\\x03\\0\\0\\0",0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'little')\nif (8+c*26)>s:return\nf.seek(int.from_bytes(f.read(4),'little'),1);z=int.from_bytes(f.read(4),'little');f.seek(8,1);o=int.from_bytes(f.read(4),'little')\nif (8+c*26)>o or(o+z)>s:return\nf.seek(o-16);z=int.from_bytes(f.read(4),'little');f.seek(8,1);return (int.from_bytes(f.read(4),'little')+z)==s"]],
+        "d":[["isat","\\x03\\0\\0\\0",0],["n0",4,4],["n0",4,8],["py","f.seek(4);c=f.readi(4,'<')\nif (8+c*26)>fsz:return\nf.seek(f.readi(4,'<'),1);z=f.readi(4,'<');f.skip(8);o=f.readi(4,'<')\nif (8+c*26)>o or(o+z)>fsz:return\nf.seek(o-16);z=f.readi(4,'<');f.skip(8);return (f.readi(4,'<')+z)==fsz"]],
         "rs":"Tom Clancy's Ghost Recon GLB"
     },
     {
-        "d":[["isat","\\0\\0",8],["isatS","\\0",16,16],["isin",["NNNN","ZZZ4"],56],["n0",1,6],["n0",4,32],["n0",2,38],["n0",4,40],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=f.read(3);f.seek(32);return (32+int.from_bytes(f.read(4),'little'))==s and c==f.read(3)"]],
+        "d":[["isat","\\0\\0",8],["isatS","\\0",16,16],["isin",["NNNN","ZZZ4"],56],["n0",1,6],["n0",4,32],["n0",2,38],["n0",4,40],["py","f.seek(4);c=f.read(3);f.seek(32);return (32+f.readi(4,'<'))==fsz and c==f.read(3)"]],
         "rs":"Messiah Image Resource"
     },
     {
-        "d":[["s%",32],["ext",".idx"],["isatS","\\0",4,24],["n0",4,28],["str0",0,24,5],["py","d=splitext(inp)[0]+'.bin'\nif not exists(d):return\ns=getsize(d)\nif s%2048:return\nf=open(inp,'rb');f.seek(f.seek(0,2)-8);o=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little');return (o+-o%2048)==s"]],
+        "d":[["s%",32],["ext",".idx"],["isatS","\\0",4,24],["n0",4,28],["str0",0,24,5],["py","d=splitext(inp)[0]+'.bin'\nif not exists(d):return\ns=getsize(d)\nif s%2048:return\nf.seek(-8,2);o=f.readi(4,'<')+f.readi(4,'<');return (o+-o%2048)==s"]],
         "rs":"Bomberman Wars IDX+BIN"
     },
     {
@@ -1203,15 +1210,15 @@
         "rs":"ODAU Zip","s":1
     },
     {
-        "d":[["s%",2],["n0",2,0],["n0",4,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(2);o=int.from_bytes(f.read(4),'little')\nif (o+6)>s:return\nf.seek(o);return f.read(4)==b'\\x06\\0\\0\\0'"]],
+        "d":[["s%",2],["n0",2,0],["n0",4,2],["py","f.seek(2);o=f.readi(4,'<')\nif (o+6)>fsz:return\nf.seek(o);return f.read(4)==b'\\x06\\0\\0\\0'"]],
         "rs":"Hell: A Cyberpunk Thriller Library"
     },
     {
-        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')\nif (2+c*4)!=int.from_bytes(f.read(4),'little'):return\ns=f.seek(0,2);f.seek(c*4-2);return s==int.from_bytes(f.read(4),'little')"]],
+        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","c=f.readi(2,'<')\nif (2+c*4)!=f.readi(4,'<'):return\nf.seek(c*4-2);return fsz==f.readi(4,'<')"]],
         "rs":"Access Software AP"
     },
     {
-        "d":[["n0",2,0],["n0",4,2],["n0",4,-12],["str0",-8,8,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');o=int.from_bytes(f.read(4),'little');f.seek(o);return f.read(4)==b'\\x06\\0\\0\\0' and(c*12+o)==f.seek(0,2)"]],
+        "d":[["n0",2,0],["n0",4,2],["n0",4,-12],["str0",-8,8,3],["py","c=f.readi(2,'<');o=f.readi(4,'<');f.seek(o);return f.read(4)==b'\\x06\\0\\0\\0' and(c*12+o)==fsz"]],
         "rs":"Bureau 13 GL"
     },
     {
@@ -1227,15 +1234,15 @@
         "rs":"SouthPeak Interactive Puzzle Archive","s":1
     },
     {
-        "d":[["isat","SLPK",0],["isat","\\0\\0\\0\\0",16],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (0x20+0x10*c)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","SLPK",0],["isat","\\0\\0\\0\\0",16],["n0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(8);c=f.readi(4,'<');return (0x20+0x10*c)==f.readi(4,'<')"]],
         "rs":"Siren 2 SLPK ROM","s":1
     },
     {
-        "d":[["isat","pak\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",24],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);o=int.from_bytes(f.read(4),'little');f.seek(16);return (0x20+0x10*int.from_bytes(f.read(4),'little'))==o"]],
+        "d":[["isat","pak\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",24],["n0",4,8],["n0",4,12],["py","f.seek(8);o=f.readi(4,'<');f.seek(16);return (0x20+0x10*f.readi(4,'<'))==o"]],
         "rs":"Siren 2 PAK","s":1
     },
     {
-        "d":[["isat","evd\\x1A",0],["n0",2,10],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');f.seek(10);c=int.from_bytes(f.read(2),'little');f.seek(16);return (0x10+8*c)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","evd\\x1A",0],["n0",2,10],["n0",4,16],["n0",4,20],["py","f.seek(10);c=f.readi(2,'<');f.seek(16);return (0x10+8*c)==f.readi(4,'<')"]],
         "rs":"Siren 2 EVD","s":1
     },
     {
@@ -1243,7 +1250,7 @@
         "rs":"GDED Binary Format","s":1
     },
     {
-        "d":[["isat","DPLK",0],["n0",8,8],["n0",8,32],["n0",8,40],["n0",8,48],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8)\nif int.from_bytes(f.read(8),'little')!=s:return\nf.seek(40);return (int.from_bytes(f.read(8),'little')+int.from_bytes(f.read(8),'little'))==s"]],
+        "d":[["isat","DPLK",0],["n0",8,8],["n0",8,32],["n0",8,40],["n0",8,48],["py","f.seek(8)\nif f.readi(8,'<')!=fsz:return\nf.seek(40);return (f.readi(8,'<')+f.readi(8,'<'))==fsz"]],
         "rs":"Ultimate Ghosts 'n Goblins DPLK","s":1
     },
     {
@@ -1255,7 +1262,7 @@
         "rs":"Sinergy GUT","s":1
     },
     {
-        "d":[["isat","\\x03",0],["isatS","\\0",19,1],["isatS","\\0",32,28],["n0",4,20],["n0",4,24],["n0",4,60],["n0",4,64],["n0",4,-4],["n0",4,-8],["n0",4,-12],["n0",4,-16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);o1,s1=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');f.seek(60);o2,s2=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little')\nif (o2+s2)!=s or not s2 in{s1,s1-8}:return\nf.seek(o2);o3,s3=int.from_bytes(f.read(4),'little'),int.from_bytes(f.read(4),'little');return o3==int.from_bytes(f.read(4),'little')and (o3+s3)==o2"]],
+        "d":[["isat","\\x03",0],["isatS","\\0",19,1],["isatS","\\0",32,28],["n0",4,20],["n0",4,24],["n0",4,60],["n0",4,64],["n0",4,-4],["n0",4,-8],["n0",4,-12],["n0",4,-16],["py","f.seek(20);o1,s1=f.readi(4,'<'),f.readi(4,'<');f.seek(60);o2,s2=f.readi(4,'<'),f.readi(4,'<')\nif (o2+s2)!=fsz or not s2 in{s1,s1-8}:return\nf.seek(o2);o3,s3=f.readi(4,'<'),f.readi(4,'<');return o3==f.readi(4,'<')and (o3+s3)==o2"]],
         "rs":"JumpStart SpyMasters Resource","s":1
     },
     {
@@ -1263,7 +1270,7 @@
         "rs":"Resistance Fall Of Man IGHW","s":1
     },
     {
-        "d":[["isat","res\\x0A",0],["isat","\\0\\0\\0\\0",8],["isat","\\0\\0\\0\\0",24],["n0",4,12],["n0",4,20],["n0",4,32],["n0",4,36],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(32);return (int.from_bytes(f.read(4),e)+int.from_bytes(f.read(4),e))==s"]],
+        "d":[["isat","res\\x0A",0],["isat","\\0\\0\\0\\0",8],["isat","\\0\\0\\0\\0",24],["n0",4,12],["n0",4,20],["n0",4,32],["n0",4,36],["py","f.seek(12);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(32);return (int.from_bytes(f.read(4),e)+int.from_bytes(f.read(4),e))==fsz"]],
         "rs":"Disney Resource","s":1
     },
     {
@@ -1288,19 +1295,19 @@
         "rs":"Sine Mora EX BIN"
     },
     {
-        "d":[["isin",["\\0\\0\\x80\\x08","\\x08\\x80\\0\\0"],0],["isat","\\0\\0\\0\\0",20],["isatS","\\xCC",160,-168],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(4);s=int.from_bytes(f.read(4),e);return exists(splitext(inp)[0]+'.gob')and os.path.getsize(splitext(inp)[0]+'.gob')==s"]],
+        "d":[["isin",["\\0\\0\\x80\\x08","\\x08\\x80\\0\\0"],0],["isat","\\0\\0\\0\\0",20],["isatS","\\xCC",160,-168],["n0",4,4],["n0",4,8],["n0",4,12],["py","e='>' if f.read(2)==b'\\0\\0' else '<';f.seek(4);s=f.readi(4,e);return exists(splitext(inp)[0]+'.gob')and getsize(splitext(inp)[0]+'.gob')==s"]],
         "rs":"Doom 3 Xbox GFC+GOB","s":1
     },
     {
-        "d":[["isin",["\\0\\0\\x80\\x08","\\x08\\x80\\0\\0"],0],["isat","\\0\\0\\0\\0",20],["n0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(4);s=int.from_bytes(f.read(4),e);return exists(splitext(inp)[0]+'.gob')and os.path.getsize(splitext(inp)[0]+'.gob')==s"]],
+        "d":[["isin",["\\0\\0\\x80\\x08","\\x08\\x80\\0\\0"],0],["isat","\\0\\0\\0\\0",20],["n0",4,4],["n0",4,8],["n0",4,12],["py","e='>' if f.read(2)==b'\\0\\0' else '<';f.seek(4);s=f.readi(4,e);return exists(splitext(inp)[0]+'.gob')and getsize(splitext(inp)[0]+'.gob')==s"]],
         "rs":"Vicarious Visions GFC+GOB","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,36],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');s=(12+32*c);f.seek(36);return (s+(-s%2048))==int.from_bytes(f.read(4),'little')"]],
+        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,36],["py","f.seek(4);c=f.readi(4,'<');s=(12+32*c);f.seek(36);return (s+(-s%2048))==f.readi(4,'<')"]],
         "rs":"Doom 3 Xbox Graph"
     },
     {
-        "d":[["s%",16],["isat","\\x4F\\xF3\\x2F\\xAC\\0\\0\\1\\0",0],["n0",4,8],["n0",4,12],["str0e",16,64,5],["py","f=open(inp,'rb');f.seek(8);o=int.from_bytes(f.read(4),'little');c=o+16+int.from_bytes(f.read(4),'little')*24;f.seek(o+28);return (c+-c%16)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["s%",16],["isat","\\x4F\\xF3\\x2F\\xAC\\0\\0\\1\\0",0],["n0",4,8],["n0",4,12],["str0e",16,64,5],["py","f.seek(8);o=f.readi(4,'<');c=o+16+f.readi(4,'<')*24;f.seek(o+28);return (c+-c%16)==f.readi(4,'<')"]],
         "rs":"Torque HHA"
     },
     {
@@ -1326,34 +1333,34 @@
         "rs":"PlayStation 5 SELF","s":1
     },
     {
-        "d":[["n0",4,4],["n0",8,8],["n0",8,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);c=int.from_bytes(f.read(4),'big');return int.from_bytes(f.read(8),'big')==s and(16+48*c)==int.from_bytes(f.read(8),'big')"]],
+        "d":[["n0",4,4],["n0",8,8],["n0",8,16],["py","f.seek(4);c=f.readi(4,'>');return f.readi(8,'>')==fsz and(16+48*c)==f.readi(8,'>')"]],
         "rs":"PlayStation 3 Core OS Package","s":1
     },
     {
         "d":[["isat","\\xDC\\xA2\\x4D\\0",0],["isat","\\0\\0\\0\\x40",20],["isin",["\\0\\0\\0\\x01","\\0\\0\\0\\x02","\\0\\0\\0\\x03"],4],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1"],24],["n0",8,8],["n0",4,16],
-             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);h=(0,64,64,96)[int.from_bytes(f.read(4),'big')]\nif int.from_bytes(f.read(8),'big')!=s:return\no=int.from_bytes(f.read(4),'big')*int.from_bytes(f.read(4),'big')+h;f.seek(h+32);return o==int.from_bytes(f.read(8),'big')"]],
+             ["py","f.seek(4);h=(0,64,64,96)[f.readi(4,'>')]\nif f.readi(8,'>')!=fsz:return\no=f.readi(4,'>')*f.readi(4,'>')+h;f.seek(h+32);return o==f.readi(8,'>')"]],
         "rs":"PlayStation Trophy File","s":1
     },
     {
         "d":[["isat","\\xB2\\x28\\xC6\\x0A\\0\\0\\0\\1",0],["isat","\\0\\0\\0\\x40",20],["n0",8,8],["n0",4,16],
-             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8)\nif int.from_bytes(f.read(8),'big')!=s:return\nc=int.from_bytes(f.read(4),'big');o=int.from_bytes(f.read(4),'big');f.seek(o+64);return int.from_bytes(f.read(8),'big')==(o+32+64*c)"]],
+             ["py","f.seek(8)\nif f.readi(8,'>')!=fsz:return\nc=f.readi(4,'>');o=f.readi(4,'>');f.seek(o+64);return f.readi(8,'>')==(o+32+64*c)"]],
         "rs":"PlayStation V2 Trophy File","s":1
     },
     {
-        "d":[["isat","\\x95\\x95\\x9E\\xE6",0],["isat","-",12],["isat","-",17],["isat","-",22],["isat","-",27],["str",4,36],["py","f=open(inp,'rb');f.seek(4);d=f.read(36);return not (d[:8]+d[9:13]+d[14:18]+d[19:23]+d[24:]).strip(b'abcdef01234567890')"]],
+        "d":[["isat","\\x95\\x95\\x9E\\xE6",0],["isat","-",12],["isat","-",17],["isat","-",22],["isat","-",27],["str",4,36],["py","f.seek(4);d=f.read(36);return not(d[:8]+d[9:13]+d[14:18]+d[19:23]+d[24:]).strip(b'abcdef01234567890')"]],
         "rs":"PlayStation Encrypted File","s":1
     },
     {
-        "d":[["isat","SLB2",0],["isin",["\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0"],4],["isatS","\\0",12,20],["isatS","\\0",8,40],["n0",4,12],["n0",4,16],["n0",4,32],["n0",4,36],["str0",48,32,7],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);return(int.from_bytes(f.read(4),'little')*512)==s"]],
+        "d":[["isat","SLB2",0],["isin",["\\x01\\0\\0\\0","\\x02\\0\\0\\0","\\x03\\0\\0\\0"],4],["isatS","\\0",12,20],["isatS","\\0",8,40],["n0",4,12],["n0",4,16],["n0",4,32],["n0",4,36],["str0",48,32,7],["py","f.seek(16);return(f.readi(4,'<')*512)==fsz"]],
         "rs":"PlayStation BLS Update","s":1
     },
     {
-        "d":[["isat","CR2W",0],["n0",4,24],["n0",4,28],["n0",4,32],["n0",4,36],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(24);return int.from_bytes(f.read(4),'little')<=int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","CR2W",0],["n0",4,24],["n0",4,28],["n0",4,32],["n0",4,36],["py","f.seek(24);return f.readi(4,'<')<=f.readi(4,'<')==fsz"]],
         "rs":"REDengine W2ResourCe","s":1
     },
     {
         "d":[["isat","IDCL",0],["isin",["\\x0C\\0\\0\\0","\\x0D\\0\\0\\0"],4],
-             ["py","f=open(inp,'rb');f.seek(4);vr=int.from_bytes(f.read(4),'little')>12;v=sum(f.read(4))and vr;f.seek(36 if v else 32)\nif not sum(f.read(4)):return\nc=int.from_bytes(f.read(4),'little');f.seek(16,1)\nif not sum(f.read(8))or not sum(f.read(8)):return\no=int.from_bytes(f.read(8),'little');h=int.from_bytes(f.read(8),'little');return h&7==o&7 and h==((136 if v else 112)if vr else 124)and o==int.from_bytes(f.read(8),'little')and(o+c*32)==int.from_bytes(f.read(8),'little')<=int.from_bytes(f.read(8),'little')"]],
+             ["py","f.seek(4);vr=f.readi(4,'<')>12;v=f.readi(4)and vr;f.seek(36 if v else 32)\nif not f.readi(4):return\nc=f.readi(4,'<');f.skip(16)\nif not f.readi(8)or not f.readi(8):return\no=f.readi(8,'<');h=f.readi(8,'<');return h&7==o&7 and h==((136 if v else 112)if vr else 124)and o==f.readi(8,'<')and(o+c*32)==f.readi(8,'<')<=f.readi(8,'<')"]],
         "rs":"idTech 7 Resource","s":1
     },
     {
@@ -1365,11 +1372,11 @@
         "rs":"Marmalade Derbh DZIP"
     },
     {
-        "d":[["size",[16,268435455]],["isat","\\x3D\\x03",0],["isatS","\\0",4,-4],["py","f=open(inp,'rb');f.seek(1);v=int.from_bytes(f.read(3),'big')\nif v>0x030101:f.seek(6)\nwhile 1:\n c=f.read(4)\n if len(c)!=4:return\n if not sum(c):break\n f.seek(int.from_bytes(f.read(4),'little')-4,1)\nreturn not f.read(1)"]],
+        "d":[["size",[16,268435455]],["isat","\\x3D\\x03",0],["isatS","\\0",4,-4],["py","f.seek(1);v=f.readi(3,'>')\nif v>0x030101:f.seek(6)\nwhile 1:\n c=f.read(4)\n if len(c)!=4:return\n if not sum(c):break\n f.skip(f.readi(4,'<')-4)\nreturn not f.read(1)"]],
         "rs":"Marmalade Resource Group"
     },
     {
-        "d":[["s%",2048],["isat","Ce\\x87\\x09",0],["n0",4,4],["n0",2,8],["n0",2,10],["n0",2,12],["n0",2,14],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif s!=int.from_bytes(f.read(4),'little'):return\nc11,c12,c21,c22=[int.from_bytes(f.read(2),'little')for _ in range(4)];o=c11*8+16;return c11==c12 and c21==c22 and(o+-o%2048)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["s%",2048],["isat","Ce\\x87\\x09",0],["n0",4,4],["n0",2,8],["n0",2,10],["n0",2,12],["n0",2,14],["n0",4,16],["py","f.seek(4)\nif fsz!=f.readi(4,'<'):return\nc11,c12,c21,c22=[f.readi(2,'<')for _ in range(4)];o=c11*8+16;return c11==c12 and c21==c22 and(o+-o%2048)==f.readi(4,'<')"]],
         "rs":"Candy Land Adventure RFS","s":1
     },
     {
@@ -1379,13 +1386,13 @@
         "rs":"Frogwares 0000 Package"
     },
     {
-        "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix') or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(8);return (int.from_bytes(f.read(4),'little')+12)==s"]],
+        "d":[["isat","HARC",0],["n0",4,4],["n0",4,8],["py","if not exists(splitext(inp)[0]+'.hix')or open(splitext(inp)[0]+'.hix','rb').read(4)!=b'HIDX':return\nf.seek(8);return (f.readi(4,'<')+12)==fsz"]],
         "rs":"Nintendo HARC+HIDX","s":1},{
-        "d":[["isat","HIDX",0],["n0",4,4],["py","if not exists(splitext(inp)[0]+'.har'):return\nf=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')*17+8)==s"]],
+        "d":[["isat","HIDX",0],["n0",4,4],["py","if not exists(splitext(inp)[0]+'.har'):return\nf.seek(4);return (f.readi(4,'<')*17+8)==fsz"]],
         "rs":"Nintendo HARC+HIDX","s":1
     },
     {
-        "d":[["isat","HATCH\\x01\\0\\0",0],["n0",2,8],["n0",4,10],["n0",8,14],["py","f=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(2),'little');f.seek(14);return (10+c*32)==int.from_bytes(f.read(8),'little')"]],
+        "d":[["isat","HATCH\\x01\\0\\0",0],["n0",2,8],["n0",4,10],["n0",8,14],["py","f.seek(8);c=f.readi(2,'<');f.seek(14);return (10+c*32)==f.readi(8,'<')"]],
         "rs":"Hatch Game Engine HATCH","s":1
     },
     {
@@ -1397,9 +1404,9 @@
         "rs":"GIANTS Archive","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","f=open(inp,'rb');c=f.read(4)\nif c!=f.read(4) or c==f.read(4):return\nc=int.from_bytes(c,'little');f.seek(8)\nfor _ in range(c):f.seek(int.from_bytes(f.read(2),'little'),1)\nf.seek(4,1);return f.read(8)[:4]==b'\\0\\0\\0\\0' and int.from_bytes(f.read(4),'little')==(f.tell()-16+c*20)"]],
+        "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","c=f.read(4)\nif c!=f.read(4)or c==f.read(4):return\nc=int.from_bytes(c,'little');f.seek(8)\nfor _ in range(c):f.seek(f.readi(2,'<'),1)\nf.skip(4);return f.read(8)[:4]==b'\\0\\0\\0\\0' and f.readi(4,'<')==(f.tell()-16+c*20)"]],
         "rs":"Petroglyph MEG"},{
-        "d":[["isatS","\\xFF",3,0],["isat","\\xA4\\x70\\x7D\\x3F",4],["isin",["\\xFF","\\x8F"],3],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');f.seek(12);return f.read(4)==f.read(4)"]],
+        "d":[["isatS","\\xFF",3,0],["isat","\\xA4\\x70\\x7D\\x3F",4],["isin",["\\xFF","\\x8F"],3],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["py","f.seek(12);return f.read(4)==f.read(4)"]],
         "rs":"Petroglyph MEG","s":1
     },
     {
@@ -1407,30 +1414,30 @@
         "rs":"Petroglyph Zlib CH","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0\\0\\x80\\0",0],["isatS","\\0",6,8],["n0",2,6],["n0",2,14],["n0",2,16],["py","f=open(inp,'rb');f.seek(14);return int.from_bytes(f.read(2),'big')==(int.from_bytes(f.read(2),'big')+2)"]],
+        "d":[["isat","\\0\\0\\0\\0\\x80\\0",0],["isatS","\\0",6,8],["n0",2,6],["n0",2,14],["n0",2,16],["py","f.seek(14);return f.readi(2,'>')==(f.readi(2,'>')+2)"]],
         "rs":"Petroglyph CHK List"
     },
     {
-        "d":[["size",[54,4194304]],["isat","\\0\\0",-2],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little')\nif (c*4+4)!=o:return\nf.seek(o+2);return (o+18)==int.from_bytes(f.read(4),'little')and f.read(12)==b'*bulkFiles\\0\\0'"]],
+        "d":[["size",[54,4194304]],["isat","\\0\\0",-2],["n0",4,0],["n0",4,4],["py","c=f.readi(4,'<');o=f.readi(4,'<')\nif (c*4+4)!=o:return\nf.seek(o+2);return (o+18)==f.readi(4,'<')and f.read(12)==b'*bulkFiles\\0\\0'"]],
         "rs":"StarFlyers Bulk File Index"
     },
     {
         "d":[["isat","\\1\\1\\0\\x05\\0\\1\\0\\0\\0\\0\\0\\x04",0],["isat","\\0\\x06",16],["isat","\\0\\x07",26],["isat","\\0\\x08",36],["isat","\\0\\x09",46],["n0",2,12],["n0",4,14],["n0",4,18],["n0",4,28],["n0",4,32],["n0",4,38],["n0",4,48],["n0",4,52],
-             ["py","if not exists(splitext(inp)[0]+'.dbb'):return\nf=open(inp,'rb');f.seek(12);c=int.from_bytes(f.read(2),'big');ns=int.from_bytes(f.read(2),'big');f.seek(32);return (c*(4+ns))==int.from_bytes(f.read(4),'big')"]],
+             ["py","if not exists(splitext(inp)[0]+'.dbb'):return\nf.seek(12);c=f.readi(2,'>');ns=f.readi(2,'>');f.seek(32);return (c*(4+ns))==f.readi(4,'>')"]],
         "rs":"Endless Interactive IN1+DBB","s":1},{
         "d":[["isat","\\2\\2\\x05\\0\\1\\0\\0\\0\\0\\0\\x04\\0",0],["isat","\\x06\\0",16],["isat","\\x07\\0",26],["isat","\\x08\\0",36],["isat","\\x09\\0",46],["n0",2,12],["n0",4,14],["n0",4,18],["n0",4,28],["n0",4,32],["n0",4,38],["n0",4,48],["n0",4,52],
-             ["py","if not exists(splitext(inp)[0]+'.dbb'):return\nf=open(inp,'rb');f.seek(12);c=int.from_bytes(f.read(2),'little');ns=int.from_bytes(f.read(2),'little');f.seek(32);return (c*(4+ns))==int.from_bytes(f.read(4),'little')"]],
+             ["py","if not exists(splitext(inp)[0]+'.dbb'):return\nf.seek(12);c=f.readi(2,'<');ns=f.readi(2,'<');f.seek(32);return (c*(4+ns))==f.readi(4,'<')"]],
         "rs":"Endless Interactive IN2+DBB","s":1},{
         "d":[["isat","\\0\\0\\1\\0\\0\\0\\1\\0",0],["isat","\\0\\0\\1\\0\\0\\0\\1\\0",256],["isatS","\\0",4,8],["isatS","\\0",4,264],["n0",1,48],["str",49,5],
-             ["py","if not exists(splitext(inp)[0]+'.in2'):return\nf=open(inp,'rb');f.seek(48)\nif basename(inp).encode('ascii').lower()!=f.read(f.read(1)[0]).lower():return\nf.seek(f.read(1)[0]*18+21,1);return (int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big'))<=f.seek(0,2)"]],
+             ["py","if not exists(splitext(inp)[0]+'.in2'):return\nf.seek(48)\nif basename(inp).encode('ascii').lower()!=f.read(f.readi(1)).lower():return\nf.seek(f.readi(1)*18+21,1);return (f.readi(4,'>')+f.readi(4,'>'))<=fsz"]],
         "rs":"Endless Interactive IN2+DBB"
     },
     {
-        "d":[["isat","NKP\\x1A",0],["isatS","\\0",4,8],["n0",4,4],["n0",4,12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4)\nif int.from_bytes(f.read(4),'little')!=s:return\nf.seek(12);c=int.from_bytes(f.read(4),'little')\nif (24+c*8)!=int.from_bytes(f.read(4),'little'):return\nf.seek(16+c*8);return not sum(f.read(8))"]],
+        "d":[["isat","NKP\\x1A",0],["isatS","\\0",4,8],["n0",4,4],["n0",4,12],["py","f.seek(4)\nif f.readi(4,'<')!=fsz:return\nf.seek(12);c=f.readi(4,'<')\nif (24+c*8)!=f.readi(4,'<'):return\nf.seek(16+c*8);return not f.readi(8)"]],
         "rs":"Konami NKP","s":1
     },
     {
-        "d":[["s%",4],["isat","NXPK",0],["isatS","\\0",8,8],["n0",4,4],["n0",4,20],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(20);o=int.from_bytes(f.read(4),'little');return not o%4 and(o+c*28)<=f.seek(0,2)"]],
+        "d":[["s%",4],["isat","NXPK",0],["isatS","\\0",8,8],["n0",4,4],["n0",4,20],["py","f.seek(4);c=f.readi(4,'<');f.seek(20);o=f.readi(4,'<');return not o%4 and(o+c*28)<=fsz"]],
         "rs":"Neox Package","s":1
     },
     {
@@ -1438,7 +1445,7 @@
         "rs":"Camelot ARC","s":1
     },
     {
-        "d":[["isat","LZS\\0\\x05",0],["isat","\\0",7],["isat","\\0\\0",26],["isin",["\\x08","\\x10","\\x20"],6],["n0",1,5],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",1,25],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(8);hs=int.from_bytes(f.read(4),'little');f.seek(20);\nif int.from_bytes(f.read(4),'little')!=s:return\nreturn (28+f.read(1)[0])<=hs"]],
+        "d":[["isat","LZS\\0\\x05",0],["isat","\\0",7],["isat","\\0\\0",26],["isin",["\\x08","\\x10","\\x20"],6],["n0",1,5],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["n0",1,25],["py","f.seek(8);hs=f.readi(4,'<');f.seek(20)\nif f.readi(4,'<')!=fsz:return\nreturn (28+f.readi(1))<=hs"]],
         "rs":"Natsume LZS","s":1
     },
     {
@@ -1450,15 +1457,15 @@
         "rs":"Wizards of a Waverly Place XPF","s":1
     },
     {
-        "d":[["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07"],148],["isatS","\\0",4,132],["isatS","\\xFF",8,136],["isatS","\\0",3,149],["isatS","\\0",3,249],["n0",4,0],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(248);return not f.read(1)[0]&224 and (4+c*270)<=f.seek(0,2)"]],
+        "d":[["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07"],148],["isatS","\\0",4,132],["isatS","\\xFF",8,136],["isatS","\\0",3,149],["isatS","\\0",3,249],["n0",4,0],["py","c=f.readi(4,'<');f.seek(248);return not f.readi(1)&224 and (4+c*270)<=fsz"]],
         "rs":"Delta Studio YSCE"
     },
     {
-        "d":[["isat","\\x0A\\0\\0\\0ENCRYPTED\\0",4],["isin",["\\x04\\0\\0\\0TEA\\0"],18],["n0",4,0],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');f.seek(o);return f.read(4)==b'\\1\\0\\0\\0' and not (f.seek(0,2)-4-o)%8"]],
+        "d":[["isat","\\x0A\\0\\0\\0ENCRYPTED\\0",4],["isin",["\\x04\\0\\0\\0TEA\\0"],18],["n0",4,0],["py","o=f.readi(4,'<');f.seek(o);return f.read(4)==b'\\1\\0\\0\\0' and not(fsz-4-o)%8"]],
         "rs":"Six Guns Encrypted Save","s":1
     },
     {
-        "d":[["s%",2048],["isat","\\0\\1\\0\\0",16],["isatS","\\xFF",4,0],["isatS","\\0",4,4],["n0",4,8],["n0",4,12],["py","f=open(inp,'rb');f.seek(8);f.seek(int.from_bytes(f.read(4),'little')-1);return f.read(4)==b'SSCN'"]],
+        "d":[["s%",2048],["isat","\\0\\1\\0\\0",16],["isatS","\\xFF",4,0],["isatS","\\0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(8);f.seek(f.readi(4,'<')-1);return f.read(4)==b'SSCN'"]],
         "rs":"Blood Will Tell Osamu Tezuka's Dororo LBI","s":1
     },
     {
@@ -1466,39 +1473,39 @@
         "rs":"Phineas And Ferb WAD"
     },
     {
-        "d":[["isat","\\0\\0\\0",0],["isatS","\\0",28,4],["isatS","\\0",20,44],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1"],52],["n0",4,0],["n0",4,40],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2);f.seek(32)\nfor _ in range(c):f.seek(8,1);f.seek(int.from_bytes(f.read(4),'big')+20,1)\nc=int.from_bytes(f.read(4),'big')\nif not c:return\nreturn (f.tell()+28+c*32)==s"]],
+        "d":[["isat","\\0\\0\\0",0],["isatS","\\0",28,4],["isatS","\\0",20,44],["isin",["\\0\\0\\0\\0","\\0\\0\\0\\1"],52],["n0",4,0],["n0",4,40],["py","c=f.readi(4,'>');f.seek(32)\nfor _ in range(c):f.skip(8);f.seek(f.readi(4,'>')+20,1)\nc=f.readi(4,'>')\nif not c:return\nreturn (f.tell()+28+c*32)==fsz"]],
         "rs":"Ludia Dir"
     },
     {
-        "d":[["size",[40,74]],["isat","GWTg\\1",0],["n0",4,5],["n0",4,-8],["n0",4,-4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(5);bs=int.from_bytes(f.read(4),'big')\nif (17+bs)!=s:return\ntry:b=f.read(bs).decode('ascii').split(',')\nexcept:return\nif len(b)!=5:return\nwh=b[1].split('x')\nif len(wh)!=2 or not wh[0].isdigit()or not wh[1].isdigit():return\nreturn int(wh[0])==int.from_bytes(f.read(4),'big')and int(wh[1])==int.from_bytes(f.read(4),'big')"]],
+        "d":[["size",[40,74]],["isat","GWTg\\1",0],["n0",4,5],["n0",4,-8],["n0",4,-4],["py","f.seek(5);bs=f.readi(4,'>')\nif (17+bs)!=fsz:return\ntry:b=f.read(bs).decode('ascii').split(',')\nexcept:return\nif len(b)!=5:return\nwh=b[1].split('x')\nif len(wh)!=2 or not wh[0].isdigit()or not wh[1].isdigit():return\nreturn int(wh[0])==f.readi(4,'>')and int(wh[1])==f.readi(4,'>')"]],
         "rs":"Ludia GWTarget","s":1
     },
     {
-        "d":[["n0",2,0],["n0",4,2],["n0",4,14],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=int.from_bytes(f.read(4),'little');return (6+c*12+s)==f.seek(0,2)"]],
+        "d":[["n0",2,0],["n0",4,2],["n0",4,14],["py","c=f.readi(2,'<');s=f.readi(4,'<');return (6+c*12+s)==fsz"]],
         "rs":"Blade Runner TLK/MIX"
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=s or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],
+        "d":[["n0",4,0],["n0",4,4],["isat","\\0\\0\\0\\0",8],["py","f.seek(4);e='big' if f.read(2)==b'\\0\\0' else 'little';f.seek(0);cs=int.from_bytes(f.read(4),e);hs=int.from_bytes(f.read(4),e)\nif (4+cs+hs)!=fsz or sum(f.read(hs-4)):return\nb=f.read(2)\nif b in(b'\\xFF\\xFE',b'\\xFE\\xFF'):return True\ntry:b.decode('ascii')\nexcept:return\nreturn True"]],
         "rs":"Disney Raw Strings"
     },
     {
-        "d":[["size",[84,209715200]],["n0",4,0],["str0",4,40,5],["str0",44,40,6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0)\nwhile neof(f):\n b=f.tell()+int.from_bytes(f.read(4),'little');f.seek(b)\n if b>s:return\nreturn True"]],
+        "d":[["size",[84,209715200]],["n0",4,0],["str0",4,40,5],["str0",44,40,6],["py","\nwhile neof(f):\n b=f.tell()+f.readi(4,'<');f.seek(b)\n if b>fsz:return\nreturn True"]],
         "rs":"Monsters Inc. Scream Team Training WAD"
     },
     {
-        "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big');s=f.seek(0,2)\nif (4+c*3)>s:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode('utf-8')\n except:return\nreturn True"]],
+        "d":[["size",[7,7500]],["n0",4,0],["n0",2,4],["n0",1,6],["py","c=f.readi(4,'>')\nif (4+c*3)>fsz:return\nf.seek(4)\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n try:f.read(int.from_bytes(ss,'big')).decode('utf-8')\n except:return\nreturn True"]],
         "rs":"Super Monkey Ball Tip 'n Tilt String Data"
     },
     {
-        "d":[["size",[3,7500]],["n0",2,0],["n0",1,2],["py","f=open(inp,'rb')\nwhile True:\n ss=f.read(2)\n if len(ss)==1:return\n if not ss:return True\n ss=int.from_bytes(ss,'little')\n if len(f.read(ss))!=ss:return"]],
+        "d":[["size",[3,7500]],["n0",2,0],["n0",1,2],["py","while True:\n ss=f.read(2)\n if len(ss)==1:return\n if not ss:return True\n ss=int.from_bytes(ss,'little')\n if len(f.read(ss))!=ss:return"]],
         "rs":"String16 Data"
     },
     {
-        "d":[["size",[3,7500]],["n0",2,0],["n0",1,2],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little')\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n ss=int.from_bytes(ss,'little')\n if len(f.read(ss))!=ss:return\nreturn not f.read(1)"]],
+        "d":[["size",[3,7500]],["n0",2,0],["n0",1,2],["py","c=f.readi(2,'<')\nfor _ in range(c):\n ss=f.read(2)\n if len(ss)!=2:return\n ss=int.from_bytes(ss,'little')\n if len(f.read(ss))!=ss:return\nreturn not f.read(1)"]],
         "rs":"String16 Count16 Data"
     },
     {
-        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'big');f.seek(6)\nif int.from_bytes(f.read(4),'big')!=(2+c*12):return\nf.seek(2+c*12-8)\nfs=int.from_bytes(f.read(4),'big')+int.from_bytes(f.read(4),'big')\nreturn fs==f.seek(0,2)"]],
+        "d":[["n0",2,0],["n0",4,2],["n0",4,6],["py","c=f.readi(2,'>');f.seek(6)\nif f.readi(4,'>')!=(2+c*12):return\nf.seek(2+c*12-8);return (f.readi(4,'>')+f.readi(4,'>'))==fsz"]],
         "rs":"Super Monkey Ball Tip 'n Tilt PAK"
     },
     {
@@ -1506,11 +1513,11 @@
         "rs":"Super Monkey Ball SPG2","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0\\0",2],["n0",2,0],["n0",4,6],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');f.seek(c*4-2);s=int.from_bytes(f.read(4),'little');return (2+c*4+s)==f.seek(0,2)"]],
+        "d":[["isat","\\0\\0\\0\\0",2],["n0",2,0],["n0",4,6],["py","c=f.readi(2,'<');f.seek(c*4-2);s=f.readi(4,'<');return (2+c*4+s)==fsz"]],
         "rs":"Mission Impossible 3 Data"
     },
     {
-        "d":[["size",[6,65537]],["isat","\\0",-1],["n0",2,0],["n0",2,2],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');s=f.seek(0,2);f.seek(2);fs=int.from_bytes(f.read(2),'little')\nif s<(2+4*c) or fs!=(2+2*c):return\nfor _ in range(c-1):\n if (int.from_bytes(f.read(2),'little')+2)>s:return\nreturn True"]],
+        "d":[["size",[6,65537]],["isat","\\0",-1],["n0",2,0],["n0",2,2],["py","c=f.readi(2,'<');fs=f.readi(2,'<')\nif fsz<(2+4*c) or fs!=(2+2*c):return\nfor _ in range(c-1):\n if (f.readi(2,'<')+2)>s:return\nreturn True"]],
         "rs":"eSMART String Data"
     },
     {
@@ -1519,28 +1526,28 @@
     },
     {
         "d":[["size",[27,131072]],["isat","\\0",-1],["n0",4,0],["n0",4,4],
-             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'big')\nif (c*23)>f.seek(0,2):return\nf.seek(4);d=dirname(inp)+'/'\nfor _ in range(c):\n s=int.from_bytes(f.read(4),'big');fn=f.read(s)\n if len(fn)!=s:return\n s=int.from_bytes(f.read(4),'big');n=f.read(s)\n if len(n)!=s:return\n try:asrt(not n or exists(d+n.decode('ascii'))or exists(d+n.decode('utf-8')+splitext(fn.decode('utf-8'))[1]))\n except:return\n f.seek(8,1)\n if f.read(1)!=b'\\0':return\nreturn not f.read(1)"]],
+             ["py","c=f.readi(4,'>')\nif (c*23)>fsz:return\nf.seek(4);d=dirname(inp)+'/'\nfor _ in range(c):\n s=f.readi(4,'>');fn=f.read(s)\n if len(fn)!=s:return\n s=f.readi(4,'>');n=f.read(s)\n if len(n)!=s:return\n try:asrt(not n or exists(d+n.decode('ascii'))or exists(d+n.decode('utf-8')+splitext(fn.decode('utf-8'))[1]))\n except:return\n f.skip(8)\n if f.read(1)!=b'\\0':return\nreturn not f.read(1)"]],
         "rs":"Moe Cure Net FileList"
     },
     {
-        "d":[["size",[60,1073741824]],["n0",4,0],["n0",2,-2],["n0",2,-4],["n0",2,-6],["n0",2,-8],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'big');s=f.seek(0,2);f.seek(o);c1,c2=int.from_bytes(f.read(2),'big'),int.from_bytes(f.read(2),'big')\nif c1==0 or c2==0 or c1<c2 or(o+4+c1*2+2+c2*8+6)!=s:return\nf.seek(c1*2+2,1)\nif f.read(4)!=b'\\0\\0\\0\\x04':return\nf.seek(c2*4-4,1);return int.from_bytes(f.read(4),'big')==o"]],
+        "d":[["size",[60,1073741824]],["n0",4,0],["n0",2,-2],["n0",2,-4],["n0",2,-6],["n0",2,-8],["py","f.seek(f.readi(4,'>'));c1,c2=f.readi(2,'>'),f.readi(2,'>')\nif c1==0 or c2==0 or c1<c2 or(o+4+c1*2+2+c2*8+6)!=fsz:return\nf.seek(c1*2+2,1)\nif f.read(4)!=b'\\0\\0\\0\\x04':return\nf.seek(c2*4-4,1);return f.readi(4,'>')==o"]],
         "rs":"The Indian In The Cupboard Data"
     },
     {
-        "d":[["isat","\\0\\0\\0\\x20",0],["n0",4,4],["n0",4,8],["n0",4,12],["str0e",16,52,5],["py","f=open(inp,'rb');f.seek(4);o=f.read(4);f.seek(12);f.seek(int.from_bytes(f.read(4),'big'),1);return o==f.read(4)"]],
+        "d":[["isat","\\0\\0\\0\\x20",0],["n0",4,4],["n0",4,8],["n0",4,12],["str0e",16,52,5],["py","f.seek(4);o=f.read(4);f.seek(12);f.skip(f.readi(4,'>'));return o==f.read(4)"]],
         "rs":"One Piece Straw Wars Pirate Defense Resource"
     },
     {
-        "d":[["isat","BLB2.0\\0\\0\\x20\\0",0],["isat","\\x12\\0\\0\\0",14],["isat","\\0\\1\\0\\0\\0\\0\\0\\0\\x08\\0",22],["isat","\\0\\0",42],["n0",2,10],["n0",2,12],["n0",2,18],["n0",2,20],["str0",32,8,3],["py","f=open(inp,'rb');f.seek(10)\nif f.read(2)!=f.read(2):return\nf.seek(20);d=f.read(2);f.seek(40);return d==f.read(2)"]],
+        "d":[["isat","BLB2.0\\0\\0\\x20\\0",0],["isat","\\x12\\0\\0\\0",14],["isat","\\0\\1\\0\\0\\0\\0\\0\\0\\x08\\0",22],["isat","\\0\\0",42],["n0",2,10],["n0",2,12],["n0",2,18],["n0",2,20],["str0",32,8,3],["py","f.seek(10)\nif f.read(2)!=f.read(2):return\nf.seek(20);d=f.read(2);f.seek(40);return d==f.read(2)"]],
         "rs":"Braveheart BLB 2.0","s":1
     },
     {
         "d":[["size",[128,2147483648]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],
-             ["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');cc=c*8+4;so=int.from_bytes(f.read(4),'little');ss=int.from_bytes(f.read(4),'little')+so;o=int.from_bytes(f.read(4),'little')\nif not(((cc+(-cc%64))==so and (ss+(-ss%64))==o)or((cc+(-cc%2048))==so and (ss+(-ss%2048))==o)):return\nf.seek(so);return int.from_bytes(f.read(4),'little')==(c*4-4)"]],
+             ["py","c=f.readi(4,'<');cc=c*8+4;so=f.readi(4,'<');ss=f.readi(4,'<')+so;o=f.readi(4,'<')\nif not(((cc+(-cc%64))==so and (ss+(-ss%64))==o)or((cc+(-cc%2048))==so and (ss+(-ss%2048))==o)):return\nf.seek(so);return f.readi(4,'<')==(c*4-4)"]],
         "rs":"D1 Grand Prix Series 2005 BIN"
     },
     {
-        "d":[["s%",4096],["isat","\\x10\\0\\0\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,8],["n0",4,16],["py","if not exists(splitext(inp)[0]+'.mdf'):return\nf=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(8),'little')\nfor _ in range(c):\n if int.from_bytes(f.read(4),'little')&15!=12:return\nreturn True"]],
+        "d":[["s%",4096],["isat","\\x10\\0\\0\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,8],["n0",4,16],["py","if not exists(splitext(inp)[0]+'.mdf'):return\nf.seek(8);c=f.readi(8,'<')\nfor _ in range(c):\n if f.readi(4,'<')&15!=12:return\nreturn True"]],
         "rs":"Encrypted Arsenal MTC+MDF","s":1
     },
     {
@@ -1552,11 +1559,11 @@
         "rs":"Compressed Nintendo Switch Executable","s":1
     },
     {
-        "d":[["isat","x",2048],["isatS","\\0",2040,8],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb')\nif int.from_bytes(f.read(4),'little')>int.from_bytes(f.read(4),'little'):return\nf.seek(2048);return not int.from_bytes(f.read(2),'big')%31"]],
+        "d":[["isat","x",2048],["isatS","\\0",2040,8],["n0",4,0],["n0",4,4],["py","if f.readi(4,'<')>f.readi(4,'<'):return\nf.seek(2048);return not f.readi(2,'>')%31"]],
         "rs":"Pseudo Interactive PIX"
     },
     {
-        "d":[["size",[2048,4294967294]],["s%",2048],["n0",4,0],["n0",1,4],["str0e",5,64,6],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2)\nif o%4 or 41>o or o>s:return\nf.seek(o-8);o=int.from_bytes(f.read(8).split(b'\\0',1)[1][:4],'little');return (o+(-o%2048))==s"]],
+        "d":[["size",[2048,4294967294]],["s%",2048],["n0",4,0],["n0",1,4],["str0e",5,64,6],["py","o=f.readi(4,'<')\nif o%4 or 41>o or o>fsz:return\nf.seek(o-8);o=int.from_bytes(f.read(8).split(b'\\0',1)[1][:4],'little');return (o+(-o%2048))==fsz"]],
         "rs":"Pseudo Interactive SmallF"
     },
     {
@@ -1576,11 +1583,11 @@
         "rs":"Gateshark2NTR Plugin","s":1
     },
     {
-        "d":[["isat","ARC0",0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return all(not x%4 and(x+16)<s for x in(int.from_bytes(f.read(4),'little')for n in range(5)))"]],
+        "d":[["isat","ARC0",0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["py","f.seek(4);return all(not x%4 and(x+16)<fsz for x in(f.readi(4,'<')for n in range(5)))"]],
         "rs":"Level5 ARC","s":1
     },
     {
-        "d":[["isat","KPLR",0],["isatS","\\0",8,8],["isatS","\\xFF",7,24],["isat","\\x7F",31],["n0",4,4],["n0",4,16],["n0",4,20],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');f.seek(20);return (16+c*16)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","KPLR",0],["isatS","\\0",8,8],["isatS","\\xFF",7,24],["isat","\\x7F",31],["n0",4,4],["n0",4,16],["n0",4,20],["py","f.seek(4);c=f.readi(4,'<');f.seek(20);return (16+c*16)==f.readi(4,'<')"]],
         "rs":"Little Witch Parfait RLPK","s":1
     },
     {
@@ -1596,15 +1603,15 @@
         "rs":"Shrek Smash n' Crash Racing Pack"
     },
     {
-        "d":[["isat","!CMP",0],["isat","x",8],["n0",4,4],["py","f=open(inp,'rb');f.seek(8);return not int.from_bytes(f.read(2),'little')%31"]],
+        "d":[["isat","!CMP",0],["isat","x",8],["n0",4,4],["py","f.seek(8);return not f.readi(2,'<')%31"]],
         "rs":"Shrek Smash n' Crash Racing CMP"
     },
     {
-        "d":[["isat","\\1\\0\\0\\0",4],["isat","\\0",-1],["n0",4,0],["str0e",-5,5,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little')-8;f.seek(o-4);return (8*int.from_bytes(f.read(4),'little'))==o and not sum(f.read(8))"]],
+        "d":[["isat","\\1\\0\\0\\0",4],["isat","\\0",-1],["n0",4,0],["str0e",-5,5,4],["py","o=f.readi(4,'<')-8;f.seek(o-4);return (8*f.readi(4,'<'))==o and not f.readi(8)"]],
         "rs":"Harry Potter and Prisoner of Azkaban IDS"
     },
     {
-        "d":[["s%",128],["size",[256,2684354560]],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')*8+4;o=int.from_bytes(f.read(4),'little')\nif o%128 or(s+-s%128)!=o:return\nf.seek(s);return not sum(f.read(-s%128))and f.read(4)==b'SCHl'"]],
+        "d":[["s%",128],["size",[256,2684354560]],["n0",4,0],["n0",4,4],["n0",4,8],["py","s=f.readi(4,'<')*8+4;o=f.readi(4,'<')\nif o%128 or(s+-s%128)!=o:return\nf.seek(s);return not sum(f.read(-s%128))and f.read(4)==b'SCHl'"]],
         "rs":"Harry Potter and Prisoner of Azkaban SDT"
     },
     {
@@ -1612,7 +1619,7 @@
         "rs":"Roblox Flag Cache","s":1
     },
     {
-        "d":[["s%",4096],["isat","\\xAA\\x55\\xAA\\x55",8192],["n0",16,0],["n0",4,16],["n0",4,24],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(24);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["s%",4096],["isat","\\xAA\\x55\\xAA\\x55",8192],["n0",16,0],["n0",4,16],["n0",4,24],["py","f.seek(24);return f.readi(4,'<')==fsz"]],
         "rs":"AMI Aptio Capsule"
     },
     {
@@ -1632,7 +1639,7 @@
         "rs":"3D Ultra Cool TBVolume","s":1
     },
     {
-        "d":[["isat","PKX:",0],["isin",["\\x01\\x01\\0\\0","\\x02\\x01\\0\\0"],12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);return (int.from_bytes(f.read(4),'little')+24)==s"]],
+        "d":[["isat","PKX:",0],["isin",["\\x01\\x01\\0\\0","\\x02\\x01\\0\\0"],12],["n0",4,16],["py","f.seek(16);return (f.readi(4,'<')+24)==fsz"]],
         "rs":"3D Ultra Cool PKX","s":1
     },
     {
@@ -1640,7 +1647,7 @@
         "rs":"London Racer Destruction Madness WAD","s":1
     },
     {
-        "d":[["isat","x",4],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');z=int.from_bytes(f.read(2),'big');return s>=f.seek(0,2) and not z%31"]],
+        "d":[["isat","x",4],["n0",4,0],["py","s=f.readi(4,'<');z=f.readi(2,'>');return s>=fsz and not z%31"]],
         "rs":"Zlib + Uncompressed Size"
     },
     {
@@ -1663,7 +1670,7 @@
         "rs":"Davilex Games IDX+IMG","s":1
     },
     {
-        "d":[["isat","Artech\\0\\0\\x02\\0\\x03\\0\\x01\\0\\0\\0\\0\\0\\0\\0",0],["n0",4,20],["n0",4,28],["py","f=open(inp,'rb');f.seek(20);c=int.from_bytes(f.read(4),'little');f.seek(28);return (28+c*16)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","Artech\\0\\0\\x02\\0\\x03\\0\\x01\\0\\0\\0\\0\\0\\0\\0",0],["n0",4,20],["n0",4,28],["py","f.seek(20);c=f.readi(4,'<');f.seek(28);return (28+c*16)==f.readi(4,'<')"]],
         "rs":"Artech DAT","s":1
     },
     {
@@ -1671,7 +1678,7 @@
         "rs":"Windows CE FW IMG","s":1
     },
     {
-        "d":[["isat","ECEC",64],["n0",4,68],["n0",4,72],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(72);return (int.from_bytes(f.read(4),'little')+84)<=s"]],
+        "d":[["isat","ECEC",64],["n0",4,68],["n0",4,72],["py","f.seek(72);return (f.readi(4,'<')+84)<=fsz"]],
         "rs":"Windows CE Xip","s":1
     },
     {
@@ -1683,7 +1690,7 @@
         "rs":"Nippon Ichi PS FS","s":1
     },
     {
-        "d":[["s%",256],["isat","vaps",0],["n0",4,8],["n0",4,16],["n0",4,28],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(16);o=int.from_bytes(f.read(4),'big');f.seek(28);return (int.from_bytes(f.read(4),'big')+o)==s"]],
+        "d":[["s%",256],["isat","vaps",0],["n0",4,8],["n0",4,16],["n0",4,28],["py","f.seek(16);o=f.readi(4,'>');f.seek(28);return (f.readi(4,'>')+o)==fsz"]],
         "rs":"Papaya Studio Wii VAPS","s":1
     },
     {
@@ -1695,7 +1702,7 @@
         "rs":"SuperScape VRT","s":1
     },
     {
-        "d":[["isat","BSF\\0",0],["isat","BLK\\0SCO\\0",24],["isat","BSF\\0",84],["isat","BLK\\0END\\0\\x48\\0\\0\\0\\0\\0\\0\\0",-72],["py","f=open(inp,'rb');f.seek(32);return (int.from_bytes(f.read(4),'little')-72)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","BSF\\0",0],["isat","BLK\\0SCO\\0",24],["isat","BSF\\0",84],["isat","BLK\\0END\\0\\x48\\0\\0\\0\\0\\0\\0\\0",-72],["py","f.seek(32);return (f.readi(4,'<')-72)==f.readi(4,'<')"]],
         "rs":"Hornby BSF","s":1
     },
     {
@@ -1703,19 +1710,19 @@
         "rs":"Detective Instinct: Farewell, My Beloved Encrypted DIP"
     },
     {
-        "d":[["isin",["DATA","MENU","STRD","SEDT"],0],["n0",4,12],["n0",4,16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);c=int.from_bytes(f.read(4),'little')*4+20;o=int.from_bytes(f.read(4),'little')\nif c!=o and (c+(-c%16))==o:return\nf.seek(c-4);l=int.from_bytes(f.read(4),'little')-s;return l<=0 and l>-10"]],
+        "d":[["isin",["DATA","MENU","STRD","SEDT"],0],["n0",4,12],["n0",4,16],["py","f.seek(12);c=f.readi(4,'<')*4+20;o=f.readi(4,'<')\nif c!=o and (c+(-c%16))==o:return\nf.seek(c-4);l=f.readi(4,'<')-fsz;return l<=0 and l>-10"]],
         "rs":"Metal Slug 3D PAK"
     },
     {
-        "d":[["size",[16,104857600]],["str0e",0,32,5],["py","f=open(inp,'rb')\nwhile neof(f):\n for _ in range(256):\n  b=f.read(1)\n  if not b:return\n  if not b[0]:break\n  try:b.decode('utf-8')\n  except:return\n else:return\n s=int.from_bytes(f.read(2)[::-1]+f.read(2)[::-1],'big')\n if len(f.read(s))!=s:return\nreturn True"]],
+        "d":[["size",[16,104857600]],["str0e",0,32,5],["py","while neof(f):\n for _ in range(256):\n  b=f.read(1)\n  if not b:return\n  if not b[0]:break\n  try:b.decode('utf-8')\n  except:return\n else:return\n s=int.from_bytes(f.read(2)[::-1]+f.read(2)[::-1],'big')\n if len(f.read(s))!=s:return\nreturn True"]],
         "rs":"OHRRPGCE RPG"
     },
     {
-        "d":[["isat","add\\0",0],["isat","\\0\\0\\0",5],["n0",1,4],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);d=f.read(4);return s in(int.from_bytes(d,'little'),int.from_bytes(d,'big'))or not sum(d)"]],
+        "d":[["isat","add\\0",0],["isat","\\0\\0\\0",5],["n0",1,4],["py","f.seek(20);d=f.read(4);return fsz in(int.from_bytes(d,'little'),int.from_bytes(d,'big'))or not sum(d)"]],
         "rs":"Add PAC","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');o=int.from_bytes(f.read(4),'little');s=f.seek(0,2)\nif o>=s or o<8:return\nf.seek(o-4);return int.from_bytes(f.read(4),'little')in(s,s-160)"]],
+        "d":[["n0",4,0],["n0",4,4],["py","o=f.readi(4,'<')\nif o>=fsz or o<8:return\nf.seek(o-4);return f.readi(4,'<')in(fsz,fsz-160)"]],
         "rs":"Advanced V.G. DAT"
     },
     {
@@ -1809,11 +1816,11 @@
     {
         "rqr":null,
         "d":[["isat","DZ",0],["isin",["\\0","\\1","\\2","\\3"],2],["isin",["\\0","\\1","\\2","\\x21","\\3","\\4","\\5","\\x51","\\x55","\\6","\\7","\\8","\\x81","\\x82","\\x83","\\x84","\\9"],3],["n0",4,4],
-             ["py","f=open(inp,'rb');siz=f.seek(0,2);f.seek(4);o=int.from_bytes(f.read(4),'little');return (o+0x42)<=siz"]],
+             ["py","f.seek(4);o=f.readi(4,'<');return (o+0x42)<=fsz"]],
         "rs":"Dzip","s":1
     },
     {
-        "d":[["size",[8,null]],["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f=open(inp,'rb');f.seek(2);fl=f.read(1)[0]\nif fl&6==6 or (not fl&6 and fl>>3):return\nif fl&1 and not fl&6:return int.from_bytes(f.read(2),'big')==(~int.from_bytes(f.read(2),'big')&0xFFFF)==(f.seek(0,2)-11)\nreturn ((fl>>3)<286 and(f.read(1)[0]&31)<30)if fl&6 else(int.from_bytes(f.read(2),'big')==(~int.from_bytes(f.read(2),'big')&0xFFFF))"]],
+        "d":[["size",[8,null]],["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f.seek(2);fl=f.readi(1)\nif fl&6==6 or (not fl&6 and fl>>3):return\nif fl&1 and not fl&6:return f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF)==(fsz-11)\nreturn ((fl>>3)<286 and(f.readi(1)&31)<30)if fl&6 else(f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF))"]],
         "rs":"ZLIB"
     },
     {
@@ -1843,7 +1850,7 @@
         "rs":"Unreal ZenLoader","s":1
     },
     {
-        "d":[["isat","KANZ",0],["py","f=open(inp,'rb');f.seek(4);b=int.from_bytes(f.read(2),'big');o=0\nif (b>>12)>=6:\n o=1\n if b>>10&3==3:return\nreturn b>>(11+o)&31<=9"]],
+        "d":[["isat","KANZ",0],["py","f.seek(4);b=f.readi(2,'>');o=0\nif (b>>12)>=6:\n o=1\n if b>>10&3==3:return\nreturn b>>(11+o)&31<=9"]],
         "rs":"Kanzi","s":1
     },
     {
@@ -1855,7 +1862,7 @@
         "rs":"ZXC","s":1
     },
     {
-        "d":[["isat","MCX\\1\\1",0],["n0",1,6],["py","f=open(inp,'rb');f.seek(6);return 0<f.read(1)[0]<29 and f.read(1)[0]<11"]],
+        "d":[["isat","MCX\\1\\1",0],["n0",1,6],["py","f.seek(6);return 0<f.readi(1)<29 and f.readi(1)<11"]],
         "rs":"Max Compression","s":1
     },
     {
@@ -1997,7 +2004,7 @@
         "rs":"fxv","s":1
     },
     {
-        "d":[["isat","\\xFAVlAz\\xFB",0],["n0",1,6],["n0",1,7],["isat","\\xA9\\x93\\xBE\\x85",-4],["py","f=open(inp,'rb');s=f.seek(0,2)-20;f.seek(12);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","\\xFAVlAz\\xFB",0],["n0",1,6],["n0",1,7],["isat","\\xA9\\x93\\xBE\\x85",-4],["py","f.seek(12);return f.readi(4,'<')==(fsz-20)"]],
         "rs":"Vlaz","s":1
     },
     {
@@ -2015,7 +2022,7 @@
         "d":[["ext",".data"],["py","return exists(inp + '.js')"]],
         "rs":"Unreal Engine Web Package","s":1},{
         "rq":"UE4 Package",
-        "d":[["ext",".gz"],["py","return inp.endswith('.data.gz') and exists(inp[:-2] + 'js.gz')"]],
+        "d":[["ext",".gz"],["py","return inp.endswith('.data.gz')and exists(inp[:-2] + 'js.gz')"]],
         "rs":"Unreal Engine Web Package","s":1
     },
     {
@@ -2024,7 +2031,7 @@
         "rs":"Unreal Engine Web Package","s":1
     },
     {
-        "d":[["n0",4,0],["str",4,1],["py","f=open(inp,'rb');ss=int.from_bytes(f.read(4),'little');n=f.read(ss)\nif len(n)!=ss:return\ntry:asrt(n.decode('utf-8').isprintable())\nexcept:return\nf.seek(int.from_bytes(f.read(4),'little'),1);ns=f.read(4)\nif not ns:return\nf.seek(4,1);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:asrt(n.decode('utf-8').isprintable())\nexcept:return\nreturn True"]],
+        "d":[["n0",4,0],["str",4,1],["py","ss=f.readi(4,'<');n=f.read(ss)\nif len(n)!=ss:return\ntry:asrt(n.decode('utf-8').isprintable())\nexcept:return\nf.seek(f.readi(4,'<'),1);ns=f.read(4)\nif not ns:return\nf.skip(4);ns=int.from_bytes(ns,'little');n=f.read(ns)\nif len(n)!=ns:return\ntry:asrt(n.decode('utf-8').isprintable())\nexcept:return\nreturn True"]],
         "rs":"Impact Screensaver ILB"
     },
     {
@@ -2080,7 +2087,7 @@
         "rs":"GBA ADS SFCD","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0",5],["n0",1,4],["py","f=open(inp,'rb');return int.from_bytes(f.read(4),'little') == f.seek(0,2)"]],
+        "d":[["isat","\\0\\0\\0",5],["n0",1,4],["py","return f.readi(4,'<')==fsz"]],
         "rs":"GBA ADS MMSTR"
     },
     {
@@ -2090,23 +2097,23 @@
         "rs":"Zeebo Resources"
     },
     {
-        "d":[["n0",2,0],["n0",4,19],["str0e",2,13,3],["py","f=open(inp,'rb');c=int.from_bytes(f.read(2),'little');f.seek(19);return int.from_bytes(f.read(4),'little')==(2+c*22)"]],
+        "d":[["n0",2,0],["n0",4,19],["str0e",2,13,3],["py","c=f.readi(2,'<');f.seek(19);return f.readi(4,'<')==(2+c*22)"]],
         "rs":"Coktel Vision STK"
     },
     {
-        "d":[["isat","STK2.",0],["str0",0,28,20],["n0",4,28],["py","f=open(inp,'rb');f.seek(28);f.seek(int.from_bytes(f.read(4),'little')+4);p=f.tell()+4;f.seek(int.from_bytes(f.read(4),'little'));return int.from_bytes(f.read(4),'little')==p"]],
+        "d":[["isat","STK2.",0],["str0",0,28,20],["n0",4,28],["py","f.seek(28);f.seek(f.readi(4,'<')+4);p=f.tell()+4;f.seek(f.readi(4,'<'));return f.readi(4,'<')==p"]],
         "rs":"Coktel Vision STK2"
     },
     {
-        "d":[["isat","XCELZLIB",-8],["isat","\\1\\0\\0\\0",-20],["n0",4,-16],["n0",4,-12],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(-16,1);return (20+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","XCELZLIB",-8],["isat","\\1\\0\\0\\0",-20],["n0",4,-16],["n0",4,-12],["py","f.seek(-16,2);return (20+f.readi(4,'<')+f.readi(4,'<'))==fsz"]],
         "rs":"Conquest Earth WAD"
     },
     {
-        "d":[["isat","BigFile 1.00\\0\\0\\0\\0",0],["isatS","\\0",4,28],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(20);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))==s"]],
+        "d":[["isat","BigFile 1.00\\0\\0\\0\\0",0],["isatS","\\0",4,28],["n0",4,16],["n0",4,20],["n0",4,24],["py","f.seek(20);return (f.readi(4,'<')+f.readi(4,'<')+f.readi(4,'<'))==fsz"]],
         "rs":"Cryo BigFile","s":1
     },
     {
-        "d":[["isatS","x",5,2],["isat","\\0\\x20\\x01",18],["n0",2,0],["n0",4,7],["n0",8,11],["n0",1,21],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(7);return (s-(int.from_bytes(f.read(4),'little')+32))in{0,8}"]],
+        "d":[["isatS","x",5,2],["isat","\\0\\x20\\x01",18],["n0",2,0],["n0",4,7],["n0",8,11],["n0",1,21],["py","f.seek(7);return (fsz-(f.readi(4,'<')+32))in{0,8}"]],
         "rs":"Escal Compressed"
     },
     {
@@ -2146,7 +2153,7 @@
     },
     {
         "rqr":null,
-        "d":[["isat","2.01",4],["n0",4,0],["isatS","\\0",8,8],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');f.seek(0x10);return int.from_bytes(f.read(4),'little')==(c*0x10+0x10)"]],
+        "d":[["isat","2.01",4],["n0",4,0],["isatS","\\0",8,8],["py","c=f.readi(4,'<');f.seek(16);return f.readi(4,'<')==(c*16+16)"]],
         "rs":"Digimon Story Lost Evolution PAK","s":1
     },
     {
@@ -2184,15 +2191,15 @@
     {
         "rq":null,
         "rqr":null,
-        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],
-             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0]>1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1]!=0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1]!=0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
+        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",12,32],["n0",8,0],
+             ["py","f.seek(8)\nif f.readi(1)>1:return\nf.seek(10);fn=f.read(f.readi(2,'<'))\nif fn[-1]!=0:return\nfn=fn[:-1];dn=f.read(f.readi(2,'<'))\nif dn[-1]!=0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif not dn or dn[-1:]==b'/':return True"]],
         "rs":"ZCM"
     },
     {
         "rq":null,
         "rqr":null,
-        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",8,48],
-             ["py","f=open(inp,'rb')\nif not sum(f.read(8)):return\nif f.read(1)[0] > 1:return\nf.seek(10);fn=f.read(int.from_bytes(f.read(2),'little'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(int.from_bytes(f.read(2),'little'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif dn and dn[-1:]!=b'/':return\nv1=f.read(3)\nif not sum(f.read(6)) and f.read(3) == v1 and not sum(f.read(6+8)):return True"]],
+        "d":[["isatS","\\0",3,5],["isat","\\1",9],["isatS","\\0",8,48],["n0",8,0],
+             ["py","f.seek(8)\nif f.readi(1) > 1:return\nf.seek(10);fn=f.read(f.readi(2,'<'))\nif fn[-1] != 0:return\nfn=fn[:-1];dn=f.read(f.readi(2,'<'))\nif dn[-1] != 0:return\ndn=dn[:-1]\ntry:(dn+fn).decode('utf-8')\nexcept:return\nif dn and dn[-1:]!=b'/':return\nv1=f.read(3)\nif not f.readi(6) and f.read(3) == v1 and not sum(f.read(14)):return True"]],
         "rs":"Flashzip"
     },
     {
@@ -2271,7 +2278,7 @@
              ["isat","\\x03\\xAD\\xF1\\x7E",61760],["isin",["\\1","\\2"],61770],
              ["isat","\\0\\1\\0\\2",-768],["isat","Root-CA0000000",-640],["isin",["1","2"],-626],["isat","-MS0000000",-625],["isin",["2","3"],-615],["isat","\\0\\0\\0\\2",-576],["isatS","\\0",64,-704],["isatS","\\0",38,-614],["isatS","\\0",60,-444],["n0",60,-764],
              ["isat","\\0\\1\\0\\2",-384],["isat","Root-CA0000000",-256],["isin",["1","2"],-242],["isat","-MS0000000",-241],["isin",["2","3"],-231],["isat","\\0\\0\\0\\2AP",-192],["isatS","\\0",64,-320],["isatS","\\0",60,-60],["n0",60,-380],
-             ["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(0xF0CC);c=int.from_bytes(f.read(4),'big');o1=int.from_bytes(f.read(4),'big');f.seek(8,1);o2=int.from_bytes(f.read(4),'big');return o1>=(128*c)and(o1+960)==o2 and(o2+0xF0C0)==s"]],
+             ["py","f.seek(0xF0CC);c=f.readi(4,'>');o1=f.readi(4,'>');f.skip(8);o2=f.readi(4,'>');return o1>=(128*c)and(o1+960)==o2 and(o2+0xF0C0)==fsz"]],
         "rs":"Wii Exported Save Data","s":1
     },
     {
@@ -2310,12 +2317,12 @@
         "rq":null,
         "rqr":"Win32 Executable (generic)",
         "d":[["size",[200,1048576]],
-             ["py","f=open(inp,'rb');f.seek(60);o=int.from_bytes(f.read(4),'little');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n f.seek(2);av,iv=f.read(1)[0],f.read(1)[0];f.seek(12)\n if f.read(1)[0]not in{124,102,185,106,127,15,191,90,141,75,232,190}:return\nelif o==12: f.seek(38);av,iv=f.read(1)[0],f.read(1)[0]\nelse:return\nif av not in{48,49,50}or iv<48 or iv>57 or(av==48 and iv>54)or(av==49 and iv>52)or(av==50 and iv>51):return\nreturn True"]],
+             ["py","f.seek(60);o=f.readi(4,'<');f.seek(o)\nif f.read(4)!=b'PE\\0\\0':return\nif o==4:\n f.seek(2);av,iv=f.readi(1),f.readi(1);f.seek(12)\n if f.readi(1)not in{124,102,185,106,127,15,191,90,141,75,232,190}:return\nelif o==12: f.seek(38);av,iv=f.readi(1),f.readi(1)\nelse:return\nif av not in{48,49,50}or iv<48 or iv>57 or(av==48 and iv>54)or(av==49 and iv>52)or(av==50 and iv>51):return\nreturn True"]],
         "rs":"Crinkler"
     },
     {
         "rq":null,
-        "d":[["isat","HEAD",256],["py","f=open(inp,'rb');f.seek(0x130);f.seek(int.from_bytes(f.read(8),'little'));return f.read(4)==b'HFS0'"]],
+        "d":[["isat","HEAD",256],["py","f.seek(0x130);f.seek(f.readi(8,'<'));return f.read(4)==b'HFS0'"]],
         "rs":"Switch XCI","s":1
     },
     {
@@ -2331,19 +2338,19 @@
         "rs":"Metroid Prime 4 RFRM ENUM","s":1
     },
     {
-        "d":[["size",[8,524288]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');s=int.from_bytes(f.read(4),'little')+8;from zlib import crc32;return (crc32(f.read())^0xFFFFFFFF)==c and s==f.tell()"]],
+        "d":[["size",[8,524288]],["n0",4,0],["n0",4,4],["py","c=f.readi(4,'<');s=f.readi(4,'<')+8;from zlib import crc32;return (crc32(f.read())^0xFFFFFFFF)==c and s==fsz"]],
         "rs":"Metroid Prime 4 Save","s":1
     },
     {
-        "d":[["isat","\\x05SER",0],["isatS","\\0",24,8],["isat","\\0\\0\\0\\0",36],["n0",4,32],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return s==(int.from_bytes(f.read(4),'big')+32)"]],
+        "d":[["isat","\\x05SER",0],["isatS","\\0",24,8],["isat","\\0\\0\\0\\0",36],["n0",4,32],["py","f.seek(4);return fsz==(f.readi(4,'>')+32)"]],
         "rs":"Deathloop Resource","s":1},{
-        "d":[["isat","\\x04SER\\x00\\x03",0],["n0",1,6],["isat","\\0\\0\\0",7],["py","f=open(inp,'rb');f.seek(6)\ntry:s=f.read(f.read(1)[0]).decode('ascii')\nexcept:return\nreturn s.startswith('master')and s.endswith('.index')and exists(dirname(i)+'/'+s)"]],
+        "d":[["isat","\\x04SER\\x00\\x03",0],["n0",1,6],["isat","\\0\\0\\0",7],["py","f.seek(6)\ntry:s=f.read(f.readi(1)).decode('ascii')\nexcept:return\nreturn s.startswith('master')and s.endswith('.index')and exists(dirname(i)+'/'+s)"]],
         "rs":"Deathloop Resource","s":1},{
         "d":["isat","\\x04SEROOD\\0\\x08\\0\\0\\0",0],
         "rs":"Deathloop Resource","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,20],["n0",4,24],["py","f=open(inp,'rb');f.seek(4);c=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');f.seek(16);return o>(16+13*c)and o==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,4],["n0",4,8],["n0",4,16],["n0",4,20],["n0",4,24],["py","f.seek(4);c=f.readi(4,'<');o=f.readi(4,'<');f.seek(16);return o>(16+13*c)and o==f.readi(4,'<')"]],
         "rs":"Noita Wizard pAK"
     },
     {
@@ -2351,11 +2358,11 @@
         "rs":"Fox Engine QAR","s":1
     },
     {
-        "d":[["isat","\\0\\0\\0\\0\\x24\\0\\0\\0",-8],["isat","\\0\\0\\0\\0aq",-18],["isatS","\\0",12,-32],["n0",4,-12],["n0",2,-20],["n0",4,-36],["py","f=open(inp,'rb');f.seek(0,2);s=f.tell();f.seek(-36,1);s-=int.from_bytes(f.read(4),'little')+36;return not s%2 and s>256 and s<983040"]],
+        "d":[["isat","\\0\\0\\0\\0\\x24\\0\\0\\0",-8],["isat","\\0\\0\\0\\0aq",-18],["isatS","\\0",12,-32],["n0",4,-12],["n0",2,-20],["n0",4,-36],["py","s=f.seek(-36,2);s-=f.readi(4,'<');return not s%2 and s>256 and s<983040"]],
         "rs":"Fox Engine Console QAR"
     },
     {
-        "d":[["isat","foxfpk",0],["isat","win",7],["isat","\\0\\0",14],["isin",["d","\\0"],6],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(10);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["isat","foxfpk",0],["isat","win",7],["isat","\\0\\0",14],["isin",["d","\\0"],6],["py","f.seek(10);return f.readi(4,'<')==fsz"]],
         "rs":"Fox Engine FPK","s":1
     },
     {
@@ -2369,21 +2376,21 @@
     {
         "rq":["IFF Data",false],
         "rqr":["Generic RIFX container (little-endian)",false],
-        "d":[["n0",4,0],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little');return s==(f.seek(0,2)-8)"]],
+        "d":[["n0",4,0],["py","f.seek(4);s=f.readi(4,'<');return s==(fsz-8)"]],
         "rs":"bsc-m03"
     },
     {
         "rq":null,
-        "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f=open(inp,'rb');f.seek(11);sl=f.read(1)[0]\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
+        "d":[["isat","\\x37\\x04",0],["isat","\\0",3],["isat","\\x37\\x03",8],["py","f.seek(11);sl=f.readi(1)\ntry:f.read(sl).decode('ascii')\nexcept:return\nreturn sl>0"]],
         "rs":"QuARK","s":1
     },
     {
-        "d":[["isat","PACK\\1\\0\\0\\0",0],["isat","\\0",-1],["isatS","\\0",8,24],["n0",4,8],["n0",4,12],["n0",4,40],["n0",4,44],["py","if not exists(splitext(inp)[0]+'.dat'):return\nf=open(inp,'rb');f.seek(8);c=int.from_bytes(f.read(4),'little');return (c*16)==int.from_bytes(f.read(4),'little')"]],
+        "d":[["isat","PACK\\1\\0\\0\\0",0],["isat","\\0",-1],["isatS","\\0",8,24],["n0",4,8],["n0",4,12],["n0",4,40],["n0",4,44],["py","if not exists(splitext(inp)[0]+'.dat'):return\nf.seek(8);c=f.readi(4,'<');return (c*16)==f.readi(4,'<')"]],
         "rs":"RTL Ski Jumping 2004 DIR+DAT","s":1
     },
     {
         "rqr":"Quake archive",
-        "d":[["isat","PACK",0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(4);return (int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little'))<s"]],
+        "d":[["isat","PACK",0],["n0",4,4],["n0",4,8],["py","f.seek(4);return (f.readi(4,'<')+f.readi(4,'<'))<fsz"]],
         "rs":"Quake PAK","s":1
     },
     {
@@ -2395,9 +2402,9 @@
         "rs":"Azito 3D Pack Message"
     },
     {
-        "d":[["size",[64,4311744510]],["isat","darc\\xFF\\xFE\\x1C\\0\\0\\0\\0\\x01",0],["isat","\\x1C\\0\\0\\0",16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return int.from_bytes(f.read(4),'little')==s"]],
+        "d":[["size",[64,4311744510]],["isat","darc\\xFF\\xFE\\x1C\\0\\0\\0\\0\\x01",0],["isat","\\x1C\\0\\0\\0",16],["py","f.seek(12);return f.readi(4,'<')==fsz"]],
         "rs":"Nintendo Data ARChive","s":1},{
-        "d":[["size",[64,4311744510]],["isat","darc\\xFE\\xFF\\0\\0\\0\\x1C\\x01\\0",0],["isat","\\0\\0\\0\\x1C",16],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(12);return int.from_bytes(f.read(4),'big')==s"]],
+        "d":[["size",[64,4311744510]],["isat","darc\\xFE\\xFF\\0\\0\\0\\x1C\\x01\\0",0],["isat","\\0\\0\\0\\x1C",16],["py","f.seek(12);return f.readi(4,'>')==fsz"]],
         "rs":"Nintendo Data ARChive","s":1
     },
     {
@@ -2405,7 +2412,7 @@
         "rs":"Azada Wizard","s":1
     },
     {
-        "d":[["isat","\\x04\\xFB",0],["isat","\\0",7],["n0",2,2],["n0",3,4],["n0",4,8],["py","f=open(inp,'rb');f.seek(4);return f.read(1)[0]&3==1"]],
+        "d":[["isat","\\x04\\xFB",0],["isat","\\0",7],["n0",2,2],["n0",3,4],["n0",4,8],["py","f.seek(4);return f.readi(1)&3==1"]],
         "rs":"GDeflate"
     },
     {
@@ -2415,19 +2422,19 @@
     },
     {
         "rq":null,
-        "d":[["size",[11,62914560]],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little');return int.from_bytes(f.read(4),'little')>c and c in{f.seek(0,2),f.seek(0,2)-8}"]],
+        "d":[["size",[11,62914560]],["n0",4,0],["n0",4,4],["py","c=f.readi(4,'<');return f.readi(4,'<')>c and c in{fsz,fsz-8}"]],
         "rs":"Amusement Vision LZ"
     },
     {
-        "d":[["isin",["\\0\\0","\\0\\1","\\0\\4"],0],["n0",2,2],["py","f=open(inp,'rb');s=f.seek(0,2);f.seek(34);b=f.read(2);return s in{int.from_bytes(b,'little'),int.from_bytes(b,'big')}"]],
+        "d":[["isin",["\\0\\0","\\0\\1","\\0\\4"],0],["n0",2,2],["py","f.seek(34);b=f.read(2);return fsz in{int.from_bytes(b,'little'),int.from_bytes(b,'big')}"]],
         "rs":"GEM Resource"
     },
     {
-        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,90]],["py","d=open(inp,'rb').read(0x100).split(b'\\r\\n')[0]\ntry:d=d.decode('utf-8')\nexcept:return\nreturn d.split()[0].split('/')[1] in{'0.9','1.0','1.1','2','3'}and d.split()[1].isdigit()"]],
+        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,90]],["py","d=f.read(256).split(b'\\r\\n')[0]\ntry:d=d.decode('utf-8')\nexcept:return\nreturn d.split()[0].split('/')[1] in{'0.9','1.0','1.1','2','3'}and d.split()[1].isdigit()"]],
         "rs":"HTTP Response"
     },
     {
-        "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');f.seek(4);s=int.from_bytes(f.read(4),'little');o=int.from_bytes(f.read(4),'little');s+=o;f.seek(o);return b'\\xA1'*4==f.read(4)and(s+-s%2048)==f.seek(0,2)"]],
+        "d":[["s%",2048],["n0",4,0],["n0",4,4],["n0",4,8],["py","f.seek(4);s=f.readi(4,'<');o=f.readi(4,'<');s+=o;f.seek(o);return b'\\xA1'*4==f.read(4)and(s+-s%2048)==fsz"]],
         "rs":"Action Replay RAM Disk","s":1
     },
     {
@@ -2436,15 +2443,15 @@
         "rs":"Unison DAT","s":1
     },
     {
-        "d":[["s%",2048],["size",[145408,null]],["isatS","\\xE0",356,143004],["isatS","\\0",22,142982],["isin",["\\1\\0","\\0\\0"],24],["n0",4,0],["n0",4,16],["str0",4,12,6],["py","f=open(inp,'rb');return int.from_bytes(f.read(4),'little')<=6500"]],
+        "d":[["s%",2048],["size",[145408,null]],["isatS","\\xE0",356,143004],["isatS","\\0",22,142982],["isin",["\\1\\0","\\0\\0"],24],["n0",4,0],["n0",4,16],["str0",4,12,6],["py","return f.readi(4,'<')<=6500"]],
         "rs":"Smoking Car Productions Disk Cache"
     },
     {
-        "d":[["isatS","\\0",4,6],["n0",4,0],["n0",2,4],["py","f=open(inp,'rb');return (int.from_bytes(f.read(4),'big')+6+int.from_bytes(f.read(2),'big')*8)==f.seek(0,2)"]],
+        "d":[["isatS","\\0",4,6],["n0",4,0],["n0",2,4],["py","return (f.readi(4,'>')+6+f.readi(2,'>')*8)==fsz"]],
         "rs":"Kamen Rider Atsume BIN"
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')+int.from_bytes(f.read(4),'little')+4;return s==f.seek(0,2)"]],
+        "d":[["n0",4,0],["n0",4,4],["n0",4,8],["py","s=f.readi(4,'<')+f.readi(4,'<')+4;return s==fsz"]],
         "rs":"Metroid Samus Returns PKG"
     },
     {
@@ -2459,17 +2466,17 @@
     },
     {
         "rqr":null,
-        "d":[["ext",[".gcz",".exe"]],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');v1=f.read(1)[0];s=f.seek(0,2);f.seek(-1,1);return v1&3==3 and u>s and f.read(1)[0]!=255"]],
+        "d":[["ext",[".gcz",".exe"]],["size",[5,62914560]],["n0",4,0],["n0",1,4],["py","u=f.readi(4,'<');v1=f.readi(1);f.seek(-1,2);return v1&3==3 and u>fsz and f.readi(1)!=255"]],
         "rs":"Konami FireBeat LZSS"
     },
     {
         "rqr":null,
-        "d":[["isat","\\x54",0],["py","f=open(inp,'rb');f.seek(1);return f.read(1)[0]&15==1"]],
+        "d":[["isat","\\x54",0],["py","f.seek(1);return f.readi(1)&15==1"]],
         "rs":"Turbo Range Coder"
     },
     {
         "rqr":null,
-        "d":[["isatS","\\0",10,16],["isin",["\\0","\\x10","\\x20","\\x30","\\x40"],27],["str0",0,16,0],["py","f=open(inp,'rb');f.seek(0x1C);end=int.from_bytes(f.read(4),'little')\nif end!=f.seek(0,2):return False\nf.seek(32)\nfor _ in range(80):\n\ta=int.from_bytes(f.read(4),'little')\n\tif a!=0 and (a<352 or a>end):return False\nreturn True"]],
+        "d":[["isatS","\\0",10,16],["isin",["\\0","\\x10","\\x20","\\x30","\\x40"],27],["str0",0,16,0],["py","f.seek(28);end=f.readi(4,'<')\nif end!=fsz:return False\nf.seek(32)\nfor _ in range(80):\n a=f.readi(4,'<')\n if a!=0 and (a<352 or a>end):return False\nreturn True"]],
         "rs":"Floppy Image"
     },
     {
@@ -2495,19 +2502,19 @@
     {
         "rq":null,
         "rqr":null,
-        "d":[["s%",2],["size",[18,16777215]],["isat","\\0",0],["py","f=open(inp,'rb')\nwhile neof(f):\n fs=f.read(6)\n if len(fs)!=6:return\n l=0;fs=int.from_bytes(fs,'little')\n for x in range(16):\n  sf=(fs>>x*3)&7\n  if sf==0:l+=4\n  elif sf in(6,7):l+=2\n if len(f.read(l))!=l:return\nreturn True"]],
+        "d":[["s%",2],["size",[18,16777215]],["isat","\\0",0],["py","while neof(f):\n fs=f.read(6)\n if len(fs)!=6:return\n l=0;fs=int.from_bytes(fs,'little')\n for x in range(16):\n  sf=(fs>>x*3)&7\n  if sf==0:l+=4\n  elif sf in(6,7):l+=2\n if len(f.read(l))!=l:return\nreturn True"]],
         "rs":"Density Lion"
     },
     {
         "rq":null,
         "rqr":null,
-        "d":[["s%",2],["size",[18,16777215]],["py","f=open(inp,'rb')\nif f.read(1)[0]&3:return\nf.seek(0)\nwhile neof(f):\n fs=f.read(8)\n if len(fs)!=8:return\n l=0;fs=int.from_bytes(fs,'little')\n for x in range(32):\n  sf=(fs>>x*2)&3\n  if sf==0:l+=4\n  elif sf in(1,2):l+=2\n if len(f.read(l))!=l:return\nreturn True"]],
+        "d":[["s%",2],["size",[18,16777215]],["py","if f.readi(1)&3:return\nf.seek(0)\nwhile neof(f):\n fs=f.read(8)\n if len(fs)!=8:return\n l=0;fs=int.from_bytes(fs,'little')\n for x in range(32):\n  sf=(fs>>x*2)&3\n  if sf==0:l+=4\n  elif sf in(1,2):l+=2\n if len(f.read(l))!=l:return\nreturn True"]],
         "rs":"Density Cheetah"
     },
     {
         "rq":null,
         "rqr":null,
-        "d":[["s%",2],["size",[20,16777215]],["py","f=open(inp,'rb')\nif f.read(1)[0]&7:return\nf.seek(0)\nwhile neof(f):\n fs=f.read(8)\n if len(fs)!=8:return\n fs=int.from_bytes(fs,'little');l=fs.bit_count()*2+(64-fs.bit_count())*4\n if len(f.read(l))!=l:return\nreturn True"]],
+        "d":[["s%",2],["size",[20,16777215]],["py","if f.readi(1)&7:return\nf.seek(0)\nwhile neof(f):\n fs=f.read(8)\n if len(fs)!=8:return\n fs=int.from_bytes(fs,'little');l=fs.bit_count()*2+(64-fs.bit_count())*4\n if len(f.read(l))!=l:return\nreturn True"]],
         "rs":"Density Chameleon"
     },
     {
@@ -2523,7 +2530,7 @@
     },
     {
         "rqr":null,
-        "d":[["size",[10,1099511627775]],["ext",".yap"],["isat","\\0\\0\\0",5],["n0",8,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(8),'little');return s>f.seek(0,2)"]],
+        "d":[["size",[10,1099511627775]],["ext",".yap"],["isat","\\0\\0\\0",5],["n0",8,0],["py","s=f.readi(8,'<');return s>fsz"]],
         "rs":"Yappy"
     },
     {
@@ -2531,7 +2538,7 @@
         "rs":"New York Race KIX+KBF"
     },
     {
-        "d":[["s%",4],["ext",".dir"],["n0",4,0],["str0",4,64,5],["py","if not exists(splitext(inp)[0]+'.wad'):return\nf=open(inp,'rb');c=int.from_bytes(f.read(4),'little');return (4+c*72)==f.seek(0,2)"]],
+        "d":[["s%",4],["ext",".dir"],["n0",4,0],["str0",4,64,5],["py","if not exists(splitext(inp)[0]+'.wad'):return\nc=f.readi(4,'<');return (4+c*72)==fsz"]],
         "rs":"Quantum3 DIR+WAD","s":1
     },
     {
@@ -2544,12 +2551,12 @@
         "rs":"Disney's Tarzan FSD"
     },
     {
-        "d":[["ext",".lzmat"],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little');return s>=f.seek(0,2)"]],
+        "d":[["ext",".lzmat"],["n0",4,0],["py","s=f.readi(4,'<');return s>=f.seek(0,2)"]],
         "rs":"LZMAT"
     },
     {
         "rqr":null,
-        "d":[["isatS","\\0",13,-13],["str0e",0,300,1],["py","f=open(inp,'rb')\ntry:[x.decode('utf-8') for x in f.read(0x1000).split(b'\\0')]\nexcept:return\nreturn True"]],
+        "d":[["isatS","\\0",13,-13],["str0e",0,300,1],["py","try:[x.decode('utf-8') for x in f.read(0x1000).split(b'\\0')]\nexcept:return\nreturn True"]],
         "rs":"UE Text Resource"
     },
     {
@@ -2562,11 +2569,11 @@
         "rs":"Destruction Derby 2 DirInfo"
     },
     {
-        "d":[["s%",16],["size",[16,4294967295]],["ext",".pg"],["n0",4,0],["n0",4,4],["py","f=open(inp,'rb');c=int.from_bytes(f.read(4),'little')*4+4\nif (c+(-c%16))!=int.from_bytes(f.read(4),'little'):return\nf.seek(c);return not sum(f.read(-c%16))"]],
+        "d":[["s%",16],["size",[16,4294967295]],["ext",".pg"],["n0",4,0],["n0",4,4],["py","c=f.readi(4,'<')*4+4\nif (c+(-c%16))!=f.readi(4,'<'):return\nf.seek(c);return not sum(f.read(-c%16))"]],
         "rs":"NCAA Gamebreaker PG"
     },
     {
-        "d":[["ext",".dat"],["n0",4,0],["py","f=open(inp,'rb');s=int.from_bytes(f.read(4),'little')+4;return s==f.seek(0,2)"]],
+        "d":[["ext",".dat"],["n0",4,0],["py","return (f.readi(4,'<')+4)==fsz"]],
         "rs":"Orange Juice Encrypted"
     },
     {
@@ -2584,7 +2591,7 @@
         "rs":"Level5 Encrypted CRI CPK"
     },
     {
-        "d":[["size",[5,367001600]],["ext",".bytes"],["n0",4,0],["py","f=open(inp,'rb')\nwhile neof(f):\n s=int.from_bytes(f.read(4),'little')\n if not s or len(f.read(s))!=s:return\nreturn True"]],
+        "d":[["size",[5,367001600]],["ext",".bytes"],["n0",4,0],["py","while neof(f):\n s=f.readi(4,'<')\n if not s or len(f.read(s))!=s:return\nreturn True"]],
         "rs":"Mini Metro Sound Bytes"
     },
     {
@@ -2597,12 +2604,12 @@
     },
     {
         "rqr":null,
-        "d":[["size",[12,2147483648]],["isin",["\\x01","\\x02","\\x03","\\x04"],0],["py","f=open(inp,'rb');sl=f.read(1)[0];f.seek(sl)\nif not f.read(1)[0]:return\nf.seek(1);s=int.from_bytes(f.read(sl),'little');fc=int.from_bytes(f.read(2),'little');return s<0x80000000 and s>f.seek(0,2) and fc>8"]],
+        "d":[["size",[12,2147483648]],["isin",["\\x01","\\x02","\\x03","\\x04"],0],["py","sl=f.readi(1);f.seek(sl)\nif not f.readi(1):return\nf.seek(1);s=int.from_bytes(f.read(sl),'little');fc=f.readi(2,'<');return s<0x80000000 and s>fsz and fc>8"]],
         "rs":"Gipfeli"
     },
     {
         "rqr":null,
-        "d":[["name","data.arc"],["size",[8388608,16777216]],["n0",4,0],["n0",4,4],["isat","\\0",8],["py","f=open(inp,'rb');u=int.from_bytes(f.read(4),'little');return f.seek(int.from_bytes(f.read(4),'little'),1)<u and f.read(1)==b'\\0'"]],
+        "d":[["name","data.arc"],["size",[8388608,16777216]],["n0",4,0],["n0",4,4],["isat","\\0",8],["py","u=f.readi(4,'<');return f.skip(f.readi(4,'<'))<u and f.read(1)==b'\\0'"]],
         "rs":"Other Ocean Interactive ARC"
     },
     {
@@ -2720,18 +2727,18 @@
         "d":[["ext",[".cmix",".cmix1",".cmix_v1",".cmixv1",".cmix2",".cmix_v2",".cmixv2",".cmix3",".cmix_v3",".cmixv3",".cmix4",".cmix_v4",".cmixv4",".cmix5",".cmix_v5",".cmixv5",".cmix6",".cmix_v6",".cmixv6",".cmix7",".cmix_v7",".cmixv7",".cmix8",".cmix_v8",".cmixv8",
                      ".cmix9",".cmix_v9",".cmixv9",".cmix10",".cmix_v10",".cmixv10",".cmix11",".cmix_v11",".cmixv11",".cmix12",".cmix_v12",".cmixv12",".cmix13",".cmix_v13",".cmixv13",".cmix14",".cmix_v14",".cmixv14",".cmix15",".cmix_v15",".cmixv15",".cmix16",".cmix_v16",
                      ".cmixv16",".cmix17",".cmix_v17",".cmixv17",".cmix18",".cmix_v18",".cmixv18",".cmix19",".cmix_v19",".cmixv19",".cmix20",".cmix_v20",".cmixv20",".cmix21",".cmix_v21",".cmixv21"]],
-             ["py","f=open(inp,'rb');s=int.from_bytes(f.read(5),'big')&0x7fffffffff;return s>f.seek(0,2)"]],
+             ["py","s=int.from_bytes(f.read(5),'big')&0x7fffffffff;return s>fsz"]],
         "rs":"CMIX"
     },
     {
         "rq":null,
         "d":[["ext",[".gmix",".gmix1",".gmix_v1",".gmixv1"]],
-             ["py","f=open(inp,'rb');s=int.from_bytes(f.read(5),'big');return s>f.seek(0,2)"]],
+             ["py","s=int.from_bytes(f.read(5),'big');return s>fsz"]],
         "rs":"GMIX"
     },
     {
         "rqr":null,
-        "d":[["s%",16],["size",[128,4096]],["ext",".ejs"],["py","return basename(inp).startswith('subconf_') and '.' in tbasename(inp)"]],
+        "d":[["s%",16],["size",[128,4096]],["ext",".ejs"],["py","return basename(inp).startswith('subconf_')and '.' in tbasename(inp)"]],
         "rs":"JDownloader2 Encrypted Subconfig"
     },
     {
@@ -2752,7 +2759,7 @@
         "rs":"Teardown Encrypted"
     },
     {
-        "d":[["size",[5,null]],["isat","\\0",0],["n0",3,1],["py","f=open(inp,'rb');f.seek(1);return (int.from_bytes(f.read(3),'little')+4)==f.seek(0,2)"]],
+        "d":[["size",[5,null]],["isat","\\0",0],["n0",3,1],["py","f.seek(1);return (f.readi(3,'<')+4)==fsz"]],
         "rs":"0Size24 Data"
     }
 ]

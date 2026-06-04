@@ -2119,7 +2119,7 @@ def extract4_2(inp:str,out:str,t:str):
             fd = open(noext(i) + '.kbf','rb')
 
             def readd(p):
-                n = p + f.read(0x20).rstrip(b'\0').decode('ansi') + '/'
+                n = p + f.read(0x20).rstrip(b'\0').decode('latin1') + '/'
                 mkdir(o + '/' + n)
                 c = f.readu32()
                 for _ in range(c):
@@ -2136,9 +2136,9 @@ def extract4_2(inp:str,out:str,t:str):
                     elif ty == 1:
                         s = f.readu32()
                         fd.seek(of)
-                        fn = n + fd.read(0x20).rstrip(b'\0').decode('ansi')
+                        fn = n + fd.read(0x20).rstrip(b'\0').decode('latin1')
                         cms = f.readu8()
-                        if cms: fn += '.' + f.read(cms).decode('ansi')
+                        if cms: fn += '.' + f.read(cms).decode('latin1')
                         writefile(o + '/' + fn,fd.read(s))
             readd('')
 

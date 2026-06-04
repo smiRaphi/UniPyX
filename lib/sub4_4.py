@@ -14,7 +14,7 @@ def extract4_4(inp:str,out:str,t:str):
 
             of = o + '/' + basename(i)
             while f:
-                n = f.read(4).decode('ansi')
+                n = f.read(4).decode('latin1')
                 s = f.readu32()
                 ep = f.pos + s
 
@@ -920,7 +920,7 @@ def extract4_4(inp:str,out:str,t:str):
                     continue
                 ids = [f.reads16() for _ in range(5)]
                 fe = (f.readu32()+bo,f.readu32())
-                fn = f.read(0x2C).rstrip(b'\0').decode('ansi')
+                fn = f.read(0x2C).rstrip(b'\0').decode('latin1')
                 f.skip(4)
 
                 if ft & 4:
@@ -984,8 +984,8 @@ def extract4_4(inp:str,out:str,t:str):
             c = f.reads32()
             cvbo = 0
             for _ in range(c):
-                on = f.read(0x40).split(b'\0')[0].decode('ansi')
-                inf = [f.read(0x40).split(b'\0')[0].decode('ansi'),f.reads32(),f.reads32(),f.reads32(),f.reads32()]
+                on = f.read(0x40).split(b'\0')[0].decode('latin1')
+                inf = [f.read(0x40).split(b'\0')[0].decode('latin1'),f.reads32(),f.reads32(),f.reads32(),f.reads32()]
                 ty = f.reads32()
                 asrt(ty >= 0,f.pos)
 
@@ -2151,7 +2151,7 @@ def extract4_4(inp:str,out:str,t:str):
             fs = [(f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
             for fe in fs:
                 f.seek(sof + fe[3])
-                fn = f.read0s('ansi')
+                fn = f.read0s('latin1')
                 asrt(fn.isprintable())
                 fd.seek(fe[2])
                 writefile(o + '/' + fn,fd.decompress(fe[0],'' if fe[0] != fe[1] else 'none',usize=fe[1]))
@@ -2300,5 +2300,39 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'EA BIGB':
+            if db.print_try: print('Trying with EA extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            assert f.read(4) == b'BIGB'
+
+            do = 0x10 + f.readu32()
+            assert f.readu32() == 0x9D # ?, game ends in inf loop if != 0x9D
+
+            f.skip(4)
+            x = b'Type: ' + f.readc(0x40).split(b'\0')[0] + b'\n\nName: ' + f.readc(0x28).split(b'\0')[0] + b'\n\ncmd: '
+            s3,s4,s1,s2,zs1,zs2 = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            cmd = f.readc(0x100).split(b'\0')[0]
+            writefile(o + '/$comment.txt',x + cmd + b'\n')
+
+            cmd = cmd.split(b' ')
+            if b'-ps2' in cmd: gex = guess_ext_ps2
+            else: gex = guess_ext
+            f.seek(do)
+            d = f.decompress(zs1,'none',usize=s1)
+            writefile(f'{o}/1.cmp',d)
+            d = f.decompress(zs2,'none',usize=s2)
+            writefile(f'{o}/2.cmp',d)
+            f.align(0x800)
+            if s3:
+                d = f.readc(s3)
+                writefile(f'{o}/3.{gex(d)}',d)
+                f.align(0x800)
+            if s4:
+                d = f.readc(s4)
+                writefile(f'{o}/4.{gex(d)}',d)
+
+            f.close()
+            return
 
     return 1

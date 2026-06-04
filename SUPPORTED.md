@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 963
+# Supported Formats: 964
 
-## "Common" Archives/Compressors/Encodings (146)
+## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -89,6 +89,7 @@ Freeze Compressed | .frz | [Ancient](https://github.com/temisu/ancient) |
 FVL0 Compressed | .fvl | [Ancient](https://github.com/temisu/ancient) |
 GEM Resource | .gem | [deark](https://entropymine.com/deark/) |
 Git Bundle | .gitbundle | [Git](https://git-scm.com/) |
+Google Authenticator Migration URL | otpauth-migration:// | Custom |
 Google Update Installer | .exe | [7-Zip](https://7-zip.org/) |
 GZIP | .gz | Custom, [7-Zip](https://7-zip.org/) |
 HA | .ha | [HA](https://www.sac.sk/download/pack/ha0999.zip) |

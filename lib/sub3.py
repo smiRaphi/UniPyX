@@ -1207,7 +1207,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             for fe in fs:
                 f.seek(fe[2])
-                fn = f.read0s().decode('ansi')
+                fn = f.read0s().decode('latin1')
                 if fe[3]: fn = '$SYS/' + fn
                 f.seek(fe[0])
                 writefile(o + '/' + fn,f.read(fe[1]))

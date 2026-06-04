@@ -905,8 +905,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with custom extractor')
             from urllib.parse import unquote_to_bytes
             hd,d = readfile(i).split(b'\r\n\r\n',1)
-            hd = {x.split(b': ',1)[0].decode('ansi'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
-            hds = {'$header':hd.split(b'\r\n')[0].decode('ansi')} | {x:hd[x].decode('ansi') for x in hd}
+            hd = {x.split(b': ',1)[0].decode('latin1'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
+            hds = {'$header':hd.split(b'\r\n')[0].decode('latin1')} | {x:hd[x].decode('latin1') for x in hd}
             hd = {x.lower():hd[x] for x in hd}
 
             of = o + '/'
@@ -918,7 +918,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fn[:1] == b'*':
                     enc,fn = fn[2:].strip().split(b"''",1)
                     fn = fn.strip().split()[0]
-                    of += unquote_to_bytes(fn).decode(enc.decode('ansi'))
+                    of += unquote_to_bytes(fn).decode(enc.decode('latin1'))
                 else:
                     fn = fn[1:].strip()
                     if fn[:1] == b'"':
@@ -926,8 +926,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if b'; ' in fn and b'filename' in fn.lower() and b"''" in fn:
                             enc,fn = fn[2:].strip().split(b"''",1)
                             fn = fn.strip().split()[0]
-                            of += unquote_to_bytes(fn).decode(enc.decode('ansi'))
-                        else: of += unquote_to_bytes(rfn).decode('ansi')
+                            of += unquote_to_bytes(fn).decode(enc.decode('latin1'))
+                        else: of += unquote_to_bytes(rfn).decode('latin1')
             elif 'content-type' in hd: of += tbasename(i) + '.' + mime2ext(hd['content-type'])
             else: of += basename(i)
 
@@ -1080,8 +1080,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                                 if '; ' in rfn and 'filename' in rfn.lower() and "''" in rfn:
                                     enc,rfn = rfn[2:].strip().split("''",1)
                                     rfn = rfn.strip().split()[0]
-                                    fn = unquote_to_bytes(rfn).decode(enc.decode('ansi'))
-                                else: fn = unquote_to_bytes(rfn).decode('ansi')
+                                    fn = unquote_to_bytes(rfn).decode(enc.decode('latin1'))
+                                else: fn = unquote_to_bytes(rfn).decode('latin1')
                     elif 'content-type' in rhd: fn = 'content.' + mime2ext(rhd['content-type'])
                     else: fn = 'content.bin'
 
@@ -1217,6 +1217,57 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/' + x,'\n'.join(ls),'w')
 
             if fs: return
+        case 'Google Authenticator Migration URL':
+            ALGM = {1:'SHA1',2:'SHA256',3:'SHA512',4:'MD5'}
+            DIGM = {1:6,2:8}
+            TYPM = {1:'hotp',2:'totp'}
+
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            from base64 import b64decode,b32encode
+            from urllib.parse import urlparse,parse_qs,unquote
+            u = urlparse(i)
+            asrt(u.scheme == 'otpauth-migration' and u.hostname == 'offline')
+            u = parse_qs(u.query)
+            asrt('data' in u)
+            f = File(b64decode(unquote(u['data'][0])),endian='>')
+
+            ob = []
+            while f:
+                tg = f.readleb128u()
+                fn,wt = tg >> 3,tg & 7
+                if fn == 1 and wt == 2:
+                    ep = f.readleb128u() + f.pos
+                    otp = {'s':b'','n':'','i':'','a':1,'d':1,'t':2,'c':0}
+                    while f.pos < ep:
+                        tg = f.readleb128u()
+                        fn,wt = tg >> 3,tg & 7
+                        if fn == 1 and wt == 2: otp['s'] = f.readc(f.readleb128u())
+                        elif fn == 2 and wt == 2: otp['n'] = f.reads(f.readleb128u(),'utf-8')
+                        elif fn == 3 and wt == 2: otp['i'] = f.reads(f.readleb128u(),'utf-8')
+                        elif fn == 4 and wt == 0: otp['a'] = f.readleb128u()
+                        elif fn == 5 and wt == 0: otp['d'] = f.readleb128u()
+                        elif fn == 6 and wt == 0: otp['t'] = f.readleb128u()
+                        elif fn == 7 and wt == 0: otp['c'] = f.readleb128u()
+                        elif wt == 0: f.readleb128u()
+                        elif wt == 2: f.skip(f.readleb128u())
+                        else: raise NotImplementedError(wt)
+                    ob.append(otp)
+                elif wt == 0: f.readleb128u()
+                elif wt == 2: f.skip(f.readleb128u())
+                else: raise NotImplementedError(wt)
+
+            f.close()
+            if ob:
+                rob = []
+                for b in ob:
+                    par = ['secret=' + b32encode(b['s']).decode().rstrip('=')]
+                    if b['i']: par.append('issuer=' + b['i'])
+                    par.append(f'algorithm={ALGM[b["a"]]}')
+                    par.append(f'digits={DIGM[b["d"]]}')
+                    rob.append(f'otpauth://{TYPM[b["t"]]}/{b["n"]}?' + '&'.join(par))
+                writefile(o + '/otpauth.txt','\n'.join(rob),'w')
+                return
 
     return 1
 
@@ -1230,12 +1281,12 @@ def read_http_head(readline,max:int=None,idn=False):
         if not l: break
         if idn and l[0] == 0x20:
             try: lr = l.decode('utf-8');asrt(lr.isprintable())
-            except: lr = l.decode('ansi')
+            except: lr = l.decode('latin1')
             o[list(o)[-1]] += lr
             continue
         l = l.lstrip()
         if not l: break
         try: lr = l.decode('utf-8');asrt(lr.isprintable())
-        except: lr = l.decode('ansi')
+        except: lr = l.decode('latin1')
         o[lr.split(': ',1)[0]] = lr.split(': ',1)[1]
     return o

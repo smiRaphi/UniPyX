@@ -136,14 +136,14 @@ class File:
         n = c = b = 0
         while True:
             b = self.readu8()
-            n |= (b & mask(7)) << (c * 7)
+            n |= (b & 0x7F) << (c * 7)
             if not b & 0x80: return n
             c += 1
     def readvlq(self):
         n = b = 0
         while True:
             b = self.readu8()
-            n = (n << 7) | (b & mask(7))
+            n = (n << 7) | (b & 0x7F)
             if not b & 0x80: return n
     def readcompiu(self,null=False):
         b = self.readu8()
@@ -325,7 +325,7 @@ OODLE = None
 GDEFLATE = None
 UCL = None
 NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
-LHZC = {f'lh{x}':f'-lh{x}-'.encode('ansi') for x in {0,5,6,7}}
+LHZC = {f'lh{x}':f'-lh{x}-'.encode('latin1') for x in {0,5,6,7}}
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     global OODLE,GDEFLATE,UCL
     match algo:

@@ -18,7 +18,7 @@ i = argv[1]
 if i[:1] == '*':
     i = i[1:]
     print('Input:',i)
-    i = i.encode('ansi')
+    i = i.encode('latin1')
 elif i[:1] == ':':
     i = bytes.fromhex(i[1:])
     print('Input:',i.hex(' ').upper())

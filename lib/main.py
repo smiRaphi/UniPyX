@@ -270,37 +270,52 @@ def checktdb(i:list[str]) -> list[str]:
         for t in TDB:
             if x.lower() in TDB[t]: o.append(t)
     return o
+
+class FileStubbed(Exception): pass
+class FileStub:
+    def __init__(self): pass
+    def close(self,*_,**__): raise FileStubbed
+    read = readi = readline = seek = skip = tell = flush = close
+    @property
+    def closed(self): raise FileStubbed
+    @property
+    def name(self): raise FileStubbed
+    def __bool__(self): return False
 def analyze(inp:str,raw=False):
     global TRDB
 
     opt = db.print_try
     db.print_try = False
-    inp = cleanp(inp)
+    if '://' in inp[:0x20]: typ = 'url'
+    else:
+        inp = cleanp(inp)
+        if isdir(inp): typ = 'directory'
+        else:
+            f = open(inp,'rb')
+            idt = f.read(0x4000)
+            f.close()
+            isz = sum(idt) != 0
+            try: assert idt.decode('utf-8').replace('\r','').replace('\n','').replace('\t','').isprintable()
+            except: typ = 'binary'
+            else:
+                if isz: typ = 'text'
+                else: typ = 'binary'
+            if typ == 'binary' and not isz: typ = 'null'
 
     ts = []
-    if isfile(inp):
-        db.get('trid')
-        import bin.trid.trid as trid # type: ignore
-        trid.print = lambda *_,**__:None
-        if not TRDB: TRDB = trid.trdpkg2defs(dirname(db.get('trid')) + '\\triddefs.trd',usecache=True)
-        ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
-        for wt in {'InstallShield setup',}:
-            if wt in ts: ts.remove(wt)
-    _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
-    ts += [x.split(',')[0].split(' created: ')[0].split('\u00BF\u0074\u2593\u256C\u2551\u2567\u00F1\u2219')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
+    if typ != 'url':
+        if typ != 'directory':
+            db.get('trid')
+            import bin.trid.trid as trid # type: ignore
+            trid.print = lambda *_,**__:None
+            if not TRDB: TRDB = trid.trdpkg2defs(dirname(db.get('trid')) + '\\triddefs.trd',usecache=True)
+            ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
+            for wt in {'InstallShield setup',}:
+                if wt in ts: ts.remove(wt)
+        _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
+        ts += [x.split(',')[0].split(' created: ')[0].split('\u00BF\u0074\u2593\u256C\u2551\u2567\u00F1\u2219')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
-    if isdir(inp): typ = 'directory'
-    else:
-        idt = open(inp,'rb').read(0x4000)
-        isz = sum(idt) != 0
-        try: idt = idt.decode('utf-8')
-        except: typ = 'binary'
-        else:
-            if isz: typ = 'text'
-            else: typ = 'binary'
-        if ('null data' in ts or 'null bytes' in ts) and typ == 'binary' and not isz: typ = 'null'
-
-    if isfile(inp):
+    if typ == 'binary':
         f = open(inp,'rb')
         tg = f.read(4)
         if tg[:2] == b'MZ' or tg == b'\x7fELF':
@@ -375,6 +390,32 @@ def analyze(inp:str,raw=False):
 
     nts = checktdb(ts)
     nts = list(set(nts))
+    f = FileStub()
+    if typ in {'text','binary','null'}:
+        f = open(inp,'rb')
+        f._close = f.close
+        f.close = lambda *_,**__:None
+        f.readi = lambda n,end='<',sign=False: int.from_bytes(f.read(n),byteorder={'<':'little','>':'big'}[end],signed=sign)
+        f.skip = lambda n: f.seek(n,1)
+        fsz = f.seek(0,2)
+    elif typ == 'url': fsz = len(inp)
+    opfs = []
+    def fkopen(p,m,*args,**kwargs):
+        asrt('r' in m and not '+' in m,'Read only')
+        if p == inp:
+            if f:
+                asrt(m == 'rb','Binary read only')
+                f.seek(0)
+            return f
+        else:
+            rf = open(p,m,*args,**kwargs)
+            rf._close = rf.close
+            rf.close = lambda *_,**__:None
+            rf.readi = lambda n,end='<',sign=False: int.from_bytes(rf.read(n),byteorder={'<':'little','>':'big'}[end],signed=sign)
+            rf.skip = lambda n: rf.seek(n,1)
+            opfs.append(rf)
+            return rf
+
     for xv in DDB:
         if 't' in xv and xv['t'] != typ: continue
         if 'rq' in xv:
@@ -403,16 +444,23 @@ def analyze(inp:str,raw=False):
         else:
             dl = xv['d']
             if type(dl[0]) != list: dl = [dl]
+        ret = False
         for x in dl:
             if x[0] == 'py':
                 lc = {}
+                if f: f.seek(0)
                 try:
-                    exec('def check(inp):\n\t' + x[1].replace('\n','\n\t'),globals={'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile,'asrt':asrt},locals=lc)
-                    ret = lc['check'](inp)
+                    exec('def check():\n\t' + x[1].replace('\n','\n\t'),globals={'inp':inp,'fsz':fsz,'f':f,'open':fkopen,'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile,'asrt':asrt},locals=lc)
+                    ret = lc['check']()
+                except FileStubbed: ret = False
                 except:
                     print(xv['rs'] + ':')
                     print(x[1])
+                    if f: f._close()
                     raise
+                finally:
+                    for opf in opfs:
+                        if not opf.closed: opf._close()
             elif x[0] == 'ps':
                 env = os.environ.copy()
                 env['input'] = inp
@@ -422,50 +470,41 @@ def analyze(inp:str,raw=False):
             elif x[0] == 'ext': ret = inp.lower().endswith(tuple(x[1]) if type(x[1]) == list else x[1])
             elif x[0] == 'name': ret = basename(inp) == x[1]
             elif x[0] == 'namei': ret = basename(inp).lower() == x[1]
-            elif x[0] == 'print': print(*x[1:]);continue
+            elif x[0] in {'print','echo'}: print(*x[1:]);continue
             elif type(x[0]) == bool and x[0] == False: tret = ret = False
-            elif isfile(inp):
+            elif typ in {'binary','text','null'}:
                 if x[0] == 'contain':
                     cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
-                    f = open(inp,'rb')
                     sp = x[2][0]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = cv in f.read(x[2][1])
-                    f.close()
                 elif x[0] == 'isat':
-                    f = open(inp,'rb')
                     cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
                     sp = x[2]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(len(cv)) == cv
-                    f.close()
                 elif x[0] == 'isatS':
-                    f = open(inp,'rb')
                     cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
                     sp = x[3]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(x[2]*len(cv)) == (cv*x[2])
-                    f.close()
                 elif x[0] == 'isin':
-                    f = open(inp,'rb')
                     cvs = [ast.literal_eval('"' + cv.replace('"','\\"') + '"').encode('latin1') for cv in x[1]]
                     sp = x[2]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(len(cvs[0])) in cvs
-                    f.close()
                 elif x[0] == 'size':
-                    sz = os.path.getsize(inp)
-                    if type(x[1]) == int: ret = sz == x[1]
-                    else: ret = (x[1][0] == None or sz >= x[1][0]) and (x[1][1] == None or sz <= x[1][1])
-                elif x[0] == 's%': ret = os.path.getsize(inp) % x[1] == 0
+                    if type(x[1]) == int: ret = fsz == x[1]
+                    else: ret = (x[1][0] == None or fsz >= x[1][0]) and (x[1][1] == None or fsz <= x[1][1])
+                elif x[0] == 's%': ret = fsz % x[1] == 0
                 elif x[0] == 'hash':
                     hs = x[1].lower()
                     if len(hs) == 40: h = hashlib.sha1
@@ -473,10 +512,9 @@ def analyze(inp:str,raw=False):
                     elif len(hs) == 64: h = hashlib.sha256
                     h = h()
 
-                    f = open(inp,'rb')
                     if len(x) > 3: mn,mx = x[2],x[3]
                     elif len(x) > 2: mn,mx = 0,x[2]
-                    else: mn,mx = 0,f.seek(0,2)
+                    else: mn,mx = 0,fsz
 
                     f.seek(mn)
                     c = mx - mn
@@ -486,12 +524,10 @@ def analyze(inp:str,raw=False):
                         if not cv: break
                         h.update(cv)
                         c -= len(cv)
-                    f.close()
                     ret = h.hexdigest() == hs
                 elif x[0] == 'str0nv':
-                    f = open(inp,'rb')
                     sp = x[1]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     scnt = 0
@@ -499,14 +535,12 @@ def analyze(inp:str,raw=False):
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': scnt += 1
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:<>*': scnt += 1
                         elif b != b'\0': ret = False;break
                     else: ret = scnt >= x[3]
-                    f.close()
                 elif x[0] == 'str0e':
-                    f = open(inp,'rb')
                     sp = x[1]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     scnt = 0
@@ -514,14 +548,12 @@ def analyze(inp:str,raw=False):
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': scnt += 1
+                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:<>*': scnt += 1
                         elif b == b'\0': ret = scnt >= x[3];break
                     else: ret = scnt >= x[3]
-                    f.close()
                 elif x[0] == 'str0':
-                    f = open(inp,'rb')
                     sp = x[1]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     scnt = 0
@@ -531,43 +563,37 @@ def analyze(inp:str,raw=False):
                         b = f.read(1)
                         if not b: ret = False;break
                         if b == b'\0': end = True
-                        elif not end and b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': scnt += 1
+                        elif not end and b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:<>*': scnt += 1
                         else: ret = False;break
                     else: ret = scnt >= x[3]
-                    f.close()
                 elif x[0] == 'str':
-                    f = open(inp,'rb')
                     sp = x[1]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     b = b''
                     for _ in range(x[2]):
                         b = f.read(1)
                         if not b: ret = False;break
-                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:': ret = False;break
+                        if not b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:<>*': ret = False;break
                     else: ret = True
-                    f.close()
                 elif x[0] == 'n0':
-                    f = open(inp,'rb')
                     sp = x[2]
-                    if sp < 0: sp = f.seek(0,2) + sp
+                    if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = sum(f.read(x[1])) != 0
-                    f.close()
                 elif x[0] == 'reg':
                     reg = re.compile(x[1].encode())
-                    f = open(inp,'rb')
                     if len(x) > 3: mn,mx = x[2],x[3]
-                    elif len(x) > 2: mn,mx = x[2],f.seek(0,2)
-                    else: mn,mx = 0,f.seek(0,2)
+                    elif len(x) > 2: mn,mx = x[2],fsz
+                    else: mn,mx = 0,fsz
 
                     f.seek(mn)
                     ret = reg.match(f.read(mx-mn)) != None
-                    f.close()
                 elif x[0] == 'json':
-                    try: js = json.load(open(inp,encoding='utf-8'))
+                    f.seek(0)
+                    try: js = json.loads(f.read().decode('utf-8'))
                     except: ret = False
                     else:
                         def chk(j,c):
@@ -593,6 +619,10 @@ def analyze(inp:str,raw=False):
                             return True
                         ret = chk(js,x[1])
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
+            elif xv.get('t') == 'url':
+                if x[0] == 'isat':
+                    cv,sp = x[1],x[2]
+                    ret = inp[sp:sp+len(cv)] == cv
             if xv.get('qq') and (type(x[-1]) != bool or x[-1]):
                 if ret:
                     tret = True
@@ -605,6 +635,7 @@ def analyze(inp:str,raw=False):
                 nts = [xv['rs']]
                 break
             else: nts.append(xv['rs'])
+    if typ in {'text','binary','null'}: f._close()
     nts = list(set(nts))
     if not raw and not nts: print(ts)
 
@@ -993,7 +1024,7 @@ MIMEMP = {
     'video/mpeg4-generic':'mp4',
 }
 def mime2ext(m:str):
-    if type(m) == bytes: m = m.decode('ansi')
+    if type(m) == bytes: m = m.decode('latin1')
     m = m.split(';')[0].lower()
     if m in MIMEMP: return MIMEMP[m]
     m = m.split('/')[1].split('+')[-1]
@@ -1066,7 +1097,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
     out = cleanp(out)
     #asrt(not exists(out),'Output directory already exists')
-    inp = cleanp(inp)
+    if not '://' in inp: inp = cleanp(inp)
     if ts == None: ts = analyze(inp)
     if not ts:
         if rs: asrt(ts,'Unknown file type')

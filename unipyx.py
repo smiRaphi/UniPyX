@@ -45,15 +45,17 @@ if __name__ == '__main__':
     scan = '-os' in argv
     if scan: argv.remove('-os')
 
-    inp = os.path.abspath(argv[1])
-    assert os.path.exists(inp),'Input file does not exist'
-    assert os.path.isfile(inp),'Input is not a file'
+    inp = argv[1]
+    if not '://' in inp:
+        inp = os.path.abspath(inp)
+        assert os.path.exists(inp),'Input file does not exist'
+        assert os.path.isfile(inp),'Input is not a file'
 
     if len(argv) > 2: out = os.path.abspath(argv[2])
     else:
-        out = os.path.splitext(inp)[0]
+        out = bout = 'output' if '://' in inp else os.path.splitext(inp)[0]
         c = 1
-        while os.path.exists(out): out = os.path.splitext(inp)[0] + '_' + str(c);c += 1
+        while os.path.exists(out): out = bout + '_' + str(c);c += 1
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 

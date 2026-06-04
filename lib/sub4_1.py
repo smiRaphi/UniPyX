@@ -46,7 +46,7 @@ def extract4_1(inp:str,out:str,t:str):
             d = f.read()
             f.close()
             ob = []
-            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode({17:'ansi',527:'utf-8',14:'ascii'}[unk]))
+            for ix in range(c): ob.append(d[fs[ix]:fs[ix+1]].decode({17:'latin1',527:'utf-8',14:'ascii'}[unk]))
 
             writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
             if fs: return
@@ -539,7 +539,7 @@ def extract4_1(inp:str,out:str,t:str):
                 def read(self,n=None):
                     p = self.tell()
                     d = self.f.read(n)
-                    if (n == 4 and p == 0) or (n == 2 and p == 4): d = d.decode('ansi')
+                    if (n == 4 and p == 0) or (n == 2 and p == 4): d = d.decode('latin1')
                     return d
                 def close(self): self.f.close()
 
@@ -1775,7 +1775,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[0])
-                fn = f.read0s('ansi')
+                fn = f.read0s('latin1')
                 f.seek(fe[2])
                 for ix in range(fe[6]):
                     s = ((fe[4] >> ix) * (fe[5] >> ix) * CTRPIXM[fe[3]][1]) // 8

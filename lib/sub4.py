@@ -881,7 +881,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     asrt(enc == 'hex')
                     return self.hex()
                 def startswith(self,prefix,start=None,end=None):
-                    if isinstance(prefix,str): prefix = prefix.encode('ansi')
+                    if isinstance(prefix,str): prefix = prefix.encode('latin1')
                     return super().startswith(prefix, start, end)
                 def __getitem__(self,i):
                     if type(i) == slice: return self.__class__(super().__getitem__(i))
@@ -1707,9 +1707,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     run(['dfm2txt','bin',i,of])
                     if not (exists(of) and getsize(of)): return 1
 
-                    d = open(of,encoding='ansi').read()
+                    d = open(of,encoding='latin1').read()
                     break
-            else: d = d.decode('ansi')
+            else: d = d.decode('latin1')
 
             if db.print_try: print('Trying with custom extractor')
             import hashlib
@@ -2119,7 +2119,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             while f:
                 d = f.read(f.readu16())
                 try: d = d.decode('utf-8')
-                except UnicodeDecodeError: d = d.decode('ansi')
+                except UnicodeDecodeError: d = d.decode('latin1')
                 if not d.replace('\n','').replace('\r','').replace('\t','').isprintable(): return 1
                 se.append(d)
             f.close()
