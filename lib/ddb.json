@@ -1481,6 +1481,10 @@
         "rs":"Ludia GWTarget","s":1
     },
     {
+        "d":[["s%",32],["size",[64,null]],["isat","end\\x1A",-32],["isatS","\\0",28,-28],["n0",4,0],["py","fo=f.readi(4,'>');f.seek(fo-32);return int.from_bytes(f.read(32).rsplit(b'\\0'*4)[0][-4:],'big')==(fsz-32)"]],
+        "rs":"Hudson Arc Dat"
+    },
+    {
         "d":[["n0",2,0],["n0",4,2],["n0",4,14],["py","c=f.readi(2,'<');s=f.readi(4,'<');return (6+c*12+s)==fsz"]],
         "rs":"Blade Runner TLK/MIX"
     },

@@ -2334,5 +2334,34 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             return
+        case 'Hudson Arc Dat':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+
+            fo = f.readu32()
+            ofs = [fo]
+            while f < fo:
+                of = f.readu32()
+                if not of: break
+                ofs.append(of)
+            ofs.append(f.size)
+
+            for ix,of in enumerate(ofs[:-1]):
+                f.seek(of)
+                d = f.readc(ofs[ix + 1] - of)
+                if d[:4] == b'end\x1A': ex = 'end'
+                elif d[:2] == b'\xFE\xFF':
+                    try: dec = d.rsplit(b'\0\0')[0].decode('utf-16')
+                    except UnicodeDecodeError: ex = 'bin'
+                    else:
+                        d = d.rsplit(b'\0\0')[0]
+                        if dec[:4] == '[00:' and (dec[1:3]+dec[4:6]+dec[7:9]).isdigit() and dec[6] == ':' and dec[9] == ']': ex = 'lyr'
+                        else: ex = 'txt'
+                else: ex = guess_ext_wii(d)
+                writefile(f'{o}/{ix:02d}.{ex}',d)
+
+            f.close()
+            if ofs: return
 
     return 1

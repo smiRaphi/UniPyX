@@ -225,6 +225,10 @@ class File:
             if not self._end_pos is None: return self._end_pos < self.size
             return False
         return self.pos < self.size
+    def __lt__(self,other:int): return self.pos < other
+    def __gt__(self,other:int): return self.pos > other
+    def __le__(self,other:int): return self.pos <= other
+    def __ge__(self,other:int): return self.pos >= other
 class BitReader:
     def __init__(self,d:bytes):
         self.d = d

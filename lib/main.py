@@ -450,8 +450,8 @@ def analyze(inp:str,raw=False):
                 lc = {}
                 if f: f.seek(0)
                 try:
-                    exec('def check():\n\t' + x[1].replace('\n','\n\t'),globals={'inp':inp,'fsz':fsz,'f':f,'open':fkopen,'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile,'asrt':asrt},locals=lc)
-                    ret = lc['check']()
+                    exec('def check(inp,fsz,f):\n\t' + x[1].replace('\n','\n\t'),globals={'open':fkopen,'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile,'asrt':asrt},locals=lc)
+                    ret = lc['check'](inp,fsz,f)
                 except FileStubbed: ret = False
                 except:
                     print(xv['rs'] + ':')
@@ -914,6 +914,18 @@ def guess_ext_3ds(d:bytes):
     if d[:4] == b'darc': ext = 'arc'
     elif d[0] == 0x11 and sum(d[1:8]) and int.from_bytes(d[1:4]) < (s-4): ext = 'lz11'
     elif d[0] == 0x40 and sum(d[1:8]) and int.from_bytes(d[1:4]) < (s-4): ext = 'lz40'
+    else: ext = guess_ext(d)
+
+    return ext
+def guess_ext_wii(d:bytes):
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
+
+    if d[:4] == b'\0\x20\xAF\x30': ext = 'tpl'
+    elif d[:4] == b'bres': ext = 'bres'
+    elif d[:4] == b'\x55\xAA\x38\x2D': ext = 'u8'
+    elif d[:4] == b'RLYT': ext = 'brlyt'
     else: ext = guess_ext(d)
 
     return ext
