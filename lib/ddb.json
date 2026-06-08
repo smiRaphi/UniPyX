@@ -1485,6 +1485,18 @@
         "rs":"Hudson Arc Dat"
     },
     {
+        "d":[["ext",".rsdk"],["n0",4,0],["n0",2,4],["n0",1,6],["py","s=f.readi(4,'<');c=f.readi(2,'<');f.skip(f.readi(1));return f.readi(4)==0 and s>(6+c*7) and (s+c*7)<fsz"]],
+        "rs":"Retro Engine RSDKv3"
+    },
+    {
+        "d":[["isat","RSDKvB",0],["n0",2,6],["n0",16,8],["n0",4,24],["py","f.seek(6);c=f.readi(2,'<');f.seek(24);return (8+c*24)==f.readi(4,'<')"]],
+        "rs":"Retro Engine RSDKv4"
+    },
+    {
+        "d":[["isat","RSDKv",0],["isin",["3","4","5"],5],["n0",2,6],["n0",16,8],["n0",4,24],["py","f.seek(6);c=f.readi(2,'<');f.seek(24);return (8+c*24)==f.readi(4,'<')"]],
+        "rs":"Retro Engine RSDKv5","s":1
+    },
+    {
         "d":[["n0",2,0],["n0",4,2],["n0",4,14],["py","c=f.readi(2,'<');s=f.readi(4,'<');return (6+c*12+s)==fsz"]],
         "rs":"Blade Runner TLK/MIX"
     },

@@ -7017,6 +7017,14 @@
         ]],
         "ts":1778882223
     },
+    "rsdk_hashes":{
+        "p":"hashes/rsdk.bhl",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/rsdk.bhl",
+            "hashes/rsdk.bhl"
+        ]],
+        "ts":1778882223
+    },
     "difmb_dip_key":{
         "p":"difmb_dip_key.bin",
         "fs":[

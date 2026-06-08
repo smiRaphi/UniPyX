@@ -652,9 +652,10 @@ def extract(inp:str,out:str,t:str) -> bool:
     from .sub4_2 import extract4_2
     from .sub4_3 import extract4_3
     from .sub4_4 import extract4_4
+    from .sub4_5 import extract4_5
     from .sub5 import extract5
 
-    for f in (extract1,extract2,extract3,extract4,extract4_1,extract4_2,extract4_3,extract4_4,extract5):
+    for f in (extract1,extract2,extract3,extract4,extract4_1,extract4_2,extract4_3,extract4_4,extract4_5,extract5):
         r = f(inp,out,t)
         if not r: return r
 
@@ -1125,7 +1126,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
             raise
         rmtree(out)
     else:
-        if rs: asrt(not rs,"Could not extract")
+        if rs: raise Exception("Could not extract")
         return
     if not quiet: print('Extracted successfully to',out)
     return True

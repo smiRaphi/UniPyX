@@ -43,6 +43,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
             return uxx().decrypt_dxor(i,key or b'\0',iv or b'\0')
         case 'inv'|'invert': return uxx().decrypt_inv(i)
+        case 'inv_len': return uxx().decrypt_xor(i,(-1 - len(i)).to_bytes(1,signed=True))
         case 'swp4'|'swap4': return uxx().decrypt_swp4(i)
         case 'roll':
             if type(key) == int: key = key.to_bytes(1)
@@ -129,8 +130,20 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             lo = len(i) % 8
             return uxx().decrypt_tea(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
 
+        case 'rsdk3':
+            asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
+            return uxx().decrypt_rsdk3(i,key,iv)
+        case 'rsdk4':
+            asrt(isinstance(key,int) and isinstance(iv,int),err=TypeError)
+            return uxx().decrypt_rsdk4(i,key,iv)
+        case 'rsdk5':
+            if isinstance(key,str): key = swap32(crc_hash(key.upper().encode('utf-8'),'md5',bytes=True))
+            asrt(isinstance(key,bytes),err=TypeError)
+            return uxx().decrypt_rsdk5(i,key)
         case 'hatch':
             if isinstance(key,int): key = key.to_bytes(4,'little')
+            asrt(isinstance(key,bytes),err=TypeError)
+            if len(key) == 4: key = key*4
             return uxx().decrypt_hatch(i,key)
         case 'capcom_mame':
             if type(iv) == str: iv = iv.encode('ascii')
@@ -524,6 +537,13 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = hashlib.new(algo,i,**kwargs).digest(**kw)
             if oby: return r
             return int.from_bytes(r,'big')
+        case 'md5r':
+            oby = kwargs.pop('bytes',False)
+            import hashlib
+            r = hashlib.md5(i).digest()
+            r = r[12:16] + r[8:12] + r[4:8] + r[0:4]
+            if oby: return r
+            return int.from_bytes(r,'big')
         case 'md5_sha1':
             import hashlib
             r = hashlib.md5(i).digest() + hashlib.sha1(i).digest()
@@ -572,7 +592,7 @@ HASHTS = {
     'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
-    'md5':16,'sha1':20,'md5_sha1':36,
+    'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,
     'sha224':28,'sha256':32,'sha384':48,'sha512':64,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,
     'sha512_224':28,'sha512_256':32,

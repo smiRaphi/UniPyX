@@ -1,7 +1,6 @@
 from lib.main import *
 
 def extract4_4(inp:str,out:str,t:str):
-    run = db.run
     i = inp
     o = out
 
@@ -2304,10 +2303,10 @@ def extract4_4(inp:str,out:str,t:str):
             if db.print_try: print('Trying with EA extractor')
             from lib.file import File
             f = File(i,endian='<')
-            assert f.read(4) == b'BIGB'
+            asrt(f.read(4) == b'BIGB')
 
             do = 0x10 + f.readu32()
-            assert f.readu32() == 0x9D # ?, game ends in inf loop if != 0x9D
+            asrt(f.readu32() == 0x9D) # ?, game ends in inf loop if != 0x9D
 
             f.skip(4)
             x = b'Type: ' + f.readc(0x40).split(b'\0')[0] + b'\n\nName: ' + f.readc(0x28).split(b'\0')[0] + b'\n\ncmd: '

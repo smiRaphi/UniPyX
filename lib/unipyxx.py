@@ -78,6 +78,10 @@ def _5base_func(fnc,src,seed):
     i = (u8 * len(src)).from_buffer_copy(src)
     return int(fnc(i,len(src),seed))
 
+import struct
+from hashlib import md5
+from zlib import crc32
+
 class X:
     MMFS = {};SELENE = {}
     def __init__(self):
@@ -114,7 +118,9 @@ class X:
             ('decrypt_cxor' ,(P(u8),szt,P(u8),P(u8),szt),void,0),
             ('decrypt_dxor' ,(P(u8),szt,P(u8),P(u8),szt,P(u8),szt),void,0),
             ('decrypt_tea'  ,(P(u8),szt,P(u8),P(u8),s8),void,0),
-            ('decrypt_hatch',(P(u8),szt,P(u8),P(u8)),void,0),
+            ('decrypt_rsdk3',(P(u8),szt,P(u8),P(u8)),void,0),
+            ('decrypt_rsdk4',(P(u8),szt,u32,u32,P(u8),P(u8)),void,0),
+            ('decrypt_rsdk5',(P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_hornby',(P(u8),szt,u8,u8),void,0),
             ('init_mmfs',(P(u8),P(u8)),void,0),
             ('decrypt_mmfs',(P(u8),szt,P(u8)),void,0),
@@ -223,16 +229,36 @@ class X:
         o = (u8 * len(src))()
         self.dll.decrypt_tea(i,len(src),o,k,1 if le else 0)
         return bytes(o)
-    def decrypt_hatch(self,src:bytes,key:bytes) -> bytes:
-        from zlib import crc32
-        if len(key) == 4: key = key*4
-        asrt(len(key) == 0x10)
-        iv = crc32(len(src).to_bytes(8,'little')).to_bytes(4,'little')*4
-
+    def decrypt_rsdk3(self,src:bytes,key1:bytes,key2:bytes) -> bytes:
+        asrt(len(key1) == 20 and len(key2) == 12)
         d = (u8 * len(src)).from_buffer_copy(src)
-        k = (u8 * 0x10).from_buffer_copy(key)
-        v = (u8 * 0x10).from_buffer_copy(iv)
-        self.dll.decrypt_hatch(d,len(src),k,v)
+        k1 = (u8 * 20).from_buffer_copy(key1)
+        k2 = (u8 * 12).from_buffer_copy(key2)
+        self.dll.decrypt_rsdk3(d,len(src),k1,k2)
+        return bytes(d)
+    def decrypt_rsdk4(self,src:bytes,key1:int,key2:int) -> bytes:
+        d = (u8 * len(src)).from_buffer_copy(src)
+        keyx1 = struct.unpack('<4I',md5(str(len(src)).encode()).digest())
+        keyx2 = struct.unpack('<4I',md5(str((len(src) >> 1) + 1).encode()).digest())
+        kx1 = (u8 * 0x10).from_buffer_copy(struct.pack('>4I',*keyx1))
+        kx2 = (u8 * 0x10).from_buffer_copy(struct.pack('>4I',*keyx2))
+        self.dll.decrypt_rsdk4(d,len(src),key1,key2,kx1,kx2)
+        return bytes(d)
+    def decrypt_rsdk5(self,src:bytes,key:bytes) -> bytes:
+        asrt(len(key) == 0x10)
+        key2 = struct.unpack('<4I',md5(str(len(src)).encode()).digest())
+        d = (u8 * len(src)).from_buffer_copy(src)
+        k1 = (u8 * 0x10).from_buffer_copy(key)
+        k2 = (u8 * 0x10).from_buffer_copy(struct.pack('>4I',*key2))
+        self.dll.decrypt_rsdk5(d,len(src),k1,k2)
+        return bytes(d)
+    def decrypt_hatch(self,src:bytes,key:bytes) -> bytes:
+        asrt(len(key) == 0x10)
+        key2 = crc32(len(src).to_bytes(8,'little')).to_bytes(4,'little')*4
+        d = (u8 * len(src)).from_buffer_copy(src)
+        k1 = (u8 * 0x10).from_buffer_copy(key)
+        k2 = (u8 * 0x10).from_buffer_copy(key2)
+        self.dll.decrypt_rsdk5(d,len(src),k1,k2)
         return bytes(d)
     def decrypt_hornby(self,src:bytes,key:bytes|int,msk:int=0xFF) -> bytes:
         if isinstance(key,bytes): key = key[0]
@@ -255,7 +281,6 @@ class X:
         self.dll.decrypt_mmfs(d,len(src),mk)
         return bytes(d)
     def init_selene(self,key:bytes):
-        from zlib import crc32
         seed = crc32(key)
         if seed not in self.SELENE:
             k = (u8 * len(key)).from_buffer_copy(key)
@@ -348,6 +373,12 @@ extern "C" {
         return ((x & 0xFF) << 24 | (x & 0xFF00) << 8 | (x & 0xFF0000) >> 8 | (x & 0xFF000000) >> 24);
     }
 #endif
+static inline uint8_t SWAP8(uint8_t x) {
+    return ((uint8_t)x << 4) | (x >> 4);
+}
+static inline uint32_t HIMUL64(uint32_t a, uint32_t b) {
+    return ((uint64_t)a) * ((uint64_t)b) >> 32;
+}
 
 static inline uint16_t read16le(const uint8_t *restrict ptr) {
     return ptr[0] | (ptr[1] << 8);
@@ -1181,7 +1212,7 @@ EXPORT void decrypt_inv(const uint8_t *restrict src, const size_t size, uint8_t 
     for (size_t p=0;p < size;p++) dst[p] = ~src[p];
 }
 EXPORT void decrypt_swp4(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {
-    for (size_t p=0;p < size;p++) dst[p] = src[p] >> 4 | src[p] << 4;
+    for (size_t p=0;p < size;p++) dst[p] = SWAP8(src[p]);
 }
 EXPORT void decrypt_roll(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
                          const uint8_t *restrict key, const size_t ksize) {
@@ -1268,36 +1299,111 @@ EXPORT void decrypt_tea(const uint8_t *restrict src, const size_t size, uint8_t 
         out[p + 1] = v1;
     }
 }
-EXPORT void decrypt_hatch(uint8_t *restrict buf, const size_t size,
-                    const uint8_t *restrict key, const uint8_t *restrict iv) {
-    int swp = 0;
-    uint8_t i1 = 0;
-    uint8_t i2 = 8;
-    uint8_t xr = (size >> 2) & 0x7F;
+EXPORT void decrypt_rsdk3(uint8_t *restrict buf, const size_t size,
+                    const uint8_t *restrict key1, const uint8_t *restrict key2) {
+    uint8_t kn = (size >> 2) & 0x7F;
+    uint8_t k2p = (kn % 9) + 1;
+    uint8_t k1p = (kn % k2p) + 1;
+    int8_t swp = 0;
 
-    for (size_t i=0;i < size;i++) {
-        uint8_t b = buf[i];
-        b ^= xr ^ iv[i2++];
-        if (swp) b = ((b & 0x0F) << 4) | (b >> 4);
-        b ^= key[i1++];
-        buf[i] = b;
+    for (size_t p=0;p < size;p++) {
+        uint8_t b = buf[p];
+        b ^= key2[k2p++] ^ kn;
+        if (swp) b = SWAP8(b);
+        b ^= key1[k1p++];
+        buf[p] = b;
 
-        if (i1 < 0x10) {
-            if (i2 > 12) {
-                i2 = 0;
+        if (k1p <= 19 || k2p <= 11) {
+            if (k1p > 19) {
+                k1p = 1;
                 swp = !swp;
             }
-        } else if (i2 <= 8) {
-            i1 = 0;
+            if (k2p > 11) {
+                k2p = 1;
+                swp = !swp;
+            }
+        } else {
+            kn = (kn + 1) & 0x7F;
+            if (swp) {
+                k1p = (kn % 12) + 6;
+                k2p = (kn % 5) + 4;
+            } else {
+                k1p = (kn % 15) + 3;
+                k2p = (kn % 7) + 1;
+            }
+            swp = !swp;
+        }
+    }
+}
+EXPORT void decrypt_rsdk4(uint8_t *restrict buf, const size_t size,
+                    const uint32_t key1, const uint32_t key2,
+                    const uint8_t *restrict keyx1, const uint8_t *restrict keyx2) {
+    int8_t swp = 0;
+    uint8_t k1p = 0;
+    uint8_t k2p = 8;
+    uint8_t kn = (size >> 2) & 0x7F;
+
+    for (size_t p=0;p < size;p++) {
+        uint8_t b = buf[p];
+        b ^= keyx2[k2p++] ^ kn;
+        if (swp) b = SWAP8(b);
+        b ^= keyx1[k1p++];
+        buf[p] = b;
+
+        if (k1p <= 15) {
+            if (k2p > 12) {
+                k2p = 0;
+                swp = !swp;
+            }
+        } else if (k2p <= 8) {
+            k1p = 0;
             swp = !swp;
         } else {
-            xr = (xr + 2) & 0x7F;
+            kn = (kn + 2) & 0x7F;
+            uint32_t t1 = HIMUL64(key2, kn);
+            t1 += (kn - t1) >> 1;
+            uint32_t t2 = (HIMUL64(key1, kn) >> 3) * 3;
             if (swp) {
-                i1 = xr % 7;
-                i2 = (xr % 12) + 2;
+                k1p = kn - (t1 >> 2) * 7;
+                k2p = kn - (t2 << 2) + 2;
             } else {
-                i1 = (xr % 12) + 3;
-                i2 = xr % 7;
+                k1p = kn - (t2 << 2) + 3;
+                k2p = kn - (t1 >> 2) * 7;
+            }
+            swp = !swp;
+        }
+    }
+}
+EXPORT void decrypt_rsdk5(uint8_t *restrict buf, const size_t size,
+                    const uint8_t *restrict key1, const uint8_t *restrict key2) {
+    int8_t swp = 0;
+    uint8_t k1p = 0;
+    uint8_t k2p = 8;
+    uint8_t kn = (size >> 2) & 0x7F;
+
+    for (size_t p=0;p < size;p++) {
+        uint8_t b = buf[p];
+        b ^= key2[k2p++] ^ kn;
+        if (swp) b = SWAP8(b);
+        b ^= key1[k1p++];
+        buf[p] = b;
+
+        if (k1p <= 15) {
+            if (k2p > 12) {
+                k2p = 0;
+                swp = !swp;
+            }
+        } else if (k2p <= 8) {
+            k1p = 0;
+            swp = !swp;
+        } else {
+            kn = (kn + 2) & 0x7F;
+            if (swp) {
+                k1p = kn % 7;
+                k2p = (kn % 12) + 2;
+            } else {
+                k1p = (kn % 12) + 3;
+                k2p = kn % 7;
             }
             swp = !swp;
         }

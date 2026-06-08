@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 965
+# Supported Formats: 968
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (503)
+## Various (506)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -730,6 +730,9 @@ Remedy BIN+RMDP | .bin+.rmdp | [remedy_bin_rmdp.bms](https://mirror.aluigi.org/b
 RenderDoc Capture | .rdc | [RenderDoc](https://renderdoc.org/) |
 RenderWare Texture Dictionary | .txd | [rwexporter](https://github.com/AmyrAhmady/rwexporter) |
 Resistance Fall Of Man IGHW | .ighw | Custom |
+Retro Engine RSDKv3 | .rsdk | Custom |
+Retro Engine RSDKv4 | .rsdk | Custom |
+Retro Engine RSDKv5 | .rsdk | Custom |
 RetroStudio PAK | .pak | [PakTool](https://www.dropbox.com/scl/fi/exp8xazcfiqlmf7zk7s9g/PakTool.rar?rlkey=w23jpu9a66j6ws13d95jkjc3a&e=1&dl=0)(src?) |
 Reverse Computer Screen | .rcs | [RCS](https://github.com/einar-saukas/RCS) |
 Roblox Flag Cache | .cache | Custom |
@@ -739,7 +742,7 @@ RouterOS Package | .npk | [npkpy](https://pypi.org/project/npkPy/) |
 RPG Maker Archive | ??? | Custom |
 RTL Ski Jumping 2001 PAK | .pak | Custom |
 RTL Ski Jumping 2002 PAK | .pak | Custom |
-RTX Remix Package | .pkg | Custom |
+RTX Remix Package | .pkg | Custom | gdeflate compression is nonstandard?
 Safari WebArchive | ??? | [pywebarchive](https://pypi.org/project/pywebarchive/) |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
