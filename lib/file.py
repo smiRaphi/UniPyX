@@ -211,6 +211,8 @@ class File:
     @property
     def size(self): return self._size
     @property
+    def left(self): return self.size - self.pos
+    @property
     def closed(self) -> bool: return self._f.closed
 
     def update_size(self,current=True):
@@ -318,6 +320,13 @@ def ext_exe(i:str,dotnet=False):
             import nefile
             return nefile.NE(i)
         else: raise NotImplementedError(t.decode(errors='ignore'))
+
+def iszl(d:bytes):
+    if len(d) < 8 or d[0] != 0x78 or d[1] not in {0x01,0x5E,0x9C,0xDA}: return False
+    fl = d[2]
+    if fl & 6 == 6 or (not fl & 6 and fl >> 3): return False
+    if fl & 6: return (fl >> 3) < 286 and (d[4] & 31) < 30
+    else: return (d[3] << 8 | d[4]) == (~(d[5] << 8 | d[6]) & 0xFFFF)
 
 UPXX = None
 def uxx():

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 968
+# Supported Formats: 972
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (506)
+## Various (510)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -385,6 +385,8 @@ Allegro DAT | .dat | [allegro/dat](http://cdn.allegro.cc/file/library/allegro/4.
 Allods 2 Rage Of Mages Resource | .res | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Alter Echo RAD | .rad | Custom |
 Alter Echo REMF | .remf | Custom |
+Alvion INS Resource | .res | Custom |
+Alvion TIM2 Collection | .tm2col | Custom | extension is named by me as the parent archives don't have filenames
 American Conquest 2 GSC | .gsc | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 AMOS Memory Bank | ??? | Custom |
 AmusementMakers Project B.G. Archive | ??? | Custom |
@@ -434,6 +436,7 @@ Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
 Cause of Death EXP | .exp | Custom |
+ChainDive FLD | .fld | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Cheat Engine Cheat Table | .ct | Custom |
 Chrome PAK | .pak | [chrome-pak](https://github.com/myfreeer/chrome-pak-customizer) |
@@ -509,6 +512,7 @@ Escal Compressed | * | [na_game_tool](https://nihav.org/game_tool.html) |
 eSMART Data | ??? | Custom |
 eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Europe Racer IND+IMG | .ind+.img | Custom |
 Eutechnyx ARC | .arc | Custom |
 Eutechnyx CDFILES.DAT+AR | .dat+.ar | Custom |
 Exient XPK | .xpk | [nfshp2010wii.bms](https://mirror.aluigi.org/bms/nfshp2010wii.bms), [angry_birds_go.bms](https://aluigi.org/bms/angry_birds_go.bms), [xpk2.bms](https://aluigi.org/bms/xpk2.bms), [angry_birds_starwars.bms](https://aluigi.org/bms/angry_birds_starwars.bms) |

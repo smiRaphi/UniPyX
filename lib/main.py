@@ -846,7 +846,10 @@ def guess_ext(d:bytes) -> str:
     elif s > 0x100 and (d[:3] == b'ID3' or
                        (d[0] == 0xFF and d[1] & 0xE0 == 0xE0 and d[1] & 0x18 != 8 and d[1] & 0x06 != 0 and
                         d[2] & 0xF0 != 0xF0 and d[2] & 0x0C != 0x0C and d[3] & 0b11 != 0b10)): ext = 'mp3'
-    elif d[0] == 0x78 and not (d[0]<<8 | d[1])%31: ext = 'zlib'
+    elif s >= 8 and d[0] == 0x78 and d[1] in {0x01,0x5E,0x9C,0xDA} and\
+                    d[2] & 6 != 6 and not (not d[2] & 6 and d[2] >> 3) and (
+                   ((d[3] << 8 | d[4]) == (~(d[5] << 8 | d[6]) & 0xFFFF)) if not d[2] & 6 else (
+                    (d[2] >> 3) < 286 and (d[4] & 31) < 30)): ext = 'zlib'
 
     return ext
 def guess_ext_zeebo(d:bytes,hint:int=None):
@@ -887,8 +890,8 @@ def guess_ext_ps2(d:bytes):
 
     ext = None
     if d[:4] == b'TIM2': ext = 'tm2'
-    if d[::8] == b'IECSsreV': ext = 'hd'
-    if d[:0x18] == b'RESET\0\0\0\0\0\x08\0\0\0\0\0ROMDIR\0\0': ext = 'img'
+    elif d[:8] == b'IECSsreV': ext = 'hd'
+    elif d[:0x18] == b'RESET\0\0\0\0\0\x08\0\0\0\0\0ROMDIR\0\0': ext = 'img'
     elif d[:0x10] == b'BOOT2 = cdrom0:\\': ext = 'cnf'
     elif not s%0x10 and not d[0] and not sum(d[2:0x10]):
         for p in range(0x10,s,0x10):

@@ -2366,8 +2366,7 @@ def extract4_3(inp:str,out:str,t:str):
                 d = fd.read(fe[1])
                 if fe[2] in HL: fn = HL[fe[2]]
                 else:
-                    if d[4:12] == b'ins\0\0\0\0\0': ex = 'res'
-                    elif d[:4] == b'FARC': ex = 'fab'
+                    if d[:4] == b'FARC': ex = 'fab'
                     elif d[:4] == b'TARC': ex = 'tpk'
                     elif d[:4] == b'FTEX': ex = 'tex'
                     elif d[:4] == b'PPHD': ex = 'phd'
@@ -2379,7 +2378,7 @@ def extract4_3(inp:str,out:str,t:str):
                     elif d[:4] == b'SEQH': ex = 'spk'
                     elif d[:5] == b'_enum': ex = 'mess.bin'
                     else:
-                        ex = guess_ext_ps2(d)
+                        ex = guess_ext_alvion(d)
                         if ex == 'luac': ex = 'so'
                         elif ex == 'psadpcm': ex = 'pbd'
                     fn = f'{fe[2]:016X}.{ex}'
@@ -2434,6 +2433,69 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'ChainDive FLD':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu8() == 0xD0)
+
+            c = f.readu24()
+            writefile(o + '/$filename.txt',f.readc(0x14).rstrip(b'\0'))
+            ofs = [f.readu32() for _ in range(c+1)]
+
+            for ix in range(c):
+                f.seek(ofs[ix] & 0xFFFFF800)
+                d = f.readc((ofs[ix+1] & 0xFFFFF800) - ofs[ix])
+                writefile(o + f'/{ix:03d}.{guess_ext_alvion(d)}',d)
+
+            f.close()
+            if c: return
+        case 'Alvion INS Resource':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readc(4) == b'ins\0')
+
+            f.seek(0x20)
+            tof = f.readu32()
+            f.seek(0x30)
+            teof = f.readu32()
+            asrt(teof == f.readu32())
+            f.seek(0x40)
+            dof = f.readu32()
+
+            f.seek(tof)
+            fs = []
+            while f < teof:
+                fs.append((f.readu32() + dof,f.readu32()))
+                f.skip(8)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                writefile(o + f'/{ix:03d}.{guess_ext_alvion(d)}',d)
+
+            f.close()
+            if fs: return
+        case 'Alvion TIM2 Collection':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='<')
+            f.padc(4)
+
+            c = f.readu32()
+            f.padc(8)
+            ofs = [f.readu32() for _ in range(c)]
+            ofs.sort()
+            ofs.append(f.size)
+
+            for ix in range(c):
+                f.seek(ofs[ix])
+                d = f.readc(ofs[ix+1]-ofs[ix])
+                writefile(o + f'/{ix:02d}.{guess_ext_alvion(d)}',d)
+
+            f.close()
+            if c: return
 
     return 1
 
@@ -2443,6 +2505,26 @@ def dnasoft_lzss_decrypt(i:bytes):
     asrt(i[:4] == b'LZSS')
     rs = int.from_bytes(i[4:8],'little')
     return decrypt(i[8:8+rs+-rs%8],'blowfish_le',DNAKEY)[:rs]
+def guess_ext_alvion(d:bytes):
+    if not d: return 'null'
+    s = len(d)
+    if s < 4: return 'bin'
+
+    ex = None
+    if d[:8] == b'I3D_I3M\0': ex = 'i3m'
+    elif d[:8] == b'I3D_I3R\0': ex = 'i3r'
+    elif d[:8] == b'I3D_BIN\0': ex = 'i3d'
+    elif d[:4] == b'ins\0': ex = 'res'
+    elif d[:4] == b'alk\0': ex = 'alk'
+    elif d[:4] == b'demo': ex = 'demo'
+    else:
+        if s > 0x60 and not sum(d[:4]) and sum(d[4:8]) and not sum(d[8:16]):
+            c = 0x10 + int.from_bytes(d[4:8],'little')*4
+            o = int.from_bytes(d[0x10:0x14],'little')
+            if (c+-c%0x10) == o and d[o:o+4] == b'TIM2': ex = 'tm2col'
+    ex = ex or guess_ext_ps2(d)
+
+    return ex
 def sxm_block(inp,o:str,hint=None):
     from lib.file import File
     f:File = inp

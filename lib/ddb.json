@@ -751,6 +751,18 @@
         "rs":"TotemTech Data","s":1
     },
     {
+        "d":[["s%",2048],["isat","\\xD0",0],["n0",3,1],["py","f.seek(1);c=f.readi(3,'<');f.seek(24);o=24+c*4\nif (f.readi(4,'<')&0xFFFFF800)!=(o+-o%2048):return\nf.seek(o);return f.readi(4,'<')==fsz"]],
+        "rs":"ChainDive FLD","s":1
+    },
+    {
+        "d":[["isat","ins\\0",0],["isat","\\x40\\0\\0\\0\\x40\\0\\0\\0",8],["isat","\\x60\\0\\0\\0",32],["n0",4,48],["n0",4,52],["n0",4,64],["n0",4,68],["py","f.seek(68)\nif f.readi(4,'<')!=fsz:return\nf.seek(48);return f.read(4)==f.read(4)"]],
+        "rs":"Alvion INS Resource","s":1
+    },
+    {
+        "d":[["size",[96,null]],["isatS","\\0",4,0],["isatS","\\0",8,8],["n0",4,4],["n0",4,16],["py","f.seek(4);c=16+f.readi(4,'<')*4;f.seek(16);o=f.readi(4,'<');f.seek(o);return (c+-c%16)==o and f.read(4)==b'TIM2'"]],
+        "rs":"Alvion TIM2 Collection"
+    },
+    {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f.seek(4);return (f.readi(4,'>')+8)==fsz"]],
         "rs":"Lucas Arts Bundle"
     },
@@ -1355,6 +1367,10 @@
         "rs":"PlayStation BLS Update","s":1
     },
     {
+        "d":[["isat","\\x90\\x1D\\x30\\x010fd01039-8794-397b-a86d-b65a6a55aa37",0],["isatS","\\0",24,40]],
+        "rs":"NetEase Minecraft Bedrock Encrypted File","s":1
+    },
+    {
         "d":[["isat","CR2W",0],["n0",4,24],["n0",4,28],["n0",4,32],["n0",4,36],["py","f.seek(24);return f.readi(4,'<')<=f.readi(4,'<')==fsz"]],
         "rs":"REDengine W2ResourCe","s":1
     },
@@ -1490,11 +1506,17 @@
     },
     {
         "d":[["isat","RSDKvB",0],["n0",2,6],["n0",16,8],["n0",4,24],["py","f.seek(6);c=f.readi(2,'<');f.seek(24);return (8+c*24)==f.readi(4,'<')"]],
-        "rs":"Retro Engine RSDKv4"
+        "rs":"Retro Engine RSDKv4","s":1
     },
     {
         "d":[["isat","RSDKv",0],["isin",["3","4","5"],5],["n0",2,6],["n0",16,8],["n0",4,24],["py","f.seek(6);c=f.readi(2,'<');f.seek(24);return (8+c*24)==f.readi(4,'<')"]],
         "rs":"Retro Engine RSDKv5","s":1
+    },
+    {
+        "d":[["ext",".ind"],["s%",2],["size",[26,1572842]],["isatS","\\0",4,22],["n0",2,0],["str0",2,20,5],["py","return exists(splitext(inp)[0]+'.img')and (2+f.readi(2,'<')*24)==fsz"]],
+        "rs":"Europe Racer IND+IMG"},{
+        "d":[["ext",".ind"],["s%",2],["size",[6,262142]],["isat","\\2\\0\\0\\0",2],["n0",2,0],["py","dp=splitext(inp)[0]+'.img'\nif not exists(dp)or f.read(2)!=open(dp,'rb').read(2):return\nf.seek(0);return (2+f.readi(2,'<')*4)==fsz"]],
+        "rs":"Europe Racer IND+IMG"
     },
     {
         "d":[["n0",2,0],["n0",4,2],["n0",4,14],["py","c=f.readi(2,'<');s=f.readi(4,'<');return (6+c*12+s)==fsz"]],
@@ -1579,7 +1601,7 @@
         "rs":"Pseudo Interactive PIX"
     },
     {
-        "d":[["size",[2048,4294967294]],["s%",2048],["n0",4,0],["n0",1,4],["str0e",5,64,6],["py","o=f.readi(4,'<')\nif o%4 or 41>o or o>fsz:return\nf.seek(o-8);o=int.from_bytes(f.read(8).split(b'\\0',1)[1][:4],'little');return (o+(-o%2048))==fsz"]],
+        "d":[["size",[2048,4294967294]],["s%",2048],["n0",4,0],["n0",1,4],["str0e",5,64,6],["py","o=f.readi(4,'<')\nif o%4 or 41>o or o>fsz:return\nf.seek(o-8);o=f.read(8)\nif not b'\\0' in o:return\no=int.from_bytes(o.split(b'\\0',1)[1][:4],'little');return (o+(-o%2048))==fsz"]],
         "rs":"Pseudo Interactive SmallF"
     },
     {

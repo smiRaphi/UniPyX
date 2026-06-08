@@ -84,5 +84,29 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Europe Racer IND+IMG':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File,decompress,iszl
+            f = File(i,endian='<')
+            fd = File(noext(i) + '.img')
+
+            c = f.readu16()
+            if (c*0x18) == f.left: fs = [(f.readc(0x14).rstrip(b'\0').decode('ascii'),f.readu32()) for _ in range(c)]
+            elif (c*4) == f.left: fs = [(0,f.readu32()) for _ in range(c)]
+            else: raise ValueError('Unknown format')
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,fd.size))
+
+            for ix,fe in enumerate(fs[:-1]):
+                fd.seek(fe[1])
+                d = fd.readc(fs[ix+1][1]-fe[1])
+                if iszl(d[4:]): d = decompress(d[4:],'zlib',usize=int.from_bytes(d[:4],'little'))
+                if fe[0]: fn = fe[0]
+                else: fn = f'{ix:03d}.{guess_ext(d)}'
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            fd.close()
+            if fs: return
 
     return 1

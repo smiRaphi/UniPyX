@@ -1530,10 +1530,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 0x6666:'ImageBank',0x6667:'FontBank',0x6668:'SoundBank',0x6669:'MusicBank',
                 0x7EEE:'Fusion3Seed',0x7F7F:'Last',
             }
-            iszl = lambda d: d[0] == 0x78 and d[1] in {0x01,0x5E,0x9C,0xDA}
 
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import EXE,File,decompress
+            from lib.file import EXE,File,decompress,iszl
             from lib.crypto import decrypt
             from multiprocessing.pool import ThreadPool
             f = EXE(i)

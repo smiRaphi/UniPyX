@@ -37,6 +37,7 @@ GameZ Asset Archive | .zbd | https://discmaster.textfiles.com/search?format=game
 GameZ Interpreter Script | .zbd | https://discmaster.textfiles.com/search?format=gameZInterpreterScript&dedup=dedup | ? | ? | detected
 Forza ZIP | .zip | Forza | ? | https://github.com/Doliman100/ForzaTech-crypto-tool | regular zip + custom compression/encryption type
 Seal Online EDT | .edt | Seal Online | ? | https://reshax.com/topic/161-old-mmorpg-file-encryption/?&_rid=15412#findComment-715 | detected
+NetEase Minecraft Bedrock Encrypted File | * | https://reshax.com/topic/19163-netease-minecraft-bedrock-decrypt-resource-and-behavior-packs/?_rid=15412 | ? | ? | detected, some sort of xor
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
