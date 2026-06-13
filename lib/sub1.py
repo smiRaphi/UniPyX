@@ -338,7 +338,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 tf.destroy()
             return
         case 'ZIP'|'InstallShield Setup ForTheWeb':
-            if open(i,'rb').read(2) == b'MZ':
+            if readfile(i,size=2) == b'MZ':
                 zip7(i,o,'ZIP',True)
                 if os.path.exists(o + '/_INST32I.EX_'):
                     if fix_isinstext(o): return
@@ -354,33 +354,35 @@ def extract1(inp:str,out:str,t:str) -> bool:
             )
             ZFMTM = {
                 0:'none',
-                1:'shrunk',
-                2:'reduce',
-                3:'reduce',
-                4:'reduce',
-                5:'reduce',
+                1:'shrunk', # unsupported
+                2:'reduce', # unsupported
+                3:'reduce', # unsupported
+                4:'reduce', # unsupported
+                5:'reduce', # unsupported
                 6:'implode',
                 8:'deflate',
-                9:'deflate64',
+                9:'deflate64', # unsupported
                 12:'bzip2',
                 14:'lzma_zip',
                 15:'oodle', # unofficial, used by "New World: Aeternum", untested
-                16:'cmpsc',
-                18:'terse',
-                19:'lz77z',
+                16:'cmpsc', # unsupported
+                18:'terse', # unsupported
+                19:'lz77z', # unsupported
                 20:'zstd', # deprecated
                 93:'zstd',
-                94:'mp3',
+                94:'mp3', # unsupported
                 95:'xz',
-                96:'jpeg',
-                97:'wavpack',
-                98:'ppmd'
+                96:'jpeg', # unsupported
+                97:'wavpack', # unsupported
+                98:'ppmd' # unsupported
             }
 
+            FRZK = None
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File,decompress,pdosdate
             from lib.crypto import decrypt,crc_hash
             f = File(i,endian='<')
+
             f.seek(-0x10015)
             d = f.read(0x10015)
             bp = f.size - len(d)
@@ -436,6 +438,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 }
                 asrt(not fe['fl'] & 0x9780)
                 asrt(not fe['fl'] & 0x2000,'Encrypted CD',err=NotImplementedError)
+                if fe['ct'] == 22 and FRZK is None:
+                    from lib.pyob import PyOBinX
+                    FRZK = PyOBinX.dl('forza_keys',db)
+
                 ct,cd = f.readu16(),f.readu16()
                 try: fe['ts']['m'] = unix2filetime(pdosdate(cd,ct))
                 except ValueError: pass
@@ -507,9 +513,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if all(x in nl for x in pk[0]):
                         KEY = pk[1]
                         break
-                else:
-                    raise ValueError('No key for zip file')
+                else: raise ValueError('No key for zip file')
 
+            if FRZK:
+                FRZK.wait()
+                FRMK = [x for x in FRZK['c'] if x['n'].startswith('fm') and x['t'] == 'file']
+                FRHK = [x for x in FRZK['c'] if x['n'].startswith('fh') and x['t'] == 'file']
             for fe in fs:
                 f.seek(fe['of'])
                 asrt(f.read(4) == b'PK\3\4')
@@ -526,10 +535,26 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     d = d[12:]
 
                 if fe['ct'] == 22: # Forza
-                    raise NotImplementedError('Forza encryption')
-                    asrt(len(d) >= 0x24)
-                    iv,pad,mach,d = d[:0x10],int.from_bytes(d[0x10:0x14],'little'),d[0x14:0x24],d[0x24:]
-                    
+                    asrt(len(d) >= 0x230) # min observed block size + fm6apex header
+                    if len(d) & 7 == 4:
+                        v = 1
+                        iv,pad,hmac,d = d[:0x10],int.from_bytes(d[0x10:0x14],'little'),d[0x14:0x24],d[0x24:]
+                        ds = len(d) - 0x24
+                        bhd = iv + pad.to_bytes(4,'little')
+                    else:
+                        v = 0
+                        iv,hmac,d = d[:0x10],d[0x10:0x20],d[0x20:]
+                        ds = len(d) - 0x20
+                        bhd = iv
+                    for ctx in (FRMK,FRHK)[v]:
+                        if ds % (ctx['b'] + 0x10): continue
+                        hd = (ds // (ctx['b'] + 0x10) * ctx['b']).to_bytes(4,'little') + bhd
+                        if crc_hash(hd,'cmac_tfit',key=ctx['mk'],table=ctx['mt']) == hmac: break
+                    else: return 1
+                    d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'])
+                    if v == 1: d = d[:-pad]
+                    d = decompress(d,'deflate',usize=fe['us'])
+
                 else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
                 if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'])
                 fn = o + '/' + fe['n']

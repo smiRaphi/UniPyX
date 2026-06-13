@@ -129,6 +129,8 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'tea_pad'|'tea_pad_be'|'tea_pad_le':
             lo = len(i) % 8
             return uxx().decrypt_tea(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
+        case 'transformit'|'tfit':
+            return uxx().decrypt_tfit(i,key,iv,kwargs['table'])
 
         case 'rsdk3':
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
@@ -166,47 +168,6 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return uxx().decrypt_selene(i,key or b'\0')
 
     raise NotImplementedError(algo)
-
-def __chmr(*i:tuple[int,int]): return set(sum([list(range(a,b)) for a,b in i],[]))
-CHMS = {
-'n64mpak':(
-    '\0' + '\0'*14 + ' '
-    '0123456789ABCDEF'
-    'GHIJKLMNOPQRSTUV'
-    'WXYZ!"#\'*+,-./:='
-    '?@。゛゜ァィゥェォッャュョヲン'
-    'アイウエオカキクケコサシスセソタ'
-    'チツテトナニヌネノハヒフヘホマミ'
-    'ムメモヤユヨラリルレロワガギグゲ'
-    'ゴザジズゼゾダヂヅデドバビブベボ'
-    'パピプペポ'
-),'n64mpak?r':__chmr((1,0x0F),(149,0x100)),
-'latin1c':(
-    '\0' + 'ÿ'*0x1F +\
-    ' !"#$%&\'()*+,-./'
-    '0123456789:;<=>?'
-    '@ABCDEFGHIJKLMNO'
-    'PQRSTUVWXYZ[\\]^_'
-    '`abcdefghijklmno'
-    'pqrstuvwxyz{|}~▒'\
-    +'▯'*0x20+\
-    ' ¡¢£¤¥¦§¨©ª«¬—®¯'
-    '°±²³´µ¶·¸¹º»¼½¾¿'
-    'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ'
-    'ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß'
-    'àáâãäåæçèéêëìíîï'
-    'ðñòóôõö÷øùúûüýþÿ'
-)
-}
-def decode(i:bytes,algo:str):
-    algo = algo.lower().replace('-','').replace('_','')
-    ct = CHMS[algo]
-    it = CHMS.get(algo + '?r',set())
-    o = []
-    for ix,b in enumerate(i):
-        if b in it: raise UnicodeDecodeError(algo,i,ix,ix+1,'invalid character')
-        o.append(ct[b])
-    return ''.join(o)
 
 CRC_LUT = {}
 def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None) -> int:
@@ -550,6 +511,12 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
 
+        case 'cmac_transformit'|'cmac_tfit':
+            asrt(isinstance(kwargs['key'],bytes) and isinstance(kwargs['table'],bytes))
+            r = uxx().mac_cmac_tfit(i,kwargs['key'],kwargs['table'])
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+
         case 'tarzan': fnc = tarzan_hash
         case 'luas': fnc = luas_hash
         case 'java': fnc = java_hash
@@ -561,10 +528,6 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'pivotal': fnc = uxx().hash_pivotal
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
-
-import os,time,zlib
-from threading import Thread
-from .file import File
 
 HASHTS = {
     f'crc8_{x}':1 for x in CRC8}|{
@@ -601,163 +564,54 @@ HASHTS = {
     'ripemd160':20,'sm3':32,
     'tarzan':4,'luas':4,'sxm':8,'slf':4,'hash40':5,'pivotal':4,'java':4,
 }
-class HashLib:
-    def __init__(self,p:str,fmt=lambda x:x,encoding='utf-8'):
-        self.p = os.path.abspath(p)
-        self.fmt = fmt
-        self.enc = encoding
-
-        self.db = {}
-        self.lhsh = None
-
-        self._load_thrd = None
+from .pyob import PyOBin,PyOFunc
+class HashLib(PyOBin):
+    def __init__(self,p:str):
+        self.obj:dict[int,str] = {}
+        super().__init__(p,unpickle=True)
     @classmethod
-    def new(cls,p:str,ht:str,**kwargs):
-        c = cls(p,**kwargs)
-        c.ht = ht
-        c.hs = HASHTS[ht]
+    def new(cls,p:str,ht:str,enc='utf-8',fmt=None):
+        c = cls(p)
+        c.db = {'t':ht,'s':HASHTS[ht],'e':enc,'fmt':PyOFunc(fmt) if not isinstance(fmt,PyOFunc) else fmt,'hs':[],'ns':[]}
+        c.ht = c.db['t']
+        c.hs = c.db['s']
+        c.enc = c.db['e']
+        c.fmt = c.db['fmt']
         return c
     @classmethod
-    def dl(cls,p:str,db,**kwargs): return cls(db.get(p + '_hashes'),**kwargs).load()
-
-    def load(self):
-        if os.path.exists(self.p):
-            asrt(os.path.isfile(self.p))
-            self._load_thrd = Thread(target=self._load)
-            self._load_thrd.start()
-        return self
-    def loadb(self):
-        self.load().wait()
-        return self
+    def dl(cls,p:str,db): return cls(db.get(p + '_hashes')).load()
     def wait(self):
-        if self._load_thrd is not None:
-            self._load_thrd.join()
-            self._load_thrd = None
-    def _load(self):
-        f = File(self.p,'rb',endian='>')
-        self.ots = f.readu48()/100
-        self.ht = f.read0s().decode(self.enc)
-        self.hs = HASHTS[self.ht]
-        c = f.readvlq()
-        ks = [f.unpacki(self.hs) for _ in range(c)]
-        d = b'\x78\xDA' + f.read()
-        f.close()
-        vs = [x.decode(self.enc) for x in zlib.decompress(d).split(b'\0')]
-        db = zip(ks,vs)
-        self.lhsh = hash(db)
-        self.db = dict(db)
-
+        ld = bool(self._load_thrd)
+        super().wait()
+        if ld:
+            self.ht:str = self.db['t']
+            self.hs:int = self.db['s']
+            self.enc:str = self.db['e']
+            self.obj = dict(zip(self.db['hs'],self.db['ns']))
+            self.fmt:PyOFunc = self.db['fmt']
     def save(self):
-        ks = list(self.db.keys())
-        vs = list(self.db.values())
-        nhsh = hash(zip(ks,vs))
-        if self.lhsh == nhsh: return
-
-        f = File(self.p,'wb',endian='>')
-        ts = int(time.time()*100)
-        f.writeu48(ts)
-        f.write(self.ht.encode(self.enc) + b'\0')
-        f.writevlq(len(ks))
-
-        for k in ks: f.packi(k,self.hs)
-        f.write(zlib.compress(bytes(b'\0'.join([x.encode(self.enc) for x in vs])),level=9)[2:])
-        f.close()
-
-        self.lhsh = nhsh
-        self.ots = ts
+        self.db = {'t':self.ht,'s':self.hs,'e':self.enc,'fmt':self.fmt,'hs':list(self.obj.keys()),'ns':list(self.obj.values())}
+        super().save()
 
     def crc(self,i:str|bytes):
         if type(i) == str: i = i.encode(self.enc)
         return crc_hash(self.fmt(i),self.ht)
-
     def add(self,i:list[str]|str):
         if type(i) == str: i = [i]
         for v in i:
             k = self.crc(v)
-            if k not in self.db: self.db[k] = v
-    def get(self,v:str|int,default=None) -> str:
-        if type(v) == str: v = self.crc(v)
-        return self.db.get(v,default)
-    def __getitem__(self,v:str|int): return self.get(v)
-    def __contains__(self,v:str|int):
-        if type(v) == str: v = self.crc(v)
-        return v in self.db
+            if k not in self: self.obj[k] = v
 
-def _kl_interpt(f:File|list):
-    if isinstance(f,File): t = f.readu8()
-    elif isinstance(f,int): t = f
-    else: t = f[0]
-    match t:
-        case 0: return (None, lambda f:None,lambda f,v:0,t)
-        case 1: return (int,  lambda f:f.readvlq(),lambda f,v:f.writevlq(v),t)
-        case 2: return (bytes,lambda f:f.readc(f.readvlq()),lambda f,v:f.writevlq(len(v)) + f.write(v),t)
-        case 3: return (str,  lambda f:f.read0s('utf-8'),lambda f,v:f.write(v.encode('utf-8') + b'\0'),t)
-        case 64:
-            if isinstance(f,File): l = f.readvlq()
-            else: l = f[1]
-            return (bytes,lambda f:f.readc(l),lambda f,v:f.write(v),t,l)
-        case 65:
-            if isinstance(f,File): l = f.readu8()
-            else: l = f[1]
-            return (int,lambda f:f.unpacki(l),lambda f,v:f.packi(v,l),t,l)
-    raise ValueError
-
-class KeyLib:
-    def __init__(self,p:str):
-        self.p = os.path.abspath(p)
-        self.db = {}
-        self.scheme = []
-        self.name_flag = None
-
-    @classmethod
-    def new(cls,p:str,scheme:tuple[type],name=None):
-        c = cls(p)
-        c.scheme = [_kl_interpt(x) for x in scheme]
-        c.name_flag = _kl_interpt(name or 0)
-        return c
-    @classmethod
-    def dl(cls,p:str,db): return cls(db.get(p + '_keys')).load()
-    def load(self):
-        if os.path.exists(self.p):
-            asrt(os.path.isfile(self.p))
-            f = File(self.p,'rb',endian='>')
-            self.name_flag = _kl_interpt(f)
-
-            sc = f.readu8()
-            self.scheme = [_kl_interpt(f) for _ in range(sc)]
-
-            c = f.readvlq()
-            for ix in range(c):
-                sch = self.scheme.copy()
-                if self.name_flag: k = sch.pop(0)[2](f)
-                else: k = ix
-                self.db[k] = [x[2](f) for x in sch]
-            f.close()
-
-        return self
-    def save(self):
-        f = File(self.p,'wb',endian='>')
-        f.writeu8(self.name_flag[3])
-        f.writeu8(len(self.scheme))
-        for x in self.scheme:
-            f.writeu8(x[3])
-            if x[3] == 64: f.writevlq(x[4])
-            elif x[3] == 65: f.writeu8(x[4])
-        f.writevlq(len(self.db))
-        for k,v in self.db.items():
-            sch = self.scheme.copy()
-            if self.name_flag: sch.pop(0)[1](f,k)
-            for x in v: sch.pop(0)[1](f,x)
-        f.close()
-
-    def add(self,v,k=None):
-        if k is None: asrt(not self.name_flag)
-        sch = self.scheme.copy()
-        if self.name_flag: asrt(isinstance(k,sch.pop(0)[0]),err=TypeError)
-        else: k = len(self.db)
-        for x in v: asrt(isinstance(x,sch.pop(0)[0]),err=TypeError)
-        self.db[k] = v
-    def get(self,k,default=None) -> str: return self.db.get(k,default)
-    def __getitem__(self,k): return self.db[k]
-    def __contains__(self,k): return k in self.db
-    def __len__(self): return len(self.db)
+    def get(self,k:int|str,default=None):
+        if isinstance(k,int) and k in self.obj: return self.obj.get(k,default)
+        elif isinstance(k,str): return self.crc(k)
+        raise TypeError
+    def __getitem__(self,k:int):
+        if not isinstance(k,int): raise TypeError
+        r = self.get(k)
+        if r is None: raise KeyError(k)
+        return r
+    def __contains__(self,k:int):
+        if not isinstance(k,int): raise TypeError
+        return k in self.obj
+    def __len__(self): return len(self.obj)

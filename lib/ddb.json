@@ -764,7 +764,7 @@
     },
     {
         "d":[["size",[65846,4294967303]],["isat","BUND",0],["isat","BNHD",8],["n0",4,4],["n0",4,12],["py","f.seek(4);return (f.readi(4,'>')+8)==fsz"]],
-        "rs":"Lucas Arts Bundle"
+        "rs":"LucasArts Bundle"
     },
     {
         "d":[["n0",4,-4],["py","f.seek(-4,2);o=f.readi(4,'<')\nif o%4 or o>=fsz or o<32:return\nf.seek(fsz-o)\nif f.read(4)!=b'\\x03\\0\\0\\0':return\nc=f.readi(4,'<');f.skip(4)\nif f.readi(4)or(c*20+12)!=o:return\nus=f.readi(4,'>');f.skip(4);s=f.readi(4,'>');f.skip(4);d=f.readi(4,'>')-((s or us)>>4);return d<16"]],

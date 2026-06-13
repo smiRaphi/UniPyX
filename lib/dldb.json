@@ -6906,131 +6906,138 @@
         "ts":0
     },
     "pokemon_hashes":{
-        "p":"hashes/pokemon.bhl",
+        "p":"hashes/pokemon.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pokemon.bhl",
-            "hashes/pokemon.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pokemon.pyob",
+            "hashes/pokemon.pyob"
         ]],
-        "ts":1775826450
+        "ts":1781365824
     },
     "tarzan_hashes":{
-        "p":"hashes/tarzan.bhl",
+        "p":"hashes/tarzan.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/tarzan.bhl",
-            "hashes/tarzan.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/tarzan.pyob",
+            "hashes/tarzan.pyob"
         ]],
-        "ts":1775755195
+        "ts":1781365824
     },
     "archer_mac_mercury_hashes":{
-        "p":"hashes/archer_mac_mercury.bhl",
+        "p":"hashes/archer_mac_mercury.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/archer_mac_mercury.bhl",
-            "hashes/archer_mac_mercury.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/archer_mac_mercury.pyob",
+            "hashes/archer_mac_mercury.pyob"
         ]],
-        "ts":1775810698
+        "ts":1781365824
     },
     "ssbu_hashes":{
-        "p":"hashes/ssbu.bhl",
+        "p":"hashes/ssbu.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/ssbu.bhl",
-            "hashes/ssbu.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/ssbu.pyob",
+            "hashes/ssbu.pyob"
         ]],
-        "ts":1775755622
+        "ts":1781365824
     },
     "sonic_galactic_demo2_hashes":{
-        "p":"hashes/sonic_galactic_demo2.bhl",
+        "p":"hashes/sonic_galactic_demo2.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sonic_galactic_demo2.bhl",
-            "hashes/sonic_galactic_demo2.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sonic_galactic_demo2.pyob",
+            "hashes/sonic_galactic_demo2.pyob"
         ]],
-        "ts":1775756197
+        "ts":1781365824
     },
     "sumo_xpac_hashes":{
-        "p":"hashes/sumo_xpac.bhl",
+        "p":"hashes/sumo_xpac.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sumo_xpac.bhl",
-            "hashes/sumo_xpac.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sumo_xpac.pyob",
+            "hashes/sumo_xpac.pyob"
         ]],
-        "ts":1775825612
+        "ts":1781365824
     },
     "sine_mora_hashes":{
-        "p":"hashes/sine_mora.bhl",
+        "p":"hashes/sine_mora.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sine_mora.bhl",
-            "hashes/sine_mora.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sine_mora.pyob",
+            "hashes/sine_mora.pyob"
         ]],
-        "ts":1776102113
+        "ts":1781365824
     },
     "sxm_hashes":{
-        "p":"hashes/sxm.bhl",
+        "p":"hashes/sxm.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sxm.bhl",
-            "hashes/sxm.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sxm.pyob",
+            "hashes/sxm.pyob"
         ]],
-        "ts":1776974841
+        "ts":1781365824
     },
     "xbxde_hashes":{
-        "p":"hashes/xbxde.bhl",
+        "p":"hashes/xbxde.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/xbxde.bhl",
-            "hashes/xbxde.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/xbxde.pyob",
+            "hashes/xbxde.pyob"
         ]],
-        "ts":1777206982
+        "ts":1781365824
     },
     "pivotal_hashes":{
-        "p":"hashes/pivotal.bhl",
+        "p":"hashes/pivotal.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pivotal.bhl",
-            "hashes/pivotal.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/pivotal.pyob",
+            "hashes/pivotal.pyob"
         ]],
-        "ts":1778763157
+        "ts":1781365824
     },
     "ludia_hashes":{
-        "p":"hashes/ludia.bhl",
+        "p":"hashes/ludia.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/ludia.bhl",
-            "hashes/ludia.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/ludia.pyob",
+            "hashes/ludia.pyob"
         ]],
-        "ts":1778882223
+        "ts":1781365824
     },
     "apetec_hashes":{
-        "p":"hashes/apetec.bhl",
+        "p":"hashes/apetec.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/apetec.bhl",
-            "hashes/apetec.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/apetec.pyob",
+            "hashes/apetec.pyob"
         ]],
-        "ts":1778882223
+        "ts":1781365824
     },
     "motogp_hashes":{
-        "p":"hashes/motogp.bhl",
+        "p":"hashes/motogp.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/motogp.bhl",
-            "hashes/motogp.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/motogp.pyob",
+            "hashes/motogp.pyob"
         ]],
-        "ts":1778882223
+        "ts":1781365824
     },
     "spiderman3_hashes":{
-        "p":"hashes/spiderman3.bhl",
+        "p":"hashes/spiderman3.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/spiderman3.bhl",
-            "hashes/spiderman3.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/spiderman3.pyob",
+            "hashes/spiderman3.pyob"
         ]],
-        "ts":1778882223
+        "ts":1781365824
     },
     "rsdk_hashes":{
-        "p":"hashes/rsdk.bhl",
+        "p":"hashes/rsdk.pyob",
         "fs":[[
-            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/rsdk.bhl",
-            "hashes/rsdk.bhl"
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/rsdk.pyob",
+            "hashes/rsdk.pyob"
         ]],
-        "ts":1778882223
+        "ts":1781365824
     },
     "difmb_dip_key":{
-        "p":"difmb_dip_key.bin",
+        "p":"difmb_dip_key.pyob",
         "fs":[
-        "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/difmb_dip_key.bin"
+        "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/difmb_dip_key.pyob"
         ],
-        "ts":0
+        "ts":1781365824
+    },
+    "forza_keys":{
+        "p":"forza_keys.pyob",
+        "fs":[
+        "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/forza_keys.pyob"
+        ],
+        "ts":1781365824
     },
     "vulkan_gpuinfo.json":{
         "p":"vulkan_gpuinfo.json",

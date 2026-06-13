@@ -8,6 +8,12 @@ __pycache__
 /bin/UTMT_CLI/*
 /out
 *.exe
+*.dll
+!/lib/unipyxx.dll
+*.pyc
+*.pyo
+*.pyob
+*.bhl
 
 !/bin/bin.7z
 !/bin/ps3key.py

@@ -127,8 +127,6 @@ class X:
             ('init_selene',(P(u8),P(u8),szt,u32),void,0),
             ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2.1),
-            ('decrypt_forza_roundA_block',(P(u8),P(u8),P(u8)),void,0),
-            ('decrypt_forza_roundB_block',(P(u8),P(u8),P(u8)),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
             ('hash_super_fast_le',(P(u8),szt),u32,4),
@@ -143,6 +141,7 @@ class X:
             ('hash_murmur2_64A_be',(P(u8),szt,u32),u64,5),
             ('hash_murmur2_64B_le',(P(u8),szt,u32),u64,5),
             ('hash_murmur2_64B_be',(P(u8),szt,u32),u64,5),
+            ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
         ):
             fnc = self.dll[e[0]]
             fnc.argtypes = e[1]
@@ -299,20 +298,6 @@ class X:
         k = (u8 * len(key)).from_buffer_copy(key)
         self.dll.decrypt_rc4_playpond(b,len(src),k,len(key),drop)
         return bytes(b)
-    def decrypt_forza_roundA_block(self,src:bytes,key:bytes,table:bytes) -> bytes:
-        asrt(len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000)
-        b = (u8 * len(src)).from_buffer_copy(src)
-        k = (u8 * len(key)).from_buffer_copy(key)
-        t = (u8 * len(table)).from_buffer_copy(table)
-        self.dll.decrypt_forza_roundA_block(b,k,t)
-        return bytes(b)
-    def decrypt_forza_roundB_block(self,src:bytes,key:bytes,table:bytes) -> bytes:
-        asrt(len(src) == 0x10 and len(key) == 0x10 and len(table) == 0x4000)
-        b = (u8 * len(src)).from_buffer_copy(src)
-        k = (u8 * len(key)).from_buffer_copy(key)
-        t = (u8 * len(table)).from_buffer_copy(table)
-        self.dll.decrypt_forza_roundB_block(b,k,t)
-        return bytes(b)
 
     def hash_pivotal(self,src:bytes) -> int: ...
     def hash_super_fast_le(self,src:bytes) -> int: ...
@@ -327,6 +312,14 @@ class X:
     def hash_murmur2_64A_be(self,src:bytes,seed:int) -> int: ...
     def hash_murmur2_64B_le(self,src:bytes,seed:int) -> int: ...
     def hash_murmur2_64B_be(self,src:bytes,seed:int) -> int: ...
+    def mac_cmac_tfit(self,src:bytes,key:bytes,table:bytes) -> bytes:
+        asrt(len(key) == 4*4*13 and len(table) == 4*0x100*0x10*13)
+        s = (u8 * len(src)).from_buffer_copy(src)
+        d = (u8 * 0x10)()
+        k = (u8 * len(key)).from_buffer_copy(key)
+        t = (u8 * len(table)).from_buffer_copy(table)
+        self.dll.mac_cmac_tfit(s,len(src),d,k,t)
+        return bytes(d)
 
 '''*/
 
@@ -349,18 +342,36 @@ class X:
 EXPORT int __stdcall DllMain(void* a,unsigned long b,void* c) { return 1; }
 #ifdef _MSC_VER
     #pragma function(memset)
-    void* memset(void* dest, int c, size_t count) {
-        uint8_t* bytes = (uint8_t*)dest;
-        while (count--) {
-            *bytes++ = (uint8_t)c;
-        }
-        return dest;
-    }
 #endif
+void* memset(void* dst, int c, size_t count) {
+    uint8_t* bytes = (uint8_t*)dst;
+    while (count--) *bytes++ = (uint8_t)c;
+    return dst;
+}
+#ifdef _MSC_VER
+    #pragma function(memcpy)
+#endif
+void* memcpy(void* dst, const void* src, size_t count) {
+    uint8_t *d = (uint8_t*)dst;
+    uint8_t *s = (uint8_t*)src;
+
+    while (count >= 8) {
+        *(uint64_t*)d = *(uint64_t*)s;
+        d += 8;
+        s += 8;
+        count -= 8;
+    }
+
+    while (count--) *d++ = *s++;
+    return dst;
+}
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define CONCAT(a,b) a##b
+#define CONCATX(a,b) CONCAT(a,b)
 
 #if defined(__GNUC__) || defined(__clang__)
     #define SWAP32(x) __builtin_bswap32(x)
@@ -378,6 +389,13 @@ static inline uint8_t SWAP8(uint8_t x) {
 }
 static inline uint32_t HIMUL64(uint32_t a, uint32_t b) {
     return ((uint64_t)a) * ((uint64_t)b) >> 32;
+}
+static inline void DBLGF(uint8_t *src, uint8_t *dst) {
+    uint8_t a = 0;
+    if (src[0] & 0x80) a = 0x87;
+    dst[15] = a ^ (src[15] << 1);
+    for (int i=14;i >= 0;i--)
+        dst[i] = (src[i + 1] >> 7) | (src[i] << 1);
 }
 
 static inline uint16_t read16le(const uint8_t *restrict ptr) {
@@ -1518,39 +1536,89 @@ EXPORT void decrypt_zipcrypto(uint8_t *restrict buf, const size_t size, const ui
     #undef crc32
     #undef mix
 }
-EXPORT void decrypt_forza_roundA_block(uint8_t *restrict buf, const uint8_t *restrict key, const uint8_t *restrict table) {
-    const uint32_t *k = (uint32_t *)key;
-    const uint32_t *t = (uint32_t *)table;
-    #define get_t(x) t[0x100 * (x) + buf[(x)]]
 
-    uint32_t tmp[4];
-    tmp[0] = get_t(0) ^ get_t(5) ^ get_t(10) ^ get_t(15) ^ k[0];
-    tmp[1] = get_t(3) ^ get_t(4) ^ get_t(9 ) ^ get_t(14) ^ k[1];
-    tmp[2] = get_t(2) ^ get_t(7) ^ get_t(8 ) ^ get_t(13) ^ k[2];
-    tmp[3] = get_t(1) ^ get_t(6) ^ get_t(11) ^ get_t(12) ^ k[3];
-
-    #undef get_t
-    buf[0] = tmp[0];
-    buf[1] = tmp[1];
-    buf[2] = tmp[2];
-    buf[3] = tmp[3];
+static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
+    return t[0x100 * x + buf[x]];
 }
-EXPORT void decrypt_forza_roundB_block(uint8_t *restrict buf, const uint8_t *restrict key, const uint8_t *restrict table) {
-    const uint32_t *k = (uint32_t *)key;
-    const uint32_t *t = (uint32_t *)table;
-    #define get_t(x) t[0x100 * (x) + buf[(x)]]
+#define TFIT_ROUND_BLOCK(t,n,x10, x11, x12, x13,\
+                             x20, x21, x22, x23,\
+                             x30, x31, x32, x33,\
+                             x40, x41, x42, x43)\
+    void CONCATX(t,crypt_tfit_round##n)(uint8_t *restrict buf, const uint32_t *restrict k, const uint32_t *restrict t) {\
+        uint32_t tmp[4];\
+        tmp[0] = tfit_get_t(t,buf,x10) ^ tfit_get_t(t,buf,x11) ^ tfit_get_t(t,buf,x12) ^ tfit_get_t(t,buf,x13) ^ k[0];\
+        tmp[1] = tfit_get_t(t,buf,x20) ^ tfit_get_t(t,buf,x21) ^ tfit_get_t(t,buf,x22) ^ tfit_get_t(t,buf,x23) ^ k[1];\
+        tmp[2] = tfit_get_t(t,buf,x30) ^ tfit_get_t(t,buf,x31) ^ tfit_get_t(t,buf,x32) ^ tfit_get_t(t,buf,x33) ^ k[2];\
+        tmp[3] = tfit_get_t(t,buf,x40) ^ tfit_get_t(t,buf,x41) ^ tfit_get_t(t,buf,x42) ^ tfit_get_t(t,buf,x43) ^ k[3];\
+        memcpy(buf,tmp,0x10);\
+    }
+TFIT_ROUND_BLOCK(en,A, 0 ,1 ,2 ,3 ,
+                       4 ,5 ,6 ,7 ,
+                       8 ,9 ,10,11,
+                       12,13,14,15)
+TFIT_ROUND_BLOCK(en,B, 0 ,5 ,10,15,
+                       3 ,4 ,9 ,14,
+                       2 ,7 ,8 ,13,
+                       1 ,6 ,11,12)
+TFIT_ROUND_BLOCK(de,B, 0 ,7 ,10,13,
+                       1, 4 ,11,14,
+                       2, 5 ,8 ,15,
+                       3, 6 ,9 ,12)
+void decrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t *iv,
+                        const size_t rounds, const uint32_t *restrict k, const uint32_t *restrict t) {
+    uint8_t tmp[16];
+    if (iv != NULL) {
+        for (size_t i=0;i < 16;i++) tmp[i] = src[i] ^ iv[i];
+    } else memcpy(tmp,src,0x10);
+    encrypt_tfit_roundA(tmp,k + 0,t + 0x0000);
+    encrypt_tfit_roundA(tmp,k + 4,t + 0x1000);
+    for (size_t i=2;i < rounds - 1;i++)
+        decrypt_tfit_roundB(tmp,k + i*4,t + i*0x1000);
+    encrypt_tfit_roundA(tmp,k + (rounds - 1)*4,t + (rounds - 1)*0x1000);
+    memcpy(dst,tmp,0x10);
+}
+void encrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t *iv,
+                        const size_t rounds, const uint32_t *restrict k, const uint32_t *restrict t) {
+    uint8_t tmp[16];
+    if (iv != NULL) {
+        for (size_t i=0;i < 16;i++) tmp[i] = src[i] ^ iv[i];
+    } else memcpy(tmp,src,0x10);
+    encrypt_tfit_roundA(tmp,k + 0,t + 0x0000);
+    encrypt_tfit_roundA(tmp,k + 4,t + 0x1000);
+    for (size_t i=2;i < rounds - 1;i++)
+        encrypt_tfit_roundB(tmp,k + i*4,t + i*0x1000);
+    encrypt_tfit_roundA(tmp,k + (rounds - 1)*4,t + (rounds - 1)*0x1000);
+    memcpy(dst,tmp,0x10);
+}
+EXPORT void decrypt_tfit(uint8_t *restrict src, const size_t size, uint8_t *restrict dst, const uint8_t *restrict iv,
+                   const uint32_t *restrict key, const uint32_t *restrict table, const size_t block_size) {
+    
+}
+EXPORT void mac_cmac_tfit(uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
+                    const uint32_t *restrict key, const uint32_t *restrict table) {
+    uint8_t tmp[16] = {0};
+    uint8_t lblk_scrmbl[16];
 
-    uint32_t tmp[4];
-    tmp[0] = get_t(0) ^ get_t(7) ^ get_t(10) ^ get_t(13) ^ k[0];
-    tmp[1] = get_t(1) ^ get_t(4) ^ get_t(11) ^ get_t(14) ^ k[1];
-    tmp[2] = get_t(2) ^ get_t(5) ^ get_t(8 ) ^ get_t(15) ^ k[2];
-    tmp[3] = get_t(3) ^ get_t(6) ^ get_t(9 ) ^ get_t(12) ^ k[3];
+    encrypt_tfit_block(tmp, lblk_scrmbl, NULL, 13, key, table);
+    DBLGF(lblk_scrmbl, lblk_scrmbl);
+    if (size != 0) {
+        size_t blocks = size / 16 + (size % 16 != 0);
+        for (size_t i=0;i < blocks - 1;i++)
+            encrypt_tfit_block(src + i*16, tmp, tmp, 13, key, table);
+    }
 
-    #undef get_t
-    buf[0] = tmp[0];
-    buf[1] = tmp[1];
-    buf[2] = tmp[2];
-    buf[3] = tmp[3];
+    if (size % 16 || size == 0) {
+        DBLGF(lblk_scrmbl, lblk_scrmbl);
+
+        uint8_t block[16] = {0};
+        block[size % 16] = 0x80;
+        memcpy(block, src + size - (size % 16), size % 16);
+        for (size_t i=0;i < 16;i++) tmp[i] ^= lblk_scrmbl[i] ^ block[i];
+    } else {
+        for (size_t i=0;i < 16;i++) tmp[i] ^= lblk_scrmbl[i] ^ src[size - 16 + i];
+    }
+
+    encrypt_tfit_block(tmp, dst, NULL, 13, key, table);
 }
 
 EXPORT uint32_t hash_pivotal(const uint8_t *restrict src, const size_t size) {

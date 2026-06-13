@@ -391,7 +391,7 @@ def extract4_3(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             from lib.crypto import HashLib
-            HL = HashLib.dl('tarzan',db,fmt=lambda x:x[:1022],encoding='ascii')
+            HL = HashLib.dl('tarzan',db)
             f = File(i,endian='<')
 
             ep = f.size
@@ -1025,11 +1025,10 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             return
         case 'Archer Maclean\'s Mercury PAQ':
-            CRCC = b"________________________________________________0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____________________________________________________________________________________________________________________________________"
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             from lib.crypto import HashLib
-            HL = HashLib.dl('archer_mac_mercury',db,fmt=lambda x:x.translate(CRCC),encoding='ascii')
+            HL = HashLib.dl('archer_mac_mercury',db)
             f = File(i,endian='<')
             asrt(f.readu32() in {0x7D1,0xFEED})
 
@@ -2000,9 +1999,9 @@ def extract4_3(inp:str,out:str,t:str):
             if d: return
         case 'Sumo Digital XPAC':
             if db.print_try: print('Trying with custom extractor')
-            from lib.file import File
+            from lib.file import File,decompress,iszl
             from lib.crypto import HashLib
-            HL = HashLib.dl('sumo_xpac',db,fmt=lambda x:x.upper().replace(b'/',b'\\'),encoding='utf-8')
+            HL = HashLib.dl('sumo_xpac',db)
 
             bak = {
                 0xC03C389F:'.\\Resource\\Racers\\Zobio.zif',0x71CA44A2:'.\\Resource\\Racers\\Zobio.zig',
@@ -2029,9 +2028,8 @@ def extract4_3(inp:str,out:str,t:str):
                 else: fn = f'$unk/{fe[0]:08X}.bin'
 
                 f.seek(fe[1])
-                zlb = fe[2] >= 12 and f.read(2) == b'\x78\xDA'
-                f.seek(fe[1])
-                d = f.decompress(fe[2] or fe[3],'zlib' if zlb else 'none')
+                d = f.readc(fe[2] or fe[3])
+                if iszl(d): d = decompress(d,'zlib')
                 writefile(o + '/' + fn,d)
             if fs: return
         case 'Dragon UnPACKer 5 Plugin':
@@ -2348,7 +2346,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File
             from lib.crypto import HashLib
 
-            HL = HashLib.dl('sxm',db,fmt=lambda x:x.lower().replace('\\','/'),encoding='ascii')
+            HL = HashLib.dl('sxm',db)
             f = File(i,endian='<')
             asrt(f.read(4) == b'FARC' and f.readu32() == 0x100)
 

@@ -87,11 +87,12 @@ def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
     mkdir(dirname(f))
     if 'b' in m: return open(f,m,**kwargs)
     return open(f,m,encoding=encoding,newline=newline,**kwargs)
-def readfile(f:str,m='rb',encoding='utf-8',newline=None,**kwargs) -> bytes|str:
+def readfile(f:str,m='rb',off=0,size=None,encoding='utf-8',newline=None,**kwargs) -> bytes|str:
     asrt('r' in m or '+' in m)
     if 'b' in m: o = xopen(f,m,**kwargs)
     else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
-    r = o.read()
+    o.seek(off)
+    r = o.read(size)
     o.close()
     return r
 def writefile(f:str,d:bytes|str,m='wb',encoding='utf-8',newline=None,**kwargs):

@@ -434,7 +434,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import HashLib
-            hl = HashLib.dl('ludia',db,encoding='ascii')
+            hl = HashLib.dl('ludia',db)
             from lib.file import File
             f = File(inp,endian='>')
 
@@ -881,7 +881,7 @@ def extract4_2(inp:str,out:str,t:str):
                 writefile(o + '/' + fe[0],f.read(fe[1]))
             f.close()
             if fs: return
-        case 'Lucas Arts Bundle':
+        case 'LucasArts Bundle':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             from lib.crypto import decrypt

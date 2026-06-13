@@ -29,7 +29,7 @@ def extract4_5(inp:str,out:str,t:str):
 
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import decrypt,HashLib
-            hl = HashLib.dl('rsdk',db,fmt=lambda x:x.lower(),encoding='utf-8')
+            hl = HashLib.dl('rsdk',db)
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(6) == b'RSDKvB')
@@ -57,7 +57,7 @@ def extract4_5(inp:str,out:str,t:str):
         case 'Retro Engine RSDKv5':
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import decrypt,HashLib
-            hl = HashLib.dl('rsdk',db,fmt=lambda x:x.lower(),encoding='utf-8')
+            hl = HashLib.dl('rsdk',db)
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(5) == b'RSDKv' and f.read(1) in b'345')
@@ -108,5 +108,70 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if fs: return
+        case 'LucasArts APak':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.read(4) == b'APak')
+
+            f.skip(4)
+            c = f.readu32()
+            f.seek(0x18)
+            sof = 0x50 + f.readu32()
+            to1 = sof + f.readu32()
+            to2 = f.readu32()
+            dof = f.readu32()
+            f.skip(4)
+            oc = f.readu32()
+
+            f.seek(to2)
+            ofs = {}
+            for _ in range(oc):
+                id = f.readu32()
+                ofs[id] = dof + f.readu32()
+                f.padc(8)
+
+            f.seek(to1)
+            fs = []
+            for _ in range(c):
+                f.skip(0x14)
+                so = sof + f.readu32()
+                f.skip(0x10)
+                fs.append((so,f.readu32(),f.readu32()))
+                f.skip(0x10)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                fn = f.read0s('utf-8')
+                if ix in ofs:
+                    f.seek(ofs[ix])
+                    asrt(fe[1] == fe[2])
+                    d = f.readc(fe[2])
+                else:
+                    asrt(fe[1] == fe[2] == 0,f'{to1+ix*0x40}')
+                    d = b''
+                    fn = '$deleted/' + fn
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
+        case 'LucasArts R2D2 Pack':
+            if db.print_try: print('Trying with custom extractor')
+            from lib.file import File
+            f = File(i)
+            asrt(f.read(8) in {b'R2D2pack',b'2D2Rkcap'})
+
+            f.seek(0x30)
+            f._end = {b'R2D2':'<',b'2D2R':'>'}[f.read(4)]
+            f.skip(8)
+            s = f.readu32()
+            f.seek(0x30 + 0x10 + s - 1)
+            fts = f.readu8()
+            f.seek(0x30 + 0x10 + s - fts - 2)
+            fn = f.read(fts).rstrip(b'\0').decode('utf-8')
+            f.seek(0x30)
+            writefile(o + '/' + fn,f.readc(s))
+            f.close()
+            return
 
     return 1

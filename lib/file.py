@@ -86,7 +86,7 @@ class File:
         return bytes(o)
     def readall(self):
         self.seek(0)
-        return self.read(self.size)
+        return self.read(self.size or None)
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -128,6 +128,7 @@ class File:
     def reads48(self,end=None): return self.unpacki(6,1,end)
     def reads64(self,end=None): return self.unpacki(8,1,end)
     def reads128(self,end=None):return self.unpacki(16,1,end)
+    def readf16(self,end=None): return self.unpack('e',end)
     def readf32(self,end=None):
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
@@ -180,6 +181,7 @@ class File:
     def writes48(self,v:int,end=None): return self.packi(v,6,1,end)
     def writes64(self,v:int,end=None): return self.packi(v,8,1,end)
     def writes128(self,v:int,end=None):return self.packi(v,16,1,end)
+    def writef16(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'e',v))
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
     def writevlq(self,v:int):
@@ -314,12 +316,12 @@ def ext_exe(i:str,dotnet=False):
         if t == b'PE':
             import pefile
             r = pefile.PE(i)
-            r.SECTIONS = {s.Name.rstrip(b'\0').decode(errors='ignore'):s for s in r.sections}
+            r.SECTIONS = {s.Name.rstrip(b'\0').decode('latin-1'):s for s in r.sections}
             return r
         elif t == b'NE':
             import nefile
             return nefile.NE(i)
-        else: raise NotImplementedError(t.decode(errors='ignore'))
+        else: raise NotImplementedError(t.decode('latin-1'))
 
 def iszl(d:bytes):
     if len(d) < 8 or d[0] != 0x78 or d[1] not in {0x01,0x5E,0x9C,0xDA}: return False
@@ -349,6 +351,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'deflate':
             import zlib
             return zlib.decompress(i,wbits=-15)
+        case 'deflate0':
+            import zlib
+            return zlib.decompress((i[0] & 0xF8 | ((i[0] & 3) - 1) << 1 | (0 if (i[0] >> 2) & 1 else 1)).to_bytes(1) + i[1:],wbits=-15)
         case 'gzip':
             import gzip
             return gzip.decompress(i)
@@ -974,3 +979,114 @@ class AnacondaDecoder:
 
         return bytes(self.o)
 def ananconda_decompress(data:bytes): return AnacondaDecoder(data).decode()
+
+import codecs
+def __chmr(*i:tuple[int,int]): return set(sum([list(range(a,b)) for a,b in i],[]))
+
+CH_N64MP = (
+    '\0' + '\0'*14 + ' '
+    '0123456789ABCDEF'
+    'GHIJKLMNOPQRSTUV'
+    'WXYZ!"#\'*+,-./:='
+    '?@。゛゜ァィゥェォッャュョヲン'
+    'アイウエオカキクケコサシスセソタ'
+    'チツテトナニヌネノハヒフヘホマミ'
+    'ムメモヤユヨラリルレロワガギグゲ'
+    'ゴザジズゼゾダヂヅデドバビブベボ'
+    'パピプペポ'
+)
+CH_N64MPR = __chmr((1,0x0F),(149,0x100))
+def _enc_n64mp(i:str):
+    o = bytearray()
+    for ix,c in enumerate(i):
+        if c not in CH_N64MP: raise UnicodeEncodeError('n64mpak',i,ix,ix+1,'invalid character')
+        o.append(CH_N64MP.index(c))
+    return (bytes(o),len(i))
+def _dec_n64mp(i:bytes):
+    o = []
+    for ix,b in enumerate(i):
+        if b in CH_N64MPR: raise UnicodeDecodeError('n64mpak',i,ix,ix+1,'invalid character')
+        o.append(CH_N64MP[b])
+    return (''.join(o),len(i))
+def _enc_ascii7(i:str):
+    o = bytearray()
+    v = c = 0
+    for b in i.encode('ascii'):
+        v |= b << c
+        c += 7
+        if c >= 8:
+            o.append(v & 0xFF)
+            v >>= 8
+            c -= 8
+    if c: o.append(v)
+    if o[-1] & 0x7F == 0 and i[-1] == '\0': raise UnicodeEncodeError('ascii7',i,len(i) - 1,len(i),'invalid null byte at end of string')
+    return (bytes(o),len(i))
+def _dec_ascii7(i:bytes):
+    o = []
+    v = c = 0
+    for b in i:
+        v |= b << c
+        c += 8
+        while c >= 7:
+            o.append(chr(v & 0x7F))
+            v >>= 7
+            c -= 7
+    if c == 0 and o[-1] == '\0': o = o[:-1]
+    return (''.join(o),len(i))
+def _enc_utf0(i:str):
+    o = bytearray()
+    d = list(i.encode('utf-8'))
+    v = c = 0
+    while d:
+        b = d.pop(0)
+        if b & 0x80:
+            x = 1
+            while b & (1 << (8 - x)): x += 1
+
+            v |= 1 << c;c += 1
+            v |= (x - 2 - 1) << c;c += 2
+
+            v |= (b & ((1 << (8 - x)) - 1)) << c;c += 8 - x
+            for _ in range(x - 2):
+                v |= (d.pop(0) & 0x3F) << c;c += 6
+        else:
+            c += 1 # 0
+            v |= b << c;c += 7
+
+        while c >= 8:
+            o.append(v & 0xFF);v >>= 8;c -= 8
+
+    if c: o.append(v)
+    return (bytes(o),len(i))
+def _dec_utf0(i:bytes):
+    o = bytearray()
+    d = list(i)
+    v = c = 0
+    while d or c >= 8:
+        if c < 8:
+            v |= d.pop(0) << c;c += 8
+        a = v & 1;v >>= 1;c -= 1
+        if a:
+            x = (v & 3) + 1;v >>= 2;c -= 2
+            ov = 0
+            for ix in range(x+1): ov |= 1 << (7 - ix)
+            o.append(ov | (v & ((1 << (8-2-x)) - 1)));v >>= 8-2-x;c -= 8-2-x
+            for _ in range(x):
+                if c < 6:
+                    v |= d.pop(0) << c;c += 8
+                o.append(0x80 | v & 0x3F);v >>= 6;c -= 6
+        else:
+            o.append(v & 0x7F);v >>= 7;c -= 7
+
+    return (o.decode('utf-8'),len(i))
+
+_CODECS = (
+    ('n64mpak',_enc_n64mp,_dec_n64mp),
+    ('ascii7',_enc_ascii7,_dec_ascii7),
+    ('utf_0','utf0',_enc_utf0,_dec_utf0),
+)
+
+def _codecs_reg(en:str):
+    for e in _CODECS:
+        if en in e: return codecs.CodecInfo(e[-2],e[-1],name=e[0])
+codecs.register(_codecs_reg)

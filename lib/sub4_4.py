@@ -114,7 +114,6 @@ def extract4_4(inp:str,out:str,t:str):
         case 'RTL Ski Jumping 2001 PAK'|'RTL Ski Jumping 2002 PAK':
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
-            from lib.crypto import decode
             f = File(i,endian='<')
 
             fnl = 0x30 if t == 'RTL Ski Jumping 2001 PAK' else 0x40
@@ -127,7 +126,7 @@ def extract4_4(inp:str,out:str,t:str):
                 zs,off = f.readu32(),f.readu32()
                 if off == 0: break
                 f.skip(4)
-                fs.append((zs,off * 0x800,f.readu32(),decode(f.readc(fnl).rstrip(b'\0'),'latin-1c')))
+                fs.append((zs,off * 0x800,f.readu32(),f.readc(fnl).rstrip(b'\0').decode('latin-1')))
 
             if t == 'RTL Ski Jumping 2001 PAK': asrt(all(fe[0] == fe[2] for fe in fs))
 
@@ -326,7 +325,7 @@ def extract4_4(inp:str,out:str,t:str):
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             from lib.crypto import HashLib
-            hl = HashLib.dl('xbxde',db,fmt=lambda x:x.lower(),encoding='ascii')
+            hl = HashLib.dl('xbxde',db)
             f = File(i,endian='<')
             asrt(f.read(4) == b'arh2')
 
@@ -550,12 +549,14 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Detective Instinct: Farewell, My Beloved Encrypted DIP':
-            KEY = readfile(db.get('difmb_dip_key')) # external file because 256KB
+            from lib.pyob import PyOBinX
+            KEY = PyOBinX.dl('difmb_dip_key',db) # external file because 256KB
 
             if db.print_try: print('Trying with custom extractor')
             from lib.file import File
             from lib.crypto import decrypt
-            f = File(decrypt(readfile(i),'xor',KEY),endian='>')
+            KEY.wait()
+            f = File(decrypt(readfile(i),'xor',KEY['key']),endian='>')
             del KEY
 
             c = f.readu32()
@@ -1711,7 +1712,7 @@ def extract4_4(inp:str,out:str,t:str):
         case 'Pivotal Games DAT':
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import HashLib
-            hl = HashLib.dl('pivotal',db,encoding='ascii',fmt=lambda x:x.upper())
+            hl = HashLib.dl('pivotal',db)
             from lib.file import File
             f = File(i)
 
@@ -1829,7 +1830,7 @@ def extract4_4(inp:str,out:str,t:str):
         case 'MotoGP ARK':
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import HashLib
-            hl = HashLib.dl('motogp',db,fmt=lambda x:x.lower(),encoding='ascii')
+            hl = HashLib.dl('motogp',db)
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1908,11 +1909,9 @@ def extract4_4(inp:str,out:str,t:str):
             if fs: return
         case 'GameZ Asset Archive': raise NotImplementedError
         case 'APETEC AIF':
-            CRCC = b"________________________________________________0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____________________________________________________________________________________________________________________________________".replace(b'_',b'\0')
-
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import HashLib
-            hl = HashLib.dl('apetec',db,fmt=lambda i:i[:0x40].translate(CRCC),encoding='ascii')
+            hl = HashLib.dl('apetec',db)
             from lib.file import File
             f = File(i,endian='<')
 
@@ -2277,7 +2276,7 @@ def extract4_4(inp:str,out:str,t:str):
 
             if db.print_try: print('Trying with custom extractor')
             from lib.crypto import HashLib
-            hl = HashLib.dl('spiderman3',db,fmt=lambda x:x.lower(),encoding='ascii')
+            hl = HashLib.dl('spiderman3',db)
             from lib.file import File
             f = File(i,endian='<')
 
