@@ -537,6 +537,14 @@
         "rs":"Hollow Knight Save","s":1
     },
     {
+        "d":[["isat","APak",0],["isatS","\\0",4,12],["n0",4,8],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,44],["py","f.seek(4);uc=f.readi(4,'>');c=f.readi(4,'>');f.seek(24);us,ss=f.readi(4,'>'),f.readi(4,'>')\nif us%16 or (uc*16)>us or (uc*48)<us:return\nreturn (80+us+ss+c*64)==f.readi(4,'>')"]],
+        "rs":"LucasArts APak","s":1
+    },
+    {
+        "d":[["isin",["R2D2pack","2D2Rkcap"],0],["isin",["pack","kcap"],16],["isin",["R2D2","2D2R"],48],["isat","\\0",-2],["isatS","\\0",4,20],["n0",4,12],["n0",1,-1],["py","f.seek(12);s=f.read(4);return (fsz-16)in(int.from_bytes(s,'little'),int.from_bytes(s,'big'))"]],
+        "rs":"LucasArts R2D2 Pack","s":1
+    },
+    {
         "d":[["size",88236],["hash","95397288029c149040af17fc6d7522a3b39c943b"]],
         "rs":"Glacier PKG Def","s":1
     },
@@ -1568,8 +1576,26 @@
         "rs":"Moe Cure Net FileList"
     },
     {
-        "d":[["size",[60,1073741824]],["n0",4,0],["n0",2,-2],["n0",2,-4],["n0",2,-6],["n0",2,-8],["py","f.seek(f.readi(4,'>'));c1,c2=f.readi(2,'>'),f.readi(2,'>')\nif c1==0 or c2==0 or c1<c2 or(o+4+c1*2+2+c2*8+6)!=fsz:return\nf.seek(c1*2+2,1)\nif f.read(4)!=b'\\0\\0\\0\\x04':return\nf.seek(c2*4-4,1);return f.readi(4,'>')==o"]],
+        "d":[["size",[60,1073741824]],["n0",4,0],["n0",2,-2],["n0",2,-4],["n0",2,-6],["n0",2,-8],["py","o=f.readi(4,'>');f.seek(o);c1,c2=f.readi(2,'>'),f.readi(2,'>')\nif c1==0 or c2==0 or c1<c2 or(o+4+c1*2+2+c2*8+6)!=fsz:return\nf.seek(c1*2+2,1)\nif f.read(4)!=b'\\0\\0\\0\\x04':return\nf.seek(c2*4-4,1);return f.readi(4,'>')==o"]],
         "rs":"The Indian In The Cupboard Data"
+    },
+    {
+        "d":[["ext",".pck"],["isin",["\\x03\\0\\0\\0","\\x01\\0\\0\\0"],0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12]],
+        "rs":"Minecraft Console PCK"},{
+        "d":[["ext",".pck"],["isat","\\x03\\0\\0\\0",0],["isatS","\\0",4,4],["n0",4,8],["n0",4,16],["n0",4,20]],
+        "rs":"Minecraft Console PCK"
+    },
+    {
+        "d":[["n0",4,0],["n0",2,4],["str",6,5],["py","c=f.readi(4,'>')*14\nif c>fsz:return\nf.skip(f.readi(2,'>'));o=f.readi(4,'>');return o>c and (o+f.readi(4,'>'))<fsz"]],
+        "rs":"Minecraft Console ARC"
+    },
+    {
+        "d":[["ext",".mcs"],["isatS","\\0",4,0],["isat","x",8],["isin",["\\x01","\\x5E","\\x9C","\\xDA"],9],["n0",4,4],["n0",1,10],["py","f.seek(4);return f.readi(4,'<')>fsz"]],
+        "rs":"Minecraft Console MCS"
+    },
+    {
+        "d":[["isat","\\0\\1\\x03",0],["isat","x",19],["isin",["\\x01","\\x5E","\\x9C","\\xDA"],20],["isatS","\\0",4,7],["n0",4,3],["n0",4,15],["py","f.seek(15);return (19+f.readi(4,'>'))==fsz"]],
+        "rs":"Minecraft Console Game Rule File"
     },
     {
         "d":[["isat","\\0\\0\\0\\x20",0],["n0",4,4],["n0",4,8],["n0",4,12],["str0e",16,52,5],["py","f.seek(4);o=f.read(4);f.seek(12);f.skip(f.readi(4,'>'));return o==f.read(4)"]],
@@ -2320,6 +2346,10 @@
         "rs":"Wii Exported Save Data","s":1
     },
     {
+        "d":[["s%",4],["n0",4,0],["isat","\\0",-1],["py","while fsz<f.tell():\n s=f.readi(4,'<')\n if s%4 or not s or (f.tell()+s-4)>fsz:break\n try:asrt(f.read(s-4).decode('utf-8').isprintable())\n except:return\nelse:return True"]],
+        "rs":"Sonic Shuffle Message Data"
+    },
+    {
         "t":"text",
         "d":[["size",[100,null]],["reg","eval *\\( *function *\\( *p *, *a *, *c *, *k *, *e *, *[rd] *\\)\\s*\\{",0]],
         "rs":"JS P.A.C.K.E.R."
@@ -2362,6 +2392,11 @@
         "rq":null,
         "d":[["isat","HEAD",256],["py","f.seek(0x130);f.seek(f.readi(8,'<'));return f.read(4)==b'HFS0'"]],
         "rs":"Switch XCI","s":1
+    },
+    {
+        "t":"directory",
+        "d":[["containsext",[".nca",".cert",".tik",".cnmt.nca"]]],
+        "rs":"Switch Unpacked","s":1
     },
     {
         "d":[["isat","RFRM",0],["isatS","\\0",12,8],["isat","PACK\\1\\0\\0\\0\\1\\0\\0\\0RFRM",20],["isatS","\\0",12,40],["isat","TOCC",52],["n0",4,56],["n0",4,60],["isat","ADIR",64],["n0",4,88]],
@@ -2526,11 +2561,6 @@
         "rq":null,
         "rqr":"Z-Code V3 adventure for Infocom Z-Machine",
         "rs":"Z-Code"
-    },
-    {
-        "rq":null,
-        "d":[["isat","\\x03\\0\\0\\0",0]],
-        "rs":"Minecraft PCK"
     },
     {
         "rqr":null,

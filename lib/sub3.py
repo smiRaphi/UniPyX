@@ -289,7 +289,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.seek(943)
             if f.read(42) == b'InstallShield Self-Extracting Stub Program':
                 from lib.file import decompress
-                if db.print_try: print('Trying with custom extractor')
+                db.try_custom()
                 while True:
                     x = f.read(1)
                     if not x: break
@@ -460,7 +460,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if x.split('/')[0] == '99':
                     tf = TmpFile()
                     run(['resourceextractor','extract',i,x.split()[0],tf.p],print_try=False)
-                    ar,_ = analyze(tf.p,True)
+                    ar = analyze(tf.p,quiet=True)
 
                     td = TmpDir()
                     if ('SZDD' in ar and not extract(tf.p,td.p,'Microsoft SZDD')) or ('ZLIB' in ar and not extract(tf.p,td.p,'ZLIB')):
@@ -504,7 +504,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 mv(of,o + '/' + basename(i))
                 return
         case 'Bat2Exe':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
 
             f = File(i,endian='<')
@@ -606,7 +606,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if exists(o): remove(o + '/gdre_export.log')
             if listdir(o): return
         case 'IRIX IDB':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
 
             cps = {}
             pr7z = db.print_try
@@ -754,7 +754,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['nsnsotool',i,of])
             if exists(of) and getsize(of): return
         case 'GameCube DOLXZ'|'Wii DOLXZ':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
 
             f = open(i,'rb')
@@ -778,7 +778,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             remove(tf)
             if listdir(o): return
         case 'd0lLZ 1'|'d0lLZ 2':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -822,7 +822,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             return
         case 'd0lLZ 3':
             raise NotImplementedError
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -834,7 +834,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(o + '/' + basename(i),f.decompress(d0s,'d0llz3'))
             return
         case 'Xamarin Compressed':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             try: writefile(o + '/' + basename(i),decompress(readfile(i)[8:],'lz4'))
             except: return 1
@@ -843,7 +843,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'JS MyObfuscate.com': return jsbeautifier('myobfuscate')
         case 'JavaScriptObfuscator': return jsbeautifier('jsobfuscator')
         case 'Javascript Obfuscator.com':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             d = readfile(i,'r')
 
             def jsstr(i:str) -> str: return ast.literal_eval(i.replace(r'\/','/'))
@@ -1057,7 +1057,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             return
         case 'Atomik Cruncher': raise NotImplementedError
         case 'Netcrypt':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import base64
             from lib.file import EXE
             from lib.crypto import decrypt
@@ -1090,7 +1090,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/' + basename(i),dat[:-dat[-1]])
                 return
         case 'Shell Archive':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             d = open(i,newline='',encoding='utf-8').read()
             for fs in ('# This is a shell archive.  Remove anything before this line,',
                        '# This is a shell archive, meaning:',
@@ -1119,19 +1119,18 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if len(rge) > 3: dt = '\n'.join([x[1 if x.startswith(fe[rge[3]]) else 0:] for x in dt.split('\n')])
                     xopen(o + '/' + fe[rge[1]].lstrip('./'),'w',newline='',encoding='utf-8').write(dt)
                 d = r.sub('',d)
-            pr = db.print_try
-            db.print_try = False
+            db.set_temp_print(False)
             for fe in re.findall(r"(?sm)^ *sed +(?P<q1>['\"])s/\^([^\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *\| *uudecode +&&\n(.+?)(?P=fend)",d):
                 tf = TmpFile('.uu')
                 xopen(tf,'w',newline='',encoding='utf-8').write('\n'.join([x[1 if x.startswith(fe[1]) else 0:] for x in fe[4].split('\n')]))
                 extract(tf.p,o,'UUencoded')
                 tf.destroy()
-            db.print_try = pr
+            db.reset_temp_print()
             for de in re.findall(r"(?m)^ *mkdir +(?P<q1>['\"]?)(.+)(?P=q1)\n",d): mkdir(o + '/' + de[1])
 
             if listdir(o): return
         case 'Casio BE-300 Package':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1147,7 +1146,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.close()
             if fc: return
         case 'GPEComp':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             f = open(i,'rb')
             for pos in (0xAA48,0xAA70):
@@ -1164,7 +1163,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'EDI Install LZSS': return extract(i,o,'ARX') # deark
         case '.NET Packer 1':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1186,7 +1185,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.close()
             if fc: return
         case 'Xbox Executable':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1229,7 +1228,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if fv == 0 and mav == 5 and miv in {1,2,3}: writefile(of,run([f'luadec{mav}{miv}','--',i],text=False)[1])
             if exists(of) and getsize(of): return
         case 'Bink Video EXE':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import EXE
             f = EXE(i)
 
@@ -1255,7 +1254,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.close()
             if listdir(o): return
         case 'Inno Archive':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import zlib
             from lib.file import File
             f = File(i,endian='<')
@@ -1344,7 +1343,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             del bfm
             if listdir(o): return
         case '.NETZ':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File,ext_exe
             e = ext_exe(i,dotnet=True)
             asrt(len(e.net.resources) == 1 and e.net.resources[0].name == 'app.resources')
@@ -1403,7 +1402,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['wasm-decompile',i,'--enable-all','-o',o + '\\' + tbasename(i) + '.txt'])
             return
         case 'CryptPE BinTable.h':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import re,ast
             from lib.file import decompress
             from lib.crypto import decrypt
@@ -1417,7 +1416,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(f'{o}/{tbasename(i)}.exe',decompress(tree + dat,'huffman',usize=s,padding=True))
             return
         case 'CryptPE':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import re
             from lib.file import decompress,EXE
             from lib.crypto import decrypt
@@ -1460,7 +1459,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(f'{o}/{tbasename(i)}.exe',decompress(tree + dat,'huffman',usize=cmps3[0],padding=True))
             return
         case 'Fatpack':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import ext_exe,decompress
             f = ext_exe(i)
 
@@ -1473,7 +1472,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(f'{o}/{tbasename(i)}.exe',decompress(d,'lzma',null_usize=True))
             return
         case 'zexe':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             d = decompress(readfile(i)[0x200:],'gzip')
             writefile(f'{o}/{tbasename(i)}.{"exe" if d[:2] == b"MZ" else "elf"}',d)
@@ -1491,7 +1490,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             tf.destroy()
             if listdir(o): return
         case 'Tixati Installer':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import ext_exe,decompress
             f = ext_exe(i)
 
@@ -1531,7 +1530,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 0x7EEE:'Fusion3Seed',0x7F7F:'Last',
             }
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import EXE,File,decompress,iszl
             from lib.crypto import decrypt
             from multiprocessing.pool import ThreadPool
@@ -1687,7 +1686,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if exists(o + '/xfl') and len(listdir(o + '/xfl')) == 1: copydir(o + '/xfl/' + listdir(o + '/xfl')[0],o + '/xfl',True,True)
             if listdir(o): return
         case 'NE Resource DLL':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import ext_exe
             f = ext_exe(i)
 
@@ -1707,7 +1706,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run(['dotnet',db.get('ilspycmd'),'--disable-updatecheck','--nested-directories','-p','-o',o,i],getexe=False,print_try=False)
             if listdir(o): return
         case 'QuickBMS XML Script':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import re
             from html import unescape
             d = readfile(i,'r').strip()
@@ -1809,7 +1808,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     ob.append(f'D6000000 {v2:08X}')
                 elif x == 0xE8BD8010: return 1
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import re,struct
             d = readfile(i)
 

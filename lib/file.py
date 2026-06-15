@@ -233,6 +233,57 @@ class File:
     def __gt__(self,other:int): return self.pos > other
     def __le__(self,other:int): return self.pos <= other
     def __ge__(self,other:int): return self.pos >= other
+class FileStruct(File):
+    def __init__(self,f,endian='<'):
+        super().__init__(f,mode='rb',endian=endian)
+        self.__values = {}
+        d = self.__class__.__dict__
+
+        def interp(t):
+            if t == float: v = self.readf32()
+            elif t in {'u8','s8','u16','s16','f16','u24','s24','u32','s32','f32','u40','s40','u48','s48','u64','s64','f64','u128','s128'}:
+                v = getattr(self,t)()
+            elif t == bool: v = bool(self.readu8())
+            elif issubclass(t,FileStruct): v = t(f)
+            return v
+        for k,t in self.__class__.__annotations__.items():
+            if t == bytes:
+                s = d.get(k,1)
+                v = self.readc(self.__values.get(s,s))
+            elif t in {str,'utf8'}:
+                s = d.get(k,1)
+                v = self.reads(self.__values.get(s,s),'utf-8')
+            elif t == 'utf16':
+                s = d.get(k,1)
+                v = self.readutf16(self.__values.get(s,s))
+            elif hasattr(t,'__iter__') and t.__name__ == 'list' and hasattr(t,'__args__') and t.__args__:
+                s = d.get(k,1)
+                t = t.__args__[0]
+                v = [interp(t) for _ in range(self.__values.get(s,s))]
+            elif t in {'skip','padding'}:
+                s = d.get(k,1)
+                self.skip(self.__values.get(s,s))
+                continue
+            elif t == 'align':
+                s = d.get(k,1)
+                self.align(self.__values.get(s,s))
+                continue
+            else: v = interp(t)
+            self.__values[k] = v
+        self.__end_pos = self.pos
+
+    def __getattribute__(self,n):
+        v = super().__getattribute__('__values')
+        if n in v: return v[n]
+        return super().__getattribute__(n)
+
+    @property
+    def size(self): return self.__end_pos
+    @property
+    def data(self):
+        self.seek(0)
+        return self.read(self.size)
+
 class BitReader:
     def __init__(self,d:bytes):
         self.d = d

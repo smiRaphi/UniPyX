@@ -49,7 +49,6 @@ if __name__ == '__main__':
     if not '://' in inp:
         inp = os.path.abspath(inp)
         assert os.path.exists(inp),'Input file does not exist'
-        assert os.path.isfile(inp),'Input is not a file'
 
     if len(argv) > 2: out = os.path.abspath(argv[2])
     else:
@@ -61,9 +60,10 @@ if __name__ == '__main__':
 
     if scan:
         from lib.main import analyze
-        ts,rts = analyze(inp,raw=True)
+        ts,rts,t = analyze(inp,raw=True)
 
         print(inp)
+        print('Data type:',t)
         print('Processed:')
         for x in ts: print(x)
         print()

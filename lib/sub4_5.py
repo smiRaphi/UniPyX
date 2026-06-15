@@ -6,7 +6,7 @@ def extract4_5(inp:str,out:str,t:str):
     match t:
         case 'Retro Engine RSDKv3':
             K1,K2 = b"4RaS9D7KaEbxcp2o5r6t",b"3tRaUxLmEaSn"
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.crypto import decrypt
             from lib.file import File
             f = File(i,endian='<')
@@ -27,7 +27,7 @@ def extract4_5(inp:str,out:str,t:str):
         case 'Retro Engine RSDKv4':
             KEY = (0xAAAAAAAB,0x24924925)
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.crypto import decrypt,HashLib
             hl = HashLib.dl('rsdk',db)
             from lib.file import File
@@ -55,7 +55,7 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Retro Engine RSDKv5':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.crypto import decrypt,HashLib
             hl = HashLib.dl('rsdk',db)
             from lib.file import File
@@ -85,7 +85,7 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Europe Racer IND+IMG':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File,decompress,iszl
             f = File(i,endian='<')
             fd = File(noext(i) + '.img')
@@ -109,7 +109,7 @@ def extract4_5(inp:str,out:str,t:str):
             fd.close()
             if fs: return
         case 'LucasArts APak':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
             asrt(f.read(4) == b'APak')
@@ -156,7 +156,7 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'LucasArts R2D2 Pack':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i)
             asrt(f.read(8) in {b'R2D2pack',b'2D2Rkcap'})
@@ -173,5 +173,106 @@ def extract4_5(inp:str,out:str,t:str):
             writefile(o + '/' + fn,f.readc(s))
             f.close()
             return
+        case 'Minecraft Console ARC':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+
+            c = f.readu32()
+            fs = [(f.reads(f.readu16(),'utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Minecraft Console MCS':
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu32() == 0)
+
+            d = f.decompress(None,'zlib',usize=f.readu32())
+            f.close()
+            f = File(d,endian=f._end)
+
+            of,c = f.readu32(),f.readu32()
+            f.seek(of)
+            fs = []
+            for _ in range(c):
+                fs.append((f.readutf16(0x40).rstrip('\0'),f.readu32(),f.readu32()))
+                f.padc(8)
+
+            for fe in fs:
+                f.seek(fe[2])
+                writefile(o + '/' + fe[0],f.readc(fe[1]))
+
+            del f
+            if fs: return
+        case 'Minecraft Console PCK':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu32() in {1,3})
+
+            strs = []
+            nc = f.readu32()
+            xml = False
+            for _ in range(nc):
+                id,n = f.readu32(),f.readutf16(f.readu32())
+                if n == "XMLVERSION": xml = True
+                strs.append(f'{id}: {n}')
+                f.padc(4)
+            strs.append('')
+
+            if xml: f.skip(4) # ???
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                s = f.readu32()
+                id = f.readu32()
+                n = f.readutf16(f.readu32())
+                strs.append(f'{id}: {n}')
+                f.padc(4)
+                fs.append((n,s))
+            strs.append('')
+
+            for fe in fs:
+                nc = f.readu32()
+                for _ in range(nc):
+                    strs.append(f'{f.readu32()}: {f.readutf16(f.readu32())}')
+                    f.padc(4)
+                if nc: strs.append('')
+                if not fe[0]:
+                    asrt(fe[1] == 0)
+                    continue
+                if fe[0] == '0' and fe[1] == 0: continue
+                writefile(o + '/' + fe[0],f.readc(fe[1]))
+
+            f.close()
+            writefile(o + '/$strings.txt','\n'.join(strs),'wt')
+            if fs: return
+        case 'Minecraft Console Game Rule File':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.readu24() == 0x103)
+
+            f.seek(15)
+            d = f.decompress(f.readu32(),'zlib')
+            writefile(f'{o}/{tbasename(i)}.grf',d)
+            f.close()
+            return
+        case 'Sonic Shuffle Message Data':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            d = []
+            while f: d.append(f.reads(f.readu32() - 4,'utf-8').rstrip('\0'))
+
+            f.close()
+            if d:
+                writefile(f'{o}/{tbasename(i)}.txt','\n\n'.join(d),'wt')
+                return
 
     return 1

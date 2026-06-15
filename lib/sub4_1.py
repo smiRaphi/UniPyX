@@ -31,7 +31,7 @@ def extract4_1(inp:str,out:str,t:str):
 
     match t:
         case '1941 Frozen Front Lang':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -51,7 +51,7 @@ def extract4_1(inp:str,out:str,t:str):
             writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
             if fs: return
         case '1941 Frozen Front Data':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -70,7 +70,7 @@ def extract4_1(inp:str,out:str,t:str):
             if offs: return
         case 'PS3 Theme':
             raise NotImplementedError
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -78,7 +78,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             f.skip(4)
         case 'Peggle Data':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
 
             bn = basename(i)
             if (len(bn) == 2 and bn[0].isalpha() and bn[1].isdigit()) or (len(bn) == 1 and bn[0].isalpha() and getsize(i) == 0 and exists(bn + '0')):
@@ -115,7 +115,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Air Adrenaline Data 1'|'Air Adrenaline Data 2':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -132,7 +132,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Karma Studios Lang':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -145,7 +145,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
                 return
         case 'Cannons Tournament PAK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -161,7 +161,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Doom Database':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -174,7 +174,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
                 return
         case 'Doom Palettes':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -184,7 +184,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if c: return
         case 'MediaMobile PAK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             txt = re.compile(r'^[А-Яа-яЁё0-9\s\.,!\?"\'\-—\(\)]*$')
             from lib.file import File
             from lib.crypto import decrypt
@@ -207,7 +207,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if c: return
         case 'Taiko no Tatsujin Data 1':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -223,7 +223,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Taiko no Tatsujin Data 2'|'Taiko no Tatsujin Data 3':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -239,7 +239,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'THQ Worms Resources':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -273,7 +273,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'THQ Worms UTF Strings':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -302,7 +302,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
                 return
         case 'X-Files Resources':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
             f.skip(4)
@@ -318,7 +318,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Atari Masterpieces Resources':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File,decompress
             f = File(i,endian='<')
 
@@ -338,7 +338,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Atari Masterpieces Strings':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -355,7 +355,7 @@ def extract4_1(inp:str,out:str,t:str):
                 return
         case 'Atari Masterpieces VPXH': raise NotImplementedError
         case 'Torus Ashen PackFile':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File,decompress
             f = File(i,endian='<')
 
@@ -379,7 +379,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Torus Ashen ZLib':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
 
             d = readfile(i)
@@ -387,7 +387,7 @@ def extract4_1(inp:str,out:str,t:str):
             writefile(o + '/' + tbasename(i),decompress(d[7:],'zlib'))
             return
         case 'Torus Ashen Strings':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             f = open(i,'rb')
             f.seek(4)
             d = f.read()[:-2]
@@ -399,7 +399,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(ob),'w')
                 return
         case 'uBlock Origin Config Backup':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             j = json.load(open(i,encoding='utf-8'))
 
@@ -413,7 +413,7 @@ def extract4_1(inp:str,out:str,t:str):
             writefile(o + '/userFilters.txt',j['userFilters'],'w')
             return
         case 'Stylus Config Export':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             j = json.load(open(i,encoding='utf-8'))
 
@@ -427,7 +427,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if 'exclusions' in jo: writefile(f'{o}/{n}_exclusions.txt','\n'.join(jo['exclusions']),'w')
             return
         case 'Violentmonkey Config Export':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             j = json.load(open(i,encoding='utf-8'))
 
@@ -442,7 +442,7 @@ def extract4_1(inp:str,out:str,t:str):
                         else: ext = 'txt'
                         writefile(f'{o}/{bk.replace("-20"," ").replace("-0a"," ").strip()}/{k}.{ext}',v[1:],'w')
         case 'StormCE Library VFS':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -460,7 +460,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'StormCE IIII':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -488,7 +488,7 @@ def extract4_1(inp:str,out:str,t:str):
             return
         case 'HMM Encrypted Snapshot': raise NotImplementedError
         case 'JDownloader2 Encrypted Subconfig'|'JDownloader2 Encrypted Accounts':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.crypto import decrypt
             if t == 'JDownloader2 Encrypted Subconfig':k = b'\x01\x02\x11\x01\x01T\x01\x01\x01\x01\x12\x01\x01\x01"\x01'
             elif t == 'JDownloader2 Encrypted Accounts':k = b'\x01\x06\x04\x05\x02\x07\x04\x03\x0c=\x0eK\xfe\xf9\xd4!'
@@ -499,7 +499,7 @@ def extract4_1(inp:str,out:str,t:str):
             writefile(o + '/' + tbasename(i) + '.json',d[:-d[-1]])
             return
         case 'Azito 3D Pack File':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File,decompress
             f = File(i,endian='<')
 
@@ -514,7 +514,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Azito 3D Pack Message':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -555,13 +555,13 @@ def extract4_1(inp:str,out:str,t:str):
 
             if listdir(o): return
         case 'Azada Wizard':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             d = readfile(i)
             asrt(d[:4] == b'WZD ')
             writefile(o + '/' + tbasename(i) + '.txt',d[0x10:])
             return
         case 'Noita Wizard pAK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -651,7 +651,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if listdir(o): return
         case 'LMPK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
 
             d = readfile(i)
@@ -667,7 +667,7 @@ def extract4_1(inp:str,out:str,t:str):
             writefile(f'{o}/{tbasename(i)}.{e}',d)
             return
         case 'BCH':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -783,7 +783,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Nintendo 3DS SMDH':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'SMDH' and f.readu32() == 0)
@@ -824,7 +824,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             return
         case 'Nintendo CTR Banner':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'CBMD')
@@ -853,7 +853,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if listdir(o): return
         case 'DBS Database':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             from lib.file import File
             f = File(i,endian='<')
@@ -934,7 +934,7 @@ def extract4_1(inp:str,out:str,t:str):
                 json.dump(b,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
                 return
         case 'Dance Layout Script':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             from lib.file import File
             f = File(i,endian='<')
@@ -959,7 +959,7 @@ def extract4_1(inp:str,out:str,t:str):
                 json.dump(ob,open(o + f'/{tbasename(i)}.json','w',encoding='utf-8'),indent=4,ensure_ascii=False)
                 return
         case 'ID String0 Count8 Data':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -971,7 +971,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(f'{o}/{tbasename(i)}.txt','\n'.join(ob),'w')
                 return
         case 'EBAB Animation Data':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             c = f.readu16()
@@ -985,7 +985,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'STXT Language Data':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'STXT')
@@ -1009,7 +1009,7 @@ def extract4_1(inp:str,out:str,t:str):
             of.close()
             if fs: return
         case 'Adventure Time VOLume':
-            if db.print_try: print("Trying with custom extractor")
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'\xCB\x32\x3D\xB5')
@@ -1029,7 +1029,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case '0Size24 Data':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             f.seek(1)
@@ -1037,7 +1037,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             return
         case 'WayForward PAK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1077,7 +1077,7 @@ def extract4_1(inp:str,out:str,t:str):
             bdb = {dbf.read(32):dbf.read(16) for _ in range(4)}
             dbf.close()
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt,crc_hash
             fd = open(noext(i) + '.mdf','rb')
@@ -1115,7 +1115,7 @@ def extract4_1(inp:str,out:str,t:str):
                 copydir(o + '/uncompressed',o,True,reni=True)
                 return
         case 'Typing of the Dead HAB':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'HAB0')
@@ -1139,7 +1139,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Advanced V.G. DAT':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1154,13 +1154,13 @@ def extract4_1(inp:str,out:str,t:str):
             if fs: return
         case 'London Racer Destruction Madness WAD': return quickbms('london_racer')
         case 'Zlib + Uncompressed Size':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             open(o + '/' + basename(i),decompress(readfile(i)[4:],'zlib'))
             return
         case 'Davilex Games IDX+IMG': return quickbms('davilex_games')
         case 'DEL CUTSEQ':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(8) == b'(C) DEL!')
@@ -1179,7 +1179,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Nippon Ichi PS FS':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(8) == b'PS_FS_V1')
@@ -1192,7 +1192,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Papaya Studio Wii VAPS':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
             asrt(f.read(4) == b'vaps')
@@ -1217,7 +1217,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Add PAC':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i)
             asrt(f.read(4) == b'add\0')
@@ -1280,7 +1280,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if listdir(o): return
             else: tf.destroy()
         case 'Smiles Fortune Hunters PAK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -1294,12 +1294,12 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'ODAU Zip':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             from lib.crypto import decrypt
             if decompress(decrypt(readfile(i),'xor',0xA5),'zip',o=o): return
         case 'Siren 2 SLPK ROM':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'SLPK')
@@ -1327,7 +1327,7 @@ def extract4_1(inp:str,out:str,t:str):
             for f in ofs.values(): f.close()
             if ofs: return
         case 'Siren 2 PAK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'pak\0')
@@ -1350,7 +1350,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Siren 2 EVD':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'evd\x1A')
@@ -1367,7 +1367,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(o + '/' + fn,f.read(fs[ix+1][1]-fs[ix][1]))
             if fs: return
         case 'GDED Binary Format':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             from lib.file import File
             f = File(i,endian='<')
@@ -1469,7 +1469,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if g.fts: return
         case 'Ultimate Ghosts \'n Goblins DPLK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(inp,endian='<')
             asrt(f.read(4) == b'DPLK')
@@ -1513,7 +1513,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Sinergy GUT':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt
             f = File(inp,endian='<')
@@ -1547,7 +1547,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Resistance Fall Of Man IGHW':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             from lib.file import File
             f = File(inp,endian='>')
@@ -1570,7 +1570,7 @@ def extract4_1(inp:str,out:str,t:str):
                 json.dump(ob,open(o + '/' + tbasename(inp) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
         case 'Disney Resource':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(inp,endian='<')
             asrt(f.read(4) == b'res\n')
@@ -1600,7 +1600,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Disney Raw Strings':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(inp,endian='<')
 
@@ -1623,7 +1623,7 @@ def extract4_1(inp:str,out:str,t:str):
 
             if d: return
         case 'Monsters Inc. Scream Team Training WAD':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(inp,endian='<')
 
@@ -1641,7 +1641,7 @@ def extract4_1(inp:str,out:str,t:str):
                 if exists(d + '/' + x): ex = x;break
             else: return 1
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             fd = File(i,endian='<')
             asrt(fd.read(8) == b'MCicon\0\0')
@@ -1679,7 +1679,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.close()
             if listdir(o): return
         case 'Sine Mora EX BIN':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             from lib.crypto import HashLib
             HL = HashLib.dl('sine_mora',db)
@@ -1708,7 +1708,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'GIANTS Archive': return quickbms('gar')
         case 'XNB': return quickbms('xnb')
         case 'XNB Dictionary':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             from lib.file import File
             f = File(i,endian='<')
@@ -1730,7 +1730,7 @@ def extract4_1(inp:str,out:str,t:str):
                 json.dump(ob,open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
         case 'Nintendo Mario Party Message':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -1752,7 +1752,7 @@ def extract4_1(inp:str,out:str,t:str):
                 writefile(o + '/' + tbasename(i) + '.txt','\n\n'.join(oc),'w')
                 return
         case 'CTPK':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'CTPK' and f.readu16() == 1)

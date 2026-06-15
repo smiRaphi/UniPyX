@@ -2,7 +2,7 @@ import sys
 if sys.version_info < (3,13):
     raise RuntimeError("Python 3.13+ is required")
 
-import re,json,ast,os,errno,subprocess,hashlib,ctypes,shutil
+import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil
 from time import sleep
 from ctypes import wintypes
 from shutil import rmtree,copytree,copyfile
@@ -23,12 +23,46 @@ DOSMAX = {
     "ipx":"false"
 }
 
+if typing.TYPE_CHECKING:
+    u8=s8=u16=s16=u24=s24=u32=s32=u40=s40=u48=s48=u64=s64=u128=s128=int
+    f16=f32=f64=float
+    padding=skip=align=types.NoneType
+
 __FNCT = type(lambda:None)
 def asrt(c:bool,*r,err:Exception=ValueError):
     if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
     elif r: r = ' '.join(str(x) for x in r)
     else: r = ''
     if not c: raise err(r)
+def namespace(_func=None,include=[],keep_init=True):
+    def f1(func):
+        class Wrapper(object):
+            def __init__(self):
+                self.__initialized = False
+                self.__body = {}
+            def __call__(self,*args,**kwargs):
+                d = super().__getattribute__('__dict__')
+                if d['_Wrapper__initialized'] and keep_init: return self
+                r = func(*args,**kwargs)
+                b = d['_Wrapper__body']
+                b.clear()
+                for k,v in r.items():
+                    if include:
+                        if k not in include: continue
+                    elif not isinstance(v,types.FunctionType): continue
+                    b[k] = v
+                d['_Wrapper__initialized'] = True
+                return self
+            def __getattribute__(self,name):
+                d = super().__getattribute__('__dict__')
+                if not d['_Wrapper__initialized']: self()
+                return d['_Wrapper__body'][name]
+        Wrapper.__name__ = func.__name__
+
+        return Wrapper()
+    if _func is None: return f1
+    return f1(_func)
+
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
 rename = os.rename
@@ -281,12 +315,13 @@ class FileStub:
     def closed(self): raise FileStubbed
     @property
     def name(self): raise FileStubbed
+    @property
+    def mode(self): raise FileStubbed
     def __bool__(self): return False
-def analyze(inp:str,raw=False):
+def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str],str]:
     global TRDB
 
-    opt = db.print_try
-    db.print_try = False
+    db.set_temp_print(False)
     if '://' in inp[:0x20]: typ = 'url'
     else:
         inp = cleanp(inp)
@@ -400,7 +435,11 @@ def analyze(inp:str,raw=False):
         f.skip = lambda n: f.seek(n,1)
         fsz = f.seek(0,2)
     elif typ == 'url': fsz = len(inp)
-    opfs = []
+    elif typ == 'directory':
+        f = rldir(inp,files=False)
+        fll = [os.path.relpath(x,inp).lower().replace('\\','/') for x in f]
+        fsz = len(f)
+    opfs = {}
     def fkopen(p,m,*args,**kwargs):
         asrt('r' in m and not '+' in m,'Read only')
         if p == inp:
@@ -408,13 +447,17 @@ def analyze(inp:str,raw=False):
                 asrt(m == 'rb','Binary read only')
                 f.seek(0)
             return f
+        elif p in opfs and opfs[p].mode == m:
+            opfs[p].seek(0)
+            return opfs[p]
         else:
+            if p in opfs: opfs[p].close()
             rf = open(p,m,*args,**kwargs)
             rf._close = rf.close
             rf.close = lambda *_,**__:None
             rf.readi = lambda n,end='<',sign=False: int.from_bytes(rf.read(n),byteorder={'<':'little','>':'big'}[end],signed=sign)
             rf.skip = lambda n: rf.seek(n,1)
-            opfs.append(rf)
+            opfs[p] = rf
             return rf
 
     for xv in DDB:
@@ -458,10 +501,9 @@ def analyze(inp:str,raw=False):
                     print(xv['rs'] + ':')
                     print(x[1])
                     if f: f._close()
-                    raise
-                finally:
-                    for opf in opfs:
+                    for opf in opfs.values():
                         if not opf.closed: opf._close()
+                    raise
             elif x[0] == 'ps':
                 env = os.environ.copy()
                 env['input'] = inp
@@ -620,10 +662,33 @@ def analyze(inp:str,raw=False):
                             return True
                         ret = chk(js,x[1])
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
-            elif xv.get('t') == 'url':
+            elif typ == 'url':
                 if x[0] == 'isat':
                     cv,sp = x[1],x[2]
                     ret = inp[sp:sp+len(cv)] == cv
+                elif x[0] == 'contains':
+                    cv,sp,lng = x[1],x[2],x[3]
+                    ret = inp[sp:sp+lng].find(cv) != -1
+                elif x[0] == 'isin':
+                    cv,sp = x[1],x[2]
+                    ret = inp[sp:sp+len(cv[0])] in cv
+            elif typ == 'directory':
+                if x[0] == 'contains':
+                    fl = fll.copy()
+                    ret = False
+                    for fn in x[1]:
+                        for pfn in fl:
+                            if fn in pfn: fl.remove(pfn);break
+                        else: break
+                    else: ret = True
+                elif x[0] == 'containsext':
+                    fl = fll.copy()
+                    ret = False
+                    for xn in x[1]:
+                        for pfn in fl:
+                            if pfn.endswith(xn): fl.remove(pfn);break
+                        else: break
+                    else: ret = True
             if xv.get('qq') and (type(x[-1]) != bool or x[-1]):
                 if ret:
                     tret = True
@@ -636,12 +701,14 @@ def analyze(inp:str,raw=False):
                 nts = [xv['rs']]
                 break
             else: nts.append(xv['rs'])
-    if typ in {'text','binary','null'}: f._close()
+    if f and hasattr(f,'_close'): f._close()
+    for opf in opfs:
+        if not opf.closed: opf._close()
     nts = list(set(nts))
-    if not raw and not nts: print(ts)
+    if not quiet and not nts: print(ts)
 
-    db.print_try = opt
-    if raw: return nts,ts
+    db.reset_temp_print()
+    if raw: return nts,ts,typ
     return nts
 
 def extract(inp:str,out:str,t:str) -> bool:
@@ -750,7 +817,7 @@ def fix_tar(o:str,rem=True):
     if len(listdir(o)) == 1:
         f = o + '/' + listdir(o)[0]
         if open(f,'rb').read(2) == b'MZ': return
-        nts,_ = analyze(f,True)
+        nts = analyze(f,quiet=True)
         if nts == ['TAR'] or nts == ['Stripped TAR']:
             r = extract(f,o,nts[0])
             if not r and rem:
@@ -1115,7 +1182,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     out = cleanp(out)
     #asrt(not exists(out),'Output directory already exists')
     if not '://' in inp: inp = cleanp(inp)
-    if ts == None: ts = analyze(inp)
+    if ts == None: ts = analyze(inp,quiet=quiet)
     if not ts:
         if rs: asrt(ts,'Unknown file type')
         return

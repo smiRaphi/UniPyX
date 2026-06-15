@@ -66,7 +66,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 except:pass
                 else:return
         case 'GameCube GCAM ISO':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             tf = TmpFile('.iso')
             with open(i,'rb') as fi:
                 fi.seek(0x20)
@@ -80,7 +80,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             tf.destroy()
             return
         case 'GameCube TGC ISO':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             tf = TmpFile('.iso')
             with open(i,'rb') as fi:
                 fi.seek(8)
@@ -146,6 +146,39 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for x in listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
+        case '\0Switch NSP':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'PFS0')
+
+            c = f.readu32()
+            sts = f.readu32()
+            f.padc(4)
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu64(),f.readu64(),f.readu32()))
+                f.padc(4)
+            so = f.pos
+
+            for fe in fs:
+                f.seek(so + fe[2])
+                fn = f.read0s('utf-8')
+                f.seek(so + sts + fe[0])
+                writefile(o + '/' + fn,f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Switch Unpacked':
+            raise NotImplementedError
+            db.try_custom()
+            inf = [x for x in listdir(i) if x.lower().endswith('.cnmt.nca')]
+            asrt(len(inf) == 1)
+            inf = i + '/' + inf[0]
+        case '\0Switch NCA':
+            raise NotImplementedError
+            db.try_custom()
+            nca = Nintendo(db).parse_nca(readfile(i,size=0x10000))
         case 'Switch NSP'|'Switch NCA'|'Switch XCI':
             import re
 
@@ -300,7 +333,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'Nintendo TMD':
             ckeys = db.get('tmd_keys') + '/'
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from bin.tmd import TMD,Ticket,PWDS,derive_key,decrypt_content,unscramble_3ds
 
             dr = dirname(i)
@@ -449,10 +482,10 @@ def extract2(inp:str,out:str,t:str) -> bool:
             run([tf.p,'-t',i,'-doprg'],print_try=False)
             tf.destroy()
             if exists(td + '/tcreport.txt') and exists(td + '/prg') and listdir(td + '/prg'):
-                r = readfile(td + '/tcreport.txt','r')
+                r = readfile(td + '/tcreport.txt','rt')
                 for x in r.split('\n---------------------------------\n')[1:]:
                     x = x.split('\n')
-                    asrt(x[0].startswith('Seq. no.: ') and x[1].startswith('File Type: '),seq)
+                    asrt(x[0].startswith('Seq. no.: ') and x[1].startswith('File Type: '),x[0])
                     seq = int(x[0][10:])
                     ty = x[1][11:]
                     if ty == 'PAUSE': continue
@@ -568,7 +601,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             run(['tapsplit',i,o])
             if listdir(o): return
         case 'CPC Plus IMG':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
 
             f = File(i)
@@ -588,7 +621,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             of.close()
             if cns: return
         case 'GBA ADS Video ROM'|'GBA ADS SFCD':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
 
             f = File(i,endian='<')
@@ -616,7 +649,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.seek(cp)
             if fsc: return
         case 'NES Remix ROM':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -641,7 +674,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             writefile(o + '/' + name,f.read(size))
             return
         case 'Famicom Disk Image':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -768,7 +801,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             tf.destroy()
             return r
         case 'PlayStation Boot Package':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -822,7 +855,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             return
         case 'SimpleFlashFS':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -850,7 +883,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.seek(cp + ln)
             if listdir(o): return
         case 'Konami Python IMG':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
 
@@ -881,7 +914,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/' + fe[1],f.read(fe[2]))
             if fs: return
         case 'StudyBox IMG':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -928,7 +961,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 426:"V.R. Technology OneBus [Serial ROM in GPIO]",534:"ING003C",594:"Rinco FSG2",595:"NES-4MROM-512"
             }
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'NES\x1A')
@@ -1113,7 +1146,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             return
         case 'N64 Memory Pak':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             from lib.crypto import crc_hash
             f = File(i,endian='>')
@@ -1135,12 +1168,14 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     continue
                 try: gn = gnr.decode('ascii');asrt(gn.isprintable())
                 except: gn = (gnr[:4].rstrip(b'\0') + gnr[4:].rstrip(b'\0')).hex().upper()
+                gn = sub_path(gn,slash=True)
 
                 ppd = f.readu8()
                 ldrgcrc = f.readu16()
 
                 ext = f.read(4).split(b'\0')[0].decode('n64mpak').strip()
-                fn = f"{o}/{gn}/{f.read(0x10).split(b'\0')[0].decode('n64mpak').strip()}{('.' + ext) if ext else ''}"
+                fn = sub_path(f.read(0x10).split(b'\0')[0].decode('n64mpak').strip() + ('.' if ext else '') + ext,slash=True)
+                fn = f"{o}/{gn}/{fn}"
                 f.back(0x20)
                 rd = bytearray(f.read(0x20))
                 rd[9:11] = b'\0\0'
@@ -1155,7 +1190,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     if cp == 1: break
                     pp = cp
 
-                fs.append((sub_path(fn),sp * 0x100,ps * 0x100 - ppd))
+                fs.append((fn,sp * 0x100,ps * 0x100 - ppd))
 
             for fe in fs:
                 f.seek(fe[1])
@@ -1187,7 +1222,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             if listdir(o): return
         case 'Donkey Kong Banana Kingdom':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
 
             f = File(i,endian='<')
@@ -1227,7 +1262,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if quickbms(f'initd3e {d} extract',ouf=o + '\\' + d): break
             else: return
         case 'Virtua Striker 3 A':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1461,7 +1496,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 return
         case 'Final Fantasy X 2 ISO':
             zip7(i,o + '\\$ISO','ISO')
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
@@ -1487,3 +1522,132 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if fs: return
 
     return 1
+
+@namespace
+def Nintendo(db):
+    from lib.file import FileStruct
+    from lib.crypto import decrypt,crc_hash
+
+    CRYPTO_TYPES = ('application','ocean','system')
+
+    class NCASectionEntry(FileStruct):
+        start_offset:'u32'
+        end_offset:'u32'
+        padding:'padding' = 8
+    class NCA(FileStruct):
+        fixed_key_sig:bytes = 0x100
+        npdm_key_sig:bytes = 0x100
+        magic:bytes = 3
+        version:'u8'
+        distribution:'u8'
+        content_type:'u8'
+        crypto_type:'u8'
+        kaek_ind:'u8'
+        nca_size:'u64'
+        title_id:'u64'
+        padding0:'padding' = 4
+        sdk_version:'u32'
+        crypto_type2:'u8'
+        fixed_key_generation:'u8'
+        padding1:'padding' = 14
+        rights_id:bytes = 0x10
+        section_entries:list[NCASectionEntry] = 4
+        section_hashes:bytes = 0x20*4
+        encrypted_keys:bytes = 0x10*4
+        padding2:'padding' = 0xC0
+
+    _NXPKEYS = None
+    _NXDKEYS = None
+    def get_nxkeys(dev=False):
+        nonlocal _NXPKEYS,_NXDKEYS
+        if dev:
+            if _NXDKEYS is None: 
+                k = db.get('devkeys')
+                if k: _NXDKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
+                else: _NXDKEYS = {}
+            return _NXDKEYS
+        if _NXPKEYS is None: 
+            k = db.get('prodkeys')
+            if k: _NXPKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
+            else: _NXPKEYS = {}
+        return _NXPKEYS
+
+    def chknca(d:bytes): return d[0x200:0x204] in {b'NCA0',b'NCA2',b'NCA3'} and not sum(d[0x340:0x400])
+    def parse_nca(d:bytes,title_key:bytes=None):
+        pkeys,dkeys = get_nxkeys(),get_nxkeys(True)
+        h = d[:0xC00]
+        asrt(len(h) in {0xC00,0xA00})
+        enc = chknca(d)
+
+        if enc:
+            dev = False
+            asrt('header_key' in pkeys and len(pkeys['header_key']) == 0x20)
+            dh = decrypt(h[:0x400],'aes_xts_sec_le',pkeys['header_key'],sector_size=0x200)
+            if not chknca(dh):
+                if not dkeys: return
+                dev = True
+                asrt('header_key' in dkeys and len(dkeys['header_key']) == 0x20)
+                dh = decrypt(h[:0x400],'aes_xts_sec_le',dkeys['header_key'],sector_size=0x200)
+                if not chknca(dh): return
+            tkeys = dkeys if dev else pkeys
+        else:
+            tkeys = pkeys
+            dh = h
+
+        nca = NCA(dh)
+        ct = max(nca.crypto_type,nca.crypto_type2)
+        if ct: ct -= 1
+        kaek = tkeys[f'key_area_{CRYPTO_TYPES[nca.kaek_ind]}_{ct:02x}']
+        ekey = nca.encrypted_keys
+        v = (nca.version - 0x30) or 1
+
+        if v == 3:
+            if enc: dh = decrypt(h,'aes_xts_sec_le',tkeys['header_key'],sector_size=0x200)
+        elif v == 2:
+            if enc:
+                dh = [dh]
+                for ix in range(4):
+                    th = h[0x400 + ix*0x200:0x600 + ix*0x200]
+                    if sum(th[0x148:0x200]): dh.append(decrypt(th,'aes_xts_sec_le',tkeys['header_key'],sector_size=0x200))
+                    else: dh.append(th)
+                dh = b''.join(dh)
+        elif v == 1:
+            if not 'beta_nca0_modulus' in pkeys or not 'beta_nca0_exponent' in pkeys or not 'beta_nca0_label_hash' in pkeys:
+                import ast,re
+                s = db.c.get('https://raw.githubusercontent.com/SciresM/hactool/refs/heads/master/pki.c').text
+                for vn,vs in (('modulus',0x100),('exponent',0x100),('label_hash',0x20)):
+                    pkeys['beta_nca0_' + vn] = bytes(ast.literal_eval('[' + re.search(rf' unsigned const beta_nca0_{vn}\[0x{vs:x}\] = ' + r'\{([^\}]+)\};') + ']'))
+                pkd = '\n'.join(f'{k} = {v.hex()}' for k,v in pkeys.items())
+                writefile(db.get('prodkeys'),pkd,'wt')
+
+                dkey = decrypt(ekey,'rsa2048_oeap_hash',pkeys['beta_nca0_modulus'],pkeys['beta_nca0_exponent'],label_hash=pkeys['beta_nca0_label_hash'])
+                if dkey is None:
+                    if crc_hash(ekey[:0x20],'sha256',bytes=True) == b'\x9a\xbb\xd2\x11\x86\x00!\x9dz\xdc[C\x95\xf8N\xfd\xffk%\xef\x9f\x96\x85(\x18\x9ev\xb0\x92\xf0j\xcb':
+                        dkey = ekey
+                    else: dkey = decrypt(ekey[:0x20],'aes_ecb',kaek) + bytes(0x20)
+                else:
+                    asrt(len(dkey) >= 0x20)
+                    dkey = dkey[:0x20] + bytes(0x20)
+                    v = 0.5
+
+                if enc:
+                    dh = [dh]
+                    for ix in range(4):
+                        off = int.from_bytes(dh[0][0x240 + 0x10*ix:0x240 + 0x10*ix + 4],'little')
+                        if off:
+                            asrt(off > 1)
+                            th = d[off * 0x200:off * 0x200 + 0x200]
+                            asrt(len(th) == 0x200)
+                            dh.append(decrypt(th,'aes_xts_sec_le',dkey,off - 2,sector_size=0x200))
+                        else: dh.append(bytes(0x200))
+                    dh = b''.join(dh)
+
+        nca = NCA(dh)
+        if not sum(nca.rights_id):
+            if v > 1: dkey = decrypt(ekey,'aes_ecb',kaek)
+        else:
+            dkey = decrypt(title_key,'aes_ecb',f'titlekek_{ct:02X}')
+        nca.decrypted_keys = dkey
+        return nca
+
+    return locals()

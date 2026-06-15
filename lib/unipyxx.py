@@ -127,6 +127,7 @@ class X:
             ('init_selene',(P(u8),P(u8),szt,u32),void,0),
             ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2.1),
+            ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
             ('hash_super_fast_le',(P(u8),szt),u32,4),
@@ -298,6 +299,15 @@ class X:
         k = (u8 * len(key)).from_buffer_copy(key)
         self.dll.decrypt_rc4_playpond(b,len(src),k,len(key),drop)
         return bytes(b)
+    def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
+        asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * (len(src) // (block_size + 0x10) * block_size))()
+        k = (u8 * len(key)).from_buffer_copy(key)
+        t = (u8 * len(table)).from_buffer_copy(table)
+        iv = (u8 * 0x10).from_buffer_copy(iv)
+        self.dll.decrypt_tfit(i,len(src),o,iv,k,t,block_size)
+        return bytes(o)
 
     def hash_pivotal(self,src:bytes) -> int: ...
     def hash_super_fast_le(self,src:bytes) -> int: ...
@@ -1592,7 +1602,15 @@ void encrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t
 }
 EXPORT void decrypt_tfit(uint8_t *restrict src, const size_t size, uint8_t *restrict dst, const uint8_t *restrict iv,
                    const uint32_t *restrict key, const uint32_t *restrict table, const size_t block_size) {
-    
+    uint8_t tmp[16];
+    memcpy(tmp,iv,0x10);
+    for (size_t p=0;p < size;p += block_size + 0x10) {
+        for (size_t i=0;i < block_size / 16;i++) {
+            decrypt_tfit_block(src + p + i*16, dst + p + i*16, tmp, 17, key, table);
+            memcpy(tmp,dst + p + i*16,0x10);
+        }
+        decrypt_tfit_block(src + p + block_size, tmp, tmp, 17, key, table);
+    }
 }
 EXPORT void mac_cmac_tfit(uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
                     const uint32_t *restrict key, const uint32_t *restrict table) {

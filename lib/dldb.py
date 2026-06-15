@@ -35,6 +35,7 @@ class DLDB:
         self.udbp = self.bin_path + 'updb.json'
         self.c = httpx.Client()
         self.print_try = False
+        self._old_print_try = []
 
         self.db = json.load(xopen(self.dbp))
         self.pdb = {x:self.db[x] for x in self.db if 'pip' in self.db[x]}
@@ -121,6 +122,7 @@ class DLDB:
                 else: os.remove(self.bin_path + exi['p'])
             if exi.get('fs',1) == None: os.makedirs(self.bin_path + exi['p'],exist_ok=True)
             if not os.path.exists(self.bin_path + exi['p']):
+                if not 'fs' in exi: return None,False
                 t = int(time())
                 up = True
                 print('Downloading',exe)
@@ -301,6 +303,15 @@ class DLDB:
         self.udb[n] = t
         self.save()
         return e
+
+    def try_custom(self):
+        if self.print_try: print('Trying with custom extractor')
+    def set_temp_print(self,v:bool):
+        self._old_print_try.append(self.print_try)        
+        self.print_try = v
+    def reset_temp_print(self):
+        if not self._old_print_try: return
+        self.print_try = self._old_print_try.pop()
 
     def save(self):
         open(self.udbp,'w',encoding='utf-8').write(json.dumps(self.udb,ensure_ascii=False,separators=(',',':')))

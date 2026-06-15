@@ -25,6 +25,7 @@ def uxx():
     return UPXX
 
 MMFS_DEC = {}
+FH3N_DEC = {}
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
@@ -63,6 +64,26 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if i is None: return obj
 
             return obj.decrypt(i)
+        case 'aes_xts':
+            from cryptography.hazmat.primitives.ciphers import Cipher,algorithms,modes
+
+            c = Cipher(algorithms.AES(key),modes.XTS(iv))
+            return c.decryptor().update(i) + c.decryptor().finalize()
+        case 'aes_xts_sec'|'aes_xts_sec_be'|'aes_xts_sec_le':
+            asrt('sector_size' in kwargs,err=TypeError)
+            secs,sec = kwargs['sector_size'],iv or 0
+            asrt(isinstance(sec,int) and isinstance(secs,int),err=TypeError)
+            asrt(len(i) % secs == 0)
+
+            from cryptography.hazmat.primitives.ciphers import Cipher,algorithms,modes
+            end = 'little' if algo.endswith('_le') else 'big'
+
+            od = []
+            for ix in range(len(i)//secs):
+                c = Cipher(algorithms.AES(key),modes.XTS((sec + ix).to_bytes(16,end)))
+                od.append(c.decryptor().update(i[ix*secs:(ix+1)*secs]) + c.decryptor().finalize())
+
+            return b''.join(od)
         case 'blowfish'|'blowfish_ecb'|'blowfish_cbc':
             from Cryptodome.Cipher import Blowfish
             m = algo[9:] or 'ecb'
@@ -112,6 +133,46 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             asrt(k.size_in_bytes() == len(i))
             return pow(int.from_bytes(i,'little' if algo == 'rsa_le' else 'big'),k.e,k.n).to_bytes(k.size_in_bytes(),'big')
+        case 'rsa2048_oeap_hash':
+            asrt('label_hash' in kwargs and len(kwargs['label_hash']) == 0x20,err=TypeError)
+
+            import hashlib
+            def mgf1_xor(d:bytearray,h:bytes):
+                of = 0
+                seed = 0
+                while of < len(d):
+                    mgf = hashlib.sha256(h + seed.to_bytes(4,'big')).digest()
+                    for i in range(min(len(d)-of,0x20)):
+                        d[of+i] ^= mgf[i]
+                    of += 0x20
+                    seed += 1
+
+            from Cryptodome.PublicKey import RSA
+            if type(key) == bytes and type(iv) == bytes:
+                asrt(len(key) == len(iv) == 0x100)
+                key,iv = int.from_bytes(key,'big'),int.from_bytes(iv,'big')
+            if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
+            elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and iv is None: k = RSA.import_key(key)
+            else: raise NotImplementedError()
+
+            c = int.from_bytes(i,'big')
+            m = pow(c,k.e,k.n).to_bytes(0x100,'big')
+            if m[0] != 0: return None
+
+            seed = bytearray(m[1:0x21])
+            db = bytearray(m[0x21:])
+            mgf1_xor(seed,bytes(db))
+            seed = bytes(seed)
+            mgf1_xor(db,seed)
+            db = bytes(db)
+
+            if db[:0x20] != kwargs['label_hash']: return None
+            of = 0x20
+            while of < len(db) and of < 0xBF and db[of] == 0: of += 1
+            if of == 0xBF or db[of] != 1: return None
+            of += 1
+            return db[of:]
         case 'rsa_inv'|'rsa_inv_le':
             asrt('r' in kwargs)
 
@@ -130,7 +191,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             lo = len(i) % 8
             return uxx().decrypt_tea(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
         case 'transformit'|'tfit':
-            return uxx().decrypt_tfit(i,key,iv,kwargs['table'])
+            return uxx().decrypt_tfit(i,key,kwargs['table'],iv,kwargs['block_size'])
 
         case 'rsdk3':
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
@@ -166,6 +227,30 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'selene':
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_selene(i,key or b'\0')
+        case 'fh3name':
+            istr = isinstance(i,str)
+            if istr:
+                i = i.encode('latin-1')
+            if isinstance(key,dict):
+                kh = hash(tuple(key.items()))
+                if kh in FH3N_DEC: k = FH3N_DEC[kh]
+                else:
+                    k = bytearray(0x100)
+                    for ix in range(0x100):
+                        if ix in key: v = key[ix]
+                        elif chr(ix) in key: v = key[chr(ix)]
+                        elif ix.to_bytes(1) in key: v = key[ix.to_bytes(1)]
+                        else: v = ix
+                        if isinstance(v,str): v = v.encode('latin-1')[0]
+                        elif isinstance(v,bytes): v = v[0]
+                        k[ix] = v
+                    k = bytes(k)
+                    FH3N_DEC[kh] = k
+            else: k = key
+            asrt(isinstance(i,bytes) and isinstance(k,bytes) and len(k) == 0x100,err=TypeError)
+            r = i.translate(k)
+            if istr: r = r.decode('latin-1')
+            return r
 
     raise NotImplementedError(algo)
 

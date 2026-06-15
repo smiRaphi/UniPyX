@@ -72,11 +72,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
                 rmtree(o,True)
                 mkdir(o)
-                opt = db.print_try
-                db.print_try = False
-                if opt: print('Trying with input')
-                run([i,'x','-o' + o,'-y'])
-                db.print_try = opt
+                if db.print_try: print('Trying with input')
+                run([i,'x','-o' + o,'-y'],print_try=False)
             if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
                 elif t in {'Z','xz','BZip2','LZIP'}: return fix_tar(o)
@@ -119,7 +116,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             run(['fastlz','d',i,of])
             if exists(of) and getsize(of): return
         case 'Stripped TAR':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             f = open(i,'rb')
 
             while True:
@@ -150,6 +147,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 asrt(sum(f.read(0xA7)) == 0)
 
                 writefile(o + '/' + fn,f.read(fs))
+
+            f.close()
             return
         case 'LHARC':
             run(['lha','xf','--extract-broken-archive','-w=' + o,i])
@@ -240,7 +239,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if nt and not extract(f,o,nt): remove(f)
                 return
         case 'Shifted ISO':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             f = open(i,'rb')
             f.seek(0x8000)
             dat = f.read(0x1000)
@@ -301,7 +300,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             return extract(i,o,'ISO')
         case 'Apple DiskCopy':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             tf = TmpFile('.img',path=o)
             writefile(tf,readfile(i)[0x84:])
             for ty in ('IMG','Apple Disk Image'):
@@ -378,9 +377,50 @@ def extract1(inp:str,out:str,t:str) -> bool:
             }
 
             FRZK = None
-            if db.print_try: print('Trying with custom extractor')
+            FRH3NK = {
+                'l':'a',
+                '`':'b',
+                '^':'c',
+                '6':'d',
+                'q':'e',
+                'v':'f',
+                '{':'g',
+                '@':'h',
+                '$':'i',
+                '7':'j',
+                's':'k',
+                'b':'l',
+                'g':'m',
+                '8':'n',
+                'h':'o',
+                'u':'p',
+                'f':'q',
+                '4':'r',
+                '~':'s',
+                '1':'t',
+                '=':'u',
+                "'":"v",
+                'm':'w',
+                ']':'x',
+                '!':'y',
+                ',':'z',
+                'y':'_',
+                '_':'-',
+                '[':'0',
+                '0':'1',
+                'w':'2',
+                'k':'3',
+                '(':'4',
+                '2':'5',
+                'j':'6',
+                '}':'7',
+                ';':'8',
+                '+':'9',
+            }
+            db.try_custom()
             from lib.file import File,decompress,pdosdate
             from lib.crypto import decrypt,crc_hash
+            fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
             f.seek(-0x10015)
@@ -454,6 +494,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fe['xa'] = f.readu32()
                 fe['of'] = f.readu32()
                 fe['n'] = f.readc(nl).rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'ascii')
+                if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
 
                 ep = f.pos + xl
                 while (f.pos + 4) < ep:
@@ -504,15 +545,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     f.seek(xep)
                 f.seek(ep)
                 fe['cm'] = f.readc(cml)
-                if fe['xa'] & 0x10: mkdir(o + '/' + fe['n'])
+                if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0): mkdir(o + '/' + fe['n'])
                 else: fs.append(fe)
 
             if any(fe['fl'] & 1 for fe in fs):
-                nl = set([fe['n'].lower() for fe in fs])
+                nl = tuple([fe['n'].lower() for fe in fs])
                 for pk in ZKEYM:
-                    if all(x in nl for x in pk[0]):
-                        KEY = pk[1]
-                        break
+                    if type(pk[0]) == set:
+                        if not all(x in nl for x in pk[0]): continue
+                    elif type(pk[0]) == tuple:
+                        if nl != pk[0]: continue
+                    KEY = pk[1]
+                    break
                 else: raise ValueError('No key for zip file')
 
             if FRZK:
@@ -525,7 +569,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 v = f.readu16()
                 asrt(f.readu16() == fe['fl'] and f.readu16() == fe['ct'])
                 f.skip(4)
-                asrt(f.readu32() == fe['crc'] and f.readu32() == fe['zs'] and f.readu32() == fe['us'])
+                crc2,zs2,us2 = f.readu32(),f.readu32(),f.readu32()
+                if not crc2 == zs2 == us2 == 0:
+                    asrt(crc2 == fe['crc'] and zs2 == fe['zs'] and us2 == fe['us'],f.pos)
                 f.skip(f.readu16() + f.readu16())
 
                 d = f.readc(fe['zs'])
@@ -551,7 +597,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         hd = (ds // (ctx['b'] + 0x10) * ctx['b']).to_bytes(4,'little') + bhd
                         if crc_hash(hd,'cmac_tfit',key=ctx['mk'],table=ctx['mt']) == hmac: break
                     else: return 1
-                    d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'])
+                    d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'],block_size=ctx['b'])
                     if v == 1: d = d[:-pad]
                     d = decompress(d,'deflate',usize=fe['us'])
 
@@ -858,7 +904,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     return
                 remove(td)
         case 'Intel HEX':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             f = open(i,encoding='utf-8')
 
             fs = [[]]
@@ -910,7 +956,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             tf.destroy()
             return
         case 'UUencoded':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import binascii
             d = readfile(i,'r')
             if 'begin ' in d: d = [x for x in re.findall(r'(?ms)begin \d+ ([^\n]+)\n(.+?)\nend\n',d)]
@@ -927,7 +973,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.close()
             if d: return
         case 'HTTP Response':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from urllib.parse import unquote_to_bytes
             hd,d = readfile(i).split(b'\r\n\r\n',1)
             hd = {x.split(b': ',1)[0].decode('latin1'):x.split(b': ',1)[1] for x in hd.split(b'\r\n')[1:]}
@@ -960,7 +1006,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             json.dump(hds,open(of + '_headers.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
             return
         case 'Motorola S-Record':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             f = open(i)
 
             fs = [[]]
@@ -1001,7 +1047,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 of.close()
             if fs: return
         case 'Bootable FAT16 IMG':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File,pdosdate
             f = File(i,endian='<')
 
@@ -1064,7 +1110,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             writefile(f'{o}/{tbasename(i)}.{ext}',d)
             return
         case 'Web ARchive':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             from urllib.parse import unquote_to_bytes
             f = open(i,'rb')
@@ -1124,7 +1170,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             run(['git','clone',i,o])
             if listdir(o): return
         case 'Bencode':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             import json
             f = open(i,'rb')
             s = f.seek(0,2);f.seek(0)
@@ -1182,7 +1228,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             run(['ttdecomp',i,of])
             if exists(of) and getsize(of): return
         case 'Diff Patch':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             f = open(i,encoding='utf-8')
 
             ix = 0
@@ -1247,7 +1293,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             DIGM = {1:6,2:8}
             TYPM = {1:'hotp',2:'totp'}
 
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import File
             from base64 import b64decode,b32encode
             from urllib.parse import urlparse,parse_qs,unquote

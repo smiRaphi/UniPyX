@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 972
+# Supported Formats: 978
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (510)
+## Various (516)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -608,7 +608,9 @@ LMPK | .lmpk | Custom |
 London Racer Destruction Madness WAD | .wad | [london_racer.bms](https://mirror.aluigi.org/bms/london_racer.bms) |
 Looking Glass Resource | .res | Custom |
 Lucas Learning DAT | .dat | Custom |
-Lucas Arts Bundle | .bdl | Custom |
+LucasArts Bundle | .bdl | Custom |
+LucasArts APak | .xma | Custom |
+LucasArts R2D2 Pack | * | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |
 Ludia GWTarget | ` ` | Custom |
@@ -627,7 +629,10 @@ Metropolis Software ZAP | .zap | Custom |
 Michigan: Report From Hell BIN | .bin | Custom |
 Michigan: Report From Hell LF | .lf | Custom |
 Microsoft .NET ResX | .resx | Custom |
-Minecraft PCK | .pck | [minecraft_pck.bms](https://mirror.aluigi.org/bms/minecraft_x360_pck.bms) |
+Minecraft Console ARC | .arc | Custom |
+Minecraft Console Game Rule File | .grf | Custom | only decompresses, does not parse
+Minecraft Console MCS | .mcs | Custom |
+Minecraft Console PCK | .pck | Custom |
 Mini Metro Sound Bytes | .bytes | Custom |
 MINICAT | .cat | Custom |
 Mission Impossible 3 Data | ??? | Custom |
@@ -771,6 +776,7 @@ Snoopy Vs. The Red Baron X | .xpc .xps | Custom |
 Sonic AMB | .amb | Custom |
 Sonic BINA | * | Custom |
 Sonic PAC | .pac | [HedgeArcPack](https://github.com/Radfordhound/HedgeLib) |
+Sonic Shuffle Message Data | .bin | Custom |
 Soulcalibur Legends NPAC | .npac | Custom |
 SouthPeak Interactive Puzzle Archive | .mco | [na_game_tool](https://nihav.org/game_tool.html) |
 Star Fox DAT | .dat | [star_fox_zero_dat.bms](https://mirror.aluigi.org/bms/star_fox_zero_dat.bms) |

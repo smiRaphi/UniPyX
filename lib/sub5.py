@@ -266,7 +266,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['tersedecompress++',i,of,'-b'])
             if exists(of) and getsize(of): return
         case 'UCLPack':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             d = decompress(open(i,'rb').read(),'uclpack',db=db)
             writefile(o + '/' + tbasename(i),d)
@@ -451,7 +451,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['aceapex','d','--in',i,'--out',of])
             if exists(of) and getsize(of): return
         case 'GDeflate':
-            if db.print_try: print('Trying with custom extractor')
+            db.try_custom()
             from lib.file import decompress
             d = decompress(i,'gdeflate',db=db)
             writefile(o + '/' + tbasename(i),d)

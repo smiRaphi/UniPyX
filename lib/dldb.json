@@ -131,6 +131,9 @@
     "Cryptodome":{
         "pip":"pycryptodomex"
     },
+    "cryptography":{
+        "pip":"cryptography"
+    },
     "7z":{
         "p":"7z/7z.exe",
         "fs":[{
@@ -6377,14 +6380,6 @@
         "fs":[[
             "https://aluigi.org/bms/arcsys.bms",
             "BMS/arcsys.bms"
-        ]],
-        "ts":0
-    },
-    "minecraft_pck":{
-        "p":"BMS/minecraft_pck.bms",
-        "fs":[[
-            "https://mirror.aluigi.org/bms/minecraft_x360_pck.bms",
-            "BMS/minecraft_pck.bms"
         ]],
         "ts":0
     },
