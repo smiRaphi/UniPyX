@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 980
+# Supported Formats: 982
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (518)
+## Various (520)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -500,6 +500,8 @@ Dragon UnPACKer 5 Plugin | .d5p | Custom |
 Dragon VDK IMG | .vdk | [dcopy](https://github.com/pulkomandy/ddosutils) |
 Dying Light RPACK | .rpack | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Dynamix DYN | .dyn | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Dynamix PVOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Dynamix VOL | .vol | Custom |
 Earth And Beyond MIX | .mix | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 EBAB Animation Data | .ebab | Custom |
 Electronic Arts LIB | .lib | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -610,7 +612,7 @@ London Racer Destruction Madness WAD | .wad | [london_racer.bms](https://mirror.
 Looking Glass Resource | .res | Custom |
 Lucas Learning DAT | .dat | Custom |
 LucasArts Bundle | .bdl | Custom |
-LucasArts APak | .xma | Custom |
+LucasArts APak | .xma .lp | Custom |
 LucasArts R2D2 Pack | * | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |

@@ -336,5 +336,32 @@ def extract4_5(inp:str,out:str,t:str):
                 set_ftime(f'{o}/{n}_{f}.bin',cd,mt=md)
 
             return
+        case 'Dynamix VOL':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(f.readu32())
+            c = f.readu32()
+            asrt(f.readu32() == 0x10)
+            fs = []
+            for _ in range(c):
+                ty = f.readu32()
+                if ty == 0:
+                    f.skip(0x10)
+                    mkdir(o + '/' + f.reads(f.readu16(),'ascii'))
+                elif ty == 1:
+                    fe = (f.readu32(),f.readu32() + 4)
+                    f.skip(8)
+                    fs.append((*fe,f.reads(f.readu16(),'ascii')))
+                else: raise NotImplementedError(f.pos - 4)
+                f.skip(4)
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[2],f.readc(fe[0]))
+
+            f.close()
+            if fs: return
 
     return 1

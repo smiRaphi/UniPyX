@@ -1618,5 +1618,9 @@
     ],
     "Nintendo Amiibo NFC Raw":[
         "nintendo amiibo nfc data dump"
+    ],
+    "Dynamix PVOL":[
+        "starsiege game data archive",
+        "starsiege tribes game data archive"
     ]
 }

@@ -568,19 +568,6 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                         h.update(cv)
                         c -= len(cv)
                     ret = h.hexdigest() == hs
-                elif x[0] == 'str0nv':
-                    sp = x[1]
-                    if sp < 0: sp = fsz + sp
-                    if sp < 0: sp = 0
-                    f.seek(sp)
-                    scnt = 0
-                    b = b''
-                    for _ in range(x[2]):
-                        b = f.read(1)
-                        if not b: ret = False;break
-                        if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:<>*': scnt += 1
-                        elif b != b'\0': ret = False;break
-                    else: ret = scnt >= x[3]
                 elif x[0] == 'str0e':
                     sp = x[1]
                     if sp < 0: sp = fsz + sp
@@ -593,6 +580,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                         if not b: ret = False;break
                         if b in b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$.#+% -_^({[]})&;@\',~=/\\:<>*': scnt += 1
                         elif b == b'\0': ret = scnt >= x[3];break
+                        else: ret = False;break
                     else: ret = scnt >= x[3]
                 elif x[0] == 'str0':
                     sp = x[1]

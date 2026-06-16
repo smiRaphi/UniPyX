@@ -782,7 +782,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'The Sims FAR'|'Quake PAK'|'Quake 3D WAD'|'Agon Game Archive'|'Alien Vs Predator FFL'|'Allods 2 Rage Of Mages Resource'|\
              'American Conquest 2 GSC'|'ASCARON Entertainment CPR'|'Halloween Harry Bank'|'Battlezone 2 PAK'|'Dark Reign 2 ZWP'|\
              'BioWare Entity Resource'|'Bloodrayne POD'|'Broderbund Mohawk MHK'|'Chasm BIN'|'Novalogic PFF'|\
-             'CI Games DPK'|'Creative Assembly PFH0'|'Dark Reign FTG'|'Destan 3DN'|'7 Studios FS'|\
+             'CI Games DPK'|'Creative Assembly PFH0'|'Dark Reign FTG'|'Destan 3DN'|'7 Studios FS'|'Dynamix PVOL'|\
              'Dynamix DYN'|'Earth And Beyond MIX'|'Electronic Arts LIB'|'Empire Earth 1 SSA'|'Ensemble Studios DRS'|\
              'Etherlords 2 Resource'|'F.E.A.R. LTAR'|'Final Fantasy 7 LGP'|'Holistic Design MUK'|'Gabriel Knight 3 Barn'|\
              'Haemimont Games HPK'|'Harry Potter: Quidditch World Cup CCD'|'Highway Pursuit HPDT'|'UE3 Package'|'Xenonauts PFP'|\
@@ -793,7 +793,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 'Allods 2 Rage Of Mages Resource':'RES_2','American Conquest 2 Game Archive':'GSC_GSCFMT','ASCARON Entertainment Game Archive':'CPR_ASCARON',
                 'Halloween Harry Bank':'BNK','Battlezone 2 PAK':'PAK_DOCP','BioWare Entity Resource':'ERF_ERFV10|ERF_ERFV20|ERF_ERFV30','Bloodrayne POD':'POD_POD3',
                 'Broderbund Mohawk MHK':'MHK_MHWK','Chasm BIN':'BIN_CSID','CI Games DPK':'DPK_DPK4','Creative Assembly PFH0':'PACK_PFH0',
-                'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Dynamix DYN':'DYN_DYNAMIX',
+                'Dark Reign FTG':'FTG_BOTG','Dark Reign 2 ZWP':'ZWP_NORK','Destan 3DN':'3DN_DESTAN','Dynamix DYN':'DYN_DYNAMIX','Dynamix PVOL':'VOL_PVOL',
                 'Earth And Beyond MIX':'MIX_MIX1','Electronic Arts LIB':'LIB_EALIB','Empire Earth 1 SSA':'SSA_RASS','Ensemble Studios DRS':'DRS',
                 'Etherlords 2 Resource':'RES_8|RES','F.E.A.R. LTAR':'ARCH00_LTAR','Final Fantasy 7 LGP':'LGP','Holistic Design MUK':'MUK_MUKFILE',
                 'Gabriel Knight 3 Barn':'BRN_GK3BARN','Haemimont Games HPK':'HPK_BPUL','Harry Potter: Quidditch World Cup CCD':'CCD_FKNL',

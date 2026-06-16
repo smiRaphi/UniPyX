@@ -434,6 +434,10 @@
         "rs":"Adventure Time VOLume","s":1
     },
     {
+        "d":[["size",[66,4294967295]],["n0",4,0],["py","o=f.readi(4,'<')\nif (o+62)>fsz:return\nf.seek(o);c=f.readi(4,'<')\nif c<2 or(o+c*34)>fsz or f.readi(4,'<')!=16 or sum(f.read(12)):return\nf.skip(4);return f.read(7)==b'\\xFF\\xFF\\xFF\\xFF\\1\\x00.'"]],
+        "rs":"Dynamix VOL"
+    },
+    {
         "d":[["isat","KCAP",0],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],88],["n0",4,4],["n0",4,72],["n0",4,76],["n0",4,80],["str0",8,64,5],["py","f.seek(4);c=f.readi(4,'<');o=[int.from_bytes(f.read(84)[72:76],'little') for _ in range(c)];return f.tell()in o and all(x>=f.tell() for x in o)"]],
         "rs":"Selene Pack","s":1
     },
