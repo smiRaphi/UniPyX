@@ -148,35 +148,35 @@ class PyOBin:
                     return fl == 1
                 case 2:
                     if fl & 8: return fl & 7
-                    if fl & 7: return f.unpacki(fl & 7)
-                    if lst: return f.unpacki((fl >> 4) + 7)
+                    if fl & 7: return f.readi(fl & 7)
+                    if lst: return f.readi((fl >> 4) + 7)
                     v = f.readu8()
-                    return v >> 4 | f.unpacki((v & 15) + 7) << 4
+                    return v >> 4 | f.readi((v & 15) + 7) << 4
                 case 3:
-                    if lst: return f.unpacki(fl,signed=True)
-                    else: return -f.unpacki(fl)
+                    if lst: return f.readi(fl,signed=True)
+                    else: return -f.readi(fl)
                 case 4:
                     if fl & 8:
                         if fl == 0b1100:
                             fl = f.readu8()
                             v,s = fl & 0b1111,fl >> 4
-                            sdbix = v | f.unpacki(s) << 4
+                            sdbix = v | f.readi(s) << 4
                         else: sdbix += (fl & 3) * (-1 if fl >> 2 & 1 else 1)
                         r = sdb[sdbix]
                         sdbix += 1
                         return r
-                    else: return sdb[f.unpacki(fl & 7)]
+                    else: return sdb[f.readi(fl & 7)]
                 case 5:
-                    if fl & 8: return f.decompress(f.unpacki(fl & 7),'deflate0' if fl & 8 else 'none')
+                    if fl & 8: return f.decompress(f.readi(fl & 7),'deflate0' if fl & 8 else 'none')
                     xr = (ty | fl << 4) ^ 0xFF
-                    return bytes(v ^ xr for v in f.readc(f.unpacki(fl)))
+                    return bytes(v ^ xr for v in f.readc(f.readi(fl)))
                 case 6: return (f.readf16,f.readf32,f.readf64)[fl]()
                 case 7:
-                    c = f.unpacki(fl)
+                    c = f.readi(fl)
                     o = [interp() for _ in range(c)]
                     return o
                 case 8:
-                    c = f.unpacki(fl)
+                    c = f.readi(fl)
                     if c == 0: return []
                     sty = f.readu8()
                     if sty == 0:
@@ -198,7 +198,7 @@ class PyOBin:
                         if sty == 2: sty |= f.readu8() << 8
                         return [interp(sty,lst=True) for _ in range(c)]
                 case 9:
-                    c = f.unpacki(fl)
+                    c = f.readi(fl)
                     ks = [interp() for _ in range(c)]
                     o = {}
                     for k in ks: o[k] = interp()
@@ -209,11 +209,11 @@ class PyOBin:
                     else:
                         v = fl & 3 | f.readu8() << 2
                         s1,s2 = (v & 0b11111) * 3,(v >> 5) * 4
-                        v = f.unpacki((s1 + s2 + 7) // 8)
+                        v = f.readi((s1 + s2 + 7) // 8)
                         r = Decimal(v & ((1 << s1) - 1)) / Decimal(v >> s1)
                     return r * ml
                 case 11:
-                    # d = f.readc(f.unpacki((fl & 3) + 1) + 7)
+                    # d = f.readc(f.readi((fl & 3) + 1) + 7)
                     # if d == b'\0': d = None
                     # else: d = d.decode('utf-0' if fl & 4 else 'ascii7')
 
@@ -288,7 +288,7 @@ class PyOBin:
                         return r
                     else: return (PyOInlineF if fl & 8 else PyOFunc,d)
                 case 12:
-                    d = f.decompress(f.unpacki(fl & 7),'deflate0' if fl & 8 else 'none')
+                    d = f.decompress(f.readi(fl & 7),'deflate0' if fl & 8 else 'none')
                     if self.unpickle: return PyOUnpickler(d,encoding='utf-8').load()
                     else: return (PyOUnpickler,d)
                 case _: raise ValueError(f'Unknown type: {ty} (0x{fl << 4 | ty:02X}) @ 0x{f.pos-1:08X}')
@@ -335,15 +335,15 @@ class PyOBin:
                         asrt(x.bit_length() <= 180)
                         v = (x.bit_length() - 4 - 7*8 + 7) // 8
                         f.writeu8(v | (x & 15) << 4)
-                        f.packi(x >> 4,s)
+                        f.writei(x >> 4,s)
                     else:
                         f.writeu8(2 | s << 4)
-                        f.packi(x,s)
+                        f.writei(x,s)
             elif t == int and x < 0:
                 x = -x
                 s = (x.bit_length() + 7) // 8
                 f.writeu8(3 | s << 4)
-                f.packi(x,s)
+                f.writei(x,s)
             elif t == str:
                 if x in sdb: ix = sdb.index(x)
                 else:
@@ -357,7 +357,7 @@ class PyOBin:
                     s = (ix.bit_length() + 7) // 8
                     asrt(s < 0b1000)
                     f.writeu8(4 | s << 4)
-                    f.packi(ix,s)
+                    f.writei(ix,s)
             elif t == bytes and len(x) in _SMAP:
                 xr = _SMAP.index(len(x)) + 1
                 f.writeu8(0 | xr << 4)
@@ -373,7 +373,7 @@ class PyOBin:
                     x = bytes(v ^ xr for v in x)
                 s = (len(x).bit_length() + 7) // 8
                 f.writeu8(5 | bs | s << 4)
-                f.packi(len(x),s)
+                f.writei(len(x),s)
                 f.write(x)
             elif t == float:
                 for ix,fm in enumerate('efd'):
@@ -394,12 +394,12 @@ class PyOBin:
                 if all(type(y) == t1 for y in x):
                     if x[0] == None:
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         f.writeu8(0)
                         return
                     elif t1 == bool:
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         v = 0
                         x = x.copy()
                         for ix in range(min(4,len(x))): v |= (1 if x.pop(0) else 0) << ix
@@ -411,22 +411,22 @@ class PyOBin:
                         return
                     elif t1 == int:
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         if all(y >= 0 for y in x):
                             s = (max(x).bit_length() + 7) // 8
                             if s > 7:
                                 f.writeu8(2)
                                 f.writeu8(s - 7)
                             else: f.writeu8(2 | s << 4)
-                            for y in x: f.packi(y,s)
+                            for y in x: f.writei(y,s)
                         else:
                             s = (max(abs(y) for y in x) + 1 + 7) // 8
                             f.writeu8(3 | s << 4)
-                            for y in x: f.packi(y,s,signed=True)
+                            for y in x: f.writei(y,s,signed=True)
                         return
                     elif t1 == bytes and len(x[0]) in _SMAP and all(len(y) == len(x[0]) for y in x[1:]):
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         xr = _SMAP.index(len(x[0])) + 1
                         f.writeu8(0 | xr << 4)
                         xr ^= (len(x[0]) & 0xFF) ^ 0xFF
@@ -434,7 +434,7 @@ class PyOBin:
                         return
                     elif t1 == bytes:
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         xc = deflate0(x[0])
                         bs = 0x80 if len(xc) < len(x[0]) else 0
                         if bs: x = [xc] + [deflate0(y) for y in x[1:]]
@@ -442,29 +442,29 @@ class PyOBin:
                         asrt(s < 0b1000)
                         f.writeu8(5 | bs | s << 4)
                         for y in x:
-                            f.packi(len(y),s)
+                            f.writei(len(y),s)
                             f.write(y)
                         return
                     elif t1 == float:
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         f.writeu8(6)
                         for y in x: f.writef32(y)
                         return
                     elif t1 == str and (not any(y in sdb for y in x) or len(x) > 5000):
                         f.writeu8(8 | s << 4)
-                        f.packi(len(x),s)
+                        f.writei(len(x),s)
                         f.writeu8(4 | 0x80)
                         sdb.extend(x)
                         sdbix += len(x)
                         return
                 f.writeu8(7 | s << 4)
-                f.packi(len(x),s)
+                f.writei(len(x),s)
                 for y in x: interp(y,t)
             elif t == dict:
                 s = (len(x).bit_length() + 7) // 8
                 f.writeu8(9 | s << 4)
-                f.packi(len(x),s)
+                f.writei(len(x),s)
                 ks = list(x.keys())
                 if pt == list and len(ks) > 1 and all(type(y) == str for y in ks) and ks[0] in sdb:
                     ix = sdb.index(ks[0])
@@ -476,7 +476,7 @@ class PyOBin:
                         s = (ix.bit_length() - 4 + 7) // 8
                         f.writeu8(s << 4 | ix & 0b1111)
                         ix >>= 4
-                        f.packi(ix,s)
+                        f.writei(ix,s)
                     for k in ks[1:]: interp(k,t)
                 else:
                     for k in x: interp(k,t)
@@ -496,7 +496,7 @@ class PyOBin:
                     fl |= v & 0b11;v >>= 2
                     f.writeu8(10 | fl << 4)
                     f.writeu8(v)
-                    f.packi(i2 << (s1 * 3) | i1,(s1 * 3 + s2 * 4 + 7) // 8)
+                    f.writei(i2 << (s1 * 3) | i1,(s1 * 3 + s2 * 4 + 7) // 8)
                     return
                 f.writeu8(10 | fl << 4)
             elif t in (FunctionType,PyOFunc,PyOInlineF):

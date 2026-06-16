@@ -41,7 +41,7 @@ class HashLibOld:
         self.ht = f.read0s().decode(self.enc)
         self.hs = HASHTS[self.ht]
         c = f.readvlq()
-        ks = [f.unpacki(self.hs) for _ in range(c)]
+        ks = [f.readi(self.hs) for _ in range(c)]
         d = b'\x78\xDA' + f.read()
         f.close()
         vs = [x.decode(self.enc) for x in zlib.decompress(d).split(b'\0')]
@@ -61,7 +61,7 @@ class HashLibOld:
         f.write(self.ht.encode(self.enc) + b'\0')
         f.writevlq(len(ks))
 
-        for k in ks: f.packi(k,self.hs)
+        for k in ks: f.writei(k,self.hs)
         f.write(zlib.compress(bytes(b'\0'.join([x.encode(self.enc) for x in vs])),level=9)[2:])
         f.close()
 

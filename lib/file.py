@@ -95,11 +95,6 @@ class File:
             o.append(d[i*2])
         if len(d) % 2: o.append(d[-1])
         return bytes(o)
-    def unpacki(self,n:int,signed=False,end=None):
-        d = self.readc(n)
-        end = end or self._end
-        if end == '-': d = self.middle_scramble(d)
-        return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
     def unpack(self,fmt:str,end=None):
         d = self.readc(struct.calcsize(fmt))
         end = end or self._end
@@ -107,27 +102,32 @@ class File:
             d = self.middle_scramble(d)
             end = '>'
         return struct.unpack(end + fmt,d)[0]
-    def packi(self,i:int,n:int,signed=False,end=None):
+    def readi(self,n:int,signed=False,end=None):
+        d = self.readc(n)
+        end = end or self._end
+        if end == '-': d = self.middle_scramble(d)
+        return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
+    def writei(self,i:int,n:int,signed=False,end=None):
         d = i.to_bytes(n,ENDMAP[end or self._end],signed=bool(signed))
         if end == '-': d = self.middle_scramble(d)
         return self.write(d)
 
-    def readu8 (self)         : return self.unpacki(1,0)
-    def readu16(self,end=None): return self.unpacki(2,0,end)
-    def readu24(self,end=None): return self.unpacki(3,0,end)
-    def readu32(self,end=None): return self.unpacki(4,0,end)
-    def readu40(self,end=None): return self.unpacki(5,0,end)
-    def readu48(self,end=None): return self.unpacki(6,0,end)
-    def readu64(self,end=None): return self.unpacki(8,0,end)
-    def readu128(self,end=None):return self.unpacki(16,0,end)
-    def reads8 (self)         : return self.unpacki(1,1)
-    def reads16(self,end=None): return self.unpacki(2,1,end)
-    def reads24(self,end=None): return self.unpacki(3,1,end)
-    def reads32(self,end=None): return self.unpacki(4,1,end)
-    def reads40(self,end=None): return self.unpacki(5,1,end)
-    def reads48(self,end=None): return self.unpacki(6,1,end)
-    def reads64(self,end=None): return self.unpacki(8,1,end)
-    def reads128(self,end=None):return self.unpacki(16,1,end)
+    def readu8 (self)         : return self.readi(1,0)
+    def readu16(self,end=None): return self.readi(2,0,end)
+    def readu24(self,end=None): return self.readi(3,0,end)
+    def readu32(self,end=None): return self.readi(4,0,end)
+    def readu40(self,end=None): return self.readi(5,0,end)
+    def readu48(self,end=None): return self.readi(6,0,end)
+    def readu64(self,end=None): return self.readi(8,0,end)
+    def readu128(self,end=None):return self.readi(16,0,end)
+    def reads8 (self)         : return self.readi(1,1)
+    def reads16(self,end=None): return self.readi(2,1,end)
+    def reads24(self,end=None): return self.readi(3,1,end)
+    def reads32(self,end=None): return self.readi(4,1,end)
+    def reads40(self,end=None): return self.readi(5,1,end)
+    def reads48(self,end=None): return self.readi(6,1,end)
+    def reads64(self,end=None): return self.readi(8,1,end)
+    def reads128(self,end=None):return self.readi(16,1,end)
     def readf16(self,end=None): return self.unpack('e',end)
     def readf32(self,end=None):
         v = self.unpack('f',end)
@@ -167,20 +167,20 @@ class File:
         return r
     def readutf16(self,l:int): return self.readc(l * 2).decode('utf-16' + UTFENDM[self._end])
 
-    def writeu8 (self,v:int): return self.packi(v,1,0)
-    def writeu16(self,v:int,end=None): return self.packi(v,2,0,end)
-    def writeu32(self,v:int,end=None): return self.packi(v,4,0,end)
-    def writeu40(self,v:int,end=None): return self.packi(v,5,0,end)
-    def writeu48(self,v:int,end=None): return self.packi(v,6,0,end)
-    def writeu64(self,v:int,end=None): return self.packi(v,8,0,end)
-    def writeu128(self,v:int,end=None):return self.packi(v,16,0,end)
-    def writes8 (self,v:int): return self.packi(v,1,1)
-    def writes16(self,v:int,end=None): return self.packi(v,2,1,end)
-    def writes32(self,v:int,end=None): return self.packi(v,4,1,end)
-    def writes40(self,v:int,end=None): return self.packi(v,5,1,end)
-    def writes48(self,v:int,end=None): return self.packi(v,6,1,end)
-    def writes64(self,v:int,end=None): return self.packi(v,8,1,end)
-    def writes128(self,v:int,end=None):return self.packi(v,16,1,end)
+    def writeu8 (self,v:int): return self.writei(v,1,0)
+    def writeu16(self,v:int,end=None): return self.writei(v,2,0,end)
+    def writeu32(self,v:int,end=None): return self.writei(v,4,0,end)
+    def writeu40(self,v:int,end=None): return self.writei(v,5,0,end)
+    def writeu48(self,v:int,end=None): return self.writei(v,6,0,end)
+    def writeu64(self,v:int,end=None): return self.writei(v,8,0,end)
+    def writeu128(self,v:int,end=None):return self.writei(v,16,0,end)
+    def writes8 (self,v:int): return self.writei(v,1,1)
+    def writes16(self,v:int,end=None): return self.writei(v,2,1,end)
+    def writes32(self,v:int,end=None): return self.writei(v,4,1,end)
+    def writes40(self,v:int,end=None): return self.writei(v,5,1,end)
+    def writes48(self,v:int,end=None): return self.writei(v,6,1,end)
+    def writes64(self,v:int,end=None): return self.writei(v,8,1,end)
+    def writes128(self,v:int,end=None):return self.writei(v,16,1,end)
     def writef16(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'e',v))
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
@@ -217,6 +217,12 @@ class File:
     @property
     def closed(self) -> bool: return self._f.closed
 
+    def fmt(self,*fmt,back=0):
+        fmt = ' '.join(map(str,fmt))
+        p = f'0x{self.pos - back:08X}'
+        r = fmt.replace('§@§',p).replace('§f§',self.name.replace('\\','/').split('/')[-1]).replace('§m§',self.mode).replace('§e§',self._end)
+        if r.endswith('§@'): r = r[:-2] + ' @ ' + p
+        return r
     def update_size(self,current=True):
         if current: self._size = self.tell()
         else:

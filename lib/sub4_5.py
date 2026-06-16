@@ -350,11 +350,11 @@ def extract4_5(inp:str,out:str,t:str):
                 if ty == 0:
                     f.skip(0x10)
                     mkdir(o + '/' + f.reads(f.readu16(),'ascii'))
-                elif ty == 1:
+                elif ty in {1,0x1001}:
                     fe = (f.readu32(),f.readu32() + 4)
                     f.skip(8)
                     fs.append((*fe,f.reads(f.readu16(),'ascii')))
-                else: raise NotImplementedError(f.pos - 4)
+                else: raise NotImplementedError(f.fmt(f'{ty:02X}§@',back=4))
                 f.skip(4)
 
             for fe in fs:
