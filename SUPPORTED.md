@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 978
+# Supported Formats: 980
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (516)
+## Various (518)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -529,6 +529,7 @@ Feral LOCM | .locm .loca .loc | Custom |
 Feral TELI | .teli | Custom |
 Final Fantasy 7 LGP | .lgp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 FlatOut BFS | .bfs | [bfs2pack](https://sourceforge.net/project/bfs2pack/) |
+Flipper Zero NFC Data | .nfc | Custom |
 Fox Engine Console QAR | .dat .qar | [MGSV_QAR_Tool](https://community.pcgamingwiki.com/files/file/1391-metal-gear-solid-v-modding-tools) |
 Fox Engine FPK | .fpk .fpkd | [GzsTool](https://github.com/Atvaark/GzsTool) |
 Fox Engine PFTXS | .pftxs | [GzsTool](https://github.com/Atvaark/GzsTool) |
@@ -657,6 +658,7 @@ Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/Kill
 Nicktoons Gravjet Racing LIN | .lin | Custom |
 Ninja Shadow of Darkness PAK | .pak | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |
+Nintendo Amiibo NFC Raw | .bin | Custom |
 Nintendo ASH0 | .bin | Custom |
 Nintendo Binary YAML | .byml .byaml .yml .yaml | [byml-to-yaml](https://github.com/ArchLeaders/byml_to_yaml) |
 Nintendo BLZ | .blz .lz * | Custom |

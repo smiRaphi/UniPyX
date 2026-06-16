@@ -6622,6 +6622,13 @@
     "devkeys":{
         "p":"prodkeys/dev.keys"
     },
+    "amiibo_retail_key":{
+        "p":"amiibo_retail_key.bin",
+        "fs":[[
+            "https://raw.githubusercontent.com/AmiiboDB/Amiibo/refs/heads/main/Amiibo%20Bin/!Essential%20Files/key_retail.bin",
+            "amiibo_retail_key.bin"
+        ]]
+    },
     "rrv3va":{
         "p":"RRVArcTool/rrv3vera.ic002",
         "fs":[{

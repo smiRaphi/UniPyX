@@ -1612,5 +1612,11 @@
     ],
     "QuickBMS XML Script":[
         "quickbms script (with xml header)"
+    ],
+    "Flipper Zero NFC Data":[
+        "flipper zero nfc device"
+    ],
+    "Nintendo Amiibo NFC Raw":[
+        "nintendo amiibo nfc data dump"
     ]
 }

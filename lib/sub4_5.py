@@ -274,5 +274,43 @@ def extract4_5(inp:str,out:str,t:str):
             if d:
                 writefile(f'{o}/{tbasename(i)}.txt','\n\n'.join(d),'wt')
                 return
+        case 'Flipper Zero NFC Data':
+            db.try_custom()
+            import re
+            d = readfile(i,'rt')
+
+            pc = int(re.search(r'(?m)^Pages total: (\d+)$',d)[1])
+            pgs = sorted(re.findall(r'(?m)^Page (\d+): ([A-F0-9 ]{2,})$',d),key=lambda x:int(x[0]))[:pc]
+            ob = []
+            DN = set()
+            for x in pgs:
+                if x[0] in DN: continue
+                DN.add(x[0])
+                ob.append(x[1])
+            if ob:
+                writefile(f'{o}/{tbasename(i)}.bin',bytes.fromhex(''.join(ob)),'wb')
+                return
+        case 'Nintendo Amiibo NFC Raw':
+            db.try_custom()
+            from .sub2 import Nintendo
+            from lib.file import File,datetime
+            f = File(Nintendo(db).amiibo_raw_decrypt(Nintendo.AmiiboRaw(i)),endian='>')
+
+            f.seek(4)
+            cd,md = f.readu16(),f.readu16()
+            cd = datetime(2000 + ((cd >> 9) & 0x7F),(cd >> 5) & 0xF,cd & 0x1F).timestamp()
+            md = datetime(2000 + ((md >> 9) & 0x7F),(md >> 5) & 0xF,md & 0x1F).timestamp()
+            f.skip(4)
+            n = f.readutf16(10).rstrip('\0') or tbasename(i)
+            writefile(f'{o}/{n}_mii.bin',f.readc(0x60))
+            f.seek(0xB0)
+            writefile(f'{o}/{n}_area.bin',f.readc(0xD8))
+            writefile(f'{o}/{n}_dec.bin',f.readall())
+            del f
+
+            for f in ('mii','area','dec'):
+                set_ftime(f'{o}/{n}_{f}.bin',cd,mt=md)
+
+            return
 
     return 1

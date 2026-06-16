@@ -53,13 +53,18 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_rolr(i,key or b'\0')
 
-        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_gcm':
+        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm':
             from Cryptodome.Cipher import AES
-            m = algo[4:] or 'cbc'
+            m = algo[4:-3 if algo.endswith(('_be','_le')) else None] or 'cbc'
 
             kw = kwargs
-            if m in {'ccm','eax','gcm','siv','ocb','ctr'}: kw['nonce'] = iv
+            if m in {'ccm','eax','gcm','siv','ocb'}: kw['nonce'] = iv
             elif m in {'cbc','cfb','ofb','openpgp'}: kw['iv'] = iv
+            elif m == 'ctr' and iv is not None:
+                from Cryptodome.Util import Counter
+                if isinstance(iv,bytes): iv = int.from_bytes(iv,'little' if algo.endswith('_le') else 'big')
+                asrt(isinstance(iv,int),err=TypeError)
+                kw['counter'] = Counter.new(len(key)*8,initial_value=iv,little_endian=algo.endswith('_le'),allow_wraparound=True)
             obj = AES.new(key,mode=getattr(AES,f'MODE_{m.upper()}'),**kw)
             if i is None: return obj
 
@@ -601,6 +606,20 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = uxx().mac_cmac_tfit(i,kwargs['key'],kwargs['table'])
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
+        case 'ctr_drbg_hmac_sha256':
+            asrt(isinstance(kwargs['key'],bytes) and isinstance(kwargs['size'],int))
+            import hashlib,hmac
+
+            seed = i[:kwargs.get('seed_size',None)]
+            s = kwargs['size']
+
+            o = bytearray()
+            c = kwargs.get('init',0)
+            while len(o) < s:
+                o.extend(hmac.new(kwargs['key'],c.to_bytes(2,'big') + seed,hashlib.sha256).digest())
+                c += 1
+
+            return bytes(o)[:s]
 
         case 'tarzan': fnc = tarzan_hash
         case 'luas': fnc = luas_hash

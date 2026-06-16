@@ -233,20 +233,25 @@ class File:
     def __gt__(self,other:int): return self.pos > other
     def __le__(self,other:int): return self.pos <= other
     def __ge__(self,other:int): return self.pos >= other
+_FILESTRUCTBL = {'data','offsets','sizes'} | set(File.__dict__.keys())
 class FileStruct(File):
     def __init__(self,f,endian='<'):
-        super().__init__(f,mode='rb',endian=endian)
-        self.__values = {}
         d = self.__class__.__dict__
+        super().__init__(f,mode='rb',endian=d.get('_ENDIAN',endian))
+        self.__values = {}
+        self.__offs = {}
+        self.__sizes = {}
 
         def interp(t):
             if t == float: v = self.readf32()
             elif t in {'u8','s8','u16','s16','f16','u24','s24','u32','s32','f32','u40','s40','u48','s48','u64','s64','f64','u128','s128'}:
-                v = getattr(self,t)()
+                v = getattr(self,'read' + t)()
             elif t == bool: v = bool(self.readu8())
-            elif issubclass(t,FileStruct): v = t(f)
+            elif issubclass(t,FileStruct): v = t(self._f,endian=self._end)
             return v
         for k,t in self.__class__.__annotations__.items():
+            if k in _FILESTRUCTBL or k.startswith('_'): raise KeyError(k)
+            self.__offs[k] = self.pos
             if t == bytes:
                 s = d.get(k,1)
                 v = self.readc(self.__values.get(s,s))
@@ -256,7 +261,7 @@ class FileStruct(File):
             elif t == 'utf16':
                 s = d.get(k,1)
                 v = self.readutf16(self.__values.get(s,s))
-            elif hasattr(t,'__iter__') and t.__name__ == 'list' and hasattr(t,'__args__') and t.__args__:
+            elif hasattr(t,'__args__') and t.__name__ == 'list' and t.__args__:
                 s = d.get(k,1)
                 t = t.__args__[0]
                 v = [interp(t) for _ in range(self.__values.get(s,s))]
@@ -269,20 +274,26 @@ class FileStruct(File):
                 self.align(self.__values.get(s,s))
                 continue
             else: v = interp(t)
+            self.__sizes[k] = self.pos - self.__offs[k]
             self.__values[k] = v
         self.__end_pos = self.pos
+        self.seek(0)
+        self.__data = self.read(self.size)
 
     def __getattribute__(self,n):
-        v = super().__getattribute__('__values')
+        if n in _FILESTRUCTBL or n.startswith('_'): return super().__getattribute__(n)
+        v = super().__getattribute__('_FileStruct__values')
         if n in v: return v[n]
         return super().__getattribute__(n)
 
+    def offsets(self,k) -> int: return self.__offs[k]
+    def sizes(self,k) -> int: return self.__sizes[k]
     @property
     def size(self): return self.__end_pos
-    @property
-    def data(self):
-        self.seek(0)
-        return self.read(self.size)
+    def data(self,k=None):
+        d = self.__data
+        if k is None: return d
+        return d[self.__offs[k]:self.__offs[k] + self.__sizes[k]]
 
 class BitReader:
     def __init__(self,d:bytes):

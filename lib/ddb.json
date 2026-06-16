@@ -2346,7 +2346,7 @@
         "rs":"Wii Exported Save Data","s":1
     },
     {
-        "d":[["s%",4],["n0",4,0],["isat","\\0",-1],["py","while fsz<f.tell():\n s=f.readi(4,'<')\n if s%4 or not s or (f.tell()+s-4)>fsz:break\n try:asrt(f.read(s-4).decode('utf-8').isprintable())\n except:return\nelse:return True"]],
+        "d":[["s%",4],["n0",4,0],["isat","\\0",-1],["py","while fsz>f.tell():\n s=f.readi(4,'<')\n if s%4 or not s or (f.tell()+s-4)>fsz:break\n try:asrt(f.read(s-4).decode('utf-8').isprintable())\n except:return\nelse:return True"]],
         "rs":"Sonic Shuffle Message Data"
     },
     {

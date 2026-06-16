@@ -1523,10 +1523,76 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
     return 1
 
-@namespace
+@namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt'])
 def Nintendo(db):
     from lib.file import FileStruct
     from lib.crypto import decrypt,crc_hash
+
+    class AmiiboId(FileStruct):
+        game_char_id:'u16'
+        char_variant:'u8'
+        figure_type:'u8'
+        model_num:'u16'
+        series:'u8'
+        unk1:'u8'
+    class AmiiboRaw(FileStruct):
+        _ENDIAN = '>'
+        mf_1:bytes = 3
+        chk_1:bytes = 1
+        mf_2:bytes = 4
+        chk_2:bytes = 1
+        internal:'u8'
+        static_lock_bytes:bytes = 2
+        capability_container:bytes = 4
+        unk1:bytes = 1
+        write_counter:'u16'
+        pad2:'padding' = 1
+        enc1:bytes = 0x20
+        tag_hmac:bytes = 0x20
+        amiibo_id:AmiiboId
+        unk2:bytes = 4
+        unk_hash:bytes = 0x20
+        data_hmac:bytes = 0x20
+        enc2:bytes = 0x114
+        enc3:bytes = 0x54
+        dyn_lock_bytes:bytes = 3
+        rfui:'u8'
+        cfg:bytes = 8
+    class AmiiboKey(FileStruct):
+        hmac_key:bytes = 0x10
+        phrase:bytes = 14
+        pad:'padding' = 1
+        seed_size:'u8'
+        seed:bytes = 0x10
+        xor_pad:bytes = 0x20
+
+    def amiibo_raw2base(raw:AmiiboRaw):
+        return raw.data('write_counter') + bytes(14) + raw.data()[:8]*2 + raw.data('unk_hash')
+    def amiibo_derive_key(key:AmiiboKey,base:bytes):
+        seed = key.phrase + base[:0x10 - key.seed_size] + key.seed[:key.seed_size] + base[0x10:0x20] + decrypt(base[0x20:0x40],'xor',key.xor_pad)
+        r = crc_hash(seed,'ctr_drbg_hmac_sha256',key=key.hmac_key,seed_size=480,size=0x30)
+        return r[:0x10],r[0x10:0x20],r[0x20:0x30]
+    def amiibo_raw_decrypt(raw:AmiiboRaw,key:AmiiboKey=None):
+        if key is None:
+            key = AmiiboKey(readfile(db.get('amiibo_retail_key'),size=0x50))
+        key,iv,_ = amiibo_derive_key(key,amiibo_raw2base(raw))
+        return decrypt(raw.enc1 + raw.enc2 + raw.enc3,'aes_ctr',key,iv)
+
+    _NXPKEYS = None
+    _NXDKEYS = None
+    def get_nxkeys(dev=False):
+        nonlocal _NXPKEYS,_NXDKEYS
+        if dev:
+            if _NXDKEYS is None: 
+                k = db.get('devkeys')
+                if k: _NXDKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
+                else: _NXDKEYS = {}
+            return _NXDKEYS
+        if _NXPKEYS is None: 
+            k = db.get('prodkeys')
+            if k: _NXPKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
+            else: _NXPKEYS = {}
+        return _NXPKEYS
 
     CRYPTO_TYPES = ('application','ocean','system')
 
@@ -1555,22 +1621,6 @@ def Nintendo(db):
         section_hashes:bytes = 0x20*4
         encrypted_keys:bytes = 0x10*4
         padding2:'padding' = 0xC0
-
-    _NXPKEYS = None
-    _NXDKEYS = None
-    def get_nxkeys(dev=False):
-        nonlocal _NXPKEYS,_NXDKEYS
-        if dev:
-            if _NXDKEYS is None: 
-                k = db.get('devkeys')
-                if k: _NXDKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
-                else: _NXDKEYS = {}
-            return _NXDKEYS
-        if _NXPKEYS is None: 
-            k = db.get('prodkeys')
-            if k: _NXPKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
-            else: _NXPKEYS = {}
-        return _NXPKEYS
 
     def chknca(d:bytes): return d[0x200:0x204] in {b'NCA0',b'NCA2',b'NCA3'} and not sum(d[0x340:0x400])
     def parse_nca(d:bytes,title_key:bytes=None):
