@@ -304,7 +304,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'Xbox LIVE ROM'|'Xbox PIRS':
             xpt = db.get('py360_stfs')
-            xpd = open(xpt,encoding='utf-8').read()
+            xpd = readfile(xpt,'rt')
             if 'from cStringIO import StringIO' in xpd:
                 writefile(xpt,xpd.replace(
                     'from cStringIO import StringIO','from io import BytesIO as StringIO').replace(
@@ -322,7 +322,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
             stfs.ord = lambda x: x[0] if isinstance(x,bytes) else (x if isinstance(x,int) else ord(x))
             stfs.os = os
 
-            stfs.extract_all(['',i,o])
+            try: stfs.extract_all(['',i,o])
+            except AssertionError: return 1
             if listdir(o): return
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])

@@ -537,7 +537,7 @@
         "rs":"Hollow Knight Save","s":1
     },
     {
-        "d":[["isat","APak",0],["isatS","\\0",4,12],["n0",4,8],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,44],["py","f.seek(4);uc=f.readi(4,'>');c=f.readi(4,'>');f.seek(24);us,ss=f.readi(4,'>'),f.readi(4,'>')\nif us%16 or (uc*16)>us or (uc*48)<us:return\nreturn (80+us+ss+c*64)==f.readi(4,'>')"]],
+        "d":[["isat","APak\\0\\0\\0\\x05",0],["isatS","\\0",4,12],["n0",4,8],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,44],["py","f.seek(8);c=f.readi(4,'>');f.seek(24);us,ss=f.readi(4,'>'),f.readi(4,'>');return not us%16 and(80+us+ss+c*64)==f.readi(4,'>')"]],
         "rs":"LucasArts APak","s":1
     },
     {

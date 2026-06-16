@@ -112,24 +112,42 @@ def extract4_5(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             f = File(i,endian='>')
-            asrt(f.read(4) == b'APak')
+            asrt(f.read(4) == b'APak' and f.readu32() == 5)
 
-            f.skip(4)
             c = f.readu32()
             f.seek(0x18)
             sof = 0x50 + f.readu32()
             to1 = sof + f.readu32()
-            to2 = f.readu32()
-            dof = f.readu32()
-            f.skip(4)
-            oc = f.readu32()
 
-            f.seek(to2)
-            ofs = {}
-            for _ in range(oc):
+            oto1,odo1,ods1,oc1 = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            oto2,odo2,ods2,oc2 = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            xtc,xto,xtdo,xtds = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+
+            f.seek(oto1)
+            ofs1 = {}
+            for _ in range(oc1):
                 id = f.readu32()
-                ofs[id] = dof + f.readu32()
+                ofs1[id] = odo1 + f.readu32()
                 f.padc(8)
+            f.seek(oto2)
+            ofs2 = {}
+            for _ in range(oc2):
+                id = f.readu32()
+                ofs2[id] = odo2 + f.readu32()
+                f.padc(8)
+            f.seek(xto)
+            oft3 = []
+            for _ in range(xtc):
+                f.skip(4) # ds
+                oft3.append((f.readu32(),xtdo + f.readu32()))
+                f.skip(0x114)
+            ofs3 = {}
+            for xc,xdo in oft3:
+                for _ in range(xc):
+                    id = f.readu32()
+                    asrt(id not in ofs3,f.pos)
+                    ofs3[id] = xdo + f.readu32()
+                    f.padc(8)
 
             f.seek(to1)
             fs = []
@@ -137,21 +155,27 @@ def extract4_5(inp:str,out:str,t:str):
                 f.skip(0x14)
                 so = sof + f.readu32()
                 f.skip(0x10)
-                fs.append((so,f.readu32(),f.readu32()))
-                f.skip(0x10)
+                fs.append((so,f.readu32(),f.readu32(),f.readu32()))
+                asrt(fs[-1][1] == fs[-1][2],f.pos)
+                f.skip(12)
 
             for ix,fe in enumerate(fs):
                 f.seek(fe[0])
                 fn = f.read0s('utf-8')
-                if ix in ofs:
-                    f.seek(ofs[ix])
-                    asrt(fe[1] == fe[2])
-                    d = f.readc(fe[2])
+
+                inc = [(oix,x[ix]) for oix,x in enumerate((ofs1,ofs2,ofs3)) if ix in x]
+                if len(inc) == 1:
+                    f.seek(inc[0][1])
+                    writefile(o + '/' + fn,f.readc(fe[1 if inc[0][0] == 0 else 3]))
+                elif len(inc) == 2 and inc[0][0] == 0:
+                    bfn = splitext(fn)
+                    f.seek(inc[0][1])
+                    writefile(o + '/' + fn,f.readc(fe[1]))
+                    f.seek(inc[1][1])
+                    writefile(o + '/' + bfn[0] + '.data' + bfn[1],f.readc(fe[3]))
                 else:
-                    asrt(fe[1] == fe[2] == 0,f'{to1+ix*0x40}')
-                    d = b''
-                    fn = '$deleted/' + fn
-                writefile(o + '/' + fn,d)
+                    print(ix,fe,inc,fn)
+                    raise NotImplementedError
 
             f.close()
             if fs: return
