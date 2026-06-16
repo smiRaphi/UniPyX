@@ -363,5 +363,17 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Disney POD':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'Pod\0' and f.read(4) in {b'file',b'\0\0\0\0'} and f.readu32() == 0)
+
+            c = f.readu32()
+            fs = [(f.reads(12,'ascii').rstrip('\0'),f.readu32()) for _ in range(c)]
+            for fe in fs: writefile(o + '/' + fe[0],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1
