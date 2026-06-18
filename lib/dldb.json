@@ -826,17 +826,6 @@
         ],
         "ts":0
     },
-    "repak":{
-        "p":"repak.exe",
-        "fs":[{
-            "u":"https://github.com/trumank/repak/releases/download/v0.2.3/repak_cli-x86_64-pc-windows-msvc.zip",
-            "x":{
-                "repak.exe":"repak.exe"
-            },
-            "ts":1767320086
-        }],
-        "ts":1767320086
-    },
     "wad_archiver":{
         "p":"wad_archiver.py",
         "fs":[[

@@ -369,6 +369,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import File,decompress
             from lib.crypto import decrypt,crc_hash
+            from multiprocessing import cpu_count
             from multiprocessing.pool import ThreadPool
             f = File(i,endian='<')
             f.seek(-max(x[0] for x in VS))
@@ -430,16 +431,16 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 idx = decrypt(idx,'aes_ecb',ky)
             else: ky = None
 
-            if v > 9:
+            if v > 90:
                 f.close()
                 writefile(o + '/$index.bin',idx)
-                run(['repak'] + (['-a',ky.hex()] if ky else []) + ['unpack','-o',o,'-q','-f',i])
-                if listdir(o): return
+                #run(['repak'] + (['-a',ky.hex()] if ky else []) + ['unpack','-o',o,'-q','-f',i])
+                #if listdir(o): return
                 raise NotImplementedError(f'{v} > 9')
 
             idx = File(idx,endian=f._end)
-            def reads():
-                l = idx.reads32()
+            def reads(fu=idx):
+                l = fu.reads32()
                 if l < 0:
                     l = -l
                     mlt = 2
@@ -447,34 +448,104 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 else:
                     mlt = 1
                     enc = 'utf-8'
-                d = idx.readc(l*mlt)
+                d = fu.readc(l*mlt)
                 if not sum(d[-mlt:]): d = d[:-mlt]
                 return d.decode(enc)
 
             md = reads().replace('\\','/').strip('/')
             c = idx.readu32()
-            fs = []
-            for _ in range(c):
-                fe = {
-                    'fn':o + '/' + sanitize_relative(md + '/' + reads().replace('\\','/').strip('/')),
-                    'o':idx.readu64(),
-                    's':idx.readu64(),
-                    'us':idx.readu64(),
-                    'c':cmps[idx.readu8() if v == 8 else idx.readu32()],
-                }
-                if v <= 1: fe['ts'] = idx.readu64()
-                fe['h'] = idx.read(20)
 
-                if v >= 3 and fe['c'] != 0:
-                    fe['bs'] = [(idx.readu64(),idx.readu64()) for _ in range(idx.readu32())]
-                    if v < 5: fe['bs'] = [(x-fe['o'],y) for x,y in fe['bs']]
-                    fe['o'] += fe['bs'][0][0]
-                if v >= 3:
+            fs = []
+            if v > 9:
+                hseed = idx.readu64()
+                if idx.readu32(): idx.skip(0x24)
+
+                asrt(idx.readu32() == 1,idx.fmt('no full directory index§@'),err=NotImplementedError)
+                f.seek(idx.readu64())
+                fidx = f.readc(idx.readu64())
+                idx.skip(0x14)
+                if enc: fidx = decrypt(fidx,'aes_ecb',ky)
+                fidx = File(fidx,endian=f._end)
+
+                fddc = fidx.readu32()
+                fds = []
+                for _ in range(fddc):
+                    dn = md + '/' + reads(fidx)
+                    fdfc = fidx.readu32()
+                    for _ in range(fdfc): fds.append((sanitize_relative(dn + '/' + reads(fidx)),fidx.reads32()))
+                del fidx
+
+                ee = File(idx.readc(idx.readu32()),endian=f._end)
+                neec = idx.readu32()
+                nee = []
+                for _ in range(neec):
+                    fe = {
+                        'o':idx.readu64(),
+                        's':idx.readu64(),
+                        'us':idx.readu64(),
+                        'c':cmps[idx.readu32()],
+                        'h':idx.read(0x14),
+                    }
+                    if fe['c'] != 'none':
+                        fe['bs'] = [(idx.readu64(),idx.readu64()) for _ in range(idx.readu32())]
+                        fe['o'] += fe['bs'][0][0]
                     fe['e'] = idx.readu8() & 1
                     fe['bus'] = idx.readu32()
-                else: fe['e'] = 0
-                fs.append(fe)
-            idx.close()
+                    nee.append(fe)
+
+                for fde in fds:
+                    if fde[1] == -0x80000000:
+                        open(o + '/$deleted/' + fde[0],'x').close()
+                        continue
+                    elif fde[1] < 0: fe = nee[-fde[1]].copy()
+                    else:
+                        ee.seek(fde[1])
+                        b1 = ee.readu32()
+                        fe = {
+                            'c':cmps[(b1 >> 23) & 0x3F],
+                            'e':(b1 >> 22) & 1,
+                        }
+                        bc = (b1 >> 6) & 0xFFFF
+                        bus = b1 & 0x3F
+                        fe['bus'] = ee.readu32() if bus == 0x3F else (bus << 11)
+                        fe['o'] = (ee.readu32() if (b1 >> 31) & 1 else ee.readu64()) + 0x39 + 0x10*bc
+                        fe['us'] = ee.readu32() if (b1 >> 30) & 1 else ee.readu64()
+                        if fe['c'] == 'none': fe['s'] = fe['us']
+                        else: fe['s'] = ee.readu32() if (b1 >> 29) & 1 else ee.readu64()
+                        if bc > 0:
+                            if bc == 1 and not fe['e']: fe['bs'] = [(0,fe['s'])]
+                            else:
+                                fe['bs'] = []
+                                ccp = 0
+                                for _ in range(bc):
+                                    cbs = ee.readu32()
+                                    fe['bs'].append((ccp,ccp + cbs))
+                                    if fe['e']: cbs += -cbs%0x10
+                                    ccp += cbs
+                    fs.append(fe | {'fn':o + '/' + fde[0]})
+                del ee,fds,nee
+            else:
+                for _ in range(c):
+                    fe = {
+                        'fn':o + '/' + sanitize_relative(md + '/' + reads().replace('\\','/').strip('/')),
+                        'o':idx.readu64(),
+                        's':idx.readu64(),
+                        'us':idx.readu64(),
+                        'c':cmps[idx.readu8() if v == 8 else idx.readu32()],
+                    }
+                    if v <= 1: fe['ts'] = idx.readu64()
+                    fe['h'] = idx.read(0x14)
+
+                    if v >= 3 and fe['c'] != 'none':
+                        fe['bs'] = [(idx.readu64(),idx.readu64()) for _ in range(idx.readu32())]
+                        if v < 5: fe['bs'] = [(x-fe['o'],y) for x,y in fe['bs']]
+                        fe['o'] += fe['bs'][0][0]
+                    if v >= 3:
+                        fe['e'] = idx.readu8() & 1
+                        fe['bus'] = idx.readu32()
+                    else: fe['e'] = 0
+                    fs.append(fe)
+            del idx
 
             if ky is None:
                 encs = [x for x in fs if x['e'] and x['us'] > 0]
@@ -497,18 +568,28 @@ def extract4(inp:str,out:str,t:str) -> bool:
                             return 1
                         if guid is not None: print(f'Key Hash: {crc_hash(ky,"sha256"):016X}\nRaw Key: {ky.hex().upper()}')
 
-            p = ThreadPool()
+            if any(fe['c'] == 'oodle' for fe in fs): decompress(b'','oodle',usize=0,db=db)
+
+            cpuc = cpu_count()
+            cpu,zcpu = cpuc // 4,cpuc // 4 * 3
+            if cpu > 4: cpu,zcpu = 4,cpuc - 4
+            p = ThreadPool(cpu)
+            zp = ThreadPool(zcpu)
             def decs(ix:int,d,us,alg): return ix,decompress(d,alg,usize=us)
             def decc(d,fe):
                 if fe['e']: d = decrypt(d,'aes_ecb',ky)[:fe['s']]
-                if fe['c'] in {'none','zlib','gzip'}: d = decompress(d,fe['c'])
+                if fe['c'] in {'none','zlib','gzip'}:
+                    # solid
+                    pcs = [zp.apply_async(decs,(0,d[fe['bs'][0][0]:fe['bs'][-1][0]+fe['bs'][-1][1]] if fe.get('bs') else d,None,fe['c']))]
                 elif fe['c'] in {'zstd',}:
-                    pcs = [p.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],None,'zstd')) for ix,b in enumerate(fe['bs'])]
-                    d = b''.join([x[1] for x in sorted([pc.get() for pc in pcs],key=lambda x:x[0])])
+                    pcs = [zp.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],None,'zstd')) for ix,b in enumerate(fe['bs'])]
                 elif fe['c'] in {'lz4','oodle'}:
-                    pcs = [p.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],min(fe['us']-fe['bus']*ix,fe['bus']),fe['c'])) for ix,b in enumerate(fe['bs'])]
-                    d = b''.join([x[1] for x in sorted([pc.get() for pc in pcs],key=lambda x:x[0])])
+                    if fe['bus'] == 0:
+                        asrt(len(fe['bs']) == 1)
+                        fe['bus'] = fe['us']
+                    pcs = [zp.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],min(fe['us']-fe['bus']*ix,fe['bus']),fe['c'])) for ix,b in enumerate(fe['bs'])]
                 else: raise NotImplementedError(fe['c'])
+                d = b''.join([x[1] for x in sorted([pc.get() for pc in pcs],key=lambda x:x[0])])
 
                 writefile(fe['fn'],d)
                 if 'ts' in fe: set_ftime(fe['fn'],fe['ts'])
@@ -516,12 +597,15 @@ def extract4(inp:str,out:str,t:str) -> bool:
             pcs = []
             for fe in fs:
                 f.seek(fe['o'])
-                if fe['e']: d = f.read(fe['s'] + -fe['s']%0x10)
-                else: d = f.read(fe['s'])
+                if fe['e']: d = f.readc(fe['s'] + -fe['s']%0x10)
+                else: d = f.readc(fe['s'])
                 pcs.append(p.apply_async(decc,(d,fe)))
+            f.close()
             for pc in pcs: pc.get()
             p.close()
             p.join()
+            zp.close()
+            zp.join()
 
             if fs: return
         case 'Unreal ZenLoader':

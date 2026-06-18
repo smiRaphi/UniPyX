@@ -34,10 +34,12 @@ def pdosdate(d:int,t:int,ms=0):
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
+        asrt(not 't' in mode)
+        self.mode = mode.replace('b','') + 'b'
         self.name = None
         if type(f) == str:
             self.name = f
-            f = open(f,mode.rstrip('b') + 'b')
+            f = open(f,self.mode)
         elif type(f) == bytes: f = io.BytesIO(f)
         self._f = f
         self._end = endian
@@ -165,7 +167,7 @@ class File:
         r = self.readu(max=max,chks=chks)
         if encoding is not None: r = r.decode(encoding)
         return r
-    def readutf16(self,l:int): return self.readc(l * 2).decode('utf-16' + UTFENDM[self._end])
+    def readutf16(self,l:int,end=None): return self.readc(l * 2).decode('utf-16' + UTFENDM[end or self._end])
 
     def writeu8 (self,v:int): return self.writei(v,1,0)
     def writeu16(self,v:int,end=None): return self.writei(v,2,0,end)
@@ -220,7 +222,7 @@ class File:
     def fmt(self,*fmt,back=0):
         fmt = ' '.join(map(str,fmt))
         p = f'0x{self.pos - back:08X}'
-        r = fmt.replace('§@§',p).replace('§f§',self.name.replace('\\','/').split('/')[-1]).replace('§m§',self.mode).replace('§e§',self._end)
+        r = fmt.replace('§@§',p).replace('§f§',(self.name or '<memory>').replace('\\','/').split('/')[-1]).replace('§m§',self.mode).replace('§e§',self._end)
         if r.endswith('§@'): r = r[:-2] + ' @ ' + p
         return r
     def update_size(self,current=True):
@@ -679,10 +681,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 ]
                 OODLE.OodleLZ_Decompress.restype = c_ssize_t
 
-            o = ctypes.create_string_buffer(kwargs['usize'])
-            r = OODLE.OodleLZ_Decompress(i,len(i),o,kwargs['usize'],0 if algo in () else 1,0,0,None,0,None,None,None,0,0)
-            if r == 0: raise Exception('Failed to decompress')
-            return o.raw[:r]
+            ib = (ctypes.c_uint8 * len(i)).from_buffer_copy(i)
+            o = (ctypes.c_uint8 * kwargs['usize'])()
+            r = OODLE.OodleLZ_Decompress(ib,len(i),o,kwargs['usize'],0 if algo in () else 1,0,0,None,0,None,None,None,0,0)
+            if r == 0 and kwargs['usize'] != 0: raise ValueError('Failed to decompress')
+            return bytes(o)[:r]
         case 'gdeflate':
             asrt(GDEFLATE or kwargs.get('db'))
             import ctypes

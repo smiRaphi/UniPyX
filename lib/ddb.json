@@ -763,6 +763,10 @@
         "rs":"Bandai ARC","s":1
     },
     {
+        "d":[["isat","\\0\\x07\\x7D\\xF9",0],["isatS","\\0",8,12],["n0",4,4],["n0",4,8],["py","f.seek(4);c,b=16+16*f.readi(4,'>'),f.readi(4,'>');f.seek(20);o=f.readi(4,'>');return not fsz%b and(c+-c%b)==(o*b)"]],
+        "rs":"Koei Tecmo LINKDATA","s":1
+    },
+    {
         "d":[["isat","TotemTech Data v1.73 (c) 1999-2002 Kalisto Entertainment - All right reserved",0],["isatS","\\0",179,77]],
         "rs":"TotemTech Data","s":1
     },
@@ -999,6 +1003,14 @@
     {
         "d":[["isat","\\xA0\\x00\\x01\\x02\\xAF\\x00\\x01\\x04",0],["isat","\\1\\0\\0",9],["isat","\\1\\0\\0",17],["isin",["\\x11","\\x12"],8],["isin",["\\x11","\\x12"],16],["n0",4,12]],
         "rs":"Snoopy Vs. The Red Baron X","s":1
+    },
+    {
+        "d":[["n0",4,0],["n0",4,4],["n0",4,21],["py","c,o=f.readi(4,'<'),f.readi(4,'<')\nif c<2 or(4+c*17)!=o:return\nf.seek(o-17);return f.readi(4,'<')==fsz and not sum(f.read(13))"]],
+        "rs":"Sierra BAG"
+    },
+    {
+        "d":[["isat","PRF\\0\\1\\0\\0\\0",4],["n0",4,16],["n0",4,20],["py","f.seek(16);s,o=f.readi(4,'<'),f.readi(4,'<')\nif (s+o)!=fsz:return\nf.seek(o);c=f.readi(2,'<')\nif c<2 or(20+c*16)!=s:return\nf.skip(10);return f.readi(4,'<')==24"]],
+        "rs":"Sierra PRF","s":1
     },
     {
         "d":[["isat","BLDh\\0\\0\\0\\0def \\x18\\0\\0\\0",0],["isat","inf ",40],["n0",4,16],["n0",4,20],["py","return exists(splitext(inp)[0]+'.dat')"]],

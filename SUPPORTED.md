@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 982
+# Supported Formats: 986
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (520)
+## Various (524)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -486,6 +486,7 @@ Digital Illusions PDT | .pdt .dta .pdo .pdw | Custom|
 Direct Storage Archive | .psarc | [UnPSARC](https://github.com/rm-NoobInCoding/UnPSARC) |
 Disney's Tarzan FSD | .fsd | Custom |
 Disney Games Archive | .pod | Custom |
+Disney POD | .pod | Custom |
 Disney Raw Strings | ??? | Custom |
 Disney Resource | ??? | Custom |
 DJarc | .dja | Custom |
@@ -595,6 +596,7 @@ JumpStart SpyMasters Resource | .res | Custom |
 K2 ConnectFile | .con | Custom |
 Kamen Rider Atsume BIN | .bin | Custom |
 Karma Studios Lang | ??? | Custom |
+Koei Tecmo LINKDATA | .a .b .c | Custom |
 Konami DPG | .dpg | Custom |
 Konami FireBeat LZSS | .gcz .exe | Custom |
 Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
@@ -765,6 +767,8 @@ SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |
 Shrek Smash n' Crash Racing Pack | .dat | Custom |
+Sierra BAG | .bag | Custom |
+Sierra PRF | .prf | Custom |
 Silent Hill PAK | .pak | Custom |
 Sine Mora EX BIN | .bin | Custom |
 Sinergy GUT | .gut | Custom |
@@ -837,7 +841,7 @@ U8 | .arc | [WSZST](https://szs.wiimm.de/) |
 uBlock Origin Config Backup | .json | Custom |
 UE Text Resource | ??? | Custom |
 UE3 Package | .pak .upk .xxx | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-UE4 Package | .pak | Custom, [repak](https://github.com/trumank/repak) |
+UE4 Package | .pak | Custom |
 Ultimate Ghosts 'n Goblins DPLK | .dplk | Custom |
 UMD Data | ??? | Custom |
 Unison DAT | .dat | Custom |
