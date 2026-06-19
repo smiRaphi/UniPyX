@@ -1384,7 +1384,7 @@ def extract4_1(inp:str,out:str,t:str):
                     f.align(4)
                     self.fts = {}
 
-                    while f.pos < (self.pos+self.size):
+                    while f < (self.pos+self.size):
                         if self.read_block(): break
                     self.meta.close()
 
@@ -1408,7 +1408,7 @@ def extract4_1(inp:str,out:str,t:str):
                         case 'SKIP': pass # padding
                         case 'CLAS':
                             self.clas = {}
-                            while f.pos < p: self.read_block(n)
+                            while f < p: self.read_block(n)
                             if not n in self.fts: self.fts[n] = 0
                             json.dump(self.clas,xopen(self.o + f'/{n}{self.fts[n]}.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
                             self.fts[n] += 1
@@ -1434,7 +1434,7 @@ def extract4_1(inp:str,out:str,t:str):
                             f.skip(12 if n == 'RSRC' else 8)
                             if not n in self.fts: self.fts[n] = 0
                             c = 0
-                            while f.pos < p:
+                            while f < p:
                                 tn = f.read(4).decode('ascii')
                                 ts = f.readu32()
                                 f.skip(-8)
@@ -1533,7 +1533,7 @@ def extract4_1(inp:str,out:str,t:str):
             fo = bp+f.readu32()
             f.skip(-12)
             fs = []
-            while f.pos < fo:
+            while f < fo:
                 fnl = f.readu32()
                 s = f.readu32()
                 of = f.readu32()
@@ -1739,7 +1739,7 @@ def extract4_1(inp:str,out:str,t:str):
             f.seek(0)
 
             ses = []
-            while f.pos < fo:
+            while f < fo:
                 f.skip(8)
                 ses.append((f.readu32(),f.readu32()))
 

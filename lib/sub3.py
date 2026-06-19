@@ -799,7 +799,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     f.skip(4)
 
                     dec = bytearray()
-                    while f.pos < epos:
+                    while f < epos:
                         flags = f.readu16('<')
                         bitc = 16
                         if (f.pos + bitc) > epos: bitc = epos - f.pos
@@ -818,7 +818,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                             else: dec.append(f.readu8())
                     of.write(dec)
             else: raise NotImplementedError(f'Version {ver}')
-            while f.pos < (data0 + data0_size): dlz_dec_block()
+            while f < (data0 + data0_size): dlz_dec_block()
             return
         case 'd0lLZ 3':
             raise NotImplementedError

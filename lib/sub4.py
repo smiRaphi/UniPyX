@@ -317,6 +317,21 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Blur PAK': return quickbms('blur')
         case 'Konami DPG':
             db.try_custom()
+            # from lib.file import File
+            # f = File(i,endian='<')
+            # asrt(f.read(8) == b'DP2\x1A0001')
+
+            # f.skip(4)
+            # c = f.readu32()
+            # ofs = [f.readu32() for _ in range(c+1)]
+            # fns = [f.read0s('utf-8') for _ in range(c)]
+
+            # for ix,fn in enumerate(fns):
+            #     f.seek(ofs[ix])
+            #     sz = f.readu32()
+            #     f.skip(sz - 1)
+            #     skp = len(f.readu(b'\x11',max=0x100,include=True))
+            #     f.seek(ofs[ix] + 4 + skp)
 
             inf = open(i,'rb')
             def readstr():
@@ -1148,10 +1163,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     else: spath = fpath
 
                     f.seek(pos + 4)
-                    while f.pos < epos: read_block(spath)
+                    while f < epos: read_block(spath)
                 elif name == b'WRCH' and BTYPE == b'NSF1':
                     f.skip(4)
-                    while f.pos < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
+                    while f < epos: read_block(fpath,f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
                 elif name == b'NETN' and BTYPE in {b'NSF1',b'NMF1'}:
                     FNAMES.append(f.read(f.readu32()).rstrip(b'\0').replace(b'\0',b' ').decode())
 
@@ -1420,7 +1435,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.seek(noffs[0] + 4)
 
             last = 0
-            while f.pos < noffs[1]:
+            while f < noffs[1]:
                 cur = f.reads32()
                 if cur > last: last = cur
                 else: break
@@ -1480,16 +1495,16 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'SLUDGE Data File':
             db.try_custom()
+            from lib.crypto import decrypt
             from lib.file import File
             f = File(i)
             asrt(f.read(7) == b'SLUDGE\0')
             f.skip(0xAD + 2)
 
-            dec_str = lambda s: ''.join(chr(x-1) for x in s)
             if f.readu8():
                 for _ in range(f.readu16('>')): f.skip(f.readu16('>'))
                 for _ in range(f.readu16('>')): f.skip(f.readu16('>'))
-                fs = [dec_str(f.read(f.readu16('>'))) for _ in range(f.readu16('>'))]
+                fs = [decrypt(f.read(f.readu16('>')),'roll',1).decode('ascii') for _ in range(f.readu16('>'))]
             else: fs = None
 
             opts = open(o + '/' + tbasename(i) + '.slp','w',encoding='utf-8')
@@ -1517,7 +1532,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(f.readu16('>'))
 
             lngs = f.readu8()
-            if lngs: opts.write('language=' + dec_str(f.read(f.readu16('>'))) + '\n')
+            if lngs: opts.write('language=' + decrypt(f.read(f.readu16('>')),'roll',1).decode('ascii') + '\n')
             for _ in range(lngs):
                 f.skip(2)
                 f.skip(f.readu16('>'))
@@ -1527,10 +1542,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             opts.write('chrRender_max_softX=' + str(f.readf32('<') * 16) + '\n')
             opts.write('chrRender_max_softY=' + str(f.readf32('<') * 16) + '\n')
 
-            asrt(dec_str(f.read(f.readu16('>'))) == 'okSoFar')
+            asrt(decrypt(f.read(f.readu16('>')),'roll',1) == b'okSoFar')
 
             clog = f.readu8()
-            if clog: raise NotImplementedError
+            if clog: raise NotImplementedError('custom logo')
             opts.write('customicon=' + ('Y' if clog & 1 else 'N') + '\n')
             opts.write('customlogo=' + ('Y' if clog & 2 else 'N') + '\n')
             opts.close()
@@ -1541,13 +1556,14 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(f.readu32('<'))
 
             offs = [f.readu32('<') + f.pos]
-            while f.pos < offs[0]: offs.append(f.readu32('<') + f.pos)
+            while f < offs[0]: offs.append(f.readu32('<') + f.pos)
             mx = len(str(len(offs)-1))
             for ix,of in enumerate(offs):
-                if fs: fn = fs[ix]
-                else: fn = str(ix).zfill(mx)
                 f.seek(of)
-                writefile(o + '/' + fn,f.read(f.readu32('<')))
+                d = f.read(f.readu32('<'))
+                if fs: fn = fs[ix]
+                else: fn = f'{ix:0{mx}}.{guess_ext(d)}'
+                writefile(o + '/' + fn,d)
             if offs: return
         case 'Balko UFL Game Archive':
             db.try_custom()
@@ -2161,7 +2177,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f.skip(4)
 
             dirfo = []
-            while f.pos < dno:
+            while f < dno:
                 dirfo.append(f.readu32() + bhs)
                 f.skip(4)
 

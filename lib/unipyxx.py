@@ -103,8 +103,9 @@ class X:
             ('decompress_lz4_fast', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_lzss0_lsb',(P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_lzss0_msb',(P(u8),szt,P(u8),sszt),   sszt,1),
-            ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_rtl_lz',   (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_vicious_lz',(P(u8),szt,P(u8),sszt),  sszt,1),
+            ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
@@ -169,6 +170,7 @@ class X:
     def decompress_lzss0_lsb(src:bytes,usize:int) -> bytes: ...
     def decompress_lzss0_msb(src:bytes,usize:int) -> bytes: ...
     def decompress_rtl_lz(src:bytes,usize:int) -> bytes: ...
+    def decompress_vicious_lz(src:bytes,usize:int) -> bytes: ...
     def decompress_graw_bpe(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
@@ -1007,6 +1009,48 @@ EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize
             if (o > op) o = op;
             dst[op] = dst[op - o];op++;
             dst[op] = dst[op - o];op++;
+        }
+    }
+
+eof:
+    #undef CHKi
+    #undef CHKo
+    return op;
+}
+EXPORT ssize_t decompress_vicious_lz(const uint8_t *restrict src, const size_t zsize,
+                                           uint8_t *restrict dst, const ssize_t usize) {
+    size_t ip = 0;
+    ssize_t op = 0;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    #define CHKo(n) if (usize != -1 && op + (n) >= usize) goto eof;
+
+    while (usize == -1 || op < usize) {
+        CHKi(0);
+        uint8_t b = src[ip++];
+
+        if (b & 0x80) {
+            CHKi(0);
+            uint8_t b2 = src[ip++];
+            uint8_t lng = (b2 & 0x0F) + 2;
+            uint16_t dist = (((b << 4) | (b2 >> 4)) ^ 0xFFF) + 2;
+            for (uint8_t i=0;i < lng;i++,op++) {
+                CHKo(0);
+                dst[op] = (op < dist) ? 0 : dst[op - dist];
+            }
+        } else if (b & 0x40) {
+            CHKi(0);
+            uint8_t c = (b & 0x3F) + 2;
+            uint8_t cb = src[ip++];
+            for (uint8_t i=0;i < c;i++) {
+                CHKo(0);
+                dst[op++] = cb;
+            }
+        } else {
+            uint8_t c = (b & 0x3F) + 1;
+            for (uint8_t i=0;i < c;i++) {
+                CHKi(0);CHKo(0);
+                dst[op++] = src[ip++];
+            }
         }
     }
 

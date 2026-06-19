@@ -179,7 +179,7 @@ def extract4_4(inp:str,out:str,t:str):
                             OFS[-1] = tbasename(i).replace(str(cid),'\0')
                         OFS[cid] = f
                     case 1002:
-                        while f.pos < ep: readpb(f)
+                        while f < ep: readpb(f)
                     case _: raise NotImplementedError(f'{id} ({s}) {f.name} @ 0x{f.pos - 14:08X}')
 
                 if ep > f.pos: f.seek(ep)
@@ -256,7 +256,7 @@ def extract4_4(inp:str,out:str,t:str):
                         return v
                     case '@':
                         v = []
-                        while f.pos < mx: v.append(readv(mx))
+                        while f < mx: v.append(readv(mx))
                         return v
                     case 'B':
                         l = f.readu8()
@@ -280,7 +280,7 @@ def extract4_4(inp:str,out:str,t:str):
                 if f.readu32(): return
                 f.skip(4)
                 r = []
-                while f.pos < ep: r.append(readv(ep))
+                while f < ep: r.append(readv(ep))
 
                 match ty:
                     case 1:
@@ -291,7 +291,7 @@ def extract4_4(inp:str,out:str,t:str):
                         f.seek(r[6])
                         ep = r[6]+r[7]
                         v = []
-                        while f.pos < ep: v.append(readv(ep))
+                        while f < ep: v.append(readv(ep))
                         for ix,x in enumerate(v[2:]):
                             f.seek(x)
                             readb(p + [f'{ix:02d}'])
@@ -412,7 +412,7 @@ def extract4_4(inp:str,out:str,t:str):
             f.skip(8)
             asrt(f.read(4) == b'IRES')
             fn = None
-            while f.pos < ep:
+            while f < ep:
                 bn = f.read(4)
                 bs = f.readu32()
                 f.skip(4)
@@ -632,7 +632,7 @@ def extract4_4(inp:str,out:str,t:str):
                     ep = bp + s
 
                     if n in {'moov','moov/trak','moov/trak/mdia','moov/trak/mdia/minf','moov/trak/mdia/minf/stbl'}: # 'moov/trak/mdia/minf/dinf',
-                        while f.pos < ep:
+                        while f < ep:
                             if readb(n): return True
                     # elif n == 'moov/trak/mdia/minf/dinf/dref':
                     #     asrt(f.readu8() == f.readu24() == 0)
@@ -1613,10 +1613,10 @@ def extract4_4(inp:str,out:str,t:str):
 
                 if xs:
                     ep = bp + xs
-                    while f.pos < ep: readd(n)
+                    while f < ep: readd(n)
 
             ep = f.seek(do) + dsz
-            while f.pos < ep: readd(o)
+            while f < ep: readd(o)
 
             fs = []
             for de in ds:
@@ -1726,7 +1726,7 @@ def extract4_4(inp:str,out:str,t:str):
             f.seek(0)
 
             fs = []
-            while f.pos < fo:
+            while f < fo:
                 fe = (f.readu32(),f.readu32(),f.readu32())
                 if not fe[0]: break
                 fs.append(fe)
@@ -2002,7 +2002,7 @@ def extract4_4(inp:str,out:str,t:str):
                 fo = bo + f.readu32()
                 f.seek(bo)
                 fs = []
-                while f.pos < fo:
+                while f < fo:
                     fn = f.readc(0x10).rstrip(b'\0').decode('ascii')
                     if not fn: break
                     fs.append((fn,f.readu32(),f.readu32() + bo))
@@ -2102,7 +2102,7 @@ def extract4_4(inp:str,out:str,t:str):
             f.skip(4)
             hs = f.readu32()
             fs = []
-            while f.pos < hs:
+            while f < hs:
                 bn = f.readc(4)
                 try: asrt(bn.decode('ascii').isprintable())
                 except: bn = bn.lstrip(b'\0').hex().upper()
@@ -2298,40 +2298,87 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
-        case 'EA BIGB':
-            if db.print_try: print('Trying with EA extractor')
-            from lib.file import File
-            f = File(i,endian='<')
+        case 'Vicious Engine BIGB':
+            db.try_custom()
+            from lib.file import File,struct
+            f = File(i)
             asrt(f.read(4) == b'BIGB')
 
+            f.skip(4)
+            v = f.readu32('<');f.back(4)
+            f._end = '>' if v > f.readu32('>') else '<'
+            f.back(8)
+
             do = 0x10 + f.readu32()
-            asrt(f.readu32() == 0x9D) # ?, game ends in inf loop if != 0x9D
+            v = f.readu32()
+            asrt(v in {0x9D,0xA3})
 
             f.skip(4)
-            x = b'Type: ' + f.readc(0x40).split(b'\0')[0] + b'\n\nName: ' + f.readc(0x28).split(b'\0')[0] + b'\n\ncmd: '
+            if v == 0xA3: asrt(f.readu8() == 1)
+            x = b'Type: ' + f.readc(0x40).split(b'\0')[0] + b'\nName: ' + f.readc(0x28).split(b'\0')[0] + b'\ncmd: '
+            if v == 0xA3: f.padc(3)
             s3,s4,s1,s2,zs1,zs2 = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
-            cmd = f.readc(0x100).split(b'\0')[0]
-            writefile(o + '/$comment.txt',x + cmd + b'\n')
+            writefile(o + '/$comment.txt',x + f.readc(0x100).split(b'\0')[0] + b'\n')
 
-            cmd = cmd.split(b' ')
-            if b'-ps2' in cmd: gex = guess_ext_ps2
-            else: gex = guess_ext
             f.seek(do)
-            d = f.decompress(zs1,'none',usize=s1)
-            writefile(f'{o}/1.cmp',d)
-            d = f.decompress(zs2,'none',usize=s2)
-            writefile(f'{o}/2.cmp',d)
+            fd = File(f.decompress(zs1,'vicious_lz',usize=s1),'rb+',endian=f._end)
+            writefile(o + '/$index.bin',fd.readall())
+            ops = list(struct.unpack(f'{f._end}{s2 // 4}I',f.decompress(zs2,'vicious_lz',usize=s2)))
+            writefile(o + '/$ops.bin',struct.pack(f'<{len(ops)}I',*ops))
             f.align(0x800)
             if s3:
-                d = f.readc(s3)
-                writefile(f'{o}/3.{gex(d)}',d)
+                d1 = f.readc(s3)
                 f.align(0x800)
-            if s4:
-                d = f.readc(s4)
-                writefile(f'{o}/4.{gex(d)}',d)
-
+            else: d1 = None
+            if s4: d2 = f.readc(s4)
+            else: d2 = None
             f.close()
-            return
+
+            while ops[0] == 0x80000113:
+                ops.pop(0)
+                fd.seek(ops.pop(0))
+                asrt(fd.read(4) == b'RIFF')
+                s = 8 + fd.readu32()
+                fd.back(8)
+                d = fd.readc(s)
+
+                rf = File(d,'rb+',endian='<')
+                rf.seek(8)
+                ty = rf.reads(4,'latin-1')
+                asrt(ty in {'WAVE','WAVS','AMPC'}) # AMPC=fd, WAVE=d1, WAVS=d2
+                while rf:
+                    bt = rf.reads(4,'latin-1')
+                    bs = rf.readu32()
+                    ep = rf.pos + bs
+
+                    match bt:
+                        case 'name':
+                            fn = o + '/' + rf.readc(bs).split(b'\0')[0].decode('ascii')
+                            writefile(fn + '.raw',d)
+                        case 'strm':
+                            asrt(ty in {'WAVE','WAVS'} and bs == 8,lambda: f'@ 0x{fd.pos - s + rf.pos:08X} {ty} {bs}')
+                            rdo,rds = rf.readu32(),rf.readu32()
+                            rf.seek(0,2)
+                            rf.write(b'data')
+                            rf.writeu32(rds)
+                            asrt(rf.write({'WAVE':d1,'WAVS':d2}[ty][rdo:rdo + rds]) == rds)
+                            if rds % 2: rf.write(b'\0')
+                            rf.update_size()
+                            rf.seek(4)
+                            rf.writeu32(rf.size)
+                            writefile(fn,rf.readall())
+                            break
+                    rf.seek(ep)
+                    rf.align(2)
+
+                del rf,d
+
+            del fd,ops
+            if len(listdir(o)) > 3: return
+            else:
+                if d1: writefile(o + '/$data1.bin',d1)
+                if d2: writefile(o + '/$data2.bin',d2)
+                return
         case 'Hudson Arc Dat':
             db.try_custom()
             from lib.file import File

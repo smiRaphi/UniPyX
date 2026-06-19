@@ -209,7 +209,7 @@ def extract4_3(inp:str,out:str,t:str):
             f.back(4)
 
             fs = []
-            while f.pos < fo:
+            while f < fo:
                 fe = (f.readu32(),f.readu32())
                 if not fe[0]: break
                 fs.append(fe)
@@ -264,14 +264,14 @@ def extract4_3(inp:str,out:str,t:str):
 
             soff = 0
             fs = []
-            while f.pos < ep:
+            while f < ep:
                 n = f.read(4).decode('ascii')
                 bep = (f.readu32() & BMSK) + f.pos
                 match n:
                     case 'vols':
                         if f.readu32(): soff = f.pos
                     case 'voli':
-                        while f.pos < bep:
+                        while f < bep:
                             fo = f.readu32()
                             if fo != 0xFFFFFFFF: fs.append((fo,f.readu32()))
                             else: f.skip(4)
@@ -396,7 +396,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             ep = f.size
             fs = []
-            while f.pos < ep:
+            while f < ep:
                 fe = (f.readu32(),f.readu32(),f.readu32())
                 if not fe[0]: break
                 fs.append(fe)
@@ -533,7 +533,7 @@ def extract4_3(inp:str,out:str,t:str):
                         xyz = (f.readf32(),f.readf32(),f.readf32())
                         f.skip(4)
                         skyfl = []
-                        while f.pos < (ep-4):
+                        while f < (ep-4):
                             skyfl.append(f.read0s().decode('ascii'))
                             f.align(4,p)
                         writefile(f'{o}/${n}/{cs[n]}.txt',f'XYZ: {xyz[0]} {xyz[1]} {xyz[2]}\nUnknown: {f.readu32()}\nFile list:\n' + '\n'.join(skyfl),'w')
@@ -953,7 +953,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.seek(to)
             fs = []
-            while f.pos < te:
+            while f < te:
                 b1 = f.readu8()
                 fl,r = b1 >> 6,b1 & 0x3F
                 if not fl: break
@@ -1504,7 +1504,7 @@ def extract4_3(inp:str,out:str,t:str):
             nps = []
             for _ in range(ec):
                 ep = f.pos + es
-                while f.pos < ep:
+                while f < ep:
                     ty = f.readu16()
                     if ty == 0x10:
                         nps.append(f.readc(f.readu16())[:0x10].ljust(0x10,b'\0'))
@@ -2285,7 +2285,7 @@ def extract4_3(inp:str,out:str,t:str):
                 match n:
                     case 'LIST':
                         typ = f.read(4).decode('ascii')
-                        while f.pos < ep: readb(typ)
+                        while f < ep: readb(typ)
                     case 'SWAV':
                         asrt(bs == 0x58)
                         fn = sub_path(f.read(0x50).rstrip(b'\0').decode('ascii'))
@@ -2311,7 +2311,7 @@ def extract4_3(inp:str,out:str,t:str):
 
                 f.seek(ep)
                 f.align(2)
-            while f.pos < ep: readb(typ)
+            while f < ep: readb(typ)
 
             f.close()
             if listdir(o): return

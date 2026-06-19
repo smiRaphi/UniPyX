@@ -1310,7 +1310,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fn == 1 and wt == 2:
                     ep = f.readleb128u() + f.pos
                     otp = {'s':b'','n':'','i':'','a':1,'d':1,'t':2,'c':0}
-                    while f.pos < ep:
+                    while f < ep:
                         tg = f.readleb128u()
                         fn,wt = tg >> 3,tg & 7
                         if fn == 1 and wt == 2: otp['s'] = f.readc(f.readleb128u())

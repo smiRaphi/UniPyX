@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 986
+# Supported Formats: 990
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (524)
+## Various (528)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -421,6 +421,8 @@ Blitz Games Archive | ??? | [blitz_games.bms](https://mirror.aluigi.org/bms/blit
 Blitz Games PAK | .ps2 .xbp | Custom |
 Bloodrayne POD | .pod | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Blur PAK | .pak | [blur.bms](https://mirror.aluigi.org/bms/blur.bms) |
+Bomberman 2 FPCK | .fpck | Custom |
+Bomberman PAK | .pak | Custom |
 Bomberman Wars IDX+BIN | .idx+.bin | Custom |
 Borland Form | .dfm | [dfm2txt](https://github.com/Sembiance/dexvert/blob/37a7da64dfd630b79046144f0c413f9c2084b122/qemu/win2k/data/app/dfm2txt/dfm2txt.exe)(src?) + Custom |
 Braveheart BLB 2.0 | .bml | Custom |
@@ -512,7 +514,7 @@ Endless Interactive IN1+DBB | .in1+.dbb | Custom |
 Endless Interactive IN2+DBB | .in2+.dbb | Custom | holy shit I hate quicktime
 Ensemble Studios DRS | .drs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Escal Compressed | * | [na_game_tool](https://nihav.org/game_tool.html) |
-eSMART Data | ??? | Custom |
+eSMART Data | .bin | Custom |
 eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Europe Racer IND+IMG | .ind+.img | Custom |
@@ -600,6 +602,7 @@ Koei Tecmo LINKDATA | .a .b .c | Custom |
 Konami DPG | .dpg | Custom |
 Konami FireBeat LZSS | .gcz .exe | Custom |
 Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
+Konami NDS Compress | * | Custom |
 Konami NKP | .nkp | Custom |
 L.A. Noire BIG | .big.ps3 | Custom |
 Lego Creator QUBE | .q | Custom | highly WIP
@@ -852,6 +855,7 @@ Unreal ZenLoader | .ucas | [UnrealPak](https://www.unrealengine.com/), [ZenTools
 UTG Software DDD | .ddd | Custom |
 Valve Package | .vpk | [VPKEdit](https://github.com/craftablescience/VPKEdit) |
 Vicarious Visions GFC+GOB | .gfc+.gob | [over_the_hedge.bms](https://mirror.aluigi.org/bms/over_the_hedge.bms) |
+Vicious Engine BIGB | .psm .pss | Custom |
 Vietcong Compressed Big File | .cbf | [CBF.wcx](http://www.vietcong-coop.net/site?node_id=6&action=show_data&p_id=510&ordercol=bin_file&ordertype=ASC&row=609)
 Violentmonkey Config Export | .json | Custom |
 Viper Flash IMG | .vip | Custom |

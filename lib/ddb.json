@@ -1013,6 +1013,18 @@
         "rs":"Sierra PRF","s":1
     },
     {
+        "d":[["n0",4,0],["n0",4,4],["py","c,o=f.readi(4,'<'),f.readi(4,'<')\nif c<3 or o%16:return\nf.seek(c*8-12);c=4+c*8;return not sum(f.read(16))and(c+-c%16)==o"]],
+        "rs":"Bomberman PAK"
+    },
+    {
+        "d":[["n0",4,0],["n0",4,4],["py","c,o=f.readi(4,'<'),f.readi(4,'<')\nif (4+c*8)!=o:return\nf.seek(o-8);return (f.readi(4,'<')+f.readi(4,'<'))==fsz"]],
+        "rs":"Bomberman 2 FPCK"
+    },
+    {
+        "d":[["isat","NDS_COMPRESS\\0\\0\\0\\0",0],["isin",["\\x10","\\x11"],16],["n0",3,17]],
+        "rs":"Konami NDS Compress","s":1
+    },
+    {
         "d":[["isat","BLDh\\0\\0\\0\\0def \\x18\\0\\0\\0",0],["isat","inf ",40],["n0",4,16],["n0",4,20],["py","return exists(splitext(inp)[0]+'.dat')"]],
         "rs":"Wangan Midnight TOC+DAT","s":1
     },
@@ -1187,8 +1199,8 @@
         "rs":"Spider-Man 3 Pack","s":1
     },
     {
-        "d":[["s%",2048],["isat","BIGB",0],["isat","\\x9D\\0\\0\\0",8],["n0",4,4],["n0",4,136],["n0",4,140],["str0",16,64,0],["str0",80,40,0],["str0",144,256,17]],
-        "rs":"EA BIGB","s":1
+        "d":[["s%",2048],["isat","BIGB",0],["isin",["\\x9D\\0\\0\\0","\\0\\0\\0\\x9D","\\xA3\\0\\0\\0","\\0\\0\\0\\xA3"],8],["n0",4,4],["n0",4,136],["n0",4,140],["str0",17,64,0],["str0",81,39,0],["str0",148,252,13]],
+        "rs":"Vicious Engine BIGB","s":1
     },
     {
         "d":[["isat","BGFA1.05",0],["n0",16,16],["py","f.seek(16);return (f.readi(8,'<')+f.readi(8,'<'))==fsz"]],

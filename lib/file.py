@@ -39,13 +39,15 @@ class File:
         self.name = None
         if type(f) == str:
             self.name = f
-            f = open(f,self.mode)
-        elif type(f) == bytes: f = io.BytesIO(f)
-        self._f = f
+            self._f = open(f,self.mode)
+        elif type(f) == bytes:
+            self._f = io.BytesIO(f)
+        else: self._f = f
         self._end = endian
 
         self._start_pos = self._f.tell()
-        self._size = self.seek(0,2)
+        if type(f) == bytes: self._size = len(f)
+        else: self._size = self.seek(0,2)
         self._end_pos = None
         self.seek(0)
 
@@ -596,6 +598,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = uxx().decompress_rtl_lz(i,usize=us)
             if kwargs.get('verify',True): asrt(len(r) == us)
             return r
+        case 'vicious_lz':
+            return uxx().decompress_vicious_lz(i,usize=kwargs['usize'])
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'
             return getattr(uxx(),'decompress_' + algo)(i,usize=kwargs['usize'])

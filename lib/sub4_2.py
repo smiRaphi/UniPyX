@@ -84,7 +84,7 @@ def extract4_2(inp:str,out:str,t:str):
                         case 'BLOK'|'LOD1':
                             if not n in self.fts: self.fts[n] = 0
                             c = 0
-                            while f.pos < xoff:
+                            while f < xoff:
                                 sn = self.readt()
                                 ss = f.readu32()
                                 writefile(o + f'/{n}{self.fts[n]}/{sn}{c}.bin',f.read(ss))
@@ -787,7 +787,7 @@ def extract4_2(inp:str,out:str,t:str):
             exdb = [f.read(4).rstrip(b'\0').decode('ascii') for _ in range(exc)]
             f.skip(4)
             fs = []
-            while f.pos < fo:
+            while f < fo:
                 fid = f.readu16()
                 eid = f.readu16()
                 off = f.readu32()
@@ -897,7 +897,7 @@ def extract4_2(inp:str,out:str,t:str):
 
                 match n:
                     case 'BUND':
-                        while f.pos < p: readb()
+                        while f < p: readb()
                     case 'BNHD':
                         unk = f.readu32('<')
                         f.skip(2)
@@ -2070,7 +2070,7 @@ def extract4_2(inp:str,out:str,t:str):
             iefs = f.readu32()
             f.skip(4)
             ps = []
-            while f.pos < iefs:
+            while f < iefs:
                 nxo = f.readu32()
                 ps.append((f.readu32(),f.read0s().decode('utf-8')))
                 if not nxo: break
@@ -2079,7 +2079,7 @@ def extract4_2(inp:str,out:str,t:str):
             fs = []
             for pe in ps:
                 f.seek(pe[0])
-                while f.pos < iefs:
+                while f < iefs:
                     nxo = f.readu32()
                     fs.append((f.readu32(),f.readu32(),f.readu32(),pe[1] + '/' + f.read0s().decode('utf-8')))
                     if not nxo: break

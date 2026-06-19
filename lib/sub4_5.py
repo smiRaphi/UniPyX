@@ -442,5 +442,49 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Bomberman PAK':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                if not fe[0]: continue
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                if d[:0x10] == b'NDS_COMPRESS\0\0\0\0': ex = 'ndsc'
+                else: ex = guess_ext_nds(d)
+                writefile(f'{o}/{ix:02d}.{ex}',d)
+
+            f.close()
+            if fs: return
+        case 'Konami NDS Compress':
+            db.try_custom()
+            from lib.file import decompress
+            d = readfile(i)
+            asrt(d[:0x10] == b'NDS_COMPRESS\0\0\0\0')
+
+            writefile(o + '/' + basename(i),decompress(d[0x10:],f'lz{d[0x10]:02x}',verify=False))
+            return
+        case 'Bomberman 2 FPCK':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                if not fe[0]: continue
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                if d[:0x10] == b'NDS_COMPRESS\0\0\0\0': ex = 'ndsc'
+                elif sum(d[:4]) and sum(d[4:8]) and (4+int.from_bytes(d[:4],'little')*8) == int.from_bytes(d[4:8],'little'): ex = 'fpck'
+                elif d[:4] == b'BLDT': ex = 'bldt'
+                else: ex = guess_ext_nds(d)
+                writefile(f'{o}/{ix:02d}.{ex}',d)
+
+            f.close()
+            if fs: return
 
     return 1
