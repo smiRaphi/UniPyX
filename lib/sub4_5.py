@@ -503,5 +503,34 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'The Learning Company MECC':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+
+            hs = f.readu16()
+            f.skip(4)
+            asrt(f.read(4) == b'MECC')
+            f.padc(2)
+            writefile(o + '/$comment.txt',f.readc(0x40).rstrip(b'\0') + b' ' + f.readc(8).rstrip(b'\0'))
+            fc = f.readu32()
+            #f.skip(4)
+            f.seek(hs)
+
+            fls = [(f.reads(8,'ascii').rstrip('\0'),f.readu32(),f.readu32()) for _ in range(fc)]
+            hs = f.pos
+            fs = []
+            for fle in fls:
+                f.seek(hs + fle[2]*0x14)
+                for _ in range(fle[1]):
+                    tn = f.reads(8,'ascii').rstrip('\0')
+                    fs.append((f'{fle[0]}/{f.readu32()}.{tn}',f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[2])
+                writefile(o + '/' + fe[0],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1

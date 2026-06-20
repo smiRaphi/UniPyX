@@ -1624,6 +1624,10 @@
         "rs":"Championship Manager 17 DCFile"
     },
     {
+        "d":[["isat","\\0\\x5C",0],["isat","MECC\\0\\0",6],["isat","1.0\\0\\0\\0\\0\\0",76],["n0",4,2],["n0",4,84],["n0",4,88],["str0",12,64,0],["py","hs,ts=f.readi(2,'>'),f.readi(4,'>');f.seek(hs-8);fc,tc=f.readi(4,'>'),f.readi(4,'>');return (fc*16+tc*20)==ts"]],
+        "rs":"The Learning Company MECC","s":1
+    },
+    {
         "d":[["ext",".pck"],["isin",["\\x03\\0\\0\\0","\\x01\\0\\0\\0"],0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12]],
         "rs":"Minecraft Console PCK"},{
         "d":[["ext",".pck"],["isat","\\x03\\0\\0\\0",0],["isatS","\\0",4,4],["n0",4,8],["n0",4,16],["n0",4,20]],
