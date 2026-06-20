@@ -409,13 +409,11 @@ def uxx():
     if UPXX is None: UPXX = X()
     return UPXX
 
-OODLE = None
-GDEFLATE = None
-UCL = None
+OODLE = GDEFLATE = UCL = XCOMPRESS = None
 NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
 LHZC = {f'lh{x}':f'-lh{x}-'.encode('latin1') for x in {0,5,6,7}}
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
-    global OODLE,GDEFLATE,UCL
+    global OODLE,GDEFLATE,UCL,XCOMPRESS
     match algo:
         case 'none': return i
         case 'zlib':
@@ -696,7 +694,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import ctypes
             if not GDEFLATE:
                 GDEFLATE = ctypes.CDLL(kwargs['db'].get('gdeflate'))
-
                 GDEFLATE.DecompressData.argtypes = [ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t]
                 GDEFLATE.DecompressData.restype = ctypes.c_int
 
@@ -715,11 +712,125 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = GDEFLATE.DecompressData(ibuf,isz,obuf,us)
             if r == 0: raise ValueError('Failed to decompress')
             return bytes(obuf)
-        case 'anaconda_deflate': return ananconda_decompress(i)
+        case 'xb'|'xbcompress'|'xmem'|'xmem_lzx':
+            asrt(XCOMPRESS or kwargs.get('db'))
+            import ctypes
+            if not XCOMPRESS:
+                XCOMPRESS = ctypes.CDLL(kwargs['db'].get('xcompress'))
+                class XMemCodecParametersLZX(ctypes.Structure):
+                    _pack_ = 4
+                    _fields_ = [
+                        ('flags',ctypes.c_int),
+                        ('windowSize',ctypes.c_int),
+                        ('compressionPartitionSize',ctypes.c_int),
+                    ]
+                XCOMPRESS.XMemCodecParametersLZX = XMemCodecParametersLZX
+                XCOMPRESS.XMemCreateDecompressionContext.argtypes = [ctypes.c_int,ctypes.POINTER(XMemCodecParametersLZX),ctypes.c_int,ctypes.POINTER(ctypes.c_void_p)]
+                XCOMPRESS.XMemCreateDecompressionContext.restype = ctypes.c_int
+                XCOMPRESS.XMemDestroyDecompressionContext.argtypes = [ctypes.c_void_p]
+                XCOMPRESS.XMemDestroyDecompressionContext.restype = None
+                XCOMPRESS.XMemDecompress.argtypes = [ctypes.c_void_p,ctypes.POINTER(ctypes.c_uint8),ctypes.POINTER(ctypes.c_size_t),ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t]
+                XCOMPRESS.XMemDecompress.restype = ctypes.c_int
+                XCOMPRESS.XMemDecompressSegmentTD.argtypes = [ctypes.c_void_p,ctypes.POINTER(ctypes.c_uint8),ctypes.POINTER(ctypes.c_size_t),ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t,ctypes.c_size_t,ctypes.c_size_t]
+                XCOMPRESS.XMemDecompressSegmentTD.restype = ctypes.c_int
+
+            if algo in {'xmem','xmem_lzx'}:
+                asrt('usize' in kwargs)
+                ctx = ctypes.c_void_p()
+                par = XCOMPRESS.XMemCodecParametersLZX(kwargs.get('flags',0),kwargs.get('win_size',0),kwargs.get('block_size',0))
+                r = XCOMPRESS.XMemCreateDecompressionContext(1,ctypes.byref(par),0,ctypes.byref(ctx))
+                if r != 0: raise ValueError(f'Failed to create decompression context ({r})')
+                try:
+                    ib = (ctypes.c_uint8 * len(i)).from_buffer_copy(i)
+                    ob = (ctypes.c_uint8 * kwargs['usize'])()
+                    fus = ctypes.c_size_t(kwargs['usize'])
+                    r = XCOMPRESS.XMemDecompress(ctx,ob,ctypes.byref(fus),ib,ctypes.c_size_t(len(i)))
+                    if r != 0: raise ValueError(f'Failed to decompress ({r})')
+                    return bytes(ob)[:fus.value]
+                except OSError: raise ValueError('Failed to decompress')
+                finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
+            elif algo in {'xb','xbcompress'}:
+                asrt(i[:3] == b'\x0F\xF5\x12')
+                if i[3] == 0xED:
+                    asrt(i[4] == 1 and i[5] == 0,'unsupported version',err=NotImplementedError)
+                    asrt(i[6] == i[7] == 0,'padding')
+                    fl = int.from_bytes(i[12:16],'big')
+
+                    ctx = ctypes.c_void_p()
+                    par = XCOMPRESS.XMemCodecParametersLZX(0,1 << ((fl & 15) + 15),0)
+                    r = XCOMPRESS.XMemCreateDecompressionContext(0,ctypes.byref(par),0x80000000,ctypes.byref(ctx))
+                    if r != 0: raise ValueError(f'Failed to create decompression context ({r})')
+
+                    try:
+                        rb = bytearray()
+                        bps = [20,32][(fl >> 22) & 3]
+                        zbs = 0x8000 << ((fl >> 4) & 3)
+                        segs = (fl >> 6) & 0xFFFF
+                        bdo = 0x10 + ((bps * segs + 31) >> 5) * 4
+                        msk = (1 << bps) - 1
+                        sbs = (bps + 7) >> 3
+
+                        biv = bic = 0
+                        tof = 0x10
+                        for ix in range(segs):
+                            if bic < bps:
+                                biv |= int.from_bytes(i[tof:tof+sbs],'big') << bic
+                                bic += sbs * 8
+                                tof += sbs
+                            ubs,biv = biv & msk,biv >> bps
+                            bic -= bps
+                            if ix == 0:
+                                do = bdo
+                                bs = zbs - do
+                            else: do,bs = ix * zbs,zbs
+                            if ubs > 0 and do > len(i): raise EOFError
+                            bs = min(len(i) - do,bs)
+                            off = 0
+                            while off < ubs:
+                                ts = min(bs,ubs - off)
+                                ob = (ctypes.c_uint8 * ts)()
+                                ib = (ctypes.c_uint8 * bs).from_buffer_copy(i[do:do+bs])
+                                ts = ctypes.c_size_t(ts)
+                                r = XCOMPRESS.XMemDecompressSegmentTD(ctx,ob,ctypes.byref(ts),ib,bs,ubs,off)
+                                if r != 0 or ts.value == 0: raise ValueError(f'Failed to decompress segment ({r}, {ts.value}, {ix} @ {off}/{ubs})')
+                                rb.extend(bytes(ob)[:ts.value])
+                                off += ts.value
+                        return bytes(rb)
+                    except OSError: raise ValueError('Failed to decompress')
+                    finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
+                elif i[3] == 0xEE:
+                    asrt(i[4] == 1 and i[5] <= 3,'unsupported version',err=NotImplementedError)
+                    asrt(i[6] == i[7] == 0,'padding')
+                    par = XCOMPRESS.XMemCodecParametersLZX(int.from_bytes(i[12:16],'big'),int.from_bytes(i[0x10:0x14],'big'),int.from_bytes(i[0x14:0x18],'big'))
+                    us,zs = int.from_bytes(i[0x18:0x20],'big'),int.from_bytes(i[0x20:0x28],'big')
+                    ctx = ctypes.c_void_p()
+                    r = XCOMPRESS.XMemCreateDecompressionContext(0,ctypes.byref(par),0,ctypes.byref(ctx))
+                    if r != 0: raise ValueError(f'Failed to create decompression context ({r})')
+
+                    try:
+                        p = 0x30
+                        rb = bytearray()
+                        while len(rb) < us and p < len(i):
+                            bs = int.from_bytes(i[p:p+4],'big',signed=True);p += 4
+                            if bs < 0: raise ValueError(f'Invalid block size {bs}')
+                            elif (p + bs) > len(i): raise EOFError
+                            ts = us - len(rb)
+                            ib = (ctypes.c_uint8 * (bs + 0x10)).from_buffer_copy(i[p:p+bs] + bytes(0x10))
+                            ob = (ctypes.c_uint8 * ts)()
+                            ts = ctypes.c_size_t(ts)
+                            r = XCOMPRESS.XMemDecompress(ctx,ob,ctypes.byref(ts),ib,bs + 0x10)
+                            if r != 0 or ts.value == 0: raise ValueError(f'Failed to decompress block ({r}, {ts.value})')
+                            rb.extend(bytes(ob)[:ts.value])
+                            p += bs
+                        return bytes(rb)
+                    except OSError: raise ValueError('Failed to decompress')
+                    finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
+                else: raise ValueError(f'Invalid mode {i[3]:02X}')
+        case 'anaconda_deflate': pass#return ananconda_decompress(i)
         case 'anaconda_zlib':
             if i[1] & 0x20: i = i[6:]
             else: i = i[2:]
-            return ananconda_decompress(i)
+            #return ananconda_decompress(i)
     raise NotImplementedError(algo)
 
 def lzss_decompress(i:bytes,usize:int=None,lens=4,offs=12,minl=3):
@@ -902,159 +1013,6 @@ def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
         prev_seq = seq
 
     return b"".join(o)
-class AnacondaDecoder:
-    def __init__(self,d:bytes):
-        self.d = d
-        self.p = 0
-        self.bit_accum = 0
-        self.cnb = 0
-        self.o = bytearray()
-
-    def _get_bits(self,bits:int):
-        while self.cnb < bits:
-            if self.p >= len(self.d): raise EOFError("Unexpected end of compressed data stream")
-            self.bit_accum |= (self.d[self.p] << self.cnb)
-            self.cnb += 8
-            self.p += 1
-
-        val = self.bit_accum & ((1 << bits) - 1)
-        self.bit_accum >>= bits
-        self.cnb -= bits
-        return val
-    def _gen_huffman_table(self,syms:int,lngs:list[int]):
-        lngc = [0] * 0x10
-        for length in lngs:
-            if length > 0: lngc[length] += 1
-        fstc = [0] * 0x10
-        for i in range(1, 16): fstc[i] = (fstc[i - 1] + lngc[i - 1]) << 1
-
-        tbl = [0] * 0x800
-        ix = 0
-        for i in range(1, 16):
-            code_limit = 1 << i
-            next_code = fstc[i] + lngc[i]
-            next_index = ix + (code_limit - fstc[i])
-
-            for j in range(syms):
-                if lngs[j] == i:
-                    tbl[ix] = j
-                    ix += 1
-            for j in range(next_code, code_limit):
-                tbl[ix] = ~next_index
-                ix += 1
-                next_index += 2
-
-        return tbl
-    def _get_huff(self,tbl:list[int]):
-        bp = 0
-        ix = 0
-        while True:
-            if self.cnb <= bp:
-                if self.p >= len(self.d): raise EOFError("Unexpected end of compressed data stream")
-                self.bit_accum |= (self.d[self.p] << self.cnb)
-                self.cnb += 8
-
-            b = (self.bit_accum >> bp) & 1
-            bp += 1
-            ix += b
-
-            if tbl[ix] >= 0: break
-            ix = ~tbl[ix]
-
-        self.bit_accum >>= bp
-        self.cnb -= bp
-        return tbl[ix]
-
-    def decode(self) -> bytes:
-        final = False
-        codelen_order = [18,17,16,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-
-        while not final:
-            block_type_raw = self._get_bits(4)
-            final = (block_type_raw >> 3) != 0
-            block_type = block_type_raw & mask(3)
-
-            type_map = {7:0,5:1,6:2}
-            block_type = type_map.get(block_type, 3)
-
-            if block_type == 3: raise ValueError("Invalid Anaconda block type encountered")
-
-            if block_type == 0:
-                self.cnb = 0
-                self.bit_accum = 0
-                lng = self._get_bits(16)
-
-                self.o.extend(self.d[self.p:self.p + lng])
-                self.p += lng
-                continue
-
-            if block_type == 2:
-                literal_count = self._get_bits(5) + 0x101
-                distance_count = self._get_bits(5) + 1
-                code_len_count = self._get_bits(4) + 4
-
-                cdln = [0] * 19
-                for i in range(code_len_count):
-                    cdln[codelen_order[i]] = self._get_bits(3)
-                code_len_table = self._gen_huffman_table(19, cdln)
-
-                lengths = [0] * (literal_count + distance_count)
-                c = 0
-                while c < literal_count + distance_count:
-                    sym = self._get_huff(code_len_table)
-                    if sym < 16:
-                        lengths[c] = sym
-                        c += 1
-                    elif sym == 16:
-                        repeat_count = self._get_bits(2) + 3
-                        val = lengths[c - 1] if c else 0
-                        for _ in range(repeat_count):
-                            lengths[c] = val
-                            c += 1
-                    elif sym == 17:
-                        repeat_count = self._get_bits(3) + 3
-                        for _ in range(repeat_count):
-                            lengths[c] = 0
-                            c += 1
-                    elif sym == 18:
-                        repeat_count = self._get_bits(7) + 11
-                        for _ in range(repeat_count):
-                            lengths[c] = 0
-                            c += 1
-
-                lit_tbl = self._gen_huffman_table(literal_count, lengths[:literal_count])
-                dist_tbl = self._gen_huffman_table(distance_count, lengths[literal_count:])
-            else:
-                fix_lit_lng = [8]*0x90 + [9]*0x70 + [7]*0x18 + [8]*8
-                fix_dist_lng = [5]*0x20
-                lit_tbl = self._gen_huffman_table(0x120, fix_lit_lng)
-                dist_tbl = self._gen_huffman_table(0x20, fix_dist_lng)
-
-            while True:
-                sym = self._get_huff(lit_tbl)
-                if sym < 0x100: self.o.append(sym)
-                elif sym == 0x100: break
-                else:
-                    if sym <= 0x108: rep_l = (sym - 0x101) + 3
-                    elif sym <= 0x11C:
-                        lng_bits = (sym - 0x105) // 4
-                        rep_l = self._get_bits(lng_bits) + 3 + ((4 + ((sym - 0x109) & 3)) << lng_bits)
-                    elif sym == 0x11D: rep_l = 0x102
-                    else: raise ValueError("Invalid length symbol encountered.")
-
-                    dist_sym = self._get_huff(dist_tbl)
-                    if dist_sym <= 3: dist = dist_sym + 1
-                    elif dist_sym <= 29:
-                        dist_bits = (dist_sym - 2) // 2
-                        dist = self._get_bits(dist_bits) + 1 + ((2 + (dist_sym & 1)) << dist_bits)
-                    else: raise ValueError("Invalid distance symbol encountered.")
-
-                    if dist > len(self.o): raise ValueError("Invalid distance calculation; exceeds available output buffer.")
-
-                    for _ in range(rep_l): self.o.append(self.o[-dist])
-
-        return bytes(self.o)
-def ananconda_decompress(data:bytes): return AnacondaDecoder(data).decode()
 
 import codecs
 def __chmr(*i:tuple[int,int]): return set(sum([list(range(a,b)) for a,b in i],[]))

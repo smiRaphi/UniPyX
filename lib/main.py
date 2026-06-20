@@ -1107,7 +1107,12 @@ def mime2ext(m:str):
     if m.startswith('x-'): m = m[2:]
     if m.startswith('vnd.'): m = m[4:]
     return m
-
+EXTEXP = {'bin','dll','exe','kmd','pdf','sys','png','jpg','bmp','cab','rar','tar'}
+EXTEXP = {x[:2]:x for x in EXTEXP | {x.upper() for x in EXTEXP}}
+def ext_expand(e:str):
+    if '.' in e: return noext(e) + '.' + ext_expand(extname(e)[1:])
+    if len(e) != 3 or not e.endswith('_'): return e
+    return EXTEXP.get(e[:2],e)
 ZIP7MP = {
     '7z':'7z',
     'ARJ':'Arj',

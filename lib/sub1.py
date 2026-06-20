@@ -1216,7 +1216,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 json.dump(ob,xopen(f'{o}/{tbasename(i)}.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 return
         case 'TTComp':
-            of = o + '/' + (basename(i)[:-1] if i[-1] == '_' and len(extname(i)) in {3,4} else tbasename(i))
+            of = o + '/' + ext_expand(basename(i))
             run(['ttdecomp',i,of])
             if exists(of) and getsize(of): return
         case 'Diff Patch':

@@ -2222,17 +2222,15 @@
         ]],
         "ts":0
     },
-    "xbdecompress":{
-        "p":"xbdecompress/xbdecompress.exe",
+    "xcompress":{
+        "p":"xcompress.dll",
         "fs":[{
             "u":".",
             "x":{
-                "xbdecompress/xbdecompress.exe":"xbdecompress/xbdecompress.exe",
-                "xbdecompress/msvcp71.dll":"xbdecompress/msvcp71.dll",
-                "xbdecompress/msvcr71.dll":"xbdecompress/msvcr71.dll",
-                "xbdecompress/xbdm.dll":"xbdecompress/xbdm.dll"
+                "xcompress.dll":"xcompress.dll"
             }
-        }]
+        }],
+        "$":"Has to have XMemDecompressSegmentTD"
     },
     "npkpy":{
         "pip":"npkPy"

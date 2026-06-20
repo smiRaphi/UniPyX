@@ -1235,8 +1235,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 except: pass
             if cnt: return
         case 'Xbox XB Compressed':
-            run(['xbdecompress','/Y','/T',i,o])
-            if listdir(o): return
+            db.try_custom()
+            from lib.file import decompress
+            of = o + '/' + basename(i)
+            if of.endswith('.xb'): of = of[:-4]
+            writefile(of,decompress(readfile(i),'xbcompress',db=db))
+            return
         case 'Xbox FArc':
             db.try_custom()
             from lib.file import File

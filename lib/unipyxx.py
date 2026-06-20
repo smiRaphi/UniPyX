@@ -1,4 +1,4 @@
-#define DUMMY1 /*
+#define DUMMY /*
 
 import os,sys
 from hashlib import sha256
@@ -17,7 +17,8 @@ def compile(quiet=False):
     elif sys.platform == 'win32':
         from setuptools import msvc
         env |= {x.upper():v for x,v in msvc.EnvironmentInfo('x64' if sys.maxsize > 2**32 else 'x86').return_env().items()}
-        cmd = ['/Ox','/GS-','/GR-','/Gs999999','/LD','/TC',__file__,f'/Fe:{DLLP}','/link','/NODEFAULTLIB','/MANIFEST:NO','/MERGE:.rdata=.text','/OPT:REF','/OPT:ICF','/ALIGN:16','/ENTRY:DllMain']
+        cmd = ['/Ox','/GS-','/GR-','/Gs999999','/LD','/TC',__file__,f'/Fe:{DLLP}','/link','/MANIFEST:NO','/MERGE:.rdata=.text','/OPT:REF','/OPT:ICF','/ALIGN:16','/ENTRY:DllMain',
+               'vcruntime.lib']
         for p in env['PATH'].split(';'):
             if os.path.exists(p + '/cl.exe') and os.path.isfile(p + '/cl.exe'): cc = p + '/cl.exe';break
     if cc is None: raise ValueError('No C compiler found')
@@ -352,31 +353,6 @@ class X:
     typedef long ssize_t;
 #endif
 EXPORT int __stdcall DllMain(void* a,unsigned long b,void* c) { return 1; }
-#ifdef _MSC_VER
-    #pragma function(memset)
-#endif
-void* memset(void* dst, int c, size_t count) {
-    uint8_t* bytes = (uint8_t*)dst;
-    while (count--) *bytes++ = (uint8_t)c;
-    return dst;
-}
-#ifdef _MSC_VER
-    #pragma function(memcpy)
-#endif
-void* memcpy(void* dst, const void* src, size_t count) {
-    uint8_t *d = (uint8_t*)dst;
-    uint8_t *s = (uint8_t*)src;
-
-    while (count >= 8) {
-        *(uint64_t*)d = *(uint64_t*)s;
-        d += 8;
-        s += 8;
-        count -= 8;
-    }
-
-    while (count--) *d++ = *s++;
-    return dst;
-}
 
 #ifdef __cplusplus
 extern "C" {
@@ -2061,5 +2037,4 @@ EXPORT uint64_t hash_murmur2_64B_be(const uint8_t *restrict src, const size_t si
 }
 #endif
 
-#define DUMMY2 /*
-'''#*/
+/*'''#*/
