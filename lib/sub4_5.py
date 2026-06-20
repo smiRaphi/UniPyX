@@ -486,5 +486,22 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Championship Manager 17 DCFile':
+            db.try_custom()
+            from lib.crypto import decrypt
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(2) == b'D0')
+
+            of,c = f.readu32(),f.readu16()
+            fs = [(f.read0s('ascii'),f.readu32(),f.readu32()) for _ in range(c)]
+            f.seek(of)
+            for fe in fs:
+                asrt(fe[1] & 0x80000000,lambda:f.read(8).hex(" ").upper(),err=NotImplementedError)
+                d = f.decompress(fe[1] & 0x7fffffff,'none' if fe[1] & 0x80000000 else 'none',usize=fe[2])
+                writefile(o + '/' + fe[0],d)
+
+            f.close()
+            if fs: return
 
     return 1

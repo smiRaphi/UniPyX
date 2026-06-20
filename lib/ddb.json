@@ -1616,6 +1616,14 @@
         "rs":"The Indian In The Cupboard Data"
     },
     {
+        "d":[["n0",4,-4],["isatS","\\0",4,-8],["n0",8,-16],["py","f.seek(-4,2);o=f.readi(4,'<');f.seek(-16,2)\nif (o+24)>fsz or(f.readi(4,'<')+f.readi(4,'<'))!=o:return\nf.seek(o);f.skip(f.readi(4,'<'));return f.readi(4)==0"]],
+        "rs":"Mattel SMB"
+    },
+    {
+        "d":[["isat","D0",0],["n0",4,2],["n0",2,6],["str0e",8,64,5],["py","f.seek(2);o,c=f.readi(4,'<'),f.readi(2,'<');return (8+c*14)<o"]],
+        "rs":"Championship Manager 17 DCFile"
+    },
+    {
         "d":[["ext",".pck"],["isin",["\\x03\\0\\0\\0","\\x01\\0\\0\\0"],0],["n0",4,4],["isatS","\\0",4,8],["n0",4,12]],
         "rs":"Minecraft Console PCK"},{
         "d":[["ext",".pck"],["isat","\\x03\\0\\0\\0",0],["isatS","\\0",4,4],["n0",4,8],["n0",4,16],["n0",4,20]],

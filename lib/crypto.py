@@ -3,10 +3,11 @@ from lib.unipyxx import X
 
 __FNCT = type(lambda:None)
 def asrt(c:bool,*r,err:Exception=ValueError):
-    if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
-    elif r: r = ' '.join(str(x) for x in r)
-    else: r = ''
-    if not c: raise err(r)
+    if not c:
+        if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
+        elif r: r = ' '.join(str(x) for x in r)
+        else: r = ''
+        raise err(r)
 
 def swap32(i:bytes):
     c = len(i) // 4
@@ -26,6 +27,10 @@ def uxx():
 
 MMFS_DEC = {}
 FH3N_DEC = {}
+BASEXX_MAP = {'base16':'b16',
+              'base32':'b32','base32hex':'b32hex','b32h':'b32hex',
+              'base64':'b64',
+              'base85':'b85','ascii85':'a85'}
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
@@ -257,7 +262,65 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if istr: r = r.decode('latin-1')
             return r
 
+        case 'hex': return bytes.fromhex(i)
+        case 'base64url'|'b64url':
+            from urllib.parse import unquote_to_bytes
+            return decrypt(unquote_to_bytes(i),'base64',**kwargs)
+        case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|\
+             'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
+            algo = BASEXX_MAP.get(algo,algo)
+            import base64
+            if algo == 'b64' and len(i) % 4 and kwargs.get('fix'):
+                if isinstance(i,str): i = i.encode('latin-1')
+                i += b'=' * (-len(i) % 4)
+
+            return getattr(base64,algo + 'decode')(i)
+        case 'uu'|'uue'|'uuencode'|'uuencoded':
+            if isinstance(i,str): i = i.encode('latin-1')
+            import binascii
+            r = []
+            for l in i.splitlines():
+                try: r.append(binascii.a2b_uu(l))
+                except binascii.Error:
+                    r.append(binascii.a2b_uu(l[:(((ord(l[0])-32) & 63) * 4 + 5) // 3]))
+            return b''.join(r)
+        case 'url'|'urldecode'|'urlencode':
+            from urllib.parse import unquote,unquote_to_bytes
+
+            if not kwargs.get('bytes',True): return unquote(i,errors='strict')
+            return unquote_to_bytes(i)
+
     raise NotImplementedError(algo)
+def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
+    match algo:
+        case 'xor':
+            if isinstance(key,int): key = key.to_bytes(1)
+            asrt(isinstance(key,bytes),err=TypeError)
+            return uxx().decrypt_xor(i,key or b'\0')
+        case 'inv'|'invert': return uxx().decrypt_inv(i)
+        case 'inv_len': return uxx().decrypt_xor(i,(-1 - len(i)).to_bytes(1,signed=True))
+        case 'swp4'|'swap4': return uxx().decrypt_swap4(i)
+        case 'roll':
+            if type(key) == int: key = key.to_bytes(1)
+            return uxx().decrypt_rolr(i,key or b'\0')
+        case 'rolr':
+            if type(key) == int: key = key.to_bytes(1)
+            return uxx().decrypt_roll(i,key or b'\0')
+
+        case 'hex':
+            r = i.hex()
+            return r if kwargs.get('bytes',False) else r.encode('ascii')
+        case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|\
+             'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
+            algo = BASEXX_MAP.get(algo,algo)
+            import base64
+            r = getattr(base64,algo + 'encode')(i)
+            return r if kwargs.get('bytes',True) else r.decode('latin-1')
+        case 'url'|'urldecode'|'urlencode':
+            from urllib.parse import quote,quote_from_bytes
+
+            r = (quote if isinstance(i,bytes) else quote_from_bytes)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
+            return r.encode('utf-8') if kwargs.get('bytes',False) else r
 
 CRC_LUT = {}
 def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None) -> int:

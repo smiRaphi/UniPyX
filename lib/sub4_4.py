@@ -621,49 +621,6 @@ def extract4_4(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
 
-            def fix_mp4(f:File,gp:int,fn:str):
-                stco = []
-                def readb(p=None):
-                    bp = f.pos
-                    s = f.readu32()
-                    n = ((p + '/') if p else '') + f.read(4).decode('ascii')
-                    if s == 1: s = f.readu64()
-                    elif s == 0: s = f.size - bp
-                    ep = bp + s
-
-                    if n in {'moov','moov/trak','moov/trak/mdia','moov/trak/mdia/minf','moov/trak/mdia/minf/stbl'}: # 'moov/trak/mdia/minf/dinf',
-                        while f < ep:
-                            if readb(n): return True
-                    # elif n == 'moov/trak/mdia/minf/dinf/dref':
-                    #     asrt(f.readu8() == f.readu24() == 0)
-                    #     c = f.readu32()
-                    #     for _ in range(c):
-                    #         if readb(n): return True
-                    # elif n == 'moov/trak/mdia/minf/dinf/dref/alis':
-                    #     asrt(f.readu8() == 0)
-                    #     fl = f.readu24()
-                    #     asrt(fl in {0,1})
-                    #     return not fl
-                    elif n == 'moov/trak/mdia/minf/stbl/stco':
-                        asrt(f.readu8() == f.readu24() == 0)
-                        stco.append(f.pos)
-
-                    f.seek(ep)
-
-                while f: readb()
-                if not stco: return
-                for x in stco:
-                    f.seek(x)
-                    c = f.readu32()
-                    for _ in range(c):
-                        v = f.readu32()
-                        f.back(4)
-                        asrt(v >= gp,f"0x{v:08X} < 0x{gp:08X} {fn}")
-                        f.writeu32(v-gp)
-
-                writefile(f'{noext(fn)}.fixed{extname(fn)}',f.readall())
-                del f
-
             f = File(noext(i) + '.in' + t[21])
             f._end = {0x101:'>',0x202:'<'}[f.readu16()]
             fd = File(noext(i) + '.dbb',endian='>')
@@ -709,7 +666,7 @@ def extract4_4(inp:str,out:str,t:str):
                 fe = fs[id-1]
                 fd.seek(bo + fe[0])
                 d = fd.readc(fe[1])
-                writefile(fn,d)
+                writefile(fn + ('.raw' if d[4:8] == b'mdat' else ''),d)
                 ids.add(id-1)
                 if d[4:8] == b'mdat': fix_mp4(File(d,endian='>'),fe[0],fn)
 
@@ -1814,14 +1771,14 @@ def extract4_4(inp:str,out:str,t:str):
             if not f: return
         case 'Microsoft .NET ResX':
             db.try_custom()
-            import base64
+            from lib.crypto import decrypt
             import xml.etree.ElementTree as ET
 
             tr = ET.parse(i)
             for r in tr.getroot().iter('data'):
                 n,ty = r.get('name'),r.get('mimetype')
                 d = r.find('value').text 
-                if ty == 'application/x-microsoft.net.object.binary.base64': d,ex = base64.b64decode(d),'net.bin'
+                if ty == 'application/x-microsoft.net.object.binary.base64': d,ex = decrypt(d,'b64'),'net.bin'
                 else: d,ex = d.encode('utf-8'),mime2ext(ty)
                 writefile(o + '/' + n + '.' + ex,d)
 
@@ -2408,5 +2365,65 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if ofs: return
+        case 'Mattel SMB':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(-4)
+            f.seek(f.readu32())
+            fs = []
+            while f:
+                nl = f.readu32()
+                if nl == 0: break
+                fs.append((f.reads(nl,'ascii'),f.readu32(),f.readu32()))
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                if not '.' in fe[0]:
+                    ex = '.'
+                    if d[4:8] == b'rpza': ex += 'rpza'
+                    else: ex += guess_ext(d)
+                else: ex = ''
+                fn = f'{o}/{fe[0]}{ex}'
+                writefile(fn + ('.raw' if d[4:8] == b'moov' else ''),d)
+                if d[4:8] == b'moov': fix_mp4(File(d,endian='>'),fe[1],fn)
+
+            f.close()
+            if fs: return
 
     return 1
+
+def fix_mp4(f:'File',gp:int,fn:str):
+    stco = []
+    def readb(p=None):
+        bp = f.pos
+        s = f.readu32()
+        n = ((p + '/') if p else '') + f.read(4).decode('ascii')
+        if s == 1: s = f.readu64()
+        elif s == 0: s = f.size - bp
+        ep = bp + s
+
+        if n in {'moov','moov/trak','moov/trak/mdia','moov/trak/mdia/minf','moov/trak/mdia/minf/stbl'}: # 'moov/trak/mdia/minf/dinf',
+            while f < ep:
+                if readb(n): return True
+        elif n == 'moov/trak/mdia/minf/stbl/stco':
+            asrt(f.readu8() == f.readu24() == 0)
+            stco.append(f.pos)
+
+        f.seek(ep)
+
+    while f: readb()
+    if not stco: return
+    for x in stco:
+        f.seek(x)
+        c = f.readu32()
+        for _ in range(c):
+            v = f.readu32()
+            f.back(4)
+            asrt(v >= gp,f"0x{v:08X} < 0x{gp:08X} {fn}")
+            f.writeu32(v-gp)
+
+    writefile(fn,f.readall())
+    del f

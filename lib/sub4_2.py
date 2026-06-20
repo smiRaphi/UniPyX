@@ -720,7 +720,8 @@ def extract4_2(inp:str,out:str,t:str):
                 return
         case 'Tiled TMX/TSX':
             db.try_custom()
-            import base64,zlib
+            from lib.crypto import decrypt
+            from lib.file import decompress
             import xml.etree.ElementTree as ET
 
             tr = ET.parse(i)
@@ -729,8 +730,8 @@ def extract4_2(inp:str,out:str,t:str):
                 n = l.get('name')
                 for ix,d in enumerate(l.findall('data')):
                     rd = d.text
-                    if d.get('encoding') == 'base64': rd = base64.b64decode(rd)
-                    if d.get('compression') == 'zlib': rd = zlib.decompress(rd)
+                    if d.get('encoding') == 'base64': rd = decrypt(rd,'b64')
+                    if d.get('compression') == 'zlib': rd = decompress(rd,'zlib')
                     if type(rd) != bytes: rd = rd.encode()
                     writefile(o + f'/{n}/{ix}.bin',rd)
             del tr
@@ -2101,11 +2102,11 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Roblox Flag Cache':
             db.try_custom()
             import json
-            from base64 import b64decode
+            from lib.crypto import decrypt
             from lib.file import File
             f = File(i,endian='<')
 
-            writefile(o + '/signature.bin',b64decode(f.read(f.readu32())))
+            writefile(o + '/signature.bin',decrypt(f.readc(f.readu32()),'b64'))
             json.dump(json.loads(f.read().decode('utf-8')),open(o + '/' + tbasename(i) + '.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
             return
         case 'New York Race KIX+KBF':

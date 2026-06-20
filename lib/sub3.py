@@ -1058,7 +1058,6 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Atomik Cruncher': raise NotImplementedError
         case 'Netcrypt':
             db.try_custom()
-            import base64
             from lib.file import EXE
             from lib.crypto import decrypt
 
@@ -1083,7 +1082,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             x.skip(2)
             dat = x.read(x.readu24('>')-1)
             x.close()
-            key,iv,dat = [base64.b64decode(x.decode('utf-16le')) for x in (key,iv,dat)]
+            key,iv,dat = [decrypt(x.decode('utf-16le'),'b64') for x in (key,iv,dat)]
 
             dat = decrypt(dat,'aes_cbc',key,iv)
             if dat[:2] == b'MZ':

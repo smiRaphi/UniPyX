@@ -298,13 +298,13 @@ def extract4_3(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Package Resource Index XML':
             db.try_custom()
-            import base64
+            from lib.crypto import decrypt
             import xml.etree.ElementTree as ET
 
             tr = ET.parse(i)
             for r in tr.getroot().find('ResourceMap').iter('NamedResource'):
                 cdt = r.find('Candidate')
-                if cdt.get('type') == 'EmbeddedData': writefile(o + '/' + r.get('uri').split('://',1)[1],base64.b64decode(cdt.find('Base64Value').text))
+                if cdt.get('type') == 'EmbeddedData': writefile(o + '/' + r.get('uri').split('://',1)[1],decrypt(cdt.find('Base64Value').text,'b64'))
             del tr
             if listdir(o): return
         case 'Team Ari Encrypted RGSSAD'|'RPG Maker Archive':

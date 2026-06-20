@@ -24,17 +24,18 @@ DOSMAX = {
 }
 
 if typing.TYPE_CHECKING:
+    from lib.file import File
     u8=s8=u16=s16=u24=s24=u32=s32=u40=s40=u48=s48=u64=s64=u128=s128=int
     f16=f32=f64=float
     utf8,utf16=str
     padding=skip=align=types.NoneType
 
-__FNCT = type(lambda:None)
 def asrt(c:bool,*r,err:Exception=ValueError):
-    if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
-    elif r: r = ' '.join(str(x) for x in r)
-    else: r = ''
-    if not c: raise err(r)
+    if not c:
+        if len(r) == 1 and isinstance(r[0],types.FunctionType): r = r[0]()
+        elif r: r = ' '.join(str(x) for x in r)
+        else: r = ''
+        raise err(r)
 def namespace(_func=None,include=[],keep_init=True):
     def f1(func):
         class Wrapper(object):

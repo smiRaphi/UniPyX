@@ -4,10 +4,11 @@ from lib.unipyxx import X
 
 __FNCT = type(lambda:None)
 def asrt(c:bool,*r,err:Exception=ValueError):
-    if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
-    elif r: r = ' '.join(str(x) for x in r)
-    else: r = ''
-    if not c: raise err(r)
+    if not c:
+        if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
+        elif r: r = ' '.join(str(x) for x in r)
+        else: r = ''
+        raise err(r)
 
 ENDMAP = {'<':'little','>':'big','-':'big'}
 UTFENDM = {'<':'le','>':'be','-':'be'}

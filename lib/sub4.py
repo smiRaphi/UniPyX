@@ -812,13 +812,12 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Hollow Knight Save':
             db.try_custom()
             from lib.crypto import decrypt
-            from base64 import b64decode
 
             f = open(i,'rb')
             f.seek(0x19)
             dat = f.read().split(b'=')[0]
             f.close()
-            dat = decrypt(b64decode(dat + b'===='),'aes_ecb',b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l')
+            dat = decrypt(decrypt(dat,'b64',fix=True),'aes_ecb',b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l')
 
             writefile(o + '/' + tbasename(i) + '.json',dat[:-dat[-1]])
             return

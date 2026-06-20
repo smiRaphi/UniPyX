@@ -957,20 +957,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'UUencoded':
             db.try_custom()
-            import binascii
+            from lib.crypto import decrypt
             d = readfile(i,'r')
             if 'begin ' in d: d = [x for x in re.findall(r'(?ms)begin \d+ ([^\n]+)\n(.+?)\nend\n',d)]
             else: d = [(tbasename(i),d)]
 
-            for en,ed in d:
-                f = xopen(o + '/' + en.lstrip('./'),'wb')
-                for l in ed.splitlines():
-                    try: dl = binascii.a2b_uu(l)
-                    except binascii.Error:
-                        n = (((ord(l[0])-32) & 63) * 4 + 5) // 3
-                        dl = binascii.a2b_uu(l[:n])
-                    f.write(dl)
-                f.close()
+            for en,ed in d: writefile(o + '/' + en,decrypt(ed,'uue'))
             if d: return
         case 'HTTP Response':
             db.try_custom()
@@ -1099,9 +1091,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fe[3]: set_ftime(o + '/' + fe[0],fe[3])
             if fs: return
         case 'Base64':
-            if db.print_try: print('Trying with base64')
-            from base64 import b64decode
-            d = b64decode(readfile(i,'r').strip().strip('=') + '===')
+            if db.print_try: print('Trying with custom extractor')
+            from lib.crypto import decrypt
+            d = decrypt(readfile(i),'b64',fix=True)
             try: asrt('\0' not in d.decode('utf-8'))
             except: ext = guess_ext(d)
             else:
@@ -1111,8 +1103,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'Web ARchive':
             db.try_custom()
+            from lib.crypto import decrypt
             import json
-            from urllib.parse import unquote_to_bytes
             f = open(i,'rb')
 
             tr = {}
@@ -1143,7 +1135,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         if rfn[:1] == '*':
                             enc,rfn = rfn[2:].strip().split("''",1)
                             rfn = rfn.strip().split()[0]
-                            fn = unquote_to_bytes(rfn).decode(enc)
+                            fn = decrypt(rfn,'url').decode(enc)
                         else:
                             rfn = rfn[1:].strip()
                             if rfn[:1] == '"':
@@ -1151,8 +1143,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                                 if '; ' in rfn and 'filename' in rfn.lower() and "''" in rfn:
                                     enc,rfn = rfn[2:].strip().split("''",1)
                                     rfn = rfn.strip().split()[0]
-                                    fn = unquote_to_bytes(rfn).decode(enc.decode('latin1'))
-                                else: fn = unquote_to_bytes(rfn).decode('latin1')
+                                    fn = decrypt(rfn,'url').decode(enc.decode('latin1'))
+                                else: fn = decrypt(rfn,'url').decode('latin1')
                     elif 'content-type' in rhd: fn = 'content.' + mime2ext(rhd['content-type'])
                     else: fn = 'content.bin'
 
@@ -1295,13 +1287,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             db.try_custom()
             from lib.file import File
-            from base64 import b64decode,b32encode
-            from urllib.parse import urlparse,parse_qs,unquote
+            from lib.crypto import decrypt,encrypt
+            from urllib.parse import urlparse,parse_qs
             u = urlparse(i)
             asrt(u.scheme == 'otpauth-migration' and u.hostname == 'offline')
             u = parse_qs(u.query)
             asrt('data' in u)
-            f = File(b64decode(unquote(u['data'][0])),endian='>')
+            f = File(decrypt(u['data'][0],'b64url'),endian='>')
 
             ob = []
             while f:
@@ -1332,7 +1324,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if ob:
                 rob = []
                 for b in ob:
-                    par = ['secret=' + b32encode(b['s']).decode().rstrip('=')]
+                    par = ['secret=' + encrypt(b['s'],'b32',bytes=False).rstrip('=')]
                     if b['i']: par.append('issuer=' + b['i'])
                     par.append(f'algorithm={ALGM[b["a"]]}')
                     par.append(f'digits={DIGM[b["d"]]}')

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 990
+# Supported Formats: 992
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -37,7 +37,7 @@ ARX | .arx | [deark](https://entropymine.com/deark/) |
 Asar | .asar | [7-Zip](https://7-zip.org/) + [Asar7z](https://www.tc4shell.com/en/7zip/asar/) |
 ASD | .asd .exe | (Custom + ) [ASD](https://www.sac.sk/download/pack/asd020.exe) |
 BBC Micro SSD | .ssd | [bbccp](https://github.com/ethandicks/bbc-disk-tools) |
-Base64 | .b64 | [base64](https://docs.python.org/3/library/base64.html) |
+Base64 | .b64 | Custom |
 Bencode | .torrent | Custom |
 BinHex | .bhx | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/), [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 BinSCII | .bsc | Custom + [deark](https://entropymine.com/deark/) |
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (528)
+## Various (530)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -434,6 +434,7 @@ Bunny Pro. Das2 DPK | .dpk | Custom |
 Burut Creative Team PAK | .pak | [burut.bms](https://mirror.aluigi.org/bms/burut.bms) |
 Bureau 13 GL | .gl | [na_game_tool](https://nihav.org/game_tool.html) |
 Cabela's Legendary Adventures ARC | .arc | Custom |
+Championship Manager 17 DCFile | .png | Custom |
 Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
@@ -626,6 +627,7 @@ Macross: Do You Remember Love? GKO | .gko | Custom |
 Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
 Marmalade Resource Group | .group.bin | Custom |
+Mattel SMB | .smb | Custom |
 MediaMobile PAK | .pak | Custom |
 Messiah Image Resource | .1 | Custom |
 Metal Slug 3D PAK | .pak | Custom |
