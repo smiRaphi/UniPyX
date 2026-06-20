@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1779746400
+            "ts":1781820000
         }],
-        "ts":1779746400
+        "ts":1781820000
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -74,13 +74,13 @@
             },
             "ts":1762090000
         },{
-            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.46-5build2_i386.deb",
+            "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.47-4_i386.deb",
             "x":{
                 "usr/share/file/magic.mgc":"file/magic.mgc"
             },
-            "ts":1770068820
+            "ts":1780782840
         }],
-        "ts":1770068820
+        "ts":1780782840
     },
     "exeinfope":{
         "p":"ExeinfoPE/exeinfope.exe",
@@ -124,9 +124,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1779919200
+            "ts":1781906400
         }],
-        "ts":1779919200
+        "ts":1781906400
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -204,10 +204,10 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":26465911303,
-            "ts":1780007331
+            "nightly_run":27509193663,
+            "ts":1781955535
         }],
-        "ts":1780007331
+        "ts":1781955535
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -259,13 +259,13 @@
     "deark":{
         "p":"deark.exe",
         "fs":[{
-            "u":"https://entropymine.com/deark/releases/deark-1.7.2.tar.gz",
+            "u":"https://entropymine.com/deark/releases/deark-1.7.3.tar.gz",
             "x":{
-                "deark-1.7.2/x64/deark.exe":"deark.exe"
+                "deark-1.7.3/x64/deark.exe":"deark.exe"
             },
-            "ts":1767858720
+            "ts":1781079480
         }],
-        "ts":1767858720
+        "ts":1781079480
     },
     "quickbms":{
         "p":"quickbms.exe",
@@ -517,13 +517,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/d5/d1/dolphin-master-2603-377-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/f6/09/dolphin-master-2603-397-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1779905031
+            "ts":1781728678
         }],
-        "ts":1779905031
+        "ts":1781728678
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -979,12 +979,12 @@
         "ts":0
     },
     "3dt":{
-        "p":"3dt.exe",
+        "p":"3dt_x86_64-windows-gnu.exe",
         "fs":[[
-            "https://github.com/trapexit/3dt/releases/download/1.1.1/3dt_win64.exe",
+            "https://github.com/trapexit/3dt/releases/download/1.3.0/3dt_x86_64-windows-gnu.exe",
             "3dt.exe"
         ]],
-        "ts":0
+        "ts":1781897914
     },
     "assamunpack":{
         "p":"assamUnpack.exe",
@@ -2036,15 +2036,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.5.0-beta.5/GDRE_tools-v2.5.0-beta.5-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.6.0-beta.3/GDRE_tools-v2.6.0-beta.3-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1775531242
+            "ts":1781913402
         }],
-        "ts":1775531242
+        "ts":1781913402
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2321,23 +2321,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46126/SDLVICE-3.10-win64-r46126.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46150/SDLVICE-3.10-win64-r46150.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46126/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46126/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46126/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46126/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46126/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46126/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46150/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46150/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46150/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46150/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46150/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46150/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1779976862
+            "ts":1781944897
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1779976862
+        "ts":1781944897
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2690,14 +2690,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_05_27_ad95260d_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_06_19_06e8f370_32.zip",
             "x":{
-                "RenderDoc_2026_05_27_ad95260d_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_05_27_ad95260d_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_06_19_06e8f370_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_06_19_06e8f370_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1779832800
+            "ts":1781820000
         }],
-        "ts":1779832800
+        "ts":1781820000
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2749,13 +2749,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.11.0/zxc-windows-x64.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.12.0/zxc-0.12.0-windows-x86_64.zip",
             "x":{
                 "bin/zxc.exe":"zxc.exe"
             },
-            "ts":1778652235
+            "ts":1781767900
         }],
-        "ts":1778652235
+        "ts":1781767900
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -5402,7 +5402,7 @@
     "undertalemodcli":{
         "p":"UTMT_CLI/UndertaleModCli.exe",
         "fs":[{
-            "u":"https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.9.0.0/UTMT_CLI_v0.9.0.0-Windows.zip",
+            "u":"https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.9.1.0/UTMT_CLI_v0.9.1.0-Windows.zip",
             "x":{
                 "GameSpecificData/Definitions/deltarune.json":"UTMT_CLI/GameSpecificData/Definitions/deltarune.json",
                 "GameSpecificData/Definitions/gamemaker.json":"UTMT_CLI/GameSpecificData/Definitions/gamemaker.json",
@@ -5457,7 +5457,7 @@
                 "Newtonsoft.Json.dll":"UTMT_CLI/Newtonsoft.Json.dll",
                 "ICSharpCode.SharpZipLib.dll":"UTMT_CLI/ICSharpCode.SharpZipLib.dll"
             },
-            "ts":1777395923
+            "ts":1781829834
         },{
             "u":".",
             "x":{
@@ -5465,7 +5465,7 @@
             },
             "t":1777588664
         }],
-        "ts":1777588664
+        "ts":1781829834
     },
     "lzmat":{
         "p":"test_lzmat.exe",
@@ -5494,7 +5494,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.18.1-nightly.2026-05-05/WolvenKit.Console-8.18.1-nightly.2026-05-05.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.18.2-nightly.2026-06-18/WolvenKit.Console-8.18.2-nightly.2026-06-18.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5547,9 +5547,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1777977328
+            "ts":1781781459
         }],
-        "ts":1777977328
+        "ts":1781781459
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5599,7 +5599,7 @@
     "git":{
         "p":"git/git.exe",
         "fs":[{
-            "u":"https://github.com/git-for-windows/git/releases/download/v2.54.0.windows.1/MinGit-2.54.0-64-bit.zip",
+            "u":"https://github.com/git-for-windows/git/releases/download/v2.55.0-rc1.windows.1/MinGit-2.55.0-rc1-64-bit.zip",
             "x":{
                 "mingw64/bin/git.exe":"git/git.exe",
                 "mingw64/bin/libiconv-2.dll":"git/libiconv-2.dll",
@@ -5608,9 +5608,9 @@
                 "mingw64/bin/libwinpthread-1.dll":"git/libwinpthread-1.dll",
                 "mingw64/bin/zlib1.dll":"git/zlib1.dll"
             },
-            "ts":1776702128
+            "ts":1781757983
         }],
-        "ts":1776702128
+        "ts":1781757983
     },
     "bsab":{
         "p":"bsab.exe",
@@ -5753,7 +5753,7 @@
     "ffdec":{
         "p":"jpexs/ffdec.jar",
         "fs":[{
-            "u":"https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version26.2.1/ffdec_26.2.1.zip",
+            "u":"https://github.com/jindrapetrik/jpexs-decompiler/releases/download/nightly3524/ffdec_26.2.1_nightly3524.zip",
             "x":{
                 "ffdec.jar":"jpexs/ffdec.jar",
                 "lib/ffdec_lib.jar":"jpexs/lib/ffdec_lib.jar",
@@ -5765,9 +5765,9 @@
                 "lib/gif.jar":"jpexs/lib/gif.jar",
                 "lib/flacomdoc.jar":"jpexs/lib/flacomdoc.jar"
             },
-            "ts":1779634946
+            "ts":1781449980
         }],
-        "ts":1779634946
+        "ts":1781449980
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -5978,13 +5978,13 @@
     "upx":{
         "p":"upx.exe",
         "fs":[{
-            "u":"https://github.com/upx/upx/releases/download/v5.1.1/upx-5.1.1-win64.zip",
+            "u":"https://github.com/upx/upx/releases/download/v5.2.0/upx-5.2.0-win64.zip",
             "x":{
-                "upx-5.1.1-win64/upx.exe":"upx.exe"
+                "upx-5.2.0-win64/upx.exe":"upx.exe"
             },
-            "ts":1772720175
+            "ts":1780921694
         }],
-        "ts":1772720175
+        "ts":1780921694
     },
     "qtifw-devtool":{
         "p":"qtifw-devtool.exe",
@@ -6616,7 +6616,8 @@
         "fs":[[
             "https://raw.githubusercontent.com/AmiiboDB/Amiibo/refs/heads/main/Amiibo%20Bin/!Essential%20Files/key_retail.bin",
             "amiibo_retail_key.bin"
-        ]]
+        ]],
+        "ts":0
     },
     "rrv3va":{
         "p":"RRVArcTool/rrv3vera.ic002",

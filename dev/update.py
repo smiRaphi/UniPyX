@@ -62,8 +62,9 @@ GFMTS = {
     'WolvenKit/WolvenKit-nightly-releases':lambda tag:f'WolvenKit.Console-{tag}.zip',
     'widberg/bff':lambda tag:f'bff-windows-{tag}.zip',
     'git-for-windows/git':lambda tag:f'MinGit-{tag[1:].split(".windows.")[0]}-64-bit.zip',
-    'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_{tag[7:]}.zip',
+    'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_26.2.1_{tag}.zip',
     'ProjectorRays/ProjectorRays':lambda tag:f'projectrrays-{tag[1:]}.exe',
+    'hellobertrand/zxc':lambda tag:f'zxc-{tag[1:]}-windows-x86_64.zip',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
@@ -195,7 +196,7 @@ def supdate(c:Cache,k:str,inf:dict):
             ms = re.findall(r'href="([^"]+)">[^<]+</a> *(\d{4}-\d\d-\d\d \d\d:\d\d)',s)[-1]
             ts = ft(ms[1],'%Y-%m-%d %H:%M')
             if ts > ots:
-                for kx in list(f['x']): f['x'][ms[:-7] + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
+                for kx in list(f['x']): f['x'][ms[0][:-7] + '/' + kx.split('/',1)[1]] = f['x'].pop(kx)
                 u = bu + ms[0]
         elif dom == 'dl.dolphin-emu.org':
             s = c.get('https://dolphin-emu.org/download/')

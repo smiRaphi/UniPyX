@@ -722,7 +722,8 @@ def hookshot(cmd:list,redirect:dict,**kwargs):
     scr = cmd[0]
     if kwargs.get('print_try',db.print_try): print('Trying with',scr)
     if 'print_try' in kwargs: kwargs.pop('print_try')
-    scr = db.get(scr)
+    scr = db.get(scr) if kwargs.get('getexe',True) else scr
+    if 'getexe' in kwargs: kwargs.pop('getexe')
     hks = scr + '.hookshot'
     open(hks,'w').close()
 
@@ -796,10 +797,11 @@ def fix_innoinstext(o:str,i:str):
     for f in os.listdir(dirname(i)):
         f = dirname(i) + '\\' + f
         if not isfile(f) or open(f,'rb').read(4) != b'ArC\1': continue
-        mkdir(TMP + '\\INNOTMP1')
-        mkdir(TMP + '\\INNOTMP2')
-        hookshot(bcmd + [f],{f'{os.environ["SYSTEMROOT"]}\\Temp':TMP + '\\INNOTMP1','C:\\Windows\\Temp':TMP + '\\INNOTMP2'},cwd=td.p)
-        remove(TMP + '\\INNOTMP1',TMP + '\\INNOTMP2')
+        td1 = TmpDir()
+        rd = {f'{os.environ["SYSTEMROOT"].lower()}\\temp':td1.p}
+        if not 'c:\\windows\\temp' in rd: rd['c:\\windows\\temp'] = td1.p
+        hookshot(bcmd + [f],rd,cwd=td.p)
+        td1.destroy()
     td.destroy()
 
     return True

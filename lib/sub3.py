@@ -378,26 +378,32 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 td.destroy()
                 return
         case 'InstallShield Archive':
-            td = TmpDir(path=o)
-            e,_,r = run(['i6comp','x','-rof',i],cwd=td.p)
-            if (not e or 'Could not open ' in r) and listdir(td.p):
-                copydir(td,o,True)
+            if exists(noext(i) + '.hdr'):
+                td = TmpDir(path=o)
+                e,_,r = run(['i6comp','x','-rof',i],cwd=td.p)
+                if not (e or 'Could not open ' in r) and listdir(td.p):
+                    copydir(td,o,True)
+                    td.destroy()
+                    return
                 td.destroy()
-                return
-            td.destroy()
 
-            td = TmpDir(path=o)
-            e,_,_ = run(['i5comp','x','-rof',i],cwd=td.p)
-            if not e and listdir(td.p):
-                copydir(td,o,True)
+                td = TmpDir(path=o)
+                e,_,_ = run(['i5comp','x','-rof',i],cwd=td.p)
+                if not e and listdir(td.p):
+                    copydir(td,o,True)
+                    td.destroy()
+                    return
                 td.destroy()
-                return
-            td.destroy()
+            return 1
 
             ti = TmpFile('.ini')
-            e,_,_ = run(['iscab',i,'-i"' + ti + '"','-lx'],env=os.environ.copy() | {'__COMPAT_LAYER':'RUNASINVOKER'})
+            td = TmpDir()
+            rd = {f'{os.environ["SYSTEMROOT"].lower()}\\temp':td.p}
+            if 'c:\\windows\\temp' in rd: rd['c:\\windows\\temp'] = td.p
+            e,_,_ = hookshot(['iscab',i,'-i"' + ti + '"','-lx'],rd,env=os.environ.copy() | {'__COMPAT_LAYER':'RUNASINVOKER'})
+            td.destroy()
             if not e:
-                print('INI:\n' + xopen(ti).read())
+                print('INI:\n' + readfile(ti))
                 ti.destroy()
                 raise NotImplementedError("iscab returned:\n" + e)
             ti.destroy()
