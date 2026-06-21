@@ -1059,31 +1059,30 @@ def extract4_1(inp:str,out:str,t:str):
             run(['rcs','-f','-d',i,of])
             if exists(of) and getsize(of): return
         case 'Encrypted Arsenal MTC+MDF':
-            DBP = db.bin_path + 'mtcmdf.bdb'
+            DBP = db.bin_path + 'mtcmdf.pyob'
+            from lib.pyob import PyOBinX
             if not exists(DBP):
-                import zipfile,json
-                from io import BytesIO
+                import json
+                from lib.file import decompress
 
-                dbf = open(DBP,'wb')
-                zf = zipfile.ZipFile(BytesIO(db.c.get('https://github.com/Infinest/Gimmick-ROM-extractor/releases/download/1.21/Gimmick_ROM_extractor.zip',follow_redirects=True).content))
+                pyo = PyOBinX.new(DBP)
+                zf = decompress(db.c.get('https://github.com/Infinest/Gimmick-ROM-extractor/releases/download/1.21/Gimmick_ROM_extractor.zip',follow_redirects=True).content,'zip')
                 for h,p in ((0xC90971742F35300A94797EC76208462C024FE0C938356B216463FB61ACF6FB4F,'config.json'),
                             (0x1D3CE6FCD673E0349C07494687796ADDDF08A30A53B78672C884907B980F47A2,'alternate_configs/Streets of Kamurocho (Streets of Rage 2)/config.json'),
                             (0xFE8314DF62A13B63990995722F6F9A083AA5B30A4971E3297B49C241A44241F5,'alternate_configs/Abarenbo Tengu & Zombie Nation/config.json'),
                             (0,'alternate_configs/F-117A Stealth Fighter/config.json')):
-                    dbf.write(h)
-                    dbf.write(json.loads(zf.read(p).replace(b',\n}',b'}'))['AES_KEY'].encode('ascii').ljust(16,b'\0'))
-                dbf.close()
-            dbf = open(DBP,'rb')
-            bdb = {dbf.read(32):dbf.read(16) for _ in range(4)}
-            dbf.close()
+                    pyo[h.to_bytes(32,'big')] = json.loads(zf.read(p).replace(b',\n}',b'}'))['AES_KEY'].encode('ascii').ljust(16,b'\0')
+                pyo.save()
+            else: pyo = PyOBinX(DBP).load()
 
             db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt,crc_hash
             fd = open(noext(i) + '.mdf','rb')
-            hsh = crc_hash(fd.read(0x1000),'sha256')
-            asrt(hsh in bdb)
-            key = bdb[hsh]
+            hsh = crc_hash(fd.read(0x1000),'sha256',bytes=True)
+            pyo.wait()
+            asrt(hsh in pyo)
+            key = pyo[hsh]
 
             f = File(i,endian='<')
 

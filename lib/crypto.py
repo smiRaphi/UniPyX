@@ -308,6 +308,17 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_roll(i,key or b'\0')
 
+        case 'zrif'|'zrif_b64':
+            asrt(len(key) == 0x400)
+            import zlib
+            c = zlib.compressobj(level=9,wbits=10,memlevel=8,zdict=key)
+            bn = c.compress(i) + c.flush()
+            if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
+            if algo == 'zrif_b64':
+                import base64
+                return base64.b64encode(bn).decode('latin-1')
+            return bn
+
         case 'hex':
             r = i.hex()
             return r if kwargs.get('bytes',False) else r.encode('ascii')
@@ -320,7 +331,7 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'url'|'urldecode'|'urlencode':
             from urllib.parse import quote,quote_from_bytes
 
-            r = (quote if isinstance(i,bytes) else quote_from_bytes)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
+            r = (quote_from_bytes if isinstance(i,bytes) else quote)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
             return r.encode('utf-8') if kwargs.get('bytes',False) else r
 
 CRC_LUT = {}
@@ -757,6 +768,7 @@ class HashLib(PyOBin):
             self.enc:str = self.db['e']
             self.obj = dict(zip(self.db['hs'],self.db['ns']))
             self.fmt:PyOFunc = self.db['fmt']
+        return self
     def save(self):
         self.db = {'t':self.ht,'s':self.hs,'e':self.enc,'fmt':self.fmt,'hs':list(self.obj.keys()),'ns':list(self.obj.values())}
         super().save()

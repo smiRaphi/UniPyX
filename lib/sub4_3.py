@@ -308,17 +308,13 @@ def extract4_3(inp:str,out:str,t:str):
             del tr
             if listdir(o): return
         case 'Team Ari Encrypted RGSSAD'|'RPG Maker Archive':
-            KEYS = {
-                b'\x9e\x83\x42\x0e\x4e\xbd\xdc\x6d':0x2b804be2,
-                b'\x31\xac\x3e\x2d\x9b\x23\xda\x11':0xdeadcafe,
-                b'RGSSAD\0\1':0xdeadcafe,
-            }
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
             from lib.file import File
             f = File(i,endian='<')
             sig = f.read(8)
-            key = KEYS[sig]
+            key = keys.wait()['rgssad'][sig]
 
             def rot(key): return (key * 7 + 3) & 0xFFFFFFFF
             def rotk():
@@ -613,9 +609,9 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Nemea File Archive':
-            KEY = (0xEE,0x1E6 & 0xFF)
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            KEY = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -625,18 +621,22 @@ def extract4_3(inp:str,out:str,t:str):
             c = f.readu32()
             f.skip(4)
             fs = []
+            key = list(KEY.wait()['nemea'])
+            del key
             for _ in range(c):
-                inf = decrypt(f.read(0x94),'xor',KEY)
+                inf = decrypt(f.read(0x94),'dxor',*key)
                 fs.append((int.from_bytes(inf[8:12],'little'),int.from_bytes(inf[12:16],'little'),inf[20:].rsplit(b'\0\0')[0].decode('utf-16le'))) # fe[2] = ,int.from_bytes(inf[16:20],'little')
             for fe in fs:
                 f.seek(fe[1])
                 #if fe[2]: print(decrypt(f.read(4),'xor',KEY).hex(),fe[0],fe[1],hex(fe[2]));raise
-                writefile(o + '/' + fe[2],decrypt(f.read(fe[0]),'dxor',*KEY))
+                writefile(o + '/' + fe[2],decrypt(f.read(fe[0]),'dxor',*key))
 
             f.close()
             if fs: return
         case 'D.N.A. Softwares Pack':
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'PACK')
@@ -647,19 +647,24 @@ def extract4_3(inp:str,out:str,t:str):
                 fn = f.read(0x40).rstrip(b'\0').decode('ascii')
                 f.skip(8)
                 fs.append((f.readu32(),f.readu32(),fn))
+            key.wait()
             for fe in fs:
                 f.seek(fe[0])
                 d = f.read(fe[1])
                 writefile(o + '/' + fe[2] + ('.lzss' if d[:4] == b'LZSS' else ''),d)
-                if d[:4] == b'LZSS': writefile(o + '/' + fe[2],dnasoft_lzss_decrypt(d))
+                if d[:4] == b'LZSS': writefile(o + '/' + fe[2],dnasoft_lzss_decrypt(d,key))
 
             f.close()
             if fs: return
         case 'D.N.A. Softwares LZSS':
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
+
             of = o + '/' + basename(i)
             if i.lower().endswith('.lzss'): of = of[:-5]
-            d = dnasoft_lzss_decrypt(readfile(i))
+            key.wait()
+            d = dnasoft_lzss_decrypt(readfile(i),key)
             writefile(of,d)
             return
         case '@N-Factory DAT':
@@ -1227,18 +1232,18 @@ def extract4_3(inp:str,out:str,t:str):
             run(['ree.unpacker','all',i,o],cwd=dirname(lp))
             if listdir(o): return
         case 'Capcom Encrypted MAME ROM':
-            KEY = (0xB5,0x29,0x6C,0x96)
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import decompress
             from lib.crypto import decrypt
 
-            if '_d.' in basename(i).lower(): iv = 'natives/STM/streaming/Roms/DecryptionRom/' + basename(i).replace('_d','_D')
-            else: iv = 'natives/STM/streaming/Roms/' + basename(i)
+            if '_d.' in basename(i).lower(): iv = key['capcom_mame']['div'] + basename(i).replace('_d.','_D.')
+            else: iv = key['capcom_mame']['iv'] + basename(i)
 
             if decompress(
                 decompress(
-                    decrypt(readfile(i),'capcom_mame',KEY,iv),
+                    decrypt(readfile(i),'capcom_mame',key['capcom_mame']['k'],iv),
                     'lz4',no_size=True),
                 'zip',o=o
             ): return
@@ -2496,12 +2501,11 @@ def extract4_3(inp:str,out:str,t:str):
 
     return 1
 
-DNAKEY = bytes.fromhex('E481D4ED17D44162FA5CE995AE252FD098C014CED9A742F99FFA8D382B2A136A26E0D9708EABB5F18E77ED809B1CAF51918D680061B2463D')
-def dnasoft_lzss_decrypt(i:bytes):
+def dnasoft_lzss_decrypt(i:bytes,pyo):
     from lib.crypto import decrypt
     asrt(i[:4] == b'LZSS')
     rs = int.from_bytes(i[4:8],'little')
-    return decrypt(i[8:8+rs+-rs%8],'blowfish_le',DNAKEY)[:rs]
+    return decrypt(i[8:8+rs+-rs%8],'blowfish_le',pyo['dnasoft'])[:rs]
 def guess_ext_alvion(d:bytes):
     if not d: return 'null'
     s = len(d)

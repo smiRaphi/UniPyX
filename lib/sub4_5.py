@@ -5,8 +5,9 @@ def extract4_5(inp:str,out:str,t:str):
 
     match t:
         case 'Retro Engine RSDKv3':
-            K1,K2 = b"4RaS9D7KaEbxcp2o5r6t",b"3tRaUxLmEaSn"
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.crypto import decrypt
             from lib.file import File
             f = File(i,endian='<')
@@ -15,6 +16,7 @@ def extract4_5(inp:str,out:str,t:str):
             dc = f.readu16()
             ds = [(decrypt(f.read(f.readu8()),'inv_len').decode('utf-8'),hs + f.readu32()) for _ in range(dc)]
             ds.append((0,f.size))
+            K1,K2 = key.wait()['rsdk3']
             for ix,de in enumerate(ds[:-1]):
                 f.seek(de[1])
                 xof = ds[ix+1][1]
@@ -25,11 +27,11 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             if de: return
         case 'Retro Engine RSDKv4':
-            KEY = (0xAAAAAAAB,0x24924925)
-
             db.try_custom()
             from lib.crypto import decrypt,HashLib
             hl = HashLib.dl('rsdk',db)
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(6) == b'RSDKvB')
@@ -41,6 +43,7 @@ def extract4_5(inp:str,out:str,t:str):
                 sz = f.readu32()
                 fs.append((*fe,sz & 0x7FFFFFFF,sz & 0x80000000))
 
+            KEY = key.wait()['rsdk4']
             hl.wait()
             for fe in fs:
                 f.seek(fe[1])

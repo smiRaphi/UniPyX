@@ -258,14 +258,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 work = None
 
             if work:
-                import zlib,base64
-                ZRIF_DICT = zlib.decompress(base64.b64decode(b"eNpjYBgFo2AU0AsYAIElGt8MRJiDCAsw3xhEmIAIU4N4AwNdRxcXZ3+/EJCAkW6Ac7C7ARwYgviuQAaIdoPSzlDaBUo7QmknIM3ACIZM78+u7kx3VWYEAGJ9HV0="))
-                rif = open(work,'rb').read()
-                c = zlib.compressobj(level=9,wbits=10,memLevel=8,zdict=ZRIF_DICT)
-                bn = c.compress(rif)
-                bn += c.flush()
-                if len(bn) % 3: bn += bytes(3 - len(bn) % 3)
-                zrif = base64.b64encode(bn).decode()
+                from lib.pyob import PyOBinX
+                keys = PyOBinX.dl('keys',db)
+                from lib.crypto import encrypt
+                rif = readfile(work)
+                keys.wait()
+                zrif = encrypt(rif,'zrif_b64',keys['zrif_dict'])
+                del keys
 
             run(['pkg2zip','-x',i] + ([zrif] if work else []),cwd=o)
             if exists(o + '/app') and listdir(o + '/app') and listdir(o + '/app/' + listdir(o + '/app')[0]):

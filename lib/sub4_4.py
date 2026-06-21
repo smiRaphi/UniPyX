@@ -505,9 +505,9 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if ds: return
         case 'Hornby BSF':
-            KEY = 0xBB
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -515,6 +515,7 @@ def extract4_4(inp:str,out:str,t:str):
             f.skip(0x14)
 
             c = 0
+            KEY = key.wait()['hornby_bsf'][0]
             while f:
                 ep = f.pos
                 asrt(f.read(4) == b'BLK\0')
@@ -550,13 +551,13 @@ def extract4_4(inp:str,out:str,t:str):
             if c: return
         case 'Detective Instinct: Farewell, My Beloved Encrypted DIP':
             from lib.pyob import PyOBinX
-            KEY = PyOBinX.dl('difmb_dip_key',db) # external file because 256KB
+            KEY = PyOBinX.dl('keys',db)
 
             db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt
             KEY.wait()
-            f = File(decrypt(readfile(i),'xor',KEY['key']),endian='>')
+            f = File(decrypt(readfile(i),'xor',KEY['difmb_dip']),endian='>')
             del KEY
 
             c = f.readu32()
@@ -737,18 +738,19 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if ofs: return
         case 'DDLC+ Encrypted Unity Bundle':
-            KEY = 0x28
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.crypto import decrypt
             of = f'{o}/{tbasename(i)}.bundle'
-            writefile(of,decrypt(readfile(i),'xor',KEY))
+            key.wait()
+            writefile(of,decrypt(readfile(i),'xor',key['DDLC']))
             r = extract(of,o,'Unity Bundle')
             return
         case 'Selene Pack':
-            KEYS = (b'Selene.Default.Password',b'PackPass')
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             from multiprocessing.pool import ThreadPool
@@ -770,7 +772,8 @@ def extract4_4(inp:str,out:str,t:str):
                 wav = wav[0]
                 f.seek(wav[1])
                 d = f.readc(4)
-                for k in KEYS: # this also initializes all key tables!!! which would otherwise cause Threading issues
+                keys.wait()
+                for k in keys['selene']: # this also initializes all key tables!!! which would otherwise cause Threading issues
                     if decrypt(d,'selene',k) == b'RIFF':
                         key = k
                         break
@@ -854,9 +857,9 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Digital Illusions PDT':
-            KEY = b'THEEVENTHORIZONS'
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File,decompress
             from lib.crypto import decrypt
             from multiprocessing.pool import ThreadPool
@@ -891,6 +894,7 @@ def extract4_4(inp:str,out:str,t:str):
                     dn = [x[1] for x in dns if ix < x[0]]
                     fs.append(('/'.join(dn) + '/' + fn,fe[0],fe[1],ft))
 
+            KEY = key.wait()['dig_illu']
             def writed(d,fe):
                 # don't trust compressed flag
                 if fe[3] & 1 or\
@@ -995,9 +999,9 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if c: return
         case 'Six Guns Encrypted Save':
-            KEY = b'\x15\x24\x11\x1C\x6F\x31\xD4\x64\x61\x20\x02\x32\xC0\x44\x99\xB0'
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -1008,7 +1012,7 @@ def extract4_4(inp:str,out:str,t:str):
             asrt(enc == 'TEA')
             f.seek(hs)
             asrt(f.readu32() == 1)
-            writefile(o + '/' + basename(i),decrypt(f.read(),'tea_le',KEY))
+            writefile(o + '/' + basename(i),decrypt(f.read(),'tea_le',key.wait()['6guns_save']))
             f.close()
             return
         case 'Temple of Elemental Evil DAT':
@@ -1978,28 +1982,26 @@ def extract4_4(inp:str,out:str,t:str):
             f.close()
             if listdir(o): return
         case 'PlayPond Pack':
-            KEYS = {
-                0:(b'786!N21.422525E39.826212@PiracyIsASin',0xFF),
-                #0x17:(,0xFF),
-            }
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File,decompress
             from lib.crypto import decrypt
             f = File(i,endian='<')
             asrt(f.read(7) == b'ARCPACK')
             v = f.readu8()
-            asrt(v in KEYS,v)
+            keys = key.wait()['playpond']
+            asrt(v in keys,v)
 
             f.skip(8)
             c,ifs = f.readu32(),f.readu32()
             f.skip(0x34)
-            fi = File(decrypt(f.readc(ifs),'rc4_pp',*KEYS[v]),endian=f._end)
+            fi = File(decrypt(f.readc(ifs),'rc4_pp',*keys[v]),endian=f._end)
             for _ in range(c):
                 fn = fi.readc(fi.readu32()).rstrip(b'\0').decode('ascii')
                 f.seek(fi.readu32())
                 us,zs = fi.readu32(),fi.readu32()
-                d = decrypt(f.readc(zs),'rc4_pp',KEYS[v][0],(zs & 0xFFF) + 0xFF)
+                d = decrypt(f.readc(zs),'rc4_pp',keys[v][0],(zs & 0xFFF) + 0xFF)
                 writefile(o + '/' + fn,decompress(d,'zlib',usize=us))
 
             f.close()

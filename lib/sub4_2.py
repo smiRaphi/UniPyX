@@ -549,20 +549,16 @@ def extract4_2(inp:str,out:str,t:str):
                     else: raise NotImplementedError('Encrypted archive without encrypted file entries, can\'t get/verify key')
                     ent = f.read(0x20)
 
-                    DB = db.bin_path + 'pet_megkeys.bdb'
+                    DB = db.bin_path + 'pet_megkeys.pyob'
+                    from lib.pyob import PyOBinX
                     if not exists(DB):
                         import re
-                        bdb = open(DB,'wb')
-                        for k in re.findall(r'Key: *([\dA-Fa-f]{32}).*<br */>\s*IV: *([\dA-Fa-f]{32})',db.c.get('https://modtools.petrolution.net/docs/MegFileFormat').text): bdb.write(bytes.fromhex(k[0] + k[1]))
-                        bdb.close()
-                    bdb = open(DB,'rb')
-                    kdb = []
-                    while True:
-                        kiv = bdb.read(0x20)
-                        if not kiv: break
-                        kdb.append((kiv[:0x10],kiv[0x10:]))
+                        keys = PyOBinX.new(DB,base=[])
+                        for k in re.findall(r'Key: *([\dA-Fa-f]{32}).*<br */>\s*IV: *([\dA-Fa-f]{32})',db.c.get('https://modtools.petrolution.net/docs/MegFileFormat').text): keys.append((bytes.fromhex(k[0]),bytes.fromhex(k[1])))
+                        keys.save()
+                    else: keys = PyOBinX(DB).loadb()
 
-                    for k,iv in kdb:
+                    for k,iv in keys:
                         aes = lambda i: decrypt(i,'aes_cbc',k,iv)
                         dent = aes(ent)
                         if not sum(dent[4:8]) and int.from_bytes(dent[12:16],'little') == ds:break
@@ -1113,8 +1109,9 @@ def extract4_2(inp:str,out:str,t:str):
             f.close()
             if fs: return
         case 'Novalogic Resource':
-            KEYS = {b'\xAD\xDE\xED\xAC',b'\x2D\xDE\xED\xAC\xAD\xDE\xED\xAC\xAD\xDE\xED\xAC'}
             db.try_custom()
+            from lib.pyob import PyOBinX
+            key = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -1122,6 +1119,7 @@ def extract4_2(inp:str,out:str,t:str):
             c = f.readu32()
 
             fs = []
+            KEYS = key.wait()['novalogic_res']
             for _ in range(c):
                 rn = f.read(12)
                 for k in KEYS:

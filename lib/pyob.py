@@ -121,13 +121,12 @@ class PyOBin:
             self._load_thrd = Thread(target=self._load)
             self._load_thrd.start()
         return self
-    def loadb(self):
-        self.load().wait()
-        return self
+    def loadb(self): return self.load().wait()
     def wait(self):
         if self._load_thrd is not None:
             self._load_thrd.join()
             self._load_thrd = None
+        return self
     def _load(self):
         f = File(self.p,'rb',endian='>')
         asrt(f.read(4) == b'PyOB')
