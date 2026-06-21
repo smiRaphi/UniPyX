@@ -7015,6 +7015,14 @@
         ]],
         "ts":1781365824
     },
+    "mitsurugi_hashes":{
+        "p":"hashes/mitsurugi.pyob",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/mitsurugi.pyob",
+            "hashes/mitsurugi.pyob"
+        ]],
+        "ts":1781365824
+    },
     "difmb_dip_key":{
         "p":"difmb_dip_key.pyob",
         "fs":[

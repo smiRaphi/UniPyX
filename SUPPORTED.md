@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 993
+# Supported Formats: 994
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (531)
+## Various (532)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -646,6 +646,7 @@ Minecraft Console PCK | .pck | Custom |
 Mini Metro Sound Bytes | .bytes | Custom |
 MINICAT | .cat | Custom |
 Mission Impossible 3 Data | ??? | Custom |
+Mitsurugi KPK | .kpk+.exe | Custom |
 MMFW Resource | .mmp .mms .mma .mmf | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Mo'PaQ | .mpq | [MPQExtractor](https://github.com/Kanma/MPQExtractor) |
 Moe Cure Net FileList | ` ` | Custom |

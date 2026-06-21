@@ -1,16 +1,17 @@
 ENC = 'ascii'
-nFMT = None #lambda x:x # x: bytes
+nFMT = 'lambda x:x.lower()' #lambda x:x # x: bytes
 iFMT = lambda x:x #'/'+x.replace('\\','/').lstrip('/') # x: str
 
 import os,sys
 argv = sys.argv
 sys.path.append(os.getcwd())
-from lib.crypto import HashLib
+from lib.crypto import HashLib,PyOFunc
+nFMT = PyOFunc(nFMT)
 
 if argv[1] == 'd':
     h = HashLib(argv[2]).loadb()
-    for x in sorted(h.db):
-        print(f'{x:0{h.hs*2}X} | {h.db[x]}')
+    for x in sorted(h.obj):
+        print(f'{x:0{h.hs*2}X} | {h[x]}')
     sys.exit()
 elif argv[1] == 'sd':
     h = HashLib(argv[2]).loadb()

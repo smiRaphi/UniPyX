@@ -446,13 +446,6 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 idx = decrypt(idx,'aes_ecb',ky)
             else: ky = None
 
-            if v > 90:
-                f.close()
-                writefile(o + '/$index.bin',idx)
-                #run(['repak'] + (['-a',ky.hex()] if ky else []) + ['unpack','-o',o,'-q','-f',i])
-                #if listdir(o): return
-                raise NotImplementedError(f'{v} > 9')
-
             idx = File(idx,endian=f._end)
             def reads(fu=idx):
                 l = fu.reads32()
@@ -595,7 +588,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if fe['e']: d = decrypt(d,'aes_ecb',ky)[:fe['s']]
                 if fe['c'] in {'none','zlib','gzip'}:
                     # solid
-                    pcs = [zp.apply_async(decs,(0,d[fe['bs'][0][0]:fe['bs'][-1][0]+fe['bs'][-1][1]] if fe.get('bs') else d,None,fe['c']))]
+                    if v > 9 and fe.get('bs'): d = d[fe['bs'][0][0]:fe['bs'][-1][0]+fe['bs'][-1][1]]
+                    pcs = [zp.apply_async(decs,(0,d,None,fe['c']))]
                 elif fe['c'] in {'zstd',}:
                     pcs = [zp.apply_async(decs,(ix,d[b[0]:b[0]+b[1]],None,'zstd')) for ix,b in enumerate(fe['bs'])]
                 elif fe['c'] in {'lz4','oodle'}:

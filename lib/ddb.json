@@ -2729,6 +2729,10 @@
         "rs":"Other Ocean Interactive ARC"
     },
     {
+        "d":[["ext",".kpk"],["s%",32],["py","return any(x.lower().endswith('.exe') for x in os.listdir(dirname(inp)))"]],
+        "rs":"Mitsurugi KPK"
+    },
+    {
         "rqr":null,
         "d":["ext",".zl"],
         "rs":"OpenZL"

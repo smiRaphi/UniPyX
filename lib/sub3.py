@@ -254,14 +254,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'VISE Installer': return quickbms('instexpl')
         case 'MSI':
-            run(['lessmsi','x',i,o + '\\'])
-            if exists(o + '/SourceDir') and listdir(o + '/SourceDir'):
+            td = TmpDir(path=o)
+            run(['lessmsi','x',i,td + '\\'])
+            if exists(td + '/SourceDir') and listdir(td + '/SourceDir') and sum(map(getsize,rldir(td.p))) > (getsize(i) / 50):
                 for _ in range(10):
-                    try:copydir(o + '/SourceDir',o,True)
+                    try:copydir(td + '/SourceDir',o,True)
                     except PermissionError:pass
                     except shutil.Error:pass
                     else:break
+                td.destroy()
                 return
+            td.destroy()
 
             td = TmpDir(path=o)
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)

@@ -532,5 +532,69 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Mitsurugi KPK':
+            db.try_custom()
+            import zlib
+            from lib.crypto import HashLib
+            hl = HashLib.dl('mitsurugi',db)
+            from lib.file import File,iszl
+            fd = File(i)
+
+            ps = []
+            for ix in range(fd.size // 0x20):
+                fd.seek(ix * 0x20)
+                td = fd.read(8)
+                if td[1] != 1 and iszl(td):
+                    ps.append(fd.pos - 8)
+                    if len(ps) == 2: break
+            if len(ps) != 2:
+                fd.close()
+                return 1
+
+            fd.seek(ps[0])
+            td = fd.read(ps[1] - ps[0])
+            zob = zlib.decompressobj()
+            dd = zob.decompress(td)
+            pfed = len(dd).to_bytes(4,'little') + (len(td) - len(zob.unused_data)).to_bytes(4,'little') + ps[0].to_bytes(4,'little')
+
+            id = dirname(i)
+            for pex in [id + '/' + x for x in listdir(id) if x.lower().endswith('.exe')]:
+                pd = readfile(pex)
+                pp = pd.find(pfed)
+                if pp == -1 or not pd[pp+0x10] & 1 or pd[pp+0x11:pp+0x14] != b'\0\0\0': continue
+                psp = pd.rfind(b'\0'*0x10,0,pp - 4)
+                if psp == -1: continue
+                f = File(pd[psp+0x10:],endian='<')
+                break
+            else:
+                fd.close()
+                return 1
+
+            cv = 0
+            fs = []
+            while cv < fd.size:
+                fe = (f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32())
+                if fe[5] & 4: fe = (fe[0],0,0,fe[3],fe[4],fe[5])
+                s = fe[2] if fe[5] & 1 else fe[1]
+                s += -s%0x20
+                if (fe[3] + s) > fd.size or fe[3] % 0x20 or (fe[2] and not fe[5] & 1): break
+                fs.append(fe)
+                cv += s
+            del f
+
+            hl.wait()
+            for fe in fs:
+                fd.seek(fe[3])
+                d = fd.decompress(fe[2] if fe[5] & 1 else fe[1],'zlib' if fe[5] & 1 else 'none',usize=fe[1])
+                if fe[0] in hl: fn = hl[fe[0]]
+                else:
+                    if d[:4] == b'E3\x0E\0': ex = 'e3'
+                    elif d[:4] in {b'CMA2',b'W9A2'}: ex = d[:3].decode('ascii').lower()
+                    else: ex = guess_ext(d)
+                    fn = f'$unk/{fe[0]:08X}.{ex}'
+                writefile(o + '/' + ("$deleted/" if fe[5] & 4 else "") + fn,d)
+
+            fd.close()
+            if fs: return
 
     return 1
