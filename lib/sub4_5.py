@@ -756,5 +756,15 @@ def extract4_5(inp:str,out:str,t:str):
 
             fd.close()
             if fc: return
+        case 'N-Space Zlib Compressed':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'\x7A\x26\xC8\x02')
+            zs,us = f.readu32(),f.readu32()
+            f.padc(4)
+            writefile(o + '/' + basename(i),f.decompress(zs,'zlib',usize=us))
+            f.close()
+            return
 
     return 1

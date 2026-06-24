@@ -1415,6 +1415,10 @@
         "rs":"NetEase Minecraft Bedrock Encrypted File","s":1
     },
     {
+        "d":[["isat","\\x7A\\x26\\xC8\\x02",0],["isatS","\\0",4,12],["isat","x",16],["isin",["\\x01","\\x5E","\\x9C","\\xDA"],17],["n0",4,4],["n0",4,8],["py","f.seek(4);s=f.readi(4,'<');return f.readi(4,'<')>s and (s+16)==fsz"]],
+        "rs":"N-Space Zlib Compressed","s":1
+    },
+    {
         "d":[["isat","CR2W",0],["n0",4,24],["n0",4,28],["n0",4,32],["n0",4,36],["py","f.seek(24);return f.readi(4,'<')<=f.readi(4,'<')==fsz"]],
         "rs":"REDengine W2ResourCe","s":1
     },
