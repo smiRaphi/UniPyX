@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 994
+# Supported Formats: 998
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -354,7 +354,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (532)
+## Various (536)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -406,6 +406,7 @@ Azito 3D Pack Message | ??? | Custom |
 BackupMii NAND Image | ??? | Custom |
 Balko UFL Game Archive | .ufl | Custom |
 Bandai ARC | .arc | Custom |
+Bandai PIDX | .idx | Custom |
 Bandai PKG | .pkg | Custom |
 Barbie: Riding Club Cache | .cache | Custom |
 Batman Raw Thrills LUX | .lux | Custom |
@@ -438,6 +439,7 @@ Championship Manager 17 DCFile | .png | Custom |
 Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
+Capcom YZ2 Compressed | * | Custom |
 Cause of Death EXP | .exp | Custom |
 ChainDive FLD | .fld | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -747,6 +749,7 @@ Red Baron VOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexv
 REDengine Archive | .archive | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 REDengine W2ResourCe | [a lot](https://wiki.redmodding.org/cyberpunk-2077-modding/for-mod-creators-theory/files-and-what-they-do/file-formats#w2rc-file-format-table) | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 Relic Chunky Container | .rgt .rsh .wtp .fda .sgb .whm .whe | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Remedy Archive System | .ras | Custom |
 Remedy BIN+RMDP | .bin+.rmdp | [remedy_bin_rmdp.bms](https://mirror.aluigi.org/bms/remedy_bin_rmdp.bms) |
 RenderDoc Capture | .rdc | [RenderDoc](https://renderdoc.org/) |
 RenderWare Texture Dictionary | .txd | [rwexporter](https://github.com/AmyrAhmady/rwexporter) |
@@ -769,6 +772,7 @@ SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
 SDFTool SDF.bin | .bin | Custom |
 Selene Pack | .pack | Custom |
+Sengoku Basara 2 Compressed | * | Custom |
 SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |

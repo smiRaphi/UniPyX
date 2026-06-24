@@ -194,7 +194,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
             f = open(i,'rb')
-            f.seek(-0x1800,2)
+            f.seek(-0x2000,2)
             gog = b'00#GOGCRCSTRING' in f.read()
             f.close()
 
@@ -235,7 +235,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     for x in listdir(o):
                         p = o + '/' + x
                         if (isfile(p) and (x.startswith('goggame-') or x == 'install_script.iss')) or\
-                           (isdir(p)  and x in {'tmp','embedded','__redist'}): mv(p,o + '/$INSFILES/' + x)
+                           (isdir(p)  and x in {'tmp','embedded','__redist'}):
+                               if exists(o + '/$INSFILES/' + x): x = noext(x) + '_2' + extname(x)
+                               mv(p,o + '/$INSFILES/' + x)
                         elif isdir(p) and x in {'commonappdata','app'}: copydir(p,o + '/$INSFILES',True)
                         elif isdir(p) and x == '__support':
                             for xf in listdir(p):

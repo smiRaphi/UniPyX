@@ -27,10 +27,24 @@ def uxx():
 
 MMFS_DEC = {}
 FH3N_DEC = {}
-BASEXX_MAP = {'base16':'b16',
-              'base32':'b32','base32hex':'b32hex','b32h':'b32hex',
-              'base64':'b64',
-              'base85':'b85','ascii85':'a85'}
+BASEXX_DEC = {
+    'b58':'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
+    'b92':'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~+!$%\'()*,:@/?;^{}[]<>&|"=`',
+    'g64':'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]',
+    'z32':'ybndrfg8ejkmcpqxot1uwisza345h769',
+    'c32':'0123456789ABCDEFGHJKMNPQRSTVWXYZ',
+    'n32':'0123456789BCDFGHJKLMNPQRSTVWXYZ.',
+}
+BASEXXNS = {'base16':'b16',
+            'base32':'b32','base32hex':'b32hex','b32h':'b32hex',
+            'base58':'b58',
+            'base64':'b64',
+            'base85':'b85','ascii85':'a85',
+            'base92':'b92',
+            'gamespy64':'g64',
+            'zbase32':'z32',
+            'cbase32':'c32','crockford32':'c32',
+            'nin32':'n32','nintendo32':'n32',}
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
@@ -261,6 +275,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             r = i.translate(k)
             if istr: r = r.decode('latin-1')
             return r
+        case 'remedy_ras':
+            if isinstance(key,bytes): key = int.from_bytes(key,'little')
+            asrt(isinstance(key,int),err=TypeError)
+            return uxx().decrypt_remedy_ras(i,key)
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
 
         case 'hex': return bytes.fromhex(i)
@@ -269,13 +287,28 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return decrypt(unquote_to_bytes(i),'base64',**kwargs)
         case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|\
              'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
-            algo = BASEXX_MAP.get(algo,algo)
+            algo = BASEXXNS.get(algo,algo)
             import base64
             if algo == 'b64' and len(i) % 4 and kwargs.get('fix'):
                 if isinstance(i,str): i = i.encode('latin-1')
                 i += b'=' * (-len(i) % 4)
 
             return getattr(base64,algo + 'decode')(i)
+        case 'base92'|'base58'|'gamespy64'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|\
+             'b92'|'b58'|'g64'|'z32'|'c32'|'n32':
+            algo = BASEXXNS.get(algo,algo)
+            if isinstance(BASEXX_DEC[algo],str): BASEXX_DEC[algo] = BaseXX(BASEXX_DEC[algo])
+            if isinstance(i,bytes): i = i.decode('latin-1')
+            r = BASEXX_DEC[algo].decode(i)
+            if kwargs.get('bytes',True): return r
+            return r.decode('latin-1')
+        case 'basexx'|'bxx':
+            asrt(isinstance(key,str),err=TypeError)
+            if key not in BASEXX_DEC: BASEXX_DEC[key] = BaseXX(key)
+            if isinstance(i,bytes): i = i.decode('latin-1')
+            r = BASEXX_DEC[key].decode(i)
+            if kwargs.get('bytes',True): return r
+            return r.decode('latin-1')
         case 'uu'|'uue'|'uuencode'|'uuencoded':
             if isinstance(i,str): i = i.encode('latin-1')
             import binascii
@@ -324,15 +357,65 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return r if kwargs.get('bytes',False) else r.encode('ascii')
         case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|\
              'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
-            algo = BASEXX_MAP.get(algo,algo)
+            algo = BASEXXNS.get(algo,algo)
             import base64
             r = getattr(base64,algo + 'encode')(i)
             return r if kwargs.get('bytes',True) else r.decode('latin-1')
+        case 'base92'|'base58'|'gamespy64'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|\
+             'b92'|'b58'|'g64'|'z32'|'c32'|'n32':
+            algo = BASEXXNS.get(algo,algo)
+            if isinstance(BASEXX_DEC[algo],str): BASEXX_DEC[algo] = BaseXX(BASEXX_DEC[algo])
+            if isinstance(i,str): i = i.encode('latin-1')
+            r = BASEXX_DEC[algo].encode(i)
+            if kwargs.get('bytes',True): return r.encode('latin-1')
+            return r
+        case 'basexx'|'bxx':
+            asrt(isinstance(key,str),err=TypeError)
+            if key not in BASEXX_DEC: BASEXX_DEC[key] = BaseXX(key)
+            if isinstance(i,str): i = i.encode('latin-1')
+            r = BASEXX_DEC[key].encode(i)
+            if kwargs.get('bytes',True): return r.encode('latin-1')
+            return r
         case 'url'|'urldecode'|'urlencode':
             from urllib.parse import quote,quote_from_bytes
 
             r = (quote_from_bytes if isinstance(i,bytes) else quote)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
             return r.encode('utf-8') if kwargs.get('bytes',False) else r
+class BaseXX:
+    def __init__(self,alphabet:str):
+        asrt(len(alphabet) > 1 and len(set(alphabet)) == len(alphabet))
+        self.alpha = alphabet
+        self.base = len(alphabet)
+        self.null = alphabet[0]
+        self.lookup = {c:i for i,c in enumerate(alphabet)}
+
+    def encode(self,d:bytes):
+        if not d: return ""
+
+        zc = 0
+        for b in d:
+            if b != 0: break
+            zc += 1
+
+        n = int.from_bytes(d,'big')
+        r = []
+        while n:
+            n,rem = divmod(n,self.base)
+            r.append(self.alpha[rem])
+        r.extend([self.null] * zc)
+        return ''.join(reversed(r))
+    def decode(self,s:str):
+        if not s: return b""
+
+        zc = 0
+        for c in s:
+            if c != self.null: break
+            zc += 1
+
+        n = 0
+        for c in s: n = n * self.base + self.lookup[c]
+        if n: r = n.to_bytes((n.bit_length() + 7) // 8,'big')
+        return (b'\0' * zc) + r
 
 CRC_LUT = {}
 def crc(i:bytes,size:int,poly:int,init:int,xor:int,reflect:bool,value:int=None) -> int:

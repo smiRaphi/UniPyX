@@ -599,5 +599,162 @@ def extract4_5(inp:str,out:str,t:str):
 
             fd.close()
             if fs: return
+        case 'Sengoku Basara 2 Compressed'|'Capcom YZ2 Compressed':
+            db.try_custom()
+            from lib.file import decompress
+            d = readfile(i)
+
+            h,d = d[:0x20].split(b'\n')[0],d[0x20:]
+            zs,us = int(h.split(b'\t')[0],16),int(h.split(b'\t')[1],16)
+            if t == 'Sengoku Basara YZ2 Compressed': d = decompress(d[:zs + 4],'capcom_yz2',usize=us)
+            else: d = decompress(d[:zs],'lzo1x',usize=us,db=db)
+            asrt(len(d) == us)
+            writefile(o + '/' + basename(i),d)
+            return
+        case 'Bandai PIDX':
+            db.try_custom()
+            from lib.crypto import decrypt
+            from lib.file import File,decompress
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'PIDX')
+
+            dno,dnc = f.readu32(),f.readu32()
+            tof,ttc,trc = f.readu32(),f.readu32(),f.readu32()
+            t2o = f.readu32();f.skip(4)
+            sof = f.readu32()
+
+            f.seek(dno)
+            dns = []
+            for _ in range(dnc):
+                dns.append(f.readu32())
+                f.padc(12);f.skip(0x10)
+
+            dns = {x:f.seekc(x + sof).read0s('ascii').lower() for x in dns}
+            fds = {}
+            id = dirname(i)
+            for k,v in dns.items():
+                if exists(id + '/' + v): fds[k] = f if v == basename(i).lower() else File(id + '/' + v,endian=f._end)
+                else: fds[k] = None
+            if all(x is None for x in fds.values()):
+                asrt(len(fds) == 1,"Couldn't find any data files and data file count is over 1, so won't use base file")
+                fds[list(fds)[0]] = f
+            if any(x is None for x in fds.values()): print('WARNING: Some data files not found')
+
+            f.seek(tof)
+            tfs = [(f.readu32(),f.readu32() + sof,f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(ttc)]
+
+            fs = []
+            def readd(of:int,c:int,p:str):
+                mkdir(p)
+                for ix in range(c):
+                    fe = tfs[of + ix]
+                    f.seek(fe[1])
+                    n = f.read0s('ascii')
+                    if fe[0] == 1: readd(fe[3],fe[2],p + '/' + n)
+                    elif fe[0] == 0: fs.append((p + '/' + n,fe[3],fe[4],fe[5]))
+                    else: raise NotImplementedError(f'{fe} @ 0x{tof+(of+ix)*0x18:08X}')
+            readd(0,trc,o)
+
+            f.seek(t2o)
+            t2c = f.readu32()
+            tos = [f.readu32() + t2o for _ in range(t2c)]
+            tfs = []
+            for of in tos:
+                f.seek(of)
+                tfs.append((f.readu32() + sof,f.readu32(),f.readu32())) # name off, data name off, fsts off
+                # u32: fsts size, u32: ?
+
+            hfst = False
+            for fe in tfs:
+                if fds[fe[1]] is None: continue
+                p = f.seekc(fe[0]).read0s('ascii')
+                hfst = True
+                fd = fds[fe[1]]
+                fd.seek(fe[2])
+
+                asrt(fd.read(4) == b'FSTS')
+                c,to,so = fd.readu32(),fd.readu32() + fe[2],fd.readu32() + fe[2]
+                # u32: strings size
+                fd.seek(to)
+                fsts = [(fd.readu32() + so,fd.readu32() + fe[2],fd.readu32(),fd.readu32()) for _ in range(c)]
+
+                for fse in fsts:
+                    n = o + '/' + fd.seekc(fse[0]).read0s('ascii')
+                    n = dirname(n) + '/' + p + '/' + basename(n)
+                    fd.seek(fse[1])
+                    asrt(fse[3] > 8)
+
+                    key = fd.readu8() ^ 0x52;fd.back(1)
+                    asrt(decrypt(fd.read(3),'xor',key) == b'RAI')
+                    isnz = fd.readu8() ^ key
+                    asrt((isnz & 0xFFFFFFFE) == 0x42)
+                    asrt(fd.readu32() == fse[2])
+                    if not isnz & 1: asrt(fse[2] == (fse[3] - 8))
+                    writefile(n,decompress(decrypt(fd.readc(fse[3] - 8),'xor',key),'lzss0' if isnz & 1 else 'none',usize=fse[2]))
+
+            for fe in fs:
+                if fds[fe[1]] is None: continue
+                fd = fds[fe[3]]
+                fd.seek(fe[1])
+                writefile(fe[0],fd.readc(fe[2]))
+
+            for v in fds.values():
+                if v is not None: v.close()
+            if not f.closed: f.close()
+            if fs or hfst: return
+        case 'Remedy Archive System':
+            db.try_custom()
+            from lib.crypto import decrypt
+            from lib.file import File
+            fd = File(i,endian='<')
+            asrt(fd.read(4) == b'RAS\0')
+
+            key = fd.readu32()
+            f = File(decrypt(fd.readc(0x20),'remedy_ras',key),endian=fd._end)
+            fc,dc,isz,fsz = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            v = f.readf32()
+            f.skip(12)
+            del f
+            if v >= 1.2: fd.skip(4)
+
+            id = decrypt(fd.readc(isz),'remedy_ras',key)
+            fdd = decrypt(fd.readc(fsz),'remedy_ras',key)
+            if v >= 1.3:
+                asrt(fdd[-1] == 0)
+                fds = fdd[:-1].decode('ascii').split('\0')
+                asrt(len(fds) == dc)
+            else:
+                f = File(fdd,endian=fd._end)
+                fds = []
+                for _ in range(dc):
+                    fds.append(f.read0s('ascii'))
+                    f.skip(0x10)
+                del f
+            del fdd
+            fds = [o + '/' + x.strip('/\\') for x in fds]
+            for p in fds: mkdir(p)
+
+            f = File(id,endian=fd._end)
+            for _ in range(fc):
+                n = f.read0s('ascii')
+                s = f.readu32()
+                if v >= 1.3:
+                    fd.seek(f.readu32())
+                    writefile(fds[f.readu32()] + '/' + n,fd.readc(s))
+                else:
+                    zs = f.readu32()
+                    f.skip(4)
+                    n = fds[f.readu32()] + '/' + n
+                    f.skip(0x18)
+                    if zs == s: writefile(n,fd.readc(s))
+                    else:
+                        asrt(fd.read(4) == b'RA->')
+                        s2,zs2 = f.readu32(),f.readu32()
+                        asrt(s == s2 and zs == (zs + 12))
+                        asrt(writefile(n,fd.decompress(zs2,'lzss0',usize=s2)) == s2,n)
+            del f,id
+
+            fd.close()
+            if fc: return
 
     return 1

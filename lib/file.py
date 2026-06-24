@@ -60,6 +60,10 @@ class File:
             n += self.size
             if n < 0: n = 0
         return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
+    def seekc(self,n:int):
+        """Seek concat, usable in list comprehensions"""
+        self.seek(n)
+        return self
     def tell(self) -> int: return self._f.tell() - self._start_pos
     def close(self):
         self._end_pos = self.pos
@@ -91,7 +95,7 @@ class File:
         return bytes(o)
     def readall(self):
         self.seek(0)
-        return self.read(self.size or None)
+        return self.read(None)
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -826,6 +830,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                     except OSError: raise ValueError('Failed to decompress')
                     finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
                 else: raise ValueError(f'Invalid mode {i[3]:02X}')
+        case 'capcom_yz2': return uxx().decompress_capcom_yz2(i,kwargs['usize'])
         case 'anaconda_deflate': pass#return ananconda_decompress(i)
         case 'anaconda_zlib':
             if i[1] & 0x20: i = i[6:]

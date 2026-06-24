@@ -18,7 +18,7 @@ def compile(quiet=False):
         from setuptools import msvc
         env |= {x.upper():v for x,v in msvc.EnvironmentInfo('x64' if sys.maxsize > 2**32 else 'x86').return_env().items()}
         cmd = ['/Ox','/GS-','/GR-','/Gs999999','/LD','/TC',__file__,f'/Fe:{DLLP}','/link','/MANIFEST:NO','/MERGE:.rdata=.text','/OPT:REF','/OPT:ICF','/ALIGN:16','/ENTRY:DllMain',
-               'vcruntime.lib']
+               'vcruntime.lib','ucrt.lib']
         for p in env['PATH'].split(';'):
             if os.path.exists(p + '/cl.exe') and os.path.isfile(p + '/cl.exe'): cc = p + '/cl.exe';break
     if cc is None: raise ValueError('No C compiler found')
@@ -55,6 +55,7 @@ def _1base_func(fnc,src,usize):
     i = (u8 * len(src)).from_buffer_copy(src)
     o = (u8 * usize)()
     r = fnc(i,len(src),o,usize)
+    if r < 0: raise RuntimeError(f'Decompression failed ({r})')
     return bytes(o)[:r]
 def _2base_func(fnc,src,key):
     i = (u8 * len(src)).from_buffer_copy(src)
@@ -109,6 +110,7 @@ class X:
             ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
             ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
@@ -129,6 +131,7 @@ class X:
             ('init_selene',(P(u8),P(u8),szt,u32),void,0),
             ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2.1),
+            ('decrypt_remedy_ras',(P(u8),szt,u32),void,0),
             ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
@@ -173,7 +176,8 @@ class X:
     def decompress_rtl_lz(src:bytes,usize:int) -> bytes: ...
     def decompress_vicious_lz(src:bytes,usize:int) -> bytes: ...
     def decompress_graw_bpe(src:bytes,usize:int) -> bytes: ...
-
+    def decompress_capcom_yz2(src:bytes,usize:int) -> bytes: ...
+    
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * usize)()
@@ -302,6 +306,10 @@ class X:
         k = (u8 * len(key)).from_buffer_copy(key)
         self.dll.decrypt_rc4_playpond(b,len(src),k,len(key),drop)
         return bytes(b)
+    def decrypt_remedy_ras(self,src:bytes,key:int) -> bytes:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_remedy_ras(b,len(src),key)
+        return bytes(b)
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)
         i = (u8 * len(src)).from_buffer_copy(src)
@@ -337,6 +345,7 @@ class X:
 '''*/
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef _WIN32
     #define EXPORT __declspec(dllexport)
@@ -1148,6 +1157,240 @@ EXPORT ssize_t decompress_graw_bpe(const uint8_t *restrict src, const size_t zsi
 }
 
 typedef struct {
+    const uint8_t *src;
+    size_t s;
+    size_t p;
+    uint8_t eofc;
+    size_t full;
+    size_t shift;
+    uint32_t w;
+    uint32_t v;
+} YZRange;
+static inline void init_YZRange(YZRange *restrict r, const uint8_t *restrict src, const size_t size, const size_t full, const size_t shift) {
+    r->src = src;
+    r->s = size;
+    r->p = 1;
+    r->eofc = 0;
+    r->full = full;
+    r->shift = shift;
+    r->w = 0x80;
+    r->v = src[0];
+}
+static inline uint16_t get_YZRange(YZRange *restrict r) {
+    while (r->w <= (r->full >> 8)) {
+        r->v <<= 8;
+        if (r->p < r->s) r->v |= r->src[r->p++];
+        else if (++r->eofc > 4) return -1;
+        r->w <<= 8;
+    }
+    r->w >>= r->shift - 1;
+    return (uint16_t)(r->v / r->w);
+}
+static inline void update_YZRange(YZRange *restrict r, const uint16_t w, const uint16_t v) {
+    r->v -= r->w * v;
+    r->w *= w;
+    r->w >>= 1;
+}
+typedef struct {
+    size_t size;
+    size_t shift;
+    uint16_t *ccnt;
+    uint16_t *orngw;
+    uint16_t *orngv;
+    uint32_t sum;
+    size_t bit;
+    uint32_t cp;
+    uint8_t flg;
+    uint16_t *decs;
+} YZFreqs;
+static int8_t init_YZFreqs(YZFreqs *restrict f, const size_t size, const size_t shift) {
+    f->size = size;
+    f->shift = shift;
+
+    f->ccnt = (uint16_t *)calloc(size, sizeof(uint16_t));
+    if (!f->ccnt) return -1;
+    f->orngw = (uint16_t *)malloc(size * sizeof(uint16_t));
+    if (!f->orngw) return -1;
+    f->orngv = (uint16_t *)malloc(size * sizeof(uint16_t));
+    if (!f->orngv) return -1;
+    f->decs = (uint16_t *)calloc(1 << shift, sizeof(uint16_t));
+    if (!f->decs) return -1;
+
+    size_t ix = 0;
+    for (size_t i=0;i < (1 << shift);i++) {
+        f->ccnt[ix]++;
+        if (++ix >= size) ix = 0;
+    }
+
+    uint16_t sum = 0;
+    for (size_t i=0;i < size;i++) {
+        f->orngw[i] = f->ccnt[i];
+        f->orngv[i] = sum;
+        sum += f->ccnt[i];
+    }
+
+    for (size_t i=0;i < size;i++) f->ccnt[i] = 1;
+    f->sum = size;
+    f->bit = 0;
+    for (;f->bit < shift && f->sum >= (1 << f->bit);f->bit++) {};
+    f->cp = 1 << f->bit;
+    f->flg = 0;
+
+    return 0;
+}
+static void update_YZFreqs(YZFreqs *restrict f, const uint16_t c) {
+    f->ccnt[c]++;
+    f->sum++;
+
+    if (f->shift > f->bit) {
+        if (f->sum == f->cp) {
+            uint16_t sum = 0;
+            uint16_t x = 1 << (f->shift - f->bit);
+            for (size_t i=0;i < f->size;i++) {
+                f->orngw[i] = f->ccnt[i] * x;
+                f->orngv[i] = sum;
+                sum += f->orngw[i];
+            }
+            f->bit++;
+            f->cp = 1 << f->bit;
+            f->flg = 0;
+        }
+    } else {
+        if (f->sum >= (1 << f->shift)) {
+            uint16_t sum = 0;
+            f->sum = 0;
+            for (size_t i=0;i < f->size;i++) {
+                f->orngw[i] = f->ccnt[i];
+                f->orngv[i] = sum;
+                sum += f->orngw[i];
+
+                uint16_t c = f->ccnt[i] >> 1;
+                f->ccnt[i] = (c == 0) ? 1 : c;
+                f->sum += f->ccnt[i];
+            }
+            f->flg = 0;
+        }
+    }
+}
+static inline uint16_t get_YZFreqs(YZFreqs *restrict f, YZRange *restrict r) {
+    uint16_t pos = get_YZRange(r);
+    if (r->eofc > 4) return -1;
+
+    if (!f->flg) {
+        size_t j=0;
+        for (size_t i=0;i < f->size;i++)
+            for (;j < (f->orngv[i] + f->orngw[i]);j++)
+                f->decs[j] = (uint16_t)i;
+        f->flg = 1;
+    }
+
+    uint16_t c = f->decs[pos];
+    update_YZRange(r, f->orngw[c], f->orngv[c]);
+    update_YZFreqs(f, c);
+    return c;
+}
+typedef struct {
+    uint16_t c;
+    size_t *off;
+    uint32_t *len;
+} YZDictE;
+typedef struct {
+    YZRange rng;
+    YZFreqs fqc;
+    YZFreqs fql;
+    YZDictE *dict;
+} YZ2;
+static inline void free_YZ2(YZ2 *restrict y2, const uint16_t dicts) {
+    if (y2->dict) {
+        for (uint16_t i=0;i < dicts;i++) {
+            if (y2->dict[i].off) free(y2->dict[i].off);
+            if (y2->dict[i].len) free(y2->dict[i].len);
+        }
+        free(y2->dict);
+    }
+    if (y2->fqc.ccnt) free(y2->fqc.ccnt);
+    if (y2->fqc.orngw) free(y2->fqc.orngw);
+    if (y2->fqc.orngv) free(y2->fqc.orngv);
+    if (y2->fqc.decs) free(y2->fqc.decs);
+    if (y2->fql.ccnt) free(y2->fql.ccnt);
+    if (y2->fql.orngw) free(y2->fql.orngw);
+    if (y2->fql.orngv) free(y2->fql.orngv);
+    if (y2->fql.decs) free(y2->fql.decs);
+}
+EXPORT ssize_t decompress_capcom_yz2(const uint8_t *restrict src, const size_t zsize,
+                                           uint8_t *restrict dst, const ssize_t usize) {
+    ssize_t op = -1;
+    YZ2 y2;
+    init_YZRange(&y2.rng, src, zsize, 0x80000000, 15);
+    y2.dict = (YZDictE *)calloc(0x100,sizeof(YZDictE));
+    if (!y2.dict) goto eof;
+    for (uint16_t i=0;i < 0x100;i++) {
+        y2.dict[i].off = (size_t *)calloc(0x200,sizeof(size_t));
+        if (!y2.dict[i].off) goto eof;
+        y2.dict[i].len = (uint32_t *)calloc(0x200,sizeof(uint32_t));
+        if (!y2.dict[i].len) goto eof;
+    }
+
+    if ((op = init_YZFreqs(&y2.fqc, 0x500, 15)) < 0) goto eof;
+    if ((op = init_YZFreqs(&y2.fql, 0x100, 15)) < 0) goto eof;
+
+    size_t kp = 0;
+    op = 0;
+    while (op < usize || usize == -1) {
+        uint16_t c = get_YZFreqs(&y2.fqc, &y2.rng);
+        if (y2.rng.eofc > 4) break;
+        size_t s = 1;
+
+        if (c >= 0x400) dst[op++] = (uint8_t)(c - 0x400);
+        else {
+            if (op == 0) {
+                op = -1;
+                break;
+            }
+            uint32_t moto;
+            if (c < 0x200) {
+                uint16_t rtn = get_YZFreqs(&y2.fql, &y2.rng);
+                if (y2.rng.eofc > 4) break;
+                s = 0;
+                switch (rtn) {
+                    case 0: s |= (uint32_t)get_YZFreqs(&y2.fql, &y2.rng) << 24;
+                    case 1: s |= (uint32_t)get_YZFreqs(&y2.fql, &y2.rng) << 16;
+                    case 2: s |= (uint32_t)get_YZFreqs(&y2.fql, &y2.rng) << 8;s |= (uint32_t)get_YZFreqs(&y2.fql, &y2.rng);break;
+                    default: s = rtn;
+                }
+                if (y2.rng.eofc > 4) break;
+                s = s - 3 + 2;
+
+                uint8_t key = dst[kp];
+                moto = y2.dict[key].off[(c + y2.dict[key].c) % 0x200];
+            } else {
+                uint8_t key = dst[kp];
+                uint16_t cnt = y2.dict[key].c;
+                s = y2.dict[key].len[(c + cnt) % 0x200];
+                moto = y2.dict[key].off[((uint16_t)(c - 0x200) + cnt) % 0x200];
+            }
+
+            if (moto > op) moto = op;
+            if (op + s > usize) s = usize - op;
+            for (size_t i=0;i < s;i++) dst[op++] = dst[moto++];
+        }
+
+        if (kp < op - 1) {
+            uint8_t key = dst[kp];
+            uint16_t cnt = y2.dict[key].c;
+            y2.dict[key].off[cnt] = kp + 1;
+            y2.dict[key].len[cnt] = (uint32_t)s;
+            y2.dict[key].c = (cnt + 1) % 0x200;
+            kp = op - 1;
+        }
+    }
+
+eof:
+    free_YZ2(&y2, 0x100);
+    return op;
+}
+
+typedef struct {
     int16_t ls[0x4EA];
     int16_t rs[0x4EA];
     int16_t par[0x4EA];
@@ -1565,6 +1808,18 @@ EXPORT void decrypt_zipcrypto(uint8_t *restrict buf, const size_t size, const ui
 
     #undef crc32
     #undef mix
+}
+EXPORT void decrypt_remedy_ras(uint8_t *restrict buf, const size_t size, const uint32_t key) {
+    int32_t tmp1 = key;
+    if (!tmp1) tmp1 = 1;
+    uint8_t tmp2 = 0x12;
+
+    for (size_t p=0;p < size;p++) {
+        tmp1 = -2 * (tmp1 / 177) + 171 * (tmp1 % 177);
+        uint8_t b = ((buf[p] << p % 5) | (buf[p] >> (8 - p % 5))) ^ tmp2;
+        tmp2 += 6;
+        buf[p] = (uint8_t)(b + tmp1);
+    }
 }
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {

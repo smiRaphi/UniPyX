@@ -1525,6 +1525,18 @@
         "rs":"Six Guns Encrypted Save","s":1
     },
     {
+        "d":[["isatS","\\0",8,24],["isatS","\\0",4,-4],["contain","\\t",[1,11]],["contain","\\n\\0",[3,21]],["py","d,p=f.read(32).split(b'\\n')\nif sum(p)or not b'\\t' in d:return\ntry:z,u=int(d.split(b'\\t')[0],16)+4,int(d.split(b'\\t')[1],16)\nexcept:return\nreturn u>z and (z+32)==fsz"]],
+        "rs":"Capcom YZ2 Compressed"
+    },
+    {
+        "d":[["isatS","\\0",8,24],["contain","\\t",[1,11]],["contain","\\n\\0",[3,21]],["py","d,p=f.read(32).split(b'\\n')\nif sum(p)or not b'\\t' in d:return\ntry:z,u=int(d.split(b'\\t')[0],16),int(d.split(b'\\t')[1],16)\nexcept:return\nreturn u>z and (z+32)==fsz"]],
+        "rs":"Sengoku Basara 2 Compressed"
+    },
+    {
+        "d":[["isat","PIDX\\x30\\0\\0\\0",0],["isatS","\\0",24,40],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,32],["n0",4,36],["n0",16,64],["py","f.seek(4);hs=f.readi(4,'<')+f.readi(4,'<')*32\nif hs!=f.readi(4,'<'):return\nc=f.readi(4,'<')\nif c<f.readi(4,'<'):return\nuo=f.readi(4,'<');return (hs+c*24)==uo and(uo+f.readi(4,'<'))==f.readi(4,'<')"]],
+        "rs":"Bandai PIDX","s":1
+    },
+    {
         "d":[["s%",2048],["isat","\\0\\1\\0\\0",16],["isatS","\\xFF",4,0],["isatS","\\0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(8);f.seek(f.readi(4,'<')-1);return f.read(4)==b'SSCN'"]],
         "rs":"Blood Will Tell Osamu Tezuka's Dororo LBI","s":1
     },
