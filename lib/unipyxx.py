@@ -53,7 +53,7 @@ P = ctypes.POINTER
 
 def _1base_func(fnc,src,usize):
     i = (u8 * len(src)).from_buffer_copy(src)
-    o = (u8 * usize)()
+    o = (u8 * ((len(src)*10) if usize == -1 else usize))()
     r = fnc(i,len(src),o,usize)
     if r < 0: raise RuntimeError(f'Decompression failed ({r})')
     return bytes(o)[:r]
@@ -85,7 +85,7 @@ from hashlib import md5
 from zlib import crc32
 
 class X:
-    MMFS = {};SELENE = {}
+    MMFS = {};SELENE = {};EMPIRE_MAGIC = None
     def __init__(self):
         if not os.path.exists(DLLP): raise FileNotFoundError
         d = open(DLLP,'rb')
@@ -110,6 +110,7 @@ class X:
             ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lzrw1kh',  (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -132,6 +133,8 @@ class X:
             ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2.1),
             ('decrypt_remedy_ras',(P(u8),szt,u32),void,0),
+            ('init_empire_magic',(P(u8),),void,0),
+            ('decrypt_empire_magic',(P(u8),szt,P(u8),szt,P(u8),u32),void,0),
             ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
@@ -147,6 +150,7 @@ class X:
             ('hash_murmur2_64A_be',(P(u8),szt,u32),u64,5),
             ('hash_murmur2_64B_le',(P(u8),szt,u32),u64,5),
             ('hash_murmur2_64B_be',(P(u8),szt,u32),u64,5),
+            ('hash_empire_magic',(P(u8),szt,s8),u32,0),
             ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
         ):
             fnc = self.dll[e[0]]
@@ -310,6 +314,16 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_remedy_ras(b,len(src),key)
         return bytes(b)
+    def decrypt_empire_magic(self,src:bytes,key:bytes,key_end:bool=False) -> bytes:
+        if self.EMPIRE_MAGIC is None:
+            tb = (u8 * 0x400)()
+            self.dll.init_empire_magic(tb)
+            self.EMPIRE_MAGIC = tb
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_empire_magic(b,len(src),k,len(key),self.EMPIRE_MAGIC,self.hash_empire_magic(key,key_end))
+        return bytes(b)
+        
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)
         i = (u8 * len(src)).from_buffer_copy(src)
@@ -333,6 +347,9 @@ class X:
     def hash_murmur2_64A_be(self,src:bytes,seed:int) -> int: ...
     def hash_murmur2_64B_le(self,src:bytes,seed:int) -> int: ...
     def hash_murmur2_64B_be(self,src:bytes,seed:int) -> int: ...
+    def hash_empire_magic(self,src:bytes,end:bool=False) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_empire_magic(b,len(src),1 if end else 0)
     def mac_cmac_tfit(self,src:bytes,key:bytes,table:bytes) -> bytes:
         asrt(len(key) == 4*4*13 and len(table) == 4*0x100*0x10*13)
         s = (u8 * len(src)).from_buffer_copy(src)
@@ -1155,6 +1172,53 @@ EXPORT ssize_t decompress_graw_bpe(const uint8_t *restrict src, const size_t zsi
 
     return op;
 }
+EXPORT ssize_t decompress_lzrw1kh(const uint8_t *restrict src, const size_t zsize,
+                                        uint8_t *restrict dst, const ssize_t usize) {
+    if (zsize == 0) return 0;
+    if (src[0] == 0x80) {
+        size_t size = zsize - 1;
+        if (usize != -1 && usize < size) size = usize;
+        memcpy(dst, src + 1, size);
+        return size;
+    }
+
+    size_t ip = 3;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    ssize_t op = 0;
+    uint16_t cmd = read16le(src + 1);
+    uint8_t bits = 0x10;
+    while (ip < zsize && (op < usize || usize == -1)) {
+        if (!bits) {
+            CHKi(1)
+            cmd = read16le(src + ip);ip += 2;
+            bits = 0x10;
+        }
+        if (cmd & 0x8000) {
+            CHKi(1)
+            uint16_t dist = (src[ip++] << 4) | (src[ip] >> 4);
+            if (dist) {
+                uint8_t len = (src[ip++] & 0xF) + 3;
+                if (op + len > usize) len = usize - op;
+                for (uint8_t i=0;i < len;i++,op++) dst[op] = dst[op - dist];
+            } else {
+                CHKi(2)
+                uint16_t len = read16le(src + ip) + 0x10;ip += 2;
+                if (op + len > usize) len = usize - op;
+                for (uint16_t i=0;i < len;i++) dst[op++] = src[ip];
+                ip++;
+            }
+        } else {
+            CHKi(0)
+            dst[op++] = src[ip++];
+        }
+        cmd <<= 1;
+        bits--;
+    }
+
+eof:
+    #undef CHKi
+    return op;
+}
 
 typedef struct {
     const uint8_t *src;
@@ -1821,6 +1885,21 @@ EXPORT void decrypt_remedy_ras(uint8_t *restrict buf, const size_t size, const u
         buf[p] = (uint8_t)(b + tmp1);
     }
 }
+EXPORT void init_empire_magic(uint8_t *restrict buf) {
+    uint64_t seed = 0x8647d59f;
+    uint32_t state = 0;
+    for (uint16_t i=0;i < 0x400;i++) {
+        uint64_t prod = seed * 0x4e35;
+        state = (((uint32_t)prod == 0xFFFFFFFF) | ((uint32_t)seed * 0x15a)) + (uint32_t)(prod >> 32) + state * 0x4e35;
+        buf[i] = (uint8_t)state;
+        seed = (uint32_t)prod + 1;
+    }
+}
+EXPORT void decrypt_empire_magic(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize,
+                           const uint8_t *restrict table, const uint32_t offset) {
+    for (size_t p=0;p < size;p++)
+        buf[p] = (buf[p] + 1 + key[p % ksize]) ^ table[(offset + p) % 0x3cb];
+}
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
     return t[0x100 * x + buf[x]];
@@ -2286,6 +2365,16 @@ EXPORT uint64_t hash_murmur2_64B_be(const uint8_t *restrict src, const size_t si
 
     uint64_t h = h1;
     return (h << 32) | h2;
+}
+EXPORT uint32_t hash_empire_magic(const uint8_t *restrict src, const size_t size, const int8_t end) {
+    uint32_t h = size * 0x1EEF;
+
+    uint8_t ss = (size < 4) ? size : 4;
+    size_t off = end ? (size - ss) : 0;
+    for (uint8_t i=0;i < ss;i++) h += src[off + i] << (24 - i*8);
+    for (size_t p=0;p < size;p++) h += src[p] * 0x2F;
+
+    return h % 0x3CB;
 }
 
 #ifdef __cplusplus

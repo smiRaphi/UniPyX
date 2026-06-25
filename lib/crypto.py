@@ -279,8 +279,11 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,bytes): key = int.from_bytes(key,'little')
             asrt(isinstance(key,int),err=TypeError)
             return uxx().decrypt_remedy_ras(i,key)
-        case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
+        case 'empire_magic':
+            asrt(isinstance(key,bytes),err=TypeError)
+            return uxx().decrypt_empire_magic(i,key,kwargs.get('key_end',False))
 
+        case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)
         case 'base64url'|'b64url':
             from urllib.parse import unquote_to_bytes
@@ -788,6 +791,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             import zlib
             return (len(i) << 32) | zlib.crc32(i,kwargs.get('value') or 0)
         case 'pivotal': fnc = uxx().hash_pivotal
+        case 'empire_magic': fnc = uxx().hash_empire_magic
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
 
@@ -825,6 +829,7 @@ HASHTS = {
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
     'tarzan':4,'luas':4,'sxm':8,'slf':4,'hash40':5,'pivotal':4,'java':4,
+    'empire_magic':2,
 }
 from .pyob import PyOBin,PyOFunc
 class HashLib(PyOBin):

@@ -766,5 +766,25 @@ def extract4_5(inp:str,out:str,t:str):
             writefile(o + '/' + basename(i),f.decompress(zs,'zlib',usize=us))
             f.close()
             return
+        case 'Empire of Magic DAT':
+            db.try_custom()
+            from lib.crypto import decrypt
+            from lib.file import File
+
+            k = basename(i).lower().encode('ascii')
+            d = decrypt(readfile(i,size=4),'empire_magic',k)
+            asrt(d == b'DATA')
+            f = File(decrypt(readfile(i),'empire_magic',k),endian='<')
+            f.seek(4)
+
+            c = f.readu32()
+            f.padc(8)
+            fs = [(0x10 + c*0x28 + f.readu32(),f.readu32(),f.reads(0x20,'ascii').rstrip('\0')) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[0])
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
+
+            del f
+            if fs: return
 
     return 1

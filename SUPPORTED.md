@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 999
+# Supported Formats: 1001
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -225,7 +225,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (124)
+## Executables/Packers/Installers (125)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -261,6 +261,7 @@ com2txt | .txt | [COM2TXT](https://www.sac.sk/download/utilprog/com2t111.rar) |
 COMPACK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Compress-EXE | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Compressed Nintendo Switch Executable | .nso | [nsnsotool](https://github.com/0CBH0/nsnsotool) |
+Concatinated C Code | .c .h | Custom | similar implementation as SHAR, missing more samples
 Cruncher | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 CryptPE | .exe | Custom |
 CryptPE BinTable.h | .h | Custom |
@@ -354,7 +355,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (537)
+## Various (538)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -512,6 +513,7 @@ Earth And Beyond MIX | .mix | [Game Extractor Server](https://github.com/Sembian
 EBAB Animation Data | .ebab | Custom |
 Electronic Arts LIB | .lib | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Empire Earth 1 SSA | .ssa | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Empire of Magic DAT | .dat | Custom |
 Encrypted Arsenal MTC+MDF | .mtc+.mdf | Custom |
 Endless Interactive IN1+DBB | .in1+.dbb | Custom |
 Endless Interactive IN2+DBB | .in2+.dbb | Custom | holy shit I hate quicktime

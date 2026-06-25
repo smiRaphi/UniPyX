@@ -1866,5 +1866,17 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 print(obs)
                 #writefile(f'{o}/{tbasename(i)}.cht','\n'.join(obs),'w')
                 #return
+        case 'Concatinated C Code':
+            db.try_custom()
+            import re
+            d = readfile(i,'rt')
+
+            for r in ((r'(?s)_{69}\n\n([^\s]{3,})[^\n]*\n_{69}\n+(.+?)(?=\n_{69}\n\n|\x1A|$)',0,1),):
+                pm = re.findall(r[0],d)
+                if pm:
+                    for m in pm: writefile(o + '/' + m[r[1]],m[r[2]],'wt')
+                    break
+            else: return 1
+            return
 
     return 1

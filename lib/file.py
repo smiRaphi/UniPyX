@@ -500,6 +500,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import lz4.frame
             return lz4.frame.decompress(i)
         case 'lz4_fast': return uxx().decompress_lz4_fast(i,usize=kwargs['usize'])
+        case 'lzrw1kh': return uxx().decompress_lzrw1kh(i,usize=kwargs['usize'])
 
         case 'lzo'|'lzo1x'|'lzo1y':
             if 'db' in kwargs: kwargs['db'].get('lzo')

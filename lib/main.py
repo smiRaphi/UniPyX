@@ -333,7 +333,10 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             idt = f.read(0x4000)
             f.close()
             isz = sum(idt) != 0
-            try: assert idt.decode('utf-8').replace('\r','').replace('\n','').replace('\t','').isprintable()
+            try:
+                ttxt = idt.decode('utf-8')
+                if ttxt.endswith('\x1A') and len(idt) < 0x4000: ttxt = ttxt[:-1]
+                assert ttxt.replace('\r','').replace('\n','').replace('\t','').isprintable()
             except: typ = 'binary'
             else:
                 if isz: typ = 'text'
@@ -551,10 +554,12 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                     else: ret = (x[1][0] == None or fsz >= x[1][0]) and (x[1][1] == None or fsz <= x[1][1])
                 elif x[0] == 's%': ret = fsz % x[1] == 0
                 elif x[0] == 'hash':
-                    hs = x[1].lower()
-                    if len(hs) == 40: h = hashlib.sha1
-                    elif len(hs) == 32: h = hashlib.md5
-                    elif len(hs) == 64: h = hashlib.sha256
+                    if isinstance(x[1],str): hs = [x[1]]
+                    else: hs = x[1]
+                    hs = [h.lower() for h in hs]
+                    if len(hs[0]) == 40: h = hashlib.sha1
+                    elif len(hs[0]) == 32: h = hashlib.md5
+                    elif len(hs[0]) == 64: h = hashlib.sha256
                     h = h()
 
                     if len(x) > 3: mn,mx = x[2],x[3]
@@ -569,7 +574,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                         if not cv: break
                         h.update(cv)
                         c -= len(cv)
-                    ret = h.hexdigest() == hs
+                    ret = h.hexdigest() in hs
                 elif x[0] == 'str0e':
                     sp = x[1]
                     if sp < 0: sp = fsz + sp

@@ -557,6 +557,10 @@
         "rs":"Donkey Kong Banana Kingdom","s":1
     },
     {
+        "d":[["ext",".dat"],["py","DB={'graphics.dat':'49ca1bf2','globals.dat':'a112840b','scenario.dat':'89556e49','sounds.dat':'48dfccb5'};c=DB.get(basename(inp).lower());return c==f.read(4).hex()"]],
+        "rs":"Empire of Magic DAT"
+    },
+    {
         "rqr":null,
         "d":["contain","\\x01CD001\\x01\\0",[32769,255]],
         "rs":"Shifted ISO"
@@ -2699,6 +2703,11 @@
     {
         "d":[["size",[4096,134215680]],["namei","dirinfo"],["isat","\\0",17],["isat","\\0",19],["str0e",0,18,5],["n0",2,18],["n0",4,20],["str0e",24,18,5],["n0",2,42],["n0",4,44]],
         "rs":"Destruction Derby 2 DirInfo"
+    },
+    {
+        "t":"text",
+        "d":[["contain","I'll post them here separated by a line of underscore characters.",[50,500]],["contain","\\r\\n_____________________________________________________________________\\r\\n",[200,500]]],
+        "rs":"Concatinated C Code"
     },
     {
         "d":[["s%",16],["size",[16,4294967295]],["ext",".pg"],["n0",4,0],["n0",4,4],["py","c=f.readi(4,'<')*4+4\nif (c+(-c%16))!=f.readi(4,'<'):return\nf.seek(c);return not sum(f.read(-c%16))"]],

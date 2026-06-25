@@ -4,12 +4,13 @@
     ],
     "exclude": [
         "**/node_modules", "**/.*","**/__pycache__",
-        "./bin/pip",
         "./out",
+        "./bin/pip",
         "./bin/sarc.py",
         "./bin/darc.py",
         "./bin/splat64",
         "./bin/Torch",
+        "./bin/py360",
         "./bin/graalvm",
     ],
     "typeCheckingMode": "off"
