@@ -9,6 +9,7 @@ def asrt(c):
 
 def compile(quiet=False):
     import sysconfig,subprocess
+    from time import sleep
     cc = None
     env = os.environ.copy()
     if sysconfig.get_config_var('CC'):
@@ -29,9 +30,17 @@ def compile(quiet=False):
     r = subprocess.call([cc] + cmd,env=env,stdout=-3 if quiet else None,stderr=-2 if quiet else None)
     for ex in {'exp','lib','a','pdb','obj'}:
         ex = os.path.splitext(DLLP)[0] + '.' + ex
-        if os.path.exists(ex): os.remove(ex)
+        if os.path.exists(ex):
+            for _ in range(5):
+                try: os.remove(ex)
+                except PermissionError: sleep(0.1)
+                else: break
         ex = os.path.basename(ex)
-        if os.path.exists(ex): os.remove(ex)
+        if os.path.exists(ex):
+            for _ in range(5):
+                try: os.remove(ex)
+                except PermissionError: sleep(0.1)
+                else: break
     if r:
         if os.path.exists(DLLP + '.bak'): os.rename(DLLP + '.bak',DLLP)
     elif os.path.exists(DLLP + '.bak'): os.remove(DLLP + '.bak')
