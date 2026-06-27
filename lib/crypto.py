@@ -737,6 +737,13 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             if algo == 'xxh128': algo = 'xxh3_128'
             import xxhash
             fnc = getattr(xxhash,algo + '_' + ('' if kwargs.pop('bytes',False) else 'int') + 'digest')
+        case 'spooky2_32'|'spooky2_64'|'spooky2_128':
+            import spookyhash
+            fnc = getattr(spookyhash,'hash' + algo[8:])
+            if algo == 'spooky2_128' and 'seed' in kwargs:
+                s = kwargs.pop('seed')
+                kwargs['seed1'] = s & 0xFFFFFFFFFFFFFFFF
+                kwargs['seed2'] = s >> 64
 
         case 'sha1'|'sha224'|'sha256'|'sha384'|'sha512'|'sha3_224'|'sha3_256'|'sha3_384'|'sha3_512'|'sha512_224'|'sha512_256'|\
              'blake2b'|'blake2s'|'md5'|'shake128'|'shake_128'|'shake256'|'shake_256'|'ripemd160'|'sm3':
@@ -821,6 +828,7 @@ HASHTS = {
     'murmur3':4,'mmh3':4,'murmur3_32':4,'mmh3_32':4,
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
+    'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
     'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,
     'sha224':28,'sha256':32,'sha384':48,'sha512':64,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,

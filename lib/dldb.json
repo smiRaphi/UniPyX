@@ -5717,6 +5717,9 @@
     "lhafile":{
         "pip":"lhafile"
     },
+    "spookyhash":{
+        "pip":"spookyhash"
+    },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",
         "fs":[{

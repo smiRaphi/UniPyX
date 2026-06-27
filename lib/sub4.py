@@ -188,19 +188,69 @@ def extract4(inp:str,out:str,t:str) -> bool:
             r = AsR_extract(i,o)
             if listdir(o) and r == 0: return
         case 'Unity Assets':
-            b = basename(i).lower()
-            if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
-                bn = b.rstrip('0123456789')
-                fs = []
-                for x in listdir(dirname(i)):
-                    if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
-                tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
-                with open(tf,'wb') as f:
-                    for x in sorted(fs,key=lambda x:x[1]): f.write(readfile(x[0]))
-                r = extract(tf,o,'Unity Bundle')
-                remove(tf)
-            else: r = extract(i,o,'Unity Bundle')
-            if not r: return
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+
+            # AssetRipper.IO.Files/SerializedFiles/Parser/SerializedFileHeader.cs
+            # AssetRipper.IO.Files/SerializedFiles/Parser/SerializedFileMetadata.cs
+            msz = f.readu32()
+            fsz = f.readu32()
+            v = Unity.VCaps(f.reads32())
+            dof = f.readu32()
+            if v.Endian:
+                end = f.readu8()
+                asrt(end in {0,1})
+                f.padc(3)
+            else: end = 0
+
+            if v.LFS:
+                msz,fsz,dof = f.readu32(),f.readu64(),f.readu64()
+                f.skip(8)
+
+            f._end = '<>'[end]
+            if not v.Endian: f.seek(fsz - msz)
+            if v.StoreExactVer: Unity.parse_version(f.read0s('ascii'),v)
+            if v.StorePlatform: plat = f.reads32()
+            else: plat = -1
+
+            if v.TypeTreeHashes: typt = f.readbool()
+            else: typt = True
+            typs = [Unity.parse_type(f,v,typt) for _ in range(f.readu32())]
+
+            if v.LongFileIDFlag: lfid = f.readbool32()
+            else: lfid = False
+            fs = [Unity.parse_objinf(f,v,lfid,typs) for _ in range(f.reads32())]
+
+            if v._ScriptTypeIdx: loid = [Unity.parse_locobjid(f,v,lfid) for _ in range(f.reads32())]
+            fids = [Unity.parse_fid(f,v) for _ in range(f.reads32())]
+            print(fs[:10])
+            print(fids[:10])
+            print(len(fids),len(fs))
+            if v.RefObject: rtyps = [Unity.parse_type(f,v,typt,True) for _ in range(f.reads32())]
+            if v.UserInfo: uinf = f.read0s('utf-8')
+            return 1
+
+            for fe in fs:
+                f.seek(dof + fe['of'])
+                writefile(f'{o}/{fe["fid"]}.{fe["tid"]}',f.readc(fe['s']))
+
+            f.close()
+            if fs: return 1
+
+            # b = basename(i).lower()
+            # if b.startswith('sharedassets') and '.assets.split' in b and b[-1].isdigit():
+            #     bn = b.rstrip('0123456789')
+            #     fs = []
+            #     for x in listdir(dirname(i)):
+            #         if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
+            #     tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
+            #     with open(tf,'wb') as f:
+            #         for x in sorted(fs,key=lambda x:x[1]): f.write(readfile(x[0]))
+            #     r = extract(tf,o,'Unity Bundle')
+            #     remove(tf)
+            # else: r = extract(i,o,'Unity Bundle')
+            # if not r: return
         case 'Rayman DCZ': return quickbms('rayman_dcz')
         case 'iQiyi PAK':
             run(['iqipack',i,o])
@@ -2415,3 +2465,376 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if rldir(o): return
 
     return 1
+
+@namespace(include=['PLATS','VCaps','parse_type','parse_objinf','parse_locobjid','parse_fid','parse_version'])
+def Unity():
+    from lib.file import File
+    from typing import Tuple,TypeAlias
+
+    UVer:TypeAlias = Tuple[int,int,float]
+    VERS:dict[int,UVer] = {
+        # Major, minor, build.build type (a-f = 0-5) + sub build
+        5: (1,2,0.50),
+        6: (2,1,0.50),
+        7: (3,0,0.10),
+        8: (3,0,0.50),
+        9: (3,5,0.50),
+        10:(5,0,0.01), # aunk1
+        11:(5,0,0.02), # aunk2
+        12:(5,0,0.03), # aunk3
+        13:(5,0,0.04), # aunk4
+        14:(5,0,0.10), # unk
+        15:(5,0,1.50),
+        16:(5,5,0.00), # a
+        17:(5,5,0.10), # unk
+        18:(2019,1,0.00), # a
+        19:(2019,1,1.10), # unk
+        20:(2019,2,0.50),
+        21:(2019,3,0.50),
+        22:(2020,1,0.50),
+    }
+    PLATS = {ix:x for ix,x in enumerate((
+        'ValidPlayer',
+        'StandaloneOSXUniversal',
+        'StandaloneOSXPPC',
+        'StandaloneOSXIntel',
+        'StandaloneWinPlayer',
+        'WebPlayerLZMA',
+        'WebPlayerLZMAStreamed',
+        'Wii',
+        'iOS',
+        'PS3',
+        'Xbox360',
+        'Broadcom',
+        'Android',
+        'WinGLESEmu',
+        'WinGLES20Emu',
+        'GoogleNaCl', # Google Native Client
+        'StandaloneLinux',
+        'Flash',
+        'StandaloneWin64Player',
+        'WebGL',
+        'MetroPlayerX86', # Windows Store App
+        'MetroPlayerX64',
+        'MetroPlayerARM',
+        'StandaloneLinux64',
+        'StandaloneLinuxUniversal',
+        'WP8Player', # Windows Phone 8
+        'StandaloneOSXIntel64',
+        'BB10' # BlackBerry
+        'Tizen',
+        'PSP2', # PSVita
+        'PS4',
+        'PSM', # PSMobile
+        'XboxOne',
+        'SamsungTV',
+        'N3DS',
+        'WiiU',
+        'tvOS',
+        'Switch',
+        'Lumin',
+        'Stadia',
+        'CloudRendering',
+        'GameCoreXboxSeries',
+        'GameCoreXboxOne',
+        'PS5',
+        'EmbeddedLinux',
+        'QNX',
+        'VisionOS', # Apple Vision
+        'Switch2',
+        'Kepler',
+    ))} | {-2:'NoTarget',-1:'AnyPlayer'}
+    # AssetRipper.IO.Files/SerializedFiles/Parser/TypeTrees/CommonString.cs
+    COMSBS = {x[0] | 0x80000000:x[1] for x in (
+		(0, "AABB"),
+		(5, "AnimationClip"),
+		(19, "AnimationCurve"),
+		(34, "AnimationState"),
+		(49, "Array"),
+		(55, "Base"),
+		(60, "BitField"),
+		(69, "bitset"),
+		(76, "bool"),
+		(81, "char"),
+		(86, "ColorRGBA"),
+		(96, "Component"),
+		(106, "data"),
+		(111, "deque"),
+		(117, "double"),
+		(124, "dynamic_array"),
+		(138, "FastPropertyName"),
+		(155, "first"),
+		(161, "float"),
+		(167, "Font"),
+		(172, "GameObject"),
+		(183, "Generic Mono"),
+		(196, "GradientNEW"),
+		(208, "GUID"),
+		(213, "GUIStyle"),
+		(222, "int"),
+		(226, "list"),
+		(231, "long long"),
+		(241, "map"),
+		(245, "Matrix4x4f"),
+		(256, "MdFour"),
+		(263, "MonoBehaviour"),
+		(277, "MonoScript"),
+		(288, "m_ByteSize"),
+		(299, "m_Curve"),
+		(307, "m_EditorClassIdentifier"),
+		(331, "m_EditorHideFlags"),
+		(349, "m_Enabled"),
+		(359, "m_ExtensionPtr"),
+		(374, "m_GameObject"),
+		(387, "m_Index"),
+		(395, "m_IsArray"),
+		(405, "m_IsStatic"),
+		(416, "m_MetaFlag"),
+		(427, "m_Name"),
+		(434, "m_ObjectHideFlags"),
+		(452, "m_PrefabInternal"),
+		(469, "m_PrefabParentObject"),
+		(490, "m_Script"),
+		(499, "m_StaticEditorFlags"),
+		(519, "m_Type"),
+		(526, "m_Version"),
+		(536, "Object"),
+		(543, "pair"),
+		(548, "PPtr<Component>"),
+		(564, "PPtr<GameObject>"),
+		(581, "PPtr<Material>"),
+		(596, "PPtr<MonoBehaviour>"),
+		(616, "PPtr<MonoScript>"),
+		(633, "PPtr<Object>"),
+		(646, "PPtr<Prefab>"),
+		(659, "PPtr<Sprite>"),
+		(672, "PPtr<TextAsset>"),
+		(688, "PPtr<Texture>"),
+		(702, "PPtr<Texture2D>"),
+		(718, "PPtr<Transform>"),
+		(734, "Prefab"),
+		(741, "Quaternionf"),
+		(753, "Rectf"),
+		(759, "RectInt"),
+		(767, "RectOffset"),
+		(778, "second"),
+		(785, "set"),
+		(789, "short"),
+		(795, "size"),
+		(800, "SInt16"),
+		(807, "SInt32"),
+		(814, "SInt64"),
+		(821, "SInt8"),
+		(827, "staticvector"),
+		(840, "string"),
+		(847, "TextAsset"),
+		(857, "TextMesh"),
+		(866, "Texture"),
+		(874, "Texture2D"),
+		(884, "Transform"),
+		(894, "TypelessData"),
+		(907, "UInt16"),
+		(914, "UInt32"),
+		(921, "UInt64"),
+		(928, "UInt8"),
+		(934, "unsigned int"),
+		(947, "unsigned long long"),
+		(966, "unsigned short"),
+		(981, "vector"),
+		(988, "Vector2f"),
+		(997, "Vector3f"),
+		(1006, "Vector4f"),
+		(1015, "m_ScriptingClassIdentifier"),
+		(1042, "Gradient"),
+		(1051, "Type*"),
+		(1057, "int2_storage"),
+		(1070, "int3_storage"),
+		(1083, "BoundsInt"),
+		(1093, "m_CorrespondingSourceObject"),
+		(1121, "m_PrefabInstance"),
+		(1138, "m_PrefabAsset"),
+		(1152, "FileSize"),
+		(1161, "Hash128"),
+		(1169, "RenderingLayerMask"),
+		(1188, "fixed_array" ),
+		(1200, "EntityId"),
+		(1209, "LoadableReference"),
+    )}
+
+    class VCaps:
+        UserInfo:bool = 5
+        FIDHash:bool = 5
+        AssetPath:bool = 6
+        StoreExactVer:bool = 7
+        StorePlatform:bool = 8
+        LongFileIDFlag:bool = (7,13)
+        Endian:bool = 9
+        TypeTree5:bool = 10
+        _ScriptTypeIdx:bool = 11
+        ScriptTypeIdx:bool = (11,16)
+        TypeTreeHashes:bool = 13
+        LongFileID:bool = 14
+        _StrippedObj:bool = 15
+        StrippedObj:bool = (15,16)
+        RefactClassId:bool = 16
+        RefactTypeData:bool = 17
+        IDHash4ScriptTypeVer:bool = (2018,3,0.01)
+        RefactShareTypeTreeData:bool = 18
+        TypeTreeNodeTypeFlags:bool = 19
+        RefObject:bool = 20
+        TypeDeps:bool = 21
+        LFS:bool = 22
+        def __init__(self,g:int):
+            asrt(g >= 0)
+            self.g = g
+            self.update(VERS[g])
+        def update(self,v:UVer|VCaps):
+            if isinstance(v,VCaps): v = v.v
+            self.v = v
+
+            for cn,cr in VCaps.__dict__.items():
+                if cn.startswith('__') or isinstance(cr,types.FunctionType): continue
+                if isinstance(cr,tuple) and len(cr) == 3:
+                    ce = self.v >= cr
+                elif isinstance(cr,tuple) and len(cr) == 2 and isinstance(cr[0],tuple):
+                    ce = cr[0] <= self.v <= cr[1]
+                elif isinstance(cr,int):
+                    ce = self.g >= cr
+                elif isinstance(cr,tuple) and len(cr) == 2 and isinstance(cr[0],int):
+                    ce = cr[0] <= self.g <= cr[1]
+                else: raise TypeError
+                setattr(self,cn,ce)
+
+    # AssetRipper.IO.Files/SerializedFiles/Parser/TypeTrees/TypeTreeNode.cs
+    def parse_typetreenode(f:File,v:VCaps):
+        if v.TypeTree5:
+            r = {
+                'v':f.readu16(),
+                'lvl':f.readu8(),
+                'tflg':f.readu8(),
+                'tso':f.readu32(),
+                'nso':f.readu32(),
+                's':f.reads32(),
+                'ix':f.reads32(),
+                'mflg':f.readu32(),
+            }
+            if v.TypeTreeNodeTypeFlags: r['refth'] = f.readu64()
+        else:
+            r = {
+                't':f.read0s('utf-8'),
+                'n':f.read0s('utf-8'),
+                's':f.reads32(),
+                'ix':f.reads32(),
+                'tflg':f.reads32(),
+                'v':f.reads32(),
+                'mflg':f.readu32(),
+            }
+        return r
+    # AssetRipper.IO.Files/SerializedFiles/Parser/TypeTrees/TypeTree.cs
+    def parse_typetree(f:File,v:VCaps):
+        if v.TypeTree5:
+            nc = f.reads32()
+            asrt(nc >= 0)
+            sbs = f.reads32()
+            asrt(sbs >= 0)
+            tr = [parse_typetreenode(f,v) for _ in range(nc)]
+            sb = COMSBS.copy()
+            sp = 0
+            for s in f.readc(sbs).split(b'\0'):
+                sb[sp] = s.decode('utf-8')
+                sp += len(s) + 1
+            for x in tr:
+                x['t'] = sb[x['tso']]
+                x['n'] = sb[x['nso']]
+            return tr
+        else:
+            tr = []
+            def readtn(d:int):
+                t = parse_typetreenode(f,v)
+                t['lvl'] = d
+                tr.append(t)
+                cc = f.reads32()
+                for _ in range(cc): readtn(d+1)
+            return readtn(0)
+    # AssetRipper.IO.Files/SerializedFiles/Parser/SerializedTypeBase.cs
+    def parse_type(f:File,v:VCaps,typt:bool,ref=False):
+        r = {}
+        r['rtid'] = f.reads32()
+        if not v.RefactClassId:
+            r['tid'] = max(r['rtid'],-1)
+            r['strip'] = False
+        else:
+            r['tid'] = r['rtid']
+            r['strip'] = f.readbool()
+        if v.RefactTypeData: r['scrtix'] = f.reads16()
+        else: r['scrtix'] = -1
+        if v.TypeTreeHashes:
+            if r['tid'] in {-1,114} or (v.IDHash4ScriptTypeVer and r['scrtix'] >= 0): r['sid'] = f.readu128()
+            r['oth'] = f.readu128()
+        if typt:
+            r['typt'] = parse_typetree(f,v)
+            if v.TypeDeps:
+                if ref: r['dep'] = {
+                    'class':f.read0s('utf-8'),
+                    'namespace':f.read0s('utf-8'),
+                    'asm':f.read0s('utf-8'),
+                }
+                else: r['dep'] = [f.reads32() for _ in range(f.reads32())]
+        return r
+    # AssetRipper.IO.Files/SerializedFiles/Parser/ObjectInfo.cs
+    def parse_objinf(f:File,v:VCaps,lid:bool,typs:list[dict]):
+        r = {}
+        if v.LongFileID or lid:
+            f.align(4)
+            r['fid'] = f.reads64()
+        else: r['fid'] = f.reads32()
+        if v.LFS: r['of'] = f.reads64()
+        else: r['of'] = f.readu32()
+        r['s'] = f.reads32()
+        if v.RefactTypeData: r['stix'] = f.reads32()
+        else: r['tid'] = f.reads32()
+        if not v.RefactClassId: r['cid'] = f.reads16()
+        if v.ScriptTypeIdx: r['scrtix'] = f.reads16()
+        elif not v._ScriptTypeIdx: r['del'] = f.reads16()
+        if v.StrippedObj: r['strip'] = f.readbool()
+        else: r['strip'] = False
+
+        if 'stix' in r: r['t'] = typs[r['stix']]
+        elif typs:
+            for t in typs:
+                if t['tid'] == r['tid'] and (not v.StrippedObj or t['strip'] == r['strip']):
+                    r['t'] = t
+                    break
+            else: raise ValueError('Type Not Found')
+
+        if 't' in r:
+            t = r['t']
+            r['tid'] = t['tid']
+            if v.RefactClassId and 0xFFFF >= t['tid'] >= ~0x8000: r['cid'] = t['tid']
+            if not v.ScriptTypeIdx: r['scrtix'] = t['scrtix']
+            if not v.StrippedObj: r['strip'] = t['strip']
+        return r
+    def parse_locobjid(f:File,v:VCaps,lid:bool):
+        lsfix = f.reads32()
+        if v.LongFileID or lid:
+            f.align(4)
+            return (lsfix,f.reads64())
+        return (lsfix,f.reads32())
+    def parse_fid(f:File,v:VCaps):
+        r = {}
+        if v.AssetPath: r['ap'] = f.read0s('utf-8')
+        if v.FIDHash:
+            r['guid'] = f.readu128()
+            r['t'] = f.reads32()
+        r['p'] = f.read0s('utf-8')
+        return r
+
+    def parse_version(vs:str,vc:VCaps=None):
+        vs = vs.split('.')
+        asrt(len(vs) == 3)
+        lvp = [x.isdigit() for x in vs[2]].index(False)
+        v = (int(vs[0]),int(vs[1]),int(vs[2][:lvp]) + 'abcdef'.index(vs[2][lvp])/10 + int(vs[2][lvp+1:])/100)
+        if vc: vc.update(v)
+        return v
+
+    return locals()

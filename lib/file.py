@@ -142,6 +142,14 @@ class File:
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
     def readf64(self,end=None) -> float: return self.unpack('d',end)
+    def readbool(self):
+        r = self.readu8()
+        if r not in {0,1}: raise ValueError(f"Invalid bool value: {r} @ 0x{self.pos-1:08X}")
+        return bool(r)
+    def readbool32(self,end=None):
+        r = self.readu32(end)
+        if r not in {0,1}: raise ValueError(f"Invalid bool value: {r} @ 0x{self.pos-4:08X}")
+        return bool(r)
     def readleb128u(self):
         n = c = b = 0
         while True:
@@ -193,6 +201,8 @@ class File:
     def writef16(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'e',v))
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
+    def writebool(self,v:bool): return self.writeu8(1 if v else 0)
+    def writebool32(self,v:bool,end=None): return self.writeu32(1 if v else 0,end)
     def writevlq(self,v:int):
         b = [v & mask(7)]
         v >>= 7
