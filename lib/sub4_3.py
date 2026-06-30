@@ -761,7 +761,7 @@ def extract4_3(inp:str,out:str,t:str):
                 elif 0x40 > fe[4] >= 0x30: ext = f'app{fe[4]-0x2F:02d}'
                 else: ext = f'{fe[4]:02d}'
 
-                if fe[2] & 0x20: db.get('pwexplode')
+                if fe[2] & 0x20: db.get('libblast')
                 if fe[2] & 2:
                     cd = f.readu16()
                     fsd = [f.readu32() for _ in range(cd+1)]

@@ -2232,6 +2232,15 @@
         }],
         "$":"Has to have XMemDecompressSegmentTD"
     },
+    "libblast":{
+        "p":"libblast.dll",
+        "fs":[{
+            "u":".",
+            "x":{
+                "libblast.dll":"libblast.dll"
+            }
+        }]
+    },
     "npkpy":{
         "pip":"npkPy"
     },
@@ -5475,13 +5484,6 @@
         }],
         "ts":0
     },
-    "pwexplode":{
-        "p":"pwexplode.py",
-        "fs":[
-        "https://raw.githubusercontent.com/Schallaven/pwexplode/refs/heads/master/pwexplode.py"
-        ],
-        "ts":0
-    },
     "splat":{
         "pip":"splat64[mips]",
         "ts":1773586899
@@ -5716,6 +5718,9 @@
     },
     "lhafile":{
         "pip":"lhafile"
+    },
+    "inflate64":{
+        "pip":"inflate64"
     },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",

@@ -1145,8 +1145,12 @@
         "rs":"Cabela's Legendary Adventures ARC","s":1
     },
     {
-        "d":[["s%",8],["isat","\\x21\\xE0\\x7A\\x42\\xAE\\x3D\\x3A\\x02",-8],["py","return not (fsz-8)%2048"]],
-        "rs":"Destroy All Humans! PKG","s":1
+        "d":[["s%",4],["isat","\\xFA\\xC7\\xBB\\x48\\x02\\0\\0\\0",0],["isatS","\\0",4,20],["isat","\\x3C\\0\\0\\0",24],["n0",4,8],["n0",4,12],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["n0",4,44],["n0",4,48],["n0",4,52],["n0",4,56],["n0",4,60],["str0",64,260,1],
+             ["py","f.seek(8);c,c2=f.readi(4,'<'),f.readi(4,'<')\nif c>c2:return\nf.seek(24);o,o2,o3=f.readi(4,'<'),f.readi(4,'<'),f.readi(4,'<');f.seek(56)\nif (f.readi(4,'<')+8)!=fsz:return\nf.seek(o)\nif (o+4+c*260)!=o2 or c!=f.readi(4,'<'):return\nf.seek(o2);return c2==f.readi(4,'<')and(o2+4+48*c2)==o3"]],
+        "rs":"Destroy All Humans! DIR+PKG PS2","s":1},{
+        "d":[["s%",4],["isat","\\xFA\\xC7\\xBB\\x48\\x02\\0\\0\\0",0],["isatS","\\0",4,20],["isat","\\x3C\\0\\0\\0",24],["n0",4,8],["n0",4,12],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,40],["n0",4,44],["n0",4,48],["n0",4,52],["n0",4,56],["n0",4,60],["str0",64,260,1],
+             ["py","f.seek(8);c,c2=f.readi(4,'<'),f.readi(4,'<')\nif c>c2:return\nf.seek(24);o,o2,o3=f.readi(4,'<'),f.readi(4,'<'),f.readi(4,'<');f.seek(56)\nif (f.readi(4,'<')+8)!=fsz:return\nf.seek(o)\nif (o+4+c*260)!=o2 or c!=f.readi(4,'<'):return\nf.seek(o2);return c2==f.readi(4,'<')and(o2+4+40*c2)==o3"]],
+        "rs":"Destroy All Humans! DIR+PKG Xbox","s":1
     },
     {
         "d":[["isat","DAT\\0",0],["isat","\\x20\\0\\0\\0",8],["isat","\\0\\0\\0\\0",28],["n0",4,4],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["n0",4,32],["py","f.seek(4);c=f.readi(4,'<');o=f.readi(4,'<');return(o+c*4)==f.readi(4,'<')and(o+c*8)==f.readi(4,'<')"]],
@@ -2866,6 +2870,11 @@
         "rq":null,
         "d":["ext",".csc"],
         "rs":"CSC"
+    },
+    {
+        "rq":null,
+        "d":["ext",".deflate64"],
+        "rs":"Deflate64"
     },
     {
         "rq":null,

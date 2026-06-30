@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1001
+# Supported Formats: 1002
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -897,7 +897,7 @@ Zlib + Uncompressed Size | * | Custom |
 ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (123)
+## Compression Enthusiasts/One-Off Formats (124)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
@@ -915,6 +915,7 @@ BSArc | .bsa | [BSA](https://www.sac.sk/download/pack/bsa.zip) |
 bsc | .bsc | [bsc](https://github.com/IlyaGrebnov/libbsc) |
 bsc-m03 | .bsc | [bsc-m03](https://github.com/IlyaGrebnov/bsc-m03) |
 BTSPK | ??? | [BTSPK](https://www.sac.sk/download/pack/btspk.arj) |
+Deflate64 | .deflate64 | Custom |
 Density Chamleon | ??? | [density-rs](https://github.com/g1mv/density) |
 Density Cheetah | ??? | [density-rs](https://github.com/g1mv/density) |
 Density Lion | ??? | [density-rs](https://github.com/g1mv/density) |

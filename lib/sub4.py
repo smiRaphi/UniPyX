@@ -1233,7 +1233,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             from lib.file import decompress
             of = o + '/' + basename(i)
             if of.endswith('.xb'): of = of[:-4]
-            writefile(of,decompress(readfile(i),'xbcompress',db=db))
+            writefile(of,decompress(readfile(i),'xbcompress'))
             return
         case 'Xbox FArc':
             db.try_custom()

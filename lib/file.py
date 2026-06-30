@@ -413,11 +413,11 @@ def uxx():
     if UPXX is None: UPXX = X()
     return UPXX
 
-OODLE = GDEFLATE = UCL = XCOMPRESS = None
+OODLE = GDEFLATE = UCL = LIBBLAST = None
 NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
 LHZC = {f'lh{x}':f'-lh{x}-'.encode('latin1') for x in {0,5,6,7}}
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
-    global OODLE,GDEFLATE,UCL,XCOMPRESS
+    global OODLE,GDEFLATE,UCL,LIBBLAST
     match algo:
         case 'none': return i
         case 'zlib':
@@ -429,6 +429,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'deflate0':
             import zlib
             return zlib.decompress((i[0] & 0xF8 | ((i[0] & 3) - 1) << 1 | (0 if (i[0] >> 2) & 1 else 1)).to_bytes(1) + i[1:],wbits=-15)
+        case 'deflate64':
+            import inflate64
+            return inflate64.Inflater().inflate(i)
         case 'gzip':
             import gzip
             return gzip.decompress(i)
@@ -508,10 +511,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             import bin.lzo # type: ignore
             return bin.lzo.decompress(i,False,kwargs['usize'],algorithm=algo.upper())
-        case 'implode':
-            if 'db' in kwargs: kwargs['db'].get('pwexplode')
-            import bin.pwexplode # type: ignore
-            return bin.pwexplode.explode(i)
         case 'ucl_nrv2b'|'ucl_nrv2b_8'|'ucl_nrv2b_16'|'ucl_nrv2b_32'|\
              'ucl_nrv2d'|'ucl_nrv2d_8'|'ucl_nrv2d_16'|'ucl_nrv2d_32'|\
              'ucl_nrv2e'|'ucl_nrv2e_8'|'ucl_nrv2e_16'|'ucl_nrv2e_32':
@@ -583,6 +582,36 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             if dcrc and crc != int.from_bytes(i[p:p+4],'big'): raise ValueError('CRC mismatch')
             return bytes(o)
+        case 'implode'|'dcl_implode'|'pkware_implode'|'pw_implode':
+            asrt(LIBBLAST or kwargs.get('db'))
+            import ctypes
+            from functools import partial
+            if not LIBBLAST:
+                def ocb(o,h,b,l):
+                    d = b[:l]
+                    o.extend(d)
+                    return len(d) != l
+                def icb(i,l,h,b):
+                    b[0] = i
+                    return l
+                LIBBLAST = (ctypes.CDLL(kwargs['db'].get('libblast')),
+                            ctypes.CFUNCTYPE(ctypes.c_uint32,ctypes.c_void_p,ctypes.POINTER(ctypes.POINTER(ctypes.c_uint8))),
+                            ctypes.CFUNCTYPE(ctypes.c_int32,ctypes.c_void_p,ctypes.POINTER(ctypes.c_uint8),ctypes.c_uint32),
+                            icb,ocb)
+                LIBBLAST[0].blast.argtypes = [LIBBLAST[1],ctypes.c_void_p,LIBBLAST[2],ctypes.c_void_p,ctypes.POINTER(ctypes.c_uint32),ctypes.POINTER(ctypes.POINTER(ctypes.c_uint8))]
+                LIBBLAST[0].blast.restype = ctypes.c_int
+
+            o = bytearray()
+            ib = (ctypes.c_uint8 * len(i)).from_buffer_copy(i)
+            left = ctypes.c_uint32(0)
+            r = LIBBLAST[0].blast(LIBBLAST[1](partial(LIBBLAST[3],ctypes.cast(ib,ctypes.POINTER(ctypes.c_uint8)),len(i))),None,
+                                  LIBBLAST[2](partial(LIBBLAST[4],o)),None,
+                                  ctypes.byref(left),None)
+            if r != 0: raise ValueError({2:'INPUT_EXHAUSTED',1:'OUTPUT_ERROR',0:'SUCCESS',-1:'WRONG_LITERAL_FLAG',-2:'WRONG_DICTIONARY',-3:'DIST_TOO_BIG'})
+            return bytes(o)
+        case 'shrink': return uxx().decompress_zip_shrink(i,usize=kwargs['usize'])
+        case 'reduce1'|'reduce2'|'reduce3'|'reduce4': return uxx().decompress_zip_reduce(i,usize=kwargs['usize'],level=int(algo[6:]))
+        case 'pkzip_implode'|'zip_implode'|'pz_implode': return uxx().decompress_zip_implode(i,usize=kwargs['usize'],flags=kwargs.get('flags',0) & 6)
 
         case 'huffman': return uxx().decompress_huffman(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'graw_bpe': return uxx().decompress_graw_bpe(i,usize=kwargs['usize'])
@@ -717,120 +746,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = GDEFLATE.DecompressData(ibuf,isz,obuf,us)
             if r == 0: raise ValueError('Failed to decompress')
             return bytes(obuf)
-        case 'xb'|'xbcompress'|'xmem'|'xmem_lzx':
-            asrt(XCOMPRESS or kwargs.get('db'))
-            import ctypes
-            if not XCOMPRESS:
-                XCOMPRESS = ctypes.CDLL(kwargs['db'].get('xcompress'))
-                class XMemCodecParametersLZX(ctypes.Structure):
-                    _pack_ = 4
-                    _fields_ = [
-                        ('flags',ctypes.c_int),
-                        ('windowSize',ctypes.c_int),
-                        ('compressionPartitionSize',ctypes.c_int),
-                    ]
-                XCOMPRESS.XMemCodecParametersLZX = XMemCodecParametersLZX
-                XCOMPRESS.XMemCreateDecompressionContext.argtypes = [ctypes.c_int,ctypes.POINTER(XMemCodecParametersLZX),ctypes.c_int,ctypes.POINTER(ctypes.c_void_p)]
-                XCOMPRESS.XMemCreateDecompressionContext.restype = ctypes.c_int
-                XCOMPRESS.XMemDestroyDecompressionContext.argtypes = [ctypes.c_void_p]
-                XCOMPRESS.XMemDestroyDecompressionContext.restype = None
-                XCOMPRESS.XMemDecompress.argtypes = [ctypes.c_void_p,ctypes.POINTER(ctypes.c_uint8),ctypes.POINTER(ctypes.c_size_t),ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t]
-                XCOMPRESS.XMemDecompress.restype = ctypes.c_int
-                XCOMPRESS.XMemDecompressSegmentTD.argtypes = [ctypes.c_void_p,ctypes.POINTER(ctypes.c_uint8),ctypes.POINTER(ctypes.c_size_t),ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t,ctypes.c_size_t,ctypes.c_size_t]
-                XCOMPRESS.XMemDecompressSegmentTD.restype = ctypes.c_int
-
-            if algo in {'xmem','xmem_lzx'}:
-                asrt('usize' in kwargs)
-                ctx = ctypes.c_void_p()
-                par = XCOMPRESS.XMemCodecParametersLZX(kwargs.get('flags',0),kwargs.get('win_size',0),kwargs.get('block_size',0))
-                r = XCOMPRESS.XMemCreateDecompressionContext(1,ctypes.byref(par),0,ctypes.byref(ctx))
-                if r != 0: raise ValueError(f'Failed to create decompression context ({r})')
-                try:
-                    ib = (ctypes.c_uint8 * len(i)).from_buffer_copy(i)
-                    ob = (ctypes.c_uint8 * kwargs['usize'])()
-                    fus = ctypes.c_size_t(kwargs['usize'])
-                    r = XCOMPRESS.XMemDecompress(ctx,ob,ctypes.byref(fus),ib,ctypes.c_size_t(len(i)))
-                    if r != 0: raise ValueError(f'Failed to decompress ({r})')
-                    return bytes(ob)[:fus.value]
-                except OSError: raise ValueError('Failed to decompress')
-                finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
-            elif algo in {'xb','xbcompress'}:
-                asrt(i[:3] == b'\x0F\xF5\x12')
-                if i[3] == 0xED:
-                    asrt(i[4] == 1 and i[5] == 0,'unsupported version',err=NotImplementedError)
-                    asrt(i[6] == i[7] == 0,'padding')
-                    fl = int.from_bytes(i[12:16],'big')
-
-                    ctx = ctypes.c_void_p()
-                    par = XCOMPRESS.XMemCodecParametersLZX(0,1 << ((fl & 15) + 15),0)
-                    r = XCOMPRESS.XMemCreateDecompressionContext(0,ctypes.byref(par),0x80000000,ctypes.byref(ctx))
-                    if r != 0: raise ValueError(f'Failed to create decompression context ({r})')
-
-                    try:
-                        rb = bytearray()
-                        bps = [20,32][(fl >> 22) & 3]
-                        zbs = 0x8000 << ((fl >> 4) & 3)
-                        segs = (fl >> 6) & 0xFFFF
-                        bdo = 0x10 + ((bps * segs + 31) >> 5) * 4
-                        msk = (1 << bps) - 1
-                        sbs = (bps + 7) >> 3
-
-                        biv = bic = 0
-                        tof = 0x10
-                        for ix in range(segs):
-                            if bic < bps:
-                                biv |= int.from_bytes(i[tof:tof+sbs],'big') << bic
-                                bic += sbs * 8
-                                tof += sbs
-                            ubs,biv = biv & msk,biv >> bps
-                            bic -= bps
-                            if ix == 0:
-                                do = bdo
-                                bs = zbs - do
-                            else: do,bs = ix * zbs,zbs
-                            if ubs > 0 and do > len(i): raise EOFError
-                            bs = min(len(i) - do,bs)
-                            off = 0
-                            while off < ubs:
-                                ts = min(bs,ubs - off)
-                                ob = (ctypes.c_uint8 * ts)()
-                                ib = (ctypes.c_uint8 * bs).from_buffer_copy(i[do:do+bs])
-                                ts = ctypes.c_size_t(ts)
-                                r = XCOMPRESS.XMemDecompressSegmentTD(ctx,ob,ctypes.byref(ts),ib,bs,ubs,off)
-                                if r != 0 or ts.value == 0: raise ValueError(f'Failed to decompress segment ({r}, {ts.value}, {ix} @ {off}/{ubs})')
-                                rb.extend(bytes(ob)[:ts.value])
-                                off += ts.value
-                        return bytes(rb)
-                    except OSError: raise ValueError('Failed to decompress')
-                    finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
-                elif i[3] == 0xEE:
-                    asrt(i[4] == 1 and i[5] <= 3,'unsupported version',err=NotImplementedError)
-                    asrt(i[6] == i[7] == 0,'padding')
-                    par = XCOMPRESS.XMemCodecParametersLZX(int.from_bytes(i[12:16],'big'),int.from_bytes(i[0x10:0x14],'big'),int.from_bytes(i[0x14:0x18],'big'))
-                    us,zs = int.from_bytes(i[0x18:0x20],'big'),int.from_bytes(i[0x20:0x28],'big')
-                    ctx = ctypes.c_void_p()
-                    r = XCOMPRESS.XMemCreateDecompressionContext(0,ctypes.byref(par),0,ctypes.byref(ctx))
-                    if r != 0: raise ValueError(f'Failed to create decompression context ({r})')
-
-                    try:
-                        p = 0x30
-                        rb = bytearray()
-                        while len(rb) < us and p < len(i):
-                            bs = int.from_bytes(i[p:p+4],'big',signed=True);p += 4
-                            if bs < 0: raise ValueError(f'Invalid block size {bs}')
-                            elif (p + bs) > len(i): raise EOFError
-                            ts = us - len(rb)
-                            ib = (ctypes.c_uint8 * (bs + 0x10)).from_buffer_copy(i[p:p+bs] + bytes(0x10))
-                            ob = (ctypes.c_uint8 * ts)()
-                            ts = ctypes.c_size_t(ts)
-                            r = XCOMPRESS.XMemDecompress(ctx,ob,ctypes.byref(ts),ib,bs + 0x10)
-                            if r != 0 or ts.value == 0: raise ValueError(f'Failed to decompress block ({r}, {ts.value})')
-                            rb.extend(bytes(ob)[:ts.value])
-                            p += bs
-                        return bytes(rb)
-                    except OSError: raise ValueError('Failed to decompress')
-                    finally: XCOMPRESS.XMemDestroyDecompressionContext(ctx)
-                else: raise ValueError(f'Invalid mode {i[3]:02X}')
+        case 'xmem'|'xmem_lzx': return uxx().decompress_xmemlzx(i,kwargs['usize'])
+        case 'xb'|'xbcompress': return uxx().decompress_xb(i)
         case 'capcom_yz2': return uxx().decompress_capcom_yz2(i,kwargs['usize'])
         case 'anaconda_deflate': pass#return ananconda_decompress(i)
         case 'anaconda_zlib':

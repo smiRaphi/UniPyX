@@ -353,14 +353,15 @@ def extract1(inp:str,out:str,t:str) -> bool:
             )
             ZFMTM = {
                 0:'none',
-                1:'shrunk', # unsupported
-                2:'reduce', # unsupported
-                3:'reduce', # unsupported
-                4:'reduce', # unsupported
-                5:'reduce', # unsupported
-                6:'implode',
+                1:'shrink',
+                2:'reduce1',
+                3:'reduce2',
+                4:'reduce3',
+                5:'reduce4',
+                6:'pkzip_implode',
                 8:'deflate',
-                9:'deflate64', # unsupported
+                9:'deflate64',
+                10:'pkware_implode', # unofficial
                 12:'bzip2',
                 14:'lzma_zip',
                 15:'oodle', # unofficial, used by "New World: Aeternum", untested
@@ -368,11 +369,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 18:'terse', # unsupported
                 19:'lz77z', # unsupported
                 20:'zstd', # deprecated
+                22:'forza_encrypted', # unofficial, custom encryption + deflate
                 93:'zstd',
-                94:'mp3', # unsupported
+                94:'none', # mp3
                 95:'xz',
-                96:'jpeg', # unsupported
-                97:'wavpack', # unsupported
+                96:'none', # jpeg
+                97:'none', # wavpack
                 98:'ppmd' # unsupported
             }
 
@@ -600,7 +602,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'],block_size=ctx['b'])
                     if v == 1: d = d[:-pad]
                     d = decompress(d,'deflate',usize=fe['us'])
-
+                elif fe['ct'] == 6: d = decompress(d,'pkzip_implode',usize=fe['us'],flags=fe['fl'])
                 else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
                 if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'])
                 fn = o + '/' + fe['n']

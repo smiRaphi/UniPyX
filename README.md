@@ -37,6 +37,7 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 * self compiled [FastLZ+6unpack](https://github.com/ariya/FastLZ)
 * self compiled [python-lzo](https://github.com/jd-boyd/python-lzo) because the pip package is outdated
 * self compiled [na_game_tool](https://nihav.org/game_tool.html)
+* self compiled [libblast](https://codeberg.org/implode-compression-impls/libblast)
 * self made [GDeflate](https://github.com/microsoft/DirectStorage/tree/main/GDeflate) wrapper
 * self made [ucl](https://www.oberhumer.com/opensource/ucl/) wrapper
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX

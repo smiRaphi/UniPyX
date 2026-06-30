@@ -453,8 +453,12 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'GDeflate':
             db.try_custom()
             from lib.file import decompress
-            d = decompress(i,'gdeflate',db=db)
-            writefile(o + '/' + tbasename(i),d)
+            writefile(o + '/' + tbasename(i),decompress(readfile(i),'gdeflate',db=db))
+        case 'Deflate64':
+            db.try_custom()
+            from lib.file import decompress
+            writefile(o + '/' + tbasename(i),decompress(readfile(i),'deflate64'))
+            return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

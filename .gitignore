@@ -15,6 +15,8 @@ __pycache__
 *.pyob
 *.bhl
 /dev/helpers/*.lib
+/lib/unipyxx/.lib
+/lib/unipyxx/!check
 
 !/bin/bin.7z
 !/bin/ps3key.py

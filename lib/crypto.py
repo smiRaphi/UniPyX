@@ -39,7 +39,7 @@ BASEXXNS = {'base16':'b16',
             'base32':'b32','base32hex':'b32hex','b32h':'b32hex',
             'base58':'b58',
             'base64':'b64',
-            'base85':'b85','ascii85':'a85',
+            'base85':'b85','ascii85':'a85','zbase85':'z85',
             'base92':'b92',
             'gamespy64':'g64',
             'zbase32':'z32',
@@ -288,7 +288,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'base64url'|'b64url':
             from urllib.parse import unquote_to_bytes
             return decrypt(unquote_to_bytes(i),'base64',**kwargs)
-        case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|\
+        case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|'zbase85'|\
              'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
             algo = BASEXXNS.get(algo,algo)
             import base64
@@ -526,9 +526,9 @@ def java_hash(i:bytes):
     for b in i: h = (h * 31 + b) & 0xFFFFFFFF
     return h
 def sxm_hash(i:bytes):
-    v = 0
-    for b in i: v = ((v * 137) + b) & 0xFFFFFFFFFFFFFFFF
-    return v
+    h = 0
+    for b in i: v = (h * 137 + b) & 0xFFFFFFFFFFFFFFFF
+    return h
 def slf_hash(i:bytes):
     h = 0
     for b in i: h = (h * 33 + b) & 0xFFFFFFFF
@@ -558,7 +558,7 @@ CRC8 = {   #  poly,init,xor ,reflect
     'dvb_s2':(0xD5,0x00,0x00,False),
 }
 CRC16 = {   # poly  , init , xor  , reflect
-    'latin1':  (0x8005,0x0000,0x0000,True ),'ibm':(0x8005,0,0,True),'arc':(0x8005,0,0,True),'lha':(0x8005,0,0,True), # default
+    'latin1':(0x8005,0x0000,0x0000,True ),'ibm':(0x8005,0,0,True),'arc':(0x8005,0,0,True),'lha':(0x8005,0,0,True), # default
     'maxim': (0x8005,0x0000,0xFFFF,True ),'maxim_dow':(0x8005,0,0xFFFF,True),
     'modbus':(0x8005,0xFFFF,0x0000,True ),
     'usb':   (0x8005,0xFFFF,0xFFFF,True ),
@@ -644,7 +644,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
              'crc8_dvb_s2':
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC8[algo[5:]]
             fnc = crc8
-        case 'crc16_ansi'|'crc16_ibm'|'crc16_arc'|'crc16_lha'|'crc16_maxim'|'crc16_maxim_dow'|'crc16_modbus'|\
+        case 'crc16_latin1'|'crc16_ansi'|'crc16_ibm'|'crc16_arc'|'crc16_lha'|'crc16_maxim'|'crc16_maxim_dow'|'crc16_modbus'|\
              'crc16_usb'|'crc16_umts'|'crc16_buypass'|'crc16_verifone'|'crc16_dds_110'|'crc16_cms'|'crc16_kermit'|\
              'crc16_ccitt'|'crc16_ccitt_true'|'crc16_tms37157'|'crc16_riello'|'crc16_iso_iec_14443_3_a'|\
              'crc16_mcrf4xx'|'crc16_x25'|'crc16_ibm_sdlc'|'crc16_iso_hdlc'|'crc16_xmodem'|'crc16_zmodem'|'crc16_acorn'|\

@@ -786,5 +786,32 @@ def extract4_5(inp:str,out:str,t:str):
 
             del f
             if fs: return
+        case 'Destroy All Humans! DIR+PKG PS2'|'Destroy All Humans! DIR+PKG Xbox':
+            raise NotImplementedError
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(8) == b'\xFA\xC7\xBB\x48\x02\x00\x00\x00')
+
+            f.skip(0x10)
+            pno,pdo,feo = f.readu32(),f.readu32(),f.readu32()
+            f.seek(pno)
+            pns = [f.reads(0x104,'ascii').rstrip('\0') for _ in range(f.readu32())]
+
+            id = dirname(i)
+            pes = []
+            fd = {}
+            f.seek(pdo)
+            for _ in range(f.readu32()):
+                n = pns[f.readu32()]
+                if not n in fd:
+                    pk = id + '/' + n + '.pkg'
+                    if exists(pk): fd[n] = File(pk,endian='<')
+                    else: fd[n] = None
+                pes.append((n,f.readu32(),fd[n]))
+                f.skip(0x28)
+            if all(v is None for v in fd.values()): return 1
+
+            f.seek(feo)
 
     return 1
