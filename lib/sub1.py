@@ -348,9 +348,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if listdir(o): return
                 return 1
 
-            ZKEYM = (
-                ({'item.edt','seal.sys','sealres.dll','quest.edt'},b''), # unk key for Seal Online
-            )
             ZFMTM = {
                 0:'none',
                 1:'shrink',
@@ -359,9 +356,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 4:'reduce3',
                 5:'reduce4',
                 6:'pkzip_implode',
+                7:'tokenize', # reserved, no implementation
                 8:'deflate',
                 9:'deflate64',
-                10:'pkware_implode', # unofficial
+                10:'pkware_implode',
                 12:'bzip2',
                 14:'lzma_zip',
                 15:'oodle', # unofficial, used by "New World: Aeternum", untested
@@ -371,11 +369,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 20:'zstd', # deprecated
                 22:'forza_encrypted', # unofficial, custom encryption + deflate
                 93:'zstd',
-                94:'none', # mp3
+                94:'mp3', # unsupported
                 95:'xz',
-                96:'none', # jpeg
-                97:'none', # wavpack
-                98:'ppmd' # unsupported
+                96:'jpeg', # unsupported
+                97:'wavpack', # unsupported
+                98:'ppmd8',
+                99:'aes',
             }
 
             FRZK = None
@@ -421,7 +420,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             }
             db.try_custom()
             from lib.file import File,decompress,pdosdate
-            from lib.crypto import decrypt,crc_hash
+            from lib.crypto import decrypt,encrypt,crc_hash
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
@@ -513,6 +512,17 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             if s > 0x18:
                                 asrt(s >= 0x1C)
                                 fe['dsk'] = f.readu32()
+                        case b'\1\x99': # AE-x
+                            asrt(fe['ct'] == 99,'AE-x entry without AE-x compression type')
+                            asrt(s == 7)
+                            fe['aes'] = {
+                                'vv':f.readu16(),
+                                'v':f.read(2),
+                                'm':f.readu8(),
+                            }
+                            asrt(fe['aes']['v'] == b'AE' and fe['aes']['vv'] in {1,2},f'Unsupported AE-x vendor {repr(fe['aes']['v'])[2:-1]}-{fe["aes"]["vv"]}')
+                            asrt(fe['aes']['m'] in {1,2,3},f'Unsupported AE-x mode {fe["aes"]["m"]}')
+                            fe['ct'] = f.readu16()
                         case b'\x0A\0': # NTFS
                             asrt(s >= 0x20)
                             f.padc(4)
@@ -551,15 +561,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else: fs.append(fe)
 
             if any(fe['fl'] & 1 for fe in fs):
-                nl = tuple([fe['n'].lower() for fe in fs])
-                for pk in ZKEYM:
-                    if type(pk[0]) == set:
-                        if not all(x in nl for x in pk[0]): continue
-                    elif type(pk[0]) == tuple:
-                        if nl != pk[0]: continue
-                    KEY = pk[1]
-                    break
-                else: raise ValueError('No key for zip file')
+                # TODO: add key db
+                KEY = None
+                raise ValueError('No key for zip file')
 
             if FRZK:
                 FRZK.wait()
@@ -569,19 +573,28 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.seek(fe['of'])
                 asrt(f.read(4) == b'PK\3\4')
                 v = f.readu16()
-                asrt(f.readu16() == fe['fl'] and f.readu16() == fe['ct'])
+                if 'aes' in fe: ct = 99
+                else: ct = fe['ct']
+                asrt(f.readu16() == fe['fl'] and f.readu16() == ct)
                 f.skip(4)
                 crc2,zs2,us2 = f.readu32(),f.readu32(),f.readu32()
                 if not crc2 == zs2 == us2 == 0:
-                    asrt(crc2 == fe['crc'] and zs2 == fe['zs'] and us2 == fe['us'],f.pos)
+                    if not 'aes' in fe or fe['aes']['vv'] == 1: asrt(crc2 == fe['crc'])
+                    if not zs2 == us2 == 0xFFFFFFFF: asrt(crc2 == fe['crc'] and zs2 == fe['zs'] and us2 == fe['us'],f.pos)
                 f.skip(f.readu16() + f.readu16())
 
                 d = f.readc(fe['zs'])
-                if fe['fl'] & 1:
+                if ct == 99:
+                    sml,kml = (0,8,12,16)[fe['aes']['m']],(0,16,24,32)[fe['aes']['m']]
+                    salt,kvr,auth,d = d[:sml],d[sml:sml+2],d[-10:],d[sml+2:-10]
+                    k = encrypt(KEY,'pbkdf2',salt,1000,size=kml*2 + 2)
+                    asrt(k[-2:] == kvr,'Password verification failed')
+                    asrt(crc_hash(d,'hmac_sha1',key=k[kml:-2])[:10] == auth,'Authentication failed')
+                    d = decrypt(d,'aes_ctr_le',k[:kml],bits=0x80)
+                elif fe['fl'] & 1:
                     d = decrypt(d,'zipcrypto',KEY)
                     asrt(d[11] == fe['chk'])
                     d = d[12:]
-
                 if fe['ct'] == 22: # Forza
                     asrt(len(d) >= 0x230) # min observed block size + fm6apex header
                     if len(d) & 7 == 4:

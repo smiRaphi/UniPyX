@@ -26,20 +26,27 @@ if __name__ == '__main__':
                 if not os.listdir(p): os.rmdir(p)
 
         exit()
-    elif argv[1:] == ['-pip']:
+    elif argv[1] == '-pip' and not any('/' in x or '\\' in x or ':' in x for x in argv[2:]):
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
         from lib.dldb import DLDB,pip
         db = DLDB()
+
         pl = []
         pn = []
-        for x,y in db.pdb.items():
-            if y.get('old'): continue
-            pn.append(x)
-            pl.append(y['pip'])
+        if len(argv) > 2:
+            for x in argv[2:]:
+                pn.append(x)
+                pl.append(db.pdb[x]['pip'])
+        else:
+            for x,y in db.pdb.items():
+                if y.get('old'): continue
+                pn.append(x)
+                pl.append(y['pip'])
         print('Downloading:')
         print(', '.join(pn))
         pip(*pl)
+        db.save()
         exit()
 
     scan = '-os' in argv

@@ -3,8 +3,12 @@ import sys,os,subprocess
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.makedirs(BDIR + '\\bin\\pip',exist_ok=True)
 sys.path.insert(0,BDIR + '\\bin\\pip')
-def pip(*pkgs):
-    return subprocess.run([sys.executable,'-m','pip','install'] + list(pkgs) + ['-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2).stdout.decode()
+def pip(*pkgs,db=None):
+    if db: t = int(time())
+    r = subprocess.run([sys.executable,'-m','pip','install',*pkgs,'-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2).stdout.decode()
+    if db:
+        for n in pkgs: db.udb[n] = t
+    return r
 
 try: import httpx
 except (ImportError,ModuleNotFoundError):

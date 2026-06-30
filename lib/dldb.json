@@ -5722,6 +5722,9 @@
     "inflate64":{
         "pip":"inflate64"
     },
+    "pyppmd":{
+        "pip":"pyppmd"
+    },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",
         "fs":[{

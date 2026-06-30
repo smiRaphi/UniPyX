@@ -505,6 +505,10 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return lz4.frame.decompress(i)
         case 'lz4_fast': return uxx().decompress_lz4_fast(i,usize=kwargs['usize'])
         case 'lzrw1kh': return uxx().decompress_lzrw1kh(i,usize=kwargs['usize'])
+        case 'ppmd8':
+            import pyppmd
+            flg = int.from_bytes(i[:2],'little')
+            return pyppmd.Ppmd8Decoder((flg & 0xF) + 1,(((flg >> 4) & 0xFF) + 1) << 20,(flg >> 12) & 0xF).decode(i[2:])
 
         case 'lzo'|'lzo1x'|'lzo1y':
             if 'db' in kwargs: kwargs['db'].get('lzo')

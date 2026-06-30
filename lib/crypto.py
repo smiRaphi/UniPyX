@@ -79,11 +79,12 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             kw = kwargs
             if m in {'ccm','eax','gcm','siv','ocb'}: kw['nonce'] = iv
             elif m in {'cbc','cfb','ofb','openpgp'}: kw['iv'] = iv
-            elif m == 'ctr' and iv is not None:
+            elif m == 'ctr':
                 from Cryptodome.Util import Counter
                 if isinstance(iv,bytes): iv = int.from_bytes(iv,'little' if algo.endswith('_le') else 'big')
+                elif iv is None: iv = 1
                 asrt(isinstance(iv,int),err=TypeError)
-                kw['counter'] = Counter.new(len(key)*8,initial_value=iv,little_endian=algo.endswith('_le'),allow_wraparound=True)
+                kw['counter'] = Counter.new(kwargs.pop('bits',len(key)*8),initial_value=iv,little_endian=algo.endswith('_le'),allow_wraparound=True)
             obj = AES.new(key,mode=getattr(AES,f'MODE_{m.upper()}'),**kw)
             if i is None: return obj
 
@@ -148,6 +149,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'rc4'|'arc4':
             from Cryptodome.Cipher import ARC4
             return ARC4.new(key,drop=iv or 0).decrypt(i)
+        case 'zipcrypto': return uxx().decrypt_zipcrypto(i,key)
         case 'rsa'|'rsa_le':
             from Cryptodome.PublicKey import RSA
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
@@ -343,6 +345,11 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'rolr':
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_roll(i,key or b'\0')
+
+        case 'pbkdf2':
+            asrt('size' in kwargs and isinstance(kwargs['size'],int),err=TypeError)
+            from Cryptodome.Protocol.KDF import PBKDF2
+            return PBKDF2(i,key,kwargs['size'],iv or 1000)
 
         case 'zrif'|'zrif_b64':
             asrt(len(key) == 0x400)
@@ -781,6 +788,9 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 c += 1
 
             return bytes(o)[:s]
+        case 'hmac_sha1':
+            import hashlib,hmac
+            return hmac.new(kwargs['key'],i,hashlib.sha1).digest()
 
         case 'tarzan': fnc = tarzan_hash
         case 'luas': fnc = luas_hash
