@@ -17,7 +17,6 @@ The Binding of Isaac Resource | ? | TBOI(Re) | ? | ? | detected
 Atari Masterpieces VPXH | ? | Atari Masterpieces | ? | ? | detected
 Specnaz UFF/BFS | ? | ? | ? | ? | detected
 Metroid Prime 4 Save | ? | MP4 | ? | ? | detected
-PS3 Theme | .p3t | ? | ? | https://github.com/hoshsadiq/ps3theme-p3t-extract/blob/master/src/P3TExtractor/Extractor.php | detected
 HMM Encrypted Snapshot | ? | ? | https://github.com/thesupersonic16/HedgeModManager | https://github.com/thesupersonic16/HedgeModManager/blob/rewrite/HedgeModManager/CLI/Commands/CliCommandDecrypt.cs<br>https://github.com/thesupersonic16/HedgeModManager/blob/rewrite/HedgeModManager/CryptoProvider.cs#L76 | detected, needs private key
 UltraCompressor 2 | .uc2 | ? | ? | ? | detected
 ELI 5750 | ? | ? | ? | ? | detected

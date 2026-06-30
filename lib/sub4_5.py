@@ -813,5 +813,101 @@ def extract4_5(inp:str,out:str,t:str):
             if all(v is None for v in fd.values()): return 1
 
             f.seek(feo)
+        case 'PlayStation 3 Theme':
+            db.try_custom()
+            from xml.dom import minidom
+            import xml.etree.ElementTree as ET
+            from lib.file import File,decompress
+            f = File(i,endian='>')
+            sig = f.read(4)
+            asrt(sig in {b'P3TF',b'RAF0'})
+
+            f.skip(4)
+            tro,trs,idto,idts,sto,sts,iao,ias,fao,fas,fto,fts = [f.readu32() for _ in range(12)]
+            f.seek(tro)
+            tr = {}
+            while f < (tro + trs):
+                trep = f.pos - tro
+                tre = (f.readu32() + sto,f.readu32(),f.reads32())
+                f.skip(0x10)
+                ats = []
+                for _ in range(tre[1]):
+                    no,ty = f.readu32() + sto,f.readu32()
+                    if ty == 1: v = f.reads32();f.padc(4)
+                    elif ty == 2: v = f.readf32();f.padc(4)
+                    elif ty == 3: v = (f.readu32() + sto,f.readu32())
+                    elif ty == 6: v = (f.readu32() + fto,f.readu32())
+                    elif ty == 7: v = f.readu32() + idto;f.padc(4)
+                    else: raise NotImplementedError(f'Attribute type {ty}')
+                    ats.append((no,ty,v))
+                tr[trep] = (tre[0],tre[2],ats)
+
+            for tro,trv in tr.items():
+                ats = {}
+                for ae in trv[2]:
+                    if ae[1] == 3:
+                        f.seek(ae[2][0])
+                        v = f.reads(ae[2][1],'utf-8').rstrip('\0')
+                    elif ae[1] == 6: v = ae[2]
+                    elif ae[1] == 7:
+                        f.seek(ae[2] + 4) # skip s32 id
+                        v = f.read0s('utf-8')
+                    else: v = str(ae[2])
+                    f.seek(ae[0])
+                    ats[f.read0s('utf-8')] = v
+                f.seek(trv[0])
+                tr[tro] = (f.read0s('utf-8'),trv[1],ats,[])
+
+            r = None
+            for treo,tre in tr.items():
+                if tre[1] == -1: r = treo
+                elif tre[1] in tr and treo != tre[1]: tr[tre[1]][3].append(tre)
+
+            asrt(not r is None)
+            r = tr[r]
+
+            def conv(e,p,par=None):
+                ats = {}
+                for k,v in e[2].items():
+                    if isinstance(v,tuple):
+                        f.seek(v[0])
+                        d = f.readc(v[1])
+
+                        if (k + 'size') in e[2]: s = e[2][k + 'size']
+                        elif 'size' in e[2]: s = e[2]['size']
+                        else: s = None
+                        if not s is None and len(d) != int(s): d = decompress(d,'zlib')
+                        if e[0] == 'bgimage':
+                            if 'anim' in e[2]: ex = '.raf'
+                            else: ex = '.jpg'
+                        elif e[0] == 'se': ex = '.vag'
+                        elif sig == b'RAF0': ex = ''
+                        else: ex = '.' + guess_ext_ps2(d)
+
+                        if ex == '.vag': fn = e[2]['id'] + '_' + k
+                        elif 'id' in e[2]: fn = e[2]['id']
+                        elif e[0] in {'notification',}: fn = e[0]
+                        else: fn = k
+
+                        c = 0
+                        bfn = fn
+                        fn += ex
+                        while exists(o + '/' + p + '/' + fn):
+                            fn = f'{bfn}_{c}{ex}'
+                            c += 1
+
+                        writefile(o + '/' + p + '/' + fn,d)
+                        ats[k] = p + '/' + fn
+                    else: ats[k] = v
+                if par is not None: x = ET.SubElement(par,e[0],ats)
+                else: x = ET.Element(e[0],ats)
+                for ch in e[3]: conv(ch,p + '/' + e[0],x)
+                return x
+
+            r = conv(r,'')
+            f.close()
+            d = minidom.parseString(ET.tostring(r,'utf-8')).toprettyxml(indent='  ')
+            writefile(f'{o}/${tbasename(i)}.{sig[:3].decode("ascii").lower()}.xml',d,'wt')
+            return
 
     return 1

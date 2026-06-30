@@ -68,15 +68,6 @@ def extract4_1(inp:str,out:str,t:str):
             for ix in range(len(offs)-1): writefile(o + f'/{ix}.bin',d[offs[ix]:offs[ix+1]])
 
             if offs: return
-        case 'PS3 Theme':
-            raise NotImplementedError
-            db.try_custom()
-            from lib.file import File
-            f = File(i,endian='>')
-
-            asrt(f.read(4) == b'P3TF')
-
-            f.skip(4)
         case 'Peggle Data':
             db.try_custom()
 

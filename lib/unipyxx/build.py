@@ -1,4 +1,5 @@
 import os,sys,sysconfig,subprocess,re,httpx
+from time import sleep
 from hashlib import sha256
 
 SRCD = os.path.dirname(os.path.abspath(__file__))
@@ -9,6 +10,12 @@ FS = [get_src(x) for x in ('unipyxx.c','util.h','comp.c','crypt.c','ext.c')]
 XEXR = re.compile(r'(?m)^XEXPORT [^\(]+ ([\w_]+)\('.encode())
 IMPR = re.compile(r'(?m)^XIMPORT\(([^\)]+)\)'.encode())
 DLLP = SRCD + ('.dll' if sys.platform == 'win32' else '.so')
+
+def remove(f:str):
+    for _ in range(5):
+        try: os.remove(f)
+        except PermissionError: sleep(0.1)
+        else: break
 
 DLDB = {
     'kernel32':('kernel32.lib',None),
@@ -58,19 +65,19 @@ def compile(quiet=False):
     if cc is None: raise ValueError('No C compiler found')
 
     if os.path.exists(DLLP):
-        if os.path.exists(DLLP + '.bak'): os.remove(DLLP + '.bak')
+        if os.path.exists(DLLP + '.bak'): remove(DLLP + '.bak')
         os.rename(DLLP,DLLP + '.bak')
     pls = os.listdir()
     r = subprocess.call([cc] + cmd + [l for l in libs if l.endswith(('.a','.lib'))],env=env,stdout=-3 if quiet else None,stderr=-2 if quiet else None)
     ex = ('exp','lib','a','pdb','obj')
     for ex in ex:
         dnf = os.path.splitext(DLLP)[0] + '.' + ex
-        if os.path.exists(dnf): os.remove(dnf)
+        if os.path.exists(dnf): remove(dnf)
     for p in os.listdir():
-        if p.endswith(ex) and p not in pls: os.remove(p)
+        if p.endswith(ex) and p not in pls: remove(p)
     if r:
         if os.path.exists(DLLP + '.bak'): os.rename(DLLP + '.bak',DLLP)
-    elif os.path.exists(DLLP + '.bak'): os.remove(DLLP + '.bak')
+    elif os.path.exists(DLLP + '.bak'): remove(DLLP + '.bak')
     if not r: open(DLLP,'ab').write(ch)
     return r
 

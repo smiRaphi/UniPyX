@@ -1956,7 +1956,7 @@
         "rs":"Dzip","s":1
     },
     {
-        "d":[["size",[8,null]],["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f.seek(2);fl=f.readi(1)\nif fl&6==6 or (not fl&6 and fl>>3):return\nif fl&1 and not fl&6:return f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF)==(fsz-11)\nreturn ((fl>>3)<286 and(f.readi(1)&31)<30)if fl&6 else(f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF))"]],
+        "d":[["size",[8,null]],["isat","x",0],["isin",["\\xDA","\\x9C","\\x5E","\\x01"],1],["n0",4,-4],["py","f.seek(2);fl=f.readi(1)\nif fl&6==6 or (not fl&6 and fl>>3):return\nif fl&1 and not fl&6:return f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF)==(fsz-11)\nreturn fl&6==2 or((fl>>3)<30 and(f.readi(1)&31)<30)if fl&6 else(f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF))"]],
         "rs":"ZLIB"
     },
     {
