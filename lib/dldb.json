@@ -5725,6 +5725,16 @@
     "pyppmd":{
         "pip":"pyppmd"
     },
+    "wvunpack":{
+        "p":"wvunpack.exe",
+        "fs":[{
+            "u":"https://github.com/dbry/WavPack/releases/download/5.9.0/wavpack-5.9.0-x64.zip",
+            "x":{
+                "wvunpack.exe":"wvunpack.exe"
+            }
+        }],
+        "ts":0
+    },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",
         "fs":[{

@@ -364,17 +364,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 14:'lzma_zip',
                 15:'oodle', # unofficial, used by "New World: Aeternum", untested
                 16:'cmpsc', # unsupported
-                18:'terse', # unsupported
+                18:'terse', # unsupported, unofficial: xceed bwt
                 19:'lz77z', # unsupported
-                20:'zstd', # deprecated
+                20:'zstd', # deprecated, unofficial: lpaq8
                 22:'forza_encrypted', # unofficial, custom encryption + deflate
+                92:'reference', # ?, winzip v25+ stuff
                 93:'zstd',
                 94:'mp3', # unsupported
                 95:'xz',
-                96:'jpeg', # unsupported
-                97:'wavpack', # unsupported
+                96:'zip_jpeg', # unsupported
+                97:'wavpack',
                 98:'ppmd8',
-                99:'aes',
+                99:'aes', # unofficial: LZFSE in .IPAs
             }
 
             FRZK = None
@@ -419,33 +420,50 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 '+':'9',
             }
             db.try_custom()
-            from lib.file import File,decompress,pdosdate
+            from lib.file import File,decompress,pdosdate,by2bi
             from lib.crypto import decrypt,encrypt,crc_hash
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
-            f.seek(-0x10015)
-            d = f.read(0x10015)
+            f.seek(-0x10061) # min EOCD32 + EOCD64
+            d = f.read(0x10061)
             bp = f.size - len(d)
             po = len(d)
-            while True:
-                p = d.rfind(b'PK\x05\x06',None,po)
-                if p == -1: return 1
-                po = p
-                f.seek(bp + p + 4 + 4)
-                rc = f.read(2)
-                if rc != f.read(2): continue
-                of,sz = f.readu32(),f.readu32()
-                if of == 0xFFFFFFFF and rc == b'\xFF\xFF': raise NotImplementedError('Zip64')
-                if (of + sz) <= (bp + p): break
+            if b'PK\x06\x06' in d:
+                while True:
+                    p = d.rfind(b'PK\x06\x06\x2C\0\0\0\0\0\0\0',None,po)
+                    if p == -1: return 1
+                    po = p
+                    f.seek(bp + p + 4 + 8 + 4 + 8)
+                    if f.read(8) != f.read(8): continue
+                    sz,of = f.readu64(),f.readu64()
+                    if (of + sz) <= (bp + p): break
 
-            f.seek(bp + p + 4)
-            if sum(f.read(4)): raise NotImplementedError('Multi file zip')
-            c = f.readu16()
-            f.skip(2)
-            cds,cdo = f.readu32(),f.readu32()
-            cmt = f.readc(f.readu16()).rstrip(b'\0')
-            if cmt: writefile(o + '/$comment.txt',cmt)
+                f.seek(bp + p + 4 + 8 + 4)
+                if sum(f.read(8)): raise NotImplementedError('Multi file zip')
+                c = f.readu64()
+                f.skip(8)
+                cds,cdo = f.readu64(),f.readu64()
+            else:
+                while True:
+                    p = d.rfind(b'PK\x05\x06',0x4C,po)
+                    if p == -1: return 1
+                    po = p
+                    f.seek(bp + p + 4)
+                    mult = sum(f.read(4))
+                    cdc,tcdc = f.readu16(),f.readu16()
+                    if not (cdc == tcdc or (not mult and cdc == 0 and tcdc != 0)): continue
+                    sz,of = f.readu32(),f.readu32()
+                    if (of + sz) <= (bp + p): break
+
+                f.seek(bp + p + 4)
+                if sum(f.read(4)): raise NotImplementedError('Multi file zip')
+                c = f.readu16()
+                if c == 0: c = f.readu16()
+                else: f.skip(2)
+                cds,cdo = f.readu32(),f.readu32()
+                cmt = f.readc(f.readu16()).rstrip(b'\0')
+                if cmt: writefile(o + '/$comment.txt',cmt)
 
             # fe: file entry
             # - cv: create version
@@ -494,7 +512,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fe['ia'] = f.readu16()
                 fe['xa'] = f.readu32()
                 fe['of'] = f.readu32()
-                fe['n'] = f.readc(nl).rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'ascii')
+                fe['n'] = f.readc(nl).rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'cp437')
                 if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
 
                 ep = f.pos + xl
@@ -504,8 +522,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     match tg:
                         case b'\0\0': pass # empty
                         case b'\1\0': # Zip64
-                            asrt(s >= 0x10)
-                            fe['us'],fe['zs'] = f.readu64(),f.readu64()
+                            asrt(s >= 8)
+                            fe['us'] = f.readu64()
+                            if s > 8:
+                                asrt(s >= 0x10)
+                                fe['zs'] = f.readu64()
                             if s > 0x10:
                                 asrt(s >= 0x18)
                                 fe['of'] = f.readu64()
@@ -533,8 +554,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             if ts: fe['ts']['a'] = ts
                             ts = f.readu64()
                             if ts: fe['ts']['c'] = ts
+                        case b'\x20\xA2': # Microsoft Open Packaging Growth Hint
+                            pass # u64 growth hint, 0x10 padding
                         case b'\x23\x11': # ?, seen in Forza Horizon 6
                             pass # u32 data offset
+                        case b'NU': # Xcess unicode
+                            asrt(s >= 10 and f.read(4) == b'NUCX')
+                            ns = f.readu32()
+                            asrt((ns*2+8) <= s)
+                            fe['n'] = f.readutf16(ns)
+                            fe['xcess'] = True
+                        case b'SD': # windows ACL
+                            pass
                         case b'UT':
                             asrt(s >= 1)
                             utfl = f.readu8()
@@ -591,11 +622,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     asrt(k[-2:] == kvr,'Password verification failed')
                     asrt(crc_hash(d,'hmac_sha1',key=k[kml:-2])[:10] == auth,'Authentication failed')
                     d = decrypt(d,'aes_ctr_le',k[:kml],bits=0x80)
-                elif fe['fl'] & 1:
-                    d = decrypt(d,'zipcrypto',KEY)
-                    asrt(d[11] == fe['chk'])
-                    d = d[12:]
-                if fe['ct'] == 22: # Forza
+                elif ct == 22: # Forza
                     asrt(len(d) >= 0x230) # min observed block size + fm6apex header
                     if len(d) & 7 == 4:
                         v = 1
@@ -614,11 +641,23 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     else: return 1
                     d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'],block_size=ctx['b'])
                     if v == 1: d = d[:-pad]
-                    d = decompress(d,'deflate',usize=fe['us'])
-                elif fe['ct'] == 6: d = decompress(d,'pkzip_implode',usize=fe['us'],flags=fe['fl'])
+                    fe['ct'] = 8 # deflate
+                elif fe['fl'] & 1:
+                    d = decrypt(d,'zipcrypto',KEY)
+                    asrt(d[11] == fe['chk'])
+                    d = d[12:]
+
+                if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
+                    d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
+                elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
+                elif fe['ct'] == 97: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
                 else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
                 if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'])
                 fn = o + '/' + fe['n']
+                c = 0
+                while exists(fn):
+                    fn = o + '/' + fe['n'] + '_' + str(c)
+                    c += 1
                 writefile(fn,d)
                 if 'c' in fe['ts']:
                     ts = fe['ts']['c']

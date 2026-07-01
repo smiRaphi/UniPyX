@@ -2562,7 +2562,7 @@
     },
     {
         "rq":null,
-        "rqr":[".NET Framework","MS Visual C# / Basic.NET","NET executable","Microsoft Visual Studio NET",true],
+        "rqr":[".NET Framework","MS Visual C# / Basic.NET",true],
         "rs":".NET Executable"
     },
     {

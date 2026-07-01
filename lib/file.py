@@ -32,6 +32,7 @@ def pdosdate(d:int,t:int,ms=0):
     dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
     if ms: dt.replace(microsecond=ms*1000000)
     return dt.timestamp()
+def by2bi(b:bytes): return f'{int.from_bytes(b,"big"):0{len(b)*8}b}'
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
@@ -641,33 +642,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'
             return getattr(uxx(),'decompress_' + algo)(i,usize=kwargs['usize'])
-
-        case 'lz10'|'lz11'|'lz40'|'lz60':
-            id,fnc = NLZC[algo]
-            asrt(i[0] == id)
-            fnc = getattr(uxx(),fnc)
-            us,i = int.from_bytes(i[1:4],'little'),i[4:]
-            if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
-            r = fnc(i,usize=us)
-            if kwargs.get('verify',True): asrt(len(r) == us)
-            return r
-        case 'blz':
-            h = i[-8:]
-            cs = int.from_bytes(h[:3],'little')
-            us = int.from_bytes(h[4:8],'little') + cs
-            r = uxx().decompress_blz_raw(i[-cs:-h[3]],usize=us)
-            if kwargs.get('verify',True): asrt(len(r) == us)
-            return r
-        case 'avlz':
-            if len(i) < 8: raise ValueError("Not enough data to decompress")
-            cs = int.from_bytes(i[:4],'little')
-            us = int.from_bytes(i[4:8],'little')
-
-            if cs == len(i): cs -= 8
-            if cs != len(i) - 8: raise ValueError("Invalid compressed size")
-            r = uxx().decompress_lzss0_lsb(i[8:8+cs],usize=us)
-            if kwargs.get('verify',True): asrt(len(r) == us)
-            return r
+        case 'd0llz3': return uxx().decompress_d0llz3(i,kwargs.get('usize',len(i) * 0x10))
         case 'natsume_lzs':
             if len(i) < 0x1C: raise ValueError("Not enough data to decompress")
             if i[:4] != b'LZS\0': raise ValueError("Invalid header")
@@ -704,12 +679,36 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if i[0x18]: o.extend(i[0x1C:0x1C+i[0x18]])
             return bytes(o)
 
+        case 'lz10'|'lz11'|'lz40'|'lz60':
+            id,fnc = NLZC[algo]
+            asrt(i[0] == id)
+            fnc = getattr(uxx(),fnc)
+            us,i = int.from_bytes(i[1:4],'little'),i[4:]
+            if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]
+            r = fnc(i,usize=us)
+            if kwargs.get('verify',True): asrt(len(r) == us)
+            return r
+        case 'blz':
+            h = i[-8:]
+            cs = int.from_bytes(h[:3],'little')
+            us = int.from_bytes(h[4:8],'little') + cs
+            r = uxx().decompress_blz_raw(i[-cs:-h[3]],usize=us)
+            if kwargs.get('verify',True): asrt(len(r) == us)
+            return r
+        case 'avlz':
+            if len(i) < 8: raise ValueError("Not enough data to decompress")
+            cs = int.from_bytes(i[:4],'little')
+            us = int.from_bytes(i[4:8],'little')
+
+            if cs == len(i): cs -= 8
+            if cs != len(i) - 8: raise ValueError("Invalid compressed size")
+            r = uxx().decompress_lzss0_lsb(i[8:8+cs],usize=us)
+            if kwargs.get('verify',True): asrt(len(r) == us)
+            return r
         case 'mio0'|'yay0'|'yaz0'|'vpk0':
             import crunch64
             return getattr(crunch64,algo).decompress(i)
         case 'ash0': return uxx().decompress_ash0(i)
-
-        case 'd0llz3': return uxx().decompress_d0llz3(i,kwargs.get('usize',len(i) * 0x10))
 
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
             asrt('usize' in kwargs and (OODLE or kwargs.get('db')))
@@ -759,6 +758,40 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if i[1] & 0x20: i = i[6:]
             else: i = i[2:]
             #return ananconda_decompress(i)
+        case 'xceed_bwt':
+            us = kwargs['usize']
+            if us == 0: return b''
+            import bz2
+
+            # I'm too lazy to write a whole bzip2 decompressor so this coaxes bz2 into decompressing without a known valid crc
+            be = by2bi(i[-2:])
+            be = be[:be.rfind('00010111') + 8] + by2bi(b'rE8P\x90')
+            bd = b'BZh' + i[:2] + b'AY&SY'
+
+            if us > 1:
+                e = be + '0'*32 + '0' * (-len(be) % 8)
+                td = bz2.BZ2File(io.BytesIO(bd + b'\0'*4 + i[2:-2] + int(e,2).to_bytes(len(e)//8,'big')),'r')
+                td = td.read1(us - 1)
+            else: td = b''
+
+            if 'check' in kwargs:
+                for pb in range(0x100):
+                    if kwargs['check'](td + pb.to_bytes(1)):
+                        return td + pb.to_bytes(1)
+            else:
+                from .crypto import crc_hash
+                for pb in range(0x100):
+                    crc = crc_hash(td + pb.to_bytes(1),'crc32_bzip2').to_bytes(4,'big')
+                    e = be + by2bi(crc) + '0' * (-len(be) % 8)
+                    try: return bz2.decompress(bd + crc + i[2:-2] + int(e,2).to_bytes(len(e)//8,'big'))
+                    except OSError: pass
+            raise ValueError("Couldn't guess last byte")
+
+        case 'wavpack'|'wv':
+            asrt('db' in kwargs)
+            r,o,e = kwargs['db'].run(['wvunpack','-','-'],stdin=i,text=False,print_try=False)
+            if r != 0: raise ValueError(e)
+            return o
     raise NotImplementedError(algo)
 
 def lzss_decompress(i:bytes,usize:int=None,lens=4,offs=12,minl=3):

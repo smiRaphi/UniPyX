@@ -102,7 +102,7 @@ class DLDB:
             if stdin: os.remove(tfi)
             if text: o,e = o.decode('cp437'),e.decode('cp437')
         else:
-            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=None if print_out else -1,stderr=None if print_out else -1,stdin=-1 if stdin != None else None,**kwargs)
+            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=None if print_out else -1,stderr=None if print_out else -1,stdin=-1 if stdin is not None else None,**kwargs)
             if timeout:
                 for _ in range(int(timeout*10)):
                     if p.poll() != None: break
