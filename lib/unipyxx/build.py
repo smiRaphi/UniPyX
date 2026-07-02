@@ -20,14 +20,19 @@ def remove(f:str):
 DLDB = {
     'kernel32':('kernel32.lib',None),
     'xcompress':('xcompress64.lib','https://raw.githubusercontent.com/NativeFunction/SC-CL/refs/heads/master/lib/xcompress64.lib'),
+    # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Wno-author "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" -DBUILD_SHARED_LIBS=OFF -A x64
+    # cmake --build build -j <cores> --config Release
+    'lzfse':('lzfse.lib',0), # static https://github.com/lzfse/lzfse
     'unimplode6a':('unimplode6a.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/unimplode6a.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
     'ozunreduce':('ozunreduce.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/ozunreduce.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
     'ozunshrink':('ozunshrink.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/ozunshrink.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
+    'lpaq8_zzz':('lpaq8_zzz.h','https://raw.githubusercontent.com/WangXuan95/TinyZZZ/refs/heads/main/src/lpaq8CD.c'),
 }
 def get_lib(n:str):
+    if DLDB[n][1] == 0: return os.path.join(LIBD + 'x',DLDB[n][0])
+    elif DLDB[n][1] is None: return DLDB[n][0]
     p = os.path.join(LIBD,DLDB[n][0])
     if not os.path.exists(p):
-        if DLDB[n][1] is None: return DLDB[n][0]
         d = httpx.get(DLDB[n][1],follow_redirects=True).content
         if len(DLDB[n]) > 2:
             d = d.replace(b'\r',b'')
@@ -58,8 +63,8 @@ def compile(quiet=False):
     elif sys.platform == 'win32':
         from setuptools import msvc
         env |= {x.upper():v for x,v in msvc.EnvironmentInfo('x64' if sys.maxsize > 2**32 else 'x86').return_env().items()}
-        cmd  = ['/Ox','/GS-','/GR-','/Gs999999','/LD','/I',LIBD,'/TC',*FS,f'/Fe:{DLLP}','/link','/MANIFEST:NO','/MERGE:.rdata=.text','/OPT:REF','/OPT:ICF','/ALIGN:128','/ENTRY:DllMain',
-               'vcruntime.lib','ucrt.lib'] + ['/EXPORT:' + x for x in xfncs]
+        cmd  = ['/Ox','/GS-','/GR-','/Gs999999','/LD','/I',LIBD,'/TC',*FS,f'/Fe:{DLLP}','/link','/MANIFEST:NO','/MERGE:.rdata=.text','/OPT:REF','/OPT:ICF','/ALIGN:128',
+                '/NODEFAULTLIB:MSVCRT'] + ['/EXPORT:' + x for x in xfncs]
         for p in env['PATH'].split(';'):
             if os.path.exists(p + '/cl.exe') and os.path.isfile(p + '/cl.exe'): cc = os.path.join(p,'cl.exe');break
     if cc is None: raise ValueError('No C compiler found')

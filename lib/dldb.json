@@ -1611,13 +1611,6 @@
         }],
         "ts":0
     },
-    "lzfse":{
-        "p":"lzfse.exe",
-        "fs":[
-        "https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe"
-        ],
-        "ts":0
-    },
     "limit":{
         "p":"LIMIT.EXE",
         "fs":[{
@@ -5734,6 +5727,16 @@
             }
         }],
         "ts":0
+    },
+    "packmp3":{
+        "p":"packMP3.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=2499&d=1380378973",
+            "ex":".zip",
+            "x":{
+                "packMP3.exe":"packMP3.exe"
+            }
+        }]
     },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",

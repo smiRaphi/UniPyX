@@ -16,6 +16,7 @@ __pycache__
 *.bhl
 /dev/helpers/*.lib
 /lib/unipyxx/.lib
+/lib/unipyxx/.libx
 /lib/unipyxx/!check
 
 !/bin/bin.7z

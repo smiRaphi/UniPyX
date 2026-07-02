@@ -506,6 +506,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return lz4.frame.decompress(i)
         case 'lz4_fast': return uxx().decompress_lz4_fast(i,usize=kwargs['usize'])
         case 'lzrw1kh': return uxx().decompress_lzrw1kh(i,usize=kwargs['usize'])
+        case 'lzfse': return uxx().decompress_lzfse(i,usize=kwargs['usize'])
         case 'ppmd8':
             import pyppmd
             flg = int.from_bytes(i[:2],'little')
@@ -753,11 +754,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'xmem'|'xmem_lzx': return uxx().decompress_xmemlzx(i,kwargs['usize'])
         case 'xb'|'xbcompress': return uxx().decompress_xb(i)
         case 'capcom_yz2': return uxx().decompress_capcom_yz2(i,kwargs['usize'])
-        case 'anaconda_deflate': pass#return ananconda_decompress(i)
-        case 'anaconda_zlib':
-            if i[1] & 0x20: i = i[6:]
-            else: i = i[2:]
-            #return ananconda_decompress(i)
         case 'xceed_bwt':
             us = kwargs['usize']
             if us == 0: return b''
@@ -786,10 +782,21 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                     try: return bz2.decompress(bd + crc + i[2:-2] + int(e,2).to_bytes(len(e)//8,'big'))
                     except OSError: pass
             raise ValueError("Couldn't guess last byte")
+        case 'lpaq8': return uxx().decompress_lpaq8(i,kwargs['usize'])
+        case 'anaconda_deflate': pass#return ananconda_decompress(i)
+        case 'anaconda_zlib':
+            if i[1] & 0x20: i = i[6:]
+            else: i = i[2:]
+            #return ananconda_decompress(i)
 
         case 'wavpack'|'wv':
             asrt('db' in kwargs)
             r,o,e = kwargs['db'].run(['wvunpack','-','-'],stdin=i,text=False,print_try=False)
+            if r != 0: raise ValueError(e)
+            return o
+        case 'packmp3':
+            asrt('db' in kwargs)
+            r,o,e = kwargs['db'].run(['packmp3','-'],stdin=i,text=False,print_try=False)
             if r != 0: raise ValueError(e)
             return o
     raise NotImplementedError(algo)

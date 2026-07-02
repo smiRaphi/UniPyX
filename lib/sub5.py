@@ -186,10 +186,6 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['quad','-d',i,of])
             if exists(of) and getsize(of): return
         case 'UltraCompressor 2': raise NotImplementedError
-        case 'LZFSE':
-            of = o + '/' + tbasename(i)
-            run(['lzfse','-decode','-i',i,'-o',of])
-            if exists(of) and getsize(of): return
         case 'LIMIT':
             dosbox(['limit','e','-y','-p',i])
             if listdir(o): return
@@ -458,6 +454,12 @@ def extract5(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import decompress
             writefile(o + '/' + tbasename(i),decompress(readfile(i),'deflate64'))
+            return
+        case 'LZFSE':
+            db.try_custom()
+            from lib.file import decompress
+            d = readfile(i) # usize calc based on official demo code
+            writefile(o + '/' + tbasename(i),decompress(d,'lzfse',usize=len(d) * 4))
             return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':

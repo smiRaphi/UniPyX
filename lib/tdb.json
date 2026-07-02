@@ -1115,7 +1115,8 @@
         "afterlife game data"
     ],
     "UUencoded":[
-        "uuencoded text"
+        "uuencoded text",
+        "uuencoded/xxencoded text"
     ],
     "Shell Archive":[
         "sh-----cut"

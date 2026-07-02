@@ -958,7 +958,7 @@ Kanzi | .knz .kanz .kanzi | [Kanzi](https://github.com/flanglet/kanzi-cpp) |
 Li-GRU | .ligru_v0_90 .ligru_v0_91 .ligru_v0_92 | [ligru-compress](https://encode.su/threads/4370-The-new-kid-on-the-block-ligru-compress-an-experimental-file-compressor) |
 LIMIT | .limit .lim | [LIMIT](http://cd.textfiles.com/nightowl/nopv13/014A/LIMIT12.ZIP) |
 Lizard | .lz .liz | [Lizard](https://github.com/inikep/lizard) |
-LZFSE | ??? | [lzfse](https://media.githubusercontent.com/media/YaronKoresh/Reverse-Engineering-Tools/bf2eba8a5fab61a755e4ceedcc440959737f4cc0/ghidra/Ghidra/Features/FileFormats/os/win_x86_64/lzfse.exe)(src?) |
+LZFSE | ??? | Custom |
 LZHAM | ??? | [lzham](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/lzham/lzham_alpha7_r1.7z) |
 LZMAT | .lzmat | [lzmat](https://web.archive.org/web/20150512034714/http://www.matcode.com/lzmat.htm) |
 LZOP | .lzop | [lzop](https://www.lzop.org/) |

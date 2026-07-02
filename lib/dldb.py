@@ -256,13 +256,18 @@ class DLDB:
             cl = httpx
             kwargs['verify'] = False
         else: cl = self.c
+        clfr = False
         try:
             with xopen(out,'wb') as f:
                 for _ in range(10):
                     try:
                         with cl.stream("GET",url,headers={'Range':f'bytes={start}-'},follow_redirects=True,**kwargs) as r:
                             if r.headers.get('Content-Length') and not int(r.headers['Content-Length']): continue
-                            for c in r.iter_bytes(4096): f.write(c)
+                            for c in r.iter_bytes(4096):
+                                if not clfr:
+                                    if b'<title>Just a moment...</title>' in c and b'://challenges.cloudflare.com' in c: raise ValueError(f'Cloudflare ({url})')
+                                    clfr = True
+                                f.write(c)
                         break
                     except (httpx.ConnectError,httpx.ConnectTimeout): pass
                     except httpx.ReadTimeout: start = f.tell()

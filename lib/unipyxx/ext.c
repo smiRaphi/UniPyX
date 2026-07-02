@@ -105,6 +105,28 @@ EXPORT int decompress_zip_shrink(const uint8_t *restrict src, const size_t zsize
     return r;
 }
 
+XIMPORT(lzfse)
+EXPORT ssize_t decompress_lzfse(const uint8_t *restrict src, const size_t zsize,
+                                      uint8_t *restrict dst, const size_t usize) {
+    void *aux = malloc(lzfse_decode_scratch_size());
+    if (!aux) return -1;
+    ssize_t r = lzfse_decode_buffer(dst, usize, src, zsize, aux);
+    free(aux);
+    return r;
+}
+
+XIMPORT(lpaq8_zzz)
+#include <lpaq8_zzz.h>
+EXPORT ssize_t decompress_lpaq8(const uint8_t *restrict src, const size_t zsize,
+                                      uint8_t *restrict dst, const size_t usize) {
+    size_t us = usize;
+    uint8_t d1;
+    size_t d2;
+    int r = lpaq8D(src, zsize, dst, &us, &d1, &d2);
+    if (r != 0) return -r;
+    return us;
+}
+
 #ifdef __cplusplus
 }
 #endif

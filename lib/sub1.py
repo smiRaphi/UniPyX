@@ -337,17 +337,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 tf.destroy()
             return
         case 'ZIP'|'InstallShield Setup ForTheWeb':
-            if readfile(i,size=2) == b'MZ':
-                zip7(i,o,'ZIP',True)
-                if os.path.exists(o + '/_INST32I.EX_'):
-                    if fix_isinstext(o): return
-                elif os.path.exists(o + '/Disk1/ikernel.ex_'):
-                    if fix_isinstext(o,o + '/Disk1'): return
-                elif listdir(o): return
-                run(['garbro','-x',i],cwd=o)
-                if listdir(o): return
-                return 1
-
             ZFMTM = {
                 0:'none',
                 1:'shrink',
@@ -356,26 +345,29 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 4:'reduce3',
                 5:'reduce4',
                 6:'pkzip_implode',
-                7:'tokenize', # reserved, no implementation
+                7:'tokenize', # reserved, no implementation, unsupported
                 8:'deflate',
                 9:'deflate64',
                 10:'pkware_implode',
                 12:'bzip2',
                 14:'lzma_zip',
                 15:'oodle', # unofficial, used by "New World: Aeternum", untested
-                16:'cmpsc', # unsupported
-                18:'terse', # unsupported, unofficial: xceed bwt
+                16:'cmpsc', # unsupported, https://github.com/Fish-Git/cmpsctst
+                18:'terse', # unsupported
+              # 18:'xceed_bwt', # unofficial
                 19:'lz77z', # unsupported
-                20:'zstd', # deprecated, unofficial: lpaq8
-                22:'forza_encrypted', # unofficial, custom encryption + deflate
-                92:'reference', # ?, winzip v25+ stuff
+                20:'zstd', # deprecated
+              # 20:'lpaq8', # unofficial
+                22:'forza_encrypted', # unofficial, custom encryption + deflate, untested
+                92:'reference',
                 93:'zstd',
-                94:'mp3', # unsupported
+                94:'packmp3',
                 95:'xz',
-                96:'zip_jpeg', # unsupported
+                96:'zipx_jpeg', # unsupported
                 97:'wavpack',
                 98:'ppmd8',
-                99:'aes', # unofficial: LZFSE in .IPAs
+                99:'aes',
+              # 99:'lzfse', # unofficial
             }
 
             FRZK = None
@@ -420,14 +412,25 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 '+':'9',
             }
             db.try_custom()
+            import json
             from lib.file import File,decompress,pdosdate,by2bi
             from lib.crypto import decrypt,encrypt,crc_hash
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
-            f.seek(-0x10061) # min EOCD32 + EOCD64
-            d = f.read(0x10061)
-            bp = f.size - len(d)
+            TESTDS = 0x10061 # max EOCD32 + EOCD64
+            f.seek(-TESTDS)
+            d = f.read(TESTDS)
+            if not sum(d):
+                while True:
+                    f.back(TESTDS*2)
+                    d = f.read(TESTDS)
+                    if sum(d):
+                        f.back((TESTDS - len(d.rstrip(b'\0'))) + TESTDS)
+                        d = f.read(TESTDS)
+                        break
+
+            bp = f.pos - len(d)
             po = len(d)
             if b'PK\x06\x06' in d:
                 while True:
@@ -487,7 +490,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
             f.seek(cdo)
             fs = []
             for _ in range(c):
-                asrt(f.read(4) == b'PK\1\2')
+                blkn = f.read(4)
+                if blkn == b'PK\5\6': break
+                asrt(blkn == b'PK\1\2')
                 fe = {
                     'cv':f.readu16(),
                     'xv':f.readu16(),
@@ -512,7 +517,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fe['ia'] = f.readu16()
                 fe['xa'] = f.readu32()
                 fe['of'] = f.readu32()
-                fe['n'] = f.readc(nl).rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'cp437')
+                fnb = f.readc(nl)
+                fe['n'] = fnb.rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'cp437')
                 if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
 
                 ep = f.pos + xl
@@ -533,6 +539,28 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             if s > 0x18:
                                 asrt(s >= 0x1C)
                                 fe['dsk'] = f.readu32()
+                        case b'\x0C\0': # OpenVMS
+                            asrt(s >= 4)
+                            f.skip(4)
+                            while (f.pos + 4) < xep:
+                                vtg,vs = f.readu16(),f.readu16()
+                                vep = f.pos + vs
+                                asrt(vep <= xep)
+                                match vtg:
+                                    case 4|19|20|13|21|22|23|29: pass # RECATTR, EXPDATE, BAKDATE, ASCDATES, UIC, FPRO, RPRO, JOURNAL
+                                    case 3: # UCHAR
+                                        asrt(vs >= 4)
+                                        fe['vms'] = f.readu32()
+                                    case 17: # CREDATE
+                                        asrt(vs >= 8)
+                                        ts = f.readu64()
+                                        if ts: fe['ts']['c'] = vms2filetime(ts)
+                                    case 18: # REVDATE
+                                        asrt(vs >= 8)
+                                        ts = f.readu64()
+                                        if ts: fe['ts']['m'] = vms2filetime(ts)
+                                    case _: raise NotImplementedError(f'Unknown OpenVMS tag {vtg} @ 0x{f.pos - 4:08X}')
+                                f.seek(vep)
                         case b'\1\x99': # AE-x
                             asrt(fe['ct'] == 99,'AE-x entry without AE-x compression type')
                             asrt(s == 7)
@@ -544,6 +572,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             asrt(fe['aes']['v'] == b'AE' and fe['aes']['vv'] in {1,2},f'Unsupported AE-x vendor {repr(fe['aes']['v'])[2:-1]}-{fe["aes"]["vv"]}')
                             asrt(fe['aes']['m'] in {1,2,3},f'Unsupported AE-x mode {fe["aes"]["m"]}')
                             fe['ct'] = f.readu16()
+                        case b'\x03\x99': # WinZip Reference
+                            pass
                         case b'\x0A\0': # NTFS
                             asrt(s >= 0x20)
                             f.padc(4)
@@ -554,16 +584,28 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             if ts: fe['ts']['a'] = ts
                             ts = f.readu64()
                             if ts: fe['ts']['c'] = ts
+                        case b'\x1E\xA1': # Data Stream Alignment
+                            pass # u16 ?
                         case b'\x20\xA2': # Microsoft Open Packaging Growth Hint
                             pass # u64 growth hint, 0x10 padding
                         case b'\x23\x11': # ?, seen in Forza Horizon 6
                             pass # u32 data offset
+                        case b'KV': # KeyValuePairs
+                            asrt(s >= 14)
+                            asrt(f.read(13)[:9] == b'KeyValuePairs'[:9]) # only verify first couple bytes
+                            kvc = f.readu8()
+                            fe['kv'] = dict((f.reads(f.readu16(),'utf-8'),f.reads(f.readu16(),'utf-8')) for _ in range(kvc))
                         case b'NU': # Xcess unicode
                             asrt(s >= 10 and f.read(4) == b'NUCX')
                             ns = f.readu32()
                             asrt((ns*2+8) <= s)
                             fe['n'] = f.readutf16(ns)
                             fe['xcess'] = True
+                        case b'Q\x1A': # minizip hash
+                            asrt(s > 4)
+                            ht,hs = f.readu16(),f.readu16()
+                            asrt((hs + 4) <= s)
+                            fe[{10:'md5',20:'sha1',23:'sha256'}[ht]] = f.read(hs)
                         case b'SD': # windows ACL
                             pass
                         case b'UT':
@@ -582,40 +624,62 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             ts = f.readu32()
                             if ts: fe['ts']['m'] = unix2filetime(ts)
                             # optional u16 UID & u16 GID
+                        case b'Ux': # Previous new Unix
+                            pass # optional u16 UID & u16 GID
+                        case b'e\0': # IBM S/390 attributes uncompressed
+                            pass
+                        case b'nu': # ASi unix
+                            pass
+                        case b'up': # Info-ZIP unicode
+                            asrt(s > 5)
+                            asrt(f.readu8() == 1)
+                            if crc_hash(fnb,'crc32') == f.readu32(): fe['n'] = f.readc(s - 5).decode('utf-8')
                         case b'ux': # New Unix
                             pass # u16 tag (?), u16 len (?), u8 v, u8 UIDlen, u8 UID[UIDlen], u8 GIDlen, u8 GID[GIDlen]
+                        case b'\xC5\x10': # minizip CMS signature
+                            pass # eh, no
+                        case b'\xCD\xCD': # minizip central directory
+                            asrt(s >= 8)
+                            fe['mzc'] = f.readu64()
+                            raise NotImplementedError('minizip central directory')
                         case _: raise NotImplementedError(f'{repr(tg)[1:]} @ 0x{f.pos - 4:08X}')
                     f.seek(xep)
                 f.seek(ep)
                 fe['cm'] = f.readc(cml)
-                if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0): mkdir(o + '/' + fe['n'])
+                if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0) or ('vms' in fe and fe['vms'] & 0x1000): mkdir(o + '/' + sanitize_relative(fe['n']))
                 else: fs.append(fe)
 
             if any(fe['fl'] & 1 for fe in fs):
                 # TODO: add key db
                 KEY = None
                 raise ValueError('No key for zip file')
-
             if FRZK:
                 FRZK.wait()
                 FRMK = [x for x in FRZK['c'] if x['n'].startswith('fm') and x['t'] == 'file']
                 FRHK = [x for x in FRZK['c'] if x['n'].startswith('fh') and x['t'] == 'file']
+
+            hrefs = any(fe['ct'] == 92 for fe in fs)
+            refs = []
+            drefs = {}
             for fe in fs:
                 f.seek(fe['of'])
                 asrt(f.read(4) == b'PK\3\4')
                 v = f.readu16()
                 if 'aes' in fe: ct = 99
                 else: ct = fe['ct']
-                asrt(f.readu16() == fe['fl'] and f.readu16() == ct)
-                f.skip(4)
-                crc2,zs2,us2 = f.readu32(),f.readu32(),f.readu32()
-                if not crc2 == zs2 == us2 == 0:
-                    if not 'aes' in fe or fe['aes']['vv'] == 1: asrt(crc2 == fe['crc'])
-                    if not zs2 == us2 == 0xFFFFFFFF: asrt(crc2 == fe['crc'] and zs2 == fe['zs'] and us2 == fe['us'],f.pos)
-                f.skip(f.readu16() + f.readu16())
+                asrt(f.readu16() == fe['fl'])
+                ct2 = f.readu16()
+                f.skip(0x10) # f.skip(4);crc2,zs2,us2 = f.readu32(),f.readu32(),f.readu32()
+                fnl2,xfl2 = f.readu16(),f.readu16()
+                fnb2 = f.reads(fnl2,'cp437')
+                if ct == 18 and ct2 == 8 and not fe['fl'] & 0x800 and fnb2.isprintable() and all(x & 0x80 for x in fe['n'].encode('cp437')):
+                    fe['n'] = fnb2
+                    ct = fe['ct'] = ct2
+                asrt(ct == ct2)
+                f.skip(xfl2)
 
                 d = f.readc(fe['zs'])
-                if ct == 99:
+                if ct == 99 and 'aes' in fe:
                     sml,kml = (0,8,12,16)[fe['aes']['m']],(0,16,24,32)[fe['aes']['m']]
                     salt,kvr,auth,d = d[:sml],d[sml:sml+2],d[-10:],d[sml+2:-10]
                     k = encrypt(KEY,'pbkdf2',salt,1000,size=kml*2 + 2)
@@ -647,27 +711,68 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     asrt(d[11] == fe['chk'])
                     d = d[12:]
 
-                if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
-                    d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
-                elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
-                elif fe['ct'] == 97: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
-                else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
-                if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'])
-                fn = o + '/' + fe['n']
+                fn = o + '/' + sanitize_relative(fe['n'])
                 c = 0
                 while exists(fn):
                     fn = o + '/' + fe['n'] + '_' + str(c)
                     c += 1
+
+                if fe['ct'] == 92:
+                    fe['sha1'] = d
+                    refs.append(fe)
+                    fe['ffn'] = fn
+                    continue
+
+                if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
+                    d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
+                elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
+                    d = decompress(d,'lzfse',usize=fe['us'])
+                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD':
+                    d = decompress(d,'lpaq8',usize=fe['us'])
+                elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
+                elif fe['ct'] in {94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
+                else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
+                for pht in ('sha256','sha1','md5'):
+                    if pht in fe:
+                        asrt(crc_hash(d,pht,bytes=True) == fe[pht],f'Hash mismatch ({pht})')
+                        break
+                else:
+                    if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'],'Checksum mismatch (crc32)')
+
+                if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
                 writefile(fn,d)
-                if 'c' in fe['ts']:
-                    ts = fe['ts']['c']
-                    if isinstance(fe['ts']['c'],tuple): ts = ts[0]
-                    if ts: set_ftime(fn,ts,not isinstance(fe['ts']['c'],tuple))
-                ts = (0,0)
-                if 'm' in fe['ts']: ts = fe['ts']['m']
+                ts = [0,0,0]
+                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
+                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
+                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
+                set_ftime(fn,*ts,unix=False)
+
+                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
+                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
 
             f.close()
+            for fe in refs:
+                fn = fe['ffn']
+                copyfile(drefs[fe['sha1']],fn)
+                ts = [0,0,0]
+                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
+                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
+                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
+                set_ftime(fn,*ts,unix=False)
+                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
+                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
             if fs: return
+
+            if readfile(i,size=2) == b'MZ':
+                zip7(i,o,'ZIP',True)
+                if os.path.exists(o + '/_INST32I.EX_'):
+                    if fix_isinstext(o): return
+                elif os.path.exists(o + '/Disk1/ikernel.ex_'):
+                    if fix_isinstext(o,o + '/Disk1'): return
+                elif listdir(o): return
+                run(['garbro','-x',i],cwd=o)
+                if listdir(o): return
+                return 1
 
             run(['unzip','-q','-o',i,'-d',o])
             if listdir(o): return

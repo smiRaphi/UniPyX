@@ -204,7 +204,8 @@ def sanitize_relative(p:str):
     elif p[-1] != r[-1]: r = r[:-1] + p[-1]
     return r
 def unix2filetime(t:int): return t * 10000000 + 116444736000000000
-def filetime2unix(t:int): return t / 10000000 - 116444736000000000
+def filetime2unix(t:int): return (t - 116444736000000000) / 10000000
+def vms2filetime(t:int): return t + 81377568000000000
 def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
     if ct is None: ct = 0
     if mt is None: mt = ct

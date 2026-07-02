@@ -75,10 +75,9 @@ class X:
         if not os.path.exists(DLLP): raise FileNotFoundError
         if os.path.exists(PRJP + '/!check'):
             ch = sha256()
-            for f in os.listdir(PRJP):
-                if f.endswith(('.c','.h')):
-                    with open(os.path.join(PRJP,f),'rb') as f:
-                        ch.update(f.read().replace(b'\r',b'').strip())
+            for f in sorted(('comp.c','crypt.c','ext.c','unipyxx.c','util.h')):
+                with open(os.path.join(PRJP,f),'rb') as f:
+                    ch.update(f.read().replace(b'\r',b'').strip())
             ch = ch.digest()
             with open(DLLP,'rb') as f:
                 f.seek(-len(ch),2)
@@ -151,6 +150,8 @@ class X:
             ('decompress_zip_shrink',(P(u8),szt,P(u8),szt),cint,0),
             ('decompress_zip_reduce',(P(u8),szt,P(u8),szt,u8),cint,0),
             ('decompress_zip_implode',(P(u8),szt,P(u8),szt,u16),cint,0),
+            ('decompress_lzfse',(P(u8),szt,P(u8),szt),sszt,1),
+            ('decompress_lpaq8',(P(u8),szt,P(u8),szt),sszt,1),
         ):
             fnc = self.dll[e[0]]
             fnc.argtypes = e[1]
@@ -180,6 +181,7 @@ class X:
     def decompress_vicious_lz(src:bytes,usize:int) -> bytes: ...
     def decompress_graw_bpe(src:bytes,usize:int) -> bytes: ...
     def decompress_capcom_yz2(src:bytes,usize:int) -> bytes: ...
+    def decompress_lzfse(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)
