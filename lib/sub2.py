@@ -146,7 +146,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for x in listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
-        case '\0Switch NSP':
+        case 'Switch NSP\0':
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
@@ -168,17 +168,43 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/' + fn,f.readc(fe[1]))
 
             f.close()
-            if fs: return
-        case 'Switch Unpacked':
-            raise NotImplementedError
+            if fs:
+                extract2(o,o,'Switch Unpacked')
+                return
+        case 'Switch Unpacked\0':
             db.try_custom()
+            from lib.file import File
             inf = [x for x in listdir(i) if x.lower().endswith('.cnmt.nca')]
             asrt(len(inf) == 1)
             inf = i + '/' + inf[0]
-        case '\0Switch NCA':
-            raise NotImplementedError
+
+            f = File(inf,endian='<')
+            nca = Nintendo(db).parse_nca(f)
+        case 'Switch NCA\0':
             db.try_custom()
-            nca = Nintendo(db).parse_nca(readfile(i,size=0x10000))
+            from lib.crypto import decrypt
+            from lib.file import File
+            f = File(i,endian='<')
+            nca = Nintendo(db).parse_nca(f)
+            v = nca.version
+
+            writefile(o + '/$header.dec',nca.data())
+            for ix in range(4):
+                sec = nca.section_entries[ix]
+                if not sec.start_offset: continue
+                off = sec.start_offset * 0x200
+                f.seek(off)
+                d = f.readc(sec.end_offset * 0x200 - off)
+                fse = nca.fs_header_entries[ix]
+                if nca.version <= 0: fse.values['enc_type'] = -1
+                if fse.enc_type == 1: pass # decrypted
+                elif fse.enc_type == 3: d = decrypt(d,'aes_ctr_be',nca.decrypted_keys[1],off >> 4,prefix=fse.aes_ctr_upper_iv,bits=0x40)
+                else: raise NotImplementedError(f'encryption type {fse.enc_type}')
+                if fse.fstype == 1: asrt(d[0x20:0x24] == b'PFS0',ix)
+                writefile(f'{o}/{ix}.{("RomFS","PartitionFS")[fse.fstype]}',d)
+
+            f.close()
+            return
         case 'Switch NSP'|'Switch NCA'|'Switch XCI':
             import re
 
@@ -1524,8 +1550,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
     return 1
 
 @namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt'])
-def Nintendo(db):
-    from lib.file import FileStruct
+def _Nintendo(db):
+    from lib.file import File,FileStruct
     from lib.crypto import decrypt,crc_hash
 
     class AmiiboId(FileStruct):
@@ -1590,7 +1616,7 @@ def Nintendo(db):
             return _NXDKEYS
         if _NXPKEYS is None: 
             k = db.get('prodkeys')
-            if k: _NXPKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
+            if k: _NXPKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k,'rt').split('\n') if x.strip()}
             else: _NXPKEYS = {}
         return _NXPKEYS
 
@@ -1600,11 +1626,43 @@ def Nintendo(db):
         start_offset:'u32'
         end_offset:'u32'
         padding:'padding' = 8
+    class NCAPatchInfo(FileStruct):
+        indirect_offset:'s64'
+        indirect_size:'s64'
+        indirect_header_offset:'s64'
+        indirect_header_size:'s64'
+        aes_ctr_ex_offset:'s64'
+        aes_ctr_ex_size:'s64'
+        aes_ctr_ex_header_offset:'s64'
+        aes_ctr_ex_header_size:'s64'
+    class NCASparseInfo(FileStruct):
+        bucket_offset:'s64'
+        bucket_size:'s64'
+        physical_offset:'s64'
+        generation:'u16'
+        padding:'padding' = 6
+    class NCAFSHeaderEntry(FileStruct):
+        version:'u16'
+        fstype:'u8'
+        hash_type:'u8'
+        enc_type:'u8'
+        meta_hash_type:'u8'
+        padding1:'padding' = 2
+        hash_data:bytes = 0x98
+        patch_info:NCAPatchInfo
+        aes_ctr_upper_iv:bytes = 8
+        sparse_info:NCASparseInfo
+        compression_info_bucket_offset:'s64'
+        compression_info_bucket_size:'s64'
+        compression_info_padding:'padding' = 8
+        meta_hash_data_info_offset:'s64'
+        meta_hash_data_info_size:'s64'
+        meta_hash_data_info_hash:bytes = 0x20
+        padding2:'padding' = 0x30        
     class NCA(FileStruct):
         fixed_key_sig:bytes = 0x100
         npdm_key_sig:bytes = 0x100
-        magic:bytes = 3
-        version:'u8'
+        magic:bytes = 4
         distribution:'u8'
         content_type:'u8'
         crypto_type:'u8'
@@ -1619,85 +1677,101 @@ def Nintendo(db):
         rights_id:bytes = 0x10
         section_entries:list[NCASectionEntry] = 4
         section_hashes:bytes = 0x20*4
-        encrypted_keys:bytes = 0x10*4
-        padding2:'padding' = 0xC0
+        encrypted_keys:bytes = 0x10*5
+        padding2:'padding' = 0xB0
+        fs_header_entries:list[NCAFSHeaderEntry] = 4
 
-    def chknca(d:bytes): return d[0x200:0x204] in {b'NCA0',b'NCA2',b'NCA3'} and not sum(d[0x340:0x400])
-    def parse_nca(d:bytes,title_key:bytes=None):
+    def chknca(d:bytes): return d[0x200:0x204] in {b'NCA0',b'NCA2',b'NCA3'} and not sum(d[0x350:0x400])
+    def parse_nca(d:bytes,title_key:bytes=None) -> NCA:
         pkeys,dkeys = get_nxkeys(),get_nxkeys(True)
+        if isinstance(d,File):
+            f = d
+            d = f.read(0xC00)
+        else: f = None
         h = d[:0xC00]
         asrt(len(h) in {0xC00,0xA00})
-        enc = chknca(d)
+        enc = not chknca(d)
 
+        dev = False
         if enc:
-            dev = False
             asrt('header_key' in pkeys and len(pkeys['header_key']) == 0x20)
-            dh = decrypt(h[:0x400],'aes_xts_sec_le',pkeys['header_key'],sector_size=0x200)
+            dh = decrypt(h[:0x400],'aes_xts_sec_be',pkeys['header_key'],sector_size=0x200)
             if not chknca(dh):
                 if not dkeys: return
                 dev = True
                 asrt('header_key' in dkeys and len(dkeys['header_key']) == 0x20)
-                dh = decrypt(h[:0x400],'aes_xts_sec_le',dkeys['header_key'],sector_size=0x200)
+                dh = decrypt(h[:0x400],'aes_xts_sec_be',dkeys['header_key'],sector_size=0x200)
                 if not chknca(dh): return
             tkeys = dkeys if dev else pkeys
         else:
             tkeys = pkeys
             dh = h
 
-        nca = NCA(dh)
+        nca = NCA(dh + (bytes(len(h) - 0x400) if enc else b''))
         ct = max(nca.crypto_type,nca.crypto_type2)
         if ct: ct -= 1
-        kaek = tkeys[f'key_area_{CRYPTO_TYPES[nca.kaek_ind]}_{ct:02x}']
+        kaek = tkeys[f'key_area_key_{CRYPTO_TYPES[nca.kaek_ind]}_{ct:02x}']
         ekey = nca.encrypted_keys
-        v = (nca.version - 0x30) or 1
+        dkey = [None]*4 # XTS64, CTR32, CTREx32, CTRHW32
+        v = nca.magic[3] - 0x30
 
         if v == 3:
-            if enc: dh = decrypt(h,'aes_xts_sec_le',tkeys['header_key'],sector_size=0x200)
+            if enc: dh = decrypt(h,'aes_xts_sec_be',tkeys['header_key'],sector_size=0x200)
         elif v == 2:
             if enc:
                 dh = [dh]
                 for ix in range(4):
                     th = h[0x400 + ix*0x200:0x600 + ix*0x200]
-                    if sum(th[0x148:0x200]): dh.append(decrypt(th,'aes_xts_sec_le',tkeys['header_key'],sector_size=0x200))
+                    if sum(th[0x148:0x200]): dh.append(decrypt(th,'aes_xts_sec_be',tkeys['header_key'],sector_size=0x200))
                     else: dh.append(th)
                 dh = b''.join(dh)
-        elif v == 1:
+        elif v == 0:
             if not 'beta_nca0_modulus' in pkeys or not 'beta_nca0_exponent' in pkeys or not 'beta_nca0_label_hash' in pkeys:
                 import ast,re
                 s = db.c.get('https://raw.githubusercontent.com/SciresM/hactool/refs/heads/master/pki.c').text
                 for vn,vs in (('modulus',0x100),('exponent',0x100),('label_hash',0x20)):
-                    pkeys['beta_nca0_' + vn] = bytes(ast.literal_eval('[' + re.search(rf' unsigned const beta_nca0_{vn}\[0x{vs:x}\] = ' + r'\{([^\}]+)\};') + ']'))
+                    pkeys['beta_nca0_' + vn] = bytes(ast.literal_eval('[' + re.search(rf' unsigned const beta_nca0_{vn}\[0x{vs:x}\] = ' + r'\{([^\}]+)\};',s)[1] + ']'))
                 pkd = '\n'.join(f'{k} = {v.hex()}' for k,v in pkeys.items())
                 writefile(db.get('prodkeys'),pkd,'wt')
 
-                dkey = decrypt(ekey,'rsa2048_oeap_hash',pkeys['beta_nca0_modulus'],pkeys['beta_nca0_exponent'],label_hash=pkeys['beta_nca0_label_hash'])
-                if dkey is None:
-                    if crc_hash(ekey[:0x20],'sha256',bytes=True) == b'\x9a\xbb\xd2\x11\x86\x00!\x9dz\xdc[C\x95\xf8N\xfd\xffk%\xef\x9f\x96\x85(\x18\x9ev\xb0\x92\xf0j\xcb':
-                        dkey = ekey
-                    else: dkey = decrypt(ekey[:0x20],'aes_ecb',kaek) + bytes(0x20)
-                else:
-                    asrt(len(dkey) >= 0x20)
-                    dkey = dkey[:0x20] + bytes(0x20)
-                    v = 0.5
+            pdkey = decrypt(ekey,'rsa2048_oeap_hash',pkeys['beta_nca0_modulus'],pkeys['beta_nca0_exponent'],label_hash=pkeys['beta_nca0_label_hash'])
+            if pdkey is None:
+                if crc_hash(ekey[:0x20],'sha256') == 0x9abbd2118600219d7adc5b4395f84efdff6b25ef9f968528189e76b092f06acb:
+                    dkey[0] = ekey[:0x20]
+                else: dkey[0] = decrypt(ekey[:0x20],'aes_ecb',kaek)
+            else:
+                asrt(len(pdkey) >= 0x20)
+                dkey[0] = pdkey[:0x20]
+                v = -1
 
-                if enc:
-                    dh = [dh]
-                    for ix in range(4):
-                        off = int.from_bytes(dh[0][0x240 + 0x10*ix:0x240 + 0x10*ix + 4],'little')
-                        if off:
-                            asrt(off > 1)
-                            th = d[off * 0x200:off * 0x200 + 0x200]
-                            asrt(len(th) == 0x200)
-                            dh.append(decrypt(th,'aes_xts_sec_le',dkey,off - 2,sector_size=0x200))
-                        else: dh.append(bytes(0x200))
-                    dh = b''.join(dh)
+            if enc:
+                dh = [dh]
+                for ix in range(4):
+                    off = int.from_bytes(dh[0][0x240 + 0x10*ix:0x240 + 0x10*ix + 4],'little')
+                    if off:
+                        asrt(off > 1)
+                        if f:
+                            f.seek(off * 0x200)
+                            th = f.read(0x200)
+                        else: th = d[off * 0x200:off * 0x200 + 0x200]
+                        asrt(len(th) == 0x200)
+                        dh.append(decrypt(th,'aes_xts_sec_be',dkey[0],off - 2,sector_size=0x200))
+                    else: dh.append(bytes(0x200))
+                dh = b''.join(dh)
+        else: raise Exception(f'Unknown NCA version: {v}')
 
         nca = NCA(dh)
         if not sum(nca.rights_id):
-            if v > 1: dkey = decrypt(ekey,'aes_ecb',kaek)
+            if v > 0:
+                tdkey = decrypt(ekey,'aes_ecb',kaek)
+                dkey = tdkey[:0x20],tdkey[0x20:0x30],tdkey[0x30:0x40],tdkey[0x40:0x50]
         else:
-            dkey = decrypt(title_key,'aes_ecb',f'titlekek_{ct:02X}')
-        nca.decrypted_keys = dkey
+            tdkey = decrypt(title_key,'aes_ecb',tkeys[f'titlekek_{ct:02X}'])
+            dkey = tdkey[:0x20],tdkey[0x20:0x30],tdkey[0x30:0x40],tdkey[0x40:0x50]
+        nca.values['decrypted_keys'] = dkey
+        nca.values['decrypted'] = not enc
+        nca.values['dev'] = dev
+        nca.values['version'] = v
         return nca
 
     return locals()

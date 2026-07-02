@@ -18,6 +18,8 @@ __pycache__
 /lib/unipyxx/.lib
 /lib/unipyxx/.libx
 /lib/unipyxx/!check
+/dev/_namespaces.py
+/dev/namespaces.py
 
 !/bin/bin.7z
 !/bin/ps3key.py

@@ -6618,7 +6618,7 @@
     "prodkeys":{
         "p":"prodkeys/prod.keys",
         "fs":[{
-            "u":"https://prodkeys.dev/wp-content/uploads/2026/05/ProdKeys-v22.1.0.zip",
+            "u":"https://files.prodkeys.net/ProdKeys.NET-v22.1.0.zip",
             "x":{
                 "Keys-22.1.0/prod.keys":"prodkeys/prod.keys",
                 "Keys-22.1.0/title.keys":"prodkeys/title.keys"

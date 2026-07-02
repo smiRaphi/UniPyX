@@ -96,7 +96,7 @@ class File:
         return bytes(o)
     def readall(self):
         self.seek(0)
-        return self.read(None)
+        return self.read(None if type(self._f) == io.BytesIO else self.size)
 
     def middle_scramble(self,d:bytes):
         o = bytearray()
@@ -249,9 +249,9 @@ class File:
     def __gt__(self,other:int): return self.pos > other
     def __le__(self,other:int): return self.pos <= other
     def __ge__(self,other:int): return self.pos >= other
-_FILESTRUCTBL = {'data','offsets','sizes'} | set(File.__dict__.keys())
+_FILESTRUCTBL = {'data','offsets','sizes','values'} | set(File.__dict__.keys())
 class FileStruct(File):
-    def __init__(self,f,endian='<'):
+    def __init__(self,f,endian='<',full_data=False):
         d = self.__class__.__dict__
         super().__init__(f,mode='rb',endian=d.get('_ENDIAN',endian))
         self.__values = {}
@@ -294,10 +294,12 @@ class FileStruct(File):
             self.__values[k] = v
         self.__end_pos = self.pos
         self.seek(0)
-        self.__data = self.read(self.size)
+        self.__data = self.read(None if full_data else self.size)
 
     def __getattribute__(self,n):
-        if n in _FILESTRUCTBL or n.startswith('_'): return super().__getattribute__(n)
+        if n in _FILESTRUCTBL or n.startswith('_'):
+            if n == 'values': n = '_FileStruct__values'
+            return super().__getattribute__(n)
         v = super().__getattribute__('_FileStruct__values')
         if n in v: return v[n]
         return super().__getattribute__(n)

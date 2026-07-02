@@ -2,7 +2,7 @@ import sys
 if sys.version_info < (3,13):
     raise RuntimeError("Python 3.13+ is required")
 
-import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil
+import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil,inspect
 from time import sleep
 from ctypes import wintypes
 from shutil import rmtree,copytree,copyfile
@@ -29,6 +29,7 @@ if typing.TYPE_CHECKING:
     f16=f32=f64=float
     utf8,utf16=str
     padding=skip=align=types.NoneType
+    from dev.namespaces import *
 
 def asrt(c:bool,*r,err:Exception=ValueError):
     if not c:
@@ -59,11 +60,19 @@ def namespace(_func=None,include=[],keep_init=True):
                 d = super().__getattribute__('__dict__')
                 if not d['_Wrapper__initialized']: self()
                 return d['_Wrapper__body'][name]
-        Wrapper.__name__ = func.__name__
+        Wrapper.__name__ = func.__name__[1 if func.__name__.startswith('_') else 0:]
 
-        return Wrapper()
+        r = Wrapper()
+        if func.__name__.startswith('_'):
+            for x in inspect.stack()[1:-1]:
+                if func.__module__ == x[0].f_globals['__name__']:
+                    x[0].f_globals[Wrapper.__name__] = r
+                    break
+            else: raise RuntimeError("Can't inject proper namespace name")
+        return r
     if _func is None: return f1
     return f1(_func)
+class Empty: pass
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath

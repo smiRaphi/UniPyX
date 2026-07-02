@@ -218,11 +218,11 @@ def supdate(c:Cache,k:str,inf:dict):
             nu = f'https://{dom}{m[1]}'
             if nu != u: u = nu
             else: ts = 0
-        elif dom == 'prodkeys.dev':
-            s = c.get('https://prodkeys.dev/prod-keys-file-eden/')
+        elif dom == 'prodkeys.net':
+            s = c.get('https://prodkeys.net/yuzu-prod-keys-update/')
             ts = ft(re.search(r'<meta property="og:updated_time" content="([^"]+)"',s)[1],'%Y-%m-%dT%H:%M:%S%z')
             if ts > ots:
-                nu = re.search(r'href="(https?://prodkeys\.dev/wp\-content/uploads/\d{4}/\d{2}/[^"]+\.zip)"><span class="kb-svg-icon-wrap ',s)[1]
+                nu = re.search(r'<a href="(https?://files\.prodkeys\.net/[^"]+)" ',s)[1]
                 if nu != u:
                     u = nu
                     v = 'Keys-' + u[:-4].split('-v',1)[1]

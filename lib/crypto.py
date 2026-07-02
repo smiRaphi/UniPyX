@@ -81,10 +81,13 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             elif m in {'cbc','cfb','ofb','openpgp'}: kw['iv'] = iv
             elif m == 'ctr':
                 from Cryptodome.Util import Counter
+                pref,suf = kwargs.pop('prefix',b''),kwargs.pop('suffix',b'')
                 if isinstance(iv,bytes): iv = int.from_bytes(iv,'little' if algo.endswith('_le') else 'big')
                 elif iv is None: iv = 1
                 asrt(isinstance(iv,int),err=TypeError)
-                kw['counter'] = Counter.new(kwargs.pop('bits',len(key)*8),initial_value=iv,little_endian=algo.endswith('_le'),allow_wraparound=True)
+
+                kw['counter'] = Counter.new(kwargs.pop('bits',len(key)*8),prefix=pref,suffix=suf,initial_value=iv,
+                                            little_endian=algo.endswith('_le'),allow_wraparound=True)
             obj = AES.new(key,mode=getattr(AES,f'MODE_{m.upper()}'),**kw)
             if i is None: return obj
 
