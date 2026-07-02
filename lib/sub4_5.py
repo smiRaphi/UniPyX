@@ -909,5 +909,18 @@ def extract4_5(inp:str,out:str,t:str):
             d = minidom.parseString(ET.tostring(r,'utf-8')).toprettyxml(indent='  ')
             writefile(f'{o}/${tbasename(i)}.{sig[:3].decode("ascii").lower()}.xml',d,'wt')
             return
+        case 'Deadly Premonition Serial':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            while f:
+                fn = f.readc(0x100).split(b'\0')[0].decode('ascii')
+                s = f.readu32()
+                writefile(o + '/' + sub_path(fn),f.readc(s))
+                f.padc(-(s + 1)%0x10 + 1)
+
+            f.close()
+            if listdir(o): return
 
     return 1

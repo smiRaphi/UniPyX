@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1002
+# Supported Formats: 1003
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -355,7 +355,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (539)
+## Various (540)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -476,6 +476,7 @@ Davilex Games IDX+IMG | .idx+.img | [davilex_games.bms](https://mirror.aluigi.or
 DBS Database | .dbs | Custom |
 DDLC+ Encrypted Unity Bundle | .cy | Custom -> Unity Bundle |
 DDR DAT | .dat | Custom |
+Deadly Premonition Serial | .001 .002 .003 | Custom |
 Death End re:Quest 2 GDAT | .dat | Custom |
 Death End re:Quest 2 ZLIB | \* | Custom |
 Deathloop Resource | .resource | Custom + [deathloop.bms](https://mirror.aluigi.org/bms/deathloop.bms) |

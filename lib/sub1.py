@@ -359,12 +359,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 20:'zstd', # deprecated
               # 20:'lpaq8', # unofficial
                 22:'forza_encrypted', # unofficial, custom encryption + deflate, untested
-                92:'reference',
+                92:'reference', # WinZip
                 93:'zstd',
-                94:'packmp3',
+                94:'packmp3', # WinZip
                 95:'xz',
-                96:'zipx_jpeg', # unsupported
-                97:'wavpack',
+                96:'zipx_jpeg', # unsupported, WinZip
+                97:'wavpack', # WinZip
                 98:'ppmd8',
                 99:'aes',
               # 99:'lzfse', # unofficial

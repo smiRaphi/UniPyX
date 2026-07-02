@@ -272,10 +272,6 @@ def make_env():
     env['TMP'] = env['TEMP']
     return env,td
 
-def _neof(f):
-    b = bool(f.read(1))
-    if b: f.seek(-1,1)
-    return b
 def send_keys(i:str,escape=False):
     if escape:
         i = i.replace('{','\0').replace('}','\1')
@@ -439,6 +435,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
         f.close = lambda *_,**__:None
         f.readi = lambda n,end='<',sign=False: int.from_bytes(f.read(n),byteorder={'<':'little','>':'big'}[end],signed=sign)
         f.skip = lambda n: f.seek(n,1)
+        f.neof = lambda: bool(f.skip(-1) or 1 if f.read(1) else 0)
         fsz = f.seek(0,2)
     elif typ == 'url': fsz = len(inp)
     elif typ == 'directory':
@@ -463,6 +460,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             rf.close = lambda *_,**__:None
             rf.readi = lambda n,end='<',sign=False: int.from_bytes(rf.read(n),byteorder={'<':'little','>':'big'}[end],signed=sign)
             rf.skip = lambda n: rf.seek(n,1)
+            rf.neof = lambda: bool(f.skip(-1) or 1 if f.read(1) else 0)
             opfs[p] = rf
             return rf
 
@@ -500,7 +498,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                 lc = {}
                 if f: f.seek(0)
                 try:
-                    exec('def check(inp,fsz,f):\n\t' + x[1].replace('\n','\n\t'),globals={'open':fkopen,'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'neof':_neof,'readfile':readfile,'asrt':asrt},locals=lc)
+                    exec('def check(inp,fsz,f):\n\t' + x[1].replace('\n','\n\t'),globals={'open':fkopen,'os':os,'dirname':dirname,'basename':basename,'tbasename':tbasename,'splitext':splitext,'isfile':isfile,'exists':exists,'getsize':getsize,'readfile':readfile,'asrt':asrt},locals=lc)
                     ret = lc['check'](inp,fsz,f)
                 except FileStubbed: ret = False
                 except:
