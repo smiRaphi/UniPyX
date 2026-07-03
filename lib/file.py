@@ -81,18 +81,24 @@ class File:
     def reads(self,n:int,encoding='utf-8'):
         if encoding == 'utf-16': return self.readutf16(n)
         return self.readc(n).decode(encoding)
-    def readu(self,c=b'\0',max=None,chks=0x80,include=False):
-        if not max is None and max < chks: chks = max
+    def readu(self,c=b'\0',maxl=None,chks=0x80,include=False,skip=True,eoferr=False):
+        if not maxl is None and maxl < chks: chks = maxl
+        lnc = len(c)
 
         o = bytearray()
-        while max is None or len(o) < max:
+        while True:
             d = self.read(chks)
-            p = d.find(c)
-            if p != -1 or len(d) != chks:
-                o.extend(d[:p + (1 if include else 0)])
-                self.back(len(d) - p - 1)
-                break
             o.extend(d)
+            p = o.find(c,max(0,len(o) - len(d) - lnc + 1),maxl or len(o))
+            if p != -1:
+                o = o[:p + (lnc if include else 0)]
+                self.back(len(d) - p - (lnc if skip else 0))
+                break
+            if len(d) != chks or (maxl is not None and len(o) >= maxl):
+                if eoferr:
+                    self.back(len(o))
+                    raise EOFError
+                break
         return bytes(o)
     def readall(self):
         self.seek(0)
@@ -171,8 +177,8 @@ class File:
         if v & 1: return -(v >> 1) - 1
         return v >> 1
 
-    def read0s(self,encoding:str=None,max:int=None,chks=0x100) -> bytes|str:
-        r = self.readu(max=max,chks=chks)
+    def read0s(self,encoding:str=None,maxl:int=None,chks=0x100) -> bytes|str:
+        r = self.readu(maxl=maxl,chks=chks)
         if encoding is not None: r = r.decode(encoding)
         return r
     def readutf16(self,l:int,end=None): return self.readc(l * 2).decode('utf-16' + UTFENDM[end or self._end])
@@ -215,6 +221,18 @@ class File:
             p = f.read(0x4000)
             if not p: break
             self.write(p)
+    def peek(self,fnc,*args,poffset=0,**kwargs):
+        if isinstance(fnc,str):
+            if fnc in {'u8','s8','u16','s16','u24','s24','u32','s32','u40','s40','u48','s48','u64','s64','u128','s128','f16','f32','f64'}: fnc = ('write' if 'w' in self.mode else 'read') + fnc
+            fnc = getattr(self,fnc)
+        elif isinstance(fnc,int):
+            args = (fnc,)
+            fnc = self.read
+        p = self.pos
+        self.seek(p + poffset)
+        try: r = fnc(*args,**kwargs)
+        finally: self.seek(p)
+        return r
 
     def decompress(self,size:int,algo:str,*args,**kwargs): return decompress(self.readc(size),algo,*args,**kwargs)
 
@@ -642,9 +660,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return r
         case 'vicious_lz':
             return uxx().decompress_vicious_lz(i,usize=kwargs['usize'])
-        case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
-            if algo == 'lz60_raw': algo = 'lz40_raw'
-            return getattr(uxx(),'decompress_' + algo)(i,usize=kwargs['usize'])
         case 'd0llz3': return uxx().decompress_d0llz3(i,kwargs.get('usize',len(i) * 0x10))
         case 'natsume_lzs':
             if len(i) < 0x1C: raise ValueError("Not enough data to decompress")
@@ -682,6 +697,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if i[0x18]: o.extend(i[0x1C:0x1C+i[0x18]])
             return bytes(o)
 
+        case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
+            if algo == 'lz60_raw': algo = 'lz40_raw'
+            return getattr(uxx(),'decompress_' + algo)(i,usize=kwargs['usize'])
         case 'lz10'|'lz11'|'lz40'|'lz60':
             id,fnc = NLZC[algo]
             asrt(i[0] == id)

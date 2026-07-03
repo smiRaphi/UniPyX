@@ -922,5 +922,32 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if listdir(o): return
+        case 'Sound Source Interactive IMX':
+            db.try_custom()
+            import re
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'\x3D\x55\x86\xED')
+
+            # NRG = re.compile(rb'(?:\x03\x02\x01\x02[\x00-\x1F]?|\x01\x02\x06)([A-Za-z0-9\. ]{5,32})\x00') # doesn't line up with wav files :/
+            WRG = re.compile(rb'RIFF(....)WAVEfmt \x10\x00{3}')
+            BRG = re.compile(rb'BM(....)\x00{4}..\x00{2}\x28\x00{3}...\x00...\x00\x01\x00[\x01\x04\x08]\x00')
+
+            f.seek(0xC4)
+            o1,s1,o2,eof = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            f.seek(o1)
+            asrt(f.readu32() == 0x10001)
+            fn = f.read0s('ascii')
+            writefile(o + '/' + fn,f.readc(s1))
+            f.seek(o2)
+            d = f.readc(eof - o2)
+            f.close()
+
+            for ix,bp in enumerate(BRG.finditer(d)):
+                writefile(f'{o}/{ix}.bmp',d[bp.start():bp.start() + int.from_bytes(bp[1],'little')])
+            for ix,bp in enumerate(WRG.finditer(d)):
+                writefile(f'{o}/{ix}.wav',d[bp.start():bp.start() + int.from_bytes(bp[1],'little') + 8])
+
+            return
 
     return 1

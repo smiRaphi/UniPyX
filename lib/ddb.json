@@ -549,12 +549,21 @@
         "rs":"LucasArts R2D2 Pack","s":1
     },
     {
+        "d":[["isat","\\x3D\\x55\\x86\\xED",0],["isat","\\xD4\\0\\0\\0",196],["n0",4,204],["n0",4,208],["py","f.seek(208);return (f.readi(4,'<')+2)==fsz"]],
+        "rs":"Sound Source Interactive IMX","s":1
+    },
+    {
         "d":[["size",88236],["hash","95397288029c149040af17fc6d7522a3b39c943b"]],
         "rs":"Glacier PKG Def","s":1
     },
     {
         "d":[["size",512483328],["hash","016ff307a32d228865257c5f450fe9d98a13ea15",4096]],
         "rs":"Donkey Kong Banana Kingdom","s":1
+    },
+    {
+        "rqr":"Nintendo Switch executable",
+        "d":[["isatS","\\0",12,4],["isin",["pa~\\x8d\\xact8*\\xe4.\\x8a\\xc8\\xded\\xee\\xb3\\xdaAf\\xcd"],64]],
+        "rs":"Camelot Obfuscated NSO","s":1
     },
     {
         "d":[["ext",".dat"],["py","DB={'graphics.dat':'49ca1bf2','globals.dat':'a112840b','scenario.dat':'89556e49','sounds.dat':'48dfccb5'};c=DB.get(basename(inp).lower());return c==f.read(4).hex()"]],
@@ -705,7 +714,7 @@
         "rs":"AmusementMakers Project B.G. Archive","s":1
     },
     {
-        "rqr":"RIFF (little-endian) data",
+        "rqr":"Generic RIFF container",
         "d":[["isat","SAGESGDS",8]],
         "rs":"Piper SAGE","s":1
     },

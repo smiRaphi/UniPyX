@@ -257,7 +257,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
                     pos = f.tell()
                     f.seek(no)
-                    n = f.readu(max=0xFF,include=True)
+                    n = f.readu(maxl=0xFF,include=True)
                     if n[-1] != 0: return -10
                     try: n = n[:-1].decode('ascii')
                     except UnicodeDecodeError: return -10
@@ -330,7 +330,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             #     f.seek(ofs[ix])
             #     sz = f.readu32()
             #     f.skip(sz - 1)
-            #     skp = len(f.readu(b'\x11',max=0x100,include=True))
+            #     skp = len(f.readu(b'\x11',maxl=0x100,include=True))
             #     f.seek(ofs[ix] + 4 + skp)
 
             inf = open(i,'rb')
