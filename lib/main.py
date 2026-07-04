@@ -22,7 +22,9 @@ DOSMAX = {
     "core":"dynamic",
     "ipx":"false"
 }
+BENCHMARK = False
 
+if BENCHMARK: import time
 if typing.TYPE_CHECKING:
     from lib.file import File
     u8=s8=u16=s16=u24=s24=u32=s32=u40=s40=u48=s48=u64=s64=u128=s128=int
@@ -329,6 +331,10 @@ class FileStub:
 def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str],str]:
     global TRDB
 
+    if BENCHMARK:
+        print('[B] Input:',inp)
+        st = rst = time.perf_counter()
+
     db.set_temp_print(False)
     if '://' in inp[:0x20]: typ = 'url'
     else:
@@ -349,6 +355,11 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                 else: typ = 'binary'
             if typ == 'binary' and not isz: typ = 'null'
 
+    if BENCHMARK:
+        tt = time.perf_counter()
+        print(f'[B] Base type detection took {tt-st:.3f}s')
+        st = tt
+
     ts = []
     if typ != 'url':
         if typ != 'directory':
@@ -359,13 +370,23 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             ts += [x.triddef.filetype for x in trid.tridAnalyze(inp,TRDB,True) if x.perc >= 10]
             for wt in {'InstallShield setup',}:
                 if wt in ts: ts.remove(wt)
+
+            if BENCHMARK:
+                tt = time.perf_counter()
+                print(f'[B] Trid took {tt-st:.3f}s')
+                st = tt
         _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
         ts += [x.split(',')[0].split(' created: ')[0].split('\u00BF\u0074\u2593\u256C\u2551\u2567\u00F1\u2219')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
+
+        if BENCHMARK:
+            tt = time.perf_counter()
+            print(f'[B] file took {tt-st:.3f}s')
+            st = tt
 
     if typ == 'binary':
         f = open(inp,'rb')
         tg = f.read(4)
-        if tg[:2] == b'MZ' or tg == b'\x7fELF':
+        if tg[:2] == b'MZ' or tg == b'\x7fELF' or (inp.lower().endswith('.com') and getsize(inp) < 0x10000):
             if tg[:2] == b'MZ':
                 f.seek(0x3C)
                 f.seek(int.from_bytes(f.read(4),'little'))
@@ -377,8 +398,26 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             dprc = subprocess.Popen([dpth,'-p','-D',dirname(dpth) + '\\db',inp],stdout=-1,stderr=-3)
 
             if pe:
+                exst = st
                 log = gtmp('.log')
-                db.run(['exeinfope',inp + '*','/s','/log:' + log])
+                eprc = subprocess.Popen([db.get('exeinfope'),inp + '*','/s','/log:' + log],stdout=-1,stderr=-3)
+                st = time.perf_counter()
+
+            yrep = db.update('yara')
+            yp = dirname(yrep[0])
+            if yrep[1]:
+                db.run([yp + '/yarac.exe','-w',yp + '/packers_peid.yar',yp + '/packers_peid.yarc'])
+                remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
+            err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
+            if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
+
+            if BENCHMARK:
+                tt = time.perf_counter()
+                print(f'[B] Yara took {tt-st:.3f}s')
+                st = tt
+
+            if pe:
+                eprc.wait()
                 for _ in range(15):
                     if exists(log) and getsize(log): break
                     sleep(0.1)
@@ -396,18 +435,20 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                             if x and x.lower() not in {'genuine','unknown','more than necessary','sections','x64 *unknown exe','<- from file.','no sec. cab.7z.zip','2010 (e8'} and not x.lower().endswith((' sections',' [deb. 02')) and not x.replace('-','').replace('.','').isdigit() and\
                                x != 'Deb' and not (x[0].lower() == 'v' and x[1:].replace('.','').isdigit()) and not (len(x) == 15 and x[:4] == 'exe ' and x[12] == '-' and x[13:].isdigit() and all(x in '0123456789ABCDEF' for x in x[4:12])): ts.append(x)
 
-            yrep = db.update('yara')
-            yp = dirname(yrep[0])
-            if yrep[1]:
-                db.run([yp + '/yarac.exe','-w',yp + '/packers_peid.yar',yp + '/packers_peid.yarc'])
-                remove(yp + '/yarac.exe','-C',yp + '/packers_peid.yar')
-            err,o,_ = db.run(['yara','-C',yp + '/packers_peid.yarc',inp])
-            if not err: ts += [x.split()[0].replace('_',' ').strip() for x in o.split('\n') if x.strip()]
+                if BENCHMARK:
+                    tt = time.perf_counter()
+                    print(f'[B] ExeInfoPE took {tt-exst:.3f}s')
+                    st = tt
 
             dprc.wait()
             o = dprc.stdout.read().decode('cp437')
             die = [x.strip() for x in DIER.findall(o.replace('\r','')) if x != 'Unknown']
             ts += die + [x.split('[')[0].split('(')[0] for x in die]
+
+            if BENCHMARK:
+                tt = time.perf_counter()
+                print(f'[B] DiE took {tt-st:.3f}s')
+                st = tt
         else: f.close()
 
     ts = [x for x in ts if not x in WEAK]
@@ -428,12 +469,20 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
         _,o,_ = db.run(['unp64','-i',inp])
         ts.append(o.strip().split(' : ',1)[1].split(', unpacker=')[0].strip())
         if ts[-1] == '(Unknown)': ts.pop(-1)
+        if BENCHMARK:
+            tt = time.perf_counter()
+            print(f'[B] unp64 took {tt-st:.3f}s')
+            st = tt
     if not ts and isfile(inp):
         _,o,_ = db.run(['gamearch',inp,'-l'])
         ts = re.findall(r'File .+ a .+ \[(.+)\]\n',o.replace('\r',''))
         for dts in re.findall(r', archive is (?:probably|definitely) not (.+)\n',o.replace('\r','')): ts.remove(dts)
         if ts: ts = [ts[0]]
         else: ts = []
+        if BENCHMARK:
+            tt = time.perf_counter()
+            print(f'[B] gamearch took {tt-st:.3f}s')
+            st = tt
 
     nts = checktdb(ts)
     nts = list(set(nts))
@@ -472,6 +521,11 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             rf.neof = lambda: bool(f.skip(-1) or 1 if f.read(1) else 0)
             opfs[p] = rf
             return rf
+
+    if BENCHMARK:
+        tt = time.perf_counter()
+        print(f'[B] custom init took {tt-st:.3f}s')
+        st = cst = tt
 
     for xv in DDB:
         if 't' in xv and xv['t'] != typ: continue
@@ -709,6 +763,11 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
         if not opf.closed: opf._close()
     nts = list(set(nts))
     if not quiet and not nts: print(ts)
+
+    if BENCHMARK:
+        tt = time.perf_counter()
+        print(f'[B] custom total took {tt - cst:.3f}s')
+        print(f'[B] total took {tt - rst:.3f}s')
 
     db.reset_temp_print()
     if raw: return nts,ts,typ

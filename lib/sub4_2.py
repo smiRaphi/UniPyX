@@ -826,8 +826,7 @@ def extract4_2(inp:str,out:str,t:str):
                 if not sum(f.read(4)):
                     f.skip(12)
                     continue
-                p = f.read(0x60)
-                f.back(0x60)
+                p = f.peek(0x60)
                 if len(p.rstrip(b'\0')) >= 0x10:
                     try:d = p.rstrip(b'\0').decode('ascii')
                     except:f.skip(12)
@@ -1374,13 +1373,11 @@ def extract4_2(inp:str,out:str,t:str):
                     f.skip(4)
 
                     if unh == b'_NVDICT_':
-                        asrt(f.read(4) == b'\x37\xA4\x30\xEC')
-                        f.back(4)
+                        asrt(f.peek(4) == b'\x37\xA4\x30\xEC')
                         zdct = f.read(s)
                     else:
                         us = f.readu32()
-                        asrt(f.read(4) == b'\x28\xB5\x2F\xFD')
-                        f.back(4)
+                        asrt(f.peek(4) == b'\x28\xB5\x2F\xFD')
                         fs.append((o + f'/{hsh.hex().upper()}.nvbin',f.read(s-4),us))
 
                 for fe in fs: writefile(fe[0],decompress(fe[1],'zstd',zstd_dict=zdct)[:fe[2]])

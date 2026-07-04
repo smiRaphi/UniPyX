@@ -1940,8 +1940,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 f.skip(4)
                 s -= 4
 
-            tst = f.read(4)
-            f.back(4)
+            tst = f.peek(4)
             try:tst = tst.decode('ascii').lower()
             except:tst = 'bin'
             writefile(o + '/' + tbasename(i) + '.' + tst,f.read(s))
@@ -1951,7 +1950,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import decompress
             d = readfile(i)
-            writefile(o + '/' + tbasename(i),decompress(d[4:],{b'\x04\x22\x4D\x18':'lz4f',b'\x28\xB5\x2F\xFD':'zstd'}[d[4:8]]))
+            writefile(o + '/' + tbasename(i),decompress(d[4:],{b'\x04\x22\x4D\x18':'lz4_frame',b'\x28\xB5\x2F\xFD':'zstd'}[d[4:8]]))
             return
         case 'Dr. Luigi INFO+GAME.dat':
             db.try_custom()

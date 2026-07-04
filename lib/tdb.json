@@ -58,6 +58,7 @@
     "ZSTD":[
         "zstandard compressed data",
         "zstandard compressed data (v0.8+)",
+        "zstandard compressed data (old/generic)",
         "facebook zstandard/zstd compressed data"
     ],
     "MSCAB SFX":[
@@ -1626,5 +1627,8 @@
     ],
     "Remedy Archive System":[
         "remedy archive system / max payne data"
+    ],
+    "RESOF":[
+        "resof compressed archive (v2.x)"
     ]
 }

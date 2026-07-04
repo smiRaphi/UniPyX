@@ -1,5 +1,11 @@
+__all__ = ['X']
+
 import os,sys
 PRJP = os.path.splitext(os.path.abspath(__file__))[0]
+if __name__ == '__main__':
+    import subprocess
+    sys.exit(subprocess.call([sys.executable,os.path.join(PRJP,'build.py')]))
+
 DLLP = PRJP + ('.dll' if sys.platform == 'win32' else '.so')
 __FNCT = type(lambda:None)
 def asrt(c:bool,*r,err:Exception=ValueError):
@@ -8,12 +14,6 @@ def asrt(c:bool,*r,err:Exception=ValueError):
         elif r: r = ' '.join(str(x) for x in r)
         else: r = ''
         raise err(r)
-
-if __name__ == '__main__':
-    import subprocess
-    sys.exit(subprocess.call([sys.executable,os.path.join(PRJP,'build.py')]))
-
-__all__ = ['X']
 
 import ctypes
 cint = ctypes.c_int
@@ -101,6 +101,7 @@ class X:
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_lzrw1kh',  (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_camelot_blz',(P(u8),szt,P(u8),sszt), sszt,1),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -125,6 +126,8 @@ class X:
             ('decrypt_remedy_ras',(P(u8),szt,u32),void,0),
             ('init_empire_magic',(P(u8),),void,0),
             ('decrypt_empire_magic',(P(u8),szt,P(u8),szt,P(u8),u32),void,0),
+            ('decrypt_camelot_exe',(P(u8),szt,u8,u8),void,0),
+            ('decrypt_zipd',(P(u8),szt),s8,0),
             ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
@@ -153,7 +156,7 @@ class X:
             ('decompress_lzfse',(P(u8),szt,P(u8),szt),sszt,1),
             ('decompress_lpaq8',(P(u8),szt,P(u8),szt),sszt,1),
         ):
-            fnc = self.dll[e[0]]
+            fnc = getattr(self.dll,e[0])
             fnc.argtypes = e[1]
             fnc.restype = e[2]
 
@@ -434,7 +437,20 @@ class X:
         k = (u8 * len(key)).from_buffer_copy(key)
         self.dll.decrypt_empire_magic(b,len(src),k,len(key),self.EMPIRE_MAGIC,self.hash_empire_magic(key,key_end))
         return bytes(b)
-        
+    def decrypt_camelot_exe(self,src:bytes,key:int,off:int) -> bytes:
+        if isinstance(key,bytes): key = key[0]
+        if isinstance(off,bytes): off = off[0]
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_camelot_exe(b,len(src),key,off)
+        return bytes(b)[:-1]
+    def decrypt_zipd(self,src:bytes) -> bytes:
+        asrt(src[-2:] == b'\x09\xEB')
+        src = src[:-2]
+        b = (u8 * len(src)).from_buffer_copy(src)
+        r = self.dll.decrypt_zipd(b,len(src))
+        if r != 0: raise ValueError(f'Decryption failed ({r})')
+        return bytes(b)[7:]
+
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)
         i = (u8 * len(src)).from_buffer_copy(src)

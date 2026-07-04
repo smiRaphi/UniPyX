@@ -1582,8 +1582,7 @@ def extract4_4(inp:str,out:str,t:str):
             fs = []
             for de in ds:
                 f.seek(de[0])
-                c = f.readu32()//0x10
-                f.back(4)
+                c = f.peek('u32')//0x10
                 for _ in range(c):
                     sp = f.pos + f.readu32()
                     f.skip(8)
@@ -1677,14 +1676,10 @@ def extract4_4(inp:str,out:str,t:str):
             from lib.file import File
             f = File(i)
 
-            f.seek(4)
-            vb = f.readu32('>')
-            f.back(4)
-            vl = f.readu32('<')
+            vb = f.peek('u32','>',poffset=4)
+            vl = f.peek('u32','<',poffset=4)
             f._end = '>' if vb < vl else '<'
-            f.seek(4)
-            fo = f.readu32()
-            f.seek(0)
+            fo = f.peek('u32',poffset=4)
 
             fs = []
             while f < fo:
@@ -2263,10 +2258,8 @@ def extract4_4(inp:str,out:str,t:str):
             f = File(i)
             asrt(f.read(4) == b'BIGB')
 
-            f.skip(4)
-            v = f.readu32('<');f.back(4)
-            f._end = '>' if v > f.readu32('>') else '<'
-            f.back(8)
+            v = f.peek('u32','<',poffset=4)
+            f._end = '>' if v > f.peek('u32','>',poffset=4) else '<'
 
             do = 0x10 + f.readu32()
             v = f.readu32()
@@ -2422,8 +2415,7 @@ def fix_mp4(f:'File',gp:int,fn:str):
         f.seek(x)
         c = f.readu32()
         for _ in range(c):
-            v = f.readu32()
-            f.back(4)
+            v = f.peek('u32')
             asrt(v >= gp,f"0x{v:08X} < 0x{gp:08X} {fn}")
             f.writeu32(v-gp)
 

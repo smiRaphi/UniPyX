@@ -151,17 +151,26 @@ class File:
     def readf64(self,end=None) -> float: return self.unpack('d',end)
     def readleb128u(self):
         n = c = b = 0
-        while True:
+        while self:
             b = self.readu8()
             n |= (b & 0x7F) << (c * 7)
             if not b & 0x80: return n
             c += 1
+        else: raise EOFError
     def readvlq(self):
         n = b = 0
-        while True:
+        while self:
             b = self.readu8()
             n = (n << 7) | (b & 0x7F)
             if not b & 0x80: return n
+        else: raise EOFError
+    def readvle(self):
+        n = b = 0
+        while self:
+            b = self.readu8()
+            n = (n << 7) | (b & 0x7F)
+            if b & 0x80: return n
+        else: raise EOFError
     def readcompiu(self,null=False):
         b = self.readu8()
         if b == 0xFF and null: return None
@@ -460,6 +469,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'bz2'|'bzip2':
             import bz2
             return bz2.decompress(i)
+        case 'brotli'|'br':
+            import brotli
+            return brotli.decompress(i)
         case 'zip':
             from zipfile import ZipFile
             z = ZipFile(io.BytesIO(i))
@@ -512,16 +524,28 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import lzma
             return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[{'id':lzma.FILTER_LZMA1,'dict_size':0x1000000,'lc':3,'lp':0,'pb':2}]).decompress(i)[:kwargs.get('usize')]
         case 'zstd':
-            if sys.version_info >= (3,14): from compression import zstd # type: ignore
+            if i[0] < 0x28:
+                asrt('db' in kwargs)
+                asrt(i[1:4] == b'\xB5\x2F\xFD')
+                if i[0] == 0x1E: v = 1
+                else:
+                    asrt(i[0] >> 4 == 2)
+                    v = i[0] & 0xF
+                r,o,e = kwargs['db'].run([f'zstd{v}','-d'],stdin=i,text=False,print_try=False)
+                if r != 0: raise ValueError(e.decode('utf-8').strip())
+                return o
             else:
-                try: import backports_zstd as zstd # type: ignore
-                except: from backports import zstd # type: ignore
-            if 'zstd_dict' in kwargs and type(kwargs['zstd_dict']) == bytes: kwargs['zstd_dict'] = zstd.ZstdDict(kwargs['zstd_dict'])
-            return zstd.decompress(i,kwargs.get('zstd_dict'))
+                if sys.version_info >= (3,14): from compression import zstd # type: ignore
+                else:
+                    try: import backports_zstd as zstd # type: ignore
+                    except: from backports import zstd # type: ignore
+                if 'zstd_dict' in kwargs and type(kwargs['zstd_dict']) == bytes: kwargs['zstd_dict'] = zstd.ZstdDict(kwargs['zstd_dict'])
+
+                return zstd.decompress(i,kwargs.get('zstd_dict'))
         case 'lz4'|'lz4_block':
             import lz4.block
             return lz4.block.decompress(i,uncompressed_size=(len(i) * 8) if kwargs.get('no_size') else kwargs['usize'])
-        case 'lz4f'|'lz4_frame':
+        case 'lz4_frame':
             import lz4.frame
             return lz4.frame.decompress(i)
         case 'lz4_fast': return uxx().decompress_lz4_fast(i,usize=kwargs['usize'])
@@ -730,6 +754,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import crunch64
             return getattr(crunch64,algo).decompress(i)
         case 'ash0': return uxx().decompress_ash0(i)
+        case 'camelot_blz': return uxx().decompress_camelot_blz(i,kwargs['usize'])
 
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
             asrt('usize' in kwargs and (OODLE or kwargs.get('db')))
@@ -812,12 +837,12 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'wavpack'|'wv':
             asrt('db' in kwargs)
             r,o,e = kwargs['db'].run(['wvunpack','-','-'],stdin=i,text=False,print_try=False)
-            if r != 0: raise ValueError(e)
+            if r != 0: raise ValueError(e.decode('utf-8').strip())
             return o
         case 'packmp3':
             asrt('db' in kwargs)
             r,o,e = kwargs['db'].run(['packmp3','-'],stdin=i,text=False,print_try=False)
-            if r != 0: raise ValueError(e)
+            if r != 0: raise ValueError(e.decode('utf-8').strip())
             return o
     raise NotImplementedError(algo)
 

@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1005
+# Supported Formats: 1008
 
-## "Common" Archives/Compressors/Encodings (147)
+## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -44,7 +44,7 @@ BinSCII | .bsc | Custom + [deark](https://entropymine.com/deark/) |
 BIX | .bix | [BIX](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 BlakHole | .bh | [izArc](https://www.izarc.org/) |
 Bootable FAT16 IMG | .img .dsk | Custom |
-Brotli | .br .brotli | [brotli](https://github.com/google/brotli) |
+Brotli | .br .brotli | Custom |
 BZip | .bz | [BZip](https://sourceware.org/pub/bzip2/)
 BZip2 | .bz2 | [7-Zip](https://7-zip.org/) |
 BZip3 | .bz3 | [bzip3](https://github.com/iczelia/bzip3) |
@@ -118,6 +118,7 @@ PeaZip | .pea | [peazip](https://github.com/peazip/PeaZip) |
 PowerPacker | .pp | [unar](https://theunarchiver.com/command-line), [Ancient](https://github.com/temisu/ancient) |
 OS/2 Installation Package | .pak .pkg | [deark](https://entropymine.com/deark/) |
 RAR | .rar .exe | [unrar](https://bioruebe.com/dev/uniextract/)([src](https://www.win-rar.com/)), [7-Zip](https://7-zip.org/) |
+RESOF | .sof | Custom |
 Rob Northen Compression | .rnc | [Ancient](https://github.com/temisu/ancient) |
 Roxio Toast IMG | .img .dsk | [hfsexplorer](https://github.com/unsound/hfsexplorer), [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 RPM Package | .rpm | [7-Zip](https://7-zip.org/) |
@@ -225,7 +226,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (125)
+## Executables/Packers/Installers (126)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -267,6 +268,7 @@ CryptPE | .exe | Custom |
 CryptPE BinTable.h | .h | Custom |
 d0lLZ 1 | .dol | Custom |
 d0lLZ 2 | .dol | Custom |
+Dave Dunfield Packer | .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 DexEXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Diet Packed | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Dn.COM Cruncher | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
@@ -355,7 +357,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (542)
+## Various (543)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -896,6 +898,7 @@ ZDA Game Archive | ??? | Custom |
 Zeebo FUFS | .fs | Custom |
 Zeebo PLZP | .plzp | Custom |
 Zeebo Resources | ??? | Custom |
+ZIPD Encrypted | .piz | Custom |
 ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | * | Custom |
 ZUN GRZ | .grz | Custom |

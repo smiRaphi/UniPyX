@@ -212,10 +212,6 @@ class PyOBin:
                         r = Decimal(v & ((1 << s1) - 1)) / Decimal(v >> s1)
                     return r * ml
                 case 11:
-                    # d = f.readc(f.readi((fl & 3) + 1) + 7)
-                    # if d == b'\0': d = None
-                    # else: d = d.decode('utf-0' if fl & 4 else 'ascii7')
-
                     bseed = fl & 3
                     seed = [0,0,0,0]
                     for ix in range(4): seed[(bseed + ix) & 3] = ix

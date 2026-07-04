@@ -982,5 +982,12 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             fd.close()
             if ds: return
+        case 'ZIPD Encrypted':
+            db.try_custom()
+            from lib.crypto import decrypt
+            of = o + '/' + tbasename(i)
+            if i.lower().endswith('.piz'): of += '.' + i[-3:][::-1]
+            writefile(of,decrypt(readfile(i),'zipd'))
+            return
 
     return 1

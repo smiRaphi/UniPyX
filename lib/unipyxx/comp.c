@@ -209,23 +209,29 @@ EXPORT ssize_t decompress_blz_raw(const uint8_t *restrict src, const size_t zsiz
     #define CHKo(n) if (op - (n) <= 0) goto eof;
 
     while (ip > 0 && op > 0) {
-        CHKi(0);
         if (fbl <= 0) {
+            CHKi(0)
             f = src[--ip];
             fbl = 8;
         }
 
         if (f & 0x80) {
-            CHKi(1);
+            CHKi(1)
             uint8_t b1 = src[--ip];
             uint8_t b2 = src[--ip];
             uint16_t dist = (((b2 & 0x0F) << 8) | b1) + 3;
             uint8_t lng = (b2 >> 4) + 3;
             for (int i=0;i < lng;i++,op--) {
-                CHKi(0);CHKo(0);
+                CHKi(0);CHKo(0)
                 dst[op - 1] = dst[op - 1 + dist];
             }
+        } else {
+            CHKi(0)
+            dst[--op] = src[--ip];
         }
+
+        f <<= 1;
+        fbl--;
     }
 
 eof:
@@ -676,6 +682,55 @@ EXPORT ssize_t decompress_lzrw1kh(const uint8_t *restrict src, const size_t zsiz
 
 eof:
     #undef CHKi
+    return op;
+}
+EXPORT ssize_t decompress_camelot_blz(const uint8_t *restrict src, const size_t zsize,
+                                            uint8_t *restrict dst, const ssize_t usize) {
+    ssize_t op = 0;
+    ssize_t ip = zsize;
+    uint8_t f = 0;
+    int8_t fbl = 0;
+
+    #define CHKi(n) if (ip - (n) <= 0) goto eof;
+    #define CHKo(n) if (usize != -1 && op + (n) >= usize) goto eof;
+
+    while (ip > 0 && (op < usize || usize == -1)) {
+        if (fbl <= 0) {
+            CHKi(0);
+            f = src[--ip];
+            fbl = 8;
+        }
+
+        if (f & 0x80) {
+            CHKi(1)
+            uint8_t b1 = src[--ip];
+            uint8_t b2 = src[--ip];
+            uint16_t dist = (b1 >> 4) | (b2 << 4);
+            if (dist == 0) goto eof;
+
+            uint32_t lng = b1 & 0xF;
+            if (lng == 0) {
+                CHKi(0);
+                lng = src[--ip] + 0x10;
+            } else if (lng == 1) {
+                CHKi(1);
+                lng = (src[--ip] | (src[--ip] << 8)) + 0x110;
+            }
+            if (usize != -1 && op + lng > usize) lng = usize - op;
+            //if (dist > op) dist = op;
+            for (uint32_t i=0;i < lng;i++,op++) dst[op] = dst[op - dist];
+        } else {
+            CHKi(0);
+            dst[op++] = src[--ip];
+        }
+
+        f <<= 1;
+        fbl--;
+    }
+
+eof:
+    #undef CHKi
+    #undef CHKo
     return op;
 }
 

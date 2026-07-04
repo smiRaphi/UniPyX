@@ -205,8 +205,7 @@ def extract4_3(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
-            fo = f.readu32()
-            f.back(4)
+            fo = f.peek('u32')
 
             fs = []
             while f < fo:
@@ -237,13 +236,10 @@ def extract4_3(inp:str,out:str,t:str):
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe)
                 d = []
-                tg = f.read(4)
-                f.back(4)
+                tg = f.peek(4)
                 while (f.pos+8) < fs[ix+1]:
-                    f.skip(4)
-                    s = f.readu32()
+                    s = f.peek('u32',poffset=4)
                     if not s: break
-                    f.back(8)
                     d.append(f.read(s))
 
                 try: tg = tg.decode('ascii');asrt(tg.isprintable())
@@ -2391,8 +2387,7 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Sunday vs. Magazine TARC'|'Sunday vs. Magazine EMIT':
             from lib.file import File
             f = File(i,endian='<')
-            asrt(f.read(4).decode('ascii') == t[-4:])
-            f.back(4)
+            asrt(f.peek(4).decode('ascii') == t[-4:])
             r = sxm_block(f,o)
             f.close()
             if r: return
@@ -2561,9 +2556,7 @@ def sxm_block(inp,o:str,hint=None):
         case _:
             f.back(4)
             if hint in {'MODL','MOTN'}:
-                f.skip(0x2C)
-                fof = f.readu32()
-                f.back(0x30)
+                fof = f.peek('u32',poffset=0x2C)
                 fs = [(f.read(0x20).rstrip(b'\0').decode('ascii'),f.skip(8),f.readu32(),f.readu32()) for _ in range(fof//0x30)]
                 for fe in fs:
                     f.seek(p + fe[3])

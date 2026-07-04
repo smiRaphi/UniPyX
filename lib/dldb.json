@@ -57,9 +57,9 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1781820000
+            "ts":1783116000
         }],
-        "ts":1781820000
+        "ts":1783116000
     },
     "stringzilla":{
         "pip":"stringzilla"
@@ -124,9 +124,9 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1781906400
+            "ts":1783116000
         }],
-        "ts":1781906400
+        "ts":1783116000
     },
     "Cryptodome":{
         "pip":"pycryptodomex"
@@ -137,12 +137,12 @@
     "7z":{
         "p":"7z/7z.exe",
         "fs":[{
-            "u":"https://github.com/ip7z/7zip/releases/download/26.01/7z2601-x64.msi",
+            "u":"https://github.com/ip7z/7zip/releases/download/26.02/7z2602-x64.msi",
             "x":{
                 "Files/7-Zip/7z.exe":"7z/7z.exe",
                 "Files/7-Zip/7z.dll":"7z/7z.dll"
             },
-            "ts":1777300791
+            "ts":1782447010
         },{
             "u":"https://www.tc4shell.com/binary/eDecoder.zip",
             "x":{
@@ -164,7 +164,7 @@
                 "Asar.64.dll":"7z/Formats/Asar.64.dll"
             }
         }],
-        "ts":1777300791
+        "ts":1782447010
     },
     "garbro":{
         "p":"GARbro/GARbro.Console.exe",
@@ -204,10 +204,10 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":27509193663,
-            "ts":1781955535
+            "nightly_run":28302836048,
+            "ts":1783181821
         }],
-        "ts":1781955535
+        "ts":1783181821
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -517,13 +517,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/f6/09/dolphin-master-2603-397-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/81/ac/dolphin-master-2606-31-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1781728678
+            "ts":1782936546
         }],
-        "ts":1781728678
+        "ts":1782936546
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -1042,17 +1042,17 @@
     "acx":{
         "p":"acx.jar",
         "fs":[[
-            "https://github.com/AppleCommander/AppleCommander/releases/download/13.0/AppleCommander-acx-13.0.jar",
+            "https://github.com/AppleCommander/AppleCommander/releases/download/13.1/AppleCommander-acx-13.1.jar",
             "acx.jar"
         ]],
-        "ts":1760048587
+        "ts":1783117581
     },
     "pyinstxtractor-ng":{
         "p":"pyinstxtractor-ng.exe",
         "fs":[
-        "https://github.com/pyinstxtractor/pyinstxtractor-ng/releases/download/2026.04.07/pyinstxtractor-ng.exe"
+        "https://github.com/pyinstxtractor/pyinstxtractor-ng/releases/download/2026.07.03/pyinstxtractor-ng.exe"
         ],
-        "ts":1775548560
+        "ts":1783066811
     },
     "ar":{
         "p":"binutils/ar.exe",
@@ -1434,15 +1434,8 @@
         "ts":0
     },
     "brotli":{
-        "p":"brotli.exe",
-        "fs":[{
-            "u":"https://github.com/google/brotli/releases/download/v1.2.0/brotli-x64-windows-static.zip",
-            "x":{
-                "brotli.exe":"brotli.exe"
-            },
-            "ts":1761577412
-        }],
-        "ts":1761577412
+        "pip":"brotli",
+        "ts":1783169411
     },
     "sbc":{
         "p":"sbc.exe",
@@ -2321,23 +2314,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46150/SDLVICE-3.10-win64-r46150.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46160/SDLVICE-3.10-win64-r46160.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46150/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46150/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46150/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46150/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46150/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46150/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46160/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46160/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46160/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46160/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46160/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46160/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1781944897
+            "ts":1783162261
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1781944897
+        "ts":1783162261
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2690,14 +2683,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_06_19_06e8f370_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_07_03_62a58c87_32.zip",
             "x":{
-                "RenderDoc_2026_06_19_06e8f370_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_06_19_06e8f370_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_07_03_62a58c87_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_07_03_62a58c87_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1781820000
+            "ts":1783029600
         }],
-        "ts":1781820000
+        "ts":1783029600
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -5402,7 +5395,7 @@
     "undertalemodcli":{
         "p":"UTMT_CLI/UndertaleModCli.exe",
         "fs":[{
-            "u":"https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.9.1.0/UTMT_CLI_v0.9.1.0-Windows.zip",
+            "u":"https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.9.1.1/UTMT_CLI_v0.9.1.1-Windows.zip",
             "x":{
                 "GameSpecificData/Definitions/deltarune.json":"UTMT_CLI/GameSpecificData/Definitions/deltarune.json",
                 "GameSpecificData/Definitions/gamemaker.json":"UTMT_CLI/GameSpecificData/Definitions/gamemaker.json",
@@ -5457,7 +5450,7 @@
                 "Newtonsoft.Json.dll":"UTMT_CLI/Newtonsoft.Json.dll",
                 "ICSharpCode.SharpZipLib.dll":"UTMT_CLI/ICSharpCode.SharpZipLib.dll"
             },
-            "ts":1781829834
+            "ts":1782754454
         },{
             "u":".",
             "x":{
@@ -5487,7 +5480,7 @@
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.18.2-nightly.2026-06-18/WolvenKit.Console-8.18.2-nightly.2026-06-18.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.19.1-nightly.2026-07-04/WolvenKit.Console-8.19.1-nightly.2026-07-04.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5540,9 +5533,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1781781459
+            "ts":1783164249
         }],
-        "ts":1781781459
+        "ts":1783164249
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5736,7 +5729,56 @@
             "x":{
                 "packMP3.exe":"packMP3.exe"
             }
-        }]
+        }],
+        "ts":0
+    },
+    "zstd3":{
+        "p":"zstd3.exe",
+        "fs":[[
+            "https://github.com/facebook/zstd/releases/download/zstd-0.3.0/zstd.exe",
+            "zstd3.exe"
+        ]],
+        "ts":0
+    },
+    "zstd4":{
+        "p":"zstd4.exe",
+        "fs":[{
+            "u":"https://github.com/facebook/zstd/releases/download/v0.4.4/zstd-win64-0.4.4.zip",
+            "x":{
+                "zstd.exe":"zstd4.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zstd5":{
+        "p":"zstd5.exe",
+        "fs":[{
+            "u":"https://github.com/facebook/zstd/releases/download/v0.5.1/zstd-windows-v0.5.1.zip",
+            "x":{
+                "win64/zstd.exe":"zstd5.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zstd6":{
+        "p":"zstd6.exe",
+        "fs":[{
+            "u":"https://github.com/facebook/zstd/releases/download/v0.6.1/zstd-windows-v0.6.1.zip",
+            "x":{
+                "win64/zstd.exe":"zstd6.exe"
+            }
+        }],
+        "ts":0
+    },
+    "zstd7":{
+        "p":"zstd7.exe",
+        "fs":[{
+            "u":"https://github.com/facebook/zstd/releases/download/v0.7.3/zstd-windows-v0.7.3.zip",
+            "x":{
+                "win64/zstd.exe":"zstd7.exe"
+            }
+        }],
+        "ts":0
     },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",

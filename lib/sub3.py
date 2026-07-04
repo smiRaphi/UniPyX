@@ -576,7 +576,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             return
         case '624'|'4kZIP'|'Amisetup'|'aPACK'|'AVPACK'|'COM RLE Packer'|'Cruncher'|'DexEXE'|'Dn.COM Cruncher'|'Envelope'|'ExeLITE'|'JAM'|'LGLZ'|'Pack Packed'|\
-             'PMWLite'|'RDT Compressor'|'RJCrush'|'Shrinker Packed'|'SpaceMaker'|'T-PACK'|'Tenth Planet Soft'|'TSCRUNCH'|'XPACK/LZCOM':
+             'PMWLite'|'RDT Compressor'|'RJCrush'|'Shrinker Packed'|'SpaceMaker'|'T-PACK'|'Tenth Planet Soft'|'TSCRUNCH'|'XPACK/LZCOM'|'Dave Dunfield Packer':
             dosbox(['cup386',i,'OUT.BIN','/1h' + ('x' if open(i,'rb').read(2) == b'MZ' else '')])
             chks = getsize(i)-768
             if chks < 0x10: chks = 0x10
@@ -1565,9 +1565,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     fn = f.readutf16(f.readu16())
                     f.skip(4)
                     s = f.readu32()
-                    if s > 6:
-                        zl = iszl(f.read(2))
-                        f.back(2)
+                    if s > 6: zl = iszl(f.peek(8))
                     else: zl = False
                     writefile(o + '/' + fn,f.decompress(s,anc + ('zlib' if zl else 'none')))
 

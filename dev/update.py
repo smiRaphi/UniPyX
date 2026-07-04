@@ -136,7 +136,7 @@ def supdate(c:Cache,k:str,inf:dict):
         elif dom == 'github.com' and '/releases/download/' in u:
             repo = u.split('/releases/download/')[0].split('//github.com/')[1]
 
-            if repo not in {'allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib'}:
+            if repo not in {'allcoolthingsatoneplace/UnrealPakTool','joncampbell123/dosbox-x','GotthardtZ/paq8gen','skandau/paq8sk','kaitz/paq8pxv','kaitz/fxcm','schnaader/precomp-cpp','graalvm/graalvm-ce-builds','Radfordhound/HedgeLib','facebook/zstd'}:
                 s = '<p><strong>This page is taking too long to load.</strong></p>'
                 while '<p><strong>This page is taking too long to load.</strong></p>' in s:
                     if repo in {'aaru-dps/Aaru','GDRETools/gdsdecomp','VICE-Team/svn-mirror','ps2homebrew/pfsshell','git-for-windows/git','AlexxEG/BSA_Browser','yasha1971-coder/aceapex','horsicq/DIE-engine','jindrapetrik/jpexs-decompiler'}:

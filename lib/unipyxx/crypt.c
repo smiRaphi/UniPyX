@@ -55,6 +55,12 @@ int32_t MT19937_rand(MT19937 *restrict ctx) {
     return y;
 }
 
+#define MICRO_C_RAND_A 0x358D
+#define MICRO_C_RAND_C 0x3619
+uint16_t micro_c_rand(uint16_t state) {
+    return state * MICRO_C_RAND_A + MICRO_C_RAND_C;
+}
+
 EXPORT void decrypt_inv(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {
     for (size_t p=0;p < size;p++) dst[p] = ~src[p];
 }
@@ -391,6 +397,39 @@ EXPORT void decrypt_empire_magic(uint8_t *restrict buf, const size_t size, const
                            const uint8_t *restrict table, const uint32_t offset) {
     for (size_t p=0;p < size;p++)
         buf[p] = (buf[p] + 1 + key[p % ksize]) ^ table[(offset + p) % 0x3cb];
+}
+EXPORT void decrypt_camelot_exe(uint8_t *restrict buf, const size_t size, uint8_t key, const uint8_t off) {
+    if (size < 2) return;
+    uint8_t pre = buf[size - 1];
+    for (ssize_t p=size - 2;p >= 0;p--) {
+        uint8_t tpre = buf[p];
+        buf[p] ^= ROT8L(pre) ^ key;
+        pre = tpre;
+        key += off;
+    }
+}
+EXPORT int8_t decrypt_zipd(uint8_t *restrict buf, const size_t size) {
+    if (size < 7) return -1;
+    const uint8_t chk[6] = {0, 0, 0, 0, 5, 0x78};
+
+    uint16_t s=0;
+    while (1) {
+        uint16_t ts = s;
+        ts = micro_c_rand(ts);
+        int8_t match = 1;
+        for (uint8_t p=0;p < 6;p++) {
+            if ((uint8_t)(buf[1 + p] ^ (ts = micro_c_rand(ts))) != chk[p]) {
+                match = 0;
+                break;
+            }
+        }
+        if (match) break;
+        if (s == 0xFFFF) return -1;
+        s++;
+    }
+
+    for (size_t p=0;p < size;p++) buf[p] ^= (s = micro_c_rand(s));
+    return 0;
 }
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
