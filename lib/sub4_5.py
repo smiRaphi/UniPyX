@@ -949,5 +949,38 @@ def extract4_5(inp:str,out:str,t:str):
                 writefile(f'{o}/{ix}.wav',d[bp.start():bp.start() + int.from_bytes(bp[1],'little') + 8])
 
             return
+        case 'Hokuto No Ken IDX+BIN':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'FARC' and f.readu32() == 1)
+
+            c = f.readu32()
+            f.skip(4)
+            ofs = [f.readu32() for _ in range(c)]
+            fd = File(dirname(i) + '/' + f.read0s('ascii'))
+            ds = []
+            for of in ofs:
+                f.seek(of)
+                ds.append((f.readc(4),f.readu32(),f.readu32()))
+
+            for de in ds:
+                f.seek(de[1])
+                asrt(f.read(4) == de[0])
+                c = f.readu32()
+                n = de[0].decode('ascii')
+                mkdir(o + '/' + n)
+                for ix in range(c):
+                    fd.seek(f.readu32())
+                    d = fd.readc(f.readu32())
+                    if d[:4] == b'PALH': ex = 'pal'
+                    elif d[:4] == b'TEXH': ex = 'tex'
+                    elif d[:8] == b'FARC\1\0\0\0': ex = 'far'
+                    else: ex = guess_ext_ps2(d)
+                    writefile(f'{o}/{n}/{ix}.{ex}',d)
+
+            f.close()
+            fd.close()
+            if ds: return
 
     return 1

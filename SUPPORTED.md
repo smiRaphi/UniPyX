@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1004
+# Supported Formats: 1005
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -355,7 +355,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (541)
+## Various (542)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -580,6 +580,7 @@ High Impact Games WAD | .wad | [tjzip_dump.py](https://github.com/electrogecko/U
 Highway Hunter Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Highway Pursuit HPDT | .hpdt | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 HMM Packfile | ??? | [hmmunpack](https://github.com/ross-spencer/hmmunpack) |
+Hokuto No Ken IDX+BIN | .idx+.bin | Custom |
 Holistic Design MUK | .muk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Hollow Knight Save | ??? | Custom |
 Hornby BSF | .bsf | Custom |

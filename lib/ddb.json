@@ -359,6 +359,10 @@
         "rs":"Sunday vs. Magazine aeDAT","s":1
     },
     {
+        "d":[["s%",8],["isat","FARC\\1\\0\\0\\0",0],["n0",4,8],["n0",4,16],["py","f.seek(8);c=f.readi(4,'<');f.seek(16);o=f.readi(4,'<')\nif (16+c*4+24)!=o:return\nf.seek(o-24);n=f.read(32).split(b'\\0')[0];return n and exists(dirname(inp)+'/'+n.decode('latin-1'))"]],
+        "rs":"Hokuto No Ken IDX+BIN","s":1
+    },
+    {
         "d":[["isat","LMPK",0],["isat","x",8],["n0",4,4]],
         "rs":"LMPK","s":1
     },
