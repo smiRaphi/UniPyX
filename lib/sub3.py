@@ -1101,7 +1101,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'Shell Archive':
             db.try_custom()
-            d = open(i,newline='',encoding='utf-8').read()
+            import re,shlex
+            from lib.crypto import decrypt
+            d = readfile(i,'rt',newline='')
             for fs in ('# This is a shell archive.  Remove anything before this line,',
                        '# This is a shell archive, meaning:',
                        '# This is a shell archive (produced by GNU sharutils',
@@ -1117,26 +1119,25 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     break
 
             for rge in (
-                (r"(?sm)^ *sed +(?:-e +)?(?P<q1>['\"])s/\^([^\n]+)//(?P=q1) +> *(?P<q2>['\"]?)([^\n\"]+?)(?P=q2) +<< *(?P<q3>['\"]?)(?P<fend>[^\n]+?)(?P=q3) *\n(.+?)(?P=fend)"          ,3,6,1),
-                (r"(?sm)^ *sed +(?:-e +)?(?P<q1>['\"])s/\^([^\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *> *(?P<q3>['\"]?)([^\n\"]+?)(?P=q3)(?: *&&)? *\n(.+?)(?P=fend)",5,6,1),
-                (r"(?sm)^ *cat +(?:- +)?> *(?P<q1>['\"]?)([^\n\"]+?)(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *\n(.+?)(?P=fend)",1,4),
-                (r"(?sm)^ *cat +(?:- +)?<< *\\(?P<fend>[^\n\"]+?) *> *(?P<q1>['\"]?)([^\n\"]+)(?P=q1) *\n(.+?)(?P=fend)"                  ,2,3),
-                (r"(?sm)^ *cat +(?:- +)?<< *(?P<q1>['\"])(?P<fend>[^\n]+?)(?P=q1) *> *(?P<q2>['\"]?)([^\n\"]+)(?P=q2) *\n(.+?)(?P=fend)"  ,3,4),
+                (r"(?sm)^ *sed +(?:-e +)?(?P<q1>['\"])s/\^([^\r\n]+)//(?P=q1) +> *(?P<q2>['\"]?)([^\r\n\"]+?)(?P=q2) +<< *(?P<q3>['\"]?)(?P<fend>[^\r\n]+?)(?P=q3) *\r?\n(.+?)(?P=fend)",3,6,1),
+                (r"(?sm)^ *sed +(?:-e +)?(?P<q1>['\"])s/\^([^\r\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\r\n]+?)(?P=q2) *> *(?P<q3>['\"]?)([^\r\n\"]+?)(?P=q3)(?: *&&)? *\r?\n(.+?)(?P=fend)",5,6,1),
+                (r"(?sm)^ *cat +(?:- +)?> *(?P<q1>['\"]?)([^\r\n\"]+?)(?P=q1) +<< *(?P<q2>['\"]?)\\?(?P<fend>[^\r\n]+?)(?P=q2) *\r?\n(.+?)(?P=fend)",1,4),
+                (r"(?sm)^ *cat +(?:- +)?<< *\\(?P<fend>[^\r\n\"]+?) *> *(?P<q1>['\"]?)([^\n\"]+)(?P=q1) *\r?\n(.+?)(?P=fend)"                  ,2,3),
+                (r"(?sm)^ *cat +(?:- +)?<< *(?P<q1>['\"])(?P<fend>[^\r\n]+?)(?P=q1) *> *(?P<q2>['\"]?)([^\r\n\"]+)(?P=q2) *\r?\n(.+?)(?P=fend)"  ,3,4),
                 ):
                 r = re.compile(rge[0])
                 for fe in r.findall(d):
                     dt = fe[rge[2]]
                     if len(rge) > 3: dt = '\n'.join([x[1 if x.startswith(fe[rge[3]]) else 0:] for x in dt.split('\n')])
-                    xopen(o + '/' + fe[rge[1]].lstrip('./'),'w',newline='',encoding='utf-8').write(dt)
+                    writefile(o + '/' + sanitize_relative(fe[rge[1]]),dt,'wt',newline='')
                 d = r.sub('',d)
-            db.set_temp_print(False)
-            for fe in re.findall(r"(?sm)^ *sed +(?P<q1>['\"])s/\^([^\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\n]+?)(?P=q2) *\| *uudecode +&&\n(.+?)(?P=fend)",d):
-                tf = TmpFile('.uu')
-                xopen(tf,'w',newline='',encoding='utf-8').write('\n'.join([x[1 if x.startswith(fe[1]) else 0:] for x in fe[4].split('\n')]))
-                extract(tf.p,o,'UUencoded')
-                tf.destroy()
-            db.reset_temp_print()
-            for de in re.findall(r"(?m)^ *mkdir +(?P<q1>['\"]?)(.+)(?P=q1)\n",d): mkdir(o + '/' + de[1])
+            UUR = re.compile(r'(?ms)begin \d+ ([^\n]+)\n(.+?)\nend\n')
+            for fe in re.findall(r"(?sm)^ *sed +(?P<q1>['\"])s/\^([^\r\n]+?)//(?P=q1) +<< *(?P<q2>['\"]?)(?P<fend>[^\r\n]+?)(?P=q2) *\| *uudecode +&&\r?\n(.+?)(?P=fend)",d):
+                dt = '\n'.join([x[1 if x.startswith(fe[1]) else 0:] for x in fe[4].replace('\r','').split('\n')])
+                asrt('begin ' in dt)
+                for ufe in UUR.findall(dt): writefile(o + '/' + sanitize_relative(ufe[0]),decrypt(ufe[1],'uu'))
+            for de in re.findall(r"(?m)^ *mkdir +([^\r\n]+)\r?\n",d):
+                for dn in shlex.split(de): mkdir(o + '/' + sanitize_relative(dn))
 
             if listdir(o): return
         case 'Casio BE-300 Package':
@@ -1875,6 +1876,36 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     for m in pm: writefile(o + '/' + m[r[1]],m[r[2]],'wt')
                     break
             else: return 1
+            return
+        case 'Camelot Obfuscated NSO':
+            OFFS = {
+                b'pa~\x8d\xact8*\xe4.\x8a\xc8\xded\xee\xb3\xdaAf\xcd':(0x53CABD,-1,-1),
+            }
+
+            db.try_custom()
+            from lib.crypto import decrypt
+            from lib.file import File,rotate8,decompress
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'NSO0')
+
+            f.skip(4);f.padc(4)
+            asrt(f.readu32() == 0)
+            f.skip(0x20)
+            dss,dsfo,dsmo = f.readu32(),f.readu32(),f.readu32()
+            f.skip(4)
+            bid = f.readc(0x14)
+            f.seek(dsfo)
+            d = f.readc(dss)
+
+            de1o = OFFS[bid][0] - dsmo
+            usd = d[de1o:de1o + 5]
+            us  = (usd[0] ^ rotate8(usd[1])) << 0
+            us |= (usd[1] ^ rotate8(usd[2])) << 8
+            us |= (usd[2] ^ rotate8(usd[3])) << 16
+            us |= (usd[3] ^ rotate8(usd[4])) << 24
+            d1 = decrypt(d[:de1o],'camelot_exe',0x68,0x0D)
+            d1 = decompress(d1,'camelot_blz',usize=us)
+            writefile(o + '/1.bin',d1)
             return
 
     return 1

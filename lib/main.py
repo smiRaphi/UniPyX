@@ -197,6 +197,8 @@ def sub_path(p:str,home=False,slash=False):
     if slash: r = r.translate(SUB_PATHX)
     return h + r
 def sanitize_relative(p:str):
+    if not p: return p
+
     rps = [len(x) for x in p.replace('\\','/').split('/')]
     ps = []
     cp = 0
@@ -211,6 +213,7 @@ def sanitize_relative(p:str):
         elif x[0] in {'.',''}: continue
         ops.append(x[0] + x[1])
     r = ''.join(ops)
+    if not r: return r
     if p[-1] not in '\\/' and r[-1] in '\\/': r = r[:-1]
     elif p[-1] != r[-1]: r = r[:-1] + p[-1]
     return r
@@ -398,10 +401,10 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             dprc = subprocess.Popen([dpth,'-p','-D',dirname(dpth) + '\\db',inp],stdout=-1,stderr=-3)
 
             if pe:
-                exst = st
+                if BENCHMARK: exst = st
                 log = gtmp('.log')
                 eprc = subprocess.Popen([db.get('exeinfope'),inp + '*','/s','/log:' + log],stdout=-1,stderr=-3)
-                st = time.perf_counter()
+                if BENCHMARK: st = time.perf_counter()
 
             yrep = db.update('yara')
             yp = dirname(yrep[0])

@@ -938,7 +938,7 @@
         "rs":"StormCE IIII","s":1
     },
     {
-        "rqr":null,
+        "rq":null,
         "d":[["isat","PK\\x05\\x06",-22],["isatS","\\0",4,-18],["isatS","\\0",2,-2],["n0",2,-14],["n0",2,-12],["n0",4,-10],["n0",4,-6],["py","f.seek(-14,2)\nif f.read(2)!=f.read(2):return\nreturn (22+f.readi(4,'<')+f.readi(4,'<'))<=fsz"]],
         "rs":"ZIP","s":1
     },

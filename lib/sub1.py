@@ -497,6 +497,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     sz,of = f.readu32(),f.readu32()
                     if t == 'RESOF': sz ^= 0xFFFFFFFF
                     if (of + sz) <= (bp + p): break
+                    if not SIG56 in d[:p] and (of + sz - 0x40) <= (bp + p): break
 
                 f.seek(bp + p + 4)
                 if sum(f.read(4)): raise NotImplementedError('Multi file zip')
@@ -527,6 +528,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
             # - cm: comment
 
             f.seek(cdo)
+            reb = 0
+            if c > 0 and not f.peek(4) == SIG12:
+                f.seek(bp + p - cds)
+                reb = f.pos - cdo
+
             fs = []
             for _ in range(c):
                 blkn = f.read(4)
@@ -539,8 +545,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     'ct':f.readu16(),
                     'ts':{},
                 }
-                asrt(not fe['fl'] & 0x9780)
-                asrt(not fe['fl'] & 0x2000,'Encrypted CD',err=NotImplementedError)
+                asrt(not fe['fl'] & 0x1780)
+                if fe['xv'] & 0xFF >= 62: asrt(not fe['fl'] & 0x2000,'Encrypted CD',err=NotImplementedError)
                 if fe['ct'] == 22 and FRZK is None:
                     from lib.pyob import PyOBinX
                     FRZK = PyOBinX.dl('forza_keys',db)
@@ -555,12 +561,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fe['dsk'] = f.readu16()
                 fe['ia'] = f.readu16()
                 fe['xa'] = f.readu32()
-                fe['of'] = f.readu32()
+                fe['of'] = f.readu32() + reb
                 fnb = f.readc(nl)
                 fe['n'] = fnb.rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'cp437')
                 if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
 
                 ep = f.pos + xl
+                if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',poffset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.reads(xl,'latin-1')):
+                    f.seek(ep) # JAR shit
                 while (f.pos + 4) < ep:
                     tg,s = f.readc(2),f.readu16()
                     xep = f.pos + s
@@ -580,6 +588,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                                 fe['dsk'] = f.readu32()
                         case b'\x07\0': # AV Info
                             fe['avinf'] = f.read(s)
+                        case b'\x09\0': # OS/2
+                            fe['os2x'] = True
                         case b'\x0A\0': # NTFS
                             asrt(s >= 0x20)
                             f.padc(4)
@@ -631,6 +641,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             pass # u64 growth hint, 0x10 padding
                         case b'\x23\x11': # ?, seen in Forza Horizon 6
                             pass # u32 data offset
+                        case b'AC': # Acorn
+                            asrt(s >= 4)
+                            asrt(f.read(4) == b'ARC0')
                         case b'KV': # KeyValuePairs
                             asrt(s >= 14)
                             asrt(f.read(13)[:9] == b'KeyValuePairs'[:9]) # only verify first couple bytes
@@ -705,11 +718,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
             drefs = {}
             for fe in fs:
                 f.seek(fe['of'])
-                asrt(f.read(4) == SIG34)
+                asrt(f.read(4) == SIG34,lambda:f.fmt('§@§'))
                 v = f.readu16()
                 if 'aes' in fe: ct = 99
                 else: ct = fe['ct']
-                asrt(f.readu16() == fe['fl'])
+                asrt(f.readu16() & 0x087F == fe['fl'] & 0x087F)
                 ct2 = f.readu16()
                 f.skip(0x10) # f.skip(4);crc2,zs2,us2 = f.readu32(),f.readu32(),f.readu32()
                 fnl2,xfl2 = f.readu16(),f.readu16()
@@ -718,7 +731,23 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     fe['n'] = fnb2
                     ct = fe['ct'] = ct2
                 asrt(ct == ct2)
-                f.skip(xfl2)
+
+                ep = f.pos + xfl2
+                if fe.get('os2x'):
+                    while (f.pos + 4) < ep:
+                        tg,s = f.readc(2),f.readu16()
+                        xep = f.pos + s
+                        if xep > ep: break
+                        match tg:
+                            case b'\x09\0':
+                                asrt(s >= 10)
+                                xus,xct,xcrc = f.readu32(),f.readu16(),f.readu32()
+                                os2 = decompress(f.readc(s - 10),ZFMTM[xct],usize=xus)
+                                if xcrc: asrt(crc_hash(os2,'crc32') == xcrc)
+                                fe['os2x'] = os2
+                                
+                        f.seek(xep)
+                f.seek(ep)
 
                 d = f.readc(fe['zs'])
                 if ct == 99 and 'aes' in fe:
@@ -784,7 +813,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
                 if 9 >= ct >= 1: pass
-                elif ct == 0 and d[0] == 0x70 and len(BUNFMTM) > d[1] > 0:
+                elif ct == 0 and len(d) >= 0x1E and d[0] == 0x70 and len(BUNFMTM) > d[1] > 0:
                     tf = File(d[:0x20])
                     tf.skip(2)
                     try: bus,bzs = tf.readleb128u(),tf.readleb128u() + 0x1A
@@ -805,6 +834,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
                 if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
                 if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
+                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):
@@ -837,6 +867,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
                 if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
                 if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
+                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
             if fs: return
 
             if readfile(i,size=2) == b'MZ':

@@ -23,7 +23,8 @@
         "ios application",
         "mozilla firefox browser extension",
         "google chrome extension",
-        "ios app zip archive data"
+        "ios app zip archive data",
+        "winzip win32 self-extracting archive (generic)"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
