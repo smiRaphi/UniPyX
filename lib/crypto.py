@@ -287,7 +287,8 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'empire_magic':
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_empire_magic(i,key,kwargs.get('key_end',False))
-        case 'camelot_exe': return uxx().decrypt_camelot_exe(i,key,iv)
+        case 'camelot_xor': return uxx().decrypt_camelot_xor(i,key)
+        case 'camelot_rand': return uxx().decrypt_camelot_rand(i,key,iv,drop=kwargs.get('drop',0))
         case 'zipd': return uxx().decrypt_zipd(i)
 
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))

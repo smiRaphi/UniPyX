@@ -126,7 +126,8 @@ class X:
             ('decrypt_remedy_ras',(P(u8),szt,u32),void,0),
             ('init_empire_magic',(P(u8),),void,0),
             ('decrypt_empire_magic',(P(u8),szt,P(u8),szt,P(u8),u32),void,0),
-            ('decrypt_camelot_exe',(P(u8),szt,u8,u8),void,0),
+            ('decrypt_camelot_xor',(P(u8),szt,u8),void,0),
+            ('decrypt_camelot_rand',(P(u8),szt,u8,u32,szt),void,0),
             ('decrypt_zipd',(P(u8),szt),s8,0),
             ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
@@ -437,11 +438,16 @@ class X:
         k = (u8 * len(key)).from_buffer_copy(key)
         self.dll.decrypt_empire_magic(b,len(src),k,len(key),self.EMPIRE_MAGIC,self.hash_empire_magic(key,key_end))
         return bytes(b)
-    def decrypt_camelot_exe(self,src:bytes,key:int,off:int) -> bytes:
+    def decrypt_camelot_xor(self,src:bytes,key:int) -> bytes:
         if isinstance(key,bytes): key = key[0]
-        if isinstance(off,bytes): off = off[0]
         b = (u8 * len(src)).from_buffer_copy(src)
-        self.dll.decrypt_camelot_exe(b,len(src),key,off)
+        self.dll.decrypt_camelot_xor(b,len(src),key)
+        return bytes(b)[:-1]
+    def decrypt_camelot_rand(self,src:bytes,key:int,seed:int,drop:int=0) -> bytes:
+        if isinstance(key,bytes): key = key[0]
+        asrt(isinstance(seed,int) and isinstance(drop,int))
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_camelot_rand(b,len(src),key,seed,drop)
         return bytes(b)[:-1]
     def decrypt_zipd(self,src:bytes) -> bytes:
         asrt(src[-2:] == b'\x09\xEB')

@@ -14,7 +14,7 @@ typedef struct {
     uint32_t TEMPERING_MASK_C;
     uint32_t INIT_MULT;
 
-    int32_t mt[624];
+    int32_t mt[MT_N];
     int32_t mti;
 } MT19937;
 #define INIT_MT19937(X) MT19937 X = { .MATRIX_A = (int32_t)0x9908B0DF, .TEMPERING_MASK_B = 0x9D2C5680,\
@@ -51,6 +51,53 @@ int32_t MT19937_rand(MT19937 *restrict ctx) {
     y ^= y >> 11;
     y ^= (int32_t)(((uint32_t)y << 7) & ctx->TEMPERING_MASK_B);
     y ^= (int32_t)(((uint32_t)y << 15) & ctx->TEMPERING_MASK_C);
+    y ^= y >> 18;
+    return y;
+}
+
+typedef struct {
+    uint32_t MATRIX_A;
+    uint32_t TEMPERING_MASK_B;
+    uint32_t TEMPERING_MASK_C;
+    uint32_t INIT_MULT;
+
+    uint32_t mt[MT_N];
+    uint32_t mti;
+} MT19937U;
+#define INIT_MT19937U(X) MT19937U X = { .MATRIX_A = 0x9908B0DF, .TEMPERING_MASK_B = 0x9D2C5680,\
+                                        .TEMPERING_MASK_C = 0xEFC60000, .INIT_MULT = 0x6C078965,\
+                                        .mt = { 0 }, .mti = MT_N + 1 }
+void MT19937U_seed(MT19937U *restrict ctx, uint32_t seed) {
+    ctx->mt[0] = seed;
+    for (ctx->mti=1;ctx->mti < MT_N;ctx->mti++) {
+        uint32_t last = ctx->mt[ctx->mti - 1];
+        ctx->mt[ctx->mti] = (uint32_t)(ctx->INIT_MULT * (uint32_t)(last ^ (last >> 30)) + (uint32_t)ctx->mti);
+    }
+}
+uint32_t MT19937U_rand(MT19937U *restrict ctx) {
+    uint32_t y;
+    const uint32_t mag01[2] = { 0x0U, ctx->MATRIX_A };
+
+    if (ctx->mti >= MT_N) {
+        int i = 0;
+
+        for (;i < MT_N - MT_M;i++) {
+            y = (ctx->mt[i] & MT_MSK_U) | (ctx->mt[i + 1] & MT_MSK_L);
+            ctx->mt[i] = ctx->mt[i + MT_M] ^ (y >> 1) ^ mag01[y & 1];
+        }
+        for (;i < MT_N - 1;i++) {
+            y = (ctx->mt[i] & MT_MSK_U) | (ctx->mt[i + 1] & MT_MSK_L);
+            ctx->mt[i] = ctx->mt[i + (MT_M - MT_N)] ^ (y >> 1) ^ mag01[y & 1];
+        }
+        y = (ctx->mt[MT_N - 1] & MT_MSK_U) | (ctx->mt[0] & MT_MSK_L);
+        ctx->mt[MT_N - 1] = ctx->mt[MT_M - 1] ^ (y >> 1) ^ mag01[y & 1];
+        ctx->mti = 0;
+    }
+
+    y = ctx->mt[ctx->mti++];
+    y ^= y >> 11;
+    y ^= (uint32_t)(((uint32_t)y << 7) & ctx->TEMPERING_MASK_B);
+    y ^= (uint32_t)(((uint32_t)y << 15) & ctx->TEMPERING_MASK_C);
     y ^= y >> 18;
     return y;
 }
@@ -398,14 +445,31 @@ EXPORT void decrypt_empire_magic(uint8_t *restrict buf, const size_t size, const
     for (size_t p=0;p < size;p++)
         buf[p] = (buf[p] + 1 + key[p % ksize]) ^ table[(offset + p) % 0x3cb];
 }
-EXPORT void decrypt_camelot_exe(uint8_t *restrict buf, const size_t size, uint8_t key, const uint8_t off) {
+EXPORT void decrypt_camelot_xor(uint8_t *restrict buf, const size_t size, const uint8_t key) {
     if (size < 2) return;
+    uint8_t tkey = key * 4;
     uint8_t pre = buf[size - 1];
     for (ssize_t p=size - 2;p >= 0;p--) {
         uint8_t tpre = buf[p];
-        buf[p] ^= ROT8L(pre) ^ key;
+        buf[p] ^= ROT8R(pre) ^ tkey;
         pre = tpre;
-        key += off;
+        tkey += key;
+    }
+}
+EXPORT void decrypt_camelot_rand(uint8_t *restrict buf, const size_t size, const uint8_t key, const uint32_t seed, const size_t drop) {
+    if (size < 2) return;
+    INIT_MT19937U(mt);
+    mt.TEMPERING_MASK_C = 0xFFC78000;
+    MT19937U_seed(&mt,seed);
+    for (size_t i=0;i < drop;i++) MT19937U_rand(&mt);
+
+    uint8_t tkey = key * 4;
+    uint8_t pre = buf[size - 1];
+    for (ssize_t p=size - 2;p >= 0;p--) {
+        uint8_t tpre = buf[p];
+        buf[p] ^= ROT8R(pre) ^ tkey ^ (uint8_t)MT19937U_rand(&mt);
+        pre = tpre;
+        tkey += key;
     }
 }
 EXPORT int8_t decrypt_zipd(uint8_t *restrict buf, const size_t size) {

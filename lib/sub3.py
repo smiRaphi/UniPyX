@@ -1879,33 +1879,45 @@ def extract3(inp:str,out:str,t:str) -> bool:
             return
         case 'Camelot Obfuscated NSO':
             OFFS = {
-                b'pa~\x8d\xact8*\xe4.\x8a\xc8\xded\xee\xb3\xdaAf\xcd':(0x53CABD,-1,-1),
+                # build id: base key, offset1, offset2, offset3, MT seed, MT drop
+                b'pa~\x8d\xact8*\xe4.\x8a\xc8\xded\xee\xb3\xdaAf\xcd\0\0\0\0\0\0\0\0\0\0\0\0':(0xD,0x53CAC2,0x71D0B3,0x84A6D3,0x76,4),
             }
 
             db.try_custom()
             from lib.crypto import decrypt
-            from lib.file import File,rotate8,decompress
+            from lib.file import File,decompress
             f = File(i,endian='<')
             asrt(f.read(4) == b'NSO0')
 
             f.skip(4);f.padc(4)
-            asrt(f.readu32() == 0)
+            fl = f.readu32()
             f.skip(0x20)
-            dss,dsfo,dsmo = f.readu32(),f.readu32(),f.readu32()
+            dsfo,dsmo,dss = f.readu32(),f.readu32(),f.readu32()
             f.skip(4)
-            bid = f.readc(0x14)
+            bid = f.readc(0x20)
+            f.skip(8)
+            cdss = f.readu32()
             f.seek(dsfo)
-            d = f.readc(dss)
+            if fl & 4: d = f.decompress(cdss,'zstd' if fl & 0x80 else 'lz4',usize=dss)
+            else: d = f.readc(dss)
 
-            de1o = OFFS[bid][0] - dsmo
-            usd = d[de1o:de1o + 5]
-            us  = (usd[0] ^ rotate8(usd[1])) << 0
-            us |= (usd[1] ^ rotate8(usd[2])) << 8
-            us |= (usd[2] ^ rotate8(usd[3])) << 16
-            us |= (usd[3] ^ rotate8(usd[4])) << 24
-            d1 = decrypt(d[:de1o],'camelot_exe',0x68,0x0D)
-            d1 = decompress(d1,'camelot_blz',usize=us)
-            writefile(o + '/1.bin',d1)
+            bk,of1,of2,of3,seed,drop = OFFS[bid]
+            of1 -= dsmo;of2 -= dsmo;of3 -= dsmo
+            od = bytearray()
+
+            td = decrypt(d[:of1],'camelot_xor',bk)
+            td = decompress(td[:-4],'camelot_blz',usize=int.from_bytes(td[-4:],'little'))
+            od.extend(td)
+
+            td = decrypt(d[of1:of2],'camelot_xor',bk + 1)
+            td = decompress(td[:-4],'camelot_blz',usize=int.from_bytes(td[-4:],'little'))
+            od.extend(td)
+
+            td = decrypt(d[of2:of3],'camelot_rand',bk + 2,seed,drop=drop)
+            td = decompress(td[:-4],'camelot_blz',usize=int.from_bytes(td[-4:],'little'))
+            od.extend(td)
+
+            writefile(f'{o}/{tbasename(i)}.nro',od)
             return
 
     return 1

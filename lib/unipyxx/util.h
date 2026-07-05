@@ -43,10 +43,10 @@ extern "C" {
 static inline uint8_t SWAP8(uint8_t x) {
     return ((uint8_t)x << 4) | (x >> 4);
 }
-static inline uint8_t ROT8L(uint8_t x) {
+static inline uint8_t ROT8R(uint8_t x) {
     return (x >> 1) | (x << 7);
 }
-static inline uint8_t ROT8R(uint8_t x) {
+static inline uint8_t ROT8L(uint8_t x) {
     return (x << 1) | (x >> 7);
 }
 static inline uint32_t HIMUL64(uint32_t a, uint32_t b) {

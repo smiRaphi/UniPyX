@@ -565,11 +565,6 @@
         "rs":"Donkey Kong Banana Kingdom","s":1
     },
     {
-        "rqr":"Nintendo Switch executable",
-        "d":[["isatS","\\0",12,4],["isin",["pa~\\x8d\\xact8*\\xe4.\\x8a\\xc8\\xded\\xee\\xb3\\xdaAf\\xcd"],64]],
-        "rs":"Camelot Obfuscated NSO","s":1
-    },
-    {
         "d":[["ext",".dat"],["py","DB={'graphics.dat':'49ca1bf2','globals.dat':'a112840b','scenario.dat':'89556e49','sounds.dat':'48dfccb5'};c=DB.get(basename(inp).lower());return c==f.read(4).hex()"]],
         "rs":"Empire of Magic DAT"
     },
@@ -1709,7 +1704,12 @@
         "rs":"Wallpaper Engine PKG","s":1
     },
     {
-        "d":[["isat","NSO0",0],["isat","\\0\\0\\0\\0\\x3F\\0\\0\\0",8],["isatS","\\0",28,108]],
+        "d":[["isat","NSO0",0],["isatS","\\0",8,4],["isatS","\\0",3,13],["isin",["pa~\\x8d\\xact8*\\xe4.\\x8a\\xc8\\xded\\xee\\xb3\\xdaAf\\xcd\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"],64]],
+        "rs":"Camelot Obfuscated NSO","s":1
+    },
+    {
+        "rqr":"Nintendo Switch executable",
+        "d":[["isat","NSO0",0],["isatS","\\0",8,4],["isatS","\\0",3,13],["isatS","\\0",28,108],["n0",1,12],["n0",4,16],["n0",4,24],["py","f.seek(12);return f.readi(1)&7"]],
         "rs":"Compressed Nintendo Switch Executable","s":1
     },
     {

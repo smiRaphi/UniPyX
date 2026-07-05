@@ -25,7 +25,7 @@ def reflecti(v:int,w:int):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
-def rotate8(v:int): return ((v << 7) & maskb(1)) | (v >> 1)
+def rotate8(v:int): return ((v << 7) & 0xFF) | (v >> 1)
 def pdosdate(d:int,t:int,ms=0):
     asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
     if d == 0: d = 0x21

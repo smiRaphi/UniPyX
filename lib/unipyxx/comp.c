@@ -660,7 +660,8 @@ EXPORT ssize_t decompress_lzrw1kh(const uint8_t *restrict src, const size_t zsiz
         }
         if (cmd & 0x8000) {
             CHKi(1)
-            uint16_t dist = (src[ip++] << 4) | (src[ip] >> 4);
+            uint8_t b0 = src[ip++];
+            uint16_t dist = (b0 << 4) | (b0 >> 4);
             if (dist) {
                 uint8_t len = (src[ip++] & 0xF) + 3;
                 if (op + len > usize) len = usize - op;
@@ -697,7 +698,7 @@ EXPORT ssize_t decompress_camelot_blz(const uint8_t *restrict src, const size_t 
     while (ip > 0 && (op < usize || usize == -1)) {
         if (fbl <= 0) {
             CHKi(0);
-            f = src[--ip];
+            f = -src[--ip]; // - is correct, not ~
             fbl = 8;
         }
 
@@ -714,10 +715,11 @@ EXPORT ssize_t decompress_camelot_blz(const uint8_t *restrict src, const size_t 
                 lng = src[--ip] + 0x10;
             } else if (lng == 1) {
                 CHKi(1);
-                lng = (src[--ip] | (src[--ip] << 8)) + 0x110;
+                uint8_t b0 = src[--ip];
+                lng = (b0 | (src[--ip] << 8)) + 0x110;
             }
             if (usize != -1 && op + lng > usize) lng = usize - op;
-            //if (dist > op) dist = op;
+            if (dist > op) return -1;
             for (uint32_t i=0;i < lng;i++,op++) dst[op] = dst[op - dist];
         } else {
             CHKi(0);
