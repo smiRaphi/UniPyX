@@ -579,7 +579,7 @@ def extract4_3(inp:str,out:str,t:str):
             f.close()
             if listdir(o): return
         case 'GameMaker Archive':
-            run(['undertalemodcli','load',i,'-s',dirname(db.get('undertalemodcli')) + '\\ExportAll.csx'],cwd=o)
+            run(['undertalemodcli','load',i,'-s',dirname(db.get('undertalemodcli')) + '\\ExportAll.csx'],cwd=o,stdin='y')
             if listdir(o): return
         case 'Contact File Data':
             db.try_custom()
