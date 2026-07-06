@@ -33,6 +33,9 @@ def pdosdate(d:int,t:int,ms=0):
     if ms: dt.replace(microsecond=ms*1000000)
     return dt.timestamp()
 def by2bi(b:bytes): return f'{int.from_bytes(b,"big"):0{len(b)*8}b}'
+def bi2by(b:str):
+    b += '0' * (-len(b) % 8)
+    return int(b,2).to_bytes(len(b) // 8,'big')
 
 class File:
     def __init__(self,f,mode='r',endian='>'):
@@ -144,7 +147,7 @@ class File:
     def reads48(self,end=None): return self.readi(6,1,end)
     def reads64(self,end=None): return self.readi(8,1,end)
     def reads128(self,end=None):return self.readi(16,1,end)
-    def readf16(self,end=None): return self.unpack('e',end)
+    def readf16(self,end=None) -> float: return self.unpack('e',end)
     def readf32(self,end=None):
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
@@ -210,11 +213,11 @@ class File:
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
     def writevlq(self,v:int):
-        b = [v & mask(7)]
+        b = [v & 0x7F]
         v >>= 7
 
         while v > 0:
-            b.append((v & mask(7)) | 0x80)
+            b.append((v & 0x7F) | 0x80)
             v >>= 7
 
         return self.write(bytes(reversed(b)))
@@ -810,8 +813,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             bd = b'BZh' + i[:2] + b'AY&SY'
 
             if us > 1:
-                e = be + '0'*32 + '0' * (-len(be) % 8)
-                td = bz2.BZ2File(io.BytesIO(bd + b'\0'*4 + i[2:-2] + int(e,2).to_bytes(len(e)//8,'big')),'r')
+                td = bz2.BZ2File(io.BytesIO(bd + b'\0'*4 + i[2:-2] + bi2by(be + '0'*32)),'r')
                 td = td.read1(us - 1)
             else: td = b''
 
@@ -823,8 +825,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 from .crypto import crc_hash
                 for pb in range(0x100):
                     crc = crc_hash(td + pb.to_bytes(1),'crc32_bzip2').to_bytes(4,'big')
-                    e = be + by2bi(crc) + '0' * (-len(be) % 8)
-                    try: return bz2.decompress(bd + crc + i[2:-2] + int(e,2).to_bytes(len(e)//8,'big'))
+                    try: return bz2.decompress(bd + crc + i[2:-2] + bi2by(be + by2bi(crc)))
                     except OSError: pass
             raise ValueError("Couldn't guess last byte")
         case 'lpaq8': return uxx().decompress_lpaq8(i,kwargs['usize'])

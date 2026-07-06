@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1009
+# Supported Formats: 1010
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -91,7 +91,7 @@ GEM Resource | .gem | [deark](https://entropymine.com/deark/) |
 Git Bundle | .gitbundle | [Git](https://git-scm.com/) |
 Google Authenticator Migration URL | otpauth-migration:// | Custom |
 Google Update Installer | .exe | [7-Zip](https://7-zip.org/) |
-GZIP | .gz | Custom, [7-Zip](https://7-zip.org/) |
+GZIP | .gz | Custom |
 HA | .ha | [HA](https://www.sac.sk/download/pack/ha0999.zip) |
 HTTP Response | .txt | Custom |
 HxC Floppy IMG | .hxc .img | [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
@@ -358,7 +358,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (543)
+## Various (544)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -453,6 +453,7 @@ CI Games DPK | .dpk | [Game Extractor Server](https://github.com/Sembiance/dexve
 Codename Kids Next Door JAM2/FSTA | .jam .fst | Custom |
 Coktel Vision STK | .stk | [na_game_tool](https://nihav.org/game_tool.html) |
 Coktel Vision STK2 | .itk | [na_game_tool](https://nihav.org/game_tool.html) |
+Colin McRae Rally 2 BFL | .bfl | Custom |
 Compressed File Library | .cfl | [uncfl](https://solhsa.com/cfl/index.html) |
 Conquest Earth WAD | .wad | [na_game_tool](https://nihav.org/game_tool.html) |
 Contact File Data | .dat | Custom |

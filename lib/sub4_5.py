@@ -989,5 +989,24 @@ def extract4_5(inp:str,out:str,t:str):
             if i.lower().endswith('.piz'): of += '.' + i[-3:][::-1]
             writefile(of,decrypt(readfile(i),'zipd'))
             return
+        case 'Colin McRae Rally 2 BFL':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'CMPR')
+
+            ep = f.seek(f.readu32() + 4)
+            f.seek(f.readu32() + 8)
+            fs = []
+            while f < ep:
+                fs.append((f.readu32(),f.readu32() + 8,f.reads(f.readu32(),'ascii')))
+                f.align(4)
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[2],f.readc(fe[0]))
+
+            f.close()
+            if fs: return
 
     return 1

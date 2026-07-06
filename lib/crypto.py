@@ -689,6 +689,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 'gsm':(0x0004820009,0x0000000000,0x0000000000,False)
             }[algo[6:]]
             fnc = crc
+        case 'crc32_16': return crc_hash(i,'crc32',**kwargs) & 0xFFFF
 
         case 'adler32':
             import zlib

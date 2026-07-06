@@ -901,48 +901,95 @@ def extract1(inp:str,out:str,t:str) -> bool:
             writefile(o + '/' + tbasename(i),d)
             return
         case 'GZIP':
-            f = open(i,'rb')
-            asrt(f.read(2) == b'\x1F\x8B')
-            if f.read(1) == b'\x08':
-                flgs = f.read(1)[0]
+            db.try_custom()
+            from lib.file import File
+            from lib.crypto import crc_hash
+            f = File(i,endian='<')
+            asrt(f.read(2) == b'\x1F\x8B' and f.readu8() == 8)
+            fl = f.readu8()
+            asrt(not fl >> 5)
+            mt = f.readu32()
+            f.skip(2)
 
-                fs = f.seek(-8,2)
-                if not sum(f.read(8)):
-                    f.seek(10)
-                    if flgs & 4: f.seek(int.from_bytes(f.read(2),'little'),1)
-                    if flgs & 8:
-                        fn = b''
-                        s = b''
-                        while True:
-                            s = f.read(1)
-                            if not s: return 1
-                            if s == b'\0': break
-                            fn += s
-                        fn = fn.decode('utf-8')
-                    else: fn = tbasename(i)
-                    if flgs & 0x10:
-                        s = b''
-                        while True:
-                            s = f.read(1)
-                            if not s: return 1
-                            if s == b'\0': break
-                    if flgs & 2: f.seek(2,1)
+            bs = None
+            if fl & 4:
+                xl = f.readu16()
+                ep = f.pos + xl
+                while (f.pos + 4) < ep:
+                    tg,sz = f.read(2),f.readu16()
+                    xep = f.pos + sz
+                    match tg:
+                        case b'\0\0': pass # padding
+                        case b'BC': # BGZF
+                            bs = f.readu16() + 1
+                        case _: raise NotImplementedError(f'Unknown extra field {repr(tg)[1:]}')
+                    f.seek(xep)
+                f.seek(ep)
 
-                    if (fs-f.tell()) > 2:
-                        if db.print_try: print('Trying with gzip')
-                        import gzip
-                        f.seek(0)
-                        writefile(o + '/' + fn,gzip.decompress(f.read()))
-                        f.close()
-                        return
-            f.close()
+            fn = None
+            if fl & 8: fn = f.read0s().decode('utf-8')
+            if not fn:
+                fn = tbasename(i)
+                if i.lower().endswith('.tgz'): fn += '.tar'
+                elif not '.' in fn and fl & 1: fn += '.txt'
+            if fl & 0x10: writefile(o + '/$comment.txt',f.read0s())
+            if fl & 2:
+                hd = f.peek(f.pos,poffset=-f.pos)
+                asrt(crc_hash(hd,'crc32_16') == f.readu16())
 
-            zip7(i,o,t,True)
-            if listdir(o):
-                if len(listdir(o)) == 1 and open(o + '/' + listdir(o),'rb').read(10) == b'WARC/1.0\r\n':
-                    extract1(o + '/' + listdir(o)[0],o,'Web ARchive')
-                    return
+            if bs:
+                f.seek(0)
+                of = xopen(o + '/' + fn,'wb')
+                while f:
+                    p = f.pos
+                    asrt(f.read(2) == b'\x1F\x8B' and f.readu8() == 8)
+                    fl = f.readu8()
+                    f.skip(6)
+
+                    bs = None
+                    if fl & 4:
+                        xl = f.readu16()
+                        ep = f.pos + xl
+                        while (f.pos + 4) < ep:
+                            tg,sz = f.read(2),f.readu16()
+                            xep = f.pos + sz
+                            if tg == b'BC': bs = f.readu16() + 1
+                            f.seek(xep)
+                        f.seek(ep)
+                    if fl & 8: f.read0s()
+                    if fl & 0x10: f.read0s()
+                    if fl & 2: f.skip(2)
+
+                    zs = (bs or f.size) - (f.pos - p) - 8
+                    f.skip(zs)
+                    crc,us = f.readu32(),f.readu32()
+                    f.back(zs + 8)
+                    d = f.decompress(zs,'deflate',usize=us)
+                    asrt(crc == crc_hash(d,'crc32'))
+                    of.write(d)
+                    if not bs: break
+                    f.skip(8)
+
+                of.close()
+                f.close()
+                if mt: set_ftime(o + '/' + fn,mt=mt)
                 return fix_tar(o)
+
+            p = f.pos
+            f.seek(-8)
+            crc,us = f.readu32(),f.readu32()
+            f.seek(p)
+            d = f.decompress(f.left - 8,'deflate',usize=us)
+            f.close()
+            if crc: asrt(crc == crc_hash(d,'crc32'))
+
+            bfl = len(d) >= 0x1C and d[:4] == b'CMPR' and int.from_bytes(d[4:8],'little') + 8 == len(d)
+            if bfl and not '.' in fn and i.lower().endswith('.bfl'): fn += '.bfl'
+            writefile(o + '/' + fn,d)
+            if mt: set_ftime(o + '/' + fn,mt=mt)
+
+            if bfl: return extract(o + '/' + fn,o,'Colin McRae Rally 2 BFL')
+            return fix_tar(o)
         case 'ZPAQ':
             run(['zpaq','x',i,'-f','-to',o])
             if listdir(o): return
