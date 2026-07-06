@@ -1704,7 +1704,8 @@
         "rs":"Wallpaper Engine PKG","s":1
     },
     {
-        "d":[["isat","NSO0",0],["isatS","\\0",8,4],["isatS","\\0",3,13],["isin",["pa~\\x8d\\xact8*\\xe4.\\x8a\\xc8\\xded\\xee\\xb3\\xdaAf\\xcd\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"],64]],
+        "d":[["isat","NSO0",0],["isatS","\\0",8,4],["isatS","\\0",3,13],
+        ["isin",["pa~\\x8d\\xact8*\\xe4.\\x8a\\xc8\\xded\\xee\\xb3\\xdaAf\\xcd\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0","\\xc88\\x82\\xf45+\\xc4\\xd9\\xbb\\xa8\\xe0\\x90zALF\\xa2\\xda\\xd2>\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"],64]],
         "rs":"Camelot Obfuscated NSO","s":1
     },
     {

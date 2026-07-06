@@ -1878,12 +1878,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             else: return 1
             return
         case 'Camelot Obfuscated NSO':
-            OFFS = {
-                # build id: base key, offset1, offset2, offset3, MT seed, MT drop
-                b'pa~\x8d\xact8*\xe4.\x8a\xc8\xded\xee\xb3\xdaAf\xcd\0\0\0\0\0\0\0\0\0\0\0\0':(0xD,0x53CAC2,0x71D0B3,0x84A6D3,0x76,4),
-            }
-
             db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+
             from lib.crypto import decrypt
             from lib.file import File,decompress
             f = File(i,endian='<')
@@ -1901,7 +1899,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if fl & 4: d = f.decompress(cdss,'zstd' if fl & 0x80 else 'lz4',usize=dss)
             else: d = f.readc(dss)
 
-            bk,of1,of2,of3,seed,drop = OFFS[bid]
+            keys.wait()
+            # build id: base key, offset1, offset2, offset3, MT seed, MT drop
+            bk,of1,of2,of3,seed,drop = keys['mario_golf_rush'][bid]
             of1 -= dsmo;of2 -= dsmo;of3 -= dsmo
             od = bytearray()
 

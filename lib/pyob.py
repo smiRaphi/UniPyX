@@ -131,8 +131,9 @@ class PyOBin:
         f = File(self.p,'rb',endian='>')
         asrt(f.read(4) == b'PyOB')
         funcs = []
+        gmxix = 0
         def interp(ty=None,lst=False):
-            nonlocal sdbix
+            nonlocal sdbix,gmxix
             if ty is None: ty = f.readu8()
             ty,fl = ty & 0b1111,ty >> 4
 
@@ -160,13 +161,17 @@ class PyOBin:
                             fl = f.readu8()
                             v,s = fl & 0b1111,fl >> 4
                             sdbix = v | f.readi(s) << 4
-                        else: sdbix += (fl & 3) * (-1 if fl >> 2 & 1 else 1)
+                        else: sdbix += (fl & 3) * (-1 if fl & 4 else 1)
                         r = sdb[sdbix]
                         sdbix += 1
+                        gmxix = max(gmxix,sdbix)
                         return r
-                    else: return sdb[f.readi(fl & 7)]
+                    else:
+                        tsix = f.readi(fl & 7)
+                        gmxix = max(gmxix,tsix + 1)
+                        return sdb[tsix]
                 case 5:
-                    if fl & 8: return f.decompress(f.readi(fl & 7),'deflate0' if fl & 8 else 'none')
+                    if fl & 8: return f.decompress(f.readi(fl & 7),'deflate0')
                     xr = (ty | fl << 4) ^ 0xFF
                     return bytes(v ^ xr for v in f.readc(f.readi(fl)))
                 case 6: return (f.readf16,f.readf32,f.readf64)[fl]()
@@ -241,7 +246,7 @@ class PyOBin:
                             fsdbix -= rb(2) + 1
                         fsdbix += 1
                         mxix = max(mxix,fsdbix)
-                        return sdb[sdbix + fsdbix - 1]
+                        return sdb[gmxix + fsdbix - 1]
 
                     d = []
                     tbc = 0
@@ -275,7 +280,7 @@ class PyOBin:
 
                     if d: d = ''.join(d)
                     else: d = None
-                    sdbix += mxix
+                    sdbix = gmxix + mxix
 
                     if self.unpickle:
                         r = PyOFunc(d,self.xenv.copy())
@@ -315,11 +320,11 @@ class PyOBin:
 
         def interp(x,pt):
             nonlocal sdb,sdbix,ibytes
-            t = None if x == None else type(x)
+            t = None if x is None else type(x)
 
             if t == str: asrt(not '\0' in x)
 
-            if t == None: f.writeu8(0)
+            if t is None: f.writeu8(0)
             elif t == bool: f.writeu8(1 | (1 if x else 0) << 4)
             elif t == int and x >= 0:
                 if x.bit_length() < 4: f.writeu8(2 | 0x80 | x << 4)
@@ -362,11 +367,12 @@ class PyOBin:
                 ibytes = True
                 xc = deflate0(x)
                 bs = 0x80 if len(xc) < len(x) else 0
-                if len(xc) < len(x): x = xc
+                if bs: x = xc
                 else:
                     xr = (5 | ((len(x).bit_length() + 7) // 8) << 4) ^ 0xFF
                     x = bytes(v ^ xr for v in x)
                 s = (len(x).bit_length() + 7) // 8
+                asrt(s < 0b1000)
                 f.writeu8(5 | bs | s << 4)
                 f.writei(len(x),s)
                 f.write(x)
@@ -435,10 +441,12 @@ class PyOBin:
                         if bs: x = [xc] + [deflate0(y) for y in x[1:]]
                         s = (max(len(y) for y in x).bit_length() + 7) // 8
                         asrt(s < 0b1000)
+                        if not bs: xr = (5 | s << 4) ^ 0xFF
                         f.writeu8(5 | bs | s << 4)
                         for y in x:
                             f.writei(len(y),s)
-                            f.write(y)
+                            if not bs: f.write(bytes(v ^ xr for v in y))
+                            else: f.write(y)
                         return
                     elif t1 == float:
                         f.writeu8(8 | s << 4)
@@ -494,11 +502,15 @@ class PyOBin:
                     f.writei(i2 << (s1 * 3) | i1,(s1 * 3 + s2 * 4 + 7) // 8)
                     return
                 f.writeu8(10 | fl << 4)
-            elif t in (FunctionType,PyOFunc,PyOInlineF):
-                if t == FunctionType: x = PyOFunc(x)
+            elif t in (FunctionType,PyOFunc,PyOInlineF) or (t == tuple and not self.unpickle and x[0] in (PyOFunc,PyOInlineF) and type(x[1]) == str):
+                if t == FunctionType:
+                    x = PyOFunc(x)
+                    src = x.source
+                elif t == tuple: t,src = x
+                else: src = x.source
                 fl = 0b1000 if t == PyOInlineF else 0
                 if x:
-                    x = list(tokenize.generate_tokens(io.StringIO(x.source).readline))
+                    x = list(tokenize.generate_tokens(io.StringIO(src).readline))
                     seed = len(x) & 3
                     f.writeu8(11 | (fl | seed) << 4)
                     seed = [(seed+ix) & 3 for ix in range(4)]
@@ -508,6 +520,7 @@ class PyOBin:
                     d = bytearray()
                     def wb(val,lng):
                         nonlocal v,c
+                        assert val >= 0 and val < (1 << lng)
                         if lng == 2: val = seed[val]
                         v |= val << c;c += lng
                         while c >= 8: d.append(v & 0xFF);v >>= 8;c -= 8
@@ -591,11 +604,11 @@ class PyOBin:
                     if c: d.append(v)
                     f.write(d)
                     sdb.extend(fsdb)
-                    sdbix += len(fsdb) - 1
+                    sdbix = len(sdb) - 1
                 else:
                     f.writeu8(11 | fl << 4)
                     f.writeu8(0)
-            else: raise TypeError
+            else: raise TypeError(t)
 
         interp(self.db,-1)
 
