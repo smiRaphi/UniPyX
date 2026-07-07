@@ -1,6 +1,7 @@
 from lib.main import *
 
 def extract4_5(inp:str,out:str,t:str):
+    run = db.run
     i,o = inp,out
 
     match t:
@@ -1008,5 +1009,16 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Minecraft NBT':
+            import json
+            ns = readfile(i,off=4,size=2)
+            of = o + '/' + tbasename(i) + '.json'
+            run(['nbt2json','-i',i,'-o',of] + (['-b'] if int.from_bytes(ns,'little') >= int.from_bytes(ns,'big') else []))
+
+            try:
+                nbt = json.load(open(of))['nbt']
+                json.dump(nbt,open(of,'w',encoding='utf-8'),ensure_ascii=False,indent=2)
+            except: return 1
+            else: return
 
     return 1

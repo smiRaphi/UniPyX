@@ -99,14 +99,15 @@ class PyOInlineF(PyOFunc): pass
 
 _SMAP = (4,5,6,8,10,12,16,20,24,32,40,48,64,128,256)
 class PyOBin:
-    def __init__(self,p:str,unpickle=False,xenv={}):
+    def __init__(self,p:str,unpickle=False,xenv={},float_prec=6):
         if type(xenv) in (list,tuple,set): xenv = {x.__name__:x for x in xenv}
 
         self.p = os.path.abspath(p)
         self.unpickle = unpickle
         self.xenv = xenv
         self.db = None
-    
+        self.float_prec = 1 / 10**float_prec
+
         self._load_thrd = None
     @classmethod
     def new(cls,p:str,base={},**kwargs):
@@ -383,7 +384,7 @@ class PyOBin:
                         v = struct.unpack(f'>{fm}',d)[0]
                     except (struct.error,OverflowError): continue
                     df = abs(x - v)
-                    if df < 0.00001:
+                    if df < self.float_prec:
                         f.writeu8(6 | ix << 4)
                         f.write(d)
                         return

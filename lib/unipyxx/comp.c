@@ -375,6 +375,36 @@ eof:
     #undef CHKo
     return op;
 }
+EXPORT ssize_t decompress_lzss1(const uint8_t *restrict src, const size_t zsize,
+                                      uint8_t *restrict dst, const ssize_t usize) {
+    BitReader br;
+    init_BitReader(&br, src, zsize);
+    uint16_t wp = 1;
+    uint8_t dict[0x2000] = {0};
+    ssize_t op = 0;
+
+    while (!is_eof(&br) && (usize == -1 || op < usize)) {
+        uint8_t f = get_bit(&br);
+        if (f) {
+            dst[op++] = get_bits(&br, 8);
+            dict[wp++] = dst[op - 1];
+            wp &= 0x1FFF;
+        } else {
+            uint16_t off = get_bits(&br, 13);
+            if (off == 0 || is_eof(&br)) break;
+            uint8_t lng = get_bits(&br, 4) + 3;
+            if (usize != -1 && op + lng > usize) lng = usize - op;
+
+            for (uint8_t i=0;i < lng;i++,op++) {
+                dst[op] = dict[(off + i) & 0x1FFF];
+                dict[wp++] = dst[op];
+                wp &= 0x1FFF;
+            }
+        }
+    }
+
+    return op;
+}
 EXPORT ssize_t decompress_rtl_lz(const uint8_t *restrict src, const size_t zsize,
                                        uint8_t *restrict dst, const ssize_t usize) {
     size_t ip = 0;

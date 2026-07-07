@@ -742,10 +742,10 @@ def extract4_3(inp:str,out:str,t:str):
             f.seek(bo)
 
             def dec(d,fn,fe):
-                d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]]
+                d = decompress(d,'lzw_lg' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]]
                 writefile(fn,d)
             def decc(d,ix1,ext,fsd,fe):
-                d = decompress(d,'lg_lzw' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]-fsd[0]]
+                d = decompress(d,'lzw_lg' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]-fsd[0]]
                 for ix in range(len(fsd)-1): writefile(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}',d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
             p = ThreadPool()
             prcs = []

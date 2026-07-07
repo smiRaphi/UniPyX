@@ -984,11 +984,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if crc: asrt(crc == crc_hash(d,'crc32'))
 
             bfl = len(d) >= 0x1C and d[:4] == b'CMPR' and int.from_bytes(d[4:8],'little') + 8 == len(d)
-            if bfl and not '.' in fn and i.lower().endswith('.bfl'): fn += '.bfl'
+            if bfl and not '.' in fn and i.lower().endswith('.bfl'): fn += extname(i)
+            nbt = len(d) >= 8 and i.lower().endswith(('.nbt','.dat','.dat_old')) and d[:3] == b'\x0A\0\0' and d[-1] == 0
+            if nbt:
+                snbt = d[6:6 + int.from_bytes(d[4:6],'big')]
+                nbt = snbt.isascii() and snbt.decode('ascii').isprintable()
+            if nbt: fn += extname(i)
+
             writefile(o + '/' + fn,d)
             if mt: set_ftime(o + '/' + fn,mt=mt)
 
             if bfl: return extract(o + '/' + fn,o,'Colin McRae Rally 2 BFL')
+            elif nbt: return extract(o + '/' + fn,o,'Minecraft NBT')
             return fix_tar(o)
         case 'ZPAQ':
             run(['zpaq','x',i,'-f','-to',o])

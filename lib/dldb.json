@@ -5780,6 +5780,12 @@
         }],
         "ts":0
     },
+    "nbt2json":{
+        "p":"nbt2json.exe",
+        "fs":[
+        "https://github.com/midnightfreddie/nbt2json/releases/download/v0.4.1/nbt2json.exe"
+        ]
+    },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",
         "fs":[{

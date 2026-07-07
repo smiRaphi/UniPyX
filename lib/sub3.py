@@ -184,10 +184,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Wise Installer':
             run(['e_wise',i,o])
             if os.path.exists(o + '/00000000.BAT'):
-                osj = OSJump()
-                osj.jump(o)
-                e,_,r = run(['00000000.BAT'],getexe=False)
-                osj.back()
+                e,_,r = run(['00000000.BAT'],getexe=False,print_try=False,cwd=o)
                 if e: print('BAT returned',e,r)
                 else: remove(o + '/00000000.BAT')
                 return

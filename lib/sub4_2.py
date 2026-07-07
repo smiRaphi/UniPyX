@@ -1147,7 +1147,7 @@ def extract4_2(inp:str,out:str,t:str):
             if listdir(o): return
         case 'AmusementMakers Project B.G. Archive':
             db.try_custom()
-            from lib.file import File,decompress
+            from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(4) == b'PBG\x1A')
             f.skip(4)
@@ -1162,7 +1162,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for ix,fe in enumerate(fs[:-1]):
                 f.seek(fe[1])
-                d = decompress(f.read(fs[ix+1][1]-fe[1]),'lzss_win',usize=fe[0])
+                d = f.decompress(fs[ix+1][1]-fe[1],'lzss1',usize=fe[0])
                 writefile(f'{o}/{ix:02d}.{guess_ext(d)}',d)
 
             f.close()

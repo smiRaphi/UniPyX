@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1010
+# Supported Formats: 1011
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -358,7 +358,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (544)
+## Various (545)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -653,6 +653,7 @@ Minecraft Console ARC | .arc | Custom |
 Minecraft Console Game Rule File | .grf | Custom | only decompresses, does not parse
 Minecraft Console MCS | .mcs | Custom |
 Minecraft Console PCK | .pck | Custom |
+Minecraft NBT | .nbt .dat .dat_old | [nbt2json](https://github.com/midnightfreddie/nbt2json) |
 Mini Metro Sound Bytes | .bytes | Custom |
 MINICAT | .cat | Custom |
 Mission Impossible 3 Data | ??? | Custom |

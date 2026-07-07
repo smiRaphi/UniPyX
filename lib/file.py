@@ -669,12 +669,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
         case 'huffman': return uxx().decompress_huffman(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'graw_bpe': return uxx().decompress_graw_bpe(i,usize=kwargs['usize'])
-        case 'lzss_win': return lzss_win_decompress(i,**kwargs)
-        case 'lzss':
-            asrt('usize' in kwargs)
-            return lzss_decompress(i,**kwargs)
         case 'lzss0'|'lzss0_lsb': return uxx().decompress_lzss0_lsb(i,usize=kwargs['usize'])
         case 'lzss0_msb': return uxx().decompress_lzss0_msb(i,usize=kwargs['usize'])
+        case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw_lg':
             if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
@@ -847,44 +844,6 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return o
     raise NotImplementedError(algo)
 
-def lzss_decompress(i:bytes,usize:int=None,lens=4,offs=12,minl=3):
-    d = BitReader(i)
-    ob = bytearray()
-    while usize is None or len(ob) < usize:
-        flg = d.get_bit()
-        if flg is None: break
-        if flg:
-            b = d.get_bits(8)
-            ob.append(b)
-        else:
-            l = d.get_bits(lens) + minl
-            of = len(ob) - (d.get_bits(offs) + 1)
-            if of < 0: of = 0
-            for x in range(l): ob.append(ob[of + x])
-    return bytes(ob)[:usize]
-def lzss_win_decompress(i:bytes,usize:int=None):
-    d = BitReader(i)
-    ob = bytearray()
-    win = bytearray(0x2000)
-    winp = 1
-    while True:
-        flg = d.get_bit()
-        if flg is None: break
-        if flg:
-            b = d.get_bits(8)
-            ob.append(b)
-            win[winp] = b
-            winp = (winp + 1) & mask(13)
-        else:
-            of = d.get_bits(13)
-            if of == 0: break
-            l = d.get_bits(4) + 2
-            for x in range(l + 1):
-                b = win[(of + x) & mask(13)]
-                ob.append(b)
-                win[winp] = b
-                winp = (winp + 1) & mask(13)
-    return bytes(ob)[:usize]
 def lzss16c_decompress(i:bytes,usize:int=None,big_endian=False):
     pos = 0
 
