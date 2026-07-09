@@ -1,7 +1,6 @@
 import struct,io,os
-from hashlib import pbkdf2_hmac,md5,sha1,sha256
 from lib.file import File,align
-from lib.crypto import decrypt
+from lib.crypto import decrypt,encrypt,crc_hash
 _File = File
 
 BASED = os.path.dirname(os.path.abspath(__file__)) + '/tmd_'
@@ -47,12 +46,12 @@ def derive_key(tid:str|bytes,pwd:str|bytes|int):
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.lstrip(b'\0') or b'\0'
 
-    return pbkdf2_hmac('sha1',get_pwd(pwd),md5(SECRET + tid).digest(),20,16)
+    return encrypt(get_pwd(pwd),'pbkdf2_sha1',crc_hash(SECRET + tid,'md5',bytes=True),20,size=16)
 def encrypt_key(tid:str|bytes,key:bytes,ckey:bytes) -> bytes:
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.rjust(16,b'\0')
 
-    return decrypt(None,'aes_cbc',ckey,tid).encrypt(key)
+    return encrypt(key,'aes_cbc',ckey,tid)
 def decrypt_key(tid:str|bytes,key:bytes,ckey:bytes) -> bytes:
     if type(tid) == str: tid = bytes.fromhex(tid)
     tid = tid.rjust(16,b'\0')
@@ -280,7 +279,7 @@ class TMD(File):
 
     def check_file(self,f:str,hsh:bytes):
         f = open(str(f),'rb')
-        sh = (sha1,sha256)[self.version]()
+        sh = crc_hash(None,('sha1','sha256')[self.version])
         while True:
             p = f.read(0x4000)
             if not p: break

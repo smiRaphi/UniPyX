@@ -70,7 +70,7 @@ from hashlib import md5,sha256
 from zlib import crc32
 
 class X:
-    MMFS = {};SELENE = {};EMPIRE_MAGIC = None
+    CRC={};MMFS={};SELENE={};EMPIRE_MAGIC=None
     def __init__(self):
         if not os.path.exists(DLLP): raise FileNotFoundError
         if os.path.exists(PRJP + '/!check'):
@@ -146,7 +146,22 @@ class X:
             ('hash_murmur2_64B_le',(P(u8),szt,u32),u64,5),
             ('hash_murmur2_64B_be',(P(u8),szt,u32),u64,5),
             ('hash_empire_magic',(P(u8),szt,s8),u32,0),
+            ('hash_westwood',(P(u32),szt),u32,0),
+            ('hash_fnv1_64',(P(u8),szt,u64,u64),u64,0),
+            ('hash_fnv1a_64',(P(u8),szt,u64,u64),u64,0),
+            ('hash_fnv1_32',(P(u8),szt,u32,u32),u32,0),
+            ('hash_fnv1a_32',(P(u8),szt,u32,u32),u32,0),
+            ('hash_bkdr',(P(u8),szt,u32,u32),u32,0),
+            ('hash_bkdr64',(P(u8),szt,u64,u64),u64,0),
+            ('hash_sdbm',(P(u8),szt,u32,u32),u32,0),
+            ('hash_djb2',(P(u8),szt,u32),u32,0),
+            ('hash_djb2a',(P(u8),szt,u32),u32,0),
+            ('hash_joaat',(P(u8),szt,u32),u32,0),
+            ('hash_tarzan',(P(u8),szt),u32,4),
+            ('hash_luas',(P(u8),szt),u32,4),
             ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
+            ('hash_crc_init',(P(u8),u32,u64,s8),s8,0),
+            ('hash_crc',(P(u8),u32,P(u8),u64,u64,u64,s8),u64,0),
 
             ('XMemCreateDecompressionContext',(cint,P(XMemCodecParametersLZX),cint,voidp),cint,0),
             ('XMemDestroyDecompressionContext',(void,),void,0),
@@ -482,9 +497,45 @@ class X:
     def hash_murmur2_64A_be(self,src:bytes,seed:int) -> int: ...
     def hash_murmur2_64B_le(self,src:bytes,seed:int) -> int: ...
     def hash_murmur2_64B_be(self,src:bytes,seed:int) -> int: ...
+    def hash_tarzan(self,src:bytes) -> int: ...
+    def hash_luas(self,src:bytes) -> int: ...
     def hash_empire_magic(self,src:bytes,end:bool=False) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
         return self.dll.hash_empire_magic(b,len(src),1 if end else 0)
+    def hash_westwood(self,src:bytes) -> int:
+        src += bytes(-len(src) % 4)
+        b = (u32 * (len(src) // 4)).from_buffer_copy(src)
+        return self.dll.hash_westwood(b,len(src) // 4)
+    def hash_fnv1_64(self,src:bytes,seed:int=0xCBF29CE484222645,prime:int=0x100000001B3) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_fnv1_64(b,len(src),seed,prime)
+    def hash_fnv1a_64(self,src:bytes,seed:int=0xCBF29CE484222645,prime:int=0x100000001B3) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_fnv1a_64(b,len(src),seed,prime)
+    def hash_fnv1_32(self,src:bytes,seed:int=0x811C9DC5,prime:int=0x1000193) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_fnv1_32(b,len(src),seed,prime)
+    def hash_fnv1a_32(self,src:bytes,seed:int=0x811C9DC5,prime:int=0x1000193) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_fnv1a_32(b,len(src),seed,prime)
+    def hash_bkdr(self,src:bytes,init:int=0,seed:int=131) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_bkdr(b,len(src),init,seed)
+    def hash_bkdr64(self,src:bytes,init:int=0,seed:int=131) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_bkdr64(b,len(src),init,seed)
+    def hash_sdbm(self,src:bytes,init:int=0,seed:int=0x1003F) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_sdbm(b,len(src),init,seed)
+    def hash_djb2(self,src:bytes,init:int=0x1505) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_djb2(b,len(src),init)
+    def hash_djb2a(self,src:bytes,init:int=0x1505) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_djb2a(b,len(src),init)
+    def hash_joaat(self,src:bytes,init:int=0) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_joaat(b,len(src),init)
     def mac_cmac_tfit(self,src:bytes,key:bytes,table:bytes) -> bytes:
         asrt(len(key) == 4*4*13 and len(table) == 4*0x100*0x10*13)
         s = (u8 * len(src)).from_buffer_copy(src)
@@ -493,3 +544,15 @@ class X:
         t = (u8 * len(table)).from_buffer_copy(table)
         self.dll.mac_cmac_tfit(s,len(src),d,k,t)
         return bytes(d)
+
+    def hash_crc(self,src:bytes,size:int,poly:int,xor:int,reflect:bool,init:int,value:int=None) -> int:
+        k = (size,poly,1 if reflect else 0)
+        if not k in self.CRC:
+            t = (u8 * 0x805)()
+            if self.dll.hash_crc_init(t,*k) != 0:
+                raise ValueError
+            self.CRC[k] = t
+
+        i = (u8 * len(src)).from_buffer_copy(src)
+        r = self.dll.hash_crc(i,len(src),self.CRC[k],init,xor,value or 0,0 if value is None else 1)
+        return r

@@ -417,10 +417,14 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if c.type & 1:
                     tf = TmpFile()
                     pwids = list(range(len(PWDS)))
-                    if cns == 'w': pwids.insert(0,1)
-                    elif cns == '3': pwids.insert(0,0)
-                    for ix in set([-1] + pwids):
-                        if ix == -1: k = cetk.get_key()
+                    if cns == 'w':
+                        pwids.remove(1)
+                        pwids.insert(0,1)
+                    # elif cns == '3': pwids.insert(0,0)
+                    for ix in [-1] + pwids:
+                        if ix == -1:
+                            if cetk is None: continue
+                            k = cetk.get_key()
                         else: k = derive_key(tmd.titleid,ix)
                         decrypt_content(ifl,tf,k,c)
                         if tmd.check_file(tf,c.sha): break

@@ -40,15 +40,39 @@ extern "C" {
         return ((x & 0xFF) << 24 | (x & 0xFF00) << 8 | (x & 0xFF0000) >> 8 | (x & 0xFF000000) >> 24);
     }
 #endif
+static inline uint16_t SWAP16(uint16_t x) {
+    return ((uint16_t)x << 8) | (x >> 8);
+}
 static inline uint8_t SWAP8(uint8_t x) {
     return ((uint8_t)x << 4) | (x >> 4);
 }
-static inline uint8_t ROT8R(uint8_t x) {
-    return (x >> 1) | (x << 7);
+
+static inline uint64_t ROTATER(uint64_t x, const size_t n) {
+    return (x >> 1) | (x << (n - 1));
 }
-static inline uint8_t ROT8L(uint8_t x) {
-    return (x << 1) | (x >> 7);
+static inline uint64_t ROTATEL(uint64_t x, const size_t n) {
+    return (x << 1) | (x >> (n - 1));
 }
+static inline uint8_t ROT8R(uint8_t x) { return ROTATER(x, 8); }
+static inline uint8_t ROT8L(uint8_t x) { return ROTATEL(x, 8); }
+static inline uint16_t ROT16R(uint16_t x) { return ROTATER(x, 16); }
+static inline uint16_t ROT16L(uint16_t x) { return ROTATEL(x, 16); }
+static inline uint32_t ROT32R(uint32_t x) { return ROTATER(x, 32); }
+static inline uint32_t ROT32L(uint32_t x) { return ROTATEL(x, 32); }
+
+static inline uint64_t REFLECT(uint64_t x, const size_t n) {
+    uint64_t r = 0;
+    for (size_t i=0;i < n;i++) {
+        r = (r << 1) | (x & 1);
+        x >>= 1;
+    }
+    return r;
+}
+static inline uint8_t REF8(uint8_t x) { return REFLECT(x, 8); }
+static inline uint16_t REF16(uint16_t x) { return REFLECT(x, 16); }
+static inline uint32_t REF32(uint32_t x) { return REFLECT(x, 32); }
+static inline uint64_t REF64(uint64_t x) { return REFLECT(x, 64); }
+
 static inline uint32_t HIMUL64(uint32_t a, uint32_t b) {
     return ((uint64_t)a) * ((uint64_t)b) >> 32;
 }
@@ -106,8 +130,8 @@ static inline uint8_t get_bit(BitReader *br) {
     br->bits--;
     return (br->buf >> br->bits) & 1;
 }
-static inline uint32_t get_bits(BitReader *br, size_t n) {
-    uint32_t v = 0;
+static inline uint64_t get_bits(BitReader *br, size_t n) {
+    uint64_t v = 0;
     while (n > 0) {
         if (!br->bits) {
             if (br->ptr >= br->end) return v << n;
@@ -122,8 +146,8 @@ static inline uint32_t get_bits(BitReader *br, size_t n) {
     }
     return v;
 }
-static inline uint32_t get_bits_l(BitReader *br, size_t n) {
-    uint32_t v = 0;
+static inline uint64_t get_bits_l(BitReader *br, size_t n) {
+    uint64_t v = 0;
     size_t p = 0;
     while (n > 0) {
         if (!br->bits) {

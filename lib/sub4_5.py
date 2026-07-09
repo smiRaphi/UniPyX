@@ -1020,5 +1020,55 @@ def extract4_5(inp:str,out:str,t:str):
                 json.dump(nbt,open(of,'w',encoding='utf-8'),ensure_ascii=False,indent=2)
             except: return 1
             else: return
+        case 'Westwood Encrypted MIX':
+            db.try_custom()
+            from lib.crypto import decrypt,HashLib
+            hlc,hl3 = HashLib.dl('westwood_mixc',db),HashLib.dl('westwood_mix3',db)
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu16() == 0)
+
+            fl = f.readu16()
+            asrt(fl >> 2 == 0)
+            if fl & 2:
+                from lib.pyob import PyOBinX
+                keys = PyOBinX.dl('keys',db)
+                mk = f.readc(0x50)
+                mk = decrypt(mk,'rsa_le',int.from_bytes(keys.wait()['westwood_mix'],'big'))[:0x38]
+                hd = f.peek(8)
+                hd = decrypt(hd,'blowfish_ecb',mk)
+                hs = 6 + int.from_bytes(hd[:2],'little') * 12
+                hd = decrypt(f.readc(hs + (-hs % 8)),'blowfish_ecb',mk)
+            else:
+                hs = 6 + f.peek('u16') * 12
+                hd = f.readc(hs + (-hs % 8))
+
+            hd = File(hd,endian=f._end)
+            c = hd.readu16()
+            hd.skip(4) # data size
+            fs = []
+            hlc.wait(),hl3.wait()
+            hlcc,hl3c = 0,0
+            for _ in range(c):
+                h = hd.readu32()
+                if h in hlc: hlcc += 1
+                if h in hl3: hl3c += 1
+                fs.append((h,hd.readu32(),hd.readu32()))
+            asrt(all(x[1] + x[2] <= f.size for x in fs))
+            del hd
+
+            if hl3c > hlcc: hl = hl3
+            else: hl = hlc
+
+            hl.wait()
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                if fe[0] in hl: fn = hl[fe[0]]
+                else: fn = f'$unk/{fe[0]:08X}.{guess_ext(d)}'
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
 
     return 1

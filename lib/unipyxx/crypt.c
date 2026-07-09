@@ -16,18 +16,18 @@ typedef struct {
 
     int32_t mt[MT_N];
     int32_t mti;
-} MT19937;
-#define INIT_MT19937(X) MT19937 X = { .MATRIX_A = (int32_t)0x9908B0DF, .TEMPERING_MASK_B = 0x9D2C5680,\
-                                      .TEMPERING_MASK_C = 0xEFC60000, .INIT_MULT = 0x6C078965,\
-                                      .mt = { 0 }, .mti = MT_N + 1 }
-void MT19937_seed(MT19937 *restrict ctx, int32_t seed) {
+} MT19937S;
+#define INIT_MT19937S(X) MT19937S X = { .MATRIX_A = (int32_t)0x9908B0DF, .TEMPERING_MASK_B = 0x9D2C5680,\
+                                        .TEMPERING_MASK_C = 0xEFC60000, .INIT_MULT = 0x6C078965,\
+                                        .mt = { 0 }, .mti = MT_N + 1 }
+void MT19937S_seed(MT19937S *restrict ctx, int32_t seed) {
     ctx->mt[0] = seed;
     for (ctx->mti=1;ctx->mti < MT_N;ctx->mti++) {
         int32_t last = ctx->mt[ctx->mti - 1];
         ctx->mt[ctx->mti] = (int32_t)(ctx->INIT_MULT * (uint32_t)(last ^ (last >> 30)) + (uint32_t)ctx->mti);
     }
 }
-int32_t MT19937_rand(MT19937 *restrict ctx) {
+int32_t MT19937S_rand(MT19937S *restrict ctx) {
     int32_t y;
     const int32_t mag01[2] = { 0x0U, ctx->MATRIX_A };
 
@@ -339,12 +339,12 @@ EXPORT void decrypt_mmfs(uint8_t *restrict buf, const size_t size, uint8_t *rest
     }
 }
 EXPORT void init_selene(uint8_t *restrict dst, const uint8_t *restrict key, const size_t ksize, const uint32_t seed) {
-    INIT_MT19937(mt);
-    MT19937_seed(&mt,seed);
+    INIT_MT19937S(mt);
+    MT19937S_seed(&mt,seed);
     size_t kc = 0;
 
     for (size_t i=0;i < 0x10000;i++) {
-        dst[i] = (uint8_t)(key[kc++] ^ (MT19937_rand(&mt) >> 16));
+        dst[i] = (uint8_t)(key[kc++] ^ (MT19937S_rand(&mt) >> 16));
         if (kc >= ksize) kc = 0;
     }
 }
@@ -586,6 +586,65 @@ EXPORT void mac_cmac_tfit(uint8_t *restrict src, const size_t size, uint8_t *res
     }
 
     encrypt_tfit_block(tmp, dst, NULL, 13, key, table);
+}
+
+EXPORT int8_t hash_crc_init(uint8_t *restrict t, const uint32_t size, const uint64_t poly, const int8_t reflect) {
+    if (size % 8 || size == 0 || size > 64) return -1;
+    const uint32_t sizey = (size + 7) / 8;
+    const uint64_t mm = (size == 64) ? ~0ULL : (1ULL << size) - 1;
+    const uint8_t ref = reflect != 0;
+    uint64_t pol = poly & mm;
+    if (ref) pol = REFLECT(pol, size);
+
+    t[0] = ref;
+    *(uint32_t *)(t + 1) = size;
+
+    if (ref) {
+        for (uint16_t b=0;b < 256;b++) {
+            uint64_t crc = b;
+            for (uint8_t i=0;i < 8;i++) {
+                if (crc & 1) crc = (crc >> 1) ^ pol;
+                else crc >>= 1;
+            }
+            *(uint64_t *)(t + 5 + b * 8) = crc & mm;
+        }
+    } else {
+        const uint64_t cm = 1ULL << (size - 1);
+        const size_t sh = size - 8;
+        for (uint16_t b=0;b < 256;b++) {
+            uint64_t crc = b << sh;
+            for (uint8_t i=0;i < 8;i++) {
+                if (crc & cm) crc = (crc << 1) ^ pol;
+                else crc <<= 1;
+                crc &= mm;
+            }
+            *(uint64_t *)(t + 5 + b * 8) = crc & mm;
+        }
+    }
+
+    return 0;
+}
+EXPORT uint64_t hash_crc(const uint8_t *restrict src, const uint32_t size, const uint8_t *restrict t,
+                         uint64_t init, uint64_t xor, const uint64_t value, const int8_t has_value) {
+    const int8_t ref = t[0];
+    const uint32_t sizei = *(uint32_t *)(t + 1);
+    const uint64_t mm = (sizei == 64) ? ~0ULL : (1ULL << sizei) - 1;
+    const uint32_t sizey = (sizei + 7) / 8;
+    init &= mm;
+    xor &= mm;
+
+    uint64_t h;
+    if (has_value) h = (value & mm) ^ xor;
+    else h = init;
+    if (ref)
+        for (size_t p=0;p < size;p++)
+            h = (h >> 8) ^ *(uint64_t *)(t + 5 + ((h ^ src[p]) & 0xFF) * 8);
+    else {
+        const size_t sh = sizei - 8;
+        for (size_t p=0;p < size;p++)
+            h = ((h << 8) & mm) ^ *(uint64_t *)(t + 5 + ((src[p] ^ (h >> sh)) & 0xFF) * 8);
+    }
+    return h ^ xor;
 }
 
 EXPORT uint32_t hash_pivotal(const uint8_t *restrict src, const size_t size) {
@@ -970,6 +1029,80 @@ EXPORT uint32_t hash_empire_magic(const uint8_t *restrict src, const size_t size
     for (size_t p=0;p < size;p++) h += src[p] * 0x2F;
 
     return h % 0x3CB;
+}
+EXPORT uint32_t hash_westwood(const uint32_t *restrict src, const size_t size) {
+    uint32_t h = 0;
+    for (size_t p=0;p < size;p++) h = ROT32L(h) + src[p];
+    return h;
+}
+EXPORT uint64_t hash_fnv1_64(const uint8_t *restrict src, const size_t size, const uint64_t seed, const uint64_t prime) {
+    uint64_t h = seed;
+    for (size_t p=0;p < size;p++) h = (h * prime) ^ src[p];
+    return h;
+}
+EXPORT uint64_t hash_fnv1a_64(const uint8_t *restrict src, const size_t size, const uint64_t seed, const uint64_t prime) {
+    uint64_t h = seed;
+    for (size_t p=0;p < size;p++) h = (h ^ src[p]) * prime;
+    return h;
+}
+EXPORT uint32_t hash_fnv1_32(const uint8_t *restrict src, const size_t size, const uint32_t seed, const uint32_t prime) {
+    uint32_t h = seed;
+    for (size_t p=0;p < size;p++) h = (h * prime) ^ src[p];
+    return h;
+}
+EXPORT uint32_t hash_fnv1a_32(const uint8_t *restrict src, const size_t size, const uint32_t seed, const uint32_t prime) {
+    uint32_t h = seed;
+    for (size_t p=0;p < size;p++) h = (h ^ src[p]) * prime;
+    return h;
+}
+EXPORT uint32_t hash_bkdr(const uint8_t *restrict src, const size_t size, const uint32_t init, const uint32_t seed) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) h = h * seed + src[p];
+    return h;
+}
+EXPORT uint64_t hash_bkdr64(const uint8_t *restrict src, const size_t size, const uint64_t init, const uint64_t seed) {
+    uint64_t h = init;
+    for (size_t p=0;p < size;p++) h = h * seed + src[p];
+    return h;
+}
+EXPORT uint32_t hash_sdbm(const uint8_t *restrict src, const size_t size, const uint32_t init, const uint32_t seed) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) h = (h + src[p]) * seed;
+    return h;
+}
+EXPORT uint32_t hash_djb2(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) h = (h << 5) + h + src[p];
+    return h;
+}
+EXPORT uint32_t hash_djb2a(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) h = ((h << 5) + h) ^ src[p];
+    return h;
+}
+EXPORT uint32_t hash_joaat(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) {
+        h += src[p];
+        h += h << 10;
+        h ^= h >> 6;
+    }
+
+    h += h << 3;
+    h ^= h >> 11;
+    h += h << 15;
+    return h;
+}
+EXPORT uint32_t hash_tarzan(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = 0;
+    for (size_t p=0;p < size;p++) h += src[p] << ((p & 3) * 8);
+    return h + size;
+}
+EXPORT uint32_t hash_luas(const uint8_t *restrict src, const size_t size) {
+    const size_t stp = (size >> 5) + 1;
+    uint32_t h = size;
+    for (size_t p=size;p >= stp;p-=stp) h ^= h * 0x20 + (h >> 2) + src[p - 1];
+    return h;
 }
 
 #ifdef __cplusplus

@@ -2772,6 +2772,16 @@
         "rs":"Mini Metro Sound Bytes"
     },
     {
+        "rqr":null,
+        "d":[["ext",["",".dat",".nbt",".dat_old",".nbt_old"]],["isat","\\x0A\\0\\0",0],["isat","\\0",-1],["n0",1,3],["n0",2,4],["str",6,1,1],["py","f.seek(4);s=f.read(f.readi(2,'>'));return s.isascii() and s.decode('ascii').isprintable()"]],
+        "rs":"Minecraft NBT"
+    },
+    {
+        "rqr":null,
+        "d":[["ext",".mix"],["isat","\\0\\0\\x03\\0",0],["n0",40,4],["n0",40,44],["n0",16,-16]],
+        "rs":"Westwood Encrypted MIX"
+    },
+    {
         "d":["ext",".lz4"],
         "rs":"LZ4"
     },
@@ -2943,11 +2953,6 @@
     {
         "d":["ext",".tde"],
         "rs":"Teardown Encrypted"
-    },
-    {
-        "rqr":null,
-        "d":[["ext",["",".dat",".nbt",".dat_old",".nbt_old"]],["isat","\\x0A\\0\\0",0],["isat","\\0",-1],["n0",1,3],["n0",2,4],["str",6,1,1],["py","f.seek(4);s=f.read(f.readi(2,'>'));return s.isascii() and s.decode('ascii').isprintable()"]],
-        "rs":"Minecraft NBT"
     },
     {
         "d":[["size",[5,null]],["isat","\\0",0],["n0",3,1],["py","f.seek(1);return (f.readi(3,'<')+4)==fsz"]],

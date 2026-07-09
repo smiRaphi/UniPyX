@@ -22,6 +22,10 @@ if i[:1] == '*':
 elif i[:1] == ':':
     i = bytes.fromhex(i[1:])
     print('Input:',i.hex(' ').upper())
+elif i[:1] == '>':
+    import ast
+    i = ast.literal_eval('b"""' + i[1:] + '"""')
+    print('Input:',repr(i)[2:-1])
 else:
     print('Input:',i)
     i = open(i,'rb').read()

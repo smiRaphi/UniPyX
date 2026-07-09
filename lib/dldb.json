@@ -7092,12 +7092,28 @@
         ]],
         "ts":1781365824
     },
+    "westwood_mixc_hashes":{
+        "p":"hashes/westwood_mixc.pyob",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/westwood_mixc.pyob",
+            "hashes/westwood_mixc.pyob"
+        ]],
+        "ts":1783617040
+    },
+    "westwood_mix3_hashes":{
+        "p":"hashes/westwood_mix3.pyob",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/westwood_mix3.pyob",
+            "hashes/westwood_mix3.pyob"
+        ]],
+        "ts":1783617040
+    },
     "keys":{
         "p":"keys.pyob",
         "fs":[
         "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/keys.pyob"
         ],
-        "ts":1783354272
+        "ts":1783617040
     },
     "forza_keys":{
         "p":"forza_keys.pyob",

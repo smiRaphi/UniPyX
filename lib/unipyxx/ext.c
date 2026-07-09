@@ -117,8 +117,8 @@ EXPORT ssize_t decompress_lzfse(const uint8_t *restrict src, const size_t zsize,
 
 XIMPORT(lpaq8_zzz)
 #include <lpaq8_zzz.h>
-EXPORT ssize_t decompress_lpaq8(const uint8_t *restrict src, const size_t zsize,
-                                      uint8_t *restrict dst, const size_t usize) {
+EXPORT ssize_t decompress_lpaq8(uint8_t *restrict src, size_t zsize,
+                                uint8_t *restrict dst, const size_t usize) {
     size_t us = usize;
     uint8_t d1;
     size_t d2;

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1011
+# Supported Formats: 1012
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -358,7 +358,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (545)
+## Various (546)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -885,6 +885,7 @@ Wangan Midnight TOC+DAT | .toc+.dat | Custom |
 WarioWare Mega Party Game PAC | .pac | Custom |
 WATCOM Archive | ??? | [WPACK](https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE) |
 WayForward PAK | .pak | Custom |
+Westwood Encrypted MIX | .mix | Custom |
 Wii Exported Save Data | .bin | Custom |
 WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
 Wizards of a Waverly Place XPF | .xpf | Custom | no file names :c
