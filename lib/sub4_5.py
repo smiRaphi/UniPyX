@@ -1070,5 +1070,121 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'The Da Vinci Code RPE':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu32() == 1)
+
+            c = f.readu32()
+            f.padc(0x18)
+            fs = []
+            for _ in range(c):
+                fn = f.reads(8,'ascii').rstrip('\0')
+                f.skip(0x18)
+                fs.append((fn,f.readu32(),f.readu32()))
+                f.skip(4)
+
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                writefile(o + '/' + fe[0] + '.' + guess_ext(d),d)
+
+            f.close()
+            if fs: return
+        case 'Construct 2 Array':
+            db.try_custom()
+            import json
+            d = json.load(xopen(i,'rt'))
+            asrt(d['c2array'] is True and len(d['size']) == 3)
+
+            ob = d['data']
+            if d['size'][2] == 1:
+                for x in range(d['size'][0]):
+                    for y in range(d['size'][1]): ob[x][y] = ob[x][y][0]
+                if d['size'][1] == 1:
+                    for x in range(d['size'][0]): ob[x] = ob[x][0]
+
+            if ob:
+                json.dump(ob,xopen(f'{o}/{tbasename(i)}.json','wt'),ensure_ascii=False,separators=(',',':'))
+                return
+        case 'NIS America VFS':
+            db.try_custom()
+            from lib.file import File,decompress
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'VFS3')
+
+            fl,v,dc = f.readu32(),f.readu32(),f.readu32()
+            asrt(v == 1,v)
+            f.skip(dc * 0x1C)
+            fc = f.readu32()
+            feo = f.pos
+            f.skip(fc * 0x28)
+
+            tos = [f.readu64() for _ in range(3)]
+            if fl & 0x10:
+                chnko = tos.pop(0)
+                if chnko == 0: f.back(8) # ???
+            if fl & 0x20: ddco = tos.pop(0)
+            so = tos.pop(0)
+            do = f.pos
+
+            if fl & 0x10 and chnko != 0:
+                f.seek(chnko)
+                ep = f.pos + f.readu32()
+                chnks = []
+                while f < ep:
+                    chnks.append([f.reads32() for _ in range(f.readu32() // 4)])
+            else: chnks = []
+
+            if fl & 0x20:
+                f.seek(ddco)
+                ddcc = f.readu32()
+                f.skip(4)
+                ddcs = [f.readc(f.readu32()) for _ in range(ddcc)]
+            else: ddcs = []
+
+            f.seek(so)
+            fsc = f.readu32()
+            asrt(fsc >= fc)
+            fss = [f.reads(f.readu32(),'utf-8') for _ in range(fsc)]
+            dsc = f.readu32()
+            asrt(dsc >= dc)
+            dss = [f.reads(f.readu32(),'utf-8') for _ in range(dsc)]
+
+            f.seek(0x10)
+            ds = {}
+            for _ in range(dc):
+                f.skip(4)
+                id = f.reads32()
+                pid = f.reads32()
+                f.skip(0x10)
+                n = dss[id]
+                if pid != -1: n = ds[pid] + '/' + n
+                ds[id] = n
+
+            f.seek(feo)
+            fs = [(f.readu64() + do,f.readu64(),f.readu64(),f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(fc)]
+
+            def dec(d,fe):
+                if fe[5] & 2:
+                    if fe[5] & 1:
+                        dci = fe[5] >> 16
+                        dd = ddcs[dci] if fl & 0x20 and dci != 0xFFFF else None
+                        if chnks:
+                            chnk = chnks[fe[4]]
+                            d = decompress(d,'nis_zstd',chunks=chnk,usize=fe[2],dict=dd)
+                        else: d = decompress(d,'zstd',usize=fe[2],dict=dd)
+                    else: d = decompress(d,'zlib')
+                writefile(o + '/' + ds[fe[6]] + '/' + fss[fe[4]],d)
+            p = LimitedPool()
+            for fe in fs:
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                p.put(dec,d,fe)
+            f.close()
+            p.close()
+            for dn in ds.values(): mkdir(o + '/' + dn)
+            if fs: return
 
     return 1

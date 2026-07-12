@@ -1380,7 +1380,7 @@ def extract4_2(inp:str,out:str,t:str):
                         asrt(f.peek(4) == b'\x28\xB5\x2F\xFD')
                         fs.append((o + f'/{hsh.hex().upper()}.nvbin',f.read(s-4),us))
 
-                for fe in fs: writefile(fe[0],decompress(fe[1],'zstd',zstd_dict=zdct)[:fe[2]])
+                for fe in fs: writefile(fe[0],decompress(fe[1],'zstd',dict=zdct)[:fe[2]])
             elif vid == 0x1002: # amd
                 f.skip(0x14)
                 while f:

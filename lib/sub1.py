@@ -79,7 +79,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 elif t in {'Z','xz','BZip2','LZIP'}: return fix_tar(o)
                 else: return
         case 'ZSTD':
-            if db.print_try: print('Trying with compression.zstd')
+            db.try_custom()
             from lib.file import decompress
             of = o + '\\' + tbasename(i)
             d = decompress(readfile(i),'zstd',db=db)

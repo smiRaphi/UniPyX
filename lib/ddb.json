@@ -938,27 +938,42 @@
         "rs":"ZIP","s":1
     },
     {
-        "rqr":["JSON object (generic)","JSON text data"],
-        "d":["json",{"timeStamp":0,"version":"n0","userSettings":{"advancedUserEnabled":true,"cloudStorageEnabled":true,"uiTheme":"n0","externalLists":"","firewallPaneMinimized":true,"importedLists":[],"popupPanelSections":0,"userFiltersTrusted":true},"selectedFilterLists":[],"hiddenSettings":{},"whitelist":[],"dynamicFilteringString":"","urlFilteringString":"","hostnameSwitchesString":"","userFilters":""}],
+        "rqr":"JSON object (generic)",
+        "d":["json",{"timeStamp":0,"version":[1,0],"userSettings":{"advancedUserEnabled":2,"importedLists":4,"popupPanelSections":0},"selectedFilterLists":4,"hiddenSettings":5,"whitelist":4,"dynamicFilteringString":1,"urlFilteringString":1,"hostnameSwitchesString":1,"userFilters":1}],
         "rs":"uBlock Origin Config Backup","s":1
     },
     {
-        "rqr":["JSON object (generic)","JSON text data"],
-        "d":["json",[{"settings":{"disableAll":true,"exposeIframes":true,"exposeStyleName":true,"keepAlive":0,"keepAliveIdle":true,"newStyleAsUsercss":true,"openEditInWindow":true,"openEditInWindow.popup":true,"patchCsp":true,"show-badge":true,"styleViaASS":true,"styleViaXhr":true,"urlInstaller":true,"windowPosition":{},"compactWidth":0,"config.autosave":true,"schemeSwitcher.enabled":"n0","schemeSwitcher.nightStart":"n0","schemeSwitcher.nightEnd":"n0","popup.enabledFirst":true,"popup.stylesFirst":true,
-                                  "popup.autoResort":true,"popup.borders":true,"popup.findSort":"n0","manage.onlyEnabled":true,"manage.onlyLocal":true,"manage.onlyUsercss":true,"manage.onlyEnabled.invert":true,"manage.onlyLocal.invert":true,"manage.onlyUsercss.invert":true,"manage.actions.expanded":true,"manage.backup.expanded":true,"manage.filters.expanded":true,"manage.links.expanded":true,"manage.minColumnWidth":0,"manage.newUI":true,"manage.newUI.favicons":true,"manage.newUI.faviconsGray":true,"manage.newUI.targets":0,"manage.newUI.sort":"","manage.searchMode":"","editor.options":{},"editor.toc.expanded":true,
-                                  "editor.options.expanded":true,"editor.options.style.expanded":true,"editor.lint.expanded":true,"editor.publish.expanded":true,"editor.lineWrapping":true,"editor.smartIndent":true,"editor.indentWithTabs":true,"editor.tabSize":0,"editor.keyMap":"n0","editor.theme":"n0",
-                                  "editor.beautify":{"selector_separator_newline":true,"newline_before_open_brace":true,"newline_after_open_brace":true,"newline_between_properties":true,"newline_before_close_brace":true,"newline_between_rules":true,"preserve_newlines":true,"end_with_newline":true,"indent_conditional":true,"indent_mozdoc":true,"space_around_combinator":true,"space_around_cmp":true},"editor.beautify.hotkey":"","editor.lintDelay":0,"editor.linter":"n0","editor.lintReportDelay":0,"editor.matchHighlight":"n0",
-                                  "editor.autoCloseBrackets":true,"editor.autocompleteOnTyping":true,"editor.contextDelete":true,"editor.selectByTokens":true,"editor.arrowKeysTraverse":true,"editor.appliesToLineWidget":true,"editor.autosaveDraft":0,"editor.livePreview":true,"editor.livePreview.delay":0.1,"editor.targetsFirst":true,"editor.colorpicker":true,"editor.colorpicker.hexUppercase":true,"editor.colorpicker.hotkey":"","editor.colorpicker.color":"","editor.colorpicker.maxHeight":0,"hotkey._execute_browser_action":"",
-                                  "hotkey.openManage":"","hotkey.styleDisableAll":"","sync.enabled":"n0","iconset":0,"badgeDisabled":"n0","badgeNormal":"n0","headerWidth.edit":0,"headerWidth.install":0,"headerWidth.manage":0,"popup.search.globals":true,"popupWidth":0,"popupWidthMax":0,"updateInterval":0,"updateOnlyEnabled":true,"undefined":null},
-                      "order":{"main":[],"prio":[]},"editorStylelintConfig":{"rules":{}}}]],
+        "rqr":"JSON array (generic)",
+        "d":["json",[4,[{"settings":{"disableAll":2,"exposeIframes":2,"exposeIframes.sites":1,"exposeIframes.sitesOnly":2,"exposeStyleName":2,"keepAlive":0,"keepAliveIdle":2,"newStyleAsUsercss":2,"openEditInWindow":2,"openEditInWindow.popup":2,"patchCsp":2,
+                                     "patchCsp.sites":1,"patchCsp.sitesOnly":2,"show-badge":2,"styleViaASS":2,"styleViaASS.sites":1,"styleViaASS.sitesOnly":2,"styleViaXhr":2,"styleViaXhr.sites":1,"styleViaXhr.sitesOnly":2,"urlInstaller":2,"windowPosition":5,
+                                     "compactWidth":0,"config.autosave":2,"schemeSwitcher.enabled":1,"schemeSwitcher.nightStart":[1,":","*"],"schemeSwitcher.nightEnd":[1,":","*"],"popup.enabledFirst":2,"popup.stylesFirst":2,"popup.autoResort":2,
+                                     "popup.borders":2,"popup.findSort":1,"manage.onlyEnabled":2,"manage.onlyLocal":2,"manage.onlyUsercss":2,"manage.onlyEnabled.invert":2,"manage.onlyLocal.invert":2,"manage.onlyUsercss.invert":2,"manage.actions.expanded":2,
+                                     "manage.backup.expanded":2,"manage.filters.expanded":2,"manage.links.expanded":2,"manage.minColumnWidth":0,"manage.newUI":2,"manage.newUI.favicons":2,"manage.newUI.faviconsGray":2,"manage.newUI.targets":0,
+                                     "manage.newUI.sort":1,"manage.searchMode":1,"editor.options":5,"editor.toc.expanded":2,"editor.options.expanded":2,"editor.options.style.expanded":2,"editor.general.expanded":2,"editor.lint.expanded":2,"editor.publish.expanded":2,
+                                     "editor.lineWrapping":2,"editor.smartIndent":2,"editor.indentWithTabs":2,"editor.tabSize":0,"editor.keyMap":1,"editor.theme":1,"editor.beautify":{"selector_separator_newline":2,"newline_before_open_brace":2,
+                                        "newline_after_open_brace":2,"newline_between_properties":2,"newline_before_close_brace":2,"newline_between_rules":2,"preserve_newlines":2,"end_with_newline":2,"indent_conditional":2,"indent_mozdoc":2,
+                                        "space_around_combinator":2,"space_around_cmp":2},"editor.beautify.hotkey":1,"editor.linter":1,"editor.linter.on":2,"editor.lintReportDelay":0,"editor.matchHighlight":1,"editor.autoCloseBrackets":2,
+                                     "editor.autocompleteOnTyping":2,"editor.contextDelete":2,"editor.selectByTokens":2,"editor.arrowKeysTraverse":2,"editor.appliesToLineWidget":2,"editor.autosaveDraft":0,"editor.livePreview":2,"editor.livePreview.delay":3,
+                                     "editor.targetsFirst":2,"editor.colorpicker":2,"editor.colorpicker.hexUppercase":0,"editor.colorpicker.hotkey":1,"editor.colorpicker.color":1,"editor.colorpicker.maxHeight":0,"hotkey._execute_browser_action":1,
+                                     "hotkey.openManage":1,"hotkey.styleDisableAll":1,"hotkey.toggleTab":1,"sync.enabled":1,"iconset":0,"badgeDisabled":[1,"#",">"],"badgeNormal":[1,"#",">"],"headerWidth.edit":0,"headerWidth.install":0,"headerWidth.manage":0,
+                                     "popup.search.globals":2,"popup.sidePanel":2,"popup.sidePanel.config":0,"popup.sidePanel.editor":2,"popup.sidePanel.finder":2,"popup.sidePanel.manager":2,"popup.sidePanel.options":2,"popup.toggler.expanded":2,"popupWidth":0,
+                                     "popupWidthMax":0,"updateInterval":0,"updateOnlyEnabled":2},"order":{"main":4,"prio":4}}]]],
         "rs":"Stylus Config Export","s":1
     },
     {
-        "rqr":["JSON object (generic)","JSON text data"],
-        "d":["json",{"scripts":{},"settings":{"isApplied":true,"blacklist":"","blacklistNet":"","popupWidth":0,"updateEnabledScriptsOnly":true,"autoUpdate":0,"lastUpdate":0,"lastModified":0,"showBadge":"n0","badgeColor":"n0","badgeColorBlocked":"n0","exportValues":true,"exportNameTemplate":"n0","expose":{"greasyfork%2Eorg":true,"sleazyfork%2Eorg":true},"closeAfterInstall":true,"editAfterInstall":true,"helpForLocalFile":true,"trackLocalFile":true,"autoReload":true,"features":null,"syncScriptStatus":true,"syncAutomatically":true,"customCSS":"","importScriptData":true,"importSettings":true,"notifyUpdates":true,
-                                              "notifyUpdatesGlobal":true,"version":0,"defaultInjectInto":"n0","ffInject":true,"xhrInject":true,"filters":{"showOrder":true,"showVisit":true,"sort":"n0","viewSingleColumn":true,"viewTable":true},"filtersPopup":{"sort":"n0","enabledFirst":true,"groupRunAt":true,"hideDisabled":""},"editor":{"killTrailingSpaceOnSave":true,"showTrailingSpace":true,"autocompleteOnTyping":0,"lineWrapping":true,"indentWithTabs":true,"indentUnit":0,"tabSize":0,"undoDepth":0},"editorTheme":"n0","editorThemeName":"n0","editorWindow":true,"editorWindowPos":{},"editorWindowSimple":true,
-                                              "scriptTemplate":"","showAdvanced":true,"valueEditor":{"autocompleteOnTyping":0,"lineWrapping":true,"indentWithTabs":true,"indentUnit":0,"tabSize":0,"undoDepth":0},"uiTheme":"n0"},"values":{}}],
+        "rqr":"JSON object (generic)",
+        "d":["json",{"scripts":5,"settings":{"isApplied":2,"blacklist":1,"blacklistNet":1,"popupWidth":0,"updateEnabledScriptsOnly":2,"gmCookieHttpOnly":2,"pageMenuCommands":2,"autoUpdate":0,"lastUpdate":0,"lastModified":0,"showBadge":1,"badgeColor":[1,"#",">"],
+                                             "badgeColorBlocked":[1,"#",">"],"exportValues":2,"exportNameTemplate":1,"expose":5,"closeAfterInstall":2,"editAfterInstall":2,"helpForLocalFile":2,"trackLocalFile":2,"autoReload":2,"features":"*","syncScriptStatus":2,
+                                             "syncAutomatically":2,"customCSS":1,"importScriptData":2,"importSettings":2,"notifyUpdates":2,"notifyUpdatesGlobal":2,"version":0,"defaultInjectInto":1,"ffInject":2,"xhrInject":2,"filters":{"showOrder":2,"showVisit":2,
+                                                "sort":1,"viewSingleColumn":2,"viewTable":2},"filtersPopup":{"sort":1,"enabledFirst":2,"groupRunAt":2,"hideDisabled":1},"editor":{"killTrailingSpaceOnSave":2,"showTrailingSpace":2,"autocompleteOnTyping":0,
+                                                "lineWrapping":2,"indentWithTabs":2,"indentUnit":0,"tabSize":0,"undoDepth":0},"editorTheme":1,"editorThemeName":"*","editorWindow":2,"editorWindowPos":5,"editorWindowSimple":2,"scriptTemplate":1,"showAdvanced":2,
+                                            "valueEditor":{"autocompleteOnTyping":0,"lineWrapping":2,"indentWithTabs":2,"indentUnit":0,"tabSize":0,"undoDepth":0,"editAsString":2},"uiTheme":1},"values":5}],
         "rs":"Violentmonkey Config Export","s":1
+    },
+    {
+        "rqr":"JSON object (generic)",
+        "d":["json",{"c2array":[2,true],"size":[4,[[0,"n0"],[0,"n0"],[0,"n0"]]],"data":[]}],
+        "rs":"Construct 2 Array","s":1
     },
     {
         "rqr":".NET Core",
@@ -1485,6 +1500,10 @@
         "rs":"Hatch Game Engine HMAP","s":1
     },
     {
+        "d":[["s%",2048],["isat","\\1\\0\\0\\0",0],["isat","\\0",64],["isatS","\\0",24,8],["n0",4,4],["n0",4,64],["str0",32,8,1],["py","f.seek(4);c=32+f.readi(4,'<')*44;f.seek(64);return (c+-c%2048)==f.readi(4,'<')"]],
+        "rs":"The Da Vinci Code RPE"
+    },
+    {
         "d":[["isat","Copyright (C) GIANTS Software GmbH, All Rights Reserved.\\r\\n\\r\\n",0],["isat","GAR ",96]],
         "rs":"GIANTS Archive","s":1
     },
@@ -1987,6 +2006,10 @@
         "rqr":"Generic XML (ASCII)",
         "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
         "rs":"Iron Sky GPK","s":1
+    },
+    {
+        "d":[["isat","VFS3",0],["isin",["\\0","\\x10","\\x20","\\x30"],4],["isatS","\\0",3,5],["isat","\\1\\0\\0\\0",8],["isatS","\\0",8,16],["isatS","\\xFF",4,24],["n0",4,12],["py","f.seek(4);hs=f.readi(4,'<');f.seek(12);f.seek(hs+f.readi(4,'<')*28);return f.readi(4)"]],
+        "rs":"NIS America VFS","s":1
     },
     {
         "d":[["isat","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x16\\0\\0\\0\\0",0],

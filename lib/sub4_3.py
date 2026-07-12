@@ -192,7 +192,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = [(f.readc(0x20).rstrip(b'\0').decode('utf-8'),f.readc(0x20).rstrip(b'\0').decode('utf-8'),f.readu32(),f.readu32()) for _ in range(c)]
             f.close()
 
-            asrt(fs and fs[0][3] == 0 and fs[0][2] != 0)
+            asrt(fs and fs[0][3] < 4 and fs[0][2] != 0)
             if len(fs) > 1 and fs[0][2] == fs[1][3]: m = 1
             else: m = 0x800
             for fe in fs:

@@ -2,10 +2,13 @@ import sys
 if sys.version_info < (3,13):
     raise RuntimeError("Python 3.13+ is required")
 
-import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil,inspect
+import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil,inspect,threading
 from time import sleep
+from queue import Queue
 from ctypes import wintypes
+from multiprocessing import cpu_count
 from shutil import rmtree,copytree,copyfile
+from multiprocessing.pool import ThreadPool
 from lib.dldb import DLDB
 
 TRIDR = re.compile(r'(\d{1,3}\.\d)% \(.*\) (.+) \(\d+(?:/\d+){1,2}\)')
@@ -298,6 +301,61 @@ def msplit(i:str|list[str],seps:list[str]) -> list[str]:
     for s in seps: out = sum([x.split(s) for x in out],[])
     return out
 
+class LimitedPool:
+    def __init__(self,limit:int=None):
+        if limit is None:
+            l = n = cpu_count()
+        elif type(limit) == float:
+            l = n = int(limit * cpu_count())
+        else: l = n = limit
+        if n < cpu_count(): n += 1
+        self.p = ThreadPool(n)
+        self.q = Queue(l)
+        self.wt = threading.Thread(target=self._worker,daemon=True)
+        self.wt.start()
+        self.pcs = []
+
+    def _worker(self):
+        while True:
+            i = self.q.get()
+            if i is None: break
+            if self.pcs:
+                try: self.pcs[0].get()
+                except:
+                    self.q.task_done()
+                    self.kill(_worker=True)
+                    return
+                else: self.pcs.pop(0)
+            self.pcs.append(self.p.apply_async(*i))
+            self.q.task_done()
+    def put(self,fnc,*args,**kwargs):
+        if hasattr(self,'q'): self.q.put((fnc,args,kwargs))
+        else: self.pcs[0].get() # no .q means this process errored
+
+    def kill(self,_worker=False): # untested
+        if _worker:
+            q = self.q
+            self.q = Queue()
+            while not q.empty():
+                try: q.get_nowait()
+                except Exception: break
+            del self.q
+        else:
+            while not self.q.empty():
+                try: self.q.get_nowait()
+                except Exception: break
+            self.q.put(None)
+            self.wt.join()
+            del self.q
+        self.p.terminate()
+    def close(self):
+        self.q.put(None)
+        self.wt.join()
+        del self.q
+        for pc in self.pcs: pc.get()
+        self.p.close()
+        self.p.join()
+
 TDB:dict = json.load(xopen('lib/tdb.json'))
 TDBF = set(sum(TDB.values(),[]))
 WEAK = set(json.load(xopen('lib/weak.json')))
@@ -476,7 +534,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             tt = time.perf_counter()
             print(f'[B] unp64 took {tt-st:.3f}s')
             st = tt
-    if not ts and isfile(inp):
+    if not ts and isfile(inp) and getsize(inp) < 0x80000000:
         _,o,_ = db.run(['gamearch',inp,'-l'])
         ts = re.findall(r'File .+ a .+ \[(.+)\]\n',o.replace('\r',''))
         for dts in re.findall(r', archive is (?:probably|definitely) not (.+)\n',o.replace('\r','')): ts.remove(dts)
@@ -491,6 +549,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
     nts = list(set(nts))
     f = FileStub()
     if typ in {'text','binary','null'}:
+        jsd = None
         f = open(inp,'rb')
         f._close = f.close
         f.close = lambda *_,**__:None
@@ -695,32 +754,92 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                     f.seek(mn)
                     ret = reg.match(f.read(mx-mn)) != None
                 elif x[0] == 'json':
-                    f.seek(0)
-                    try: js = json.loads(f.read().decode('utf-8'))
-                    except: ret = False
+                    if jsd is None:
+                        f.seek(0)
+                        try: jsd = json.loads(f.read().decode('utf-8'))
+                        except: jsd = False
+                    if jsd is False: ret = False
                     else:
                         def chk(j,c):
-                            if type(j) != type(c): return False
-                            if type(j) == dict and len(j) != len(c): return False
-                            elif type(j) == list and len(c) > len(j): return False
+                            if type(c) != list or len(c) == 0:
+                                c = [c]
+                                if type(c[0]) == dict and c[0]: c.append(c[0])
+                            tj,tc,x = type(j),type(c[0]),c[1:]
+                            if c[0] in ('i','I',0): tc = int
+                            elif c[0] in ('s','S',1): tc = str
+                            elif c[0] in ('b','B',2): tc = bool
+                            elif c[0] in ('f','F',3): tc = float
+                            elif c[0] in ('l','L',4): tc = list
+                            elif c[0] in ('d','D',5): tc = dict
+                            elif c[0] in ('n','N',6): tc = type(None)
+                            elif c[0] == '*': return True
+                            if tj != tc: return False
+                            
+                            if x:
+                                lx = len(x)
+                                if tc == str:
+                                    if x == [0]: return bool(j)
+                                    elif lx == 1: return x[0] == j
+                                    else:
+                                        if x[1][1:2] == '?': j,x[0] = j.lower(),x[0].lower()
+                                        if x[1][0] == '=': return x[0] == j
+                                        elif x[1][0] == '*': return x[0] in j
+                                        elif x[1][0] == '>': return j.startswith(x[0])
+                                        elif x[1][0] == '<': return j.endswith(x[0])
+                                        elif x[1][0] == '!': return x[0] not in j
+                                elif tc == bool: return x[0] is j
+                                elif tc in (int,float):
+                                    if x == ['n0']: return bool(j)
+                                    elif lx == 1: return x[0] == j
+                                    elif lx == 2 and x[1] == '<': return x[0] < j
+                                    elif lx == 2 and x[1] == '>': return x[0] > j
+                                    elif lx == 2 and x[1] == '<=': return x[0] <= j
+                                    elif lx == 2 and x[1] == '>=': return x[0] >= j
+                                    elif lx == 2 and x[1][:1] == '=': return x[0] == j
+                                    elif lx == 2 and x[1][:1] == '!': return x[0] != j
+                                    elif lx == 2 and x[1] == '%': return j % x[0] == 0
+                                    elif lx == 2: return x[0] <= j < x[1]
+                                elif tc == list:
+                                    tx = type(x[0])
+                                    if x == ['n0']: return bool(j)
+                                    elif lx == 1 and tx == list: return all(chk(ji,xi) for ji,xi in zip(j,x[0]))
+                                    elif lx == 1 and tx == int: return len(j) == x[0]
+                                    elif lx == 2 and tx == type(x[1]) == int: return x[0] <= len(j) < x[1]
+                                    elif lx == 2 and tx == int and x[1] == '<': return len(j) < x[0]
+                                    elif lx == 2 and tx == int and x[1] == '>': return len(j) > x[0]
+                                    elif lx == 2 and tx == int and x[1] == '<=': return len(j) <= x[0]
+                                    elif lx == 2 and tx == int and x[1] == '>=': return len(j) >= x[0]
+                                    elif lx == 2 and tx == int and x[1][:1] == '=': return len(j) == x[0]
+                                    elif lx == 2 and tx == int and x[1][:1] == '!': return len(j) != x[0]
+                                    elif lx == 2 and tx == int and x[1] == '%': return len(j) % x[0] == 0
+                                elif tc == dict:
+                                    tx = type(x[0])
+                                    if x == ['n0']: return bool(j)
+                                    elif lx == 1 and tx == list: return all(y in j for y in x[0])
+                                    elif lx == 1 and tx == dict:
+                                        if len(j) != len(x[0]): return False
+                                        for k in x[0]:
+                                            if k not in j: return False
+                                            if not chk(j[k],x[0][k]): return False
+                                        return True
+                                    elif lx == 2 and tx == dict and x[1] == '?':
+                                        for k in x[0]:
+                                            if k not in j: return False
+                                            if not chk(j[k],x[0][k]): return False
+                                        return True
+                                    elif lx == 1 and tx == int: return len(j) == x[0]
+                                    elif lx == 2 and tx == type(x[1]) == int: return x[0] <= len(j) < x[1]
+                                    elif lx == 2 and tx == int and x[1] == '<': return len(j) < x[0]
+                                    elif lx == 2 and tx == int and x[1] == '>': return len(j) > x[0]
+                                    elif lx == 2 and tx == int and x[1] == '<=': return len(j) <= x[0]
+                                    elif lx == 2 and tx == int and x[1] == '>=': return len(j) >= x[0]
+                                    elif lx == 2 and tx == int and x[1][:1] == '=': return len(j) == x[0]
+                                    elif lx == 2 and tx == int and x[1][:1] == '!': return len(j) != x[0]
+                                    elif lx == 2 and tx == int and x[1] == '%': return len(j) % x[0] == 0
+                                raise ValueError(f'Invalid json filter: {tc.__name__} {x}')
 
-                            if type(j) == dict:
-                                for k in c:
-                                    if k not in j: return False
-                                    v = j[k]
-                                    if type(v) != type(c[k]): return False
-                                    if type(v) == dict and c[k] and not chk(v,c[k]): return False
-                                    elif type(v) == list and c[k] and not chk(v,c[k]): return False
-                                    elif type(v) == str and c[k] == 'n0' and not v: return False
-                            elif type(j) == list:
-                                for ix,cv in enumerate(c):
-                                    v = j[ix]
-                                    if type(v) != type(cv): return False
-                                    if type(v) == dict and cv and not chk(v,cv): return False
-                                    elif type(v) == list and cv and not chk(v,cv): return False
-                                    elif type(v) == str and cv == 'n0' and not v: return False
                             return True
-                        ret = chk(js,x[1])
+                        ret = chk(jsd,x[1])
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
             elif typ == 'url':
                 if x[0] == 'isat':

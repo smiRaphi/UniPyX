@@ -23,6 +23,9 @@ DLDB = {
     # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Wno-author "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" -DBUILD_SHARED_LIBS=OFF -A x64
     # cmake --build build -j <cores> --config Release
     'lzfse':('lzfse.lib',0), # static https://github.com/lzfse/lzfse
+    # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Wno-author -A x64 -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_SHARED=OFF -DZSTD_BUILD_COMPRESSION=OFF -DZSTD_BUILD_DICTBUILDER=OFF -DZSTD_LEGACY_SUPPORT=1
+    # cmake --build build -j <cores> --config Release
+    'zstd':('zstd_static.lib',0), # static https://github.com/facebook/zstd
     'unimplode6a':('unimplode6a.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/unimplode6a.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
     'ozunreduce':('ozunreduce.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/ozunreduce.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
     'ozunshrink':('ozunshrink.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/ozunshrink.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
@@ -64,7 +67,7 @@ def compile(quiet=False):
         from setuptools import msvc
         env |= {x.upper():v for x,v in msvc.EnvironmentInfo('x64' if sys.maxsize > 2**32 else 'x86').return_env().items()}
         cmd  = ['/Ox','/GS-','/GR-','/Gs999999','/LD','/I',LIBD,'/TC',*FS,f'/Fe:{DLLP}','/link','/MANIFEST:NO','/MERGE:.rdata=.text','/OPT:REF','/OPT:ICF','/ALIGN:128',
-                '/NODEFAULTLIB:MSVCRT'] + ['/EXPORT:' + x for x in xfncs]
+                '/NODEFAULTLIB:MSVCRT','/IGNORE:4108','/IGNORE:4217','/IGNORE:4286'] + ['/EXPORT:' + x for x in xfncs]
         for p in env['PATH'].split(';'):
             if os.path.exists(p + '/cl.exe') and os.path.isfile(p + '/cl.exe'): cc = os.path.join(p,'cl.exe');break
     if cc is None: raise ValueError('No C compiler found')

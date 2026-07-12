@@ -145,7 +145,7 @@ class PyOBin:
                         return bytes(v ^ xr for v in f.readc(_SMAP[fl - 1]))
                     else: return None
                 case 1:
-                    assert not fl >> 1 # not asrt!
+                    assert not fl >> 1 # reserved for flags
                     return fl == 1
                 case 2:
                     if fl & 8: return fl & 7

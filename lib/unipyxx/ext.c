@@ -127,6 +127,62 @@ EXPORT ssize_t decompress_lpaq8(uint8_t *restrict src, size_t zsize,
     return us;
 }
 
+typedef struct {
+    void *buf;
+    size_t size;
+    size_t pos;
+} ZSTD_Buffer;
+XIMPORT(zstd)
+void *ZSTD_createDCtx(void);
+EXPORT ssize_t decompress_zstd(uint8_t *restrict src, const  size_t zsize,
+                              uint8_t **restrict dst, const ssize_t usize,
+                         const uint8_t *restrict dct, const  size_t dsize) {
+    void *ctx = ZSTD_createDCtx();
+    if (!ctx) return -1;
+    ssize_t r;
+    if (usize != -1)
+        r = ZSTD_decompress_usingDict(ctx, *dst, usize, src, zsize, dct, dsize);
+    else {
+        r = ZSTD_initDStream_usingDict(ctx, dct, dsize);
+        if (r < 0) goto cleanup;
+        size_t us = ZSTD_DStreamOutSize();
+        if (*dst == NULL) {
+            *dst = malloc(us);
+            if (!*dst) { r = -1; goto cleanup; }
+        }
+
+        ZSTD_Buffer ibuf = { src, zsize, 0 };
+        ZSTD_Buffer obuf = { *dst, us, 0 };
+
+        while (1) {
+            r = ZSTD_decompressStream(ctx, &obuf, &ibuf);
+            if (r < 0) goto cleanup;
+            if (r == 0) {
+                r = obuf.pos;
+                break;
+            }
+
+            if (obuf.size == obuf.pos) {
+                us *= 2;
+                uint8_t *ndst = realloc(*dst, us);
+                if (!ndst) { r = -1; goto cleanup; }
+                *dst = ndst;
+                obuf.buf = *dst;
+                obuf.size = us;
+            } else if (ibuf.size == ibuf.pos) {
+                r = -1;
+                goto cleanup;
+            }
+        }
+    }
+
+cleanup:
+    ZSTD_freeDCtx(ctx);
+    return r;
+}
+
+EXPORT void free_exp(void *ptr) { free(ptr); }
+
 #ifdef __cplusplus
 }
 #endif

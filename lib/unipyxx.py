@@ -35,6 +35,16 @@ class XMemCodecParametersLZX(ctypes.Structure):
         ('windowSize',cint),
         ('compressionPartitionSize',cint),
     ]
+ZSTDERR = {
+    1:'Generic',10:'Prefix unknown',12:'Version unsupported',14:'Frame Parameter: Unsupported',16:'Frame Parameter: Window too large',
+    20:'Corruption detected',22:'Checksum wrong',24:'Literals header wrong',30:'Dictionary: Corrupted',32:'Dictionary: Wrong',
+    34:'Dictionary: Creation failed',40:'Parameter: Unsupported',41:'Parameter: Combination unsupported',42:'Parameter: Out of bound',
+    44:'Table log too large',46:'Max Symbol Value: Too large',48:'Max Symbol Value: Too small',49:'Cannot produce uncompressed block',
+    50:'Stability condition not respected',60:'Stage wrong',62:'Init missing',64:'Memory allocation',66:'Workspace too small',
+    70:'Output buffer size too small',72:'Input buffer size wrong',74:'Output buffer is NULL',80:'No Forward Progress: Output full',
+    82:'No Forward Progress: Input empty',100:'Frame index too large',102:'SeekableIO',104:'Output buffer wrong',105:'Input buffer wrong',
+    106:'Sequence producer failed',107:'External sequences invalid'
+}
 
 def _1base_func(fnc,src,usize):
     i = (u8 * len(src)).from_buffer_copy(src)
@@ -172,6 +182,9 @@ class X:
             ('decompress_zip_implode',(P(u8),szt,P(u8),szt,u16),cint,0),
             ('decompress_lzfse',(P(u8),szt,P(u8),szt),sszt,1),
             ('decompress_lpaq8',(P(u8),szt,P(u8),szt),sszt,1),
+            ('decompress_zstd',(P(u8),szt,P(P(u8)),szt,P(u8),szt),sszt,0),
+
+            ('free_exp',(voidp,),void,0),
         ):
             fnc = getattr(self.dll,e[0])
             fnc.argtypes = e[1]
@@ -333,6 +346,21 @@ class X:
         r = self.dll.decompress_zip_implode(i,len(src),o,usize,flags)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)
+    def decompress_zstd(self,src:bytes,usize:int,zdict:bytes=None) -> bytes:
+        i = (u8 * len(src)).from_buffer_copy(src)
+        if zdict:
+            dl = len(zdict)
+            d = (u8 * dl).from_buffer_copy(zdict)
+        else: dl,d = 0,None
+        if usize == -1: o = P(u8)()
+        else:
+            o = (u8 * usize)()
+            o = ctypes.cast(o,P(u8))
+        r = self.dll.decompress_zstd(i,len(src),ctypes.byref(o),usize,d,dl)
+        if r < 0: raise ValueError(f'Decompression failed: {ZSTDERR[-r]} ({-r})')
+        od = ctypes.string_at(o,r)
+        if usize == -1: self._free(o)
+        return od
 
     def decrypt_inv(src:bytes) -> bytes: ...
     def decrypt_swp4(src:bytes) -> bytes: ...
@@ -556,3 +584,5 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         r = self.dll.hash_crc(i,len(src),self.CRC[k],init,xor,value or 0,0 if value is None else 1)
         return r
+
+    def _free(self,p): self.dll.free_exp(ctypes.cast(p,voidp))

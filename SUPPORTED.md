@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1012
+# Supported Formats: 1015
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -152,7 +152,7 @@ ZIP | .zip .zipx .exe | Custom, [unzip](https://bioruebe.com/dev/uniextract/)([s
 ZLIB | .zlib | [zlib](https://docs.python.org/3/library/zlib.html) |
 ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https://bioruebe.com/dev/uniextract/)(src?) |
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
-ZSTD | .zst | [compression.zstd](https://docs.python.org/3/library/compression.zstd.html)/[backports.zstd](https://pypi.org/project/backports.zstd/) |
+ZSTD | .zst | Custom |
 
 ## ROM Formats (68)
 Name | Extension(s) | Extractor(s) | Comment
@@ -358,7 +358,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (546)
+## Various (549)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -456,6 +456,7 @@ Coktel Vision STK2 | .itk | [na_game_tool](https://nihav.org/game_tool.html) |
 Colin McRae Rally 2 BFL | .bfl | Custom |
 Compressed File Library | .cfl | [uncfl](https://solhsa.com/cfl/index.html) |
 Conquest Earth WAD | .wad | [na_game_tool](https://nihav.org/game_tool.html) |
+Construct 2 Array | .hsp .hsm .hsd | Custom |
 Contact File Data | .dat | Custom |
 Cosmo Volume Game Archive | .vol | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 CPK | .cpk | [CpkExtract](https://github.com/1330-Studios/CPK-Extract) |
@@ -699,6 +700,7 @@ Nintendo Table | ??? | Custom |
 Nintendo Yay0 | .yay0 | Custom |
 Nintendo Yaz0 | .yaz0 .szs | Custom |
 Nippon Ichi PS FS | .fs | Custom |
+NIS America VFS | .vfs | Custom |
 NitroARC | .arc .narc | [Narchive](https://github.com/nickworonekin/narchive) |
 NMZIP | .nmzip | Custom |
 Noita Wizard pAK | .wak | Custom |
@@ -838,6 +840,7 @@ Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Teardown Encrypted | .tde | Custom |
 Temple of Elemental Evil DAT | .dat | Custom |
+The Da Vinci Code RPE | .rpe | Custom |
 The Indian In The Cupboard Data | .dta | Custom |
 The Learning Company MECC | .mdt | Custom |
 The Pagemaster DAT | .dat | Custom |

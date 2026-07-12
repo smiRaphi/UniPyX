@@ -41,5 +41,6 @@ for x in hshs:
 mx = max([len(x) for x in hshs])
 cs.sort(key=lambda x:(HASHTS[x[0]],x[1]))
 for x,crc in cs:
+    if crc.bit_length() > HASHTS[x] * 8: print(x,crc)
     cb = crc.to_bytes(HASHTS[x],'big')
     print(f'{x.ljust(mx)} | {crc:0{HASHTS[x]*2}X}')

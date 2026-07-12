@@ -5378,11 +5378,6 @@
         }],
         "ts":0
     },
-    "backports_zstd":{
-        "pip":"backports.zstd",
-        "name":"backports.zstd",
-        "old":true
-    },
     "lzo":{
         "p":"lzo.cp314-win_amd64.pyd",
         "fs":[{
@@ -5732,59 +5727,14 @@
         }],
         "ts":0
     },
-    "zstd3":{
-        "p":"zstd3.exe",
-        "fs":[[
-            "https://github.com/facebook/zstd/releases/download/zstd-0.3.0/zstd.exe",
-            "zstd3.exe"
-        ]],
-        "ts":0
-    },
-    "zstd4":{
-        "p":"zstd4.exe",
-        "fs":[{
-            "u":"https://github.com/facebook/zstd/releases/download/v0.4.4/zstd-win64-0.4.4.zip",
-            "x":{
-                "zstd.exe":"zstd4.exe"
-            }
-        }],
-        "ts":0
-    },
-    "zstd5":{
-        "p":"zstd5.exe",
-        "fs":[{
-            "u":"https://github.com/facebook/zstd/releases/download/v0.5.1/zstd-windows-v0.5.1.zip",
-            "x":{
-                "win64/zstd.exe":"zstd5.exe"
-            }
-        }],
-        "ts":0
-    },
-    "zstd6":{
-        "p":"zstd6.exe",
-        "fs":[{
-            "u":"https://github.com/facebook/zstd/releases/download/v0.6.1/zstd-windows-v0.6.1.zip",
-            "x":{
-                "win64/zstd.exe":"zstd6.exe"
-            }
-        }],
-        "ts":0
-    },
-    "zstd7":{
-        "p":"zstd7.exe",
-        "fs":[{
-            "u":"https://github.com/facebook/zstd/releases/download/v0.7.3/zstd-windows-v0.7.3.zip",
-            "x":{
-                "win64/zstd.exe":"zstd7.exe"
-            }
-        }],
-        "ts":0
-    },
     "nbt2json":{
         "p":"nbt2json.exe",
         "fs":[
         "https://github.com/midnightfreddie/nbt2json/releases/download/v0.4.1/nbt2json.exe"
         ]
+    },
+    "spookyhash":{
+        "pip":"spookyhash"
     },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",

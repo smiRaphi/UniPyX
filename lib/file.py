@@ -152,6 +152,14 @@ class File:
         v = self.unpack('f',end)
         return float(f'{v:.7g}') # clamp precision to that of a float32
     def readf64(self,end=None) -> float: return self.unpack('d',end)
+    def readbool(self):
+        b = self.readu8()
+        if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-1:08X}")
+        return bool(b)
+    def readbool32(self,end=None):
+        b = self.readu32(end)
+        if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-4:08X}")
+        return bool(b)
     def readleb128u(self):
         n = c = b = 0
         while self:
@@ -212,6 +220,8 @@ class File:
     def writef16(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'e',v))
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
+    def writebool(self,v:bool): return self.writeu8(1 if v else 0)
+    def writebool32(self,v:bool,end=None): return self.writeu32(1 if v else 0,end)
     def writevlq(self,v:int):
         b = [v & 0x7F]
         v >>= 7
@@ -527,24 +537,20 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             import lzma
             return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[{'id':lzma.FILTER_LZMA1,'dict_size':0x1000000,'lc':3,'lp':0,'pb':2}]).decompress(i)[:kwargs.get('usize')]
         case 'zstd':
-            if i[0] < 0x28:
-                asrt('db' in kwargs)
-                asrt(i[1:4] == b'\xB5\x2F\xFD')
-                if i[0] == 0x1E: v = 1
-                else:
-                    asrt(i[0] >> 4 == 2)
-                    v = i[0] & 0xF
-                r,o,e = kwargs['db'].run([f'zstd{v}','-d'],stdin=i,text=False,print_try=False)
-                if r != 0: raise ValueError(e.decode('utf-8').strip())
-                return o
-            else:
-                if sys.version_info >= (3,14): from compression import zstd # type: ignore
-                else:
-                    try: import backports_zstd as zstd # type: ignore
-                    except: from backports import zstd # type: ignore
-                if 'zstd_dict' in kwargs and type(kwargs['zstd_dict']) == bytes: kwargs['zstd_dict'] = zstd.ZstdDict(kwargs['zstd_dict'])
-
-                return zstd.decompress(i,kwargs.get('zstd_dict'))
+            if not kwargs.get('custom') and sys.version_info >= (3,14) and i[:4] == b'\x28\xB5\x2F\xFD':
+                from compression import zstd # type: ignore
+                if kwargs.get('dict'): d = zstd.ZstdDict(kwargs['dict'])
+                else: d = None
+                if 'usize' in kwargs: return zstd.ZstdDecompressor(d).decompress(i,kwargs['usize'])
+                else: return zstd.decompress(i,d)
+            else: return uxx().decompress_zstd(i,usize=kwargs.get('usize',-1),zdict=kwargs.get('dict'))
+        case 'zstd_raw':
+            d = bytearray(b'\0\xB5\x2F\xFD\x00\x88')
+            d[0] = (0,0x1E,0x22,0x23,0x24,0x25,0x26,0x27,0x28)[kwargs.pop('version',8)]
+            ch = 0 if kwargs.pop('uncompressed',False) else 0b100
+            d.extend((ch | (len(i) << 3)).to_bytes(3,'little') + i)
+            d.extend(b'\1\0\0')
+            return decompress(d,'zstd',**kwargs)
         case 'lz4'|'lz4_block':
             import lz4.block
             return lz4.block.decompress(i,uncompressed_size=(len(i) * 8) if kwargs.get('no_size') else kwargs['usize'])
@@ -831,6 +837,19 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if i[1] & 0x20: i = i[6:]
             else: i = i[2:]
             #return ananconda_decompress(i)
+        case 'nis_zstd':
+            asrt('chunks' in kwargs)
+            d = bytearray(b'\x28\xB5\x2F\xFD\x00\x88')
+            p = 0
+            for s in kwargs.pop('chunks'):
+                ch = 0b100
+                if s < 0:
+                    s = -s
+                    ch = 0b000
+                d.extend((ch | (s << 3)).to_bytes(3,'little') + i[p:p+s])
+                p += s
+            d.extend(b'\1\0\0')
+            return decompress(d,'zstd',**kwargs)
 
         case 'wavpack'|'wv':
             asrt('db' in kwargs)
