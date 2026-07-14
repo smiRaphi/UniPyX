@@ -1226,6 +1226,12 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 f.seek(fe[1])
                 writefile(fe[0],f.read(fe[2]))
             return
+        case 'Doctor V64 ROM':
+            db.try_custom()
+            import struct
+            d = readfile(i,'rb')
+            writefile(f'{o}/{tbasename(i)}.z64',struct.pack(f'>{len(d)//2}H',*struct.unpack(f'<{len(d)//2}H',d)))
+            return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'
@@ -1381,7 +1387,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     'NPNP':'eur',
                 },
                 'Super Smash Bros.':{
-                    0:'ssb_decommp_re_yaml',
+                    0:'ssb_decomp_re_yaml',
                     1:'smashbrothers',
                     2:{'symbols'},
                     'NALJ':'jp',
@@ -1522,7 +1528,28 @@ def extract2(inp:str,out:str,t:str) -> bool:
                             f.seek(of)
                             writefile(f'{o}/mio0/decompressed_{of:08X}.bin',decompress(f.read(),'mio0'))
                 elif rt == 'Super Smash Bros.':
-                    raise NotImplementedError('VPK0: https://github.com/decompals/crunch64/issues/1')
+                    from lib.file import File,decompress
+                    ass = o + '/assets/' + MP[rt][tg] + '/'
+                    f = File(ass + 'relocData.bin',endian='>')
+
+                    fs = []
+                    while True:
+                        off = f.readu32()
+                        fs.append((off >> 31,off & 0x7FFFFFFF,f.readu16(),f.readu16(),f.readu16(),f.readu16()))
+                        if sum(fs[-1]) == off: break
+                    do = f.pos
+
+                    cd = '\n'.join([f'{fe[0]}, {fe[1]:#08x}, {fe[2]:#06x}, {fe[3]:#06x}, {fe[4]:#06x}, {fe[5]:#06x}' for fe in fs])
+                    writefile(ass + 'relocData.csv','isVpk0, dataOffset, relocInternOffset, compressedSize, relocExternOffset, decompressedSize\n' + cd,'wt')
+
+                    ass += 'relocData/'
+                    for ix,fe in enumerate(fs[:-1]):
+                        f.seek(do + fe[1])
+                        d = f.readc(fs[ix+1][1] - fe[1])
+                        if fe[0]:
+                            writefile(f'{ass}{ix}.vpk0',d)
+                            writefile(f'{ass}{ix}.vpk0.bin',decompress(d,'vpk0'))
+                        else: writefile(f'{ass}{ix}.bin',d)
                 return
         case 'Final Fantasy X 2 ISO':
             zip7(i,o + '\\$ISO','ISO')

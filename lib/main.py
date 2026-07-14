@@ -436,7 +436,8 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                 tt = time.perf_counter()
                 print(f'[B] Trid took {tt-st:.3f}s')
                 st = tt
-        _,o,_ = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
+        errc,o,err = db.run(['file','-bsnNkm',dirname(db.get('file')) + '\\magic.mgc',inp])
+        if errc == 1 and ' supports only version ' in err and '\\magic.mgc\' is version ' in err: raise RuntimeError("'file' version mismatch")
         ts += [x.split(',')[0].split(' created: ')[0].split('\u00BF\u0074\u2593\u256C\u2551\u2567\u00F1\u2219')[0].split('\\012-')[0].strip(' \t\n\r\'') for x in o.split('\n') if x.strip()]
 
         if BENCHMARK:

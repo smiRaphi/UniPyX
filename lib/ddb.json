@@ -1501,7 +1501,11 @@
     },
     {
         "d":[["s%",2048],["isat","\\1\\0\\0\\0",0],["isat","\\0",64],["isatS","\\0",24,8],["n0",4,4],["n0",4,64],["str0",32,8,1],["py","f.seek(4);c=32+f.readi(4,'<')*44;f.seek(64);return (c+-c%2048)==f.readi(4,'<')"]],
-        "rs":"The Da Vinci Code RPE"
+        "rs":"Slayer Engine RPE"
+    },
+    {
+        "d":[["isat","vpk0",0],["isin",["\\0","\\1"],8],["py","f.seek(9);v=f.readi(2,'<');return v&16512==0"]],
+        "rs":"HAL VPK0","s":1
     },
     {
         "d":[["isat","Copyright (C) GIANTS Software GmbH, All Rights Reserved.\\r\\n\\r\\n",0],["isat","GAR ",96]],

@@ -67,12 +67,11 @@
     "file":{
         "p":"file/file.exe",
         "fs":[{
-            "u":".",
+            "u":"https://github.com/weaverant/file-windows/releases/download/v5.48/file-windows-5.48-x64.zip",
             "x":{
-                "file/file.exe":"file/file.exe",
-                "file/libmagic.dll":"file/libmagic.dll"
+                "file.exe":"file/file.exe"
             },
-            "ts":1762090000
+            "ts":1784027723
         },{
             "u":"http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.47-4_i386.deb",
             "x":{
@@ -80,7 +79,7 @@
             },
             "ts":1780782840
         }],
-        "ts":1780782840
+        "ts":1784027723
     },
     "exeinfope":{
         "p":"ExeinfoPE/exeinfope.exe",

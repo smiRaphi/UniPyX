@@ -110,6 +110,7 @@ class X:
             ('decompress_vicious_lz',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
+            ('decompress_vpk0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_graw_bpe', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_lzrw1kh',  (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_camelot_blz',(P(u8),szt,P(u8),sszt), sszt,1),
@@ -235,6 +236,14 @@ class X:
         o = (u8 * us)()
         r = self.dll.decompress_ash0(i,len(src),o)
         if r == -1: raise ValueError('Decompression failed')
+        return bytes(o)[:r]
+    def decompress_vpk0(self,src:bytes) -> bytes:
+        if len(src) <= 9 or src[:4] != b'vpk0' or src[8] > 1: raise ValueError('Invalid data')
+        us = int.from_bytes(src[4:8],'big')
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * us)()
+        r = self.dll.decompress_vpk0(i,len(src),o)
+        if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
     def decompress_xmemlzx(self,src:bytes,usize:int,flags:int=0,win_size:int=0,block_size:int=0) -> bytes:
         ctx = void()

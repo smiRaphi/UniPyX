@@ -8,15 +8,15 @@ typedef struct {
     int16_t l;
     int16_t r; // -1 = leaf
 } HuffNode;
-static inline int read_hufftree(BitReader *br, int width, int max, HuffNode *tree) {
-    int root = 0;
-    int nodec = 1;
+static inline int32_t read_hufftree(BitReader *br, uint8_t width, uint32_t max, HuffNode *tree) {
+    uint16_t root = 0;
+    uint32_t nodec = 1;
     int16_t stack[0x800];
-    int stacki = 0;
+    uint16_t stacki = 0;
 
     while (1) {
         if (get_bit(br)) {
-            if (nodec + 1 >= max * 2) return 0;
+            if (nodec + 1 >= max * 2) return -1;
             tree[root].l = nodec;
             tree[root].r = nodec + 1;
             stack[stacki++] = nodec + 1;
@@ -29,10 +29,37 @@ static inline int read_hufftree(BitReader *br, int width, int max, HuffNode *tre
             root = stack[--stacki];
         }
     }
-    return 1;
+    return nodec;
 }
-static inline int get_huffcode(BitReader *br, HuffNode *tree) {
-    int node = 0;
+static inline int32_t read_hufftree_end(BitReader *br, uint8_t width, uint32_t max, HuffNode *tree) {
+    uint32_t nodec = 0;
+    int16_t stack[0x800];
+    uint16_t stacki = 0;
+
+    while (1) {
+        if (get_bit(br)) {
+            if (stacki < 2) break;
+            tree[nodec].r = stack[--stacki];
+            tree[nodec].l = stack[--stacki];
+        } else {
+            if (nodec >= max * 2) return -1;
+            tree[nodec].l = get_bits(br, width);
+            tree[nodec].r = -1;
+        }
+        stack[stacki++] = nodec;
+        nodec++;
+    }
+    return nodec;
+}
+static inline uint16_t get_huffcode(BitReader *br, HuffNode *tree) {
+    uint16_t node = 0;
+    while (tree[node].r != -1) {
+        node = (get_bit(br)) ? tree[node].r : tree[node].l;
+    }
+    return tree[node].l;
+}
+static inline uint16_t get_huffcode_end(BitReader *br, HuffNode *tree, uint32_t size) {
+    uint16_t node = size - 1;
     while (tree[node].r != -1) {
         node = (get_bit(br)) ? tree[node].r : tree[node].l;
     }
@@ -560,8 +587,8 @@ EXPORT ssize_t decompress_huffman(const uint8_t *restrict src, const size_t zsiz
                                         uint8_t *restrict dst, const ssize_t usize, const int8_t padding) {
     BitReader br;
     init_BitReader(&br, src, zsize);
-    HuffNode tree[512];
-    if (!read_hufftree(&br, 8, 256, tree)) return -1;
+    HuffNode tree[0x200];
+    if (read_hufftree(&br, 8, 0x100, tree) < 0) return -1;
 
     if (padding) br.bits = 0;
 
@@ -587,8 +614,8 @@ EXPORT ssize_t decompress_ash0(const uint8_t *restrict src, const size_t zsize,
 
     HuffNode sym_tree[0x400];
     HuffNode dist_tree[0x1000];
-    if (!read_hufftree(&symr ,9 ,0x200,sym_tree) ||
-        !read_hufftree(&distr,11,0x500,dist_tree)) return -1;
+    if (read_hufftree(&symr ,9 ,0x200,sym_tree ) < 0 ||
+        read_hufftree(&distr,11,0x500,dist_tree) < 0) return -1;
 
     ssize_t op = 0;
     while (op < usize) {
@@ -602,6 +629,42 @@ EXPORT ssize_t decompress_ash0(const uint8_t *restrict src, const size_t zsize,
             if (op + lng > usize) lng = usize - op;
             for (size_t i=0;i < lng;i++) dst[op++] = dst[cp++];
         }
+    }
+
+    return op;
+}
+EXPORT ssize_t decompress_vpk0(const uint8_t *restrict src, const size_t zsize, uint8_t *restrict dst) {
+    if (9 >= zsize) return -1;
+
+    uint32_t usize = read32be(src+4);
+    uint8_t mode = src[8];
+
+    BitReader br;
+    init_BitReader(&br, src + 9, zsize - 9);
+
+    HuffNode off_tree[0x200];
+    int32_t offts = read_hufftree_end(&br,8,0x100,off_tree);
+    if (offts < 0) return -2;
+    HuffNode len_tree[0x200];
+    int32_t lents = read_hufftree_end(&br,8,0x100,len_tree);
+    if (lents < 0) return -3;
+
+    ssize_t op = 0;
+    while (op < usize && !is_eof(&br)) {
+        if (get_bit(&br)) {
+            uint64_t dist = get_bits(&br, get_huffcode_end(&br, off_tree, offts));
+            if (mode == 1) {
+                if (dist < 3) dist = (dist + 1) | (get_bits(&br, get_huffcode_end(&br, off_tree, offts)) << 2);
+                else dist <<= 2;
+                dist -= 8;
+            }
+
+            if (dist > op) return -4;
+            if (is_eof(&br)) return -1;
+            uint64_t len = get_bits(&br, get_huffcode_end(&br, len_tree, lents));
+            if (op + len > usize) len = usize - op;
+            for (uint64_t i=0;i < len;i++,op++) dst[op] = dst[op - dist];
+        } else dst[op++] = get_bits(&br, 8);
     }
 
     return op;

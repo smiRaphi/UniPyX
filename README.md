@@ -12,7 +12,6 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 [Unsupported Formats/TODOs](./UNSUPPORTED.md)
 
 ## Included tools
-* self compiled [file-windows v5.46](https://github.com/ember91/file-windows)
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
 * self compiled [bbccp](https://github.com/ethandicks/bbc-disk-tools) without glob

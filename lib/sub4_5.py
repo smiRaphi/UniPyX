@@ -1070,7 +1070,7 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
-        case 'The Da Vinci Code RPE':
+        case 'Slayer Engine RPE':
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
@@ -1186,5 +1186,12 @@ def extract4_5(inp:str,out:str,t:str):
             p.close()
             for dn in ds.values(): mkdir(o + '/' + dn)
             if fs: return
+        case 'HAL VPK0':
+            db.try_custom()
+            from lib.file import decompress
+            of = o + '/' + basename(i)
+            if of.lower().endswith(('.vpk','.vpk0')): of = noext(of)
+            writefile(of,decompress(readfile(i),'vpk0'))
+            return
 
     return 1

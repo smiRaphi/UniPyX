@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1015
+# Supported Formats: 1018
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -154,7 +154,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | Custom |
 
-## ROM Formats (68)
+## ROM Formats (70)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -166,6 +166,7 @@ C64 IMG | .img .dsk .c64 | [c1541](https://github.com/VICE-Team/svn-mirror) |
 C64 LiBRary | .lbr | [DirMaster](https://style64.org/dirmaster) |
 C64 Tape | .tap | [TAPClean](https://sourceforge.net/projects/tapclean/) |
 CPC Plus IMG | ??? | Custom |
+Doctor V64 ROM | .v64 .n64 | Custom |
 Donkey Kong Banana Kingdom | ??? | Custom |
 Dr. Mario 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Dr. Mario 64 decomp YAML](https://github.com/AngheloAlf/drmario64/tree/master/config) |
 Encrypted GD-ROM | .bin | Custom + [chdecrypt](https://github.com/JayFoxRox/Chihiro-Tools) |
@@ -210,6 +211,7 @@ SimpleFlashFS | .sffs | Custom |
 Snowboard Kids 2 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Snowboard Kids 2 decomp YAML](https://github.com/cdlewis/snowboardkids2-decomp) |
 SPS IPF | .ipf | [uaeunp](https://www.winuae.net/download/), [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 StudyBox IMG | .img | Custom |
+Super Smash Bros. N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [SSB Decomp YAML](https://github.com/VetriTheRetri/ssb-decomp-re) + Custom |
 Switch NCA | .nca | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Switch NSP | .nsp | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Switch XCI | .xci | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
@@ -358,7 +360,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (549)
+## Various (550)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -570,6 +572,7 @@ Goosebumps CFS | .cfs | [na_game_tool](https://nihav.org/game_tool.html) |
 Groove World Archive | .grv | Custom |
 Gwtar | .gwtar.html | Custom -> TAR |
 HAL Switch CMP | .cmp | Custom |
+HAL VPK0 | .vpk0 .vpk * | Custom |
 HAL XBIN | .bin * | Custom |
 HAL XBIN YAML | .bin | Custom |
 Haemimont Games HPK | .hpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -800,6 +803,7 @@ Siren 2 PAK | .pak | Custom |
 Siren 2 SLPK ROM | .slpk | Custom |
 Six Guns Encrypted Save | ` ` | Custom |
 Sky CoTL Preferences | .pref | Custom |
+Slayer Engine RPE | .rpe | Custom |
 SLUDGE Data File | .sludge | Custom |
 Smiles Fortune Hunters PAK | .pak | Custom |
 Smoking Car Productions Disk Cache | .hdf | Custom |
@@ -840,7 +844,6 @@ Team Ari Encrypted RGSSAD | .ari | Custom |
 Team17 EPF | .epf | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Teardown Encrypted | .tde | Custom |
 Temple of Elemental Evil DAT | .dat | Custom |
-The Da Vinci Code RPE | .rpe | Custom |
 The Indian In The Cupboard Data | .dta | Custom |
 The Learning Company MECC | .mdt | Custom |
 The Pagemaster DAT | .dat | Custom |

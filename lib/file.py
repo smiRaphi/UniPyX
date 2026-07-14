@@ -756,10 +756,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = uxx().decompress_lzss0_lsb(i[8:8+cs],usize=us)
             if kwargs.get('verify',True): asrt(len(r) == us)
             return r
-        case 'mio0'|'yay0'|'yaz0'|'vpk0':
+        case 'mio0'|'yay0'|'yaz0':
             import crunch64
             return getattr(crunch64,algo).decompress(i)
         case 'ash0': return uxx().decompress_ash0(i)
+        case 'vpk0': return uxx().decompress_vpk0(i)
         case 'camelot_blz': return uxx().decompress_camelot_blz(i,kwargs['usize'])
 
         case 'oodle'|'oodle_kraken'|'oodle_leviathan':
