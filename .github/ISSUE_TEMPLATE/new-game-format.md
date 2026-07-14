@@ -13,7 +13,7 @@ assignees: ''
 > Example (2002) (PS2/Xbox/GameCube)
 
 **Samples:**
-upload or insert links to samples, if your url is the entire game, specify which files are supposed to be added
+upload or insert links to samples (if available, always more than one), if your url is the entire game, specify which files are supposed to be added
 YOUR ISSUE WILL BE CLOSED IF THERE ARE NONE
 
 **Trivia:**
