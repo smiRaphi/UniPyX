@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1022
+# Supported Formats: 1023
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -360,7 +360,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (554)
+## Various (555)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -423,6 +423,8 @@ Bethesda BSA | .bsa | [BSA Browser](https://github.com/AlexxEG/BSA_Browser) |
 Bezel Archive | .bea | [vroom_scne.bms](https://mirror.aluigi.org/bms/vroom_scne.bms) |
 Bezel Shader Pack | ??? | Custom |
 BioWare Entity Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Black Lantern Studios DB | .db | Custom |
+Black Lantern Studios XPF | .xpf | Custom |
 Blade Runner TLK/MIX | .tlk .mix | Custom |
 Blitz Games Archive | ??? | [blitz_games.bms](https://mirror.aluigi.org/bms/blitz_games.bms) |
 Blitz Games PAK | .ps2 .xbp | Custom |
@@ -898,7 +900,6 @@ WayForward PAK | .pak | Custom |
 Westwood Encrypted MIX | .mix | Custom |
 Wii Exported Save Data | .bin | Custom |
 WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
-Wizards of a Waverly Place XPF | .xpf | Custom | no file names :c
 X-Files Resources | ??? | Custom |
 Xbox FArc | .fa | Custom |
 Xbox XB Compressed | .xb * | Custom |

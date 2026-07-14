@@ -1580,7 +1580,11 @@
     },
     {
         "d":[["isat","\\xF1\\xEE\\xDB\\xBA",0],["isat","\\x06\\0E\\0n\\0g\\0i\\0n\\0e\\0",5],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],23],["n0",1,4],["n0",4,19]],
-        "rs":"Wizards of a Waverly Place XPF","s":1
+        "rs":"Black Lantern Studios XPF","s":1
+    },
+    {
+        "d":[["size",[32,65536]],["ext",".db"],["isatS","\\0",8,0],["isatS","\\0",4,14],["isat","\\1",26],["n0",4,8],["py","f.seek(8);c=f.readi(4,'<');m={}\nfor _ in range(c):\n f.skip(2);o,u,x=f.readi(4,'<'),f.readi(4,'<'),f.readi(4,'<')\n if not u in m:m[u]=x\n elif m[u]!=x:return\n if f.readi(1)>1:return\nreturn o<fsz"]],
+        "rs":"Black Lantern Studios DB"
     },
     {
         "d":[["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07"],148],["isatS","\\0",4,132],["isatS","\\xFF",8,136],["isatS","\\0",3,149],["isatS","\\0",3,249],["n0",4,0],["py","c=f.readi(4,'<');f.seek(248);return not f.readi(1)&224 and (4+c*270)<=fsz"]],

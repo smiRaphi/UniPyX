@@ -64,9 +64,9 @@ class File:
             n += self.size
             if n < 0: n = 0
         return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
-    def seekc(self,n:int):
+    def seekc(self,n:int,whence=0):
         """Seek concat, usable in list comprehensions"""
-        self.seek(n)
+        self.seek(n,whence)
         return self
     def tell(self) -> int: return self._f.tell() - self._start_pos
     def close(self):
@@ -732,7 +732,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return getattr(uxx(),'decompress_' + algo)(i,usize=kwargs['usize'])
         case 'lz10'|'lz11'|'lz40'|'lz60':
             id,fnc = NLZC[algo]
-            asrt(i[0] == id)
+            asrt(i[0] == id,lambda:f'{i[0]:02X} != {id:02X} ({repr(i[:12])[2:-1]})')
             fnc = getattr(uxx(),fnc)
             us,i = int.from_bytes(i[1:4],'little'),i[4:]
             if not us: us,i = int.from_bytes(i[4:8],'little'),i[4:]

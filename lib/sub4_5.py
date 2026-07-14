@@ -1263,5 +1263,24 @@ def extract4_5(inp:str,out:str,t:str):
 
             fd.close()
             if fs: return
+        case 'Black Lantern Studios DB':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu64() == 0)
+
+            c = f.readu32()
+            do = 12 + c*15
+            fs = [(f.readu16(),f.readu32() + do,f.readu32(),f.seekc(4,1).readbool()) for _ in range(c)]
+
+            fs.sort(key=lambda x:x[1])
+            fs.append((0,f.size,0))
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe[1])
+                d = f.decompress(fs[ix+1][1] - fe[1],'lz11' if fe[3] else 'none',usize=fe[2])
+                writefile(f'{o}/{fe[0]}.{guess_ext_nds(d)}',d)
+
+            f.close()
+            if fs: return
 
     return 1

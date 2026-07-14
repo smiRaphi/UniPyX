@@ -1367,7 +1367,7 @@ def extract4_4(inp:str,out:str,t:str):
 
             f.close()
             if fns and fs: return
-        case 'Wizards of a Waverly Place XPF':
+        case 'Black Lantern Studios XPF':
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
@@ -1378,7 +1378,7 @@ def extract4_4(inp:str,out:str,t:str):
             for _ in range(vc):
                 n = f.readutf16(f.readu16())
                 vs[n] = f.readu32()
-                asrt(f.readu32() in {0,1},f.pos - 4)
+                f.readbool32()
             asrt('Engine' in vs)
 
             of = open(f'{o}/$header.txt','w',encoding='utf-8')
@@ -1396,22 +1396,21 @@ def extract4_4(inp:str,out:str,t:str):
                     asrt(f.readu32().bit_count() == 1,f.pos - 4)
                     ns[id] = f.readutf16(f.readu16())
 
+                fec = f.readu16()
                 if v >= 0x20:
-                    fec = f.readu16()
                     feo = f.pos
                     f.skip(fec * 8)
                     oc = f.readu16()
                     oo = f.pos
                 else:
-                    fec = f.readu16()
                     oc = f.readu16()
                     oo = f.pos
                     xc = 6
                     feo = oo + oc * (4+xc)
 
                 f.seek(feo)
-                fes = [(ix,f.readu16(),f.reads16(),f.readu32() + bp) for ix in range(fec)]
-                fo = min([x[3] for x in fes])
+                fes = [(ix,f.reads32(),f.readu32() + bp) for ix in range(fec)]
+                fo = min([x[2] for x in fes])
 
                 f.seek(oo)
                 if v >= 0x20:
@@ -1433,13 +1432,12 @@ def extract4_4(inp:str,out:str,t:str):
                 ordr = [fc + f.readu16() for _ in range(fc)]
                 fes = [(ix,f.readu16(),f.reads16(),f.readu32() + bp) for ix in range(fc)]
 
-            fes.sort(key=lambda x:x[3])
-            fes.append((0,0,0,f.size))
+            fes.sort(key=lambda x:x[2])
+            fes.append((0,0,f.size))
             for ix in range(len(fes)-1):
                 fe = fes[ix]
-                f.seek(fe[3])
-                asrt(fe[2] <= 0,f'{fe} {f.read(4)}')
-                d = f.decompress(fes[ix+1][3] - fe[3],'lz11' if fe[2] < 0 else 'none')
+                f.seek(fe[2])
+                d = f.decompress(fes[ix+1][2] - fe[2],'lz11' if fe[1] < 0 else 'none')
                 writefile(f'{o}/{fe[0]:03d}.{guess_ext_nds(d)}',d)
 
             f.close()
