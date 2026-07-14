@@ -882,7 +882,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                 break
             else: nts.append(xv['rs'])
     if f and hasattr(f,'_close'): f._close()
-    for opf in opfs:
+    for opf in opfs.values():
         if not opf.closed: opf._close()
     nts = list(set(nts))
     if not quiet and not nts: print(ts)

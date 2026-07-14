@@ -1109,6 +1109,7 @@ def _dec_utf0(i:bytes):
 
 _CODECS = (
     ('n64mpak',_enc_n64mp,_dec_n64mp),
+    ('ascii_mask',lambda i:(i.encode('ascii'),len(i)),lambda i:(bytes(x & 0x7F for x in i).decode('ascii'),len(i))),
     ('ascii7',_enc_ascii7,_dec_ascii7),
     ('utf_0','utf0',_enc_utf0,_dec_utf0),
 )

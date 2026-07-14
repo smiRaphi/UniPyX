@@ -1193,5 +1193,75 @@ def extract4_5(inp:str,out:str,t:str):
             if of.lower().endswith(('.vpk','.vpk0')): of = noext(of)
             writefile(of,decompress(readfile(i),'vpk0'))
             return
+        case 'L.A. Rush DIR+RES':
+            db.try_custom()
+            from lib.file import File
+            f = File(noext(i) + '.dir',endian='<')
+
+            c = f.readu32()
+            asrt(c & 0x80000000)
+            fd = File(noext(i) + '.res')
+            for _ in range(c & 0x7FFFFFFF):
+                fn = f.reads(0x20,'ascii').rstrip('\0')
+                for ix in range(3):
+                    fd.seek(f.readu32())
+                    writefile(f'{o}/{fn}.{ix}',fd.readc(f.readu32()))
+
+            f.close()
+            fd.close()
+            if listdir(o): return
+        case 'L.A. Rush Compressed':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'k9CP')
+
+            us = f.readu32()
+            f.skip(4)
+            writefile(o + '/' + tbasename(i),f.decompress(None,'zlib',usize=us))
+            f.close()
+            return
+        case 'L.A. Rush AClump':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu64() == 0)
+
+            fs = []
+            off = f.size
+            while f < off:
+                fe = (f.readu32(),f.readu32())
+                if fe[0] == 0: break
+                off = min(off,fe[0])
+                fs.append(fe)
+
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                writefile(f'{o}/{ix}.bin',f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Pitbull Syndciate BigFile IDX+BIN':
+            db.try_custom()
+            from lib.file import File
+            f = File(noext(i) + '.idx',endian='<')
+            fd = File(noext(i) + '.bin',endian='<')
+            asrt(fd.read(0x1B) == b'BigFileHeader for BigFile V')
+
+            fd.seek(0)
+            writefile(o + '/$comment.txt',fd.read(0x800).split(b'\0')[0])
+
+            fs = [(f.reads(0x18,'ascii_mask').rstrip('\0'),f.readu32(),f.readu32()) for _ in range(f.size // 0x20)]
+            f.close()
+            ds = [x for x in fs if x[1] == 0]
+            ds.append((0,0,len(fs)))
+            for ix,de in enumerate(ds[:-1]):
+                for fix in range(de[2],ds[ix+1][2]):
+                    fe = fs[fix]
+                    fd.seek(fe[1] * 0x800)
+                    writefile(f'{o}/{de[0]}/{fe[0]}',fd.readc(fe[2]))
+
+            fd.close()
+            if fs: return
 
     return 1

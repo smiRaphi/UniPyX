@@ -655,6 +655,24 @@
         "rs":"Super Smash Bros Ultimate ARC","s":1
     },
     {
+        "d":[["s%",512],["ext",".dir"],["n0",4,0],["str0",4,32,2],["py","if not exists(splitext(inp)[0]+'.res'):return\nc=f.readi(4,'<')\nif not c>>31:return\nc=4+(c&0x7FFFFFFF)*56;return (c+-c%512)==fsz"]],
+        "rs":"L.A. Rush DIR+RES"
+    },
+    {
+        "d":[["isat","k9CP",0],["isat","x",12],["isin",["\\0\\0\\0\\0","\\1\\0\\0\\0"],8],["isin",["\\x01","\\x5E","\\x9C","\\xDA"],13],["n0",4,4]],
+        "rs":"L.A. Rush Compressed","s":1
+    },
+    {
+        "d":[["s%",2048],["isatS","\\0",8,0],["n0",4,8],["py","f.seek(8);o,s=f.readi(4,'<'),f.readi(4,'<');return not o%2048 and not s%2048 and (o+s)==fsz"]],
+        "rs":"L.A. Rush AClump"
+    },
+    {
+        "d":[["s%",32],["ext",".idx"],["isatS","\\0",4,24],["str0",0,24,4],["py","return exists(splitext(inp)[0]+'.bin') and open(splitext(inp)[0]+'.bin','rb').read(27)==b'BigFileHeader for BigFile V'"]],
+        "rs":"Pitbull Syndciate BigFile IDX+BIN","s":1},{
+        "d":[["s%",2048],["ext",".bin"],["isat","BigFileHeader for BigFile V",0],["py","return exists(splitext(inp)[0]+'.idx') and not getsize(splitext(inp)[0]+'.idx')%32"]],
+        "rs":"Pitbull Syndciate BigFile IDX+BIN","s":1
+    },
+    {
         "d":[["isat","ONEPACK\\0",0],["n0",8,8]],
         "rs":"Trinity OnePack","s":1},{
         "d":[["ext",".trpfd"],["n0",8,0],["py","p=splitext(inp)[0]+'.trpfs';return exists(p)and open(p,'rb').read(8)==b'ONEPACK\\0'"]],
