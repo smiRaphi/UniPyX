@@ -1518,6 +1518,10 @@
         "rs":"Hatch Game Engine HMAP","s":1
     },
     {
+        "d":[["s%",32],["isatS","\\xCD",8,24],["isatS","\\xFF",4,50],["isatS","\\xCD",10,54],["n0",4,8],["n0",4,20],["n0",4,36],["py","f.seek(8);c=f.readi(4,'<');f.seek(20);o=f.read(4);f.seek(32);return (32+c*32)==f.readi(4,'<') and f.read(4)==o"]],
+        "rs":"Snail Mail DAW"
+    },
+    {
         "d":[["s%",2048],["isat","\\1\\0\\0\\0",0],["isat","\\0",64],["isatS","\\0",24,8],["n0",4,4],["n0",4,64],["str0",32,8,1],["py","f.seek(4);c=32+f.readi(4,'<')*44;f.seek(64);return (c+-c%2048)==f.readi(4,'<')"]],
         "rs":"Slayer Engine RPE"
     },

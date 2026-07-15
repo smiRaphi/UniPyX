@@ -1282,5 +1282,30 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Snail Mail DAW':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(8)
+            c = f.readu32()
+            f.align(0x20)
+            fs = []
+            for _ in range(c):
+                fs.append((f.readu32(),f.readu32(),f.readu32(),f.readu32()))
+                f.align(0x20)
+
+            for fe in fs:
+                f.seek(fe[0])
+                fn = o + '/' + f.read0s('ascii')
+                if fn[-1] in '/\\' and fe[3] == fe[2] == 0: mkdir(fn)
+                else:
+                    f.seek(fe[1])
+                    if fe[3]: d = f.decompress(fe[3],'lz11',usize=fe[2])
+                    else: d = f.readc(fe[2])
+                    writefile(fn,d)
+
+            f.close()
+            if fs: return
 
     return 1

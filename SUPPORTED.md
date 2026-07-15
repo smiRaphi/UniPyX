@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1023
+# Supported Formats: 1024
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -360,7 +360,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (555)
+## Various (556)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -813,6 +813,7 @@ Slayer Engine RPE | .rpe | Custom |
 SLUDGE Data File | .sludge | Custom |
 Smiles Fortune Hunters PAK | .pak | Custom |
 Smoking Car Productions Disk Cache | .hdf | Custom |
+Snail Mail DAW | .daw | Custom |
 Snoopy Vs. The Red Baron X | .xpc .xps | Custom |
 Sonic AMB | .amb | Custom |
 Sonic BINA | * | Custom |

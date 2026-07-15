@@ -405,7 +405,17 @@ def extract2(inp:str,out:str,t:str) -> bool:
                             break
                     else: raise ValueError('No valid key found')
                     inf.close();ouf.close()
-                else: copy(fi,fo)
+                elif getsize(fi) == c.csize: copy(fi,fo)
+                else:
+                    inf,ouf = open(fi,'rb'),open(fo,'wb')
+                    ol = 0
+                    while ol < c.csize:
+                        p = inf.read(1024**2)
+                        if not p: break
+                        ol += len(p)
+                        if ol > c.csize: p = p[:c.csize - ol]
+                        ouf.write(p)
+                    inf.close();ouf.close()
 
                 od = readfile(fo,size=0x800)
                 if cns == 'w':
