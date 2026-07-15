@@ -1654,6 +1654,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     rob.append(f'otpauth://{TYPM[b["t"]]}/{b["n"]}?' + '&'.join(par))
                 writefile(o + '/otpauth.txt','\n'.join(rob),'w')
                 return
+        case 'FreeArc':
+            run(['unarc','x','-o+','-dp' + o,i])
+            if listdir(o): return
 
     return 1
 

@@ -74,13 +74,10 @@ EXPORT ssize_t decompress_lz10_raw(const uint8_t *restrict src, const size_t zsi
     int fbl = 0;
 
     #define CHKi(n) if (ip + (n) >= zsize) goto eof;
-    #define CHKo(n) if (usize != -1 && op + (n) >= usize) goto eof;
 
-    while (usize == -1 || op < usize) {
-        CHKi(0);
+    while (ip < zsize && (usize == -1 || op < usize)) {
         if (fbl <= 0) {
             f = src[ip++];
-            CHKi(0);
             fbl = 8;
         }
 
@@ -90,21 +87,17 @@ EXPORT ssize_t decompress_lz10_raw(const uint8_t *restrict src, const size_t zsi
             uint8_t b2 = src[ip++];
             uint16_t dist = (((b1 & 0x0F) << 8) | b2) + 1;
             uint8_t lng = (b1 >> 4) + 3;
-            if (dist < lng && dist != 0) lng = dist;
+            if (dist > op) return -1;
             if (op + lng > usize) lng = usize - op;
-            for (int i=0;i < lng;i++,op++) {
-                CHKi(0);CHKo(0);
-                dst[op] = dst[(op - dist) & 0xFFF];
-            }
-        } else {
-            CHKo(0);
-            dst[op++] = src[ip++];
-        }
+            for (int i=0;i < lng;i++,op++) dst[op] = dst[op - dist];
+        } else dst[op++] = src[ip++];
+
+        fbl--;
+        f <<= 1;
     }
 
 eof:
     #undef CHKi
-    #undef CHKo
     return op;
 }
 EXPORT ssize_t decompress_lz11_raw(const uint8_t *restrict src, const size_t zsize,

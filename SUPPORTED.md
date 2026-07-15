@@ -2,7 +2,7 @@
 
 # Supported Formats: 1023
 
-## "Common" Archives/Compressors/Encodings (148)
+## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -85,6 +85,7 @@ FastLZ | .fastlz | [FastLZ](https://github.com/ariya/FastLZ) |
 FDCOPY CFI IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
 File Imploder | .imp | [Ancient](https://github.com/temisu/ancient) |
 Floppy Image | .img .dsk | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
+FreeArc | .arc .bin | [unarc](https://sourceforge.net/projects/freearc/) |
 Freeze Compressed | .frz | [Ancient](https://github.com/temisu/ancient) |
 FVL0 Compressed | .fvl | [Ancient](https://github.com/temisu/ancient) |
 GEM Resource | .gem | [deark](https://entropymine.com/deark/) |
@@ -228,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (127)
+## Executables/Packers/Installers (126)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -284,7 +285,6 @@ EXECUTRIX-COMPRESSOR | .exe .com | [CUP386](https://github.com/Sembiance/dexvert
 ExeLITE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 EXEPACK | .exe .com | [deark](https://github.com/activescott/deark) |
 Fatpack | .exe | Custom |
-FreeArc | .arc | [unarc](https://sourceforge.net/projects/freearc/) |
 GameCube DOLXZ | .dol | Custom |
 GPEComp | .elf ` ` | Custom |
 Godot Game | .exe | [GDRETools](https://github.com/GDRETools/gdsdecomp) |
@@ -872,7 +872,7 @@ Trinity PAK | .trpak | Custom |
 Tsunami Media RLB | .rlb | [na_game_tool](https://nihav.org/game_tool.html) |
 TTGames DAT | .dat | [ttgames.bms](https://mirror.aluigi.org/bms/ttgames.bms) |
 Typing of the Dead HAB | .hab | Custom |
-U8 | .arc | [WSZST](https://szs.wiimm.de/) |
+U8 | .arc .u8 | Custom |
 uBlock Origin Config Backup | .json | Custom |
 UE Text Resource | ??? | Custom |
 UE3 Package | .pak .upk .xxx | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |

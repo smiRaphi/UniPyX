@@ -1,6 +1,6 @@
 from .main import *
 
-NINARC = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
+NINARC = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive',b'U\xAA8\x2D':'U8'}
 
 def extract4(inp:str,out:str,t:str) -> bool:
     run = db.run
@@ -29,7 +29,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             }[t])
 
             if d[:4] in NINARC:
-                tf = f'{o}\\tmp{os.urandom(6).hex()}.{d[:4].decode().lower()}'
+                tf = f'{o}\\tmp{os.urandom(6).hex()}.bin'
                 writefile(tf,d)
                 r = extract(tf,o,NINARC[d[:4]])
                 if r: mv(tf,o + '/' + tbasename(i))
@@ -41,7 +41,37 @@ def extract4(inp:str,out:str,t:str) -> bool:
             else: writefile(o + '/' + tbasename(i),d)
             del d
             return
-        case 'U8'|'RARC':
+        case 'U8':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.read(4) == b'U\xAA8\x2D')
+
+            ro = f.readu32()
+            f.seek(ro)
+            if f.peek('u8') == 1: nc = f.peek('u32',poffset=8)
+            else: nc = 1
+            ns = [(f.readu8(),f.readu24(),f.readu32(),f.readu32()) for _ in range(nc)]
+            so = f.pos
+
+            ds = {}
+            for ix,ne in enumerate(ns):
+                f.seek(so + ne[1])
+                n = f.read0s('utf-8')
+                for dn,dei in ds.items():
+                    if dei >= ix: n = dn + '/' + n
+                n = o + '/' + n
+                if ne[0] == 1:
+                    ds[basename(n)] = ne[3]
+                    mkdir(n)
+                elif ne[0] == 0:
+                    f.seek(ne[2])
+                    writefile(n,f.readc(ne[3]))
+                else: raise NotImplementedError(ne)
+
+            f.close()
+            if ns: return
+        case 'RARC':
             run(['wszst','X',i,'-M','2g','-B','-B','-o','-E$','-d',o])
             remove(o + '/wszst-setup.txt')
             if listdir(o): return

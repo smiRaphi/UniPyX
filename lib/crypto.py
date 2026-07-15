@@ -394,6 +394,14 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 import base64
                 return base64.b64encode(bn).decode('latin-1')
             return bn
+        case 'tmd_secret':
+            asrt(isinstance(i,int) and isinstance(key,int))
+            o = bytearray()
+            add = key + i
+            for _ in range(i):
+                o.append(key.to_bytes(8,'big',signed=True)[7])
+                key,add = key + add,key
+            return bytes(o)
 
         case 'hex':
             r = i.hex()

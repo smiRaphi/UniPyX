@@ -205,7 +205,7 @@
     },
     {
         "rqr":null,
-        "d":[["n0",4,0],["n0",4,4],["str0",12,15,1],["isin",["\\0","\\1","\\2"],27],["py","from zlib import crc32;m=f.readi(4,'<');c=f.readi(4,'<');return crc32(f.read(m*32))==c"]],
+        "d":[["n0",4,0],["n0",4,4],["str0",12,15,1],["isin",["\\0","\\1","\\2"],27],["py","m=f.readi(4,'<');c=f.readi(4,'<')\nif (8+m*32)>fsz:return\nfrom zlib import crc32;return crc32(f.read(m*32))==c"]],
         "rs":"CP Shrink","s":1
     },
     {

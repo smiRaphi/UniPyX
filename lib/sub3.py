@@ -409,9 +409,6 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 ti.destroy()
                 raise NotImplementedError("iscab returned:\n" + e)
             ti.destroy()
-        case 'FreeArc':
-            run(['unarc','x','-o+','-dp' + o,i])
-            if listdir(o): return
         case 'Big EXE':
             ts = getsize(i)
             f = open(i,'rb')

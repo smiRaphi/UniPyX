@@ -357,113 +357,70 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if exists(o + '/IP.BIN') and SGKeys().get(o): return extract(o + '\\IP.BIN',o,'Encrypted GD-ROM')
                 return
         case 'Nintendo TMD':
-            ckeys = db.get('tmd_keys') + '/'
-
             db.try_custom()
-            from bin.tmd import TMD,Ticket,PWDS,derive_key,decrypt_content,unscramble_3ds
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt,encrypt,crc_hash
+            if isdir(i): dr = i
+            else: dr = dirname(i)
+            ifs = [x.lower() for x in listdir(dr) if isfile(dr + '/' + x)]
 
-            dr = dirname(i)
-            dls = [x for x in listdir(dr) if isfile(dr + '/' + x)]
-            if 'tmd' in dls: tmd = 'tmd'
-            else: tmd = max([x for x in dls if x.startswith('tmd.')],key=lambda x:int(x.split('.')[-1]))
-            tmd = TMD(dr + '/' + tmd)
+            if 'tmd' in ifs: tmd = 'tmd'
+            else: tmd = max([x for x in ifs if x.startswith('tmd.')],key=lambda x:int(x.split('.')[-1]))
+            tmd = Nintendo(db).parse_tmd(dr + '/' + tmd)
 
-            if tmd.sigt == 1 and tmd.version == 0: cns = 'w'
-            elif tmd.sigt in {3,4,5} and tmd.version == 1: cns = '3'
-            else: raise NotImplementedError(f'{tmd.signature.type:4X} {tmd.version}')
+            if tmd.signature.type & 0xFF == 1 and tmd.version == 0: cns = 'w'
+            else: raise NotImplementedError(f'{tmd.signature.type:06X} {tmd.version}')
 
-            if exists(dr + '/cetk'):
-                cetk = Ticket(dr + '/cetk')
-                if cns == 'w':
-                    if not exists(ckeys + 'wii-common.key'):
-                        s = db.c.get('https://wiki.wiidatabase.de/wiki/Common-Key').text
-                        for r,k in [('Normal','common'),
-                                    ('Korea' ,'korea' ),
-                                    ('Debug' ,'debug' )]:
-                            writefile(ckeys + f'wii-{k}.key',bytes.fromhex(re.search(f'<b>{r}:</b> *<code>([^<]+)</code>',s)[1]))
-                    cetk.ckey = readfile(ckeys + f'wii-{["common","korea","debug"][cetk.ckeyindex]}.key')
-                elif cns == '3':
-                    if not exists(ckeys + '3ds-generator.key'):
-                        s = db.c.get('https://raw.githubusercontent.com/Kc57/ntool/refs/heads/master/lib/keys.py').text
-                        writefile(ckeys + '3ds-generator.key',bytes.fromhex(re.search(r'\) *\+ *0x([\da-fA-F]{32}), *87, *128\)',s)[1]))
-
-                        x3d = re.search(r'KeyX0x3D *= *\(0x([\da-fA-F]{32}), *0x([\da-fA-F]{32})\)',s)
-                        writefile(ckeys + '3ds-3Dx.key',bytes.fromhex(x3d[1]))
-                        writefile(ckeys + '3ds-dev-3Dx.key',bytes.fromhex(x3d[2]))
-
-                        y3d = re.search(r'KeyY0x3D *= *\(\s*((?:\(0x[\da-fA-F]{32}, *0x[\da-fA-F]{32}\),?\s*)+)\)\n',s)[1]
-                        y3dr = []
-                        y3dd = []
-                        for r,d in re.findall(r'\(0x([\da-fA-F]{32}), *0x([\da-fA-F]{32})\)',y3d):
-                            y3dr.append(bytes.fromhex(r))
-                            y3dd.append(bytes.fromhex(d))
-
-                        writefile(ckeys + '3ds-3Dy.key',b''.join(y3dr))
-                        writefile(ckeys + '3ds-dev-3Dy.key',b''.join(y3dd))
-
-                    g3d = readfile(ckeys + '3ds-generator.key')
-                    x3d = readfile(ckeys + '3ds-3Dx.key')
-                    y3d = open(ckeys + '3ds-3Dy.key','rb')
-                    y3d.seek(0x10 * cetk.ckeyindex)
-                    y3d = y3d.read(0x10)
-                    cetk.ckey = unscramble_3ds(x3d,y3d,g3d)
-            else: cetk = None
-
+            db.set_temp_print(False)
+            pids = list(range(len(keys.wait()['tmd']['p'])))
+            sec = encrypt(10,'tmd_secret',keys['tmd']['s'])
+            if cns == 'w': pids.remove(1);pids.insert(0,1)
+            #elif cns == '3': pids.remove(0);pids.insert(0,0)
+            tmd.contents.sort(key=lambda x:x.csize) # smallest first for faster key guessing
             for c in tmd.contents:
-                fn = hex(c.cid)[2:].zfill(8)
-                odr = o + '/' + fn
-                ifl = dr + '/' + fn
+                fn = f'{c.cid:08X}'
+                fi,fo = dr + '/' + fn,o + '/' + fn
 
                 if c.type & 1:
-                    tf = TmpFile()
-                    pwids = list(range(len(PWDS)))
-                    if cns == 'w':
-                        pwids.remove(1)
-                        pwids.insert(0,1)
-                    # elif cns == '3': pwids.insert(0,0)
-                    for ix in [-1] + pwids:
-                        if ix == -1:
-                            if cetk is None: continue
-                            k = cetk.get_key()
-                        else: k = derive_key(tmd.titleid,ix)
-                        decrypt_content(ifl,tf,k,c)
-                        if tmd.check_file(tf,c.sha): break
-                    else: raise Exception
-                    ifl = str(tf)
+                    inf,ouf = open(fi,'rb'),open(fo,'wb')
+                    tid = crc_hash(sec + (tmd.title_id.to_bytes(8,'big').lstrip(b'\0') or b'\0'),'md5',bytes=True)
+                    for ix in pids:
+                        aes = decrypt(None,'aes_cbc',encrypt(keys['tmd']['p'][ix],'pbkdf2_sha1',tid,0x14,size=0x10),
+                                                     c.index.to_bytes(2,'big') + bytes(14))
+                        hsh = crc_hash(None,('sha1','sha256')[tmd.version])
+                        inf.seek(0)
+                        ol = 0
+                        while ol < c.csize:
+                            p = inf.read(1024**2)
+                            if not p: break
+                            d = aes.decrypt(p + bytes(-len(p) % 0x40))
+                            ol += len(d)
+                            if ol > c.csize: d = d[:c.csize - ol]
+                            hsh.update(d)
+                            ouf.write(d)
 
+                        if hsh.digest() == c.sha:
+                            if pids[0] != ix: pids.remove(ix);pids.insert(0,ix)
+                            break
+                    else: raise ValueError('No valid key found')
+                    inf.close();ouf.close()
+                else: copy(fi,fo)
+
+                od = readfile(fo,size=0x800)
                 if cns == 'w':
-                    if c.type == 2: copy(ifl,o + '/CAFEDEAD.bin')
+                    if c.type == 2: mv(fo,o + '/CAFEDEAD.bin')
                     elif c.type & 0x8000:
-                        if extract(ifl,o + '/$SHARED','U8'): copy(ifl,o + '/$SHARED/' + fn + '.bin')
-                    elif c.index == 0 and tmd.titleid == b'\0\0\0\1\0\0\0\2': copy(ifl,o + '/build_tag.bin')
-                    elif c.index == 0: copy(ifl,o + '/banner.bnr')
-                    elif c.index == 1: copy(ifl,o + '/launch.dol')
-                    elif tmd.bootindex == c.index: copy(ifl,o + '/boot.dol')
-                    else:
-                        if open(ifl,'rb').read(4) == b'U\xAA8\x2D':
-                            if extract(ifl,odr,'U8'): copy(ifl,odr + '.bin')
-                        else: copy(ifl,odr + '.bin')
-                elif cns == '3':
-                    if c.type & 0x4000: copy(ifl,odr + '.dlc')
-                    elif c.index == 0 and tmd.srl_flag:
-                        if extract2(ifl,odr,'NDS'): copy(ifl,odr + '.srl')
-                    elif c.index == 0:
-                        f = open(ifl,'rb')
-                        f.seek(0x100)
-                        ncch = f.read(4) == b'NCCH'
-                        f.seek(0x208)
-                        cxi = ncch and f.read(4) == b'\0\0\0\0'
-                        f.seek(0x560)
-                        cxi = cxi and f.read(0x10) == (b'\xFF'*0x10)
-                        f.close()
-                        if cxi:
-                            if extract(ifl,odr,'NCCH CXI'): copy(ifl,odr + '.cxi')
-                        elif ncch:
-                            if extract(ifl,odr,'NCCH CFA'): copy(ifl,odr + '.cfa')
-                        else: copy(ifl,odr + '.bin')
-                    elif c.index in {1,2}:
-                        if extract2(ifl,odr,'NCCH CFA'): copy(ifl,odr + '.cfa')
-                    else: copy(ifl,odr + '.bin')
+                        mv(fo,f'{o}/shared_{fn}.arc')
+                        extract(f'{o}/shared_{fn}.arc',o + '/shared','U8')
+                    elif c.index == 0 and tmd.title_id == 0x0100000002: mv(fo,o + '/build_tag.bin')
+                    elif c.index == 0: mv(fo,o + '/banner.bnr')
+                    elif c.index == 1: mv(fo,o + '/launch.dol')
+                    elif tmd.boot_index == c.index: mv(fo,o + '/boot.dol')
+                    elif od[:4] == b'U\xAA8\x2D':
+                        mv(fo,fo + '.arc')
+                        extract(fo + '.arc',fo,'U8')
+            db.reset_temp_print()
             return
         case '3DO IMG':
             run(['3dt','unpack','-o',o,i])
@@ -1580,7 +1537,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
     return 1
 
-@namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt'])
+@namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt','parse_tmd','parse_tmd_tik'])
 def _Nintendo(db):
     from lib.file import File,FileStruct
     from lib.crypto import decrypt,crc_hash
@@ -1634,6 +1591,120 @@ def _Nintendo(db):
             key = AmiiboKey(readfile(db.get('amiibo_retail_key'),size=0x50))
         key,iv,_ = amiibo_derive_key(key,amiibo_raw2base(raw))
         return decrypt(raw.enc1 + raw.enc2 + raw.enc3,'aes_ctr',key,iv)
+
+    def parse_tmd_sig(d:bytes):
+        f = File(d,endian='>')
+        r = Empty()
+        r.type = f.readu32()
+        match r.type:
+            case 0x010000|0x010003: d,p = 0x200,0x3C
+            case 0x010001|0x010004: d,p = 0x100,0x3C
+            case 0x010002|0x010005: d,p = 0x3C,0x40
+            case _: raise Exception(f'Unknown signature type: {r.type:06X}')
+        r.value = f.readc(d)
+        r.padding = f.readc(p)
+        return r
+    def parse_tmd_cert(d:bytes):
+        f = File(d,endian='>')
+        r = Empty()
+        r.signature = parse_tmd_sig(f)
+        r.issuer = f.readc(0x40)
+        r.type = f.readu32()
+        r.name = f.readc(0x40)
+        r.date = f.readu32('<')
+        r.modulus = f.readc((0x200,0x100,0x3C)[r.type])
+        if r.type in {0,1}: r.exponent = f.readu32()
+        r.padding = f.readc((0x34,0x34,0x3C)[r.type])
+        return r
+    class TMDInfo(FileStruct):
+        _ENDIAN = '>'
+        cid:'u16'
+        ccc:'u16'
+        sha256:bytes = 0x20
+    def parse_tmd_content(d:bytes,version:int):
+        f = File(d,endian='>')
+        r = Empty()
+        r.cid = f.readu32()
+        r.index = f.readu16()
+        r.type = f.readu16()
+        r.csize = f.readu64()
+        r.sha = f.readc((0x14,0x20)[version])
+        return r
+    def parse_tmd(d:bytes):
+        f = File(d,endian='>')
+        r = Empty()
+
+        r.signature = parse_tmd_sig(f)
+        r.issuer = f.readc(0x40)
+        r.version = f.readu8()
+        r.ca_crl_version = f.readu8()
+        r.signed_crl_version = f.readu8()
+        r.is_vwii = f.readbool()
+        r.system_version = f.readu64()
+        r.title_id = f.readu64()
+        r.type = f.readu32()
+        r.group_id = f.readu16()
+
+        if r.version == 1:
+            r.save_data_size = f.readu32('<')
+            r.srl_private_size = f.readu32('<')
+            r.reserved1 = f.read(4)
+            r.srl_flag = f.readu8()
+            r.reserved2 = f.read(0x31)
+        else:
+            r.zero1 = f.read(2)
+            r.region = f.readu16()
+            r.ratings = f.readc(0x10)
+            r.reserved1 = f.read(12)
+            r.ipc_mask = f.readc(12)
+            r.reserved2 = f.read(0x12)
+
+        r.access_rights = f.readu32()
+        r.title_version = f.readu16()
+        r.content_count = f.readu16()
+        r.boot_index = f.readu16()
+        r.minor_version = f.readu16()
+
+        if r.version == 1:
+            r.sha256 = f.readc(0x20)
+            r.content_info = [TMDInfo(f) for _ in range(0x40)]
+        r.contents = [parse_tmd_content(f,r.version) for _ in range(r.content_count)]
+        r.certificates = [parse_tmd_cert(f) for _ in range(2)]
+        return r
+    def parse_tmd_tik(d:bytes):
+        f = File(d,endian='>')
+        r = Empty()
+
+        r.signature = parse_tmd_sig(f)
+        r.issuer = f.readc(0x40)
+        r.ecdhdata = f.readc(0x3C)
+        r.version = f.readu8()
+        r.ca_crl_version = f.readu8()
+        r.signed_crl_version = f.readu8()
+        r.title_key = f.readc(0x10)
+        r.reserved1 = f.read(1)
+        r.ticked_id = f.readu64()
+        r.console_id = f.readu32()
+        r.title_id = f.readu64()
+        r.reserved2 = f.read(2)
+        r.title_version = f.readu16()
+        r.permitted_titles_mask = f.readu32()
+        r.permit_mask = f.readu32()
+        r.export_allowed = f.readu8()
+        r.ckey_index = f.readu8()
+        r.reserved3 = f.read(0x2A)
+        r.eshop_acc_id = f.readu32()
+        r.reserved4 = f.read(1)
+        r.audit = f.readu8()
+        r.content_access_permissions = f.readc(0x40)
+        r.reserved5 = f.read(2)
+        r.limits = f.readc(0x40)
+
+        if r.version == 1:
+            r.content_index_size = f.peek('u32',poffset=4)
+            r.content_index = f.readc(r.content_index_size)
+        r.certificates = [parse_tmd_cert(f) for _ in range(2)]
+        return r
 
     _NXPKEYS = None
     _NXDKEYS = None

@@ -245,7 +245,7 @@ class File:
             self.write(p)
     def peek(self,fnc,*args,poffset=0,**kwargs):
         if isinstance(fnc,str):
-            if fnc in {'u8','s8','u16','s16','u24','s24','u32','s32','u40','s40','u48','s48','u64','s64','u128','s128','f16','f32','f64'}: fnc = ('write' if 'w' in self.mode else 'read') + fnc
+            if fnc in {'u8','s8','u16','s16','u24','s24','u32','s32','u40','s40','u48','s48','u64','s64','u128','s128','f16','f32','f64','bool','bool32'}: fnc = ('write' if 'w' in self.mode else 'read') + fnc
             fnc = getattr(self,fnc)
         elif isinstance(fnc,int):
             args = (fnc,)

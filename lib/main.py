@@ -1184,7 +1184,7 @@ def guess_ext_wii(d:bytes):
 
     if d[:4] == b'\0\x20\xAF\x30': ext = 'tpl'
     elif d[:4] == b'bres': ext = 'bres'
-    elif d[:4] == b'\x55\xAA\x38\x2D': ext = 'u8'
+    elif d[:4] == b'\x55\xAA\x38\x2D': ext = 'arc'
     elif d[:4] == b'RLYT': ext = 'brlyt'
     else: ext = guess_ext(d)
 

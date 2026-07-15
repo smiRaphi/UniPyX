@@ -227,7 +227,8 @@
         "www.netopsystems.com"
     ],
     "FreeArc":[
-        "freearc compressed archive"
+        "freearc compressed archive",
+        "freearc archive <http://freearc.org>"
     ],
     "Windows Help File":[
         "windows help file"
@@ -1637,5 +1638,8 @@
     ],
     "Doctor V64 ROM":[
         "doctor v64 rom dump"
+    ],
+    "Storm Region PAK":[
+        "storm region game data archive"
     ]
 }
