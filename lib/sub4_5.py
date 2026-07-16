@@ -1307,5 +1307,58 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Legaia 2 DIR+BIN':
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt
+            from lib.file import File
+
+            bn = noext(i)
+            asrt(exists(bn + '.bin'))
+            fds = [open(bn + '.bin','rb')]
+            for ix in range(1,10):
+                if not exists(f'{bn}{ix}.bin'): break
+                fds.append(open(f'{bn}{ix}.bin','rb'))
+            fds = [(fd,fd.seek(0,2)) for fd in fds]
+            f = File(decrypt(readfile(i),'legaia2',keys.wait()['legaia2']),endian='<')
+
+            exts = [f.reads(4,'ascii').lstrip('\0')[::-1] for _ in range(0x40)]
+            def readd(p:str=None):
+                n = f.reads(8,'ascii').lstrip('\0')[::-1]
+                dc,fc = f.readu16(),f.readu16()
+                ep = f.readu32() * 0x10 + f.pos
+
+                if p is None and n == 'ROOT': p = o
+                else: p = p + '/' + n
+                mkdir(p)
+
+                for _ in range(fc):
+                    n = f.reads(8,'ascii').lstrip('\0')[::-1]
+                    ex = exts[f.readu16()]
+                    if ex: n += '.' + ex
+                    sz = f.readu16() * 0x800
+                    off = f.readu32() * 0x800
+
+                    for ix,fd in enumerate(fds):
+                        if off <= fd[1]:
+                            fdp = ix
+                            break
+                        else: off -= fd[1]
+                    else: raise ValueError(f'Offset too big for all files ({len(fds)}, 0x{off:08X})')
+
+                    fds[fdp][0].seek(off)
+                    d = fds[fdp][0].read(sz)
+                    if len(d) != sz:
+                        fds[fdp + 1][0].seek(0)
+                        d += fds[fdp + 1][0].read(sz - len(d))
+                    writefile(p + '/' + n,d)
+                for _ in range(dc): readd(p)
+                f.seek(ep)
+
+            readd()
+            f.close()
+            for fd in fds: fd[0].close()
+            if listdir(o): return
 
     return 1

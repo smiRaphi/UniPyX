@@ -495,6 +495,13 @@ EXPORT int8_t decrypt_zipd(uint8_t *restrict buf, const size_t size) {
     for (size_t p=0;p < size;p++) buf[p] ^= (s = micro_c_rand(s));
     return 0;
 }
+EXPORT void decrypt_legaia2(uint32_t *restrict buf, const size_t size, const uint32_t key) {
+    uint32_t k = key * ((buf[1] & 0xFFFF) ^ (buf[1] >> 16));
+    for (size_t p=4;p < size / 4;p++) {
+        buf[p] ^= k;
+        k = k * 5 + 1;
+    }
+}
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
     return t[0x100 * x + buf[x]];

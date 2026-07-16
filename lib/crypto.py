@@ -310,6 +310,11 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'camelot_xor': return uxx().decrypt_camelot_xor(i,key)
         case 'camelot_rand': return uxx().decrypt_camelot_rand(i,key,iv,drop=kwargs.get('drop',0))
         case 'zipd': return uxx().decrypt_zipd(i)
+        case 'legaia2':
+            if isinstance(key,bytes):
+                asrt(0 < len(key) <= 4)
+                key = int.from_bytes(key,'little')
+            return uxx().decrypt_legaia2(i,key)
 
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)

@@ -1522,6 +1522,10 @@
         "rs":"Snail Mail DAW"
     },
     {
+        "d":[["size",[304,1048832]],["s%",16],["ext",".dir"],["isat","\\2\\0\\0\\0",0],["isatS","\\0",8,8],["n0",1,16],["n0",1,17],["n0",1,18],["n0",1,19],["py","return exists(splitext(inp)[0]+'.bin')"]],
+        "rs":"Legaia 2 DIR+BIN"
+    },
+    {
         "d":[["s%",2048],["isat","\\1\\0\\0\\0",0],["isat","\\0",64],["isatS","\\0",24,8],["n0",4,4],["n0",4,64],["str0",32,8,1],["py","f.seek(4);c=32+f.readi(4,'<')*44;f.seek(64);return (c+-c%2048)==f.readi(4,'<')"]],
         "rs":"Slayer Engine RPE"
     },

@@ -141,6 +141,7 @@ class X:
             ('decrypt_camelot_xor',(P(u8),szt,u8),void,0),
             ('decrypt_camelot_rand',(P(u8),szt,u8,u32,szt),void,0),
             ('decrypt_zipd',(P(u8),szt),s8,0),
+            ('decrypt_legaia2',(P(u8),szt,u32),void,0),
             ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
@@ -510,6 +511,11 @@ class X:
         r = self.dll.decrypt_zipd(b,len(src))
         if r != 0: raise ValueError(f'Decryption failed ({r})')
         return bytes(b)[7:]
+    def decrypt_legaia2(self,src:bytes,key:int) -> bytes:
+        asrt(not len(src) % 4 and src[:4] == b'\2\0\0\0')
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_legaia2(b,len(src),key)
+        return bytes(b)[0x10:]
 
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)

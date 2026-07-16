@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1024
+# Supported Formats: 1025
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -360,7 +360,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (556)
+## Various (557)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -625,6 +625,7 @@ L.A. Noire BIG | .big.ps3 | Custom |
 L.A. Rush AClump | .aclump | Custom |
 L.A. Rush Compressed | .k9z | Custom |
 L.A. Rush DIR+RES | .dir+.res | Custom |
+Legaia 2 DIR+BIN | .dir+.bin | Custom |
 Lego Creator QUBE | .q | Custom | highly WIP
 LEGO JAM | .jam | [legoracer_jam.bms](https://mirror.aluigi.org/bms/legoracer_jam.bms) |
 Level5 ARC | .arc | [3ds-xfsatool](https://github.com/MeltyPlayer/MeltyTool/tree/main/cli/tools/3ds-xfsatool) |
