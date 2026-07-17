@@ -1559,7 +1559,7 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if xinf:
-                writefile(o + '/$info.txt','\n\n'.join(xinf),'w')
+                writefile(o + '/$info.txt','\n\n'.join(xinf),'wt')
                 if gts: set_ftime(o + '/$info.txt',gts)
                 return
 

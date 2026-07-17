@@ -1644,5 +1644,12 @@
     ],
     "IBM AIX Backup":[
         "aix backup/restore format file"
+    ],
+    "Amiga PFS Hard Disk Image":[
+        "amiga hard disk image (pfs)"
+    ],
+    "AOLSetup":[
+        "aolsetup",
+        "aolsetup(by america online)"
     ]
 }

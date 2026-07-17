@@ -43,6 +43,10 @@
         "rqr":["MASM","MASMTASM","PE32 executable for MS Windows 4.00 (GUI)","assembler",true],
         "rs":"MASM Installer"
     },
+    {
+        "rq":["ZIP","AOLSetup",true],
+        "rs":"AOLSetup","s":1
+    },
 
     {
         "t":"url",
@@ -2680,8 +2684,7 @@
         "rs":"Metroid Samus Returns PKG"
     },
     {
-        "d":[["isat","\\0\\0\\0\\0",256],
-             ["str0",0,256,2]],
+        "d":[["size",[2560,130815]],["s%",256],["str0",0,8,0],["str",8,7],["py","f.seek(8)\nfor _ in range(32):\n if not sum(f.read(8)):f.skip(-8);break\np=f.tell()+f.seek(256)\nfor _ in range(32):\n if not sum(f.read(8)):f.skip(-8);break\nreturn f.tell()==p"]],
         "rs":"BBC Micro SSD"
     },
     {

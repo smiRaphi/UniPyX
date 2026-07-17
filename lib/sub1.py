@@ -1043,8 +1043,29 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 if fs and rldir(o): return
         case 'BBC Micro SSD':
-            run(['bbccp','-i',i,'.',o + '\\'])
-            if listdir(o): return
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            dn = f.reads(8,'latin-1').rstrip('\0 ')
+            if dn: writefile(o + '/$diskname.txt',dn,'wt')
+            f.seek(0)
+            ns = [(f.reads(7,'latin-1').rstrip('\0 '),f.reads(1,'latin-1')) for _ in range(0x20)]
+            fs = []
+            for ix in range(0x20):
+                f.skip(4)
+                sz = f.readu16() | (((f.readu8() >> 4) & 3) << 16)
+                fs.append((f.readu8() * 0x100,sz,*ns[ix]))
+
+            for fe in fs[1:]: # skip disk name
+                if len(fe[2]) == 0:
+                    asrt(fe[1] == 0)
+                    continue
+                f.seek(fe[0])
+                writefile(o + '/' + fe[3].rstrip('\0 $') + '/' + fe[2],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
         case 'ACE':
             db.get('acefile')
             if db.print_try: print('Trying with acefile')

@@ -14,7 +14,6 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 ## Included tools
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
-* self compiled [bbccp](https://github.com/ethandicks/bbc-disk-tools) without glob
 * self compiled [assamUnpack](https://github.com/refint/assamUnpack) without input request
 * self compiled [atr](https://github.com/jhallen/atari-tools)
 * self compiled [CSC/CSArc](https://github.com/fusiyuan2010/CSC)

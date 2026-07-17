@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1026
+# Supported Formats: 1027
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -36,7 +36,7 @@ ARQ | .arq | [ARQ](https://github.com/Sembiance/dexvert/blob/master/dos/ARQ.EXE)
 ARX | .arx | [deark](https://entropymine.com/deark/) |
 Asar | .asar | [7-Zip](https://7-zip.org/) + [Asar7z](https://www.tc4shell.com/en/7zip/asar/) |
 ASD | .asd .exe | (Custom + ) [ASD](https://www.sac.sk/download/pack/asd020.exe) |
-BBC Micro SSD | .ssd | [bbccp](https://github.com/ethandicks/bbc-disk-tools) |
+BBC Micro SSD | .ssd | Custom |
 Base64 | .b64 | Custom |
 Bencode | .torrent | Custom |
 BinHex | .bhx | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/), [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
@@ -229,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (126)
+## Executables/Packers/Installers (127)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -241,6 +241,7 @@ Advanced Installer | .exe | Input (/extract) |
 AMI Aptio Capsule | .cap | [UEFIExtract](https://github.com/LongSoft/UEFITool) |
 Amiga Kickstart ROM | .rom | [amitools](https://github.com/cnvogelg/amitools) + [ROMSplit SplitData](https://web.archive.org/web/20250808152813/http://www.doobreynet.co.uk/beta/index.html) |
 Amisetup | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
+AOLSetup | .exe | Custom |
 aPACK | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 AVPACK | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 AXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |

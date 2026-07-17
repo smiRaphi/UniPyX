@@ -470,6 +470,10 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'deflate':
             import zlib
             return zlib.decompress(i,wbits=-15)
+        case 'deflate_obj':
+            import zlib
+            obj = zlib.decompressobj(wbits=-15)
+            return obj.decompress(i) + obj.flush()
         case 'deflate0':
             import zlib
             return zlib.decompress((i[0] & 0xF8 | ((i[0] & 3) - 1) << 1 | (0 if (i[0] >> 2) & 1 else 1)).to_bytes(1) + i[1:],wbits=-15)

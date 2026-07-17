@@ -1913,5 +1913,67 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             writefile(f'{o}/{tbasename(i)}.nro',od)
             return
+        case 'AOLSetup':
+            db.try_custom()
+            from lib.file import File,ext_exe,decompress
+            e = ext_exe(i)
+            xn = e.DIRECTORY_ENTRY_EXPORT.name.decode('latin-1')
+            asrt(xn in {'INSTALL.EXE','SETUP.EXE'},xn)
+
+            f = File(e.get_overlay(),endian='<')
+            asrt(f.readc(2) == b'RS')
+            def reads(): return f.readc(f.readu16()).decode('latin-1')
+
+            strs = [reads() for _ in whilelc(lambda:f.peek('u32'))]
+            strs.append('')
+            padl = len([f.skip(2) for _ in whilelc(lambda:not f.peek('u16'))]) * 2
+
+            if xn == 'INSTALL.EXE' or padl == 12:
+                strs.extend([reads() for _ in whilelc(lambda:f.peek('u32'))])
+                while not f.peek('u16'): f.skip(2)
+                f.skip(2)
+
+            f.skip(2)
+            f.skip(f.readu16()*4)
+            xd = []
+            for _ in range(2):
+                c = f.readu16()
+                d = {}
+                for _ in range(c):
+                    k = reads()
+                    d[k] = reads()
+                xd.append(d)
+            while f.peek('u32'):
+                c = f.readu16()
+                xd.append([reads() for _ in range(c)])
+            padl2 = len([f.skip(2) for _ in whilelc(lambda:not f.peek('u16'))]) * 2
+            if padl2 == 6:
+                f.skip(6)
+                c = f.readu16()
+                xd.append([reads() for _ in range(c)])
+            elif xn == 'INSTALL.EXE' and padl == 0x14:
+                c = f.readu16()
+                xd.append([reads() for _ in range(c)])
+
+            [f.skip(2) for _ in whilelc(lambda:not (f.peek('u16') > 1 and 20 >= f.peek('u16',poffset=2) >= 10 and f.peek(6,poffset=4).lower() == b'dunzip'))]
+
+            c = f.readu16()
+            fs = [(reads(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                if fe[2] > f.left:
+                    d = f.read(f.left)
+                    if fe[2] != fe[1] and len(d) > 0x20:
+                        asrt(d[:4] == b'PK\3\4' and d[8] in {8,0} and d[9] == 0)
+                        nl = int.from_bytes(d[0x1A:0x1E],'little')
+                        d = decompress(d[0x1E + nl:],'none' if d[8] == 0 else 'deflate_obj')
+                    writefile(o + '/' + sanitize_relative(fe[0]) + '.$eof',d)
+                else:
+                    writefile(o + '/' + sanitize_relative(fe[0]),f.decompress(fe[2],'zip' if fe[2] != fe[1] else 'none',usize=fe[1],out=1))
+
+            del f
+            if fs:
+                writefile(o + '/$strings.txt','\n'.join(strs),'wt')
+                json.dump(xd,xopen(o + '/$extra.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
+                return
 
     return 1

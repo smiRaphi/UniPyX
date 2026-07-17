@@ -36,6 +36,7 @@ Forza ZIP | .zip | Forza | ? | https://github.com/Doliman100/ForzaTech-crypto-to
 Seal Online EDT | .edt | Seal Online | ? | https://reshax.com/topic/161-old-mmorpg-file-encryption/?&_rid=15412#findComment-715 | detected
 NetEase Minecraft Bedrock Encrypted File | * | https://reshax.com/topic/19163-netease-minecraft-bedrock-decrypt-resource-and-behavior-packs/?_rid=15412 | ? | ? | detected, some sort of xor
 Slayer Engine PAK | .pak | Buffy the Vampire Slayer<br>The Da Vinci Code | https://web.archive.org/web/20210301062500/http://wiki.xentax.com/index.php/Slayer_Engine_PAK<br>https://github.com/XeNTaXBackup/XeNTaXBackup.github.io/blob/2c6074a1bcb085e77f527fcf620620a4ee1e76da/markdown/The%20Da%20Vinci%20Code%20-%20PAK%20files_23435.md#post-7 | https://aluigi.altervista.org/bms/buffy_2002_pak.bms |
+Amiga PFS Hard Disk Image | .adf | https://sembiance.com/fileFormatSamples/archive/amigaHardDiskPFS/ | ? | https://github.com/Sembiance/dexvert/tree/master/bin/vibeExtract/amigaHardDiskPFS | detected
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

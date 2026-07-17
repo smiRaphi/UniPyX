@@ -882,15 +882,6 @@
         ]],
         "ts":0
     },
-    "bbccp":{
-        "p":"bbccp.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "bbccp.exe":"bbccp.exe"
-            }
-        }]
-    },
     "chrome-pak":{
         "p":"chrome-pak.exe",
         "fs":[[

@@ -78,6 +78,8 @@ def namespace(_func=None,include=[],keep_init=True):
     if _func is None: return f1
     return f1(_func)
 class Empty: pass
+def whilelc(fnc):
+    while fnc(): yield
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
