@@ -468,6 +468,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         d = f.read(TESTDS)
                         break
 
+            trrntzip = None
             bp = f.pos - len(d)
             po = len(d)
             if SIG66 in d:
@@ -506,7 +507,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else: f.skip(2)
                 cds,cdo = f.readu32(),f.readu32()
                 cmt = f.readc(f.readu16()).rstrip(b'\0')
-                if cmt: writefile(o + '/$comment.txt',cmt)
+                if len(cmt) == 0x16 and cmt.startswith(b'TORRENTZIPPED-'): trrntzip = int(cmt[14:0x16],16)
+                elif cmt: writefile(o + '/$comment.txt',cmt)
 
             # fe: file entry
             # - cv: create version
@@ -533,6 +535,10 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.seek(bp + p - cds)
                 reb = f.pos - cdo
 
+            if not trrntzip is None:
+                asrt(crc_hash(f.peek(cds),'crc32') == trrntzip)
+                trrntzip = True
+
             fs = []
             for _ in range(c):
                 blkn = f.read(4)
@@ -552,8 +558,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     FRZK = PyOBinX.dl('forza_keys',db)
 
                 ct,cd = f.readu16(),f.readu16()
-                try: fe['ts']['m'] = unix2filetime(pdosdate(cd,ct))
-                except ValueError: pass
+                if not trrntzip:
+                    try: fe['ts']['m'] = unix2filetime(pdosdate(cd,ct))
+                    except ValueError: pass
                 fe['crc'] = f.readu32()
                 fe['chk'] = (cd >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
                 fe['zs'],fe['us'] = f.readu32(),f.readu32()

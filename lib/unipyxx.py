@@ -83,7 +83,7 @@ class X:
     CRC={};MMFS={};SELENE={};EMPIRE_MAGIC=None
     def __init__(self):
         if not os.path.exists(DLLP): raise FileNotFoundError
-        if os.path.exists(PRJP + '/!check'):
+        if os.path.exists(os.path.dirname(DLLP) + '/.is_dev'):
             ch = sha256()
             for f in sorted(('comp.c','crypt.c','ext.c','unipyxx.c','util.h')):
                 with open(os.path.join(PRJP,f),'rb') as f:

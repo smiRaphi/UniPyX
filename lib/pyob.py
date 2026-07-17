@@ -1,4 +1,32 @@
-import pickle,struct,os,zlib,inspect,tokenize,io
+import zlib,struct,os
+
+TH = 0x793FD3AF # 3.14.6
+def calc_th(i:dict|list):
+    if isinstance(i,dict): i = sorted(list(i.items()),key=lambda x:x[0])
+    return zlib.crc32(struct.pack(f'>{len(i)}h',*[x[0] for x in i])) ^ zlib.adler32(b'\xFF' + '\0'.join([x[1] for x in i]).encode('ascii') + b'\xFF')
+def check_th(tkn=None):
+    if tkn is None: from token import tok_name as tkn
+    if isinstance(tkn,dict): tkn = sorted(list(tkn.items()),key=lambda x:x[0])
+    th = calc_th(tkn)
+    if th != TH:
+        import sys
+        print('Token dump (include in bug report):')
+        print(sys.version,sys.platform)
+        print(repr(tkn).replace(' ',''))
+        raise RuntimeError(f'Token hash mismatch {th:08X} != {TH:08X}')
+
+if __name__ == '__main__':
+    import sys
+    from token import tok_name
+    print(f'Token hash: {calc_th(tok_name):08X} ({TH:08X})')
+    sys.exit()
+# check only needed for writing
+if os.path.exists(os.path.dirname(__file__) + '/.is_dev'):
+    check_th()
+    TH_CHECKED = True
+else: TH_CHECKED = False
+
+import pickle,inspect,tokenize,io
 from decimal import Decimal
 from threading import Thread
 from types import FunctionType
@@ -18,6 +46,7 @@ from .file import asrt,File
 # 11: function
 # 12: python pickle
 
+# makes the most common deflate type (0b10) look invalid to deflate scanners
 def deflate0(d:bytes):
     d = zlib.compress(d,level=9,wbits=-15)
     return (d[0] & 0xF8 | (((d[0] >> 1) & 3) + 1) | (0 if d[0] & 1 else 1) << 2).to_bytes(1) + d[1:]
@@ -313,6 +342,7 @@ class PyOBin:
         f.close()
         for fnc in funcs: fnc(self.db)
     def save(self):
+        global TH_CHECKED
         asrt(type(self.db) in (dict,list),err=TypeError)
         sdb = []
         sdbix = 0
@@ -504,6 +534,10 @@ class PyOBin:
                     return
                 f.writeu8(10 | fl << 4)
             elif t in (FunctionType,PyOFunc,PyOInlineF) or (t == tuple and not self.unpickle and x[0] in (PyOFunc,PyOInlineF) and type(x[1]) == str):
+                if not TH_CHECKED:
+                    check_th()
+                    TH_CHECKED = True
+
                 if t == FunctionType:
                     x = PyOFunc(x)
                     src = x.source
@@ -664,4 +698,4 @@ class PyOBinX(PyOBin):
     def extend(self,v): self.db.extend(v)
     def insert(self,i,v): self.db.insert(i,v)
 
-OPS = (':',':=',',','.','@','(','[','{','}',']',')','*','*=','**','**=','+','+=','-','-=','/','/=','//','//=','=','==','<','<=','>','>=','!=','|','|=','&','&=','^','^=','~','~=','>>','>>=','<<','<<=','%','%=',';')
+OPS = (':',':=',',','.','@','(','[','{','}',']',')','*','*=','**','**=','+','+=','-','-=','/','/=','//','//=','=','==','<','<=','>','>=','!=','|','|=','&','&=','^','^=','~','~=','>>','>>=','<<','<<=','%','%=',';','->','...')

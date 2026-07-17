@@ -29,7 +29,7 @@ def rotate8(v:int): return ((v << 7) & 0xFF) | (v >> 1)
 def pdosdate(d:int,t:int,ms=0):
     asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
     if d == 0: d = 0x21
-    dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
+    dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 11) & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
     if ms: dt.replace(microsecond=ms*1000000)
     return dt.timestamp()
 def by2bi(b:bytes): return f'{int.from_bytes(b,"big"):0{len(b)*8}b}'
@@ -470,7 +470,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'deflate':
             import zlib
             return zlib.decompress(i,wbits=-15)
-        case 'deflate_obj':
+        case 'deflate_noerr'|'deflate_noerror':
             import zlib
             obj = zlib.decompressobj(wbits=-15)
             return obj.decompress(i) + obj.flush()

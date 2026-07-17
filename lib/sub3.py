@@ -1962,7 +1962,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if fe[2] != fe[1] and len(d) > 0x20:
                         asrt(d[:4] == b'PK\3\4' and d[8] in {8,0} and d[9] == 0)
                         nl = int.from_bytes(d[0x1A:0x1E],'little')
-                        d = decompress(d[0x1E + nl:],'none' if d[8] == 0 else 'deflate_obj')
+                        d = decompress(d[0x1E + nl:],'none' if d[8] == 0 else 'deflate_noerr')
                     writefile(o + '/' + sanitize_relative(fe[0]) + '.$eof',d)
                 else:
                     writefile(o + '/' + sanitize_relative(fe[0]),f.decompress(fe[2],'zip' if fe[2] != fe[1] else 'none',usize=fe[1],out=1))
