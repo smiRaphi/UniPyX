@@ -695,6 +695,13 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 s = kwargs.pop('seed')
                 kwargs['seed1'] = s & 0xFFFFFFFFFFFFFFFF
                 kwargs['seed2'] = s >> 64
+        case 'sum': return sum(i)
+        case 'sum8'|'sum16'|'sum24'|'sum32'|'sum40'|'sum48'|'sum56'|'sum64':
+            return sum(i) & ((1 << int(algo[3:])) - 1)
+        case 'xor'|'xor8':
+            r = 0
+            for b in i: r ^= b
+            return r
 
         case 'sha1'|'sha224'|'sha256'|'sha384'|'sha512'|'sha3_224'|'sha3_256'|'sha3_384'|'sha3_512'|'sha512_224'|'sha512_256'|\
              'blake2b'|'blake2s'|'md5'|'shake128'|'shake_128'|'shake256'|'shake_256'|'ripemd160'|'sm3':
@@ -809,6 +816,8 @@ HASHTS = {
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
     'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
+    'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
+    'xor':1,'xor8':1,
     'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,'md2':16,'md4':16,
     'sha224':28,'sha256':32,'sha384':48,'sha512':64,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,

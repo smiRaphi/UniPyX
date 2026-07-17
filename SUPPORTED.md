@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1025
+# Supported Formats: 1026
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -360,7 +360,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (557)
+## Various (558)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -596,6 +596,7 @@ Hollow Knight Save | ??? | Custom |
 Hornby BSF | .bsf | Custom |
 Hostile Waters MNG | .mng | [na_game_tool](https://nihav.org/game_tool.html) |
 Hudson Arc Dat | .bin | Custom |
+IBM AIX Backup | .bff .bck .img .ima * | Custom |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |
 idTech 7 Resource | .resource | Custom |

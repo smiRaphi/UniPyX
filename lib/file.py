@@ -271,7 +271,7 @@ class File:
         fmt = ' '.join(map(str,fmt))
         p = f'0x{self.pos - back:08X}'
         r = fmt.replace('§@§',p).replace('§f§',(self.name or '<memory>').replace('\\','/').split('/')[-1]).replace('§m§',self.mode).replace('§e§',self._end)
-        if r.endswith('§@'): r = r[:-2] + ' @ ' + p
+        if r.endswith('§@'): r = r[:-3 if r.endswith(' §@') else -2] + ' @ ' + p
         return r
     def update_size(self,current=True):
         if current: self._size = self.tell()

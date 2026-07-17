@@ -1360,5 +1360,207 @@ def extract4_5(inp:str,out:str,t:str):
             f.close()
             for fd in fds: fd[0].close()
             if listdir(o): return
+        case 'IBM AIX Backup':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.peek('u16') == 9 and f.peek('u8',poffset=3) == 0xEA)
+
+            xinf = []
+            sc = 0
+            gts = None
+            fs = {}
+            byn = None
+            while f.pos + 4 < f.size:
+                if (byn is False and f.peek('u32') == 0) or (byn is True and f.peek('u32') == 0xF6F6F6F6): break
+                rt,rst = f.readu8(),f.readu8()
+                f.skip(1) # chksum, idk what algo
+                asrt(f.readu8() == 0xEA,lambda:f.fmt('§@§'))
+
+                if rt == 9 and rst == 0:
+                    if f.left < 0x44: break
+                    f.skip(4)
+                    gts = f.readu32()
+                    f.skip(8)
+                    dev1 = f.reads(0x10,'latin-1').split('\0')[0]
+                    byn = not dev1.startswith('/dev/')
+                    xinf.append(f"Device 1: {dev1}\nDevice 2: {f.reads(0x10,'latin-1').split('\0')[0]}\nUser: {f.reads(0x10,'latin-1').split('\0')[0]}")
+                    f.skip(4)
+                elif byn and rt == 1:
+                    if f.left < 4: break
+                    f.skip(4)
+                    bp = f.pos
+                    while f.pos + 4 < f.size:
+                        if f.peek('u8') <= 15 and f.peek('u8',poffset=3) == 0xEA: break
+                        f.skip(8)
+
+                    sz = f.pos - bp
+                    f.seek(bp)
+                    d = f.readc(sz)
+                    fn = f'{o}/$special{sc}.{"txt" if istext(d) else guess_ext(d)}'
+                    writefile(fn,d)
+                    if gts: set_ftime(fn,gts)
+                    sc += 1
+                elif byn and rst == 9:
+                    if f.left < 0x38: break
+                    f.skip(4)
+                    m = f.readu16() & 0o170000
+                    asrt(m in {0o040000,0o100000,0o120000},f.pos - 12,err=NotImplementedError)
+                    f.skip(6)
+                    s = f.readu32()
+                    ts = (f.readu32(),f.readu32(),f.readu32())
+                    f.skip(0x10)
+                    fn = f.read0s('latin-1')
+                    f.align(8)
+                    fn = o + '/' + sanitize_relative(fn)
+                    if s > f.left: s = max(f.left,0)
+                    if m == 0o040000:
+                        asrt(s == 0)
+                        mkdir(fn)
+                    elif m == 0o120000:
+                        tfn = f.readc(s).split(b'\0')[0].decode('latin-1')
+                        f.align(8)
+                        tfn = o + '/' + sanitize_relative(tfn)
+                        symlink(tfn,fn)
+                    else:
+                        writefile(fn,f.readc(s))
+                        f.align(8)
+                        set_ftime(fn,ts[2],ts[1],ts[0])
+                elif byn and rst == 11:
+                    if f.left < 0x44: break
+                    f.skip(8)
+                    m = f.readu32() & 0o170000
+                    asrt(m in {0o040000,0o100000,0o120000},f.pos - 0x10,err=NotImplementedError)
+                    f.skip(8)
+                    s = f.readu32()
+                    ts = (f.readu32(),f.readu32(),f.readu32())
+                    f.skip(0x18)
+                    fn = f.read0s('latin-1')
+                    f.align(8)
+                    if m != 0o120000 and f.peek('u32') == 2: f.skip(0x28)
+                    fn = o + '/' + sanitize_relative(fn)
+                    if s > f.left: s = max(f.left,0)
+                    if m == 0o040000:
+                        asrt(s == 0)
+                        mkdir(fn)
+                    elif m == 0o120000:
+                        tfn = f.readc(s).split(b'\0')[0].decode('latin-1')
+                        f.align(8)
+                        tfn = o + '/' + sanitize_relative(tfn)
+                        symlink(tfn,fn)
+                    else:
+                        writefile(fn,f.readc(s))
+                        f.align(8)
+                        set_ftime(fn,ts[2],ts[0],ts[1])
+                elif byn and rst == 12:
+                    if f.left < 0x4C: break
+                    f.skip(8)
+                    m = f.readu32() & 0o170000
+                    asrt(m in {0o040000,0o100000,0o120000},f.pos - 0x10,err=NotImplementedError)
+                    f.skip(8)
+                    s = f.readu32()
+                    ts = (f.readu32(),f.readu32(),f.readu32())
+                    f.skip(0x20)
+                    fn = f.read0s('latin-1')
+                    f.align(8)
+                    fn = o + '/' + sanitize_relative(fn)
+                    if s > f.left: s = max(f.left,0)
+                    if m == 0o040000:
+                        asrt(s == 0)
+                        mkdir(fn)
+                    elif m == 0o120000:
+                        tfn = f.readc(s).split(b'\0')[0].decode('latin-1')
+                        f.align(8)
+                        tfn = o + '/' + sanitize_relative(tfn)
+                        symlink(tfn,fn)
+                    else:
+                        writefile(fn,f.readc(s))
+                        f.align(8)
+                        set_ftime(fn,ts[2],ts[0],ts[1])
+                elif not byn and rt == 1 and rst == 3:
+                    if f.left < 4: break
+                    f.skip(4)
+                    bp = f.pos
+                    while f.pos + 4 < f.size:
+                        if f.peek('u8') != 1 and f.peek('u8',poffset=3) == 0xEA: break
+                        f.skip(8)
+
+                    sz = f.pos - bp
+                    f.seek(bp)
+                    d = f.readc(sz)
+                    fn = f'{o}/$bitmap{sc}.bin'
+                    writefile(fn,d)
+                    if gts: set_ftime(fn,gts)
+                    sc += 1
+                elif byn is False and rt == 0x3E and rst == 1:
+                    if f.left < 0x1E4: break
+                    f.skip(4)
+                    writefile(f'{o}/$inode{sc}.tbl',f.readc(0x1E0))
+                    while f.pos + 4 < f.size:
+                        if f.peek('u16') == 0x0806 and f.peek('u8',poffset=3) == 0xEA: break
+                        f.skip(8)
+                elif byn is False and rt == 6 and rst == 8:
+                    if f.left < 0x2C: break
+                    f.skip(2)
+                    id = f.readu16()
+                    m = f.readu16() & 0o170000
+                    asrt(m in {0o040000,0o100000,0o120000},f.pos - 10,err=NotImplementedError)
+                    f.skip(6)
+                    s = f.readu32()
+                    ts = (f.readu32(),f.readu32(),f.readu32())
+                    f.skip(0x10)
+                    if s > f.left: s = max(f.left,0)
+
+                    if m == 0o040000:
+                        es = [(f.readu16(),sub_path(f.reads(14,'latin-1').split('\0')[0])) for _ in range(s//0x10)]
+                        fs[id] = es
+                    else:
+                        fs[id] = {'o':f.pos,'m':m,'s':s,'t':ts}
+                        f.skip(s)
+                        f.align(8)
+                else: raise NotImplementedError(f.fmt(byn,rt,rst,'§@',back=4))
+
+            if fs:
+                for id,fe in fs.items():
+                    if isinstance(fe,list):
+                        i1 = i2 = None
+                        for cid,cn in fe:
+                            if cn == '.': i1 = cid
+                            elif cn == '..': i2 = cid
+                        if i1 == i2 == id: r = id;break
+                else: raise ValueError('No root found')
+
+                l = [r]
+                ps = {r:''}
+                dn = set()
+                while l:
+                    pid = l.pop(0)
+                    if pid in dn: continue
+                    dn.add(pid)
+                    if isinstance(fs[pid],dict): continue
+                    pp = ps[pid]
+                    for cid,cn in fs[pid]:
+                        ps[cid] = sanitize_relative(pp + '/' + cn)
+                        if cid in fs and isinstance(fs[cid],list):
+                            mkdir(o + '/' + ps[cid])
+                            l.append(cid)
+
+                for id,fe in fs.items():
+                    if not isinstance(fe,dict): continue
+                    f.seek(fe['o'])
+                    fn = o + '/' + ps[id]
+                    if fe['m'] == 0o120000:
+                        tfn = f.readc(fe['s']).split(b'\0')[0].decode('latin-1')
+                        tfn = o + '/' + sanitize_relative(tfn)
+                        symlink(tfn,fn)
+                    else:
+                        writefile(fn,f.readc(fe['s']))
+                        set_ftime(fn,fe['t'][2],fe['t'][1],fe['t'][0])
+
+            f.close()
+            if xinf:
+                writefile(o + '/$info.txt','\n\n'.join(xinf),'w')
+                if gts: set_ftime(o + '/$info.txt',gts)
+                return
 
     return 1

@@ -247,6 +247,12 @@ def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
         at = filetime2unix(at)
         mt = filetime2unix(mt)
     os.utime(p,(at,mt))
+TEXTBL = {'\0','\1','\2','\3','\4','\5','\6','\7','\x08','\x0B','\x0C','\x0E','\x0F','\x10','\x11','\x12','\x13','\x14','\x15','\x16','\x17','\x18','\x19','\x1A','\x1B','\x1C','\x1D','\x1E','\x1F','\x7F'}
+def istext(d:bytes,encoding='ascii'):
+    try: dd = d.decode(encoding)
+    except UnicodeDecodeError: return False
+    if dd[-1] == '\x1A': dd = dd[:-1] # strip EOF
+    return not any(c in TEXTBL for c in dd)
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'
 def gtmp(suf=''): return TMP + 'tmp' + os.urandom(8).hex() + suf

@@ -1641,5 +1641,8 @@
     ],
     "Storm Region PAK":[
         "storm region game data archive"
+    ],
+    "IBM AIX Backup":[
+        "aix backup/restore format file"
     ]
 }
