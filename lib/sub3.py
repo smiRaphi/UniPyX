@@ -459,29 +459,25 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 td.destroy()
                 if listdir(o): return
         case 'CExe':
-            err,e,_ = run(['resourceextractor','list',i])
-            if err: return 1
-            for x in e.strip().replace('\r','').split('\n'):
-                if x.split('/')[0] == '99':
-                    tf = TmpFile()
-                    run(['resourceextractor','extract',i,x.split()[0],tf.p],print_try=False)
-                    ar = analyze(tf.p,quiet=True)
+            db.try_custom()
+            from lib.file import ext_exe,decompress,iszl
+            e = ext_exe(i)
 
-                    td = TmpDir()
-                    if ('SZDD' in ar and not extract(tf.p,td.p,'Microsoft SZDD')) or ('ZLIB' in ar and not extract(tf.p,td.p,'ZLIB')):
-                        otf = td.p + '\\' + listdir(td.p)[0]
-                        if open(otf,'rb').read(8) == b'MZ\x90\0\3\0\0\0': mv(otf,o + '/' + x.split('/')[1] + '.exe')
-                        else: mv(otf,o + '/' + x.split('/')[1])
-                    else: mv(tf.p,o + '/' + x.split('/')[1])
-                    tf.destroy()
-                    td.destroy()
+            for x in e.DIRECTORY_ENTRY_RESOURCE.entries[0].directory.entries:
+                id = x.id
+                x = x.directory.entries[0].data.struct
+                d = e.get_data(x.OffsetToData,x.Size)
+                if d[:10] == b'SZDD\x88\xF0\x27\x33\x41\x00':
+                    d = decompress(d,'szdd')
+                    fn = '$STUB/inflate.dll'
+                elif iszl(d):
+                    d = decompress(d,'zlib')
+                    fn = basename(i)
+                else: fn = f'$STUB/{id}.bin'
+                writefile(o + '/' + fn,d)
 
-            for f in listdir(o):
-                f = o + '\\' + f
-                if not f.endswith('.exe') or getsize(f) < 16384:continue
-                main_extract(f,f[:-4])
-
-            if listdir(o): return
+            e.close()
+            return
         case 'PyInstaller':
             run(['pyinstxtractor-ng',i],cwd=o)
             if exists(o + '/' + basename(i) + '_extracted'):
@@ -1718,10 +1714,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
             hd = re.search(r'^<bms(\s+([\w_]+="[^"\n]*"\s*)+)?\s*>',d)
             asrt(hd)
             hd = hd[0]
-            d = d[len(hd):].strip()
+            d = unescape(d[len(hd):].strip())
 
             atrs = [f'# {x[0]}={unescape(x[1])}' for x in re.findall(r'([\w_]+)="([^"\n]*)"',hd)]
-            if atrs: d = '\n'.join(atrs) + '\n\n' + unescape(d)
+            if atrs: d = '\n'.join(atrs) + '\n\n' + d
             writefile(f'{o}/{tbasename(i)}.bms',d,'w')
             if d: return
         case 'Gateshark2NTR Plugin':
@@ -1921,6 +1917,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             asrt(xn in {'INSTALL.EXE','SETUP.EXE'},xn)
 
             f = File(e.get_overlay(),endian='<')
+            e.close()
             asrt(f.readc(2) == b'RS')
             def reads(): return f.readc(f.readu16()).decode('latin-1')
 

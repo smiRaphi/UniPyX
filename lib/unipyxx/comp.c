@@ -406,8 +406,8 @@ EXPORT ssize_t decompress_lzss1(const uint8_t *restrict src, const size_t zsize,
     while (!is_eof(&br) && (usize == -1 || op < usize)) {
         uint8_t f = get_bit(&br);
         if (f) {
-            dst[op++] = get_bits(&br, 8);
-            dict[wp++] = dst[op - 1];
+            dst[op] = get_bits(&br, 8);
+            dict[wp++] = dst[op++];
             wp &= 0x1FFF;
         } else {
             uint16_t off = get_bits(&br, 13);
@@ -750,12 +750,12 @@ EXPORT ssize_t decompress_lzrw1kh(const uint8_t *restrict src, const size_t zsiz
             uint16_t dist = (b0 << 4) | (b0 >> 4);
             if (dist) {
                 uint8_t len = (src[ip++] & 0xF) + 3;
-                if (op + len > usize) len = usize - op;
+                if (usize != -1 && op + len > usize) len = usize - op;
                 for (uint8_t i=0;i < len;i++,op++) dst[op] = dst[op - dist];
             } else {
                 CHKi(2)
                 uint16_t len = read16le(src + ip) + 0x10;ip += 2;
-                if (op + len > usize) len = usize - op;
+                if (usize != -1 && op + len > usize) len = usize - op;
                 for (uint16_t i=0;i < len;i++) dst[op++] = src[ip];
                 ip++;
             }
@@ -819,6 +819,50 @@ EXPORT ssize_t decompress_camelot_blz(const uint8_t *restrict src, const size_t 
 eof:
     #undef CHKi
     #undef CHKo
+    return op;
+}
+EXPORT ssize_t decompress_szdd_raw(const uint8_t *restrict src, const size_t zsize,
+                                         uint8_t *restrict dst, const ssize_t usize) {
+    size_t ip = 0;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    uint16_t wp = 0xFF0;
+    uint8_t dict[0x1000] = {0};
+    ssize_t op = 0;
+    uint8_t f = 0;
+    int8_t fbl = 0;
+
+    while (ip < zsize && (op < usize || usize == -1)) {
+        if (fbl <= 0) {
+            f = src[ip++];
+            fbl = 8;
+        }
+
+        if (!(f & 1)) {
+            CHKi(1)
+            uint8_t b1 = src[ip++];
+            uint8_t b2 = src[ip++];
+            uint16_t off = b1 | ((b2 >> 4) << 8);
+            uint8_t len = (b2 & 0xF) + 3;
+
+            if (usize != -1 && op + len > usize) len = usize - op;
+            for (uint8_t i=0;i < len;i++,op++) {
+                dst[op] = dict[(off + i) & 0xFFF];
+                dict[wp++] = dst[op];
+                wp &= 0xFFF;
+            }
+        } else {
+            CHKi(0)
+            dst[op] = src[ip++];
+            dict[wp++] = dst[op++];
+            wp &= 0xFFF;
+        }
+
+        f >>= 1;
+        fbl--;
+    }
+
+eof:
+    #undef CHKi
     return op;
 }
 

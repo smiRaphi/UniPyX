@@ -65,7 +65,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         return r
 
     match t:
-        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'Microsoft SZDD'|'LZIP'|'CPIO'|'Asar'|'ARJZ'|\
+        case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'LZIP'|'CPIO'|'Asar'|'ARJZ'|\
              'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer'|'RPM Package'|\
              'Microsoft Compound Document':
             _,_,e = zip7(i,o,t)
@@ -1678,6 +1678,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'FreeArc':
             run(['unarc','x','-o+','-dp' + o,i])
             if listdir(o): return
+        case 'Microsoft SZDD':
+            db.try_custom()
+            from lib.file import decompress
+            writefile(o + '/' + ext_expand(basename(i)),decompress(readfile(i),'szdd'))
+            return
 
     return 1
 

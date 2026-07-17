@@ -109,7 +109,7 @@ MacBinary | ??? | [unar](https://theunarchiver.com/command-line) |
 Master Boot Record | .mbr | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 Microsoft Comic Chat Character | .avd .bgb | [deark](https://entropymine.com/deark/) |
 Microsoft Compound Document | ??? | [7-Zip](https://7-zip.org/) |
-Microsoft SZDD | .??_ | [7-Zip](https://7-zip.org/) |
+Microsoft SZDD | .??_ | Custom |
 Motorola S-Record | .srec | Custom |
 MSCAB | .cab | [7-Zip](https://7-zip.org/) + file name correction |
 Nero CD IMG | .nrg | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
@@ -259,7 +259,7 @@ C64 Time Cruncher | .prg | [unp64](https://iancoog.altervista.org/)
 Camelot Obfuscated NSO | .nso ` ` | Custom |
 Casio BE-300 Package | ??? | Custom |
 CEBE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
-CExe | .exe | [ResourceExtractor](https://github.com/rgl/ResourceExtractor) -> Microsoft SZDD/ZLIB |
+CExe | .exe | Custom |
 Cheat Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Chromium Delta Update | ??? | [android-ota-extractv](https://github.com/tobyxdd/android-ota-payload-extractor) |
 COM RLE Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |

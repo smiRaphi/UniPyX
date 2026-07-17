@@ -6086,13 +6086,6 @@
         }],
         "ts":1769378295
     },
-    "resourceextractor":{
-        "p":"ResourceExtractor.exe",
-        "fs":[
-        "https://github.com/rgl/ResourceExtractor/releases/download/v1.0.1/ResourceExtractor.exe"
-        ],
-        "ts":0
-    },
     "steamless":{
         "p":"Steamless/Steamless.CLI.exe",
         "fs":[{

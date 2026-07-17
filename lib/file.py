@@ -519,6 +519,10 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = fout.read(s.output_pos)
             del s,fout,fin
             return r
+        case 'szdd':
+            asrt(i[:10] == b'SZDD\x88\xF0\x27\x33\x41\x00')
+            return uxx().decompress_szdd_raw(i[14:],int.from_bytes(i[10:14],'little'))
+        case 'szdd_raw': return uxx().decompress_szdd_raw(i,kwargs['usize'])
 
         case 'lzma'|'lzma_alone':
             import lzma
