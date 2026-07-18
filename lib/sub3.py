@@ -1972,5 +1972,269 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/$strings.txt','\n'.join(strs),'wt')
                 json.dump(xd,xopen(o + '/$extra.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
                 return
+        case 'BitRock Installer':
+            SST = (
+                (8, 16,1, 32,2, 4 ),
+                (4, 8, 1, 16,2, 0 ),
+                (2, 4, 8, 1, 0, 16),
+                (2, 4, 0, 8, 1, 0 ),
+                (1, 2, 4, 0, 8, 0 ),
+                (1, 2, 4, 0, 0, 8 ),
+                (1, 2, 0, 4, 0, 0 ),
+            )
+            FSIG = b'bitrock-lzma-4.0mFC3acAOJrQinu5aEHu0uH7N5XSQ3Z14'
+
+            db.try_custom()
+            from lib.file import File,decompress,ext_exe,mask
+            e = ext_exe(i)
+            cert = None
+            if len(e.OPTIONAL_HEADER.DATA_DIRECTORY) > 4:
+                cert = e.OPTIONAL_HEADER.DATA_DIRECTORY[4].VirtualAddress
+                if cert == 0: cert = None
+            oo = e.get_overlay_data_start_offset()
+            e.close()
+
+            f = File(i,endian='>')
+
+            if cert is None:
+                f.seek(f.size)
+                for _ in range(f.pos,oo,-8):
+                    f.back(0x38)
+                    tmp = f.read(0x38)
+                    p = tmp.rfind(FSIG)
+                    if p != -1: break
+                    f.back(8)
+                else: raise ValueError('Footer not found')
+                f.back(len(tmp) - p)
+            else:
+                f.seek(cert - 0x37)
+                tmp = f.read(0x37)
+                p = tmp.rfind(FSIG)
+                asrt(p != -1)
+                f.back(len(tmp) - p)
+            sp = f.back(0x10)
+            f.skip(4)
+            sz = f.readu32()
+            f.skip(4) # toc size & 0x7FFFFFFF
+            toco = f.readu32()
+            sp -= sz
+
+            if oo + 0x100 < sp:
+                f.seek(oo)
+                lnchd = f.peek(0x100)
+                if lnchd.startswith(b'#!/bin/sh\n') and lnchd.endswith(b'#') and b'\x1A#' in lnchd and lnchd.rstrip(b'#').endswith(b'\x1A'):
+                    writefile(o + '/$INSTFILES/$tclkit_launcher.sh',lnchd.split(b'\x1A')[0])
+                oo += 0x100
+
+            f.seek(sp - 7)
+            cookfs = f.readc(7) == b'CFS0002'
+            asrt(f.read(4) == b'JL\x1A\x00')
+            f.seek(sp + toco)
+            asrt(f.readbp() == 0)
+            sch = f.reads(f.readbp())
+            asrt(sch == 'dirs[name:S,parent:I,files[name:S,size:I,date:I,contents:B]]',sch)
+            asrt(f.readbp() == 1)
+            asrt(f.readbp() > 0) # dir size
+            f.seek(sp + f.readbp())
+            asrt(f.readbp() == 0)
+            dc = f.readbp()
+
+            def readi(s:int,c:int,signed=True) -> list[int]:
+                if c == 0:
+                    asrt(s == 0)
+                    return []
+                d = f.readc(s)
+
+                if c < 8 and 0 < len(d) < 7: w = SST[c - 1][len(d) - 1]
+                else: w = (len(d) * 8) // c
+                asrt(w in {0,1,2,4,8,16,32,64})
+
+                if w < 8:
+                    asrt(not signed)
+                    m = mask(w)
+                    r = []
+                    for ix in range(c): r.append((d[(ix * w) // 8] >> ((ix * w) & 7)) & m)
+                    return r
+                else: return f.readil(w // 8,d,signed,'<')
+            def readd(c:int) -> list[bytes]:
+                ds = f.readbp()
+                if ds:
+                    do = f.readbp()
+                    ss = f.readbp()
+                    if ss != 0: so = f.readbp()
+                else: ss = 0
+                cs = f.readbp()
+                if cs != 0: co = f.readbp()
+                rbp = f.pos
+
+                if ss:
+                    f.seek(sp + so)
+                    s = readi(ss,c,False)
+                else: s = [0] * c
+                if ds:
+                    f.seek(sp + do)
+                    d = f.readc(ds)
+                else: d = b''
+
+                p = 0
+                r = []
+                for sz in s:
+                    if sz == 0: r.append(None)
+                    else:
+                        r.append(d[p:p+sz])
+                        p += sz
+
+                if cs:
+                    f.seek(sp + co)
+                    xr = []
+                    p = 0
+                    while f.pos < sp + co + cs:
+                        p += f.readbp()
+                        asrt(c > p >= 0 and r[p] is None)
+                        xs = f.readbp()
+                        if xs:
+                            xo = f.readbp()
+                            if xo == 0: xr.append((p,xs))
+                            else:
+                                cp = f.pos
+                                f.seek(sp + xo)
+                                r[p] = f.readc(xs)
+                                f.seek(cp)
+                        else: r[p] = b''
+                        p += 1
+
+                    if xr:
+                        f.seek(sp + co + cs)
+                        for p,xs in xr: r[p] = f.readc(xs)
+                f.seek(rbp)
+                return [b'' if x is None else x for x in r]
+
+            ns = [x[:-1].decode('utf-8') for x in readd(dc)]
+            ps = f.readbp()
+            if ps:
+                po = f.readbp()
+                cp = f.pos
+                f.seek(sp + po)
+                prs = readi(ps,dc,True)
+                f.seek(cp)
+            else: prs = []
+            fes = f.readbp()
+            if fes: feo = f.readbp()
+
+            asrt(ns[0] == '<root>' and prs[0] == -1)
+            ds = ['']
+            for ix in range(1,dc): ds.append(sanitize_relative(ds[prs[ix]] + '/' + ns[ix]))
+
+            f.seek(sp + feo)
+            dist = None
+            for dn in ds:
+                asrt(f.readbp() == 0)
+                c = f.readbp()
+                dn = '$INSFILES/' + dn
+                if c == 0:
+                    mkdir(o + '/' + dn)
+                    continue
+                asrt(c > 0)
+                fns = [x[:-1].decode('utf-8') for x in readd(c)]
+
+                fss = f.readbp()
+                fso = f.readbp()
+                cp = f.pos
+                f.seek(sp + fso)
+                fs = readi(fss,c,True)
+                f.seek(cp)
+
+                fds = f.readbp()
+                fdo = f.readbp()
+                cp = f.pos
+                f.seek(sp + fdo)
+                fd = readi(fds,c,True)
+                f.seek(cp)
+
+                d = readd(c)
+                for fix in range(c):
+                    fn = o + '/' + dn + '/' + fns[fix]
+                    sd = decompress(d[fix],'zlib' if len(d[fix]) != fs[fix] else 'none',usize=fs[fix])
+                    if dn + '/' + fns[fix].lower() == '$INSFILES//origindist': dist = sd.decode('utf-8').lower()
+                    writefile(fn,sd)
+                    if fd[fix] != 0: set_ftime(fn,fd[fix])
+            if not dist is None and exists(o + '/$INSFILES/' + dist): copydir(o + '/$INSFILES/' + dist,o,True)
+
+            if cookfs:
+                import json,re
+                from lib.crypto import crc_hash,HASHTS
+                BRG = re.compile(r'(.*)___bitrockBigFile([1-9]\d*)$')
+
+                cmm = {0:'none',1:'deflate',255:'lzma'}
+                ep = sp
+                f.seek(ep - 0x10)
+                idxs,pc,dalg = f.readu32(),f.readu32(),cmm[f.readu8()]
+                sp = f.seek(ep - 0x10 - idxs - pc*0x14)
+                asrt(sp >= oo)
+                hshs = [f.readu128() for _ in range(pc)]
+                szs = f.readil(4,pc)
+
+                idx = File(f.decompress(idxs - 1,cmm[f.readu8()]),endian=f._end)
+                asrt(idx.read(8) == b'CFS2.200')
+                fs = []
+                def readce(p):
+                    c = idx.readu32()
+                    for _ in range(c):
+                        n = sanitize_relative(p + '/' + idx.reads(idx.readu8(),'utf-8'))
+                        asrt(idx.readu8() == 0)
+                        ts = idx.readu64()
+                        bc = idx.reads32()
+                        if bc == -1:
+                            mkdir(o + '/' + n)
+                            readce(n)
+                        else: fs.append((n,ts,[(idx.readu32(),idx.readu32(),idx.readu32()) for _ in range(bc)]))
+                readce('')
+
+                if idx.left >= 4:
+                    mc = idx.readu32()
+                    m = {}
+                    for _ in range(mc):
+                        n = idx.reads(idx.readu32(),'utf-8').split('\0',1)
+                        m[n[0]] = n[1]
+                    json.dump(m,xopen(o + '/$INSFILES/$cookfs_metadata.json','wt'),ensure_ascii=False,indent=2)
+                else: m = {}
+                del idx
+
+                hsh = m.get('cookfs.pagehash','md5')
+                hmsk = mask(HASHTS[hsh]*8)
+                f.seek(sp - sum(szs))
+                pgs = []
+                for ix in range(pc):
+                    d = f.decompress(szs[ix] - 1,cmm[f.readu8()])
+                    asrt(crc_hash(d,hsh) == hshs[ix] & hmsk,lambda:f'{hshs[ix] & hmsk:0{HASHTS[hsh]*2}X} != {crc_hash(d,hsh):0{HASHTS[hsh]*2}X} ({ix}, {szs[ix]} @ 0x{f.pos - szs[ix]:08X})')
+                    pgs.append(d)
+                f.close()
+
+                bfs = {}
+                tbfs = {}
+                for fe in fs:
+                    m = BRG.match(fe[0])
+                    if m:
+                        if m[1] not in bfs: bfs[m[1]] = []
+                        bfs[m[1]].append((int(m[2]),fe[0]))
+
+                    of = xopen(o + '/' + fe[0],'wb')
+                    for be in fe[2]: of.write(pgs[be[0]][be[1]:be[1]+be[2]])
+                    of.close()
+                    set_ftime(o + '/' + fe[0],fe[1])
+                    tbfs[fe[0]] = fe[1]
+
+                for bf in bfs:
+                    of = xopen(o + '/' + bf,'ab')
+                    for x in sorted(bfs[bf],key=lambda x:x[0]):
+                        of.write(readfile(o + '/' + x[1]))
+                        remove(o + '/' + x[1])
+                    of.close()
+                    set_ftime(o + '/' + bf,tbfs[bf])
+
+                if listdir(o) == ['$INSFILES','default']: copydir(o + '/default',o,True,True)
+            else: f.close()
+
+            if ds: return
 
     return 1

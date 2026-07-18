@@ -37,6 +37,7 @@ def bi2by(b:str):
     b += '0' * (-len(b) % 8)
     return int(b,2).to_bytes(len(b) // 8,'big')
 
+ILSTRM = {1:'B',2:'H',4:'I',8:'Q',0.2:'e',0.4:'f',0.8:'d'}
 class File:
     def __init__(self,f,mode='r',endian='>'):
         asrt(not 't' in mode)
@@ -126,6 +127,17 @@ class File:
         end = end or self._end
         if end == '-': d = self.middle_scramble(d)
         return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
+    def readil(self,n:int|float,c:int,signed=False,end=None) -> list[int|float]:
+        end = end or self._end
+        asrt(end != '-')
+        t = ILSTRM[n]
+        if signed: t = t.lower()
+        if isinstance(n,float): n = int(n*10)
+        if isinstance(c,bytes):
+            d = c
+            c = len(d) // n
+        else: d = self.readc(c*n)
+        return list(struct.unpack(f'{end}{c}{t}',d))
     def writei(self,i:int,n:int,signed=False,end=None):
         d = i.to_bytes(n,ENDMAP[end or self._end],signed=bool(signed))
         if end == '-': d = self.middle_scramble(d)
@@ -182,6 +194,19 @@ class File:
             n = (n << 7) | (b & 0x7F)
             if b & 0x80: return n
         else: raise EOFError
+    def readbp(self):
+        n = b = 0
+        ng = False
+        if self.peek('u8') == 0:
+            ng = True
+            self.skip(1)
+        while self:
+            b = self.readu8()
+            n = (n << 7) | (b & 0x7F)
+            if b & 0x80: break
+        else: raise EOFError
+        if ng: return ~n
+        return n
     def readcompiu(self,null=False):
         b = self.readu8()
         if b == 0xFF and null: return None

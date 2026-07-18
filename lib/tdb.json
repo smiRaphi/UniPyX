@@ -1653,5 +1653,13 @@
     "AOLSetup":[
         "aolsetup",
         "aolsetup(by america online)"
+    ],
+    "Asymetrix Toolbook":[
+        "asymetrix data (generic)"
+    ],
+    "BitRock Installer":[
+        "bitrock installbuilder ver: ?.?.?",
+        "bitrock installer",
+        "www.bitrock.com"
     ]
 }
