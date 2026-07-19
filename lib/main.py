@@ -68,7 +68,7 @@ def namespace(_func=None,include=[],keep_init=True):
         Wrapper.__name__ = func.__name__[1 if func.__name__.startswith('_') else 0:]
 
         r = Wrapper()
-        if func.__name__.startswith('_'):
+        if func.__name__.startswith('_'): # _ so you can have working type hints
             for x in inspect.stack()[1:-1]:
                 if func.__module__ == x[0].f_globals['__name__']:
                     x[0].f_globals[Wrapper.__name__] = r
@@ -80,15 +80,26 @@ def namespace(_func=None,include=[],keep_init=True):
 class Empty: pass
 def whilelc(fnc):
     while fnc(): yield
+NOCONSOLE = False
 def console():
+    global NOCONSOLE
+    if NOCONSOLE: return
     import tokenize,io,sys
     from traceback import TracebackException
 
-    loc = sys._getframe(1).f_locals
+    fr = sys._getframe(1)
+    print('[Console] Called from:',f'"{fr.f_code.co_filename}:{fr.f_lineno}"')
+    loc = fr.f_locals
     while True:
         try: i = input('> ')
-        except (EOFError,KeyboardInterrupt): break
-        if not i: continue
+        except EOFError:
+            NOCONSOLE = True
+            break
+        except KeyboardInterrupt:
+            print()
+            break
+        # CTRL+A
+        if not i or i.endswith('\x01'): continue
         if i == '\x11': sys.exit() # CTRL+Q
         try:
             if i.startswith(('from ','import ','def ','class ','async ')) or\
@@ -1124,12 +1135,14 @@ def guess_ext(d:bytes) -> str:
     elif d[:3] == b'\xFF\xD8\xFF' and ((d[3] == 0xE0 and d[6:11] == b'JFIF\0') or (d[3] == 0xE1 and d[6:11] == b'Exif\0')): ext = 'jpg'
     elif d[-0x12:] == b'TRUEVISION-XFILE.\0': ext = 'tga'
     elif d[4:8] == b'mdat' and d[int.from_bytes(d[0:4],'big')+4:int.from_bytes(d[0:4],'big')+8] == b'moov': ext = 'mp4'
+    elif d[:6] in {b'GIF87a',b'GIF89a'}: ext = 'gif'
     elif d[:4] == b'\0\0\1\xBA' and\
          d[4] >> 6 == 0b01 and d[4] & 4 and\
          d[6] & 4 and d[8] & 4 and d[9] & 1 and\
          d[12] & 3 == 0b11 and not d[13] >> 3: ext = 'mpeg2'
     elif d[:2] == b'BM' and (not sum(d[4:8]) or not d[3]): ext = 'bmp'
     elif d[:0x13] == b'<?xml version="1.0"': ext = 'xml'
+    elif d[:5] == b'{\\rtf': ext = 'rtf'
     elif d[:10] == b'# Blender ' and d[15:0x1A] == b' MTL File: ' and (d[10:11]+d[12:13]+d[14:15]).isdigit() and d[11] == d[13] == 0x2E: ext = 'blend'
     elif int.from_bytes(d[:4],'little') == s and d[5] == 0xAF and d[4] in {0x11,0x12,0x30,0x31,0x44}: ext = 'flc'
     elif s > 0x100 and (d[:3] == b'ID3' or

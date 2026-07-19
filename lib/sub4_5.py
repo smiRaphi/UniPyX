@@ -1562,5 +1562,64 @@ def extract4_5(inp:str,out:str,t:str):
                 writefile(o + '/$info.txt','\n\n'.join(xinf),'wt')
                 if gts: set_ftime(o + '/$info.txt',gts)
                 return
+        case 'CP/M HUF':
+            db.try_custom()
+            from lib.file import File,BitReader
+            f = File(inp,endian='<')
+            asrt(f.readu16() == 0x1BD)
+
+            c = f.readu16()
+            xs = f.readu16()
+            do = f.readu32()
+            x = f.readc(xs)
+
+            br = BitReader(f)
+            huf = [None] * 0x200
+            stck = []
+            rt = 0
+            nc = 1
+            xp = 0
+            while f < do or br.p != 8:
+                if br.get_bit_l():
+                    if nc + 1 >= 0x200: raise ValueError
+                    huf[rt] = (nc,nc + 1)
+                    stck.append(nc + 1)
+                    rt = nc
+                    nc += 2
+                else:
+                    try: huf[rt] = (x[xp],-1)
+                    except Exception as e:
+                        print(f'{e.__class__.__name__}: {e}')
+                        console()
+                        raise
+                    xp += 1
+                    if not stck: break
+                    rt = stck.pop()
+            else: raise ValueError
+
+            def get_huf():
+                n = 0
+                while huf[n][1] != -1:
+                    n = huf[n][0 if br.get_bit_l() else 1]
+                return huf[n][0]
+
+            f.seek(do)
+            fs = [(f.readu32(),f.readu32(),f.readu32(),f.readu8()) for _ in range(c)]
+            for fe in fs:
+                br.seek(fe[0])
+                fn = bytearray()
+                for _ in range(0x1000):
+                    b = get_huf()
+                    if b == 0: break
+                    fn.append(b)
+                else: raise ValueError(fn[:0x10])
+                fn = sanitize_relative(fn.decode('ascii'))
+
+                br.seek(fe[2])
+                d = bytes([get_huf() for _ in range(fe[1])])
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
 
     return 1

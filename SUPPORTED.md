@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1029
+# Supported Formats: 1030
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -363,7 +363,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (558)
+## Various (559)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -466,6 +466,7 @@ Conquest Earth WAD | .wad | [na_game_tool](https://nihav.org/game_tool.html) |
 Construct 2 Array | .hsp .hsm .hsd | Custom |
 Contact File Data | .dat | Custom |
 Cosmo Volume Game Archive | .vol | [gamearch](https://www.shikadi.net/camoto/desktop/) |
+CP/M HUF | .huf | Custom |
 CPK | .cpk | [CpkExtract](https://github.com/1330-Studios/CPK-Extract) |
 Creative Assembly PFH0 | .pfh | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 CRI ACS File | .acs | Custom |

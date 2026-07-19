@@ -379,20 +379,45 @@ class FileStruct(File):
         return d[self.__offs[k]:self.__offs[k] + self.__sizes[k]]
 
 class BitReader:
-    def __init__(self,d:bytes):
+    def __init__(self,d:bytes|io.BytesIO):
+        if isinstance(d,(bytes,bytearray)): d = io.BytesIO(d)
+        p = d.tell()
         self.d = d
-        self.p = 0
+        self.size = self.d.seek(0,2)
+        self.d.seek(p)
         self.b = 0
-        self.m = 0
+        self.p = 8
+
+    def seek(self,p:float):
+        self.d.seek(int(p))
+        bp = int((p - int(p)) * 10)
+        asrt(bp < 8,bp)
+        self.p = bp
+        if p >= self.size: self.b = None
+        else: self.b = self.d.read(1)[0]
+    def tell(self):
+        if self.p == 8: return self.d.tell() + 0.0
+        return self.d.tell() - 1 + self.p / 10
 
     def get_bit(self):
-        if not self.m:
-            if self.p >= len(self.d): return None
-            self.b = self.d[self.p]
-            self.p += 1
-            self.m = 0x80
-        bit = 1 if self.b & self.m else 0
-        self.m >>= 1
+        if self.b is None: return None
+        if self.p == 8:
+            if self.d.tell() >= self.size: return None
+            self.b = self.d.read(1)[0]
+            self.p = 0
+        bit = (self.b >> (7 - self.p)) & 1
+        self.p += 1
+        if self.p != 8: self.p %= 8
+        return bit
+    def get_bit_l(self):
+        if self.b is None: return None
+        if self.p == 8:
+            if self.d.tell() >= self.size: return None
+            self.b = self.d.read(1)[0]
+            self.p = 0
+        bit = (self.b >> self.p) & 1
+        self.p += 1
+        if self.p != 8: self.p %= 8
         return bit
     def get_bits(self,n,ret_none=False) -> int|None:
         v = 0
@@ -403,9 +428,9 @@ class BitReader:
                 break
             v |= b << (n - 1 - i)
         return v
-    def reset(self): self.m = 0
+    def reset(self): self.p = 8
     @property
-    def eof(self): return self.p >= len(self.d) and not self.m
+    def eof(self): return self.d.tell() >= self.size and not self.p
 
 class EXE(File):
     def __init__(self,f):
