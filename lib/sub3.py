@@ -2236,5 +2236,85 @@ def extract3(inp:str,out:str,t:str) -> bool:
             else: f.close()
 
             if ds: return
+        case 'Bytessence Install Maker':
+            db.try_custom()
+            from lib.crypto import crc_hash
+            from lib.file import File,ext_exe,decompress
+            e = ext_exe(i)
+            oo = e.get_overlay_data_start_offset()
+            e.close()
+            f = File(i,endian='<')
+            f.seek(oo)
+            asrt(f.read(0x14) == b"$_BIM_CONFIG_START_$")
+
+            f.skip(4)
+            ms = f.readu32()
+            if f.peek('u32') == 0 and f.peek(0x12,poffset=ms + 4) == b"$_BIM_CONFIG_END_$": v = 0
+            else:
+                ms = f.readu32()
+                if f.peek('u32') == 0 and f.peek(0x12,poffset=ms + 4) == b"$_BIM_CONFIG_END_$": v = 1
+                else: raise ValueError
+
+            f.seek(oo + 0x18)
+            if v == 0:
+                ms = f.readu32()
+                f.padc(4)
+                md = f.readc(ms)
+            elif v == 1:
+                mc,ms = f.readu32(),f.readu32()
+                f.padc(4)
+                md = f.readc(ms)
+                asrt(crc_hash(md,'crc32') == mc)
+            asrt(f.read(0x12) == b"$_BIM_CONFIG_END_$")
+            e = ext_exe(md)
+            mn = e.DIRECTORY_ENTRY_EXPORT.name.decode('latin-1')
+            del e
+            writefile(o + '/$INSFILES/' + mn,md)
+
+            if f.peek(5) == b'BLZMA':
+                f.skip(5)
+                v,ts = f.readu32(),f.readu32()
+                asrt(v in {1,2})
+                c = f.readu64()
+                f.skip(0x10)
+                prop = f.readc(5)
+
+                for _ in range(c):
+                    n = o + '/' + sanitize_relative(f.reads(f.readu32(),'cp1252').rstrip('\0'))
+                    ts = f.readu32()
+                    f.skip(4)
+                    zs,us = f.readu64(),f.readu64()
+                    ccrc = f.readu32()
+                    if v == 1: enc = f.readu32()
+                    else: enc = f.readu8()
+                    asrt(enc == 0,'Encryption')
+
+                    of = xopen(n,'wb')
+                    crc = 0
+                    while of.tell() < us:
+                        bzs,bus = f.readu32(),f.readu32()
+                        d = f.decompress(bzs,'lzma1_raw',props=prop,usize=bus + 4)[:bus]
+                        crc = crc_hash(d,'crc32',value=crc)
+                        of.write(d)
+                    of.close()
+                    asrt(crc == ccrc)
+                    set_ftime(n,ts)
+            elif f.peek(4) == b'PK\3\4':
+                for fe in f.decompress(None,'zip',out={}):
+                    fn = sanitize_relative(fe[0])
+                    if fe[1] is None: mkdir(o + '/' + fn)
+                    else:
+                        writefile(o + '/' + fn,fe[1])
+                        set_ftime(o + '/' + fn,fe[2])
+
+            f.close()
+            if listdir(o) != ['$INSFILES']:
+                for de in listdir(o):
+                    if de.startswith('_$_INSTALLER_Data_') and de.endswith('_$_') and de[18:-3].isdigit():
+                        copydir(o + '/' + de,o + '/$INSFILES',True)
+                if len(listdir(o)) == 2:
+                    dig = [x for x in listdir(o) if x.isdigit()]
+                    if dig: copydir(o + '/' + dig[0],o,True,True)
+                return
 
     return 1

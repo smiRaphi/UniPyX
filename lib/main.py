@@ -80,6 +80,27 @@ def namespace(_func=None,include=[],keep_init=True):
 class Empty: pass
 def whilelc(fnc):
     while fnc(): yield
+def console():
+    import tokenize,io,sys
+    from traceback import TracebackException
+
+    loc = sys._getframe(1).f_locals
+    while True:
+        try: i = input('> ')
+        except (EOFError,KeyboardInterrupt): break
+        if not i: continue
+        if i == '\x11': sys.exit() # CTRL+Q
+        try:
+            if i.startswith(('from ','import ','def ','class ','async ')) or\
+               any(x.type == tokenize.OP and x.string in {'=','+=','-=','*=','**=','/=','//=','%=','>>=','<<=','&=','|=','^=',':=','@='} for x in tokenize.tokenize(io.BytesIO(i.encode()).readline)):
+                exec(i,locals=loc)
+            else: print(eval(i,locals=loc))
+        except Exception as e:
+            if e.__class__ == SyntaxError:
+                ex = TracebackException.from_exception(e)._format_syntax_error(None)
+                next(ex);next(ex)
+                print('  ' + next(ex).strip('\n\r')[4:])
+            print(f'{e.__class__.__name__}: {e}')
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
@@ -222,28 +243,33 @@ def sanitize_relative(p:str):
     if p[-1] not in '\\/' and r[-1] in '\\/': r = r[:-1]
     elif p[-1] != r[-1]: r = r[:-1] + p[-1]
     return r
-def unix2filetime(t:int): return t * 10000000 + 116444736000000000
+def unix2filetime(t:int): return int(t * 10000000 + 116444736000000000)
 def filetime2unix(t:int): return (t - 116444736000000000) / 10000000
 def vms2filetime(t:int): return t + 81377568000000000
 def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
+    if ct is None and at is None and mt is None: return
     if ct is None: ct = 0
     if mt is None: mt = ct
     if at is None: at = mt
+    if ct == at == mt == 0: return
 
+    if unix:
+        wct = unix2filetime(ct)
+        wat = unix2filetime(at)
+        wmt = unix2filetime(mt)
+    else: wct,wat,wmt = ct,at,mt
+    fct = wintypes.FILETIME(wct & 0xFFFFFFFF,wct >> 32)
+    fat = wintypes.FILETIME(wat & 0xFFFFFFFF,wat >> 32)
+    fmt = wintypes.FILETIME(wmt & 0xFFFFFFFF,wmt >> 32)
+
+    h = None
     try:
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)
-        if unix:
-            wct = unix2filetime(ct)
-            wat = unix2filetime(at)
-            wmt = unix2filetime(mt)
-        else: wct,wat,wmt = ct,at,mt
-        fct = wintypes.FILETIME(wct & 0xFFFFFFFF,wct >> 32)
-        fat = wintypes.FILETIME(wat & 0xFFFFFFFF,wat >> 32)
-        fmt = wintypes.FILETIME(wmt & 0xFFFFFFFF,wmt >> 32)
         ctypes.windll.kernel32.SetFileTime(h,ctypes.byref(fct),ctypes.byref(fat),ctypes.byref(fmt))
-        ctypes.windll.kernel32.CloseHandle(h)
     except: pass
     else: return
+    finally:
+        if h is not None: ctypes.windll.kernel32.CloseHandle(h)
 
     if not unix:
         at = filetime2unix(at)

@@ -47,6 +47,10 @@
         "rq":["ZIP","AOLSetup",true],
         "rs":"AOLSetup","s":1
     },
+    {
+        "rq":["UPX","Bytessence Install Maker",true],
+        "rs":"Bytessence Install Maker","s":1
+    },
 
     {
         "t":"url",

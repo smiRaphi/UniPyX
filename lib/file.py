@@ -447,24 +447,33 @@ class EXE(File):
         else: raise NotImplementedError(pe)
 
         self.ovl_off = max([x[2] for x in self.secs.values()])
-def ext_exe(i:str,dotnet=False):
+def ext_exe(i:str|bytes,dotnet=False):
+    if isinstance(i,str): kw = {'name':i}
+    elif isinstance(i,(bytes,bytearray)): kw = {'data':i}
+    else: raise TypeError
     if dotnet:
         import dnfile
-        return dnfile.dnPE(i)
+        return dnfile.dnPE(**kw)
     else:
-        f = open(i,'rb')
-        f.seek(0x3C)
-        f.seek(int.from_bytes(f.read(4),'little'))
-        t = f.read(2)
-        f.close()
+        if isinstance(i,str):
+            f = open(i,'rb')
+            f.seek(0x3C)
+            f.seek(int.from_bytes(f.read(4),'little'))
+            t = f.read(2)
+            f.close()
+        else:
+            of = int.from_bytes(i[0x3C:0x40],'little')
+            t = i[of:of+2]
 
         if t == b'PE':
             import pefile
-            r = pefile.PE(i)
+            r = pefile.PE(**kw)
             r.SECTIONS = {s.Name.rstrip(b'\0').decode('latin-1'):s for s in r.sections}
             return r
         elif t == b'NE':
             import nefile
+            if 'name' in kw: kw['filepath'] = kw.pop('name')
+            if 'data' in kw: kw['stream'] = io.BytesIO(kw.pop('data'))
             return nefile.NE(i)
         else: raise NotImplementedError(t.decode('latin-1'))
 
@@ -525,6 +534,13 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             elif type(om) == str:
                 z.extractall(om)
                 r = z.namelist()
+            elif om == {}:
+                from datetime import datetime
+                r = []
+                for n in z.infolist():
+                    dt = datetime(*n.date_time).timestamp()
+                    if n.is_dir(): r.append((n.filename,None,dt))
+                    else: r.append((n.filename,z.read(n),dt))
             else: r = {n:z.read(n) for n in z.namelist()}
             z.close()
             return r
@@ -563,6 +579,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[
                    lzma._decode_filter_properties(lzma.FILTER_LZMA1,i[4:4+ps])]).decompress(i[4+ps:])
+        case 'lzma1_raw':
+            import lzma
+            if 'props' in kwargs: f = lzma._decode_filter_properties(lzma.FILTER_LZMA1,kwargs['props'])
+            else: f = {'id':lzma.FILTER_LZMA1,'dict_size':kwargs['dict_size'],'lc':kwargs['lc'],'lp':kwargs['lp'],'pb':kwargs['pb']}
+            return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[f]).decompress(i,kwargs.get('usize',-1))
         case 'xz':
             import lzma
             return lzma.LZMADecompressor(format=lzma.FORMAT_XZ).decompress(i)

@@ -1661,5 +1661,9 @@
         "bitrock installbuilder ver: ?.?.?",
         "bitrock installer",
         "www.bitrock.com"
+    ],
+    "Bytessence Install Maker":[
+        "bytessence install maker",
+        "bytessence install maker(5.40)"
     ]
 }

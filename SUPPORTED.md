@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1028
+# Supported Formats: 1029
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -229,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (128)
+## Executables/Packers/Installers (129)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -250,6 +250,7 @@ Big EXE | .exe | Custom | Carves out EXEs and tries to extract those
 Bink Video EXE | .exe | Custom |
 BitRock Installer | .exe | Custom |
 bytepress | .exe | [BytePressDecompressor](https://web.archive.org/web/20201001175533/https://github.com/ribthegreat99OrN0P/BytePressDecompressor) + [bytepress.lib.dll](https://github.com/roachadam/bytepress/releases) |
+Bytessence Install Maker | .exe | Custom |
 C64 1001 CardCruncher | .prg | [unp64](https://iancoog.altervista.org/)
 C64 CruelCrunch | .prg | [unp64](https://iancoog.altervista.org/)
 C64 ECA Compactor | .prg | [unp64](https://iancoog.altervista.org/)
