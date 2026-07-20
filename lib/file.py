@@ -84,7 +84,10 @@ class File:
         if sum(self.readc(n)): raise ValueError(f"Unexpected Value in padding @ 0x{self.pos - n:08X} - 0x{self.pos:08X}")
     def reads(self,n:int,encoding='utf-8'):
         if encoding == 'utf-16': return self.readutf16(n)
-        return self.readc(n).decode(encoding)
+        try: return self.readc(n).decode(encoding)
+        except UnicodeDecodeError:
+            print(f'Failed to decode {encoding} @ 0x{self.pos - n:08X} - 0x{self.pos:08X}')
+            raise
     def readu(self,c=b'\0',maxl=None,chks=0x80,include=False,skip=True,eoferr=False):
         if not maxl is None and maxl < chks: chks = maxl
         lnc = len(c)
@@ -127,7 +130,7 @@ class File:
         end = end or self._end
         if end == '-': d = self.middle_scramble(d)
         return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
-    def readil(self,n:int|float,c:int,signed=False,end=None) -> list[int|float]:
+    def readil(self,n:int|float,c:int,signed=False,end=None,eoferr=True) -> list[int|float]:
         end = end or self._end
         asrt(end != '-')
         t = ILSTRM[n]
@@ -136,7 +139,12 @@ class File:
         if isinstance(c,bytes):
             d = c
             c = len(d) // n
-        else: d = self.readc(c*n)
+        else:
+            d = self.read(c*n)
+            if len(d) != c*n:
+                if eoferr: raise EOFError
+                d = d[:-len(d) % -n]
+                c = len(d) // n
         return list(struct.unpack(f'{end}{c}{t}',d))
     def writei(self,i:int,n:int,signed=False,end=None):
         d = i.to_bytes(n,ENDMAP[end or self._end],signed=bool(signed))
@@ -227,6 +235,18 @@ class File:
         if encoding is not None: r = r.decode(encoding)
         return r
     def readutf16(self,l:int,end=None): return self.readc(l * 2).decode('utf-16' + UTFENDM[end or self._end])
+    def read0s16(self,maxl:int=None,chks=0x40,end=None):
+        r = []
+        while self and (maxl is None or len(r) < maxl):
+            v = self.readil(2,chks,eoferr=False)
+            if 0 in v:
+                i0 = v.index(0)
+                r.extend(v[:i0])
+                self.back((len(v) - i0) * 2)
+                break
+            r.extend(v)
+
+        return struct.pack(f'<{len(r)}H',*r).decode('utf-16le')
 
     def writeu8 (self,v:int): return self.writei(v,1,0)
     def writeu16(self,v:int,end=None): return self.writei(v,2,0,end)
@@ -281,7 +301,19 @@ class File:
         finally: self.seek(p)
         return r
 
-    def decompress(self,size:int,algo:str,*args,**kwargs): return decompress(self.readc(size),algo,*args,**kwargs)
+    def decompress(self,size:int,algo:str,*args,**kwargs):
+        if size == -1:
+            obj = decompress(None,algo,*args,**kwargs)
+            hf = hasattr(obj,'flush')
+
+            d = bytearray()
+            while not obj.eof:
+                if not self: raise EOFError
+                d.extend(obj.decompress(self.read(0x4000)))
+                if hf: d.extend(obj.flush())
+            self.back(len(obj.unused_data))
+            return bytes(d)
+        else: return decompress(self.readc(size),algo,*args,**kwargs)
 
     @property
     def pos(self): return self.tell()
@@ -525,9 +557,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'none': return i
         case 'zlib':
             import zlib
+            if i is None: return zlib.decompressobj(wbits=kwargs.get('wbits',15))
             return zlib.decompress(i,wbits=kwargs.get('wbits',15))
         case 'deflate':
             import zlib
+            if i is None: return zlib.decompressobj(wbits=-15)
             return zlib.decompress(i,wbits=-15)
         case 'deflate_noerr'|'deflate_noerror':
             import zlib
@@ -544,9 +578,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return gzip.decompress(i)
         case 'bz2'|'bzip2':
             import bz2
+            if i is None: return bz2.BZ2Decompressor()
             return bz2.decompress(i)
         case 'brotli'|'br':
             import brotli
+            if i is None: return brotli.Decompressor()
             return brotli.decompress(i)
         case 'zip':
             from zipfile import ZipFile

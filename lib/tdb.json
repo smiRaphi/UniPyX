@@ -1668,5 +1668,9 @@
     ],
     "CP/M HUF":[
         "cp/m huf compressed archive"
+    ],
+    "DeployMaster":[
+        "deploymaster",
+        "deploymaster(2.8.0)"
     ]
 }

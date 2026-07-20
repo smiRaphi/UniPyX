@@ -2316,5 +2316,107 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     dig = [x for x in listdir(o) if x.isdigit()]
                     if dig: copydir(o + '/' + dig[0],o,True,True)
                 return
+        case 'DeployMaster':
+            db.try_custom()
+            from lib.crypto import crc_hash
+            from lib.file import File,ext_exe,iszl
+            e = ext_exe(i)
+            oo = e.get_overlay_data_start_offset()
+            for x in e.DIRECTORY_ENTRY_RESOURCE.entries:
+                if x.id == 0x10:
+                    ve = x.directory.entries[0].directory.entries[0].data.struct
+                    vd = e.get_data(ve.OffsetToData,ve.Size)
+                    break
+            else: raise ValueError('No version offset')
+            e.close()
+
+            f = File(vd,endian='<')
+            f.skip(6)
+            f.read0s16()
+            for _ in range(4):
+                if f.peek('u8'): break
+                f.skip(1)
+            asrt(f.read(4) == b'\xBD\x04\xEF\xFE')
+            v = tuple(f.readil(2,4)[::-1])
+            del f
+
+            f = File(i,endian='<')
+            f.seek(oo)
+            writefile(o + '/$INSFILES/$engine.exe',f.decompress(-1,'bz2'))
+            asrt(f.reads32() == -1)
+            writefile(o + '/$INSFILES/$lang.txt',f.decompress(f.readu32(),'zlib'))
+            prj = f.decompress(f.readu32(),'zlib').split(b'\x0C')
+            flg = prj[-1][-1] if prj[-1] else 0
+            prj = [x.decode('cp1252').rstrip('\0') for x in prj[:-1]]
+            writefile(o + '/$INSFILES/$project.txt','\n'.join(prj) + f'\n{flg:02X}','wt')
+
+            if flg & 1:
+                writefile(o + '/$INSFILES/$id_registry.bin',f.decompress(f.readu32(),'zlib'))
+                writefile(o + '/$INSFILES/$id_validation.bin',f.decompress(f.readu32(),'zlib'))
+                asrt(f.readu32() == 0)
+            writefile(o + '/$INSFILES/$authentication.bin',f.readc(0x43))
+            apph = f.readc(0x2B if v >= (2,7,0,0) else 4)
+            writefile(o + '/$INSFILES/$appearance_header.bin',apph)
+            if apph[-1]: writefile(o + '/$INSFILES/$appearance.bin',f.decompress(f.readu32(),'zlib'))
+
+            fids = [7,8,9,10]
+            if len(prj) >= 17: fids.append(14)
+            res = {}
+            for fi in fids:
+                if prj[fi]: res[prj[fi]] = f.decompress(f.readu32(),'zlib')
+
+            cc = f.readu8()
+            for ix in range(cc):
+                d = f.decompress(f.readu32(),'zlib')
+                writefile(f'{o}/$INSFILES/$component_{ix}.{guess_ext(d)}',d)
+            ns = f.decompress(f.readu32(),'zlib').decode('cp1252').replace('\r','').split('\n')
+            if not ns[-1]: ns.pop()
+            c = len(res) + len(ns)
+            ofs = f.readil(4,c,signed=True)
+            tss = f.readil(4,c)
+            vss = f.readil(8,c,signed=True)
+            szs = f.readil(4,c)
+            crs = f.readil(4,c)
+
+            for ix,(fn,d) in enumerate(res.items()):
+                asrt(ofs[ix] == -1)
+                asrt(szs[ix] == len(d) and crc_hash(d,'crc32') == crs[ix])
+                fn = o + '/$INSFILES/' + fn
+                writefile(fn,d)
+                set_ftime(fn,tss[ix])
+
+            eof = max(x + f.peek('u32',poffset=x - f.pos) for x in ofs[len(res):])
+            ds = {}
+            while f < eof:
+                p = []
+                while f < eof:
+                    l = f.readu8()
+                    if l == 0xFE: break
+                    if l == 0xFF:
+                        pk = f.peek('u32')
+                        if pk == 0 or (pk >= 8 and f.pos + 4 + pk <= eof and iszl(f.peek(8,poffset=4))):
+                            p = None
+                            break
+                    else: p.append(f.reads(l,'cp1252'))
+                if p is None: break
+                if p and p[0].upper() == '%APPFOLDER%': p.pop(0)
+                p = sanitize_relative('/'.join(p))
+                fids = f.decompress(f.readu32(),'zlib')
+                fids = [int.from_bytes(fids[ix*3+1:ix*3+3],'little') for ix in range(len(fids)//3)]
+                for ix in fids: ds[ix] = p
+
+            oid = sorted(ds)[:c]
+            for ix in range(len(res),c):
+                f.seek(ofs[ix])
+                d = f.decompress(f.readu32(),'zlib')
+                asrt(szs[ix] == len(d) and crc_hash(d,'crc32') == crs[ix])
+                if ix < len(oid): fn = o + '/' + ds[oid[ix]]
+                else: fn = o
+                fn += '/' + ns[ix - len(res)]
+                writefile(fn,d)
+                set_ftime(fn,tss[ix])
+
+            f.close()
+            if c > 0: return
 
     return 1
