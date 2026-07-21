@@ -25,7 +25,9 @@
         "google chrome extension",
         "ios app zip archive data",
         "winzip win32 self-extracting archive (generic)",
-        "torrentzip compressed archive"
+        "torrentzip compressed archive",
+        "java archive",
+        "java archive data (jar)"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",

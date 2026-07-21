@@ -69,7 +69,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
              'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer'|'RPM Package'|\
              'Microsoft Compound Document':
             _,_,e = zip7(i,o,t)
-            if 'ERROR: Unsupported Method : ' in e and open(i,'rb').read(2) == b'MZ':
+            if 'ERROR: Unsupported Method : ' in e and readfile(i,size=2) == b'MZ':
                 rmtree(o,True)
                 mkdir(o)
                 if db.print_try: print('Trying with input')
@@ -117,7 +117,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if exists(of) and getsize(of): return
         case 'Stripped TAR':
             db.try_custom()
-            f = open(i,'rb')
+            f = xopen(i,'rb')
 
             while True:
                 fn = f.read(100)
@@ -217,7 +217,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if f.endswith('.iso'):
                         nt = None
                         f = o + '\\' + f
-                        fo = open(f,'rb')
+                        fo = xopen(f,'rb')
                         fs = fo.seek(0,2)
 
                         for off in (0x10000,0xFDA0000,0x18310000):
@@ -240,13 +240,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 return
         case 'Shifted ISO':
             db.try_custom()
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(0x8000)
             dat = f.read(0x1000)
             if not b'\x01CD001\x01\x00' in dat: return 1
             tf = o + '\\TMP' + os.urandom(8).hex() + '.iso'
             f.seek(dat.index(b'\x01CD001\x01\x00'))
             writefile(tf,f.read())
+            f.close()
 
             if extract1(tf,o,'ISO'): rename(tf,o + '/' + tbasename(i) + '_fixed.iso')
             else: remove(tf)
@@ -1133,7 +1134,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             fs = listdir(o)
             if fs: return
         case 'ZOO':
-            if open(i,'rb').read(2) == b'MZ':
+            if readfile(i,size=2) == b'MZ':
                 run(['deark','-od',o,i])
                 tf = o + '\\output.000.zoo'
                 if not exists(tf): return 1
@@ -1190,11 +1191,11 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'ARG': return msdos(['arg','e',i],cwd=o)
         case 'ASD':
             tf = i
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             if f.read(2) == b'MZ':
                 tf = TmpFile('.asd')
                 f.seek(0x9000)
-                writefile(tf.p,f.read())
+                tf.write(f.read())
             f.close()
             run(['asd','x','-y',tf],cwd=o)
             if hasattr(tf,'destroy'): tf.destroy()
@@ -1228,13 +1229,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 return
         case 'DWC':
             tf = i
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             if f.read(2) == b'MZ':
                 siz = f.seek(0,2)
                 f.seek(0)
                 tf = TmpFile('.dwc')
                 d = f.read(siz-0x10)
-                writefile(tf.p,d + f.read(0x10).rsplit(b'DWC')[0] + b'DWC')
+                tf.write(d + f.read(0x10).rsplit(b'DWC')[0] + b'DWC')
                 del d
             f.close()
             r = msdos(['dwc','x',tf],cwd=o)
@@ -1256,7 +1257,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 remove(td)
         case 'Intel HEX':
             db.try_custom()
-            f = open(i,encoding='utf-8')
+            f = xopen(i,encoding='utf-8')
 
             fs = [[]]
             for l in f.readlines():
@@ -1277,7 +1278,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             for ix,fe in enumerate(fs):
                 of = o + '/' + tbasename(i)
                 if mf: of += f'_{ix}'
-                of = open(of + '.bin','wb')
+                of = xopen(of + '.bin','wb')
                 for addr,data in fe:
                     if addr > of.seek(0,2): of.write(b'\xFF'*(addr-of.tell()))
                     else: of.seek(addr)
@@ -1350,7 +1351,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'Motorola S-Record':
             db.try_custom()
-            f = open(i)
+            f = xopen(i)
 
             fs = [[]]
             for l in f.readlines():
@@ -1382,7 +1383,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if not fe: continue
                 of = o + f'/{ix}'
                 if type(fe[0]) == str: of += '_' + fe.pop(0)
-                of = open(of + '.bin','wb')
+                of = xopen(of + '.bin','wb')
                 for a,d in fe:
                     if a > of.seek(0,2): of.write(b'\xFF'*(a-of.tell()))
                     of.seek(a)
@@ -1456,7 +1457,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.crypto import decrypt
             import json
-            f = open(i,'rb')
+            f = xopen(i,'rb')
 
             tr = {}
             while True:
@@ -1515,7 +1516,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
         case 'Bencode':
             db.try_custom()
             import json
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             s = f.seek(0,2);f.seek(0)
             fc = 0
 

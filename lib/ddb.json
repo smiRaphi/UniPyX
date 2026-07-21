@@ -51,6 +51,11 @@
         "rq":["UPX","Bytessence Install Maker",true],
         "rs":"Bytessence Install Maker","s":1
     },
+    {
+        "rqr":["Java Archive","Java archive data (JAR)"],
+        "d":[["contain","optifine/xdelta/licence.txtPK\\1\\2",[-256,256]],["contain","patch/notch/com/mojang/",[-250000,250000]]],
+        "rs":"OptiFine Installer","s":1
+    },
 
     {
         "t":"url",

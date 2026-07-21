@@ -3,12 +3,10 @@ import sys,os,subprocess
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.makedirs(BDIR + '\\bin\\pip',exist_ok=True)
 sys.path.insert(0,BDIR + '\\bin\\pip')
-def pip(*pkgs,db=None):
-    if db: t = int(time())
-    r = subprocess.run([sys.executable,'-m','pip','install',*pkgs,'-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2).stdout.decode()
-    if db:
-        for n in pkgs: db.udb[n] = t
-    return r
+def pip(*pkgs,error=False):
+    r = subprocess.run([sys.executable,'-m','pip','install',*pkgs,'-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2)
+    if error and r.returncode: raise RuntimeError(r.stdout.decode('cp437'))
+    return r.stdout.decode('cp437')
 
 try: import httpx
 except (ImportError,ModuleNotFoundError):
@@ -87,7 +85,7 @@ class DLDB:
             if stdin:
                 tfi = gtmp('.i')
                 if type(stdin) == str: stdin = stdin.encode()
-                open(tfi,'wb').write(stdin)
+                xopen(tfi,'wb').write(stdin)
             tfo,tfe = gtmp('.o'),gtmp('.e')
 
             if 'cwd' in kwargs:

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1031
+# Supported Formats: 1032
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -229,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (130)
+## Executables/Packers/Installers (131)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -316,6 +316,7 @@ Neobook Executable | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/t
 Netcrypt | .exe | Custom |
 NSIS Installer | .exe | [7-Zip](https://7-zip.org/), [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
 Nuitka Compiled | .exe | [nuitka-extractor](https://github.com/extremecoders-re/nuitka-extractor) |
+OptiFine Installer | .jar | Custom |
 Optilink | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 PGMPAK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 PlayStation 2 BIOS | .bin | [romman](https://github.com/israpps/romman) |

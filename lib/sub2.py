@@ -68,9 +68,9 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'GameCube GCAM ISO':
             db.try_custom()
             tf = TmpFile('.iso')
-            with open(i,'rb') as fi:
+            with xopen(i,'rb') as fi:
                 fi.seek(0x20)
-                with open(tf.p,'wb') as f:
+                with tf.open('wb') as f:
                     d = b''
                     while True:
                         d = fi.read(0x4000)
@@ -82,7 +82,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'GameCube TGC ISO':
             db.try_custom()
             tf = TmpFile('.iso')
-            with open(i,'rb') as fi:
+            with xopen(i,'rb') as fi:
                 fi.seek(8)
                 off = int.from_bytes(fi.read(4),'big')
                 fi.seek(0x10)
@@ -90,7 +90,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 fi.seek(0x1C)
                 dol = int.from_bytes(fi.read(4),'big') - off
                 fi.seek(off)
-                with open(tf.p,'wb') as f:
+                with tf.open('wb') as f:
                     d = b''
                     while True:
                         d = fi.read(0x4000)
@@ -270,16 +270,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if r or not listdir(o): return 1
                 return
             if not extract(i,o,'ISO'):
-                if exists(o + '/PS3_GAME/USRDIR/EBOOT.BIN') and open(o + '/PS3_GAME/USRDIR/EBOOT.BIN','rb').read(4) != b'SCE\0': return 1
+                if exists(o + '/PS3_GAME/USRDIR/EBOOT.BIN') and readfile(o + '/PS3_GAME/USRDIR/EBOOT.BIN',size=4) != b'SCE\0': return 1
                 return
         case 'PSVita PKG':
             if exists(noext(i) + '.work.bin'): work = noext(i) + '.work.bin'
             elif exists(dirname(i) + '/work.bin'): work = dirname(i) + '/work.bin'
             else:
-                f = open(i,'rb')
-                f.seek(0x10)
-                ms = int.from_bytes(f.read(4),'big')
-                f.close()
+                ms = int.from_bytes(readfile(i,off=0x10,size=4),'big')
                 if ms >= 0x140: return 1
                 work = None
 
@@ -383,7 +380,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 fi,fo = dr + '/' + fn,o + '/' + fn
 
                 if c.type & 1:
-                    inf,ouf = open(fi,'rb'),open(fo,'wb')
+                    inf,ouf = xopen(fi,'rb'),xopen(fo,'wb')
                     tid = crc_hash(sec + (tmd.title_id.to_bytes(8,'big').lstrip(b'\0') or b'\0'),'md5',bytes=True)
                     for ix in pids:
                         aes = decrypt(None,'aes_cbc',encrypt(keys['tmd']['p'][ix],'pbkdf2_sha1',tid,0x14,size=0x10),
@@ -407,7 +404,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     inf.close();ouf.close()
                 elif getsize(fi) == c.csize: copy(fi,fo)
                 else:
-                    inf,ouf = open(fi,'rb'),open(fo,'wb')
+                    inf,ouf = xopen(fi,'rb'),xopen(fo,'wb')
                     ol = 0
                     while ol < c.csize:
                         p = inf.read(1024**2)
@@ -520,7 +517,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 ld = id + '\\' + f
                 if isdir(ld) or getsize(ld) != 0x100: continue
 
-                lf = open(ld,'rb')
+                lf = xopen(ld,'rb')
                 if sum(lf.read(8)) == 0 and sum(lf.read(8)) != 0 and sum(lf.read(3)) == 0 and lf.read(1)[0] == 0xFF and sum(lf.read(0x8C)) == 0:
                     lf.seek(0xC0)
                     drv = lf.read(0x20).strip(b'\0')
@@ -539,19 +536,16 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 asrt(exists(tf),err=FileNotFoundError)
                 od = tbasename(f) + '_ext'
                 if t == 'C':
-                    asrt(open(tf,'rb').read(4) == b'FATX',basename(tf))
+                    asrt(readfile(tf,size=4) == b'FATX',basename(tf))
                     mkdir(od)
                     extract(tf,od,'FATX')
                 elif t == 'T':
-                    tff = open(tf,'rb')
-                    tff.seek(28)
-                    chk = tff.read(4) == b'\xC2\x33\x9F\x3D'
-                    tff.close()
+                    chk = readfile(tf,off=0x1C,size=4) == b'\xC2\x33\x9F\x3D'
                     asrt(chk,basename(tf))
                     mkdir(od)
                     extract2(tf,od,'GameCube ISO')
                 elif t == 'N':
-                    tff = open(tf,'rb')
+                    tff = xopen(tf,'rb')
                     nt = None
 
                     if tff.read(0x50) == b"NAOMI           SEGA ENTERPRISES,LTD.           MONKEY BALL JAPAN VERSION       ": nt = 'Monkey Ball A'
@@ -568,7 +562,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                         mkdir(od)
                         extract2(tf,od,nt)
                 elif t == '2':
-                    tff = open(tf,'rb')
+                    tff = xopen(tf,'rb')
                     nt = None
 
                     if tff.read(0x60) == b'Naomi2          SEGA CORPORATION                INITIAL D Ver.3                 INITIAL D Ver.3 IN USA          ': nt = 'Initial D 3 Export A'
@@ -613,7 +607,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 cns[int(cn[2:])] = f.read(f.readu32())
             asrt((len(cns)-1) == max(list(cns)))
 
-            of = open(o + '/' + tbasename(i) + '.bin','wb')
+            of = xopen(f'{o}/{tbasename(i)}.bin','wb')
             for ix in range(1,len(cns)): of.write(cns[ix])
             of.close()
             if cns: return
@@ -640,9 +634,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     name += b.decode('utf-8')
                 cp = f.pos + -(f.pos-aoff) % 4
                 f.seek(off)
-                of = open(o + '/' + name,'wb')
-                of.write(f.read(siz))
-                of.close()
+                writefile(o + '/' + name,f.readc(siz))
                 f.seek(cp)
             if fsc: return
         case 'NES Remix ROM':
@@ -758,7 +750,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 for f in rldir(o,False):
                     if not exists(f): continue
                     if exists(f + '.inf'):
-                        finf = open(f + '.inf','rb').read()
+                        finf = readfile(f + '.inf')
                         if b'\n' in finf or b'\r' in finf: continue
                         try: finf = finf.decode('utf-8')
                         except: continue
@@ -1196,7 +1188,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'Doctor V64 ROM':
             db.try_custom()
             import struct
-            d = readfile(i,'rb')
+            d = readfile(i)
             writefile(f'{o}/{tbasename(i)}.z64',struct.pack(f'>{len(d)//2}H',*struct.unpack(f'<{len(d)//2}H',d)))
             return
 
@@ -1304,7 +1296,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if f.startswith('unknown_') and f.endswith('.bin') and not getsize(o + '/' + f): remove(o + '/' + f)
             return
         case 'Mario Kart 64 N64 ROM'|'F-Zero X N64 ROM'|'Wonder Project J2 N64 ROM':
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(0x3B)
             tg = f.read(4).decode('latin1')
             f.close()
@@ -1386,7 +1378,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 },
             }
 
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(0x3B)
             tg = f.read(4).decode('latin1')
             v = f.read(1)[0]
@@ -1488,12 +1480,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     from lib.file import decompress
 
                     offs = ast.literal_eval(re.search(r'target_mio0_offsets = (\[[\s\dA-Fa-fx,]+\])',readfile(bps + '/mio0_extract.py','r'))[1])
-                    f = open(i,'rb')
+                    f = xopen(i,'rb')
                     for of in offs:
                         f.seek(of)
                         if f.read(4) == b'MIO0':
                             f.seek(of)
                             writefile(f'{o}/mio0/decompressed_{of:08X}.bin',decompress(f.read(),'mio0'))
+                    f.close()
                 elif rt == 'Super Smash Bros.':
                     from lib.file import File,decompress
                     ass = o + '/assets/' + MP[rt][tg] + '/'
@@ -1517,6 +1510,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                             writefile(f'{ass}{ix}.vpk0',d)
                             writefile(f'{ass}{ix}.vpk0.bin',decompress(d,'vpk0'))
                         else: writefile(f'{ass}{ix}.bin',d)
+                    f.close()
                 return
         case 'Final Fantasy X 2 ISO':
             zip7(i,o + '\\$ISO','ISO')

@@ -47,7 +47,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             sleep(0.1)
 
         while True:
-            r = open(oup + '/_OUT.TXT','rb').read()
+            r = readfile(oup + '/_OUT.TXT')
             if len(r) == getsize(oup + '/_OUT.TXT'):
                 r = r.decode('utf-8')
                 break
@@ -127,7 +127,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['zzip','x','-q',i],cwd=o)
             if listdir(o): return
         case 'Squeez':
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             if f.read(2) == b'MZ':
                 for of in (0x19600,0x1ce00,0x55c00,0x1c400,0x20200,0x65a00,0x19400,0x1ca00,0x55000):
                     f.seek(of)
@@ -146,9 +146,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
             else: f.seek(-2,1)
 
             tf = o + '/tmp' + os.urandom(8).hex() + '.exe'
-            t = open(tf,'wb')
+            t = xopen(tf,'wb')
 
-            t.write(open(db.get('sqx'),'rb').read())
+            t.write(readfile(db.get('sqx')))
             # SCSFX
             import zlib,base64
             t.write(zlib.decompress(base64.b85decode('c-oy-&2Aev5LVDjp+ff_nE;X!G?uMDOHTR&N0u9-i5+;;ra;sKwM$8?cgZcum7=~;Z@u?WpfAuz=_~Xb?yj_U5}>F7+uWJq@SB-$h72ab`H!`~f4^7zv{tLlKdaUL`Qy(<{cR*{Xk_Z7RzEfBjrtM$icQrrmUcy-ZzJybPH}b9sCV)IQa9>7{GV_YinvklV|^{sn1_P#7=i%=tw6XeZPbUfp1yO2hptgS#@9tlEi~hEok1`n^>Y!!a*SoC(`nRCD!v=_r-9=t;wEAU0RRX|>uN2`#z-gFLdL?fjdUycW2w;zqESm264W;<p;)AqU?PVA6>FJHv3Aq8VMK8>?Gx6FGw<r5eRR0caU={@<t7mwI$`k-;JOs;B$nX~)9_M6)@DwZ)|7(+)&g*tTS+@p+=MH+7G&pEg4tArav?>;^3%xk;Qx4Lh2su8-6=N`%emOYCm-!|e^9$KQ?F@Xe(ugTG=h_*Trla7GPqIN!G*N0<LhuHd90TfK&hq^trpTGW#J*E+EzXD7%rnN3$=1wDj@annBob}X*auV3YrM;MrU!vwmM_6yzwbA1)V5W9s<>kc4G(egzBA#kJ^3%A#tYJzaQOa&$g)5OvT(fmgp!?a<luGHG81#(a!F>XCE~p=DhMuLM(>8;?{1oiJ<BE7<1OK2Tl8c0YX~niG5B`zB}wyEVu=B<&X)ABGkq}w=+iUy?)^>lBCjR%k;t<mt<*L@-I|qw&{O!>j76??0nOK#IQ;<RL4uPVQ13bppd_0uq8QFvN#EK69#-Bi)MyT7MTJW4$5(Grr;#yZbfH|_M5GU2^+yF*|ri!+`?y9zW7zPk{2p+kZ(UHPD6B3@~hms;aJB&fZAb1REah>`i44RE~Vo!vvR4p%Z#``Q&*`_hedM{)w$Yk_!b=M9~I@OWWVBa&0`t8@3Hefrm~gL#c;tL{he?98YszvI;%jQ_ZFKPqYa|$6Za<9lLIe+vQLyd4MSlqi-eMXN58-8H6r4!TdfcYwGXmc0xrh`Hc|C2l+6|k8A_CnB_hd*(I4K;?JjVsiokIbkmd1R%MUjIEQtu`u};%1QN=Te0B3Pb+VO74BU8vuX8jQC`{C~?K>?MM8k&K>n<y*nVKaL~RBYNJd*2Er45yo?>tjR{B%CfaNO~n;TptIgA1ITbB|$1gG|@?d5&_6e%~Zt=mGZU)g~Hcd#(a(fpvJUg=2p(7_Q~PlX0z#7+JKDwjEr<bog9+MM5kLLmn-+zZ>)QA(m&`Op$&sKQx>d2*lX#)ikYHW?#(PlAu_Y}DIHMRTlpM+g3rNw!BQRb+jKyMx`P=RU<b$=v{an4g3Ce4Wyq;47deqE`jqG03nIWU&U3LU2s{@6ypRfS1ra@FTj7wl={xE2!F+4auE|iXmqKMY>BPt4NBZ!n@<^Dui8JvRQ;542F>4_wg)Ughh4U7@+(P0dG4#oqMt(imkB`c}Q)q@2O`sD|s9r)v8EajrH4VJn#3yy=-zYywvB8@1(|W<pQm_m32vRxpfdmQN&4uXL$MXW$7S=w9Gl6c3NkxbQjT2h)Ej~TyOWcT9`)AYZZAxqZYzpMBv_8(ytXx$PdQhj%89C1!&BtR8?V9q94-X2JPeC6`8%9UIv06!j&c|nWPbGZy_Rp}9hx8n&N%<1Tj|O>K$~W5wNaf2);pRyi`Fq93H1aI;VT=fI9^Htb-U(<#h^z68bHMuu#ss;DZ`{k3c`##wT*fjcyiLpxybcpQ;vgB`mK67r_j&B!f9&D@AiM?rCV!8Sh<!P=Ay38EG+9GGvWlliilIXsL2HgFr0>;@(i>GgRPfNQeS+W5hqaIX+$(;oKmP(&ql(S')))
@@ -235,11 +235,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'CRUSH': return msdos(['uncrush','-qo',i],cwd=o)
         case 'DGCA':
             tf = i
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             if f.read(2) == b'MZ':
                 tf = TmpFile('.dgc')
                 f.seek(0x36540)
-                writefile(tf.p,f.read())
+                tf.write(f.read())
             f.close()
             run(['dgcac','e',tf,o])
             if hasattr(tf,'destroy'): tf.destroy()
@@ -264,7 +264,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'UCLPack':
             db.try_custom()
             from lib.file import decompress
-            d = decompress(open(i,'rb').read(),'uclpack',db=db)
+            d = decompress(readfile(i),'uclpack',db=db)
             writefile(o + '/' + tbasename(i),d)
             return
         case 'Binary ][ Archive':
@@ -350,7 +350,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             if exists(of) and getsize(of): return
         case 'ELI 5750': raise NotImplementedError
         case 'Fold FOL'|'Fold ARK':
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             if f.read(2) == b'MZ':
                 f.seek(0x2be0)
                 tg = f.read(5)
@@ -358,7 +358,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 elif tg == b'FARC1': tf = TmpFile(name=tbasename(i) + '.ark',path=o)
                 else: f.close();return 1
                 f.seek(-5,1)
-                writefile(tf.p,f.read())
+                tf.write(f.read())
                 f.close()
                 r = msdos(['unfold',basename(tf.p)],cwd=o)
                 tf.destroy()
@@ -371,9 +371,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['d' + t.lower(),'-f',i,of])
             if exists(of) and getsize(of): return
         case 'CMIX':
-            f = open(i,'rb')
-            dic = f.read(1)[0] & 0x80
-            f.close()
+            dic = readfile(i,size=1)[0] & 0x80
             v = i[-2:]
             if not v.isdigit(): v = v[1:]
             if not v.isdigit(): v = '21'
@@ -384,11 +382,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run([scr,'-d'] + ([dirname(scr) + '\\english.dic'] if dic else []) + [i,of])
             if exists(of) and getsize(of): return
         case 'fxcm':
-            f = open(i,'rb')
-            f.seek(2)
-            v = f.read(1)[0]
-            f.close()
-
+            v = readfile(i,off=2,size=1)[0]
             scr = db.get(f'fxcm_v{v}')
             if not exists(scr): raise NotImplementedError(v)
             of = o + '/' + tbasename(i)
@@ -399,7 +393,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['gmix_v1','-d',i,of])
             if exists(of) and getsize(of): return
         case 'Precomp':
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(3)
             v = list(f.read(3))
             f.seek(7)
@@ -489,11 +483,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                     run([f'fp8_v{ix}','-d',i,o],print_try=False)
                     if listdir(o): return
         case 'Fast PAQ8 SK':
-            f = open(i,'rb')
-            f.seek(5)
-            v = f.read(2).rstrip(b'\0').decode('ascii')
-            f.close()
-
+            v = readfile(i,off=5,size=2).rstrip(b'\0').decode('ascii')
             scr = db.get('fp8sk' + v)
             if not exists(scr): raise NotImplementedError(v)
 
@@ -510,22 +500,14 @@ def extract5(inp:str,out:str,t:str) -> bool:
                     if listdir(o): return
                 tf.destroy()
         case 'PAQ8K':
-            f = open(i,'rb')
-            f.seek(5)
-            v = f.read(1).decode('ascii').strip()
-            f.close()
-
+            v = readfile(i,off=5,size=1).decode('ascii').strip()
             scr = db.get('paq8k' + v + ('_lp2' if v in {'','2'} else ''))
             if not exists(scr): raise NotImplementedError(v)
 
             run([scr,'-d',i,o])
             if listdir(o): return
         case 'PAQ8KX':
-            f = open(i,'rb')
-            f.seek(6)
-            old = f.read(1) != b'\0'
-            f.close()
-
+            old = readfile(i,off=6,size=1) != b'\0'
             if old:
                 for ix in range(3,0,-1):
                     _,r,_ = run([f'paq8kx_v{ix}','-d',i,o])
@@ -549,10 +531,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 if 'Time ' in r and ' bytes of memory' in r and listdir(o): return
                 for f in listdir(o): remove(o + '/' + f)
         case 'PAQ8O':
-            f = open(i,'rb')
-            f.seek(5)
-            v = f.read(3).split(b' ')[0].decode('ascii')
-            f.close()
+            v = readfile(i,off=5,size=3).split(b' ')[0].decode('ascii')
             if v in {'','1'}: v = '2'
             elif v == '10t': v = '10tlp2'
 
@@ -575,12 +554,9 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run([t.lower(),'-d',i,o])
             if listdir(o): return
         case 'PAQ8SK':
-            f = open(i,'rb')
-            f.seek(6)
-            v = f.read(3).split(b'\0')[0]
+            v = readfile(i,off=6,size=3).split(b'\0')[0]
             if not v or v[0] <= 8: v = '-'
             else: v = v.decode('ascii')
-            f.close()
 
             if v == '-':
                 for ix in list(range(38,32,-1)) + [1]:
@@ -604,11 +580,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
                 tf.destroy()
                 if listdir(o): return
         case 'PAQ8PX':
-            f = open(i,'rb')
-            f.seek(6)
-            old = f.read(1) != b'\0'
-            f.close()
-
+            old = readfile(i,off=6,size=1) != b'\0'
             if old:
                 for ix in range(67,-1,-1):
                     scr = db.get('paq8px' + (f'_v{ix}' if ix else ''))
@@ -643,11 +615,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
             run(['paq8pxkzu_v69','-d',i,o])
             if listdir(o): return
         case 'PAQ8PXV':
-            f = open(i,'rb')
-            f.seek(7)
-            v = f.read(2).lstrip(b'v').rstrip(b'\0').decode('ascii')
-            f.close()
-
+            v = readfile(i,off=7,size=2).lstrip(b'v').rstrip(b'\0').decode('ascii')
             scr = db.get('paq8pxv_v' + v)
             if not exists(scr): raise NotImplementedError(v)
 

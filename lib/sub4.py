@@ -197,7 +197,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             ofl = {}
             bid = dirname(i) + '/'
             for x in fs:
-                if not x['source'] in ofl: ofl[x['source']] = open(bid + x['source'],'rb')
+                if not x['source'] in ofl: ofl[x['source']] = xopen(bid + x['source'],'rb')
                 ofl[x['source']].seek(x['offset'])
                 writefile(o + '/' + x['alias'],ofl[x['source']].read(x['size']))
                 if x['compression'] != 'CM_STORE' or x['size'] != x['originalSize']: print('Unknown compression',x)
@@ -225,7 +225,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 for x in listdir(dirname(i)):
                     if x.startswith(bn): fs.append((dirname(i) + '/' + x,int(x[len(bn):])))
                 tf = dirname(i) + '\\' + os.urandom(8).hex() + '.assets'
-                with open(tf,'wb') as f:
+                with xopen(tf,'wb') as f:
                     for x in sorted(fs,key=lambda x:x[1]): f.write(readfile(x[0]))
                 r = extract(tf,o,'Unity Bundle')
                 remove(tf)
@@ -324,7 +324,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for tb in tabs:
                 lt = max([x[0] + x[1] for x in tb])
                 if lt == ds:
-                    fd = open(i,'rb')
+                    fd = xopen(i,'rb')
                     for xf in tb:
                         fd.seek(xf[0])
                         writefile(o + '/' + xf[2],fd.read(xf[1]))
@@ -363,7 +363,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             #     skp = len(f.readu(b'\x11',maxl=0x100,include=True))
             #     f.seek(ofs[ix] + 4 + skp)
 
-            inf = open(i,'rb')
+            inf = xopen(i,'rb')
             def readstr():
                 t = b''
                 while True:
@@ -378,7 +378,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fnms = [readstr() for _ in range(nfs)]
 
             for idx in range(nfs):
-                tof = open(o + '/' + fnms[idx],'wb')
+                tof = xopen(o + '/' + fnms[idx],'wb')
                 inf.seek(offs[idx])
                 print(hex(inf.tell()),fnms[idx])
                 siz = int.from_bytes(inf.read(4),byteorder='little') - 5
@@ -819,13 +819,13 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if db.print_try: print('Trying with ddrutil')
             from bin.ddrutil import FileTable,FILE_TABLE_OFFSET,decompress # type: ignore
 
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(FILE_TABLE_OFFSET)
             ft = FileTable(f)
             d = b''
             for fe in ft.entries:
                 if not fe.is_valid(): continue
-                of = open(o + '/' + hex(fe.filename_hash),'wb')
+                of = xopen(o + '/' + hex(fe.filename_hash),'wb')
                 f.seek(fe.offset)
                 d = f.read(fe.length)
                 if fe.is_compressed(): d = decompress(d)
@@ -837,13 +837,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.crypto import decrypt
 
-            f = open(i,'rb')
-            f.seek(0x19)
-            dat = f.read().split(b'=')[0]
-            f.close()
-            dat = decrypt(decrypt(dat,'b64',fix=True),'aes_ecb',b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l')
+            d = readfile(i,off=0x19).split(b'=')[0]
+            #a = f..1"4.'"
+            d = decrypt(decrypt(d,'b64',fix=True),'aes_ecb',b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l')
 
-            writefile(o + '/' + tbasename(i) + '.json',dat[:-dat[-1]])
+            writefile(o + '/' + tbasename(i) + '.json',d[:-d[-1]])
             return
         case 'Initial D XAF':
             run(['assamunpack',i],cwd=o)
@@ -946,8 +944,8 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     print(p.stderr.read().decode())
                     raise Exception('gameextractor server failed to start')
                 if t in CODS: c = CODS[t]
-                elif t == 'Dying Light RPACK': c = 'RPACK_' + open(i,'rb').read(4).decode('ascii')
-                elif t == 'Frogwares 0000 Package': c = '0000_package' + ('_2' if open(i,'rb').read(8)[7] == 7 else '')
+                elif t == 'Dying Light RPACK': c = 'RPACK_' + readfile(i,'rt',size=4,encoding='ascii')
+                elif t == 'Frogwares 0000 Package': c = '0000_package' + ('_2' if readfile(i,off=7,size=1)[0] == 7 else '')
                 else:
                     p.kill()
                     raise Exception('No mapped codes for ' + t)
@@ -1022,7 +1020,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'QOOB Flash IMG':
             db.try_custom()
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             tp = f.read(4)
 
             n = f.read(0xF4).rstrip(b'\0').decode()
@@ -1036,7 +1034,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'Viper Flash IMG':
             db.try_custom()
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(0x10)
             n = f.read(0x10).rstrip(b'\0').decode()
             if '\n' in n: n = n.split('\n')[0]
@@ -1103,7 +1101,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             lfmmstr.extract_mmstr_archive(i,True)
             if listdir(o): return
         case 'Exient XPK':
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             ver = f.read(1)[0]
             if ver == 1:
                 f.seek(0x10)
@@ -1210,7 +1208,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
                 elif name == b'TEXT' and BTYPE == b'HEAD':
                     if not 'TXT' in FDATA:
-                        FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
+                        FDATA['TXT'] = xopen(fpath + f'/{basename(i)}{cnt}.txt','wb')
                         FDATA['INDENT'] = 0
                         cnt += 1
                     FDATA['TXT'].write(b'  '*FDATA['INDENT'] + f.read(size) + b'\n')
@@ -1218,7 +1216,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     FDATA['INDENT'] = f.readu16()
 
                 elif (name == b'DOCU' and BTYPE == b'4WRT') or (name == b'DOC ' and BTYPE == b'WORD'):
-                    FDATA['TXT'] = open(fpath + f'/{basename(i)}{cnt}.txt','wb')
+                    FDATA['TXT'] = xopen(fpath + f'/{basename(i)}{cnt}.txt','wb')
                     cnt += 1
                 elif (name == b'PARA' and BTYPE == b'4WRT') or (name in {b'HEAD',b'FOOT',b'PARA'} and BTYPE == b'WORD'):
                     FDATA['TXT'].write(b'\r\n')
@@ -1416,10 +1414,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 if exists(df): break
             else: return 1
 
-            df = open(df,'rb')
+            df = xopen(df,'rb')
             for fe in inf['files']:
                 df.seek(fe['start'])
                 writefile(o + '/' + fe['filename'].strip('/'),df.read(fe['end'] - fe['start']))
+            df.close()
             return
         case 'BackupMii NAND Image':
             db.try_custom()
@@ -1429,9 +1428,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 asrt(exists(i))
 
             if getsize(i) != 0x21000400:
-                kf = open(dirname(i) + '/keys.bin','rb')
+                kf = xopen(dirname(i) + '/keys.bin','rb')
             else:
-                kf = open(i,'rb')
+                kf = xopen(i,'rb')
                 kf.seek(0x21000000)
 
             kf.seek(0x100,1)
@@ -1892,7 +1891,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             return
         case 'DelphiX Picture Collection':
             db.try_custom()
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             asrt(f.read(0x1E) == b'\xFF\x0A\0DELPHIXPICTURECOLLECTION\0\x30\x10')
             s = int.from_bytes(f.read(4),'little')
             tf = TmpFile(name=tbasename(i) + '.dfm')
@@ -1906,7 +1905,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'FrontPage Theme':
             db.try_custom()
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.readline()
             n = int(f.readline().strip())
             fs = []
@@ -1916,6 +1915,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for fe in fs:
                 f.seek(14,1)
                 writefile(o + '/' + fe[0],f.read(fe[1]))
+            f.close()
             if fs: return
         case 'Impact Screensaver ILB':
             db.try_custom()
@@ -1945,7 +1945,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             solv = b'\r\n'.join(f.read(w) for _ in range(h))
             grid = b'\r\n'.join(f.read(w) for _ in range(h))
 
-            of = open(o + '/' + tbasename(i) + '.txt','wb')
+            of = xopen(o + '/' + tbasename(i) + '.txt','wb')
             of.write(f.read0s() + b'\r\n')
             at = f.read0s()
             of.write(at + (b' ' if at and at[-1] != 0x20 else b'') + f.read0s() + b'\r\n\r\n' + grid + b'\r\n\r\n' + solv + b'\r\n\r\n' + b'\r\n'.join(f.read0s() for _ in range(clus)) + b'\r\n\r\n')
@@ -2081,7 +2081,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             for _ in range(c): fs.append((f.readu32(),f.readu32()))
 
             if len(fs) == 1 and not f: return
-            of = open(o + '/' + tbasename(i) + '.txt','wb')
+            of = xopen(o + '/' + tbasename(i) + '.txt','wb')
             bo = f.pos
             for ix,off in fs:
                 f.seek(bo + off)
@@ -2419,7 +2419,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 inf.seek(0x5DF638)
             else: return 1
 
-            df = open(i,'rb')
+            df = xopen(i,'rb')
             for ix in range(0x998):
                 df.seek(inf.readu32())
                 inf.skip(4)
@@ -2430,6 +2430,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     if isvalid(ext,True): ext = ext.lower()
                     else: ext = 'bin'
                 writefile(o + f'/{ix}.{ext}',d)
+            df.close()
             return
         case 'Remedy BIN+RMDP': return quickbms('remedy_bin_rmdp',noext(i) + '.bin')
         case 'RenderDoc Capture':

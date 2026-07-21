@@ -25,7 +25,7 @@ def extract4_3(inp:str,out:str,t:str):
             import zlib
             from lib.file import File
             f = File(i,endian='<')
-            fd = open(noext(i) + '.dat','rb')
+            fd = xopen(noext(i) + '.dat','rb')
             asrt(f.read(4) == b'BLDh' and f.readu32() == 0)
 
             fc = bs = 0
@@ -79,7 +79,7 @@ def extract4_3(inp:str,out:str,t:str):
             from lib.file import File,decompress
             from multiprocessing.pool import ThreadPool
             f = File(i,endian='>')
-            fd = open(noext(i) + '.dat','rb')
+            fd = xopen(noext(i) + '.dat','rb')
 
             c = f.readu32()
             f.skip(12)
@@ -775,7 +775,7 @@ def extract4_3(inp:str,out:str,t:str):
             db.try_custom()
             import re
 
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             d = b''
             while not b'</script>' in d: d += f.read(0x1000)
             f.seek(len(d.split(b'</script>',1)[0]))
@@ -784,7 +784,7 @@ def extract4_3(inp:str,out:str,t:str):
 
             f.seek(int(re.search(r'let +overhead *= *parseInt\("(\d+)"\)',d)[1]))
             tf = TmpFile('.tar',path=o)
-            writefile(tf.p,f.read())
+            tf.write(f.read())
             f.close()
 
             r = extract(tf.p,o,'TAR')
@@ -1514,7 +1514,7 @@ def extract4_3(inp:str,out:str,t:str):
                 f.seek(ep)
             f.close()
 
-            d = open(i,'rb').read()
+            d = readfile(i)
             div,d = d[:0x10],d[0x10:]
 
             for n in nps:
@@ -1837,7 +1837,7 @@ def extract4_3(inp:str,out:str,t:str):
         case 'Wii Exported Save Data':
             sdk = db.bin_path + 'wii_sd.bdb'
             if exists(sdk):
-                sdk = open(sdk,'rb').read()
+                sdk = readfile(sdk)
                 sdky,sdiv = sdk[:0x10],sdk[0x10:]
             else:
                 import re
@@ -1903,8 +1903,8 @@ def extract4_3(inp:str,out:str,t:str):
                 if sn:
                     if not sn in fds:
                         fsn = dirname(i) + '/' + sn
-                        if exists(fsn): fds[sn] = open(dirname(i) + '/' + sn,'rb')
-                        elif exists(fsn + extname(n)): fds[sn] = open(fsn + extname(n),'rb')
+                        if exists(fsn): fds[sn] = xopen(dirname(i) + '/' + sn,'rb')
+                        elif exists(fsn + extname(n)): fds[sn] = xopen(fsn + extname(n),'rb')
                         else: print('Could not find',sn,'skipping')
                     if sn in fds:
                         fds[sn].seek(f.readu32())
@@ -2355,7 +2355,7 @@ def extract4_3(inp:str,out:str,t:str):
             fs = [(f.readu32(),f.readu32(),f.readu64()) for _ in range(c)]
             if so == 0:
                 f.close()
-                fd = open(noext(i) + '.fac','rb')
+                fd = xopen(noext(i) + '.fac','rb')
             else: fd = f
 
             HL.wait()
@@ -2383,6 +2383,7 @@ def extract4_3(inp:str,out:str,t:str):
                 writefile(o + '/' + fn,d)
 
             fd.close()
+            if not f.closed: f.close()
             if fs: return
         case 'Sunday vs. Magazine TARC'|'Sunday vs. Magazine EMIT':
             from lib.file import File

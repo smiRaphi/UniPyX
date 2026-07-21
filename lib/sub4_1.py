@@ -78,7 +78,7 @@ def extract4_1(inp:str,out:str,t:str):
                 d = b''
                 for ix in range(10):
                     if not exists(fi + str(ix)): break
-                    d += readfile(fi + str(ix),'rb')
+                    d += readfile(fi + str(ix))
             else: d = readfile(i)
 
             from lib.file import File
@@ -379,11 +379,7 @@ def extract4_1(inp:str,out:str,t:str):
             return
         case 'Torus Ashen Strings':
             db.try_custom()
-            f = open(i,'rb')
-            f.seek(4)
-            d = f.read()[:-2]
-            f.close()
-
+            d = readfile(i,off=4,size=-2)
             ob = [x.decode('utf-16le') for x in d.rsplit(b'\0\0')]
 
             if ob:
@@ -570,11 +566,8 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Fox Engine QAR'|'Fox Engine FPK'|'Fox Engine PFTXS':
             if t == 'Fox Engine QAR': ext = 'dat'
             elif t == 'Fox Engine FPK':
-                f = open(i,'rb')
-                f.seek(6)
-                if f.read(1) == b'd': ext = 'fpkd'
+                if readfile(i,off=6,size=1) == b'd': ext = 'fpkd'
                 else: ext = 'fpk'
-                f.close()
             elif t == 'Fox Engine PFTXS': ext = 'pftxs'
 
             tf = TmpFile(suf='.' + ext,path=o)
@@ -1069,7 +1062,7 @@ def extract4_1(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt,crc_hash
-            fd = open(noext(i) + '.mdf','rb')
+            fd = xopen(noext(i) + '.mdf','rb')
             hsh = crc_hash(fd.read(0x1000),'sha256',bytes=True)
             pyo.wait()
             asrt(hsh in pyo)
@@ -1264,7 +1257,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Level5 Encrypted CRI CPK':
             tf = TmpFile('.cpk',path=o)
             run(['viola.cli','-m','decrypt','-i',i,'-o',tf])
-            if exists(tf.p) and getsize(tf.p) and open(tf.p,'rb').read(4) == b'CPK ':
+            if exists(tf.p) and getsize(tf.p) and tf.read(size=4) == b'CPK ':
                 quickbms('cpk',inf=tf,ouf=o)
                 tf.destroy()
                 if listdir(o): return
@@ -1310,7 +1303,7 @@ def extract4_1(inp:str,out:str,t:str):
             for _ in range(c):
                 fn = readstr()
                 arc = readstr()
-                if not arc in ofs: ofs[arc] = open(dirname(i) + '/' + arc,'rb')
+                if not arc in ofs: ofs[arc] = xopen(dirname(i) + '/' + arc,'rb')
                 ofs[arc].seek(f.readu32())
                 writefile(o + '/' + fn.lstrip('../\\'),ofs[arc].read(f.readu32()))
             f.close()

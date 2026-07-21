@@ -316,7 +316,7 @@ def extract4_5(inp:str,out:str,t:str):
                 DN.add(x[0])
                 ob.append(x[1])
             if ob:
-                writefile(f'{o}/{tbasename(i)}.bin',bytes.fromhex(''.join(ob)),'wb')
+                writefile(f'{o}/{tbasename(i)}.bin',bytes.fromhex(''.join(ob)))
                 return
         case 'Nintendo Amiibo NFC Raw':
             db.try_custom()
@@ -1316,10 +1316,10 @@ def extract4_5(inp:str,out:str,t:str):
 
             bn = noext(i)
             asrt(exists(bn + '.bin'))
-            fds = [open(bn + '.bin','rb')]
+            fds = [xopen(bn + '.bin','rb')]
             for ix in range(1,10):
                 if not exists(f'{bn}{ix}.bin'): break
-                fds.append(open(f'{bn}{ix}.bin','rb'))
+                fds.append(xopen(f'{bn}{ix}.bin','rb'))
             fds = [(fd,fd.seek(0,2)) for fd in fds]
             f = File(decrypt(readfile(i),'legaia2',keys.wait()['legaia2']),endian='<')
 

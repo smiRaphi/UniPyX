@@ -506,7 +506,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Nintendo HARC+HIDX':
             db.try_custom()
             from lib.file import File
-            fd = open(noext(i) + '.har','rb')
+            fd = xopen(noext(i) + '.har','rb')
             f = File(noext(i) + '.hix',endian='<')
             asrt(f.read(4) == b'HIDX' and fd.read(4) == b'HARC')
 
@@ -852,8 +852,8 @@ def extract4_2(inp:str,out:str,t:str):
             if listdir(o): return
         case 'Lucky Chicken TOC+HFF':
             db.try_custom()
-            f = open(i,encoding='utf-8')
-            fd = open(noext(i) + '.hff','rb')
+            f = xopen(i,encoding='utf-8')
+            fd = xopen(noext(i) + '.hff','rb')
 
             c = int(f.readline().strip())
             for _ in range(c):
@@ -1066,7 +1066,7 @@ def extract4_2(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
-            if exists(dirname(i) + '/textures.pit'): fd = open(dirname(i) + '/textures.pit','rb')
+            if exists(dirname(i) + '/textures.pit'): fd = xopen(dirname(i) + '/textures.pit','rb')
             else: fd = None
 
             while f:
@@ -1936,7 +1936,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             fc = sorted(fsd.keys())[0]
 
-            of = open(o + '/' + (fsd[fc].splt.get('n') or tbasename(i)),'wb')
+            of = xopen(o + '/' + (fsd[fc].splt.get('n') or tbasename(i)),'wb')
             for c in sorted(fsd.keys()):
                 f = fsd[c]
                 if 'd' in f.splt:
@@ -2108,7 +2108,7 @@ def extract4_2(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             f = File(noext(i) + '.kix',endian='<')
-            fd = open(noext(i) + '.kbf','rb')
+            fd = xopen(noext(i) + '.kbf','rb')
 
             def readd(p):
                 n = p + f.read(0x20).rstrip(b'\0').decode('latin1') + '/'
@@ -2218,7 +2218,7 @@ def extract4_2(inp:str,out:str,t:str):
             if fs: return
         case 'Burut Creative Team PAK': return quickbms('burut')
         case 'Next Level Games DICT+DATA':
-            be = open(i,'rb').read(4) == b'\xA9\xF3\x24\x58'
+            be = readfile(i,size=4) == b'\xA9\xF3\x24\x58'
 
             if be: raise NotImplementedError('big endian')
             else:

@@ -600,7 +600,7 @@ def extract4_4(inp:str,out:str,t:str):
                         f.skip(14)
                         fn = dirname(i) + '/' + f.read0s('ascii')
                         #if not exists(fn): print('WARNING:',fn,'not found, skipping entries')
-                        ofs[id] = open(fn,'rb') if exists(fn) else None
+                        ofs[id] = xopen(fn,'rb') if exists(fn) else None
                     else:
                         fe = [f.readu32(),f.readu32(),f.readu32()]
                         f.padc(6)
@@ -1018,7 +1018,7 @@ def extract4_4(inp:str,out:str,t:str):
         case 'Temple of Elemental Evil DAT':
             db.try_custom()
             from lib.file import File
-            f = File(i,'rb',endian='<')
+            f = File(i,endian='<')
             f.seek(-12)
             asrt(f.read(4) == b'1TAD')
 
@@ -1053,7 +1053,7 @@ def extract4_4(inp:str,out:str,t:str):
         case 'ZUN GRZ':
             db.try_custom()
             from lib.file import File
-            f = File(i,'rb',endian='<')
+            f = File(i,endian='<')
             asrt(f.read(4) == b'HGRZ')
 
             c = f.readu32()
@@ -1071,7 +1071,7 @@ def extract4_4(inp:str,out:str,t:str):
         case 'Eutechnyx CDFILES.DAT+AR':
             db.try_custom()
             from lib.file import File
-            f = File(i,'rb',endian='<')
+            f = File(i,endian='<')
             asrt(f.read(4) == b'file')
 
             v = f.readu32()
@@ -1141,8 +1141,8 @@ def extract4_4(inp:str,out:str,t:str):
                 for ix in range(10):
                     n = bn + f'{ix}.ar'
                     if not exists(n): break
-                    fds.append(open(n,'rb'))
-            else: fds = [open(an,'rb')]
+                    fds.append(xopen(n,'rb'))
+            else: fds = [xopen(an,'rb')]
 
             for ix in range(fc):
                 dix = ids[ix]
@@ -1169,7 +1169,7 @@ def extract4_4(inp:str,out:str,t:str):
 
             db.try_custom()
             from lib.file import File
-            f = File(i,'rb',endian='<')
+            f = File(i,endian='<')
             asrt(f.read(3) == b'ARC')
             v = f.reads(1,'ascii')
             if v == 'N': f._end = '>'
@@ -1248,7 +1248,7 @@ def extract4_4(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt
-            f = File(i,'rb',endian='<')
+            f = File(i,endian='<')
             asrt(f.read(0x14) == b'ConnectFile Version ')
 
             f.seek(0)

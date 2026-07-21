@@ -101,7 +101,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             sleep(0.1)
 
         while True:
-            r = open(oup + '/_OUT.TXT','rb').read()
+            r = readfile(oup + '/_OUT.TXT')
             if len(r) == getsize(oup + '/_OUT.TXT'):
                 r = r.decode('utf-8')
                 break
@@ -190,10 +190,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
             if listdir(o): raise NotImplementedError('Unhandled Wise Installer output')
         case 'Inno Installer':
-            f = open(i,'rb')
-            f.seek(-0x2000,2)
-            gog = b'00#GOGCRCSTRING' in f.read()
-            f.close()
+            gog = b'00#GOGCRCSTRING' in readfile(i,off=-0x2000)
 
             if not gog:
                 _,e,_ = run(['innounp-2','-o','-q',i],print_try=False)
@@ -287,9 +284,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
             quickbms('instexpl')
         case 'InstallShield Setup':
-            f = open(i,'rb')
-            f.seek(943)
-            if f.read(42) == b'InstallShield Self-Extracting Stub Program':
+            f = xopen(i,'rb')
+            f.seek(0x3AF)
+            if f.read(0x2A) == b'InstallShield Self-Extracting Stub Program':
                 from lib.file import decompress
                 db.try_custom()
                 while True:
@@ -411,8 +408,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             ti.destroy()
         case 'Big EXE':
             ts = getsize(i)
-            f = open(i,'rb')
-            f.seek(64)
+            f = xopen(i,'rb')
+            f.seek(0x40)
             c = 0
             while True:
                 b = f.read(16)
@@ -567,13 +564,14 @@ def extract3(inp:str,out:str,t:str) -> bool:
             return
         case '624'|'4kZIP'|'Amisetup'|'aPACK'|'AVPACK'|'COM RLE Packer'|'Cruncher'|'DexEXE'|'Dn.COM Cruncher'|'Envelope'|'ExeLITE'|'JAM'|'LGLZ'|'Pack Packed'|\
              'PMWLite'|'RDT Compressor'|'RJCrush'|'Shrinker Packed'|'SpaceMaker'|'T-PACK'|'Tenth Planet Soft'|'TSCRUNCH'|'XPACK/LZCOM'|'Dave Dunfield Packer':
-            dosbox(['cup386',i,'OUT.BIN','/1h' + ('x' if open(i,'rb').read(2) == b'MZ' else '')])
+            dosbox(['cup386',i,'OUT.BIN','/1h' + ('x' if readfile(i,size=2) == b'MZ' else '')])
             chks = getsize(i)-768
             if chks < 0x10: chks = 0x10
             if exists(o + '/OUT.BIN') and getsize(o + '/OUT.BIN') >= chks:
                 on = basename(i)
-                if on.lower().endswith('.exe') and open(o + '/OUT.BIN','rb').read(2) != b'MZ': on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
-                elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
+                mz = readfile(o + '/OUT.BIN',size=2) == b'MZ'
+                if on.lower().endswith('.exe') and not mz: on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
+                elif on.lower().endswith('.com') and mz: on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
                 mv(o + '/OUT.BIN',o + '/' + on)
                 return
         case 'COMPACK'|'Compress-EXE'|'ICE'|'Optlink'|'PGMPAK'|'TinyProg':
@@ -582,8 +580,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if chks < 0x10: chks = 0x10
             if exists(o + '/OUT.BIN') and getsize(o + '/OUT.BIN') >= chks:
                 on = basename(i)
-                if on.lower().endswith('.exe') and open(o + '/OUT.BIN','rb').read(2) != b'MZ': on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
-                elif on.lower().endswith('.com') and open(o + '/OUT.BIN','rb').read(2) == b'MZ': on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
+                mz = readfile(o + '/OUT.BIN',size=2) == b'MZ'
+                if on.lower().endswith('.exe') and not mz: on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
+                elif on.lower().endswith('.com') and mz: on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
                 mv(o + '/OUT.BIN',o + '/' + on)
                 return
         case 'AXE'|'CEBE'|'Cheat Packer'|'Diet Packed'|'EXECUTRIX-COMPRESSOR'|'LM-T2E'|'Neobook Executable'|'PACKWIN'|'Pro-Pack'|'SCRNCH'|'UCEXE'|'WWPACK'|\
@@ -641,7 +640,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     elif exists(noext(i) + '.sw64'): d = noext(i) + '.sw64'
                     else: raise FileNotFoundError(od)
                 if not d in cps:
-                    cps[d] = open(d,'rb')
+                    cps[d] = xopen(d,'rb')
                     cps[d].seek(13)
                 d = cps[d]
 
@@ -758,7 +757,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import decompress
 
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             f.seek(0x20)
             off = int.from_bytes(f.read(4),'big')
             f.seek(0x124)
@@ -791,7 +790,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             asrt(f.read(3) == b'DLZ')
             ver = f.readu8()
 
-            of = open(o + '/' + basename(i),'wb')
+            of = xopen(o + '/' + basename(i),'wb')
             if ver == 2:
                 def dlz_dec_block():
                     size = f.readu32()
@@ -820,6 +819,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     of.write(dec)
             else: raise NotImplementedError(f'Version {ver}')
             while f < (data0 + data0_size): dlz_dec_block()
+            of.close()
             return
         case 'd0lLZ 3':
             raise NotImplementedError
@@ -1025,7 +1025,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             remove(p + '/original_eac.bin',p + '/eac_.bin')
             copydir(p,o,True)
-            if open(o + '/EAC_Launcher_decrypted.dll','rb').read(4) in {b'MZ\x90\x00',b'\x7FELF'}: return
+            if readfile(o + '/EAC_Launcher_decrypted.dll',size=4) in {b'MZ\x90\x00',b'\x7FELF'}: return
         case 'Chromium Delta Update':
             run(['android-ota-extract',i],cwd=o)
             if listdir(o): return
@@ -1149,7 +1149,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'GPEComp':
             db.try_custom()
             from lib.file import decompress
-            f = open(i,'rb')
+            f = xopen(i,'rb')
             for pos in (0xAA48,0xAA70):
                 f.seek(pos)
                 if f.read(8) == b"\x00\xE9\x55\x43\x4C\xFF\x01\x1A": break
@@ -1213,8 +1213,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/' + fn,f.read(fe[1]))
             if fs: return
         case 'Lua Bytecode':
-            f = open(i,'rb')
-            asrt(f.read(4) == b'\x1bLua')
+            f = xopen(i,'rb')
+            asrt(f.read(4) == b'\x1BLua')
             v = f.read(1)[0]
             fv = f.read(1)[0]
             f.close()
@@ -1264,7 +1264,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             asrt(f.read(4) == b'zlb\x1A')
             f.skip(6)
 
-            of = open(o + '/' + basename(i),'wb')
+            of = xopen(o + '/' + basename(i),'wb')
             z = zlib.decompressobj(wbits=-15)
             while f: of.write(z.decompress(f.read(0x800)))
             f.close()
@@ -2418,5 +2418,119 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if c > 0: return
+        case 'OptiFine Installer':
+            db.try_custom()
+            import zipfile,re,io,json,zlib
+            from lib.crypto import crc_hash
+            z = zipfile.ZipFile(inp,'r')
+            asrt('srg/net/optifine/Config.class' in z.namelist() and any(x.startswith('patch/') for x in z.namelist()))
+
+            sfs = [x for x in z.infolist() if x.compress_type == 8 and x.compress_size >= 0x100]
+            if sfs:
+                scf = min(sfs,key=lambda x:x.file_size)
+                d = z.read(scf)
+                lvl = min([(x,abs(scf.compress_size - len(zlib.compress(d,wbits=-15,level=x)))) for x in range(1,10)],key=lambda x:x[1])[0]
+            else: lvl = 0
+
+            ccd = z.read('srg/net/optifine/Config.class')
+            v = re.search(rb'(?s)\0\x13minecraftVersionInt.{4}(\0[\x05-\x28])[!-~]{5}',ccd)
+            vd = ccd[v.start(1):]
+            v = vd[2:2+int.from_bytes(vd[0:2],'big')].decode('ascii')
+            ov = re.search(rb'(?s)\0\x06<init>\x01\0\x03\(\)V.{4}(\0[\x0E-\xFF]|\x01.)[!-~]{14}',ccd)
+            ovd = ccd[ov.start(1):]
+            ov = ovd[2:2+int.from_bytes(ovd[0:2],'big')].decode('ascii')
+
+            pc = z.read('patch.cfg').decode('utf-8').strip().replace('\r','').split('\n')
+            pmr = []
+            rsg = re.compile(r'(?<!\\)\$(\d+)')
+            for x in pc:
+                x = x.split('=')
+                asrt(len(x) == 2,x)
+                pmr.append((re.compile(x[0],re.IGNORECASE),
+                            rsg.sub(r'\\\1',x[1]).replace('\\$','$')))
+            if 'patch2.cfg' in z.namelist():
+                pc = z.read('patch2.cfg').decode('utf-8').strip().replace('\r','').split('\n')
+                for x in pc:
+                    x = x.split('=')
+                    asrt(len(x) == 2,x)
+                    pmr.append((re.compile(x[0],re.IGNORECASE),x[1]))
+
+            bip = db.bin_path
+            vfn = bip + f'minecraft/{v}.jar'
+            if exists(vfn): vd = readfile(vfn)
+            else:
+                # content-md5 is not in GET
+                hsh = db.c.head('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json').headers['content-md5']
+                if exists(bip + 'minecraft/versions.json'):
+                    vs = json.load(xopen(bip + 'minecraft/versions.json'))
+                    if vs['md5'] != hsh:
+                        remove(bip + 'minecraft/versions.json')
+                if not exists(bip + 'minecraft/versions.json'):
+                    print('Downloading Minecraft versions manifest')
+                    vs = db.c.get('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json').json()
+                    vs['md5'] = hsh
+                    json.dump(vs,xopen(bip + 'minecraft/versions.json','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
+                vs = vs['versions']
+
+                for x in vs:
+                    if x['id'] == v: break
+                else: raise LookupError(v)
+                print('Downloading Minecraft client',v)
+                vi = db.c.get(x['url']).json()['downloads']['client']
+                asrt('url' in vi and 'sha1' in vi and 'size' in vi,vi)
+                vd = db.c.get(vi['url']).content
+                asrt(len(vd) == vi['size'] and crc_hash(vd,'sha1') == int(vi['sha1'],16),vi)
+                writefile(vfn,vd)
+            vz = zipfile.ZipFile(io.BytesIO(vd),'r')
+
+            # optifine completely rewrites the jar so don't use 'ZipInfo's
+            oz = zipfile.ZipFile(xopen(f'{o}/{ov}_MOD.jar','wb'),'w',allowZip64=False)
+            for x in z.infolist():
+                if x.filename.startswith('patch/'):
+                    if x.filename.endswith('.xdelta'): continue
+                    asrt(x.filename.endswith('.md5'))
+                    h = int(z.read(x),16)
+
+                    ofn = x.filename[6:-4]
+                    for rg,sbs in pmr:
+                        if rg.match(ofn):
+                            if sbs != '*': ofn = rg.sub(sbs,ofn)
+                            break
+                    d = vz.read(ofn)
+                    if crc_hash(d,'md5') != h:
+                        d = apply_gdiff(d,z.read(x.filename[:-3] + 'xdelta'))
+                        asrt(crc_hash(d,'md5') == h,x.filename[:-3] + 'xdelta')
+                    oz.writestr(x.filename[6:-4],d,x.compress_type,lvl)
+                else: oz.writestr(x.filename,z.read(x),x.compress_type,lvl)
+
+            oz.close()
+            return
 
     return 1
+
+def apply_gdiff(src:bytes,dlt:bytes):
+    from lib.file import File
+    f = File(dlt,endian='>')
+    asrt(f.read(4) == b'\xD1\xFF\xD1\xFF' and f.readu8() == 4)
+
+    ob = bytearray()
+    while f:
+        c = f.readu8()
+        if c == 0: break
+        of = None
+        if   c == 0xF7: ln = f.readu16()
+        elif c == 0xF8: ln = f.readu32()
+        elif c == 0xF9: of,ln = f.readu16(),f.readu8 ()
+        elif c == 0xFA: of,ln = f.readu16(),f.readu16()
+        elif c == 0xFB: of,ln = f.readu16(),f.readu32()
+        elif c == 0xFC: of,ln = f.readu32(),f.readu8 ()
+        elif c == 0xFD: of,ln = f.readu32(),f.readu16()
+        elif c == 0xFE: of,ln = f.readu32(),f.readu32()
+        elif c == 0xFF: of,ln = f.readu64(),f.readu32()
+        else: ln = c
+
+        if of is None: ob.extend(f.read(ln))
+        else: ob.extend(src[of:of+ln])
+
+    del f
+    return ob

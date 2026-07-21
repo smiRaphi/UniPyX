@@ -29,6 +29,7 @@ if __name__ == '__main__':
     elif argv[1] == '-pip' and not any('/' in x or '\\' in x or ':' in x for x in argv[2:]):
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+        from time import time
         from lib.dldb import DLDB,pip
         db = DLDB()
 
@@ -45,7 +46,9 @@ if __name__ == '__main__':
                 pl.append(y['pip'])
         print('Downloading:')
         print(', '.join(pn))
-        pip(*pl)
+        pip(*pl,error=True)
+        t = int(time())
+        for n in pn: db.udb[n] = t
         db.save()
         exit()
 

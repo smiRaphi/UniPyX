@@ -168,18 +168,25 @@ def symlink(i:str,o:str):
     os.symlink(i,o)
 def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
     f = abspath(str(f))
-    mkdir(dirname(f))
+    if 'w' in m or 'a' in m or 'x' in m or '+' in m: mkdir(dirname(f))
     if 'b' in m: return open(f,m,**kwargs)
     return open(f,m,encoding=encoding,newline=newline,**kwargs)
 def readfile(f:str,m='rb',off=0,size=None,encoding='utf-8',newline=None,**kwargs) -> bytes|str:
-    asrt('r' in m or '+' in m)
+    asrt(not any(x in m for x in 'wax') and not '+' in m)
+    if not 'r' in m and not '+' in m: m += 'r'
     if 'b' in m: o = xopen(f,m,**kwargs)
     else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
-    o.seek(off)
+    fs = o.seek(0,2)
+    if off < 0: o.seek(off,2)
+    else: o.seek(off)
+    if size is not None and size < 0: size += fs - o.tell()
     r = o.read(size)
     o.close()
     return r
-def writefile(f:str,d:bytes|str,m='wb',encoding='utf-8',newline=None,**kwargs):
+def writefile(f:str,d:bytes|str,m=None,encoding='utf-8',newline=None,**kwargs):
+    if m is None: m = 't' if isinstance(d,str) else 'b'
+    else: asrt(not 'r' in m and not '+' in m)
+    if not 'w' in m and not 'a' in m and not 'x' in m and not '+' in m: m += 'w'
     if 'b' in m: o = xopen(f,m,**kwargs)
     else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
     r = o.write(d)
@@ -314,6 +321,9 @@ class TmpFile:
     def destroy(self):
         try: os.remove(self.p)
         except FileNotFoundError: pass
+    def write(self,*args,**kwargs): return writefile(self.p,*args,**kwargs)
+    def read(self,*args,**kwargs): return readfile(self.p,*args,**kwargs)
+    def open(self,*args,**kwargs): return xopen(self.p,*args,**kwargs)
     def __str__(self): return self.p
     def __add__(self,i): return self.p + i
     def __radd__(self,i): return i + self.p
