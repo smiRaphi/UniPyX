@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1033
+# Supported Formats: 1034
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -229,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (132)
+## Executables/Packers/Installers (133)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -285,6 +285,7 @@ EDI Install Archive | ??? | [ediextract](http://cd.textfiles.com/cica/cica9603/d
 Encrypted EAC Payload | .bin | [DecryptEACPayload](https://github.com/lguilhermee/EAC-Extractor-Utility) |
 Envelope | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Excel DNA XLL | .dll | [exceldna-unpack](https://github.com/augustoproiete/exceldna-unpackv) |
+Excelsior Installer | .exe | Custom |
 EXECUTRIX-COMPRESSOR | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 ExeLITE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 EXEPACK | .exe .com | [deark](https://github.com/activescott/deark) |

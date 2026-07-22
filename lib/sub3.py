@@ -2023,7 +2023,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 f.seek(oo)
                 lnchd = f.peek(0x100)
                 if lnchd.startswith(b'#!/bin/sh\n') and lnchd.endswith(b'#') and b'\x1A#' in lnchd and lnchd.rstrip(b'#').endswith(b'\x1A'):
-                    writefile(o + '/$INSTFILES/$tclkit_launcher.sh',lnchd.split(b'\x1A')[0])
+                    writefile(o + '/$INSFILES/$tclkit_launcher.sh',lnchd.split(b'\x1A')[0])
                 oo += 0x100
 
             f.seek(sp - 7)
@@ -2582,7 +2582,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     gus = f.readu32()
                     gid = f.readu16()
                     gd = f.decompress(gzs,'lh5',usize=gus)
-                    writefile(f'{o}/$block{bix}_global_res{gid}.{guess_ext(gd)}',gd)
+                    writefile(f'{o}/$INSFILES/$block{bix}_global_res{gid}.{guess_ext(gd)}',gd)
                 bix += 1
                 if ep > f: f.seek(ep)
 
@@ -2624,12 +2624,12 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     gus = f.readu32()
                     gid = f.readu16()
                     gd = f.decompress(gzs,'lh5',usize=gus)
-                    writefile(f'{o}/$block{bix}_global_res{gid}.{guess_ext(gd)}',gd)
+                    writefile(f'{o}/$INSFILES/$block{bix}_global_res{gid}.{guess_ext(gd)}',gd)
             else:
                 f.back(4)
                 while f: readve()
-            writefile(o + '/$info.txt','\n'.join(info))
-            writefile(o + '/$associations.txt','\n'.join(ass))
+            writefile(o + '/$INSFILES/$info.txt','\n'.join(info))
+            writefile(o + '/$INSFILES/$associations.txt','\n'.join(ass))
 
             for fe in fs:
                 if fe[3] == fe[4] == 0:
@@ -2650,6 +2650,133 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fs: return
+        case 'Excelsior Installer':
+            db.try_custom()
+            import json
+            from lib.file import File,ext_exe
+            f = ext_exe(inp,custom=True)
+            f.seek(f.get_overlay_data_start_offset())
+
+            asrt(f.read(12) == b'ExcelsiorII1')
+            mzs,mof,mus = f.readu32(),f.readu64(),f.readu32()
+            bss = f.readu32()
+            do = f.readu64()
+            f.seek(mof)
+            m = File(f.decompress(mzs,'excelsior_lzma'),endian=f._end)
+            asrt(m.read(12) == b'ExcelsiorII1')
+            vmj,vmi = m.readu8(),m.readu8()
+            asrt(vmj == 1 and vmi in {0,5,6,7},vmj,vmi)
+            m.skip(2)
+            vgn = m.readu8()
+            m.skip(7)
+            asrt(do == m.readu64())
+            ds = m.readu64()
+
+            pks = [(m.readu64(),m.readu64(),m.readu64(),m.readu64()) for _ in range(2)]
+            rstrs = ['name','display_name','publisher','product_id','license','splash_image','uninstaller_name','installer_library','auxiliary_library','uinstaller_library',
+                     None,None,'root_options',None,None,'pair_name','pair_value','default_install_directory','short_name']
+            if vmi < 6: rstrs.append('legacy_option_string')
+            rstrs.append('launcher_or_variant')
+            rofs = [(x,m.readu32()) for x in rstrs if x or m.skip(4) & 0]
+            cos = [(ix,m.readu32(),m.readu32()) for ix in range(1,5)]
+            if vmi >= 6: cos.append((6,m.readu32(),m.readu32()))
+            cos.append((5,m.readu32(),m.readu32()))
+            if vmi == 0 and vgn == 2: cos.append((7,m.readu32(),m.readu32()))
+            m.seek(0x9C)
+            cos.append((0,m.readu32(),m.readu32()))
+
+            inf = {}
+            for rsn,nof in rofs:
+                if nof:
+                    m.seek(nof)
+                    inf[rsn] = m.read0s16()
+            for ix,c,of in cos:
+                m.seek(of)
+                l = []
+                if ix == 0:
+                    es = [(m.readu32(),m.readu32()) for _ in range(c)]
+                    for e in es:
+                        ex = m.seekc(e[0]).read0s16()
+                        if e[1]: ex += m.seekc(e[1]).read0s16()
+                        l.append(ex)
+                    inf['commands'] = l
+                elif ix == 1:
+                    es = [m.readil(4,7) for _ in range(c)]
+                    for e in es:
+                        ob = {'type':e[0],'name':m.seekc(e[1]).read0s16()}
+                        if e[2]: ob['icon'] = m.seekc(e[2]).read0s16()
+                        ob['icon_index'] = e[3]
+                        if e[4]: ob['cwd'] = m.seekc(e[4]).read0s16()
+                        ex = m.seekc(e[5]).read0s16()
+                        if e[6]: ex += m.seekc(e[6]).read0s16()
+                        ob['exe'] = ex
+                        l.append(ob)
+                    inf['shortcuts'] = l
+                elif ix == 2:
+                    es = [(m.readu32(),m.readu32(),m.readu32(),m.readu32(),m.readu32(),m.readu8() + m.padc(3)) for _ in range(c)]
+                    for e in es:
+                        ob = {'extension':m.seekc(e[0]).read0s16(),'type':m.seekc(e[1]).read0s16()}
+                        if e[2]: ob['description'] = m.seekc(e[2]).read0s16()
+                        ex = m.seekc(e[3]).read0s16()
+                        if e[4]: ex += m.seekc(e[4]).read0s16()
+                        ob['exe'] = ex
+                        ob['flag'] = {0:False,1:True}[e[5]]
+                        l.append(ob)
+                    inf['associations'] = l
+                elif ix == 3:
+                    es = [(m.readu32(),m.readu32(),m.readu32(),m.readu32(),m.readu8(),m.readu8() + m.padc(2)) for _ in range(c)]
+                    for e in es:
+                        ob = {'type':e[0],'label':m.seekc(e[1]).read0s16()}
+                        if e[2]:
+                            ex = m.seekc(e[2]).read0s16()
+                            if e[3]: ex += m.seekc(e[3]).read0s16()
+                            ob['exe'] = ex
+                        ob['mode'] = e[4]
+                        ob['default'] = {0:False,1:True}[e[5]]
+                        l.append(ob)
+                    inf['postinstall'] = l
+                elif ix == 4:
+                    es = [(m.readu32(),m.readu32(),m.readu32(),m.readu32(),m.readu32(),m.readu32(),m.readu8(),m.readu8(),m.readu8() + m.padc(1)) for _ in range(c)]
+                    for e in es:
+                        ob = {'name':m.seekc(e[0]).read0s16()}
+                        if e[1]: ob['display_name'] = m.seekc(e[1]).read0s16()
+                        if e[2]: ob['description'] = m.seekc(e[2]).read0s16()
+                        ob['exe'] = m.seekc(e[3]).read0s16()
+                        ob['dependencies'] = [m.seekc(eof).read0s16() for eof in m.seekc(e[5]).readil(4,e[4])]
+                        ob['start_type'] = e[6]
+                        ob['error_control'] = e[7]
+                        ob['flag'] = {0:False,1:True}[e[8]]
+                        l.append(ob)
+                    inf['services'] = l
+                elif ix in {5,6,7}:
+                    inf[('generated_paths','remove_paths','legacy_paths')[ix - 5]] = [m.seekc(eof).read0s16() for eof in m.readil(4,c)]
+
+            if 'license' in inf: writefile(o + '/$INSFILES/$license.txt',inf.pop('license'),newline='')
+            json.dump(inf,xopen(o + '/$INSFILES/$info.json','w'),indent=4,ensure_ascii=False)
+
+            f.seek(do)
+            d = f.decompress(ds,'excelsior_lzma')
+            bs = d[:bss]
+            e = ext_exe(bs)
+            bn = e.DIRECTORY_ENTRY_EXPORT.name.decode('latin-1')
+            del e
+            writefile(o + '/$INSFILES/' + bn,bs)
+
+            for pk in pks:
+                m.seek(pk[3])
+                fs = [(m.readu32(),m.readu32(),m.reads64(),m.readu32(),m.readu32()) for _ in range(pk[0])]
+                p = pk[1]
+                for fe in fs:
+                    m.seek(fe[0])
+                    fn = o + '/' + m.read0s16()
+                    if fe[2] == -1: mkdir(fn)
+                    else:
+                        writefile(fn,d[p:p+fe[2]])
+                        p += fe[2]
+                        set_ftime(fn,fe[1])
+
+            f.close()
+            if pks: return
 
     return 1
 

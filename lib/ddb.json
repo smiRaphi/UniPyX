@@ -56,6 +56,11 @@
         "d":[["contain","optifine/xdelta/licence.txtPK\\1\\2",[-256,256]],["contain","patch/notch/com/mojang/",[-250000,250000]]],
         "rs":"OptiFine Installer","s":1
     },
+    {
+        "rq":"Excelsior Installer",
+        "rqr":"Nullsoft PiMP Install System",
+        "rs":"Excelsior Installer","s":1
+    },
 
     {
         "t":"url",

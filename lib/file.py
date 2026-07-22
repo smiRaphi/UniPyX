@@ -82,6 +82,7 @@ class File:
         return d
     def padc(self,n:int): 
         if sum(self.readc(n)): raise ValueError(f"Unexpected Value in padding @ 0x{self.pos - n:08X} - 0x{self.pos:08X}")
+        return 0 # for chaining
     def reads(self,n:int,encoding='utf-8'):
         if encoding == 'utf-16': return self.readutf16(n)
         try: return self.readc(n).decode(encoding)
@@ -508,14 +509,16 @@ class EXE(File):
                 self.skip(4)
         else: raise NotImplementedError(pe)
 
-        self.ovl_off = max([x[2] for x in self.secs.values()])
-def ext_exe(i:str|bytes,dotnet=False):
+        self.ovl_off:int = max([x[2] for x in self.secs.values()])
+    def get_overlay_data_start_offset(self): return self.ovl_off
+def ext_exe(i:str|bytes,dotnet=False,custom=False):
     if isinstance(i,str): kw = {'name':i}
     elif isinstance(i,(bytes,bytearray)): kw = {'data':i}
     else: raise TypeError
     if dotnet:
         import dnfile
         return dnfile.dnPE(**kw)
+    elif custom: return EXE(i)
     else:
         if isinstance(i,str):
             f = open(i,'rb')
@@ -650,6 +653,14 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if 'props' in kwargs: f = lzma._decode_filter_properties(lzma.FILTER_LZMA1,kwargs['props'])
             else: f = {'id':lzma.FILTER_LZMA1,'dict_size':kwargs['dict_size'],'lc':kwargs['lc'],'lp':kwargs['lp'],'pb':kwargs['pb']}
             return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[f]).decompress(i,kwargs.get('usize',-1))
+        case 'excelsior_lzma':
+            asrt(len(i) >= 13)
+            import lzma
+            us = int.from_bytes(i[:8],'little')
+            return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[
+                {'id':lzma.FILTER_X86},
+                lzma._decode_filter_properties(lzma.FILTER_LZMA1,i[8:13]),
+            ]).decompress(i[13:],us)
         case 'xz':
             import lzma
             return lzma.LZMADecompressor(format=lzma.FORMAT_XZ).decompress(i)
