@@ -1565,7 +1565,7 @@ def extract4_5(inp:str,out:str,t:str):
         case 'CP/M HUF':
             db.try_custom()
             from lib.file import File,BitReader
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
             asrt(f.readu16() == 0x1BD)
 
             c = f.readu16()
@@ -1618,6 +1618,52 @@ def extract4_5(inp:str,out:str,t:str):
                 br.seek(fe[2])
                 d = bytes([get_huf() for _ in range(fe[1])])
                 writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
+        case 'Maximus Installer FIZ':
+            db.try_custom()
+            from lib.crypto import crc_hash
+            from lib.file import File,pdosdate
+            f = File(i,endian='<')
+
+            while f:
+                asrt(f.read(4) == b'FIZ\x1A')
+                m = f.readu8()
+                nl = f.readu8()
+                crc = f.readu16()
+                us,zs = f.readu32(),f.readu32()
+                ts = (f.readu16(),f.readu16())
+                try: ts = pdosdate(ts[1],ts[0])
+                except ValueError: ts = None
+                n = f.reads(nl,'ascii')
+
+                d = f.decompress(zs,('none','lh5')[m],usize=us)
+                asrt(crc_hash(d,'crc16') == crc)
+                writefile(o + '/' + n,d)
+                if ts: set_ftime(o + '/' + n,ts)
+
+            f.close()
+            if listdir(o): return
+        case 'Maximus Installer ACopy':
+            db.try_custom()
+            from lib.crypto import crc_hash
+            from lib.file import File,pdosdate
+            f = File(i,endian='<')
+            asrt(f.read(10) == b'ACOPY011a\x1A')
+
+            c = f.readu16()
+            f.skip(0x74)
+            fs = []
+            for _ in range(c):
+                asrt(f.read(2) == b'\r\n')
+                fs.append((f.readu8(),f.readc(0x41).split(b'\0')[0].decode('ascii'),f.readu8(),f.readu16(),f.readu16(),f.readu32(),f.readu32(),f.readu16()))
+
+            for fe in fs:
+                d = f.decompress(fe[6],(0,'none','lzw')[fe[0]],usize=fe[5])
+                asrt(crc_hash(d,'crc16') == fe[7])
+                writefile(o + '/' + fe[1],d)
+                if fe[4]: set_ftime(o + '/' + fe[1],pdosdate(fe[4],fe[3]))
 
             f.close()
             if fs: return

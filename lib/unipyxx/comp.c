@@ -865,6 +865,80 @@ eof:
     #undef CHKi
     return op;
 }
+EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
+                                    uint8_t *restrict dst, const ssize_t usize,
+                              const uint8_t max_bits, const uint32_t max_dict, const uint16_t init_code_size,
+                              const uint16_t first_code, const uint16_t clear_code, const uint16_t end_code, const int8_t be) {
+    if (max_bits > 16 || max_dict > 0x10000) return -1;
+
+    uint8_t *dict_data = malloc(max_dict * sizeof(uint16_t) + max_dict * sizeof(uint8_t) * 2);
+    if (!dict_data) return -2;
+    uint16_t *dict_pre = (uint16_t *)dict_data;
+    uint8_t *dict = dict_data + max_dict*sizeof(uint16_t);
+    uint8_t *stack = dict + max_dict*sizeof(uint8_t);
+
+    BitReader br;
+    init_BitReader(&br, src, zsize);
+    uint16_t code_size = init_code_size;
+    uint32_t next_code = first_code;
+    int32_t old_code = -1;
+    uint8_t firstc = 0;
+    ssize_t op = 0;
+
+    while (!is_eof(&br) && (usize == -1 || op < usize)) {
+        uint16_t code = be ? get_bits(&br, code_size) : get_bits_l(&br, code_size);
+        if (code == clear_code) {
+            next_code = first_code;
+            code_size = init_code_size;
+            old_code = -1;
+            continue;
+        }
+        if (code == end_code) break;
+        if (old_code == -1) {
+            dst[op++] = code;
+            old_code = code;
+            firstc = code;
+            continue;
+        }
+        if (code > next_code) { op = -3;goto eof; };
+
+        uint16_t c = code;
+        uint32_t stackp = 0;
+        if (c == next_code) {
+            stack[stackp++] = firstc;
+            c = old_code;
+        }
+
+        while(c > 0xFF) {
+            if (stackp >= max_dict) { op = -4;goto eof; };
+            stack[stackp++] = dict[c];
+            c = dict_pre[c];
+        }
+        firstc = c;
+        stack[stackp++] = c;
+
+        for (int32_t i=stackp-1;i >= 0;i--) {
+            if (usize != -1 && op >= usize) break;
+            dst[op++] = stack[i];
+        }
+
+        if (next_code < max_dict) {
+            dict_pre[next_code] = old_code;
+            dict[next_code] = firstc;
+            next_code++;
+        }
+
+        if (next_code >= (1 << code_size) && code_size < max_bits)
+            code_size++;
+
+        old_code = code;
+    }
+
+eof:
+    free(dict_data);
+
+    return op;
+}
 
 typedef struct {
     const uint8_t *src;

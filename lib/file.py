@@ -639,7 +639,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if kwargs.get('null_usize'): i = i[:5] + b'\xFF'*8 + i[13:]
             elif kwargs.get('usize') is not None: i = i[:5] + kwargs['usize'].to_bytes(8,'little') + i[13:]
             return lzma.LZMADecompressor(format=lzma.FORMAT_ALONE).decompress(i)
-        case 'lzma_us32'|'lzma_alone_us32': return decompress(i[:9] + b'\0'*4 + i[9:],'lzma_alone',*args,**kwargs)
+        case 'lzma_us32'|'lzma_alone_us32': return decompress(i[:9] + b'\0'*4 + i[9:],'lzma_alone',**kwargs)
         case 'lzma_zip':
             import lzma
             if len(i) <= 4: return b''
@@ -810,9 +810,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lzss0_msb': return uxx().decompress_lzss0_msb(i,usize=kwargs['usize'])
         case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
-        case 'lzw_lg':
-            if algo == 'lzw_lg': args = {'bit_width':14,'reset':0x3FFE,'eof':0x3FFF,'max_dict':0x3FFE}
-            return lzw_decompress(i,**args)
+        case 'lzw': return uxx().decompress_lzw(i,kwargs['usize'],kwargs.get('max_bits',13),kwargs.get('init_code_size',9),kwargs.get('first_code',0x102),
+                                                  kwargs.get('clear_code',0x100),kwargs.get('end_code',0x101),kwargs.get('be',False),kwargs.get('max_dict',None))
+        case 'lzw_lg': return uxx().decompress_lzw(i,kwargs['usize'],max_bits=14,init_code_size=14,first_code=0x100,clear_code=0x3FFE,end_code=0x3FFF,max_dict=0x3FFE,be=True)
         case 'rtl_lz':
             if 'usize' in kwargs: us = kwargs['usize']
             else: us,i = int.from_bytes(i[:8],'little'),i[8:]
@@ -1090,53 +1090,6 @@ def lzss16c_decompress(i:bytes,usize:int=None,big_endian=False):
                 cpysrc = (cpysrc + 1) & mask(13)
 
     return bytes(ob)[:usize] if usize else bytes(ob)
-def lzw_decompress(i:bytes,bit_width=9,reset=0x100,eof=0x101,max_dict:int=None):
-    max_dict = max_dict or reset
-    d = BitReader(i)
-
-    resetd = lambda:{x:x.to_bytes() for x in range(0x100)}
-    dic = resetd()
-    nxt = 0x100
-    def get_nxt():
-        nonlocal dic,nxt
-        while True:
-            b = d.get_bits(bit_width)
-            if b != reset: return b
-            dic = resetd()
-            nxt = 0x100
-
-    c = get_nxt()
-    if c in {None,eof}: return b''
-
-    o = []
-    seq = dic[c]
-    o.append(seq)
-    prev_seq = seq
-
-    while True:
-        c = d.get_bits(bit_width)
-        if c is None or c == eof: break
-        if c == reset:
-            dic = resetd()
-            nxt = 256
-            c = d.get_bits(bit_width)
-            if c is None or c == eof: break
-            seq = dic[c]
-            o.append(seq)
-            prev_seq = seq
-            continue
-
-        if c in dic: seq = dic[c]
-        elif c == nxt: seq = prev_seq + prev_seq[:1]
-        else: raise ValueError(f"Invalid LZW code encountered: {c}")
-
-        o.append(seq)
-        if nxt < max_dict:
-            dic[nxt] = prev_seq + seq[:1]
-            nxt += 1
-        prev_seq = seq
-
-    return b"".join(o)
 
 import codecs
 def __chmr(*i:tuple[int,int]): return set(sum([list(range(a,b)) for a,b in i],[]))

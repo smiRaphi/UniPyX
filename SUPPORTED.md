@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
 
-# Supported Formats: 1034
+# Supported Formats: 1036
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -657,6 +657,8 @@ Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
 Marmalade Resource Group | .group.bin | Custom |
 Mattel SMB | .smb | Custom |
+Maximus Installer ACopy | .fiz | Custom |
+Maximus Installer FIZ | .fiz | Custom |
 MediaMobile PAK | .pak | Custom |
 Messiah Image Resource | .1 | Custom |
 Metal Slug 3D PAK | .pak | Custom |

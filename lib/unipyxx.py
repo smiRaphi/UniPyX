@@ -93,7 +93,8 @@ class X:
                 f.seek(-len(ch),2)
                 dch = f.read(len(ch))
             if dch != ch:
-                os.remove(DLLP)
+                try: os.remove(DLLP)
+                except PermissionError: pass
                 raise ValueError('DLL is out of date, deleted')
 
         self.dll = ctypes.CDLL(DLLP)
@@ -115,6 +116,7 @@ class X:
             ('decompress_lzrw1kh',  (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_camelot_blz',(P(u8),szt,P(u8),sszt), sszt,1),
             ('decompress_szdd_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u16,u16,u16,u16),sszt,0),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -375,6 +377,13 @@ class X:
         od = ctypes.string_at(o,r)
         if usize == -1: self._free(o)
         return od
+    def decompress_lzw(self,src:bytes,usize:int,max_bits:int,init_code_size:int,first_code:int,clear_code:int,end_code:int,be=False,max_dict:int=None):
+        if max_dict is None or max_dict < 0: max_dict = 1 << max_bits
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * usize)()
+        r = self.dll.decompress_lzw(i,len(src),o,usize,max_bits,max_dict,init_code_size,first_code,clear_code,end_code,1 if be else 0)
+        if r < 0: raise ValueError(f'Decompression failed ({r})')
+        return bytes(o)[:r]
 
     def decrypt_inv(src:bytes) -> bytes: ...
     def decrypt_swp4(src:bytes) -> bytes: ...

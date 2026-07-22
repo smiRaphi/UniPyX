@@ -742,14 +742,17 @@ def extract4_3(inp:str,out:str,t:str):
             f.seek(bo)
 
             def dec(d,fn,fe):
-                d = decompress(d,'lzw_lg' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]]
+                d = decompress(d,'lzw_lg' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'),usize=fe[1])
                 writefile(fn,d)
             def decc(d,ix1,ext,fsd,fe):
-                d = decompress(d,'lzw_lg' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'))[:fe[1]-fsd[0]]
-                for ix in range(len(fsd)-1): writefile(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}',d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
+                d = decompress(d,'lzw_lg' if fe[2] & 1 else ('implode' if fe[2] & 0x20 else 'none'),usize=fe[1] - fsd[0])
+                if len(fsd) == 2: writefile(f'{o}/{ix1}.{ext}',d[:fsd[1] - fsd[0]])
+                else:
+                    for ix in range(len(fsd)-1): writefile(f'{o}/{ix1}.{ext}/{ix:02d}.{ext}',d[fsd[ix] - fsd[0]:fsd[ix+1] - fsd[0]])
             p = ThreadPool()
             prcs = []
 
+            if any(fe[2] & 0x20 for fe in fs): db.get('libblast')
             for fe in fs:
                 fn = f'{fe[0]:03d}'
                 if fe[4] < len(TMP): ext = TMP[fe[4]]
@@ -757,7 +760,6 @@ def extract4_3(inp:str,out:str,t:str):
                 elif 0x40 > fe[4] >= 0x30: ext = f'app{fe[4]-0x2F:02d}'
                 else: ext = f'{fe[4]:02d}'
 
-                if fe[2] & 0x20: db.get('libblast')
                 if fe[2] & 2:
                     cd = f.readu16()
                     fsd = [f.readu32() for _ in range(cd+1)]

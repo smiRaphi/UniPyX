@@ -16,7 +16,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Alter Echo REMF':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             class REMF:
                 def __init__(self,o:str,c:int=None):
@@ -118,7 +118,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Alter Echo RAD':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
             f.skip(4)
             asrt(f.read(5) == b'\0RAD\0')
 
@@ -151,7 +151,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Culpa Innata SFS':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
             asrt(f.read(4) == b'SFS1')
 
             c = f.readu16()
@@ -172,7 +172,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'PlayStation Trophy File':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='>')
+            f = File(i,endian='>')
             asrt(f.read(4) == b'\xDC\xA2\x4D\x00')
 
             v = f.readu32()
@@ -198,7 +198,7 @@ def extract4_2(inp:str,out:str,t:str):
             db.try_custom() # WIP
             import json
             from lib.file import File
-            f = File(inp,endian='>')
+            f = File(i,endian='>')
             asrt(f.read(8) == b'\0\0\0\0\0\x03\0\0')
 
             dicc = f.readu32()
@@ -282,7 +282,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'NCAA Gamebreaker PG':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             c = f.readu32()
             fs = [f.readu32() for _ in range(c)]
@@ -302,7 +302,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Orange Juice LAG':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
             asrt(f.read(4) == b'LAG\0')
             f.skip(4)
 
@@ -317,7 +317,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Destruction Derby 2 DirInfo':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             fs = []
             while f:
@@ -333,7 +333,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'One Piece Straw Wars Pirate Defense Resource':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='>')
+            f = File(i,endian='>')
             f.skip(8)
 
             c = f.readu32()
@@ -346,7 +346,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'D1 Grand Prix Series 2005 BIN':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             c = f.readu32() - 1
             so = f.readu32()
@@ -369,7 +369,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'Groove World Archive':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='>')
+            f = File(i,endian='>')
             f.skip(12)
 
             rt = f.read0s().decode('utf-8')
@@ -403,7 +403,7 @@ def extract4_2(inp:str,out:str,t:str):
         case 'OHRRPGCE RPG':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='-')
+            f = File(i,endian='-')
 
             while f:
                 fn = f.read0s().decode('utf-8')
@@ -436,7 +436,7 @@ def extract4_2(inp:str,out:str,t:str):
             from lib.crypto import HashLib
             hl = HashLib.dl('ludia',db)
             from lib.file import File
-            f = File(inp,endian='>')
+            f = File(i,endian='>')
 
             co = f.readu32()
             f.skip(0x1C)

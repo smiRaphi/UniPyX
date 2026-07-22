@@ -1680,5 +1680,12 @@
     ],
     "Excelsior Installer":[
         "excelsior installer"
+    ],
+    "Maximus Installer FIZ":[
+        "maximus installer archive format (new)",
+        "fiz archive data"
+    ],
+    "Maximus Installer ACopy":[
+        "maximus installer archive format (old)"
     ]
 }

@@ -1454,7 +1454,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Ultimate Ghosts \'n Goblins DPLK':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
             asrt(f.read(4) == b'DPLK')
             f.skip(4+8+8)
 
@@ -1499,7 +1499,7 @@ def extract4_1(inp:str,out:str,t:str):
             db.try_custom()
             from lib.file import File
             from lib.crypto import decrypt
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             msg = b''
             b = b''
@@ -1533,7 +1533,7 @@ def extract4_1(inp:str,out:str,t:str):
             db.try_custom()
             import json
             from lib.file import File
-            f = File(inp,endian='>')
+            f = File(i,endian='>')
             asrt(f.read(4) == b'IGHW' and f.readu32() == 2 and f.readu32() == 4 and f.readu32() == 0)
 
             f.seek(0x34)
@@ -1555,7 +1555,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Disney Resource':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
             asrt(f.read(4) == b'res\n')
             f.skip(8)
 
@@ -1585,7 +1585,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Disney Raw Strings':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             f.seek(4)
             hsl = f.readu32('<')
@@ -1608,7 +1608,7 @@ def extract4_1(inp:str,out:str,t:str):
         case 'Monsters Inc. Scream Team Training WAD':
             db.try_custom()
             from lib.file import File
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             while f:
                 s = f.readu32()
@@ -1666,7 +1666,7 @@ def extract4_1(inp:str,out:str,t:str):
             from lib.file import File
             from lib.crypto import HashLib
             HL = HashLib.dl('sine_mora',db)
-            f = File(inp,endian='<')
+            f = File(i,endian='<')
 
             fs = []
             while (f.pos+20) < f.size:
