@@ -2487,7 +2487,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             oz = zipfile.ZipFile(xopen(f'{o}/{ov}_MOD.jar','wb'),'w',allowZip64=False)
             for x in z.infolist():
                 if x.filename.startswith('patch/'):
-                    if x.filename.endswith('.xdelta'): continue
+                    if x.is_dir() or x.filename.endswith('.xdelta'): continue
                     asrt(x.filename.endswith('.md5'))
                     h = int(z.read(x),16)
 
@@ -2505,6 +2505,151 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             oz.close()
             return
+        case 'Myriad Install':
+            MAG = 0x15620001
+
+            def ppath(p:str):
+                pn = p.upper().replace('\\','/')
+                if pn[:3] in {'$D/','$D'}: return p[3:]
+                elif pn[:3] in {'$S/','$S'}: return '$SYSTEM' + p[2:]
+                elif pn[:3] in {'$W/','$W'}: return '$WINDOWS' + p[2:]
+                elif pn[:3] in {'$F/','$F'}: return '$FONTS' + p[2:]
+                elif pn[:1] == '$' and pn[2:3] in {'/',''}: raise NotImplementedError(pn)
+                return p
+
+            db.try_custom()
+            from lib.crypto import crc_hash
+            from lib.file import EXE,pdosdate
+            f = EXE(i)
+            f.seek(f.ovl_off)
+            m = f.readu32()
+            old = m == 0x02081967
+            if old: m = f.readu32()
+            asrt(m == MAG)
+
+            fs = []
+            info = []
+            ass = []
+            bix = 0
+            def readve():
+                nonlocal bix
+                bp = f.pos
+                asrt(f.readu32() == MAG,f.pos)
+                fc = f.readu16()
+                asrt(f.readu16() == 1)
+                f.readbool16()
+                ac = f.readu16()
+                f.skip(4)
+                info.append('Default directory: ' + f.read0s('cp1252',0xFF))
+                info.append('Uninstaller name: ' + f.read0s('cp1252',0xFF))
+                sc = f.readu8()
+                shs = [f.read0s('cp1252',0xFF) for _ in range(sc)]
+                info.append('Shortcuts: ' + ';'.join(shs))
+                info.append('Title: ' + f.read0s('cp1252',0xFF))
+                info.append('Copyright: ' + f.read0s('cp1252',0xFF))
+                info.append('Version: ' + f.read0s('cp1252',0xFF))
+                if not old: info.append(f'UI Words: {f.readu32():08X} {f.readu32():08X} {f.readu32():08X}')
+                info.append('')
+
+                # table hash seems to be broken in non fixed blocks
+                #tp = f.pos
+                ep = 0
+                for _ in range(fc):
+                    n = f.read0s('cp1252',0xFF)
+                    n = f.read0s('cp1252',0xFF) + '/' + n
+                    grp = f.read0s('cp1252',maxl=0xFF)
+                    ts = pdosdate(f.readu16(),f.readu16())
+                    zs,us,hsh = f.readu32(),f.readu32(),f.readu32()
+                    m = f.readu8()
+                    f.skip(6)
+                    of = bp + f.readu32()
+                    ep = max(ep,of + zs)
+                    flgs = 0
+                    for ix in range(2 if old else 3): flgs |= (1 if f.readbool() else 0) << ix
+                    fs.append((n,grp,ts,zs,us,hsh,m,of,flgs))
+                #etp = f.pos
+                #f.seek(tp)
+                #tbd = f.read(etp - tp)
+                for _ in range(ac):
+                    ass.append('Extension: .' + f.read0s('cp1252',0xFF))
+                    ass.append('Class: ' + f.read0s('cp1252',0xFF))
+                    ass.append('App path: ' + ppath(f.read0s('cp1252',0xFF)))
+                    ass.append(f'Icon index: {f.readu16()}\n')
+                asrt(f.readu32() == MAG)
+                f.skip(4) # asrt(f.readu32() == crc_hash(tbd,'md5x',le=True))
+                gzs = f.readu32()
+                if gzs:
+                    gus = f.readu32()
+                    gid = f.readu16()
+                    gd = f.decompress(gzs,'lh5',usize=gus)
+                    writefile(f'{o}/$block{bix}_global_res{gid}.{guess_ext(gd)}',gd)
+                bix += 1
+                if ep > f: f.seek(ep)
+
+            if f.left >= 0x60C and f.peek('u32',poffset=0x608) == MAG:
+                bp = f.pos - 4
+                fc = f.readu16()
+                asrt(f.readu16() == 1)
+                f.readbool16()
+                ac = f.readu16()
+                f.skip(4)
+                strs = [f.readc(0xFF).split(b'\0')[0].decode('cp1252') for _ in range(6)]
+                info.append(f'Default directory: {strs[0]}\nUninstaller name: {strs[1]}\nShortcuts: {strs[2]}\nTitle: {strs[3]}\nCopyright: {strs[4]}\nVersion: {strs[5]}\n')
+                f.padc(2)
+                asrt(f.readu32() == MAG)
+
+                tbd = f.peek(0x68 * fc)
+                for _ in range(fc):
+                    n = f.readc(0x20).split(b'\0')[0].decode('cp1252')
+                    n = f.readc(0x20).split(b'\0')[0].decode('cp1252') + '/' + n
+                    f.padc(1)
+                    grp = f.readc(5).split(b'\0')[0].decode('cp1252')
+                    ts = pdosdate(f.readu16(),f.readu16())
+                    f.padc(2)
+                    zs,us,hsh = f.readu32(),f.readu32(),f.readu32()
+                    m = f.readu8()
+                    f.padc(1)
+                    f.skip(6)
+                    fs.append((n,grp,ts,zs,us,hsh,m,bp + f.readu32(),f.readu32()))
+                for _ in range(ac):
+                    ass.append('Extension: .' + f.readc(4).split(b'\0')[0].decode('cp1252'))
+                    ass.append('Class: ' + f.readc(0x20).split(b'\0')[0].decode('cp1252'))
+                    f.padc(1)
+                    ass.append('App path: ' + ppath(f.readc(0x20).split(b'\0')[0].decode('cp1252')))
+                    f.padc(1)
+                    ass.append(f'Icon index: {f.readu16()}\n')
+                asrt(f.readu32() == crc_hash(tbd,'md5x',le=True))
+                gzs = f.readu32()
+                if gzs:
+                    gus = f.readu32()
+                    gid = f.readu16()
+                    gd = f.decompress(gzs,'lh5',usize=gus)
+                    writefile(f'{o}/$block{bix}_global_res{gid}.{guess_ext(gd)}',gd)
+            else:
+                f.back(4)
+                while f: readve()
+            writefile(o + '/$info.txt','\n'.join(info))
+            writefile(o + '/$associations.txt','\n'.join(ass))
+
+            for fe in fs:
+                if fe[3] == fe[4] == 0:
+                    if fe[6] in {2,3,4}:
+                        asrt(fe[5] == 0)
+                        continue
+                    asrt(fe[6] in {0,1})
+                    d = b''
+                else:
+                    f.seek(fe[7])
+                    d = f.decompress(fe[3],('none','lh5')[fe[6]],usize=fe[4])
+                if fe[5] != 0: asrt(crc_hash(d,'md5_lh5',le=True) == fe[5],fe)
+                fn = sub_path(ppath(fe[0]))
+                if fe[1] != 'MAIN': fn = o + '/$GROUPS/' + sub_path(fe[1],slash=True) + '/' + fn
+                else: fn = o + '/' + fn
+                writefile(fn,d)
+                set_ftime(fn,fe[2])
+
+            f.close()
+            if fs: return
 
     return 1
 

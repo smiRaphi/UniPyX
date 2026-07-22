@@ -1125,6 +1125,7 @@ def guess_ext(d:bytes) -> str:
     if not d: return 'null'
     s = len(d)
     if s < 4: return 'bin'
+    ifb = int.from_bytes
 
     ext = 'bin'
     if d[:4] == b'\x89PNG': ext = 'png'
@@ -1144,17 +1145,22 @@ def guess_ext(d:bytes) -> str:
     elif d[:4] == b'FORM' and d[8:12] == b'AIFF': ext = 'aif'
     elif d[:3] == b'\xFF\xD8\xFF' and ((d[3] == 0xE0 and d[6:11] == b'JFIF\0') or (d[3] == 0xE1 and d[6:11] == b'Exif\0')): ext = 'jpg'
     elif d[-0x12:] == b'TRUEVISION-XFILE.\0': ext = 'tga'
-    elif d[4:8] == b'mdat' and d[int.from_bytes(d[0:4],'big')+4:int.from_bytes(d[0:4],'big')+8] == b'moov': ext = 'mp4'
+    elif d[4:8] == b'mdat' and d[ifb(d[0:4],'big')+4:ifb(d[0:4],'big')+8] == b'moov': ext = 'mp4'
     elif d[:6] in {b'GIF87a',b'GIF89a'}: ext = 'gif'
     elif d[:4] == b'\0\0\1\xBA' and\
          d[4] >> 6 == 0b01 and d[4] & 4 and\
          d[6] & 4 and d[8] & 4 and d[9] & 1 and\
          d[12] & 3 == 0b11 and not d[13] >> 3: ext = 'mpeg2'
-    elif d[:2] == b'BM' and (not sum(d[4:8]) or not d[3]): ext = 'bmp'
+    elif d[:2] == b'BM' and ifb(d[2:6],'little') <= s and (not sum(d[6:10]) or ifb(d[2:6],'little') == s) and\
+         ifb(d[10:14],'little') < ifb(d[2:6],'little') and d[14:0x12] == b'\x28\0\0\0' and d[0x1A:0x1C] == b'\1\0': ext = 'bmp'
+    elif d[:2] == b'MZ' and not sum(d[0x1C:0x24]) + sum(d[0x28:0x3C]):
+        cof = ifb(d[0x3C:0x40],'little')
+        if d[cof:cof+4] == b'PE\0\0' and d[cof + 0x17] & 0x20: ext = 'dll'
+        else: ext = 'exe'
     elif d[:0x13] == b'<?xml version="1.0"': ext = 'xml'
     elif d[:5] == b'{\\rtf': ext = 'rtf'
     elif d[:10] == b'# Blender ' and d[15:0x1A] == b' MTL File: ' and (d[10:11]+d[12:13]+d[14:15]).isdigit() and d[11] == d[13] == 0x2E: ext = 'blend'
-    elif int.from_bytes(d[:4],'little') == s and d[5] == 0xAF and d[4] in {0x11,0x12,0x30,0x31,0x44}: ext = 'flc'
+    elif ifb(d[:4],'little') == s and d[5] == 0xAF and d[4] in {0x11,0x12,0x30,0x31,0x44}: ext = 'flc'
     elif s > 0x100 and (d[:3] == b'ID3' or
                        (d[0] == 0xFF and d[1] & 0xE0 == 0xE0 and d[1] & 0x18 != 8 and d[1] & 0x06 != 0 and
                         d[2] & 0xF0 != 0xF0 and d[2] & 0x0C != 0x0C and d[3] & 0b11 != 0b10)): ext = 'mp3'

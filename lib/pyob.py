@@ -20,7 +20,7 @@ if __name__ == '__main__':
     from token import tok_name
     print(f'Token hash: {calc_th(tok_name):08X} ({TH:08X})')
     sys.exit()
-# check only needed for writing
+# tokenize only needed for writing
 if os.path.exists(os.path.dirname(__file__) + '/.is_dev'):
     check_th()
     TH_CHECKED = True

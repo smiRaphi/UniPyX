@@ -176,6 +176,10 @@ class File:
         b = self.readu8()
         if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-1:08X}")
         return bool(b)
+    def readbool16(self,end=None):
+        b = self.readu16(end)
+        if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-2:08X}")
+        return bool(b)
     def readbool32(self,end=None):
         b = self.readu32(end)
         if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-4:08X}")
@@ -266,6 +270,7 @@ class File:
     def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
     def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
     def writebool(self,v:bool): return self.writeu8(1 if v else 0)
+    def writebool16(self,v:bool,end=None): return self.writeu16(1 if v else 0,end)
     def writebool32(self,v:bool,end=None): return self.writeu32(1 if v else 0,end)
     def writevlq(self,v:int):
         b = [v & 0x7F]

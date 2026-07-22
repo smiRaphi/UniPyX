@@ -717,12 +717,25 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             if oby: return r
             return int.from_bytes(r,'big')
         case 'md5r':
-            oby = kwargs.pop('bytes',False)
             import hashlib
             r = hashlib.md5(i).digest()
             r = r[12:16] + r[8:12] + r[4:8] + r[0:4]
-            if oby: return r
+            if kwargs.get('bytes',False): return r
             return int.from_bytes(r,'big')
+        case 'md5x':
+            le = kwargs.get('le',False)
+            import hashlib
+            r = struct.unpack(('<' if le else '>') + '4I',hashlib.md5(i).digest())
+            r = r[0] ^ r[1] ^ r[2] ^ r[3]
+            if kwargs.get('bytes',False): return r.to_bytes(4,'little' if le else 'big')
+            return r
+        case 'md5_lh5':
+            r = kwargs.get('init',0xCAFEDECA)
+            le = kwargs.get('le',False)
+            import hashlib
+            for x in range(0,max(1,len(i)),0x2000): r ^= crc_hash(i[x:x+0x2000],'md5x',le=le)
+            if kwargs.get('bytes',False): return r.to_bytes(4,'little' if le else 'big')
+            return r
         case 'md5_sha1':
             import hashlib
             r = hashlib.md5(i).digest() + hashlib.sha1(i).digest()
@@ -819,6 +832,7 @@ HASHTS = {
     'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
     'xor':1,'xor8':1,
     'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,'md2':16,'md4':16,
+    'md5x':4,'md5_lh5':4,
     'sha224':28,'sha256':32,'sha384':48,'sha512':64,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,
     'sha512_224':28,'sha512_256':32,
