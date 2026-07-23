@@ -1,4 +1,4 @@
-[//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used before it, otherwise it's gonna stick to the text to the left.)
+[//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
 # Supported Formats: 1036
 
@@ -22,11 +22,11 @@ ALZip | .alz | [ALZip](https://altools.co.kr/product/ALZIP) |
 AMGC | .amgc | [AMGC](https://www.sac.sk/download/pack/amgc22.zip) |
 Amiga XPK | .xpk | [Ancient](https://github.com/temisu/ancient) |
 AmiPack | ??? | [unar](https://theunarchiver.com/command-line) |
-Apple DiskCopy | .img ` ` | Custom -> Apple Disk Image/IMG |
+Apple DiskCopy | .img ` ` | Custom -> Apple Disk Image/IMG |
 Apple Disk Image | .img .iso .dsk .dmg | [hfsexplorer](https://github.com/unsound/hfsexplorer), [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 Apple DOS IMG | .img .dsk | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
 Apple Partition Map | .apm .iso | [7-Zip](https://7-zip.org/) -> ISO/Apple Disk Image |
-AppleSingle | * | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/) |
+AppleSingle | \* | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/) |
 AR | .a .ar .lib | [AR](https://packages.msys2.org/packages/mingw-w64-x86_64-binutils), [7-Zip](https://7-zip.org/) |
 AR7 | .ar7 | [AR7](http://cd.textfiles.com/640swstudio/COMPRESS/AR712.ZIP) |
 ARG | .arg | [ARG](https://www.sac.sk/download/pack/arg.zip) |
@@ -67,8 +67,8 @@ CrLZH | ??? | [unar](https://theunarchiver.com/command-line), [deark](https://en
 Crunch | ??? | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/) |
 Crunch-Mania | ??? | [Ancient](https://github.com/temisu/ancient) |
 DAR | .dar | [DAR](https://sourceforge.net/projects/dar/) |
-DIET | * | [deark](https://entropymine.com/deark/) |
-DietDisk | * | [DietDisk](http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP) |
+DIET | \* | [deark](https://entropymine.com/deark/) |
+DietDisk | \* | [DietDisk](http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP) |
 CUE + BIN | .cue+.bin | [Aaru](https://github.com/aaru-dps/Aaru), [bin2iso](https://gitlab.com/bunnylin/bin2iso) + [7-Zip](https://7-zip.org/) |
 Diff Patch | .diff .patch | Custom |
 Disk Doubler | ??? | [unar](https://theunarchiver.com/command-line) |
@@ -195,7 +195,7 @@ NCCH CXI | .cxi | [3dstool](https://github.com/dnasdw/3dstool) |
 NCSD | .cci .3ds | [3dstool](https://github.com/dnasdw/3dstool) |
 NDS | .nds .srl | [mdnds](https://github.com/Roughsketch/mdnds) |
 NES Remix ROM | ??? | Custom |
-Nintendo TMD | .tmd ` ` | Custom |
+Nintendo TMD | .tmd ` ` | Custom |
 NKit GameCube ISO | .nkit.iso | [DolphinTool](https://dolphin-emu.org/download/) |
 NKit Wii ISO | .nkit.iso | [DolphinTool](https://dolphin-emu.org/download/) |
 Pilotwings 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Pilotwings64Decomp YAML](https://github.com/gcsmith/Pilotwings64Decomp/tree/main/config)
@@ -206,7 +206,7 @@ PS3 ISO | .iso | [ps3dec](https://github.com/Redrrx/ps3dec) -> ISO |
 PS4 PKG | .pkg | [ps4pkg](https://github.com/CyB1K/PS4-Fake-PKG-Tools-3.87) |
 PS5 PKG | .pkg | [ps5pkg](https://github.com/DNNDHH/PS5-PKGs) |
 PSVita PKG | .pkg | [pkg2zip](https://github.com/mmozeiko/pkg2zip) + [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api) |
-Ridge Racer V A | ` ` | [rrvatool](https://github.com/ch-mcl/PS2_RidgeRacerV_ArchiveTool)
+Ridge Racer V A | ` ` | [rrvatool](https://github.com/ch-mcl/PS2_RidgeRacerV_ArchiveTool)
 RVZ | .rvz | [DolphinTool](https://dolphin-emu.org/download/) |
 SimpleFlashFS | .sffs | Custom |
 Snowboard Kids 2 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Snowboard Kids 2 decomp YAML](https://github.com/cdlewis/snowboardkids2-decomp) |
@@ -221,8 +221,8 @@ Wave Race 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Wa
 Wii ISO | .iso | [DolphinTool](https://dolphin-emu.org/download/), [WIT](https://wit.wiimm.de/) |
 Wonder Project J2 N64 ROM | .z64 | [Torch](https://github.com/HarbourMasters/Torch) + [Wonder Torch YAML](https://github.com/LLONSIT-glitch/wonder/tree/master/assets/yaml) |
 WUX | .wux | [JWUDTool](https://github.com/Maschell/JWUDTool) |
-Xbox LIVE ROM | ` ` | [py360/stfs](https://raw.githubusercontent.com/arkem/py360/stfs) |
-Xbox PIRS | ` ` | [py360/stfs](https://raw.githubusercontent.com/arkem/py360/stfs) |
+Xbox LIVE ROM | ` ` | [py360/stfs](https://raw.githubusercontent.com/arkem/py360/stfs) |
+Xbox PIRS | ` ` | [py360/stfs](https://raw.githubusercontent.com/arkem/py360/stfs) |
 XISO | .iso | [xdvdfs](https://github.com/antangelo/xdvdfs) |
 XVD | .xvd | [XvdTool.Streaming](https://github.com/LukeFZ/XvdTool.Streaming) |
 ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
@@ -258,7 +258,7 @@ C64 MegaByte Cruncher | .prg | [unp64](https://iancoog.altervista.org/)
 C64 Super Compressor | .prg | [unp64](https://iancoog.altervista.org/)
 C64 TBC MultiCompactor | .prg | [unp64](https://iancoog.altervista.org/)
 C64 Time Cruncher | .prg | [unp64](https://iancoog.altervista.org/)
-Camelot Obfuscated NSO | .nso ` ` | Custom |
+Camelot Obfuscated NSO | .nso ` ` | Custom |
 Casio BE-300 Package | ??? | Custom |
 CEBE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 CExe | .exe | Custom |
@@ -291,7 +291,7 @@ ExeLITE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/
 EXEPACK | .exe .com | [deark](https://github.com/activescott/deark) |
 Fatpack | .exe | Custom |
 GameCube DOLXZ | .dol | Custom |
-GPEComp | .elf ` ` | Custom |
+GPEComp | .elf ` ` | Custom |
 Godot Game | .exe | [GDRETools](https://github.com/GDRETools/gdsdecomp) |
 ICE | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Inno Archive | .bin | Custom |
@@ -345,7 +345,7 @@ Resource DLL | .dll | [7-Zip](https://7-zip.org/) | DLL with only resources
 RJCrush | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 SCRNCH | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Setup Factory Installer | .exe | [Total Observer](https://bioruebe.com/dev/uniextract/)(src?), [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
-Shell Archive | .sh .shar ` ` | Custom |
+Shell Archive | .sh .shar ` ` | Custom |
 Shockwave Flash | .swf | [ffdec](https://github.com/jindrapetrik/jpexs-decompiler) |
 Shrinker Packed | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 SpaceMaker | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
@@ -365,20 +365,20 @@ Xamarin Compressed | ??? | Custom + [LZ4](https://github.com/lz4/lz4) |
 Xbox Executable | .xbe | Custom | Extracts resources that are single sections
 XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
-[zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
+[zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (559)
+## Various (560)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
 @N-Factory DAT | .dat | Custom |
-0Size24 Data | * | Custom |
+0Size24 Data | \* | Custom |
 10,000 Bullets FILE.BIN | .bin | Custom |
 1941 Frozen Front Data | ??? | Custom |
 1941 Frozen Front Lang | ??? | Custom |
 1nsane Game Archive | .idf | Custom |
 3D Ultra Cool TBVolume | .tbv | Custom |
-3D Ultra Cool PKX | * | Custom |
+3D Ultra Cool PKX | \* | Custom |
 7 Studios FS | .fs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 7th Level BIN | .bin | [na_game_tool](https://nihav.org/game_tool.html) |
 Access Software AP | .ap | [na_game_tool](https://nihav.org/game_tool.html) |
@@ -454,7 +454,7 @@ Championship Manager 17 DCFile | .png | Custom |
 Candy Land Adventure RFS | .rfs | Custom |
 Cannons Tournament PAK | .pak | Custom |
 Capcom Encrypted MAME ROM | .mameac.2 | Custom |
-Capcom YZ2 Compressed | * | Custom |
+Capcom YZ2 Compressed | \* | Custom |
 Cause of Death EXP | .exp | Custom |
 ChainDive FLD | .fld | Custom |
 Chasm BIN | .bin | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -480,7 +480,7 @@ Cryo BigFile | .big | [na_game_tool](https://nihav.org/game_tool.html) |
 CSI NY GRF | .grf | Custom |
 CTPK | .ctpk | Custom |
 Culpa Innata SFS | .sfs | Custom |
-D.N.A. Softwares LZSS | * | Custom |
+D.N.A. Softwares LZSS | \* | Custom |
 D.N.A. Softwares Pack | .p .mus | Custom |
 D1 Grand Prix Series 2005 BIN | .bin | Custom |
 Dance Layout Script | .dls | Custom |
@@ -503,7 +503,7 @@ DelphiX Picture Collection | .dxc | Custom -> Borland Form |
 Delta Studio YSCE | .ysce | Custom |
 Descent HOG | .hog | [gamearch](https://www.shikadi.net/camoto/desktop/), [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Destan 3DN | .3dn | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-Destruction Derby 2 DirInfo | ` ` | Custom |
+Destruction Derby 2 DirInfo | ` ` | Custom |
 Detective Instinct: Farewell, My Beloved Encrypted DIP | .dip | Custom |
 Digimon Story Lost Evolution PAK | .pak | Custom |
 Digital Illusions PDT | .pdt .dta .pdo .pdw | Custom|
@@ -536,7 +536,7 @@ Encrypted Arsenal MTC+MDF | .mtc+.mdf | Custom |
 Endless Interactive IN1+DBB | .in1+.dbb | Custom |
 Endless Interactive IN2+DBB | .in2+.dbb | Custom | holy shit I hate quicktime
 Ensemble Studios DRS | .drs | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-Escal Compressed | * | [na_game_tool](https://nihav.org/game_tool.html) |
+Escal Compressed | \* | [na_game_tool](https://nihav.org/game_tool.html) |
 eSMART Data | .bin | Custom |
 eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -581,12 +581,13 @@ Golden Tee Fore! BIG | .big | Custom |
 Goosebumps CFS | .cfs | [na_game_tool](https://nihav.org/game_tool.html) |
 Groove World Archive | .grv | Custom |
 Gwtar | .gwtar.html | Custom -> TAR |
-HAL Switch CMP | .cmp | Custom |
-HAL VPK0 | .vpk0 .vpk * | Custom |
-HAL XBIN | .bin * | Custom |
-HAL XBIN YAML | .bin | Custom |
 Haemimont Games HPK | .hpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+HAL Switch CMP | .cmp | Custom |
+HAL VPK0 | .vpk0 .vpk \* | Custom |
+HAL XBIN | .bin \* | Custom |
+HAL XBIN YAML | .bin | Custom |
 Halloween Harry Bank | .bnk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Hammer | ` ` .hmr | Custom |
 Harry Potter and Prisoner of Azkaban IDS | .ids | Custom |
 Harry Potter and Prisoner of Azkaban SDT | .sdt | Custom |
 Harry Potter and the Deathly Hallows BIN | .bin | Custom |
@@ -604,11 +605,11 @@ Hollow Knight Save | ??? | Custom |
 Hornby BSF | .bsf | Custom |
 Hostile Waters MNG | .mng | [na_game_tool](https://nihav.org/game_tool.html) |
 Hudson Arc Dat | .bin | Custom |
-IBM AIX Backup | .bff .bck .img .ima * | Custom |
+IBM AIX Backup | .bff .bck .img .ima \* | Custom |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |
 idTech 7 Resource | .resource | Custom |
-IFF Data | .iff * | Custom |
+IFF Data | .iff \* | Custom |
 Impact Screensaver ILB | .ilb | Custom |
 Import Tuner Challenge TOC+DAT | .toc+.dat | Custom |
 Initial D XAF | .xaf | [assamUnpack](https://github.com/refint/assamUnpack) |
@@ -628,7 +629,7 @@ Koei Tecmo LINKDATA | .a .b .c | Custom |
 Konami DPG | .dpg | Custom |
 Konami FireBeat LZSS | .gcz .exe | Custom |
 Konami GAME.DAT | .dat | [ddrutil.py](https://git.sr.ht/~zanneth/ddr-extreme-clarity/blob/master/src/scripts/ddrutil.py) |
-Konami NDS Compress | * | Custom |
+Konami NDS Compress | \* | Custom |
 Konami NKP | .nkp | Custom |
 L.A. Noire BIG | .big.ps3 | Custom |
 L.A. Rush AClump | .aclump | Custom |
@@ -648,10 +649,10 @@ Looking Glass Resource | .res | Custom |
 Lucas Learning DAT | .dat | Custom |
 LucasArts Bundle | .bdl | Custom |
 LucasArts APak | .xma .lp | Custom |
-LucasArts R2D2 Pack | * | Custom |
+LucasArts R2D2 Pack | \* | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |
-Ludia GWTarget | ` ` | Custom |
+Ludia GWTarget | ` ` | Custom |
 Macross: Do You Remember Love? GKO | .gko | Custom |
 Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
@@ -681,15 +682,15 @@ Mission Impossible 3 Data | ??? | Custom |
 Mitsurugi KPK | .kpk+.exe | Custom |
 MMFW Resource | .mmp .mms .mma .mmf | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Mo'PaQ | .mpq | [MPQExtractor](https://github.com/Kanma/MPQExtractor) |
-Moe Cure Net FileList | ` ` | Custom |
+Moe Cure Net FileList | ` ` | Custom |
 Monolith Productions LTAR | ??? | [shadow_of_mordor.bms](https://mirror.aluigi.org/bms/shadow_of_mordor.bms), [condemned2.bms](https://mirror.aluigi.org/bms/condemned2.bms), [fear.bms](https://mirror.aluigi.org/bms/fear.bms) |
 Monsters Inc. Scream Team Training WAD | .wad | Custom |
 Motocross Mania DAT | .dat | [e_biker.bms](https://mirror.aluigi.org/bms/e_biker.bms) |
 MotoGP ARK | .ark | Custom |
 mTropolis MDM | .q3 | Custom |
 mTropolis MPL | .mpl | Custom |
-N-Space Zlib Compressed | * | Custom |
-Natsume LZS | .paz * | Custom |
+N-Space Zlib Compressed | \* | Custom |
+Natsume LZS | .paz \* | Custom |
 NCAA Gamebreaker PG | .pg | Custom |
 NDS Sound Data | .sdat | [ndssntext](https://gbatemp.net/download/nds-sound-extractor.28818/) |
 NeoBook Cartoon | .nbc | Custom |
@@ -704,14 +705,14 @@ Nintendo 3DS SMDH | .smdh .ico | Custom |
 Nintendo Amiibo NFC Raw | .bin | Custom |
 Nintendo ASH0 | .bin | Custom |
 Nintendo Binary YAML | .byml .byaml .yml .yaml | [byml-to-yaml](https://github.com/ArchLeaders/byml_to_yaml) |
-Nintendo BLZ | .blz .lz * | Custom |
+Nintendo BLZ | .blz .lz \* | Custom |
 Nintendo CTR Banner | .bnr | Custom |
 Nintendo Data ARChive | .arc .darc | [darc.py](https://github.com/LITTOMA/darctool) |
 Nintendo HARC+HIDX | .har+.hix | Custom |
-Nintendo LZ10 | .lz10 .lz * | Custom |
-Nintendo LZ11 | .lz11 .lz * | Custom |
-Nintendo LZ40 | .lz40 .lz * | Custom |
-Nintendo LZ60 | .lz60 .lz * | Custom |
+Nintendo LZ10 | .lz10 .lz \* | Custom |
+Nintendo LZ11 | .lz11 .lz \* | Custom |
+Nintendo LZ40 | .lz40 .lz \* | Custom |
+Nintendo LZ60 | .lz60 .lz \* | Custom |
 Nintendo Mario Party Message | ??? | Custom |
 Nintendo Message BMG | .bmg .mbmg | [ndspy/bmg.py](https://github.com/RoadrunnerWMC/ndspy/blob/master/ndspy/bmg.py) + Custom |
 Nintendo MSBT | .msb .msbt | [ce_msbt.py](https://github.com/Treeki/CylindricalEarth/blob/master/msbt.py) + Custom |
@@ -742,7 +743,7 @@ Package Resource Index | .pri | [makepri](https://www.nuget.org/packages/Microso
 Package Resource Index XML | .xml | Custom |
 Palm MemoPad Archive | .mpa | Custom |
 Papaya Studio Wii VAPS | .vaps | Custom |
-Peggle Data | ` ` | Custom |
+Peggle Data | ` ` | Custom |
 Petroglyph CHK List | .chk | Custom |
 Petroglyph MEG | .meg | Custom |
 Petroglyph Zlib CH | .ch | Custom |
@@ -806,7 +807,7 @@ SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
 SDFTool SDF.bin | .bin | Custom |
 Selene Pack | .pack | Custom |
-Sengoku Basara 2 Compressed | * | Custom |
+Sengoku Basara 2 Compressed | \* | Custom |
 SharkPortSave | ??? | Custom |
 Shin Megami Tensei 9 PACK | ??? | Custom |
 Shrek Smash n' Crash Racing CMP | .cmp | Custom |
@@ -819,7 +820,7 @@ Sinergy GUT | .gut | Custom |
 Siren 2 EVD | .evd | Custom |
 Siren 2 PAK | .pak | Custom |
 Siren 2 SLPK ROM | .slpk | Custom |
-Six Guns Encrypted Save | ` ` | Custom |
+Six Guns Encrypted Save | ` ` | Custom |
 Sky CoTL Preferences | .pref | Custom |
 Slayer Engine RPE | .rpe | Custom |
 SLUDGE Data File | .sludge | Custom |
@@ -828,7 +829,7 @@ Smoking Car Productions Disk Cache | .hdf | Custom |
 Snail Mail DAW | .daw | Custom |
 Snoopy Vs. The Red Baron X | .xpc .xps | Custom |
 Sonic AMB | .amb | Custom |
-Sonic BINA | * | Custom |
+Sonic BINA | \* | Custom |
 Sonic PAC | .pac | [HedgeArcPack](https://github.com/Radfordhound/HedgeLib) |
 Sonic Shuffle Message Data | .bin | Custom |
 Soulcalibur Legends NPAC | .npac | Custom |
@@ -839,9 +840,9 @@ StarFlyers Bulk File Index | .inx+.bul | Custom |
 Starsky & Hutch WAD | .btw | Custom |
 StormCE IIII | ??? | Custom |
 StormCE Library VFS | .vfs | Custom |
-String16 Count16 Data | * | Custom |
-String16 Data | * | Custom |
-String16BE Data | * | Custom |
+String16 Count16 Data | \* | Custom |
+String16 Data | \* | Custom |
+String16BE Data | \* | Custom |
 STXT Language Data | .stxt | Custom |
 Stylus Config Export | .json | Custom |
 Sumo Digital XPAC | .xpac | Custom |
@@ -915,7 +916,7 @@ Wii Exported Save Data | .bin | Custom |
 WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
 X-Files Resources | ??? | Custom |
 Xbox FArc | .fa | Custom |
-Xbox XB Compressed | .xb * | Custom |
+Xbox XB Compressed | .xb \* | Custom |
 Xenoblade Chronicles X DE ARH2 | .arh+.ard | Custom |
 Xenonauts PFP | .pfp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 XNB | .xnb | [xnb.bms](https://mirror.aluigi.org/bms/xnb.bms) |
@@ -928,11 +929,11 @@ Zeebo PLZP | .plzp | Custom |
 Zeebo Resources | ??? | Custom |
 ZIPD Encrypted | .piz | Custom |
 ZLARC | .zl .zlarc | Custom |
-Zlib + Uncompressed Size | * | Custom |
+Zlib + Uncompressed Size | \* | Custom |
 ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (124)
+## Compression Enthusiasts/One-Off Formats (123)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
@@ -983,7 +984,6 @@ GMIX | .gmix | [gmix](https://github.com/byronknoll/gmix) |
 GRZip | ??? | [GRZip](https://www.sac.sk/download/pack/grzip.zip) |
 GRZipII | ??? | [GRZipII](https://www.sac.sk/download/pack/grzipiiw.zip) |
 Hamarsoft HAP | .hap | [PAH21](https://github.com/Sembiance/dexvert/blob/master/dos/PAH21PD.EXE)(src?), [PAH3](https://github.com/Sembiance/dexvert/blob/master/dos/PAH3.EXE)(src?) |
-Hammer | ??? | [hammer_decomp.py](https://github.com/Treeki/RandomStuff/blob/master/hammer_decomp.py) |
 HIT | .hit | [HIT](https://www.sac.sk/download/pack/hit.arj) |
 Hyper | .hyp | [HYPER](http://cd.textfiles.com/phoenix2/01d/hyper25.zip) |
 IMP | .imp | [IMP](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/imp/imp112.zip)(src?) |

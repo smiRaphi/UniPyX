@@ -2594,13 +2594,6 @@
         ]],
         "ts":0
     },
-    "hammer_decomp":{
-        "p":"hammer_decomp.py",
-        "fs":[
-        "https://raw.githubusercontent.com/Treeki/RandomStuff/refs/heads/master/hammer_decomp.py"
-        ],
-        "ts":0
-    },
     "hit":{
         "p":"HIT.EXE",
         "fs":[{

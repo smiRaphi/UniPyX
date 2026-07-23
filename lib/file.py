@@ -857,6 +857,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             if i[0x18]: o.extend(i[0x1C:0x1C+i[0x18]])
             return bytes(o)
+        case 'hammer': return uxx().decompress_hammer(i)
 
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'

@@ -939,6 +939,80 @@ eof:
 
     return op;
 }
+static inline uint32_t hammer_transp(const uint32_t s, const uint32_t max, const uint8_t fmt) {
+    if (fmt == 0) {
+        if (s > max) return max;
+        return s;
+    } else if (fmt == 1) {
+        uint32_t a = s;
+        uint32_t b = a << 2;
+        for (int8_t i=0;i < 4;i++) {
+            a -= max >> 2;
+            if (a & 0x80000000 == 0) b = (b + 1) - max;
+        }
+        if (b > max) return max;
+        return b;
+    }
+    return -1;
+}
+EXPORT ssize_t decompress_hammer(const uint8_t *restrict src, const size_t zsize, uint8_t *restrict dst) {
+    size_t ip = 8;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    const uint8_t fmt = src[3];
+    const uint32_t usize = read32le(src + 4);
+    ssize_t op = 0;
+
+    while (ip < zsize && op < usize) {
+        uint8_t b = src[ip++];
+        if (b == 0xFF) break;
+        else if (b < 0x10) {
+            CHKi(0)
+            uint8_t c = src[ip++];
+            uint8_t l = b + 2;
+            if (b == 0xF) l = 0x100;
+            if (op + l > usize) l = usize - op;
+            for (int16_t i=0;i < l;i++) dst[hammer_transp(op++, usize, fmt)] = c;
+        } else if (b < 0x20) {
+            uint8_t l = (b & 0xF) + 1;
+            if (op + l > usize) l = usize - op;
+            if (ip + l > zsize) return -1;
+            for (uint8_t i=0;i < l;i++) dst[hammer_transp(op++, usize, fmt)] = src[ip++];
+        } else if (b < 0x40) {
+            CHKi(0)
+            uint16_t dist = (src[ip++] | ((b & 3) << 8)) + 1;
+            uint8_t l = ((b >> 2) & 7) + 2;
+            if (op + l > usize) l = usize - op;
+
+            size_t cp = op - dist;
+            for (uint8_t i=0;i < l;i++) dst[hammer_transp(op++, usize, fmt)] = dst[hammer_transp(cp - i, usize, fmt)];
+        } else if (b < 0x80) {
+            CHKi(0)
+            uint16_t dist = (src[ip++] | ((b & 1) << 8)) + 1;
+            uint8_t a = (b >> 1) & 3;
+            uint8_t l = ((b >> 3) & 7) + 2;
+            if (a > 1) a++;
+            a = 1 << a;
+
+            if (op + l > usize) l = usize - op;
+            size_t cp = op - dist;
+            size_t p = 0;
+            for (uint8_t i=0;i < l;i++) {
+                dst[hammer_transp(op++, usize, fmt)] = dst[hammer_transp(cp + (p >> 2), usize, fmt)];
+                p += a;
+            }
+        } else {
+            CHKi(0)
+            uint16_t dist = (src[ip++] | ((b & 7) << 8)) + 1;
+            uint8_t l = ((b >> 3) & 0xF) + 2;
+            if (op + l > usize) l = usize - op;
+            for (uint8_t i=0;i < l;i++) dst[hammer_transp(op++, usize, fmt)] = dst[hammer_transp(op - dist, usize, fmt)];
+        }
+    }
+
+eof:
+    #undef CHKi
+    return op;
+}
 
 typedef struct {
     const uint8_t *src;

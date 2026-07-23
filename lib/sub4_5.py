@@ -1667,5 +1667,10 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Hammer':
+            db.try_custom()
+            from lib.file import decompress
+            writefile(o + '/' + basename(i),decompress(readfile(i),'hammer'))
+            return
 
     return 1

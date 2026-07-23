@@ -116,6 +116,7 @@ class X:
             ('decompress_lzrw1kh',  (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_camelot_blz',(P(u8),szt,P(u8),sszt), sszt,1),
             ('decompress_szdd_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_hammer',   (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u16,u16,u16,u16),sszt,0),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
@@ -382,6 +383,13 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * usize)()
         r = self.dll.decompress_lzw(i,len(src),o,usize,max_bits,max_dict,init_code_size,first_code,clear_code,end_code,1 if be else 0)
+        if r < 0: raise ValueError(f'Decompression failed ({r})')
+        return bytes(o)[:r]
+    def decompress_hammer(self,src:bytes):
+        asrt(len(src) > 8 and src[:3] == b'Hmr' and src[3] < 2)
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * int.from_bytes(src[4:8],'little'))()
+        r = self.dll.decompress_hammer(i,len(src),o)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
 
