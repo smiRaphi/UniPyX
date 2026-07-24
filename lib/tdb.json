@@ -1408,7 +1408,7 @@
     "SharkPortSave":[
         "sharkport file"
     ],
-    "Novalogic Resource":[
+    "Novalogic Resource 2":[
         "novalogic resource / game data (v2)"
     ],
     "ASDG SPLiT":[
@@ -1687,5 +1687,8 @@
     ],
     "Maximus Installer ACopy":[
         "maximus installer archive format (old)"
+    ],
+    "Novalogic Resource 1":[
+        "novalogic resource / game data (v1)"
     ]
 }

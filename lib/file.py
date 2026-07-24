@@ -282,6 +282,7 @@ class File:
             v >>= 7
 
         return self.write(bytes(reversed(b)))
+    def writes(self,s:str,encoding='utf-8'): return self.write(s.encode(encoding))
 
     def align(self,blocksize:int,base:int=0):
         v = align(self.tell() - base,blocksize)
@@ -696,7 +697,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             flg = int.from_bytes(i[:2],'little')
             return pyppmd.Ppmd8Decoder((flg & 0xF) + 1,(((flg >> 4) & 0xFF) + 1) << 20,(flg >> 12) & 0xF).decode(i[2:])
 
-        case 'lzo'|'lzo1x'|'lzo1y':
+        case 'lzo'|'lzo1'|'lzo1a'|'lzo1b'|'lzo1c'|'lzo1f'|'lzo1x'|'lzo1y'|'lzo1z'|'lzo2a':
             if 'db' in kwargs: kwargs['db'].get('lzo')
             if algo == 'lzo': algo = 'lzo1x'
 
@@ -858,6 +859,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if i[0x18]: o.extend(i[0x1C:0x1C+i[0x18]])
             return bytes(o)
         case 'hammer': return uxx().decompress_hammer(i)
+        case 'lbalzss1'|'lbalzss2'|'lbalzss1x'|'lbalzss2x': return uxx().decompress_lbalzss(i,kwargs['usize'],int(algo[7]),algo.endswith('x'))
 
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'
@@ -1120,6 +1122,31 @@ def _dec_n64mp(i:bytes):
         if b in CH_N64MPR: raise UnicodeDecodeError('n64mpak',i,ix,ix+1,'invalid character')
         o.append(CH_N64MP[b])
     return (''.join(o),len(i))
+CH_ATARIST = (
+    '\0⇧⇩⇨⇦🮽🮾🮿✓🕒🔔♪\f\r��' # atari logo
+    '🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹ə\x1B����' # easter egg
+    ' !"#$%&\'()*+,-./'
+    '0123456789:;<=>?'
+    '@ABCDEFGHIJKLMNO'
+    'PQRSTUVWXYZ[\\]^_'
+    '`abcdefghijklmno'
+    'pqrstuvwxyz{|}~⌂'
+    'ÇüéâäàåçêëèïîìÄÅ'
+    'ÉæÆôöòûùÿÖÜ¢£¥ßƒ'
+    'áíóúñÑªº¿⌐¬½¼¡«»'
+    'ãõØøœŒÀÃÕ¨´†¶©®™'
+    'ĳĲאבגדהוזחטיכלמנ'
+    'סעפצקרשתןךםףץ§∧∞'
+    'αβΓπΣσµτΦΘΩδ∮ϕ∈∩'
+    '≡±≥≤⌠⌡÷≈°•·√ⁿ²³¯'
+)
+def _enc_atarist(i:str):
+    o = bytearray()
+    for ix,c in enumerate(i):
+        if c not in CH_ATARIST: raise UnicodeEncodeError('atarist',i,ix,ix+1,'invalid character')
+        o.append(CH_ATARIST.index(c))
+    return (bytes(o),len(o))
+def _dec_atarist(i:bytes): return (''.join(CH_ATARIST[b] for b in i),len(i))
 def _enc_ascii7(i:str):
     o = bytearray()
     v = c = 0
@@ -1194,6 +1221,7 @@ def _dec_utf0(i:bytes):
 
 _CODECS = (
     ('n64mpak',_enc_n64mp,_dec_n64mp),
+    ('atari_st','atarist',_enc_atarist,_dec_atarist),
     ('ascii_mask',lambda i:(i.encode('ascii'),len(i)),lambda i:(bytes(x & 0x7F for x in i).decode('ascii'),len(i))),
     ('ascii7',_enc_ascii7,_dec_ascii7),
     ('utf_0','utf0',_enc_utf0,_dec_utf0),

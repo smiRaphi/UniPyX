@@ -395,9 +395,9 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Teardown Encrypted':
             db.try_custom()
             from lib.crypto import decrypt
-            d = decrypt(readfile(i),'dxor',
-                        b"599Cc51887A8cb0C20F9CdE34cf9e0A535E5cAd1C26c7b562596ACC207Ae9A0bfB3E3161f31af5bEf1c2f064b3628174D83BF6E0739D9D6918fD9C2Eba02D5aD",
-                        b"0C3b676fe8d7188Cde022F71632830F36b98b181aD48Fed160006eA59")
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            d = decrypt(readfile(i),'dxor',*keys.wait()['teardown'])
             writefile(o + '/' + tbasename(i),d)
             return
         case 'UE4 Package':
@@ -836,10 +836,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'Hollow Knight Save':
             db.try_custom()
             from lib.crypto import decrypt
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
 
             d = readfile(i,off=0x19).split(b'=')[0]
-            #a = f..1"4.'"
-            d = decrypt(decrypt(d,'b64',fix=True),'aes_ecb',b'UKu52ePUBwetZ9wNX88o54dnfKRu0T1l')
+            d = decrypt(decrypt(d,'b64',fix=True),'aes_ecb',keys.wait()['hollow_knight'])
 
             writefile(o + '/' + tbasename(i) + '.json',d[:-d[-1]])
             return

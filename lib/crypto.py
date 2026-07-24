@@ -161,6 +161,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             from Cryptodome.PublicKey import RSA
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
             elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and type(iv) == int: k = RSA.construct((int.from_bytes(key,'little' if algo == 'rsa_raw_le' else 'big'),iv))
             elif type(key) == bytes and iv is None: k = RSA.import_key(key)
             else: raise NotImplementedError()
 
@@ -170,6 +171,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             from Cryptodome.PublicKey import RSA
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
             elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and type(iv) == int: k = RSA.construct((int.from_bytes(key,'little' if algo == 'rsa_le' else 'big'),iv))
             elif type(key) == bytes and iv is None: k = RSA.import_key(key)
             else: raise NotImplementedError()
 
@@ -202,6 +204,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 key,iv = int.from_bytes(key,'big'),int.from_bytes(iv,'big')
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
             elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and type(iv) == int: k = RSA.construct((int.from_bytes(key,'big'),iv))
             elif type(key) == bytes and iv is None: k = RSA.import_key(key)
             else: raise NotImplementedError()
 
@@ -228,6 +231,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             from Cryptodome.PublicKey import RSA
             if type(key) == int and type(iv) == int: k = RSA.construct((key,iv))
             elif type(key) == int and iv is None: k = RSA.construct((key,0x10001))
+            elif type(key) == bytes and type(iv) == int: k = RSA.construct((int.from_bytes(key,'little' if algo == 'rsa_inv_le' else 'big'),iv))
             elif type(key) == bytes and iv is None: k = RSA.import_key(key)
             else: raise NotImplementedError()
 

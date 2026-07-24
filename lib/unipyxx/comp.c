@@ -831,7 +831,7 @@ EXPORT ssize_t decompress_szdd_raw(const uint8_t *restrict src, const size_t zsi
     uint8_t f = 0;
     int8_t fbl = 0;
 
-    while (ip < zsize && (op < usize || usize == -1)) {
+    while (ip < zsize && (usize == -1 || op < usize)) {
         if (fbl <= 0) {
             f = src[ip++];
             fbl = 8;
@@ -1007,6 +1007,47 @@ EXPORT ssize_t decompress_hammer(const uint8_t *restrict src, const size_t zsize
             if (op + l > usize) l = usize - op;
             for (uint8_t i=0;i < l;i++) dst[hammer_transp(op++, usize, fmt)] = dst[hammer_transp(op - dist, usize, fmt)];
         }
+    }
+
+eof:
+    #undef CHKi
+    return op;
+}
+EXPORT ssize_t decompress_lbalzss(const uint8_t *restrict src, const size_t zsize,
+                                        uint8_t *restrict dst, const ssize_t usize, const uint8_t flags) {
+    const int8_t rle = flags & 1;
+    const uint8_t add = flags >> 1;
+    size_t ip = 0;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    ssize_t op = 0;
+    uint8_t f = 0;
+    int8_t fc = 0;
+
+    while (ip < zsize && (usize == -1 || op < usize)) {
+        if (fc <= 0) {
+            f = src[ip++];
+            fc = 8;
+            CHKi(0)
+        }
+        if (f & 1) dst[op++] = src[ip++];
+        else {
+            CHKi(1)
+            uint16_t b = src[ip++];
+            b |= src[ip++] << 8;
+            uint16_t l = (b & 0xF) + add + 1;
+            if (usize != -1 && op + l > usize) l = usize - op;
+            int16_t dist = ~b >> 4; // logical shift
+            if (dist > op || -dist > op) { op = -ip;goto eof; }
+            if (rle && dist == -1) {
+                uint8_t c = dst[op - 1];
+                if (usize == -1 || op + l < usize) l += op & 1;
+                for (uint16_t i=0;i < l;i++) dst[op++] = c;
+            } else {
+                for (uint16_t i=0;i < l;i++,op++) dst[op] = dst[op + dist];
+            }
+        }
+        f >>= 1;
+        fc--;
     }
 
 eof:

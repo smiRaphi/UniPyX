@@ -118,6 +118,7 @@ class X:
             ('decompress_szdd_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_hammer',   (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u16,u16,u16,u16),sszt,0),
+            ('decompress_lbalzss',  (P(u8),szt,P(u8),sszt,u8),sszt,0),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -390,6 +391,13 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * int.from_bytes(src[4:8],'little'))()
         r = self.dll.decompress_hammer(i,len(src),o)
+        if r < 0: raise ValueError(f'Decompression failed ({r})')
+        return bytes(o)[:r]
+    def decompress_lbalzss(self,src:bytes,usize:int,add=2,rle=False) -> bytes:
+        fl = (1 if rle else 0) | add << 1
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * usize)()
+        r = self.dll.decompress_lbalzss(i,len(src),o,usize,fl)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
 

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1036
+# Supported Formats: 1037
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -367,7 +367,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (560)
+## Various (561)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -726,7 +726,8 @@ NitroARC | .arc .narc | [Narchive](https://github.com/nickworonekin/narchive) |
 NMZIP | .nmzip | Custom |
 Noita Wizard pAK | .wak | Custom |
 Novalogic PFF | .pff | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
-Novalogic Resource | ??? | Custom |
+Novalogic Resource 1 | .res | Custom |
+Novalogic Resource 2 | .res | Custom |
 NSMBW Coin World ARC | .arc | Custom |
 NUB2 | .nub .nub2 | [nus3_nub2.bms](https://mirror.aluigi.org/bms/nus3_nub2.bms) |
 ODAU Zip | .odau | Custom |

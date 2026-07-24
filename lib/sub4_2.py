@@ -1107,10 +1107,10 @@ def extract4_2(inp:str,out:str,t:str):
             for fe in fs: writefile(f'{o}/{fe[0]}',f.read(fe[1]-f.pos))
             f.close()
             if fs: return
-        case 'Novalogic Resource':
+        case 'Novalogic Resource 2':
             db.try_custom()
             from lib.pyob import PyOBinX
-            key = PyOBinX.dl('keys',db)
+            keys = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -1118,7 +1118,7 @@ def extract4_2(inp:str,out:str,t:str):
             c = f.readu32()
 
             fs = []
-            KEYS = key.wait()['novalogic_res']
+            KEYS = keys.wait()['novalogic_res']
             for _ in range(c):
                 rn = f.read(12)
                 for k in KEYS:
@@ -1132,7 +1132,7 @@ def extract4_2(inp:str,out:str,t:str):
 
             for fe in fs:
                 f.seek(fe[1])
-                writefile(f'{o}/{fe[0]}',f.read(fe[2]))
+                writefile(f'{o}/{fe[0]}',f.readc(fe[2]))
             f.close()
             if fs: return
         case 'Specnaz UFF/BFS': raise NotImplementedError

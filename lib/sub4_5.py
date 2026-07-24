@@ -1672,5 +1672,23 @@ def extract4_5(inp:str,out:str,t:str):
             from lib.file import decompress
             writefile(o + '/' + basename(i),decompress(readfile(i),'hammer'))
             return
+        case 'Novalogic Resource 1':
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(12) == b'RESOURCE1\r\n\x1A')
+
+            c = f.readu32()
+            fs = [(f.read(12),f.readu32()) for _ in range(c+1)]
+            keys.wait()
+            for ix,fe in enumerate(fs[:-1]):
+                f.seek(fe[1])
+                writefile(o + '/' + decrypt(fe[0],'xor',keys['novalogic_res'][0]).decode('ascii').rstrip('\0'),f.readc(fs[ix+1][1] - fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1
