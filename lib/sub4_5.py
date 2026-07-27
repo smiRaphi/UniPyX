@@ -1690,5 +1690,76 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Army Men: Sarge\'s War PIK':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            us,zs = f.readu32(),f.readu32()
+            asrt(f.readu32() == 8 and f.readu32() == 1)
+            f = File(f.decompress(zs,'lbalzss2',usize=us),endian=f._end)
+            f.skip(8)
+            dc = f.readu32()
+
+            ds = []
+            for _ in range(dc):
+                n = f.readc(0x80).split(b'\0')[0].decode('ascii')
+                dio = f.readu32()
+                f.skip(4)
+                ds.append((n,dio,f.readu32(),f.readu32()))
+                f.skip(8)
+
+            fs = []
+            for de in ds:
+                f.seek(de[1])
+                do = f.readu32()
+                #ds = f.readu32()
+                f.seek(de[2])
+                for _ in range(de[3]): fs.append((de[0] + '/' + f.readc(0x80).split(b'\0')[0].decode('ascii'),f.readu32() + do,f.readu32()))
+                mkdir(o + '/' + de[0])
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Specnaz UFF':
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(8) == b'UFF 1.0\n')
+
+            f.seek(-4)
+            f.seek(f.readu32())
+            nc,c = f.readu32(),f.readu32()
+            if nc < 0xFF and c < 0xFF: rfnc,maxv = f.readu8,0xFF
+            elif nc < 0xFFFF and c < 0xFFFF: rfnc,maxv = f.readu16,0xFFFF
+            else: rfnc,maxv = f.readu32,0xFFFFFFFF
+
+            fs = [(rfnc(),rfnc(),rfnc(),f.readu32(),f.readu32(),rfnc()) for _ in range(c)]
+            ns = f.reads(f.readu32(),'utf-8')[:-1].split('\0')
+            asrt(len(ns) == nc)
+
+            k = keys.wait()['specnaz_uff']
+            for fe in fs:
+                if fe[1] != maxv: continue
+
+                p = []
+                de = fe
+                while de[2] != maxv:
+                    p.append(ns[de[5]])
+                    de = fs[de[2]]
+                if p[-1] == 'Root': p.pop()
+                p.reverse()
+
+                f.seek(fe[3])
+                writefile(o + '/' + '/'.join(p),decrypt(f.readc(fe[4]),'cxori',k))
+
+            f.close()
+            if fs: return
 
     return 1

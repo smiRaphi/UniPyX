@@ -239,7 +239,10 @@ def supdate(c:Cache,k:str,inf:dict):
                     for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
                 else: ts = 0
         elif dom == 'wimlib.net':
-            s = c.get('https://wimlib.net/')
+            for _ in range(5):
+                try: s = c.get('https://wimlib.net/')
+                except (httpx.ConnectTimeout,httpx.ConnectError): pass
+                else: break
             m = re.search(r'Current release: (wimlib\-\d+\.\d+\.\d+) \(released (\w+ \d{1,2}, \d{4})\)',s)
             ts = ft(m[2],'%B %d, %Y')
             if ts > ots:

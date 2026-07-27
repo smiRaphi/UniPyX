@@ -6,7 +6,9 @@ __FNCT = type(lambda:None)
 def asrt(c:bool,*r,err:Exception=ValueError):
     if not c:
         if len(r) == 1 and isinstance(r[0],__FNCT): r = r[0]()
-        elif r: r = ' '.join(str(x) for x in r)
+        if r:
+            if hasattr(r,'__iter__'): r = ' '.join(str(x) for x in r)
+            else: r = str(r)
         else: r = ''
         raise err(r)
 
@@ -25,7 +27,6 @@ def reflecti(v:int,w:int):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
-def rotate8(v:int): return ((v << 7) & 0xFF) | (v >> 1)
 def pdosdate(d:int,t:int,ms=0):
     asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
     if d == 0: d = 0x21
@@ -472,45 +473,56 @@ class BitReader:
     def eof(self): return self.d.tell() >= self.size and not self.p
 
 class EXE(File):
-    def __init__(self,f):
+    def __init__(self,f,dos=False):
         super().__init__(f,mode='r',endian='<')
 
         asrt(self.read(2) == b'MZ')
         self.seek(0x3C)
         self.coff_off = self.readu32()
-        self.seek(self.coff_off)
-        self.secs = {}
-        pe = self.read(4)
-        if pe == b'PE\0\0':
-            self.skip(2)
-            secs = self.readu16()
-            self.skip(12)
-            self.skip(self.readu16() + 2)
+        if not dos and self.coff_off != 0:
+            self.seek(self.coff_off)
+            self.secs = {}
+            pe = self.read(4)
+            if pe == b'PE\0\0':
+                self.skip(2)
+                secs = self.readu16()
+                self.skip(12)
+                self.skip(self.readu16() + 2)
 
-            for _ in range(secs):
-                n = self.read(8).strip(b'\0').decode(errors='ignore')
-                self.skip(8)
-                s,o = self.readu32(),self.readu32()
-                self.secs[n] = (o,s,o+s)
-                self.skip(0x10)
-        elif pe[:2] == b'NE':
-            self.skip(0x18)
-            secs = self.readu16()
-            self.skip(4)
-            seco = self.readu16()
-            self.reco = self.readu16()
-            blcks = 1 << self.readu16()
-            self.skip(12)
-            self.recs = self.readu16()
-
-            self.seek(self.coff_off + seco)
-            for x in range(secs):
-                s,o = self.readu16()*blcks,self.readu16()
-                self.secs[x] = (o,s,o+s)
+                for _ in range(secs):
+                    n = self.read(8).strip(b'\0').decode(errors='ignore')
+                    self.skip(8)
+                    s,o = self.readu32(),self.readu32()
+                    self.secs[n] = (o,s,o+s)
+                    self.skip(0x10)
+            elif pe[:2] == b'NE':
+                self.skip(0x18)
+                secs = self.readu16()
                 self.skip(4)
-        else: raise NotImplementedError(pe)
+                seco = self.readu16()
+                self.reco = self.readu16()
+                blcks = 1 << self.readu16()
+                self.skip(12)
+                self.recs = self.readu16()
 
-        self.ovl_off:int = max([x[2] for x in self.secs.values()])
+                self.seek(self.coff_off + seco)
+                for x in range(secs):
+                    s,o = self.readu16()*blcks,self.readu16()
+                    self.secs[x] = (o,s,o+s)
+                    self.skip(4)
+            else: raise NotImplementedError(pe)
+
+            self.ovl_off:int = max([x[2] for x in self.secs.values()])
+        else:
+            self.seek(2)
+            xps = self.readu16() or 0x200
+            pgs = self.readu16()
+            self.ovl_off:int = (pgs - 1)*0x200 + xps
+            self.skip(2)
+            self.code_start:int = self.readu16() * 0x10
+            self.skip(10)
+            self.entry_point:int = self.code_start + self.readu16() + self.readu16() * 0x10
+        self.seek(0)
     def get_overlay_data_start_offset(self): return self.ovl_off
 def ext_exe(i:str|bytes,dotnet=False,custom=False):
     if isinstance(i,str): kw = {'name':i}
@@ -525,14 +537,16 @@ def ext_exe(i:str|bytes,dotnet=False,custom=False):
             f = open(i,'rb')
             f.seek(0x3C)
             f.seek(int.from_bytes(f.read(4),'little'))
-            t = f.read(2)
+            if f.tell() == 0: t = None
+            else: t = f.read(2)
             f.close()
         else:
             of = int.from_bytes(i[0x3C:0x40],'little')
-            t = i[of:of+2]
+            t = None if of == 0 else i[of:of+2]
 
         if t == b'PE':
             import pefile
+            if not 'fast_load' in kw: kw['fast_load'] = True
             r = pefile.PE(**kw)
             r.SECTIONS = {s.Name.rstrip(b'\0').decode('latin-1'):s for s in r.sections}
             return r
@@ -541,6 +555,7 @@ def ext_exe(i:str|bytes,dotnet=False,custom=False):
             if 'name' in kw: kw['filepath'] = kw.pop('name')
             if 'data' in kw: kw['stream'] = io.BytesIO(kw.pop('data'))
             return nefile.NE(i)
+        elif t is None: return EXE(i,dos=True)
         else: raise NotImplementedError(t.decode('latin-1'))
 
 def iszl(d:bytes):
@@ -811,9 +826,13 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lzss0_msb': return uxx().decompress_lzss0_msb(i,usize=kwargs['usize'])
         case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
-        case 'lzw': return uxx().decompress_lzw(i,kwargs['usize'],kwargs.get('max_bits',13),kwargs.get('init_code_size',9),kwargs.get('first_code',0x102),
-                                                  kwargs.get('clear_code',0x100),kwargs.get('end_code',0x101),kwargs.get('be',False),kwargs.get('max_dict',None))
-        case 'lzw_lg': return uxx().decompress_lzw(i,kwargs['usize'],max_bits=14,init_code_size=14,first_code=0x100,clear_code=0x3FFE,end_code=0x3FFF,max_dict=0x3FFE,be=True)
+        case 'lzw'|'lzw_lg':
+            p = {
+                'lzw':(13,9,0x102,0x100,0x101,False),
+                'lzw_lg':(14,14,0x100,0x3FFE,0x3FFF,True,0x3FFE),
+            }[algo]
+
+            return uxx().decompress_lzw(i,kwargs['usize'],*[kwargs.get(x,p[ix] if ix < len(p) else None) for ix,x in enumerate(('max_bits','init_code_size','first_code','clear_code','end_code','be','max_dict'))])
         case 'rtl_lz':
             if 'usize' in kwargs: us = kwargs['usize']
             else: us,i = int.from_bytes(i[:8],'little'),i[8:]
@@ -860,6 +879,12 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return bytes(o)
         case 'hammer': return uxx().decompress_hammer(i)
         case 'lbalzss1'|'lbalzss2'|'lbalzss1x'|'lbalzss2x': return uxx().decompress_lbalzss(i,kwargs['usize'],int(algo[7]),algo.endswith('x'))
+        case 'xd_lzss':
+            asrt(i[:4] == b'LZSS' and not sum(i[12:16]),i[:0x10])
+            us,zs = int.from_bytes(i[4:8],'big'),int.from_bytes(i[8:12],'big')
+            asrt(len(i) == zs,i[:0x10],len(i))
+            if 'usize' in kwargs: asrt(kwargs['usize'] == us)
+            return uxx().decompress_lzss0_lsb(i[0x10:],usize=us)
 
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'

@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1037
+# Supported Formats: 1041
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -229,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (133)
+## Executables/Packers/Installers (136)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -238,6 +238,7 @@ Name | Extension(s) | Extractor(s) | Comment
 4kZIP | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 624 | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Advanced Installer | .exe | Input (/extract) |
+Ady's Glue | .exe | Custom |
 AMI Aptio Capsule | .cap | [UEFIExtract](https://github.com/LongSoft/UEFITool) |
 Amiga Kickstart ROM | .rom | [amitools](https://github.com/cnvogelg/amitools) + [ROMSplit SplitData](https://web.archive.org/web/20250808152813/http://www.doobreynet.co.uk/beta/index.html) |
 Amisetup | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
@@ -261,6 +262,7 @@ C64 Time Cruncher | .prg | [unp64](https://iancoog.altervista.org/)
 Camelot Obfuscated NSO | .nso ` ` | Custom |
 Casio BE-300 Package | ??? | Custom |
 CEBE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
+Central Point Anti-Virus Immunizer | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 CExe | .exe | Custom |
 Cheat Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Chromium Delta Update | ??? | [android-ota-extractv](https://github.com/tobyxdd/android-ota-payload-extractor) |
@@ -357,6 +359,7 @@ Tixati Installer | .exe | Custom |
 TSCRUNCH | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 UCEXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 UPX | .exe | [upx](https://github.com/upx/upx) |
+V-Load | .exe | Custom |
 WebAssembly | .wasm | [wasm2c/wasm2wat/wasm-decompiler](https://github.com/WebAssembly/wabt) |
 Wii DOLXZ | .dol | Custom |
 Windows CE FW IMG | .img | [eimgfs](https://github.com/nlitsme/eimgfs) |
@@ -367,7 +370,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (561)
+## Various (562)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -513,7 +516,7 @@ Disney Games Archive | .pod | Custom |
 Disney POD | .pod | Custom |
 Disney Raw Strings | ??? | Custom |
 Disney Resource | ??? | Custom |
-DJarc | .dja | Custom |
+DJarc | .dja .eja | Custom |
 Doom 3 Xbox GFC+GOB | .gfc+.gob | [RazbSbor](https://www.moddb.com/downloads/gob-globald3tfull-unpacker)([src](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) |
 Doom 3 Xbox Graph | .d3tfull | [RazbSbor](https://www.moddb.com/downloads/gob-globald3tfull-unpacker)([src](https://web.archive.org/web/20230817153723/https://forum.xentax.com/viewtopic.php?t=4233)) |
 Doom Database | ??? | Custom |
@@ -716,7 +719,7 @@ Nintendo LZ60 | .lz60 .lz \* | Custom |
 Nintendo Mario Party Message | ??? | Custom |
 Nintendo Message BMG | .bmg .mbmg | [ndspy/bmg.py](https://github.com/RoadrunnerWMC/ndspy/blob/master/ndspy/bmg.py) + Custom |
 Nintendo MSBT | .msb .msbt | [ce_msbt.py](https://github.com/Treeki/CylindricalEarth/blob/master/msbt.py) + Custom |
-Nintendo Puzzle Archive | ??? | Custom |
+Nintendo Puzzle Archive | .bin | Custom |
 Nintendo Table | ??? | Custom |
 Nintendo Yay0 | .yay0 | Custom |
 Nintendo Yaz0 | .yaz0 .szs | Custom |
@@ -764,7 +767,7 @@ PlayStation Encrypted SFM | .esfm | Custom |
 PlayStation SFO | .sfo | Custom |
 PlayStation Trophy File | .trp | Custom |
 PlayStation V2 Trophy File | .ucp | Custom |
-Pokemon FSYS | .fsys | [gcfsysd](https://www.hcs64.com/vgm_ripping.html) |
+Pokemon FSYS | .fsys | Custom |
 Project IGI Resource | .res | Custom |
 PS2 Memory Card | ??? | [mymc](http://www.csclub.uwaterloo.ca:11068/mymc/) |
 PS3/PSV PUP | .pup | Custom |
@@ -836,6 +839,7 @@ Sonic Shuffle Message Data | .bin | Custom |
 Soulcalibur Legends NPAC | .npac | Custom |
 Sound Source Interactive IMX | .imx | Custom | only extracts wavs & bmps except for the hardcoded entry at the beginning
 SouthPeak Interactive Puzzle Archive | .mco | [na_game_tool](https://nihav.org/game_tool.html) |
+Specnaz UFF | .bfs | Custom |
 Star Fox DAT | .dat | [star_fox_zero_dat.bms](https://mirror.aluigi.org/bms/star_fox_zero_dat.bms) |
 StarFlyers Bulk File Index | .inx+.bul | Custom |
 Starsky & Hutch WAD | .btw | Custom |

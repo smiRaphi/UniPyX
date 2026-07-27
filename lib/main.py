@@ -39,7 +39,9 @@ if typing.TYPE_CHECKING:
 def asrt(c:bool,*r,err:Exception=ValueError):
     if not c:
         if len(r) == 1 and isinstance(r[0],types.FunctionType): r = r[0]()
-        elif r: r = ' '.join(str(x) for x in r)
+        if r:
+            if hasattr(r,'__iter__'): r = ' '.join(str(x) for x in r)
+            else: r = str(r)
         else: r = ''
         raise err(r)
 def namespace(_func=None,include=[],keep_init=True):

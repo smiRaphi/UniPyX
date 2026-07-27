@@ -108,58 +108,64 @@ uint16_t micro_c_rand(uint16_t state) {
     return state * MICRO_C_RAND_A + MICRO_C_RAND_C;
 }
 
-EXPORT void decrypt_inv(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {
-    for (size_t p=0;p < size;p++) dst[p] = ~src[p];
+EXPORT void decrypt_inv(uint8_t *restrict buf, const size_t size) {
+    for (size_t p=0;p < size;p++) buf[p] = ~buf[p];
 }
-EXPORT void decrypt_swp4(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst) {
-    for (size_t p=0;p < size;p++) dst[p] = SWAP8(src[p]);
+EXPORT void decrypt_swp4(uint8_t *restrict buf, const size_t size) {
+    for (size_t p=0;p < size;p++) buf[p] = SWAP8(buf[p]);
 }
-EXPORT void decrypt_roll(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
-                         const uint8_t *restrict key, const size_t ksize) {
+EXPORT void decrypt_roll(uint8_t *restrict buf, const size_t size,
+                   const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
     for (size_t p=0;p < size;p++) {
-        dst[p] = src[p] - key[kc++];
+        buf[p] -= key[kc++];
         if (kc >= ksize) kc = 0;
     }
 }
-EXPORT void decrypt_rolr(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
-                         const uint8_t *restrict key, const size_t ksize) {
+EXPORT void decrypt_rolr(uint8_t *restrict buf, const size_t size,
+                   const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
     for (size_t p=0;p < size;p++) {
-        dst[p] = src[p] + key[kc++];
+        buf[p] += key[kc++];
         if (kc >= ksize) kc = 0;
     }
 }
-EXPORT void decrypt_xor(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
-                        const uint8_t *restrict key, const size_t ksize) {
+EXPORT void decrypt_xor(uint8_t *restrict buf, const size_t size,
+                  const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
     for (size_t p=0;p < size;p++) {
-        dst[p] = src[p] ^ key[kc++];
+        buf[p] ^= key[kc++];
         if (kc >= ksize) kc = 0;
     }
 }
-EXPORT void decrypt_rxor(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
-                         const uint8_t key) {
+EXPORT void decrypt_rxor(uint8_t *restrict buf, const size_t size, const uint8_t key) {
     if (size == 0) return;
-    size_t p = 1;
-    dst[0] = src[0] ^ key;
-    for (;p < size;p++) dst[p] = src[p] ^ dst[p - 1];
+    buf[0] ^= key;
+    for (size_t p=1;p < size;p++) buf[p] ^= buf[p - 1];
 }
-EXPORT void decrypt_cxor(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
-                         const uint8_t *restrict key, const size_t ksize) {
+EXPORT void decrypt_cxor(uint8_t *restrict buf, const size_t size,
+                   const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
     for (size_t p=0;p < size;p++) {
-        dst[p] = src[p] ^ (uint8_t)(key[kc++] + p);
+        buf[p] ^= (key[kc++] + p);
         if (kc >= ksize) kc = 0;
     }
 }
-EXPORT void decrypt_dxor(const uint8_t *restrict src,  const size_t size, uint8_t *restrict dst,
-                         const uint8_t *restrict key1, const size_t ksize1,
-                         const uint8_t *restrict key2, const size_t ksize2) {
+EXPORT void decrypt_cxori(uint8_t *restrict buf, const size_t size,
+                    const uint8_t *restrict key, const size_t ksize, const size_t iv) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        buf[p] = (buf[p] - (p + iv)) ^ key[kc++];
+        if (kc >= ksize) kc = 0;
+    }
+}
+EXPORT void decrypt_dxor(uint8_t *restrict buf,  const size_t size,
+                   const uint8_t *restrict key1, const size_t ksize1,
+                   const uint8_t *restrict key2, const size_t ksize2) {
     size_t kc1 = 0;
     size_t kc2 = 0;
     for (size_t p=0;p < size;p++) {
-        dst[p] = src[p] ^ key1[kc1++] ^ key2[kc2++];
+        buf[p] ^= key1[kc1++] ^ key2[kc2++];
         if (kc1 >= ksize1) kc1 = 0;
         if (kc2 >= ksize2) kc2 = 0;
     }
@@ -500,6 +506,14 @@ EXPORT void decrypt_legaia2(uint32_t *restrict buf, const size_t size, const uin
     for (size_t p=4;p < size / 4;p++) {
         buf[p] ^= k;
         k = k * 5 + 1;
+    }
+}
+EXPORT void decrypt_ady_glue(uint8_t *restrict buf, const size_t size,
+                       const uint8_t *restrict key, const size_t ksize) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        buf[p] = ROT8R(buf[p] - key[kc++]);
+        if (kc >= ksize) kc = 0;
     }
 }
 

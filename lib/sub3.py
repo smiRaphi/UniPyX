@@ -574,11 +574,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 elif on.lower().endswith('.com') and mz: on = on[:-3] + ('exe' if on.endswith('.com') else 'EXE')
                 mv(o + '/OUT.BIN',o + '/' + on)
                 return
-        case 'COMPACK'|'Compress-EXE'|'ICE'|'Optlink'|'PGMPAK'|'TinyProg':
+        case 'COMPACK'|'Compress-EXE'|'ICE'|'Optlink'|'PGMPAK'|'TinyProg'|'Central Point Anti-Virus Immunizer':
             dosbox(['unp','e',i,'OUT.BIN'])
-            chks = getsize(i)-768
-            if chks < 0x10: chks = 0x10
-            if exists(o + '/OUT.BIN') and getsize(o + '/OUT.BIN') >= chks:
+            if exists(o + '/OUT.BIN') and getsize(o + '/OUT.BIN') >= max(getsize(i)-0x400,0x21):
                 on = basename(i)
                 mz = readfile(o + '/OUT.BIN',size=2) == b'MZ'
                 if on.lower().endswith('.exe') and not mz: on = on[:-3] + ('com' if on.endswith('.exe') else 'COM')
@@ -590,7 +588,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             r = extract(i,o,'624') # cup386
             if not r: return r
             remove(o)
-            mkdir(i)
+            mkdir(o)
 
             r = extract(i,o,'COMPACK') # unp
             if not r: return r
@@ -2777,6 +2775,95 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if pks: return
+        case 'Ady\'s Glue':
+            db.try_custom()
+            import re,struct
+            from lib.crypto import decrypt,crc_hash
+            from lib.file import EXE,File
+            e = EXE(i,dos=True)
+            ep = e.entry_point
+            e.seek(ep)
+
+            e.skip(7)
+            asrt(e.readu8() == 0xBF)
+            ks = e.readu16()
+            e.seek(ep + ks - 10)
+            ds = int.from_bytes(e.readc(10).rsplit(b'\x81\xFF',1)[1][:2],'little')
+            e.seek(ep)
+            k = e.readc(ks)
+            d = decrypt(e.readc(ds - ks),'ady_glue',k)
+            e.seek(ep + int.from_bytes(d[2:4],'little'))
+            asrt(d[0] == 0x3B and d[1] == 0x1E and e.readu16() == crc_hash(d,'sum16_rotl'))
+
+            try:
+                rdo = int.from_bytes(re.search(rb'(?s)\xBE(.[\x00-\x02])\xAD',d)[1],'little')
+                rla = int.from_bytes(re.search(rb'(?s)\x26\x01[\x96\x97](.[\x03-\xFF])',d)[1],'little',signed=True)
+                ind2 = struct.unpack('<4H',d.split(bytes(8),1)[1][:8])
+            except:
+                print(d.hex())
+                raise
+            e.seek(ep + rdo)
+            rc = e.readu16()
+            rl = e.readil(2,2 * rc)
+            for ix in range(rc): rl[ix*2] += rla
+            ss,sp,cs,ip = e.readil(2,4)
+            e.align(0x10)
+            e.padc(0x100)
+
+            f1 = File(o + '/1.EXE','wb',endian=e._end)
+            f1.write(b'MZ')
+            d1 = e.readc(e.ovl_off - e.pos)
+            hs = 0x1C + rc*4
+            hs += -hs%0x10
+            hs = max(hs,0x200)
+            ld = hs + len(d1)
+            if not ld % 0x200 and sum(d1[-0x200:]): d1 = d1[:-1]
+            f1.writeu16(ld % 0x200)
+            f1.writeu16(ld // 0x200 + 1)
+            f1.writeu16(rc)
+            f1.writeu16(hs // 0x10)
+            f1.write(b'\0\0\xFF\xFF')
+            f1.writeu16(ss)
+            f1.writeu16(sp)
+            f1.writeu16(0)
+            f1.writeu16(ip)
+            f1.writeu16(cs)
+            f1.writeu16(0x1C)
+            f1.writeu16(0)
+            f1.write(struct.pack(f'<{rc*2}H',*rl))
+            f1.write(bytes(hs - f1.pos))
+            f1.write(d1)
+            f1.close()
+
+            ss,sp,cs,ip = ind2
+            e.seek(0)
+            f2 = File(o + '/2.EXE','wb',endian=e._end)
+            d2 = e.read(ep)
+            e.close()
+            if not len(d2) % 0x200 and sum(d2[-0x200:]): d2 = d2[:-1]
+            f2.write(d2)
+            f2.seek(2)
+            f2.writeu16(len(d2) % 0x200)
+            f2.writeu16(len(d2) // 0x200 + 1)
+            f2.seek(14)
+            f2.writeu16(ss)
+            f2.writeu16(sp)
+            f2.skip(2)
+            f2.writeu16(ip)
+            f2.writeu16(cs)
+            f2.close()
+            return
+        case 'V-Load':
+            db.try_custom()
+            from lib.file import EXE
+            e = EXE(i,dos=True)
+            writefile(o + '/VLOAD.EXE',e.readc(e.ovl_off))
+            e = EXE(e.read(),dos=True)
+            writefile(o + '/1.EXE',e.readc(e.ovl_off))
+            e = EXE(e.read(),dos=True)
+            writefile(o + '/2.EXE',e.readc(e.ovl_off))
+            del e
+            return
 
     return 1
 

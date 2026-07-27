@@ -763,7 +763,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     salt,kvr,auth,d = d[:sml],d[sml:sml+2],d[-10:],d[sml+2:-10]
                     k = encrypt(KEY,'pbkdf2',salt,1000,size=kml*2 + 2)
                     asrt(k[-2:] == kvr,'Password verification failed')
-                    asrt(crc_hash(d,'hmac_sha1',key=k[kml:-2])[:10] == auth,'Authentication failed')
+                    asrt(crc_hash(d,'hmac_sha1',key=k[kml:-2],bytes=True)[:10] == auth,'Authentication failed')
                     d = decrypt(d,'aes_ctr_le',k[:kml],bits=0x80)
                 elif ct == 22: # Forza
                     asrt(len(d) >= 0x230) # min observed block size + fm6apex header

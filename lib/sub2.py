@@ -1588,7 +1588,7 @@ def _Nintendo(db):
         return raw.data('write_counter') + bytes(14) + raw.data()[:8]*2 + raw.data('unk_hash')
     def amiibo_derive_key(key:AmiiboKey,base:bytes):
         seed = key.phrase + base[:0x10 - key.seed_size] + key.seed[:key.seed_size] + base[0x10:0x20] + decrypt(base[0x20:0x40],'xor',key.xor_pad)
-        r = crc_hash(seed,'ctr_drbg_hmac_sha256',key=key.hmac_key,seed_size=480,size=0x30)
+        r = crc_hash(seed,'ctr_drbg_hmac_sha256',key=key.hmac_key,seed_size=0x1E0,size=0x30,bytes=True)
         return r[:0x10],r[0x10:0x20],r[0x20:0x30]
     def amiibo_raw_decrypt(raw:AmiiboRaw,key:AmiiboKey=None):
         if key is None:

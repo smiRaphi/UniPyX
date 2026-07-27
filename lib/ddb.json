@@ -326,7 +326,7 @@
         "rs":"Nintendo LZ40"
     },
     {
-        "d":["isat","FSYS\\0",0],
+        "d":[["s%",16],["isat","FSYS",0],["isat","FSYS",-4],["isin",["\\0\\0\\2\\1","\\0\\0\\1\\2"],4],["n0",4,12],["n0",4,24],["n0",4,28],["n0",4,32],["py","f.seek(24);h,d=f.readi(4,'>'),f.read(4)\nif f.readi(4,'>')!=fsz:return\nf.seek(h+8);return d==f.read(4)"]],
         "rs":"Pokemon FSYS","s":1
     },
     {
@@ -644,8 +644,8 @@
         "rs":"PSX PFW","s":1
     },
     {
-        "d":[["isat","UFF 1.0\\n",0],["n0",4,-4]],
-        "rs":"Specnaz UFF/BFS"
+        "d":[["isat","UFF 1.0\\n",0],["isat","\\0",-5],["n0",4,-4],["py","f.seek(-4,2);f.seek(f.readi(4,'<'));nc,c=f.readi(4,'<'),f.readi(4,'<');nc=max(nc,c)\nif nc<255:f.skip(12*c)\nelif nc<65535:f.skip(16*c)\nelse:f.skip(24*c)\nf.skip(f.readi(4,'<'));return f.tell()+4==fsz"]],
+        "rs":"Specnaz UFF","s":1
     },
     {
         "d":[["isat","\\xFF\\x0A\\x00DELPHIXPICTURECOLLECTION\\x00\\x30\\x10",0],["isat","TPF0",34],["n0",4,30],["py","f.seek(30);return(34+f.readi(4,'<'))==fsz"]],
@@ -2413,6 +2413,11 @@
         "rs":"DGCA","s":1
     },
     {
+        "rqr":"Borland Cpp for Win32 1995",
+        "d":[["isat","DATA\\0\\0\\0\\0",544],["isat","\\0\\x5E\\0\\0",564],["isat","FI",33312],["contain","\\0fimain.ico\\0",[24208,256]],["contain","\\0lzpunz2.dll\\0",[24208,256]],["contain","\\0fimain.exe\\0",[24208,256]],["contain","\\0LzpUnzClose\\0",[24464,256]]],
+        "rs":"FI Installer","s":1
+    },
+    {
         "rqr":null,
         "t":"text",
         "d":[["size",[4,262144]],["s%",4],["py","d=readfile(inp,'r',encoding='ascii');np=d.rstrip('=');return (len(d)-len(np))<=3 and all(c in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/+' for c in np)"]],
@@ -2684,6 +2689,10 @@
         "d":[["s%",2048],["ext",".dat"],["isat","MCicon\\0\\0",0],
              ["py","for n in('SLUS_201.73','SLPS_250.10','UNISON.ELF'):\n if exists(dirname(inp)+'/'+n):return True"]],
         "rs":"Unison DAT","s":1
+    },
+    {
+        "d":[["isat","\\x08\\0\\0\\0\\1\\0\\0\\0",8],["n0",4,0],["n0",4,4],["py","u,z=f.readi(4,'<'),f.readi(4,'<');f.skip(8);return u>z and(z+16)==fsz and f.readi(1)&7==7"]],
+        "rs":"Army Men: Sarge's War PIK"
     },
     {
         "d":[["s%",2048],["size",[145408,null]],["isatS","\\xE0",356,143004],["isatS","\\0",22,142982],["isin",["\\1\\0","\\0\\0"],24],["n0",4,0],["n0",4,16],["str0",4,12,6],["py","return f.readi(4,'<')<=6500"]],

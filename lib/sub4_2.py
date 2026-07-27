@@ -1135,7 +1135,6 @@ def extract4_2(inp:str,out:str,t:str):
                 writefile(f'{o}/{fe[0]}',f.readc(fe[2]))
             f.close()
             if fs: return
-        case 'Specnaz UFF/BFS': raise NotImplementedError
         case 'Nicktoons Gravjet Racing LIN':
             db.try_custom()
             d = readfile(i)

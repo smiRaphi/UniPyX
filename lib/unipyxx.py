@@ -53,12 +53,6 @@ def _1base_func(fnc,src,usize):
     if r < 0: raise ValueError(f'Decompression failed ({r})')
     return bytes(o)[:r]
 def _2base_func(fnc,src,key):
-    i = (u8 * len(src)).from_buffer_copy(src)
-    o = (u8 * len(src))()
-    k = (u8 * len(key)).from_buffer_copy(key)
-    fnc(i,len(src),o,k,len(key))
-    return bytes(o)
-def _21base_func(fnc,src,key):
     b = (u8 * len(src)).from_buffer_copy(src)
     k = (u8 * len(key)).from_buffer_copy(key)
     fnc(b,len(src),k,len(key))
@@ -122,32 +116,34 @@ class X:
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
-            ('decrypt_inv'  ,(P(u8),szt,P(u8)),void,3),
-            ('decrypt_swp4' ,(P(u8),szt,P(u8)),void,3),
-            ('decrypt_roll' ,(P(u8),szt,P(u8),P(u8),szt),void,2),
-            ('decrypt_rolr' ,(P(u8),szt,P(u8),P(u8),szt),void,2),
-            ('decrypt_xor'  ,(P(u8),szt,P(u8),P(u8),szt),void,2),
-            ('decrypt_rxor' ,(P(u8),szt,P(u8),u8),void,0),
-            ('decrypt_cxor' ,(P(u8),szt,P(u8),P(u8),szt),void,0),
-            ('decrypt_dxor' ,(P(u8),szt,P(u8),P(u8),szt,P(u8),szt),void,0),
-            ('decrypt_tea'  ,(P(u8),szt,P(u8),P(u8),s8),void,0),
-            ('decrypt_rsdk3',(P(u8),szt,P(u8),P(u8)),void,0),
-            ('decrypt_rsdk4',(P(u8),szt,u32,u32,P(u8),P(u8)),void,0),
-            ('decrypt_rsdk5',(P(u8),szt,P(u8),P(u8)),void,0),
+            ('decrypt_inv',   (P(u8),szt),          void,3),
+            ('decrypt_swp4',  (P(u8),szt),          void,3),
+            ('decrypt_roll',  (P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_rolr',  (P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_xor',   (P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_rxor',  (P(u8),szt,u8),       void,0),
+            ('decrypt_cxor',  (P(u8),szt,P(u8),szt),void,0),
+            ('decrypt_cxori', (P(u8),szt,P(u8),szt,szt),void,0),
+            ('decrypt_dxor',  (P(u8),szt,P(u8),szt,P(u8),szt),void,0),
+            ('decrypt_tea',   (P(u8),szt,P(u8),P(u8),s8),void,0),
+            ('decrypt_rsdk3', (P(u8),szt,P(u8),P(u8)),void,0),
+            ('decrypt_rsdk4', (P(u8),szt,u32,u32,P(u8),P(u8)),void,0),
+            ('decrypt_rsdk5', (P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_hornby',(P(u8),szt,u8,u8),void,0),
-            ('init_mmfs',(P(u8),P(u8)),void,0),
-            ('decrypt_mmfs',(P(u8),szt,P(u8)),void,0),
-            ('init_selene',(P(u8),P(u8),szt,u32),void,0),
+            ('init_mmfs',     (P(u8),P(u8)),void,0),
+            ('decrypt_mmfs',  (P(u8),szt,P(u8)),void,0),
+            ('init_selene',   (P(u8),P(u8),szt,u32),void,0),
             ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
-            ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2.1),
+            ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_remedy_ras',(P(u8),szt,u32),void,0),
             ('init_empire_magic',(P(u8),),void,0),
             ('decrypt_empire_magic',(P(u8),szt,P(u8),szt,P(u8),u32),void,0),
             ('decrypt_camelot_xor',(P(u8),szt,u8),void,0),
             ('decrypt_camelot_rand',(P(u8),szt,u8,u32,szt),void,0),
-            ('decrypt_zipd',(P(u8),szt),s8,0),
+            ('decrypt_zipd',  (P(u8),szt),s8,0),
             ('decrypt_legaia2',(P(u8),szt,u32),void,0),
-            ('decrypt_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
+            ('decrypt_ady_glue',(P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
             ('hash_super_fast_le',(P(u8),szt),u32,4),
@@ -202,8 +198,6 @@ class X:
                     def wrapper(src,usize,_f=fnc): return _1base_func(_f,src,usize)
                 elif e[3] == 2:
                     def wrapper(src,key,_f=fnc): return _2base_func(_f,src,key)
-                elif e[3] == 2.1:
-                    def wrapper(src,key,_f=fnc): return _21base_func(_f,src,key)
                 elif e[3] == 3:
                     def wrapper(src,_f=fnc): return _3base_func(_f,src)
                 elif e[3] == 4:
@@ -410,28 +404,30 @@ class X:
 
     def decrypt_rxor(self,src:bytes,key:bytes|int) -> bytes:
         if isinstance(key,bytes): key = key[0]
-        i = (u8 * len(src)).from_buffer_copy(src)
-        o = (u8 * len(src))()
-        self.dll.decrypt_rxor(i,len(src),o,key)
-        return bytes(o)
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_rxor(b,len(src),key)
+        return bytes(b)
     def decrypt_cxor(self,src:bytes,key:bytes,iv:int=0) -> bytes:
         if iv: key = bytes((x + iv) & 0xFF for x in key)
-        i = (u8 * len(src)).from_buffer_copy(src)
+        b = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * len(key)).from_buffer_copy(key)
-        o = (u8 * len(src))()
-        self.dll.decrypt_cxor(i,len(src),o,k,len(key))
-        return bytes(o)
+        self.dll.decrypt_cxor(b,len(src),k,len(key))
+        return bytes(b)
+    def decrypt_cxori(self,src:bytes,key:bytes,iv:int=0) -> bytes:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_cxori(b,len(src),k,len(key),iv)
+        return bytes(b)
     def decrypt_dxor(self,src:bytes,key1:bytes,key2:bytes) -> bytes:
-        i = (u8 * len(src)).from_buffer_copy(src)
+        b = (u8 * len(src)).from_buffer_copy(src)
         k1 = (u8 * len(key1)).from_buffer_copy(key1)
         k2 = (u8 * len(key2)).from_buffer_copy(key2)
-        o = (u8 * len(src))()
         if len(key1) == len(key2):
             mk = (u8 * len(key1))()
             self.dll.decrypt_xor(k1,len(key1),mk,k2,len(key2))
-            self.dll.decrypt_xor(i,len(src),o,mk,len(key1))
-        else: self.dll.decrypt_dxor(i,len(src),o,k1,len(key1),k2,len(key2))
-        return bytes(o)
+            self.dll.decrypt_xor(b,len(src),mk,len(key1))
+        else: self.dll.decrypt_dxor(b,len(src),k1,len(key1),k2,len(key2))
+        return bytes(b)
     def decrypt_tea(self,src:bytes,key:bytes,le:bool=False) -> bytes:
         asrt(len(key) == 0x10 and not len(src) % 8)
         i = (u8 * len(src)).from_buffer_copy(src)

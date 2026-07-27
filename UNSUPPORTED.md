@@ -15,7 +15,6 @@ Atomik Cruncher | ? | ? | ? | http://aminet.net/package/util/pack/xfdmaster | de
 Encrypted Rclone Config | .conf | ARMGDDN | https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/obscure/obscure.go#L19<br>https://github.com/rclone/rclone/blob/847734d421d219f1b12b144fcb0d08a6556e1485/fs/config/crypt.go#L74 | ? | detected
 The Binding of Isaac Resource | ? | TBOI(Re) | ? | ? | detected
 Atari Masterpieces VPXH | ? | Atari Masterpieces | ? | ? | detected
-Specnaz UFF/BFS | ? | ? | ? | ? | detected
 Metroid Prime 4 Save | ? | MP4 | ? | ? | detected
 HMM Encrypted Snapshot | ? | ? | https://github.com/thesupersonic16/HedgeModManager | https://github.com/thesupersonic16/HedgeModManager/blob/rewrite/HedgeModManager/CLI/Commands/CliCommandDecrypt.cs<br>https://github.com/thesupersonic16/HedgeModManager/blob/rewrite/HedgeModManager/CryptoProvider.cs#L76 | detected, needs private key
 UltraCompressor 2 | .uc2 | ? | ? | ? | detected
@@ -38,6 +37,9 @@ NetEase Minecraft Bedrock Encrypted File | * | https://reshax.com/topic/19163-ne
 Slayer Engine PAK | .pak | Buffy the Vampire Slayer<br>The Da Vinci Code | https://web.archive.org/web/20210301062500/http://wiki.xentax.com/index.php/Slayer_Engine_PAK<br>https://github.com/XeNTaXBackup/XeNTaXBackup.github.io/blob/2c6074a1bcb085e77f527fcf620620a4ee1e76da/markdown/The%20Da%20Vinci%20Code%20-%20PAK%20files_23435.md#post-7 | https://aluigi.altervista.org/bms/buffy_2002_pak.bms |
 Amiga PFS Hard Disk Image | .adf | https://sembiance.com/fileFormatSamples/archive/amigaHardDiskPFS/ | ? | https://github.com/Sembiance/dexvert/tree/master/bin/vibeExtract/amigaHardDiskPFS | detected
 Asymetrix Toolbook | .tbk | https://sembiance.com/fileFormatSamples/other/asymetrixToolbook/ | http://fileformats.archiveteam.org/wiki/Asymetrix_Toolbook | https://github.com/Sembiance/dexvert/tree/master/bin/vibeExtract/asymetrixToolbook | detected
+WinUpack Dwing | .exe | https://discmaster.textfiles.com/view/41962/VIOLET.dvd2011.iso/tools/Sources/_Sources%202007.rar/DXbot/secure.RES/Dllfile/Secure/1049.exe | ? | ? | detected
+FI Installer | .exe | https://www.sac.sk/download/pack/djar95.zip<br>http://www.edicomex.com.mx/demo/setup.exe | ? | ? | detected, lzpunz2.dll=zip/deflate
+DJarchive/DJcomp | .dja .djc .eja | https://discmaster.textfiles.com/search?format=djarcArchive | ? | ? | detected, DJarchive extracted without compression (DJcomp)
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

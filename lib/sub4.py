@@ -131,15 +131,40 @@ def extract4(inp:str,out:str,t:str) -> bool:
             run(['bnrtool','decode','--bnr',i,'--image',o + '/' + tbasename(i) + '.png','--info',o + '/' + tbasename(i) + '.yaml','-f','-s'],useos=True)
             if os.path.exists(o + '/' + tbasename(i) + '.png') and os.path.exists(o + '/' + tbasename(i) + '.yaml'): return
         case 'Pokemon FSYS':
-            td = TmpDir()
-            osj = OSJump()
-            osj.jump(td)
-            run(['gcfsysd',i])
-            osj.back()
-            if listdir(td.p):
-                copydir(td,o,True)
-                return
-            td.destroy()
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.read(4) == b'FSYS' and f.readu32() in {0x201,0x102})
+
+            id = f.readu32()
+            c = f.readu32()
+            f.skip(8)
+            ho = f.readu32()
+            fpo = f.seekc(ho).readu32()
+            ofs = f.seekc(fpo).readil(4,c)
+
+            for ix,of in enumerate(ofs):
+                f.seek(of)
+                f.skip(4)
+                fof,us,flg = f.readu32(),f.readu32(),f.readu32()
+                f.padc(4)
+                zs = f.readu32()
+                f.padc(4)
+                fno = f.readu32()
+                f.skip(4)
+                no = f.readu32()
+
+                f.seek(fof)
+                d = f.decompress(zs,'xd_lzss' if flg & 0x80000000 else 'none',usize=us)
+                if fno: fn = f.seekc(fno).read0s('ascii')
+                else:
+                    fn = f.seekc(no).read0s('ascii')
+                    if fn == '(null)': fn = f'{ix:02d}'
+                    fn += '.' + guess_ext_wii(d)
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if ofs: return
         case 'BRSAR':
             run(['mrst','extract','-o',o,i])
             if listdir(o): return
@@ -1819,7 +1844,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             asrt(f.read(8) == b'DJarc \0\0')
             fc = f.readu16()
-            fs = [(f.readu32(),f.readu32(),f.read(13).split(b'\0')[0].decode('utf-8')) for _ in range(fc)]
+            fs = [(f.readu32(),f.readu32(),f.reads(13,'ascii').rstrip('\0')) for _ in range(fc)]
             for fe in fs:
                 f.seek(fe[0])
                 d = f.read(fe[1])
@@ -2135,10 +2160,10 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='>')
 
             c = f.readu32()
-            fs = [(f.readu32(),f.readu32(),f.read(0x10).strip(b'\0').decode('utf-8')) for _ in range(c)]
+            fs = [(f.readu32(),f.readu32(),f.reads(0x10,'utf-8').rstrip('\0')) for _ in range(c)]
             for fe in fs:
                 f.seek(fe[1])
-                writefile(o + '/' + fe[2],f.read(fe[0]))
+                writefile(o + '/' + fe[2],f.readc(fe[0]))
             f.close()
             if fs: return
         case 'The Binding of Isaac Resource': raise NotImplementedError

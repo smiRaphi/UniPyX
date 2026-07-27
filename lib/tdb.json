@@ -661,8 +661,7 @@
         "16bit dos exe pktiny compressed"
     ],
     "PKLITE":[
-        "16bit dos exe pklite compressed",
-        "pklite"
+        "16bit dos exe pklite compressed"
     ],
     "LZOP":[
         "lzop compressed data",
@@ -1158,6 +1157,9 @@
     ],
     "DJarc":[
         "djarc compressed archive"
+    ],
+    "DJcomp":[
+        "djcomp compressed data"
     ],
     "Borland Form":[
         "borland form (generic)",
@@ -1690,5 +1692,31 @@
     ],
     "Novalogic Resource 1":[
         "novalogic resource / game data (v1)"
+    ],
+    "WinUpack Dwing":[
+        "dwing.51.net",
+        "upack 036 beta dwing",
+        "upack v03x dwing",
+        "(win)upack[alt stub]",
+        "upack patch or any version dwing"
+    ],
+    "Ady's Glue":[
+        "16bit dos exe ady's glue combined (v1.10)",
+        "ady`s glue",
+        "ady`s glue(1.10)"
+    ],
+    "V-Load":[
+        "16bit dos v-load joined executable",
+        "v-load",
+        "v-load(0.9c1)"
+    ],
+    "Central Point Anti-Virus Immunizer":[
+        "16bit dos central point anti-virus immunized executable",
+        "central point anti-virus",
+        "central point anti-virus(1992-1993)",
+        "central point anti-virus immunizer",
+        "central point anti-virus immunizer(1993)",
+        "turbo anti-virus",
+        "turbo anti-virus[by carmel software engineering]"
     ]
 }

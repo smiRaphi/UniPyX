@@ -18,6 +18,8 @@ def reflecti(v:int,w:int):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
+def rot8l(v:int): return ((v << 1) & 0xFF) | (v >> 7)
+def rot8r(v:int): return (v >> 1) | ((v & 1) << 7)
 
 UPXX = None
 def uxx():
@@ -55,12 +57,18 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,int): key = key.to_bytes(1)
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_xor(i,key or b'\0')
-        case 'rxor': return uxx().decrypt_rxor(i,key or b'\0')
+        case 'rxor':
+            if isinstance(key,int): key = key.to_bytes(1)
+            return uxx().decrypt_rxor(i,key or b'\0')
         case 'cxor':
             if isinstance(key,int): key = key.to_bytes(1)
             if isinstance(iv,bytes): iv = iv[0]
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_cxor(i,key or b'\0',iv or 0)
+        case 'cxori'|'cxor_inv':
+            if isinstance(key,int): key = key.to_bytes(1)
+            if isinstance(iv,bytes): iv = iv[0]
+            return uxx().decrypt_cxori(i,key or b'\0',iv or 0)
         case 'dxor':
             if type(key) == int: key = key.to_bytes(1)
             if type(iv) == int: iv = iv.to_bytes(1)
@@ -239,6 +247,17 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             c = pow(int.from_bytes(i,'little' if algo == 'rsa_inv_le' else 'big'),k.e,k.n)
             R = pow(pow(pow(2,k.size_in_bits()),-1,k.n),kwargs['r'],k.n)
             return ((c * R) % k.n).to_bytes(k.size_in_bytes(),'big')
+        case 'rijndael'|'rijndael128'|'rijndael192'|'rijndael256':
+            from pprp.crypto_3 import rijndael
+            o = rijndael(key,block_size={'rijndael':kwargs.get('block_size'),
+                                         'rijndael128':0x10,'rijndael192':0x18,'rijndael256':0x20}[algo])
+
+            o._encrypt,o._decrypt = o.encrypt,o.decrypt
+            o.encrypt = lambda i: bytes(o._encrypt(i))
+            o.decrypt = lambda i: bytes(o._decrypt(i))
+
+            if i is None: return o
+            return o.decrypt(i)
         case 'tea'|'tea_be'|'tea_le': return uxx().decrypt_tea(i,key,le=algo == 'tea_le')
         case 'tea_pad'|'tea_pad_be'|'tea_pad_le':
             lo = len(i) % 8
@@ -319,6 +338,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 asrt(0 < len(key) <= 4)
                 key = int.from_bytes(key,'little')
             return uxx().decrypt_legaia2(i,key)
+        case 'ady_glue': return uxx().decrypt_ady_glue(i,key)
 
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)
@@ -382,7 +402,13 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return uxx().decrypt_roll(i,key or b'\0')
 
         case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm':
-            return decrypt(None,algo,key,iv,**kwargs).encrypt(i)
+            o = decrypt(None,algo,key,iv,**kwargs)
+            if i is None: return o
+            return o.encrypt(i)
+        case 'rijndael'|'rijndael128'|'rijndael192'|'rijndael256':
+            o = decrypt(None,algo,key,iv,**kwargs)
+            if i is None: return o
+            return o.encrypt(i)
         case 'pbkdf2'|'pbkdf2_sha1'|'pbkdf2_hmac_sha1'|'pbkdf2_sha256'|'pbkdf2_hmac_sha256':
             asrt(isinstance(iv,int))
             if algo == 'pbkdf2': algo = 'sha1'
@@ -393,6 +419,7 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             from Cryptodome.Protocol.KDF import PBKDF2
             h = __import__('Cryptodome.Hash.' + PYCRHSHM.get(algo,algo),fromlist=['*'])
             return PBKDF2(i,key,kwargs['size'] if 'size' in kwargs else h.digest_size,iv,hmac_hash_module=h)
+
         case 'zrif'|'zrif_b64':
             asrt(len(key) == 0x400)
             import zlib
@@ -441,6 +468,8 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             r = (quote_from_bytes if isinstance(i,bytes) else quote)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
             return r.encode('utf-8') if kwargs.get('bytes',False) else r
+
+    raise NotImplementedError(algo)
 class BaseXX:
     def __init__(self,alphabet:str):
         asrt(len(alphabet) > 1 and len(set(alphabet)) == len(alphabet))
@@ -702,8 +731,18 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'sum': return sum(i)
         case 'sum8'|'sum16'|'sum24'|'sum32'|'sum40'|'sum48'|'sum56'|'sum64':
             return sum(i) & ((1 << int(algo[3:])) - 1)
+        case 'sum_rotl'|'sum8_rotl'|'sum16_rotl'|'sum24_rotl'|'sum32_rotl'|'sum40_rotl'|'sum48_rotl'|'sum56_rotl'|'sum64_rotl':
+            r = sum(rot8l(b) for b in i)
+            if algo[3] == '_': return r
+            s = int(algo[3:].split('_',1)[0])
+            return r & ((1 << s) - 1)
+        case 'sum_rotr'|'sum8_rotr'|'sum16_rotr'|'sum24_rotr'|'sum32_rotr'|'sum40_rotr'|'sum48_rotr'|'sum56_rotr'|'sum64_rotr':
+            r = sum(rot8r(b) for b in i)
+            if algo[3] == '_': return r
+            s = int(algo[3:].split('_',1)[0])
+            return r & ((1 << s) - 1)
         case 'xor'|'xor8':
-            r = 0
+            r = kwargs.get('init',0)
             for b in i: r ^= b
             return r
 
@@ -779,10 +818,24 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 o.extend(hmac.new(kwargs['key'],c.to_bytes(2,'big') + seed,hashlib.sha256).digest())
                 c += 1
 
-            return bytes(o)[:s]
+            r = bytes(o)[:s]
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
         case 'hmac_sha1':
             import hashlib,hmac
-            return hmac.new(kwargs['key'],i,hashlib.sha1).digest()
+            r = hmac.new(kwargs['key'],i,hashlib.sha1).digest()
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+        case 'eac':
+            b = kwargs.get('iv',kwargs.get('iv',b'\0'*0x20))
+            asrt(len(b) == len(kwargs['key']) == 0x20)
+            o = encrypt(None,'rijndael256',kwargs['key'])
+
+            for p in range(0,len(i),0x20):
+                b = o.encrypt(encrypt(i[p:p+0x20].ljust(0x20,b'\0'),'xor',b))
+
+            if kwargs.get('bytes'): return b
+            return int.from_bytes(b,'big')
 
         case 'tarzan': fnc = uxx().hash_tarzan
         case 'luas': fnc = uxx().hash_luas
@@ -834,6 +887,8 @@ HASHTS = {
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
     'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
     'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
+    'sum8_rotl':1,'sum16_rotl':2,'sum24_rotl':3,'sum32_rotl':4,'sum40_rotl':5,'sum48_rotl':6,'sum56_rotl':7,'sum64_rotl':8,
+    'sum8_rotr':1,'sum16_rotr':2,'sum24_rotr':3,'sum32_rotr':4,'sum40_rotr':5,'sum48_rotr':6,'sum56_rotr':7,'sum64_rotr':8,
     'xor':1,'xor8':1,
     'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,'md2':16,'md4':16,
     'md5x':4,'md5_lh5':4,
