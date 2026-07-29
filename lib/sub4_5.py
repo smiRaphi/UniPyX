@@ -1870,16 +1870,13 @@ def extract4_5(inp:str,out:str,t:str):
             from lib.crypto import HashLib
             hl = HashLib.dl('nlg',db)
             from lib.file import File
-            writefile = lambda *a,**k: None
-            mkdir = lambda *a,**k: None
-
             if exists(i[:-5] + '.dict'): f = File(i[:-5] + '.dict')
             else: f = File(i)
             m = f.readu32('<')
             if m == 0xA9F32458: f._end = '<'
             elif m == 0x5824F3A9: f._end = '>'
             else: raise ValueError
-            fd = File(i[:-5] + '.data',endian=f._end)
+            fd = File(noext(i) + '.data',endian=f._end)
 
             v = f.readu16()
             # 0x100: https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper
@@ -1999,5 +1996,60 @@ def extract4_5(inp:str,out:str,t:str):
 
             fd.close()
             if suc: return
+        case 'Artificial Mind and Movement SBH+SBB':
+            db.try_custom()
+            from lib.file import File
+            if exists(i[:-4] + '.sbh'): f = File(i[:-4] + '.sbh',endian='<')
+            else: f = File(i,endian='<')
+            asrt(f.read(4) == b'A2M\0')
+            fd = File(noext(i) + '.sbb')
+
+            writefile(o + '/$platform.txt',f.reads(4,'ascii').rstrip('\0'))
+            f.skip(4)
+            asrt(f.readu32() >= 0x20)
+            f.padc(4)
+            fo,fsz = f.readu32(),f.readu32()
+
+            asrt(fsz % 0x8C == 0)
+            f.seek(fo)
+            fs = []
+            for _ in range(fsz // 0x8C):
+                fs.append((f.readc(0x80).split(b'\0')[0].decode('ascii'),f.readu32()))
+                f.skip(8) # flags?, hz
+            f.close()
+            fs.append((0,fd.size))
+
+            for ix,fe in enumerate(fs[:-1]):
+                fd.seek(fe[1])
+                writefile(o + '/' + fe[0],fd.readc(fs[ix+1][1] - fe[1]))
+
+            fd.close()
+            if fs: return
+        case 'Music Pen MDF+CMF':
+            db.try_custom()
+            from lib.file import File
+            if exists(i[:-4] + '.mdf'): f = File(i[:-4] + '.mdf',endian='<')
+            else: f = File(i,endian='<')
+            fd = File(noext(i) + '.cmf')
+
+            f.seek(4)
+            c,rc = f.readu32(),f.readu32()
+            f.skip(6)
+            fs = []
+            cc = 0
+            for ix in range(c):
+                f.skip(6)
+                of,sz = f.readu32(),f.readu32()
+                if of: cc += 1
+                if sz & 0x80000000: fs.append((ix,of,sz & 0x7FFFFFFF))
+            f.close()
+            asrt(abs(rc - cc) < 2)
+
+            for ix,of,sz in fs:
+                d = fd.seekc(of).readc(sz)
+                writefile(f'{o}/{ix}.{guess_ext(d)}',d)
+
+            fd.close()
+            if fs: return
 
     return 1

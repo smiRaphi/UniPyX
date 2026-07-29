@@ -1721,5 +1721,8 @@
     ],
     "Nintendo CIA":[
         "nintendo 3ds ctr importable archive"
+    ],
+    "UUencoded Base64":[
+        "uuencoded base64 text"
     ]
 }

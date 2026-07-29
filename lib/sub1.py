@@ -1691,6 +1691,17 @@ def extract1(inp:str,out:str,t:str) -> bool:
             from lib.file import decompress
             writefile(o + '/' + ext_expand(basename(i)),decompress(readfile(i),'szdd'))
             return
+        case 'UUencoded Base64':
+            db.try_custom()
+            from lib.crypto import decrypt
+            import re
+            d = readfile(i,'rt')
+
+            for fe in re.findall(r'(?s)begin-base64 +([0-7]+) +([^\n]+)\n(.*?====)',d):
+                asrt(int(fe[0],8) & 0o170000 != 0o040000,'directory')
+                writefile(o + '/' + fe[1],decrypt(fe[2],'base64'))
+
+            if listdir(o): return
 
     return 1
 

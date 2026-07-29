@@ -860,6 +860,15 @@
         "rs":"Next Level Games DICT+DATA","s":1
     },
     {
+        "d":[["ext",".sbh"],["s%",4],["isat","A2M\\0",0],["isin",["PS2\\0"],4],["isatS","\\0",4,16],["n0",4,12],["n0",4,20],["n0",4,24],["n0",4,28],
+             ["py","if not exists(splitext(inp)[0]+'.sbb'):return\nf.seek(12);o=f.readi(4,'<');f.skip(4)\nif o<32 or f.readi(4,'<')!=o:return\ns=f.readi(4,'<');return (o+s)==f.readi(4,'<')and not s%140"]],
+        "rs":"Artificial Mind and Movement SBH+SBB","s":1
+    },
+    {
+        "d":[["ext",".mdf"],["s%",2],["isat","\\x2A\\0\\3\\0",0],["isat","\\2\\0",16],["n0",4,4],["n0",4,8],["n0",4,12],["py","p=splitext(inp)[0]+'.cmf'\nif not exists(p):return\nf.seek(4);c=f.readi(4,'<');return c>=f.readi(4,'<') and 18+c*14==fsz and f.readi(4,'<')==getsize(p)"]],
+        "rs":"Music Pen MDF+CMF"
+    },
+    {
         "d":[["isat","\\x02",0],["n0",1,1],["isat","Microsoft.Xna.Framework.Content.DictionaryReader`",3]],
         "rs":"XNB Dictionary","s":1
     },

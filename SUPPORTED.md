@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1045
+# Supported Formats: 1048
 
-## "Common" Archives/Compressors/Encodings (149)
+## "Common" Archives/Compressors/Encodings (150)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -137,7 +137,8 @@ UDF | .udf | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org
 UFA | .ufa | [UFA](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 UHARC | .uha .uhc | [UHARC](https://www.sac.sk/download/pack/uharc06b.zip) |
 Unix Fast Filesystem | .fs | [Aaru](https://github.com/aaru-dps/Aaru) |
-UUencoded | .uu .uue | Custom + [binascii](https://docs.python.org/3/library/binascii.html) |
+UUencoded | .uu .uue | Custom |
+UUencoded Base64 | .b64 | Custom |
 VHD | .vhd | [7-Zip](https://7-zip.org/) |
 VirtualBox Disk Image | .vdi | [7-Zip](https://7-zip.org/) |
 Web ARchive | .warc | Custom |
@@ -371,7 +372,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (565)
+## Various (567)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -412,6 +413,7 @@ APETEC AIF | .aif .bin | Custom |
 Arc System Works PAC | .pac | [arcsys.bms](https://aluigi.org/bms/arcsys.bms) |
 Archer Maclean's Mercury PAQ | .paq | Custom |
 Artech DAT | .dat | Custom |
+Artificial Mind and Movement SBH+SBB | .sbh+.sbb | Custom |
 ASCARON Entertainment CPR | .cpr | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 ASDG SPLiT | .spl .spt | Custom |
 Asura Engine Resource | .asr .ps2 | Custom |
@@ -696,6 +698,7 @@ Motocross Mania DAT | .dat | [e_biker.bms](https://mirror.aluigi.org/bms/e_biker
 MotoGP ARK | .ark | Custom |
 mTropolis MDM | .q3 | Custom |
 mTropolis MPL | .mpl | Custom |
+Music Pen MDF+CMF | .mdf+.cmf | Custom |
 N-Space Zlib Compressed | \* | Custom |
 Natsume LZS | .paz \* | Custom |
 NCAA Gamebreaker PG | .pg | Custom |
