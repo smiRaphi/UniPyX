@@ -1761,5 +1761,243 @@ def extract4_5(inp:str,out:str,t:str):
 
             f.close()
             if fs: return
+        case 'Avatar Legends: The Fighting Game PAK':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'PACK')
+
+            dio,dis = f.readu32(),f.readu32()
+            ep = f.seek(dio) + dis
+            fs = [(f.reads(0xF8).rstrip('\0'),f.readu32(),f.readu32()) for _ in whilelc(lambda:f < ep)]
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Grezzo Archive':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            sig = f.read(3)
+            v = f.readu8()
+            if v == 1: asrt(sig == b'ZAR')
+            else: asrt(sig == b'GAR')
+
+            f.skip(4)
+            gc = f.readu16()
+            c = f.readu16()
+            go,fo,do = f.readu32(),f.readu32(),f.readu32()
+
+            f.seek(fo)
+            if v in {1,2}:
+                if v == 1: fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+                elif v == 2: fs = [(f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+                f.seek(do)
+                ofs = f.readil(4,c)
+
+                for ix,fe in enumerate(fs):
+                    fn = f.seekc(fe[v]).read0s('ascii')
+                    f.seek(ofs[ix])
+                    writefile(o + '/' + fn,f.readc(fe[0]))
+            else:
+                fs = [(f.readu32(),f.readu32(),f.readu32(),f.reads32()) for _ in range(c)]
+
+                gs = []
+                if v > 1:
+                    f.seek(go)
+                    for _ in range(gc):
+                        fc = f.readu32()
+                        f.skip(4)
+                        ixo = f.reads32()
+                        no = f.readu32()
+                        f.skip(4)
+                        f.padc(12)
+                        if fc > 0 and ixo >= 0: gs.append((range(ixo,ixo + fc),no))
+                    gs = [(x[0],f.seekc(x[1]).read0s('ascii')) for x in gs]
+
+                for ix,fe in enumerate(fs):
+                    if fe[3] > 0: fn = f.seekc(fe[3]).read0s('ascii')
+                    else:
+                        fn = f.seekc(fe[2]).read0s('ascii')
+                        for ge in gs:
+                            if ix in ge[0]: fn += '.' + ge[1];break
+                    f.seek(fe[1])
+                    writefile(o + '/' + sanitize_relative(fn),f.readc(fe[0]))
+
+            f.close()
+            if fs: return
+        case 'Grezzo LzS':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'LzS\1')
+
+            f.skip(4)
+            us = f.readu32()
+            of = o + '/' + tbasename(i)
+            d = f.decompress(f.readu32(),'lzss0_lsb',usize=us)
+            writefile(of,d)
+            f.close()
+            if d[:4] in {b'ZAR\1',b'GAR\2',b'GAR\3',b'GAR\4',b'GAR\5'}: extract4_5(of,noext(of),'Grezzo Archive')
+            return
+        case 'Next Level Games DICT+DATA':
+            CFTM = {1:'FileTable',0x10:'Room',0x20:'TextureBundle',0x21:'ModelBundle',0x30:'CutsceneNLB',0x31:'config',0x1200:'mpg',0x1302:'AnimationBundle',
+                    0x3000:'AudioBank',0x4000:'Effect',0x5000:'Script',0x6500:'GameObjectScriptTable',0x6510:'GameObject',0x7000:'AnimationData',0x7010:'Font',
+                    0x7020:'MessageData',0x7100:'Skeleton',0x9501:'VAND',0xB000:'Model',0xB300:'MaterialEffect',0xB310:'MaterialParams',0xB320:'MaterialShader',
+                    0xB400:'Shader',0xB404:'ShaderConstants',0xB500:'Texture',0xC107:'CollisionStatic',0xC300:'Hitbox',0xD000:'HitboxRigged',0xE000:'ClothPhysics'}
+            CTM = {0x1200:'CutsceneNLB',0x5011:'ScriptHashBundle',0x5012:'ScriptData',0x5013:'ScriptHeader',0x5014:'ScriptFunctionTable',0x5015:'ScriptStringHashes',
+                   0x6500:'GameObjectDB',0x6501:'GameObjectDBScriptHashTable',0x6502:'GameObjectDBHashScriptIndexTable',0x6503:'GameObjectDBScriptHash',0x6511:'GameObjectScriptHash',
+                   0x6512:'GameObjectComponentOffsets',0x6513:'GameObjectComponentHashes',0x6514:'GameObjectComponentList',0x6515:'GameObjectParentHash',0x7000:'UILayoutStart',
+                   0x7001:'UILayoutHeader',0x7002:'UILayoutData',0x7003:'UILayout',0x7011:'FontData',0x7020:'MessageData',0x7101:'SkeletonHeader',0x7102:'SkeletonBoneInfo',
+                   0x7103:'SkeletonBoneTransform',0x7104:'SkeletonBoneIndexList',0x7105:'SkeletonBoneHashList',0x7106:'SkeletonBoneParenting',0xA251:'AudioData1',
+                   0xA252:'AudioData2',0xA253:'AudioData3',0xA254:'AudioData4',0xB001:'ModelTransform',0xB002:'ModelInfo',0xB003:'MeshInfo',0xB004:'VertexStartPointers',
+                   0xB005:'MeshBuffers',0xB006:'MaterialData',0xB007:'MaterialLookupTable',0xB008:'BoundingRadius',0xB009:'BoundingBox',0xB00A:'MeshMorphInfos',
+                   0xB00B:'MeshMorphIndexBuffer',0xB00C:'ModelUnknownSection',0xB100:'SkinControllerStart',0xB101:'SkinBindingModelAssign',0xB102:'SkinMatrices',
+                   0xB103:'SkinHashes',0xB321:'MaterialRasterizerConfig',0xB322:'MaterialDepthConfig',0xB323:'MaterialBlendConfig',0xB325:'MaterialShaderHeader',
+                   0xB326:'MaterialShaderName',0xB327:'MaterialParameterIndices',0xB328:'MaterialParameterOffsets',0xB329:'MaterialShaderAttrLocations',0xB32A:'MaterialShaderAttrLocationOffsets',
+                   0xB32B:'MaterialShaderProgramLocations',0xB32D:'MaterialShaderProgramOffsets',0xB32E:'MaterialShaderUnknown',0xB330:'MaterialVariation',0xB331:'ShaderProgramRenderParams',
+                   0xB332:'ShaderProgramHeader',0xB333:'ShaderProgramLocationOffsets',0xB334:'ShaderProgramLocIndices',0xB335:'ShaderProgramLocFlags',0xB337:'ShaderProgramHashes',
+                   0xB400:'ShaderData',0xB401:'ShaderA',0xB402:'ShaderB',0xB501:'TextureHeader',0xB502:'TextureData',0xC100:'CollisionDataStart',0xC101:'CollisionHeader',
+                   0xC102:'CollisionSearch',0xC103:'CollisionSearchTriIndices',0xC110:'CollisionVertexPositions',0xC111:'CollisionTriIndices',0xC112:'CollisionTriNormals',
+                   0xC113:'CollisionTriNormalIndices',0xC114:'CollisionMaterialHashes',0xC115:'CollisionTriMaterialIndices',0xC116:'CollisionTriPropertyIndices',
+                   0xC301:'HitboxObjects',0xC302:'HitboxObjectParams',0xC900:'HavokPhysics',0xC901:'PhysicData2',0xD001:'HitboxRiggedHeader',0xD002:'HitboxRiggedData'}
+
+            db.try_custom()
+            from lib.crypto import HashLib
+            hl = HashLib.dl('nlg',db)
+            from lib.file import File
+            writefile = lambda *a,**k: None
+            mkdir = lambda *a,**k: None
+
+            if exists(i[:-5] + '.dict'): f = File(i[:-5] + '.dict')
+            else: f = File(i)
+            m = f.readu32('<')
+            if m == 0xA9F32458: f._end = '<'
+            elif m == 0x5824F3A9: f._end = '>'
+            else: raise ValueError
+            fd = File(i[:-5] + '.data',endian=f._end)
+
+            v = f.readu16()
+            # 0x100: https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper
+            asrt(v == 0x104,hex(v),err=NotImplementedError)
+            cmp = f.readbool()
+            f.padc(1)
+            bc = f.readu32()
+            f.skip(4)
+            ftc = f.readu8()
+            f.padc(1)
+            ftrc,xc = f.readu8(),f.readu8()
+            bic = {0x104:8}[v]
+            ftr = [(f.readu32(),{ix:x for ix,x in enumerate(f.readil(1,bic)) if x}) for _ in range(ftrc)]
+            f.skip(bc)
+            bs = [(f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(bc)]
+            xs = [f.read0s('ascii') for _ in range(xc)]
+            f.close()
+
+            bsd = [None] * bc
+            dn = set()
+            def getb(ix):
+                if bsd[ix] is None:
+                    if bs[ix][0] in dn: bsd[ix] = False;return False
+                    dn.add(bs[ix][0])
+                    if bs[ix][1] == 0: bsd[ix] = False;return False
+                    fd.seek(bs[ix][0])
+                    if cmp: bsd[ix] = fd.decompress(bs[ix][2],'zlib',usize=bs[ix][1])
+                    else: bsd[ix] = fd.readc(bs[ix][1])
+                return bsd[ix]
+            getb(0)
+
+            hl.wait()
+            suc = False
+            for ix,ftre in enumerate(ftr):
+                if ftre[0] in hl: n = hl[ftre[0]]
+                else: n = f'{ftre[0]:08X}'
+                op = f'{o}/{n}{xs[ix]}'
+
+                bd = getb(ix)
+                if bd is False:
+                    mkdir(op + '.deleted')
+                    continue
+                f = File(bd,endian=fd._end)
+                gcs = []
+                fs = []
+                dups = set()
+                while f.left >= 12:
+                    ge = {}
+                    if f.peek('u32') == 0x02001301:
+                        f.skip(4)
+                        ge['hs'],ge['ho'] = f.readu32(),f.readu32()
+                        ge['t'],ge['f'] = f.readu16(),f.readu16()
+                        ge['ds'],ge['do'] = f.readu32(),f.readu32()
+                        gcs.append(ge)
+                        dups.add(len(gcs))
+                        gcs.append(ge)
+                        fs.append(ge)
+                    else:
+                        ge['t'],ge['f'] = f.readu16(),f.readu16()
+                        ge['ds'],ge['do'] = f.readu32(),f.readu32()
+                        gcs.append(ge)
+                f.close()
+
+                if any('ho' in ge for ge in gcs):
+                    bd = getb(ftre[1][0])
+                    if bd is False:
+                        mkdir(op + '.deleted')
+                        continue
+                    f = File(bd,endian=f._end)
+                    for gix,ge in enumerate(gcs):
+                        if not 'ho' in ge or gix in dups: continue
+                        asrt(ge['hs'] == 8)
+                        f.seek(ge['ho'])
+                        f.skip(4) # type_name = hl.get(f.readu32())
+                        h = f.readu32()
+                        if h in hl: ge['n'] = hl[h]
+                        else:
+                            ex = CFTM.get(ge['t'],f"{ge['t']:04X}")
+                            ge['n'] = f'{h:08X}.{ex}'
+                    f.close()
+                suc = suc or gcs
+
+                for gix,ge in enumerate(gcs):
+                    if ge is None: continue
+                    if ge['f'] & 0x8000:
+                        ln = ge['ds']
+                        if ge['do'] + ln > len(gcs): ln = len(gcs) - ge['do']
+                        for six in range(ln):
+                            sge = gcs[ge['do'] + six]
+                            if 'p' in sge: continue
+                            sge['p'] = gix
+                            if not 'n' in sge:
+                                if 'ho' in sge: ex = CFTM.get(sge['t'],f"{sge['t']:04X}")
+                                else: ex = CTM.get(sge['t'],f"{sge['t']:04X}")
+                                sge['n'] = f'{six}.{ex}'
+                gix = 0
+                for ge in gcs:
+                    if ge is None: continue
+                    if not 'n' in ge:
+                        asrt(not 'p' in ge)
+                        if 'ho' in ge: ex = CFTM.get(ge['t'],f"{ge['t']:04X}")
+                        else: ex = CTM.get(ge['t'],f"{ge['t']:04X}")
+                        ge['n'] = f'{gix}.{ex}'
+                    gix += 1
+
+                mkdir(op)
+                for gix,ge in enumerate(gcs):
+                    if gix in dups: continue
+                    p = [ge['n']]
+                    de = ge
+                    while 'p' in de:
+                        de = gcs[de['p']]
+                        p.append(de['n'])
+                    p = op + '/' + '/'.join(reversed(p))
+                    if ge['f'] & 0x8000: mkdir(p)
+                    else: writefile(p,getb(ftre[1][(ge['f'] >> 12) & 7])[ge['do']:ge['do']+ge['ds']])
+
+            fd.close()
+            if suc: return
 
     return 1

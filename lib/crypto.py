@@ -848,6 +848,10 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'slf':
             kwargs['seed'] = 33
             fnc = uxx().hash_bkdr
+        case 'nlg':
+            kwargs['seed'] = 33
+            kwargs['init'] = kwargs.get('init',0xFFFFFFFF)
+            fnc = uxx().hash_bkdr
         case 'hash40':
             import zlib
             return ((len(i) & 0xFF) << 32) | zlib.crc32(i,kwargs.get('value') or 0)
@@ -899,7 +903,7 @@ HASHTS = {
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
     'keccak224':28,'keccak256':32,'keccak384':48,'keccak512':64,
-    'tarzan':4,'luas':4,'sxm':8,'slf':4,'hash40':5,'pivotal':4,'java':4,
+    'tarzan':4,'luas':4,'sxm':8,'slf':4,'hash40':5,'pivotal':4,'java':4,'nlg':4,
     'empire_magic':2,'westwood':4,
 }
 from .pyob import PyOBin,PyOFunc

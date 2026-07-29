@@ -36,13 +36,16 @@ if typing.TYPE_CHECKING:
     padding=skip=align=types.NoneType
     from dev.namespaces import *
 
-def asrt(c:bool,*r,err:Exception=ValueError):
+def asrt(c:bool,*r,err:Exception=ValueError,debug=False):
     if not c:
         if len(r) == 1 and isinstance(r[0],types.FunctionType): r = r[0]()
         if r:
             if hasattr(r,'__iter__'): r = ' '.join(str(x) for x in r)
             else: r = str(r)
         else: r = ''
+        if debug:
+            print(f'{err.__name__}: {r}')
+            console(1)
         raise err(r)
 def namespace(_func=None,include=[],keep_init=True):
     def f1(func):
@@ -83,17 +86,17 @@ class Empty: pass
 def whilelc(fnc):
     while fnc(): yield
 NOCONSOLE = False
-def console():
+def console(back=0):
     global NOCONSOLE
     if NOCONSOLE: return
     import tokenize,io,sys
     from traceback import TracebackException
 
-    fr = sys._getframe(1)
+    fr = sys._getframe(1 + back)
     print('[Console] Called from:',f'"{fr.f_code.co_filename}:{fr.f_lineno}"')
     loc = fr.f_locals
     while True:
-        try: i = input('> ')
+        try: i = input('\x1B[96m>\x1B[0m ')
         except EOFError:
             NOCONSOLE = True
             break
@@ -103,6 +106,10 @@ def console():
         # CTRL+A
         if not i or i.endswith('\x01'): continue
         if i == '\x11': sys.exit() # CTRL+Q
+        elif i == '\x01\x11': os._exit(0) # CTRL+A + CTRL+Q
+        elif i == '\x18': # CTRL+X
+            print('Help:\n - CTRL+X: show help\n - CTRL+C: exit console\n - CTRL+Q: exit script\n - CTRL+A at end: ignore line\n - CTRL+Z: exit & don\'t trigger console\n - CTRL+A + CTRL+Q: hard script exit')
+            continue
         try:
             if i.startswith(('from ','import ','def ','class ','async ')) or\
                any(x.type == tokenize.OP and x.string in {'=','+=','-=','*=','**=','/=','//=','%=','>>=','<<=','&=','|=','^=',':=','@='} for x in tokenize.tokenize(io.BytesIO(i.encode()).readline)):
@@ -113,7 +120,7 @@ def console():
                 ex = TracebackException.from_exception(e)._format_syntax_error(None)
                 next(ex);next(ex)
                 print('  ' + next(ex).strip('\n\r')[4:])
-            print(f'{e.__class__.__name__}: {e}')
+            print(f'\x1B[91m{e.__class__.__name__}: {e}\x1B[0m')
 
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
@@ -617,9 +624,8 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
         fsz = f.seek(0,2)
     elif typ == 'url': fsz = len(inp)
     elif typ == 'directory':
-        f = rldir(inp,files=False)
-        fll = [os.path.relpath(x,inp).lower().replace('\\','/') for x in f]
-        fsz = len(f)
+        fll = [x.lower().replace('\\','/') for x in listdir(inp)]
+        fsz = len(listdir(inp))
     opfs = {}
     def fkopen(p,m,*args,**kwargs):
         asrt('r' in m and not '+' in m,'Read only')
@@ -911,17 +917,15 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                     ret = inp[sp:sp+len(cv[0])] in cv
             elif typ == 'directory':
                 if x[0] == 'contains':
-                    fl = fll.copy()
-                    ret = False
-                    for fn in x[1]:
-                        for pfn in fl:
-                            if fn in pfn: fl.remove(pfn);break
-                        else: break
-                    else: ret = True
+                    chk = x[1]
+                    if not isinstance(chk,list): chk = [chk]
+                    ret = all(fn in fll for fn in chk)
                 elif x[0] == 'containsext':
                     fl = fll.copy()
+                    chk = x[1]
+                    if not isinstance(chk,list): chk = [chk]
                     ret = False
-                    for xn in x[1]:
+                    for xn in chk:
                         for pfn in fl:
                             if pfn.endswith(xn): fl.remove(pfn);break
                         else: break

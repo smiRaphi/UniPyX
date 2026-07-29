@@ -66,10 +66,6 @@ class File:
             n += self.size
             if n < 0: n = 0
         return self._f.seek(n + (self._start_pos if whence == 0 else 0),whence)
-    def seekc(self,n:int,whence=0):
-        """Seek concat, usable in list comprehensions"""
-        self.seek(n,whence)
-        return self
     def tell(self) -> int: return self._f.tell() - self._start_pos
     def close(self):
         self._end_pos = self.pos
@@ -77,11 +73,15 @@ class File:
 
     def skip(self,n:int): return self.seek(n,1)
     def back(self,n:int): return self.skip(-n)
+    def seekc(self,n:int,whence=0):
+        """Seek concat, usable in list comprehensions"""
+        self.seek(n,whence)
+        return self
     def readc(self,n:int=None):
         d = self.read(n)
         if n is not None and len(d) != n: raise EOFError(f"Unexpected EOF ({len(d)} != {n}) @ 0x{self.pos - len(d):08X} - 0x{self.pos - len(d) + n:08X}")
         return d
-    def padc(self,n:int): 
+    def padc(self,n:int):
         if sum(self.readc(n)): raise ValueError(f"Unexpected Value in padding @ 0x{self.pos - n:08X} - 0x{self.pos:08X}")
         return 0 # for chaining
     def reads(self,n:int,encoding='utf-8'):
@@ -252,7 +252,7 @@ class File:
                 break
             r.extend(v)
 
-        return struct.pack(f'<{len(r)}H',*r).decode('utf-16le')
+        return struct.pack(f'<{len(r)}H',*r).decode('utf-16' + UTFENDM[end or self._end])
 
     def writeu8 (self,v:int): return self.writei(v,1,0)
     def writeu16(self,v:int,end=None): return self.writei(v,2,0,end)

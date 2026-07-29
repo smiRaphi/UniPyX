@@ -146,6 +146,45 @@ def extract2(inp:str,out:str,t:str) -> bool:
             for x in listdir(o):
                 if x.endswith('.bin'): remove(o + '/' + x)
             return
+        case 'Nintendo CIA':
+            Nintendo(db)
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            hs = f.readu32()
+            asrt(hs >= 0x20)
+            asrt(f.readu16() == 0 and f.readu16() == 0)
+            cts,tks,tms,mts = f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            cs = f.readu64()
+            f.seek(hs)
+            f.align(0x40)
+
+            cd,cp = f.readc(cts),0
+            writefile(o + '/cert',cd)
+            cts = []
+            for _ in range(3):
+                c = Nintendo.parse_tmd_cert(cd[cp:])
+                cts.append(cd[cp:cp + c._size])
+                cp += c._size
+            f.align(0x40)
+            writefile(o + '/cetk',f.readc(tks) + cts[1] + cts[0])
+            f.align(0x40)
+            tmd = f.readc(tms) + cts[2] + cts[0]
+            writefile(o + '/tmd',tmd)
+            tmd = Nintendo.parse_tmd(tmd)
+            f.align(0x40)
+            asrt(not tmd.srl_flag,err=NotImplementedError)
+            ep = f.pos + cs
+            for x in tmd.contents:
+                writefile(f'{o}/{x.cid:08X}',f.readc(x.csize))
+                f.align(0x10)
+            asrt(ep == f.pos)
+            if mts:
+                f.align(0x40)
+                writefile(o + '/meta',f.readc(mts))
+            f.close()
+            return
         case 'Switch NSP\0':
             db.try_custom()
             from lib.file import File
@@ -367,6 +406,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             tmd = Nintendo(db).parse_tmd(dr + '/' + tmd)
 
             if tmd.signature.type & 0xFF == 1 and tmd.version == 0: cns = 'w'
+            elif tmd.signature.type & 0xFF in {3,4,5} and tmd.version == 1: cns = '3'
             else: raise NotImplementedError(f'{tmd.signature.type:06X} {tmd.version}')
 
             db.set_temp_print(False)
@@ -427,6 +467,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     elif od[:4] == b'U\xAA8\x2D':
                         mv(fo,fo + '.arc')
                         extract(fo + '.arc',fo,'U8')
+                elif cns == '3':
+                    if c.type >> 1: raise NotImplementedError(c.type,c.index,tmd.srl_flag,tmd.title_id)
+                    if c.index == 0 and tmd.srl_flag: mv(fo,o + '/main.srl')
+                    elif c.index == 0 and od[0x18D] & 3 in {2,3}: mv(fo,o + '/main.cxi')
+                    elif c.index == 0: mv(fo,o + '/main.cfa')
+                    elif c.index == 1: mv(fo,o + '/manual.cfa')
+                    elif c.index == 2: mv(fo,o + '/dlp_child.cfa')
             db.reset_temp_print()
             return
         case '3DO IMG':
@@ -1541,7 +1588,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
     return 1
 
-@namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt','parse_tmd','parse_tmd_tik'])
+@namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt','parse_tmd','parse_tmd_tik','parse_tmd_cert'])
 def _Nintendo(db):
     from lib.file import File,FileStruct
     from lib.crypto import decrypt,crc_hash
@@ -1619,6 +1666,7 @@ def _Nintendo(db):
         r.modulus = f.readc((0x200,0x100,0x3C)[r.type])
         if r.type in {0,1}: r.exponent = f.readu32()
         r.padding = f.readc((0x34,0x34,0x3C)[r.type])
+        r._size = f.pos
         return r
     class TMDInfo(FileStruct):
         _ENDIAN = '>'
@@ -1673,7 +1721,7 @@ def _Nintendo(db):
             r.sha256 = f.readc(0x20)
             r.content_info = [TMDInfo(f) for _ in range(0x40)]
         r.contents = [parse_tmd_content(f,r.version) for _ in range(r.content_count)]
-        r.certificates = [parse_tmd_cert(f) for _ in range(2)]
+        if f: r.certificates = [parse_tmd_cert(f) for _ in range(2)]
         return r
     def parse_tmd_tik(d:bytes):
         f = File(d,endian='>')
@@ -1707,7 +1755,7 @@ def _Nintendo(db):
         if r.version == 1:
             r.content_index_size = f.peek('u32',poffset=4)
             r.content_index = f.readc(r.content_index_size)
-        r.certificates = [parse_tmd_cert(f) for _ in range(2)]
+        if f: r.certificates = [parse_tmd_cert(f) for _ in range(2)]
         return r
 
     _NXPKEYS = None

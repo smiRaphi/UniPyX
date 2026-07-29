@@ -26,7 +26,7 @@ if os.path.exists(os.path.dirname(__file__) + '/.is_dev'):
     TH_CHECKED = True
 else: TH_CHECKED = False
 
-import pickle,inspect,tokenize,io
+import pickle,inspect,tokenize,io,re
 from decimal import Decimal
 from threading import Thread
 from types import FunctionType
@@ -63,7 +63,9 @@ class PyOUnpickler(pickle.Unpickler):
         if mn == 'builtins' and n in self.SAFE: return getattr(__builtins__,n)
         return None
 class PyOFunc:
-    def __init__(self,f:FunctionType,xenv={}):
+    LAMBDARG = re.compile(r'\blambda\b')
+
+    def __init__(self,f:FunctionType,xenv={},no_clean=False):
         def _err(*args,**kwargs): raise RuntimeError
         self.env = {x:_err for x in dir(__builtins__) if x in PyOUnpickler.UNSAFE or x.startswith('_')} | xenv
 
@@ -83,8 +85,14 @@ class PyOFunc:
         elif type(f) != FunctionType: raise TypeError
         else:
             self.source = inspect.getsource(f)
-            if not self.source.startswith('def '): raise TypeError(self.source)
-        if f is not None:
+            if f.__name__ == '<lambda>':
+                pos = list(f.__code__.co_positions())
+                asrt(not any(x is None for x in pos),'no positional data for lambda',err=RuntimeError)
+                asrt(all(pos[0][0] == pos[0][1] == x[0] == x[1] for x in pos[1:]),'multiline lambda',err=NotImplementedError)
+                pos = pos[-1]
+                self.source = 'lambda' + self.LAMBDARG.split(self.source[:pos[2]])[-1] + self.source[pos[2]:pos[3]]
+            elif not self.source.startswith('def '): raise TypeError(self.source)
+        if f is not None and not no_clean:
             r = []
             fstl = None
             fstc = None
@@ -312,11 +320,12 @@ class PyOBin:
                     else: d = None
                     sdbix = gmxix + mxix
 
+                    cl = PyOInlineF if fl & 8 else PyOFunc
                     if self.unpickle:
-                        r = PyOFunc(d,self.xenv.copy())
+                        r = cl(d,self.xenv.copy(),no_clean=True)
                         if fl & 8: funcs.append(r)
                         return r
-                    else: return (PyOInlineF if fl & 8 else PyOFunc,d)
+                    else: return (cl,d)
                 case 12:
                     d = f.decompress(f.readi(fl & 7),'deflate0' if fl & 8 else 'none')
                     if self.unpickle: return PyOUnpickler(d,encoding='utf-8').load()
@@ -342,7 +351,6 @@ class PyOBin:
         f.close()
         for fnc in funcs: fnc(self.db)
     def save(self):
-        global TH_CHECKED
         asrt(type(self.db) in (dict,list),err=TypeError)
         sdb = []
         sdbix = 0
@@ -350,6 +358,7 @@ class PyOBin:
         ibytes = False
 
         def interp(x,pt):
+            global TH_CHECKED
             nonlocal sdb,sdbix,ibytes
             t = None if x is None else type(x)
 

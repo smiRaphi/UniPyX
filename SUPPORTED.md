@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1041
+# Supported Formats: 1045
 
 ## "Common" Archives/Compressors/Encodings (149)
 Name | Extension(s) | Extractor(s) | Comment
@@ -155,7 +155,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | Custom |
 
-## ROM Formats (70)
+## ROM Formats (71)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -195,6 +195,7 @@ NCCH CXI | .cxi | [3dstool](https://github.com/dnasdw/3dstool) |
 NCSD | .cci .3ds | [3dstool](https://github.com/dnasdw/3dstool) |
 NDS | .nds .srl | [mdnds](https://github.com/Roughsketch/mdnds) |
 NES Remix ROM | ??? | Custom |
+Nintendo CIA | .cia | Custom |
 Nintendo TMD | .tmd ` ` | Custom |
 NKit GameCube ISO | .nkit.iso | [DolphinTool](https://dolphin-emu.org/download/) |
 NKit Wii ISO | .nkit.iso | [DolphinTool](https://dolphin-emu.org/download/) |
@@ -370,7 +371,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (562)
+## Various (565)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -416,6 +417,7 @@ ASDG SPLiT | .spl .spt | Custom |
 Asura Engine Resource | .asr .ps2 | Custom |
 Atari Masterpieces Resources | ??? | Custom |
 Atari Masterpieces Strings | ??? | Custom |
+Avatar Legends: The Fighting Game PAK | .pak | Custom |
 Azada Wizard | .wzd | Custom |
 Azito 3D Pack File | ??? | Custom |
 Azito 3D Pack Message | ??? | Custom |
@@ -582,6 +584,8 @@ God of Thunder Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/de
 Godot Pack | .pck | [GDRETools](https://github.com/GDRETools/gdsdecomp) |
 Golden Tee Fore! BIG | .big | Custom |
 Goosebumps CFS | .cfs | [na_game_tool](https://nihav.org/game_tool.html) |
+Grezzo Archive | .gar .zar | Custom |
+Grezzo LzS | .lzs | Custom |
 Groove World Archive | .grv | Custom |
 Gwtar | .gwtar.html | Custom -> TAR |
 Haemimont Games HPK | .hpk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -701,7 +705,7 @@ Neox Package | .npk | Custom |
 Nemea File Archive | .bin | Custom |
 New York Race KIX+KBF | .kix+.kbf | Custom |
 Nexas New PAC | .pac | [GARbro](https://github.com/crskycode/GARbro) |
-Next Level Games DICT+DATA | .dict+.data | [NlgFileTool](https://github.com/KillzXGaming/NLG-File-Editor-Tool), [NlgFileTool MFF](https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper), [luigi_mansion_dict.bms](https://mirror.aluigi.org/bms/luigi_mansion_dict.bms) |
+Next Level Games DICT+DATA | .dict+.data | Custom |
 Nicktoons Gravjet Racing LIN | .lin | Custom |
 Ninja Shadow of Darkness PAK | .pak | Custom |
 Nintendo 3DS SMDH | .smdh .ico | Custom |

@@ -1,5 +1,5 @@
 ENC = 'ascii'
-nFMT = 'lambda x:x.lower()' #lambda x:x # x: bytes
+nFMT = lambda x:x.lower() #lambda x:x # x: bytes
 iFMT = lambda x:x #'/'+x.replace('\\','/').lstrip('/') # x: str
 
 import os,sys
@@ -38,7 +38,9 @@ for x in argv[2:]:
         from dev.bhl2pyob import HashLibOld
         l = HashLibOld(x,fmt=nFMT or (lambda x:x),encoding=ENC).loadb().db.values()
     else:
-        l = open(x,encoding=ENC).read().split('\n')
+        l = open(x,encoding=ENC).read()
+        if l and l[0] == '\xEF\xBB\xBF': l = l[3:]
+        l = l.split('\n')
         if l and len(l[0]) > (h.hs*2+1) and l[0][h.hs*2] == '|' and all(x in '0123456789abcdefABDEF' for x in l[0][:h.hs*2]):
             l = [e[h.hs*2+1:] for e in l if len(e) > (h.hs*2+1)]
     h.add([iFMT(e) for e in l])
