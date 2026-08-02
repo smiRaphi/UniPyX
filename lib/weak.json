@@ -33,5 +33,6 @@
 "Inset PIX bitmap",
 "Portable Float Map color bitmap",
 "PCX bitmap (v2.5)",
-"Windows Device Dependent Bitmap"
+"Windows Device Dependent Bitmap",
+"Continuous Wave Accelerometry data"
 ]

@@ -967,9 +967,10 @@ def extract(inp:str,out:str,t:str) -> bool:
     from .sub4_3 import extract4_3
     from .sub4_4 import extract4_4
     from .sub4_5 import extract4_5
+    from .sub4_6 import extract4_6
     from .sub5 import extract5
 
-    for f in (extract1,extract2,extract3,extract4,extract4_1,extract4_2,extract4_3,extract4_4,extract4_5,extract5):
+    for f in (extract1,extract2,extract3,extract4,extract4_1,extract4_2,extract4_3,extract4_4,extract4_5,extract4_6,extract5):
         r = f(inp,out,t)
         if not r: return r
 

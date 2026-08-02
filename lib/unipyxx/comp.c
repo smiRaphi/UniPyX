@@ -1054,6 +1054,68 @@ eof:
     #undef CHKi
     return op;
 }
+EXPORT ssize_t decompress_cc3(const uint8_t *restrict src, const size_t zsize,
+                                    uint8_t *restrict dst, const ssize_t usize) {
+    size_t ip = 0;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+    ssize_t op = 0;
+
+    while (ip < zsize && (usize == -1 || op < usize)) {
+        uint8_t b = src[ip++];
+        if (b & 1) {
+            if (b & 2) {
+                if (b & 4) {
+                    uint16_t dist = b >> 3;
+                    if (dist == 0) dist = 0x100;
+                    dst[op] = dst[op - dist];op++;
+                    if (usize != -1 && op >= usize) break;
+                    dst[op] = dst[op - dist];op++;
+                } else {
+                    if (!(b & 8)) break;
+                    uint8_t v = (b >> 4) - 1;
+                    dst[op++] = v;
+                    if (usize != -1 && op >= usize) break;
+                    dst[op++] = v;
+                }
+            } else if (b & 4) {
+                uint16_t l = 1;
+                if (b & 8) {
+                    CHKi(0)
+                    l += ((b >> 4) << 8) | src[ip++];
+                } else l += b >> 4;
+                if (usize != -1 && op + l > usize) l = usize - op;
+                if (ip + l > zsize) return -1;
+                for (uint16_t i=0;i < l;i++) dst[op++] = src[ip++];
+            } else {
+                uint16_t l = 3;
+                if (b & 8) l += b >> 4;
+                else {
+                    CHKi(0)
+                    l += ((b >> 4) << 8) | src[ip++];
+                }
+                if (usize != -1 && op + l > usize) l = usize - op;
+                CHKi(0)
+                uint8_t v = src[ip++];
+                for (uint16_t i=0;i < l;i++) dst[op++] = v;
+            }
+        } else {
+            CHKi(0)
+            uint16_t dist = ((b & 0xE) << 7) | src[ip++];
+            uint16_t l = b >> 4;
+            if (l == 0xF) {
+                CHKi(0)
+                l += src[ip++];
+            }
+            l += 3;
+            if (usize != -1 && op + l > usize) l = usize - op;
+            for (uint16_t i=0;i < l;i++,op++) dst[op] = dst[op - dist];
+        }
+    }
+
+eof:
+    #undef CHKi
+    return op;
+}
 
 typedef struct {
     const uint8_t *src;

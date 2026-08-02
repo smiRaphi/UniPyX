@@ -113,6 +113,7 @@ class X:
             ('decompress_hammer',   (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u16,u16,u16,u16),sszt,0),
             ('decompress_lbalzss',  (P(u8),szt,P(u8),sszt,u8),sszt,0),
+            ('decompress_cc3',      (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -220,6 +221,7 @@ class X:
     def decompress_szdd_raw(src:bytes,usize:int) -> bytes: ...
     def decompress_capcom_yz2(src:bytes,usize:int) -> bytes: ...
     def decompress_lzfse(src:bytes,usize:int) -> bytes: ...
+    def decompress_cc3(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)

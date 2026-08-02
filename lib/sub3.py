@@ -2864,6 +2864,15 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(o + '/2.EXE',e.readc(e.ovl_off))
             del e
             return
+        case 'Code Cruncher 3':
+            db.try_custom()
+            from lib.file import decompress
+            d = readfile(i)
+            asrt(d[:4] == b'\xF3KSA' and d[10] == 1 and d[0x19] == 0xC9)
+            od = decompress(d[0x1A + int.from_bytes(d[11:13],'little'):],'cc3')
+            if len(od) > len(d) :
+                writefile(o + '/' + basename(i),od)
+                return
 
     return 1
 

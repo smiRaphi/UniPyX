@@ -377,6 +377,10 @@
         "rs":"Sunday vs. Magazine aeDAT","s":1
     },
     {
+        "d":[["isat","\\x70\\0\\4\\0",4],["isat","Temp",24],["isatS","\\0",60,28],["isat","\\0\\0\\0\\0\\x72\\0\\4\\0",-8],["n0",4,0],["n0",4,16],["n0",4,20]],
+        "rs":"Torus Hunk File","s":1
+    },
+    {
         "d":[["s%",8],["isat","FARC\\1\\0\\0\\0",0],["n0",4,8],["n0",4,16],["py","f.seek(8);c=f.readi(4,'<');f.seek(16);o=f.readi(4,'<')\nif (16+c*4+24)!=o:return\nf.seek(o-24);n=f.read(32).split(b'\\0')[0];return n and exists(dirname(inp)+'/'+n.decode('latin-1'))"]],
         "rs":"Hokuto No Ken IDX+BIN","s":1
     },
@@ -1214,6 +1218,10 @@
         "rs":"Golden Tee Fore! BIG"
     },
     {
+        "d":[["size",[4352,1048576]],["s%",256],["isatS","\\0",225,2048],["isatS","\\0",12,2280],["isin",["\\x16","\\x17","\\x18","\\x19"],2275],["n0",1,2276],["str",1,8],["str",2293,8]],
+        "rs":"TR-DOS Disk"
+    },
+    {
         "d":[["isat","NPAC",0],["isat","NPAC\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",-32]],
         "rs":"Soulcalibur Legends NPAC","s":1
     },
@@ -1870,7 +1878,7 @@
         "rs":"NDS","s":1
     },
     {
-        "d":[["isat","\\0\\1\\0",0],["isin",["\\x00","\\x01","\\x02","\\x03","\\x04","\\x05"],3],["isat","Root-CA000000",320]],
+        "d":[["isat","\\0\\1\\0",0],["isin",["\\x00","\\x01","\\x02","\\x03","\\x04","\\x05"],3],["py","f.seek(3);t=f.skip((572,316,124,572,316,124)[f.readi(1)]);return f.read(13)==b'Root-CA000000'"]],
         "rs":"Nintendo TMD","s":1},{
         "t":"directory",
         "d":[["contains","tmd"],["py","f=open(inp+'/tmd','rb')\nif f.read(3)!=b'\\0\\1\\0' or not f.read(1)[0]in{0,1,2,3,4,5}:return\nf.seek(320);return f.read(13)==b'Root-CA000000'"]],
@@ -2368,7 +2376,7 @@
     },
     {
         "d":[["isat","FSH2",0],["isat","\\1\\0\\0\\0Root",24],["isatS","\\0",12,12],["n0",4,8]],
-        "rs":"Goosebumps CFS"
+        "rs":"Goosebumps CFS","s":1
     },
     {
         "d":[["isat","FUFS",0],["n0",4,8],["n0",4,12]],
@@ -2729,6 +2737,12 @@
     {
         "d":[["n0",4,0],["n0",4,4],["n0",4,8],["py","s=f.readi(4,'<')+f.readi(4,'<')+4;return s==fsz"]],
         "rs":"Metroid Samus Returns PKG"
+    },
+    {
+        "rq":"ZLIB",
+        "d":[["size",[8,2097152]],["ext",".fat"],
+             ["py","if not exists(splitext(inp)[0]):return\nmf=f;f=open(splitext(inp)[0],'rb')\nif f.read(1)!=b'x' or not f.readi(1)in b'\\xDA\\x9C\\x5E\\x01':return\nf.seek(2);fl=f.readi(1)\nif fl&6==6 or (not fl&6 and fl>>3):return\nif fl&1 and not fl&6:\n if not(f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF)==(fsz-11)):return\nif not(fl&6==2 or((fl>>3)<30 and(f.readi(1)&31)<30)if fl&6 else(f.readi(2,'>')==(~f.readi(2,'>')&0xFFFF))):return\nimport zlib;mf.seek(0)\ntry:d=zlib.decompress(mf.read())\nexcept:return\nreturn sum(d[:4]) and not sum(d[8:16]) and len(d)==4+int.from_bytes(d[:4],'little')*12"]],
+        "rs":"Onyx Engine FAT+data","s":1
     },
     {
         "d":[["size",[2560,130815]],["s%",256],["str0",0,8,0],["str",8,7],["py","f.seek(8)\nfor _ in range(32):\n if not sum(f.read(8)):f.skip(-8);break\np=f.tell()+f.seek(256)\nfor _ in range(32):\n if not sum(f.read(8)):f.skip(-8);break\nreturn f.tell()==p"]],

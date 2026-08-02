@@ -1238,6 +1238,38 @@ def extract2(inp:str,out:str,t:str) -> bool:
             d = readfile(i)
             writefile(f'{o}/{tbasename(i)}.z64',struct.pack(f'>{len(d)//2}H',*struct.unpack(f'<{len(d)//2}H',d)))
             return
+        case 'TR-DOS Disk':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            f.seek(0x8E4)
+            c = f.readu8()
+            f.seek(0x8F5)
+            inf = ['Diskname: ' + f.reads(8,'ascii').rstrip()]
+            f.seek(0)
+            fs = [(f.reads(8,'ascii').rstrip(),f.reads(1,'ascii'),f.readu16(),f.readu16(),f.readu8(),f.readu8(),f.readu8()) for _ in range(c)]
+
+            for fe in fs:
+                fn = o + '/' + sub_path(fe[0].replace('\1','.') + '.' + fe[1],slash=True)
+                if fe[0][0] == '\1': xopen(fn + '.deleted','x').close()
+                else:
+                    f.seek(fe[5] * 0x100 + fe[6] * 0x1000)
+                    if fe[1] == 'B':
+                        writefile(fn + '.var',f.readc(fe[2]))
+                        writefile(fn + '.prg',f.readc(fe[3]))
+                    elif fe[1] == 'C':
+                        writefile(fn,f.readc(fe[3]))
+                        inf.append(f'"{fe[0]}.{fe[1]}" code start: 0x{fe[2]:04X}')
+                    elif fe[1] == '#':
+                        writefile(fn,f.readc(fe[3]))
+                        inf.append(f'"{fe[0]}.{fe[1]}" print number: {fe[2] & 0xFF}')
+                    elif fe[1] in 'D': writefile(fn,f.readc(fe[3]))
+
+            f.close()
+            if fs:
+                writefile(o + '/$info.txt','\n'.join(inf) + '\n')
+                return
 
         case 'Ridge Racer V A':
             tf = dirname(i) + '\\rrv3vera.ic002'

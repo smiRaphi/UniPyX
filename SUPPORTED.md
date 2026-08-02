@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1048
+# Supported Formats: 1051
 
 ## "Common" Archives/Compressors/Encodings (150)
 Name | Extension(s) | Extractor(s) | Comment
@@ -156,7 +156,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | Custom |
 
-## ROM Formats (71)
+## ROM Formats (72)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -218,6 +218,7 @@ Super Smash Bros. N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) 
 Switch NCA | .nca | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Switch NSP | .nsp | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 Switch XCI | .xci | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
+TR-DOS Disk | .trd | Custom |
 Virtua Striker 3 A | ??? | Custom |
 Wave Race 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Wave Race 64 decomp YAML](https://github.com/LLONSIT/Wave-Race-64) |
 Wii ISO | .iso | [DolphinTool](https://dolphin-emu.org/download/), [WIT](https://wit.wiimm.de/) |
@@ -231,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (136)
+## Executables/Packers/Installers (137)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -268,6 +269,7 @@ Central Point Anti-Virus Immunizer | .exe .com | [UNP](https://github.com/Sembia
 CExe | .exe | Custom |
 Cheat Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Chromium Delta Update | ??? | [android-ota-extractv](https://github.com/tobyxdd/android-ota-payload-extractor) |
+Code Cruncher 3 | ` ` | Custom | Z80 packer
 COM RLE Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 com2txt | .txt | [COM2TXT](https://www.sac.sk/download/utilprog/com2t111.rar) |
 COMPACK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
@@ -372,7 +374,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (567)
+## Various (568)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -745,6 +747,7 @@ OHRRPGCE RPG | ??? | Custom |
 One Piece Battle Adventure FSM | .apf .pac | Custom |
 One Piece Battle Adventure NXD | .nxd | Custom |
 One Piece Straw Wars Pirate Defense Resource | ??? | Custom |
+Onyx Engine FAT+data | .fat+` ` | Custom |
 Opalium Engine PAK | .opk .obp .ovp .osp | Custom |
 Open Media Toolkit Formatted Stream | .omt | Custom |
 Orange Juice Encrypted | .dat | [qpcrypt](https://github.com/jwilins/qptk) |

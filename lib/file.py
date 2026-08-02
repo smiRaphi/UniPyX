@@ -842,6 +842,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'vicious_lz':
             return uxx().decompress_vicious_lz(i,usize=kwargs['usize'])
         case 'd0llz3': return uxx().decompress_d0llz3(i,kwargs.get('usize',len(i) * 0x10))
+        case 'cc3'|'code_cruncher_3': return uxx().decompress_cc3(i,kwargs.get('usize',len(i) * 0x10))
         case 'natsume_lzs':
             if len(i) < 0x1C: raise ValueError("Not enough data to decompress")
             if i[:4] != b'LZS\0': raise ValueError("Invalid header")
