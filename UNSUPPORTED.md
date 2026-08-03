@@ -40,6 +40,8 @@ Asymetrix Toolbook | .tbk | https://sembiance.com/fileFormatSamples/other/asymet
 WinUpack Dwing | .exe | https://discmaster.textfiles.com/view/41962/VIOLET.dvd2011.iso/tools/Sources/_Sources%202007.rar/DXbot/secure.RES/Dllfile/Secure/1049.exe | ? | ? | detected
 FI Installer | .exe | https://www.sac.sk/download/pack/djar95.zip<br>http://www.edicomex.com.mx/demo/setup.exe | ? | ? | detected, lzpunz2.dll=zip/deflate
 DJarchive/DJcomp | .dja .djc .eja | https://discmaster.textfiles.com/search?format=djarcArchive | ? | ? | detected, DJarchive extracted without compression (DJcomp)
+Colorado Memory System Package | .cmp | https://discmaster.textfiles.com/search?format=coloradoMemorySystemPackage&dedup=dedup | ? | https://discmaster.textfiles.com/browse/556/Experimental%20BBS%20Explossion%20III.iso/windows/cbwlite.zip/INSTALL.EXE | detected, LZSS @ 1010:0698, parent @ 1010:07d1
+Hydrate H2O Dry | .dry | https://discmaster.textfiles.com/search?format=dryArchiveData&dedup=dedup | ? | https://discmaster.textfiles.com/view/34777/prog125_128.zip/prog125_128/PROG_127/C&B-B324.ZIP/HYDRATE.DLL | detected
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)

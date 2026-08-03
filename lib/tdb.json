@@ -1727,5 +1727,19 @@
     ],
     "Code Cruncher 3":[
         "code cruncher 3 packed"
+    ],
+    "Colorado Memory System Package":[
+        "colorado memory system compressed package"
+    ],
+    "Hydrate H2O Dry":[
+        "dry archive data",
+        "dry compressed format"
+    ],
+    "ZPackage":[
+        "zpackage compressed archive (v1)"
+    ],
+    "WarpIN Archive":[
+        "os/2 warpin archive",
+        "warpin installer"
     ]
 }

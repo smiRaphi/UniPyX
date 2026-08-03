@@ -824,6 +824,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'graw_bpe': return uxx().decompress_graw_bpe(i,usize=kwargs['usize'])
         case 'lzss0'|'lzss0_lsb': return uxx().decompress_lzss0_lsb(i,usize=kwargs['usize'])
         case 'lzss0_msb': return uxx().decompress_lzss0_msb(i,usize=kwargs['usize'])
+        case 'lzss0_win'|'lzss0_win_lsb':
+            return uxx().decompress_lzss0_win_lsb(i,usize=kwargs['usize'],win=kwargs.get('win'),woff=kwargs.get('woff',0xFEE))
         case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw'|'lzw_lg':

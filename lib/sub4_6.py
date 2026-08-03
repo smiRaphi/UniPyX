@@ -79,5 +79,79 @@ def extract4_6(inp:str,out:str,t:str):
 
             fd.close()
             if fs: return
+        case 'ZPackage':
+            db.try_custom()
+            from lib.file import File,pdosdate
+            f = File(i,endian='<')
+            asrt(f.read(10) == b'ZPackage1\0')
+
+            while f:
+                xo = f.readu32()
+                n = o + '/' + f.read0s('ascii')
+                ts = (f.readu16(),f.readu16())
+                writefile(n,f.decompress(xo - f.pos,'zlib'))
+                set_ftime(n,pdosdate(ts[1],ts[0]))
+
+            f.close()
+            if listdir(o): return
+        case 'XelaSoft Archive':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'PCK2')
+
+            to = f.readu32()
+            f.skip(4) # tsz
+            c = f.readu32()
+            f.seek(to)
+
+            fs = []
+            for _ in range(c):
+                f.skip(4) # file type id
+                fs.append((f.readu32(),f.readu32(),f.read0s('ascii')))
+                f.skip(3)
+
+            for fe in fs:
+                f.seek(fe[0])
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'WarpIN Archive':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'w\4\2\xBE' and f.readu16() == 3)
+            f.padc(0x100)
+
+            writefile(o + '/$info.txt',b'Title: ' + f.readc(0x40).split(b'\0')[0] + b'\nAuthor: '+ f.readc(0x40).split(b'\0')[0] + b'\nURL: ' + f.readc(0x80).split(b'\0')[0] + b'\n')
+            f.skip(4)
+            pc = f.readu16()
+            pus,pzs = f.readu16(),f.readu16()
+            f.padc(4)
+            writefile(o + '/$page.htm',f.decompress(pzs,'bzip2',usize=pus))
+            ps = []
+            for _ in range(pc):
+                f.skip(2) # index/id
+                c,of = f.readu16(),f.readu32()
+                f.skip(8) # total data us/zs
+                ps.append((c,of,f.readc(0x20).split(b'\0')[0].decode('ascii')))
+
+            for pe in ps:
+                f.seek(pe[1])
+                dn = o + '/' + pe[2]
+                mkdir(dn)
+                for _ in range(pe[0]):
+                    f.skip(8) # u32: ?, u16: ?, u16: pid
+                    us,zs = f.readu32(),f.readu32()
+                    f.skip(4) # crc? unknown, 0 if us == zs
+                    n = f.readc(0x100).split(b'\0')[0].decode('ascii')
+                    ts = (f.readu32(),f.readu32())
+                    f.padc(1)
+                    writefile(dn + '/' + n,f.decompress(zs,'bzip2' if us != zs else 'none',usize=us))
+                    set_ftime(dn + '/' + n,ct=ts[0],mt=ts[1])
+
+            f.close()
+            if ps: return
 
     return 1

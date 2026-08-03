@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1051
+# Supported Formats: 1054
 
 ## "Common" Archives/Compressors/Encodings (150)
 Name | Extension(s) | Extractor(s) | Comment
@@ -374,7 +374,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (568)
+## Various (571)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -924,6 +924,7 @@ Vulkan Pipeline Cache | .bin | Custom |
 Wallpaper Engine PKG | .pkg | [RePKG](https://github.com/notscuffed/repkg) |
 Wangan Midnight TOC+DAT | .toc+.dat | Custom |
 WarioWare Mega Party Game PAC | .pac | Custom |
+WarpIN Archive | .wip | Custom |
 WATCOM Archive | ??? | [WPACK](https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE) |
 WayForward PAK | .pak | Custom |
 Westwood Encrypted MIX | .mix | Custom |
@@ -932,6 +933,7 @@ WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
 X-Files Resources | ??? | Custom |
 Xbox FArc | .fa | Custom |
 Xbox XB Compressed | .xb \* | Custom |
+XelaSoft Archive | .pck | Custom | only uncompressed variant
 Xenoblade Chronicles X DE ARH2 | .arh+.ard | Custom |
 Xenonauts PFP | .pfp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 XNB | .xnb | [xnb.bms](https://mirror.aluigi.org/bms/xnb.bms) |
@@ -945,6 +947,7 @@ Zeebo Resources | ??? | Custom |
 ZIPD Encrypted | .piz | Custom |
 ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | \* | Custom |
+ZPackage | .zpk | Custom |
 ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 

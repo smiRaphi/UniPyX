@@ -6,6 +6,11 @@ db = DLDB()
 from lib.crypto import crc_hash,HASHTS
 from sys import argv
 
+if len(argv) == 2 and argv[1].isdigit() and not os.path.exists(argv[1]):
+    s = int(argv[1])
+    hshs = [x for x in HASHTS if HASHTS[x] == s]
+    print('\n'.join(sorted(hshs)))
+    sys.exit()
 if len(argv) == 3:
     if argv[2].isdigit():
         s = int(argv[2])

@@ -530,6 +530,11 @@
         "rs":"Blitz Games PAK","s":1
     },
     {
+        "rqr":"XelaSoft Archive compressed data",
+        "d":[["isat","PCK2",0],["isat","\\0",-4],["n0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(4);o,s=f.readi(4,'<'),f.readi(4,'<');return 17*f.readi(4,'<')<=s and s+o==fsz"]],
+        "rs":"XelaSoft Archive","s":1
+    },
+    {
         "d":[["size",[11,4294967295]],["isat","SDPC",0],["n0",4,4],["n0",2,8]],
         "rs":"TREVA SDPC","s":1
     },

@@ -395,6 +395,48 @@ eof:
     #undef CHKo
     return op;
 }
+EXPORT ssize_t decompress_lzss0_win_lsb(const uint8_t *restrict src, const size_t zsize,
+                                              uint8_t *restrict dst, const ssize_t usize,
+                                              uint8_t *restrict win, uint16_t woff) {
+    size_t ip = 0;
+    ssize_t op = 0;
+    uint16_t wp = woff & 0xFFF;
+    uint8_t f = 0;
+    int8_t fbl = 0;
+
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+
+    while (ip < zsize && (usize == -1 || op < usize)) {
+        if (fbl <= 0) {
+            f = src[ip++];
+            fbl = 8;
+            CHKi(0);
+        }
+
+        if (f & 1) {
+            dst[op++] = win[wp++] = src[ip++];
+            wp &= 0xFFF;
+        } else {
+            CHKi(1);
+            uint16_t dist = src[ip++];
+            uint8_t l = src[ip++];
+            dist |= (l & 0xF0) << 4;
+            l = (l & 0x0F) + 3;
+            if (usize != -1 && op + l > usize) l = usize - op;
+            for (int i=0;i < l;i++) {
+                dst[op++] = win[wp++] = win[(dist + i) & 0xFFF];
+                wp &= 0xFFF;
+            }
+        }
+
+        f >>= 1;
+        fbl--;
+    }
+
+eof:
+    #undef CHKi
+    return op;
+}
 EXPORT ssize_t decompress_lzss1(const uint8_t *restrict src, const size_t zsize,
                                       uint8_t *restrict dst, const ssize_t usize) {
     BitReader br;

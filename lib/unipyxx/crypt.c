@@ -611,7 +611,6 @@ EXPORT void mac_cmac_tfit(uint8_t *restrict src, const size_t size, uint8_t *res
 
 EXPORT int8_t hash_crc_init(uint8_t *restrict t, const uint32_t size, const uint64_t poly, const int8_t reflect) {
     if (size % 8 || size == 0 || size > 64) return -1;
-    const uint32_t sizey = (size + 7) / 8;
     const uint64_t mm = (size == 64) ? ~0ULL : (1ULL << size) - 1;
     const uint8_t ref = reflect != 0;
     uint64_t pol = poly & mm;
@@ -631,13 +630,12 @@ EXPORT int8_t hash_crc_init(uint8_t *restrict t, const uint32_t size, const uint
         }
     } else {
         const uint64_t cm = 1ULL << (size - 1);
-        const size_t sh = size - 8;
+        const size_t sh = (size < 8) ? 0 : (size - 8);
         for (uint16_t b=0;b < 256;b++) {
             uint64_t crc = b << sh;
             for (uint8_t i=0;i < 8;i++) {
                 if (crc & cm) crc = (crc << 1) ^ pol;
                 else crc <<= 1;
-                crc &= mm;
             }
             *(uint64_t *)(t + 5 + b * 8) = crc & mm;
         }
@@ -650,7 +648,6 @@ EXPORT uint64_t hash_crc(const uint8_t *restrict src, const uint32_t size, const
     const int8_t ref = t[0];
     const uint32_t sizei = *(uint32_t *)(t + 1);
     const uint64_t mm = (sizei == 64) ? ~0ULL : (1ULL << sizei) - 1;
-    const uint32_t sizey = (sizei + 7) / 8;
     init &= mm;
     xor &= mm;
 
@@ -661,7 +658,7 @@ EXPORT uint64_t hash_crc(const uint8_t *restrict src, const uint32_t size, const
         for (size_t p=0;p < size;p++)
             h = (h >> 8) ^ *(uint64_t *)(t + 5 + ((h ^ src[p]) & 0xFF) * 8);
     else {
-        const size_t sh = sizei - 8;
+        const size_t sh = (sizei < 8) ? 0 : (sizei - 8);
         for (size_t p=0;p < size;p++)
             h = ((h << 8) & mm) ^ *(uint64_t *)(t + 5 + ((src[p] ^ (h >> sh)) & 0xFF) * 8);
     }

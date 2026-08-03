@@ -100,6 +100,7 @@ class X:
             ('decompress_lz4_fast', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_lzss0_lsb',(P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_lzss0_msb',(P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_lzss0_win_lsb',(P(u8),szt,P(u8),sszt,P(u8),u16),sszt,0),
             ('decompress_lzss1',    (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_rtl_lz',   (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_vicious_lz',(P(u8),szt,P(u8),sszt),  sszt,1),
@@ -394,6 +395,16 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * usize)()
         r = self.dll.decompress_lbalzss(i,len(src),o,usize,fl)
+        if r < 0: raise ValueError(f'Decompression failed ({r})')
+        return bytes(o)[:r]
+    def decompress_lzss0_win_lsb(self,src:bytes,usize:int,win:bytes=None,woff:int=0xFEE):
+        if not win: win = b'\0'
+        if len(win) == 1: win = win * 0x1000
+        asrt(len(win) == 0x1000)
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * usize)()
+        w = (u8 * 0x1000).from_buffer_copy(win)
+        r = self.dll.decompress_lzss0_win_lsb(i,len(src),o,usize,w,woff)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
 
