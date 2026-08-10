@@ -10,10 +10,10 @@ def check_th(tkn=None):
     th = calc_th(tkn)
     if th != TH:
         import sys
-        print('Token dump (include in bug report):')
-        print(sys.version,sys.platform)
-        print(repr(tkn).replace(' ',''))
-        raise RuntimeError(f'Token hash mismatch {th:08X} != {TH:08X}')
+        raise RuntimeError(f"""Token hash mismatch {th:08X} != {TH:08X}
+Token dump (include in bug report):
+{sys.version} {sys.platform}
+{repr(tkn).replace(' ','')}""")
 
 if __name__ == '__main__':
     import sys
@@ -115,7 +115,9 @@ class PyOFunc:
                     r.append(to.line[cc*fstl+fstc:])
                 cl = to.end[0] + 1
             self.source = ''.join(r)
+
         self.f = f
+        self.islambda = self.source is not None and self.source.startswith(('lambda:','lambda '))
     def __call__(self,*args,**kwargs):
         if self.f is None:
             if not kwargs and len(args) == 1: return args[0]

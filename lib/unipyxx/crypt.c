@@ -1,13 +1,99 @@
 #include "util.h"
+#include "const.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define MT_N 624
-#define MT_M 397
-#define MT_MSK_U (int32_t)0x80000000
-#define MT_MSK_L (int32_t)0x7FFFFFFF
+typedef struct {
+    uint32_t d[4];
+} hash128_t;
+typedef struct {
+    uint32_t d[5];
+} hash160_t;
+typedef struct {
+    uint32_t d[8];
+} hash256_t;
+typedef struct {
+    uint32_t d[16];
+} hash512_t;
+#define HASH128_ABC(H) uint32_t a = (H).d[0], b = (H).d[1], c = (H).d[2], d = (H).d[3]
+#define PHASH128_ABC(H) uint32_t a = (H)->d[0], b = (H)->d[1], c = (H)->d[2], d = (H)->d[3]
+#define HASH160_ABC(H) uint32_t a = (H).d[0], b = (H).d[1], c = (H).d[2], d = (H).d[3], e = (H).d[4]
+#define PHASH160_ABC(H) uint32_t a = (H)->d[0], b = (H)->d[1], c = (H)->d[2], d = (H)->d[3], e = (H)->d[4]
+#define HASH256_ABC(H) uint32_t a = (H).d[0], b = (H).d[1], c = (H).d[2], d = (H).d[3], e = (H).d[4], f = (H).d[5], g = (H).d[6], h = (H).d[7]
+#define PHASH256_ABC(H) uint32_t a = (H)->d[0], b = (H)->d[1], c = (H)->d[2], d = (H)->d[3], e = (H)->d[4], f = (H)->d[5], g = (H)->d[6], h = (H)->d[7]
+
+// expects a zero padded buffer
+static inline void md_pad64(uint8_t buf[0x40], uint8_t c, void *restrict H, const uint64_t bits,
+                            void (*process_block)(void *restrict, const uint32_t[16])) {
+    uint32_t tbuf[0x10];
+    buf[c] = 0x80;INCWi(c, 6);
+    if (c > 0x38) c = 0;
+    if (c == 0) {
+        memcpy(tbuf, buf, 0x40);
+        process_block(H, tbuf);
+    }
+
+    for (int i=c;i < 0x38;i++) buf[i] = 0;
+    memcpy(tbuf, buf, 0x40);
+    memcpy(tbuf + 14, &bits, 8);
+    process_block(H, tbuf);
+}
+static inline void aes_mix(uint32_t *restrict arr,
+                     const uint32_t i0, const uint32_t i1, const uint32_t i2, const uint32_t i3) {
+    for (int i=0;i < 4;i++) {
+        uint32_t a = arr[i0 * 4 + i];uint32_t b = arr[i1 * 4 + i];
+        uint32_t c = arr[i2 * 4 + i];uint32_t d = arr[i3 * 4 + i];
+        uint32_t ab = a ^ b;uint32_t bc = b ^ c;uint32_t cd = c ^ d;
+        uint32_t abx = ((ab & 0x80808080U) >> 7) * 27
+                     ^ ((ab & 0x7F7F7F7FU) << 1);
+        uint32_t bcx = ((bc & 0x80808080U) >> 7) * 27
+                     ^ ((bc & 0x7F7F7F7FU) << 1);
+        uint32_t cdx = ((cd & 0x80808080U) >> 7) * 27
+                     ^ ((cd & 0x7F7F7F7FU) << 1);
+        arr[i0 * 4 + i] = abx ^ bc ^ d;
+        arr[i1 * 4 + i] = bcx ^ cd ^ a;
+        arr[i2 * 4 + i] = cdx ^ ab ^ d;
+        arr[i3 * 4 + i] = abx ^ bcx ^ cdx ^ ab ^ c;
+    }
+}
+
+static inline void shiftlx_arr32(uint32_t *restrict arr, const uint32_t o, const uint32_t s, const uint32_t c) {
+    if (c < 2) return;
+    uint32_t t = arr[o];
+    for (uint32_t i=0;i < c - 1;i++) arr[o + i*s] = arr[o + (i + 1)*s];
+    arr[o + (c - 1)*s] = t;
+}
+static inline void shiftrx_arr32(uint32_t *restrict arr, const uint32_t o, const uint32_t s, const uint32_t c) {
+    if (c < 2) return;
+    uint32_t t = arr[o + (c - 1)*s];
+    for (uint32_t i=c - 1;i > 0;i--) arr[o + i*s] = arr[o + (i - 1)*s];
+    arr[o] = t;
+}
+static inline void swap_arr32(uint32_t *restrict arr, const uint32_t i1, const uint32_t i2) {
+    uint32_t t = arr[i1];
+    arr[i1] = arr[i2];
+    arr[i2] = t;
+}
+static inline void arr_swap(uint8_t *restrict arr, uint8_t *restrict Tarr, const size_t size, const size_t len) {
+    memcpy(Tarr, arr + (size - len), len);
+    memmove(arr + len, arr, size - len);
+    memcpy(arr, Tarr, len);
+}
+static inline void arr32_swap(uint32_t *restrict arr, uint32_t *restrict Tarr, const size_t size, const size_t len) {
+    arr_swap((uint8_t *)arr, (uint8_t *)Tarr, size * sizeof(uint32_t), len * sizeof(uint32_t));
+}
+static inline void swaple32_arr(uint32_t *restrict arr, const size_t size) {
+    for (size_t i=0;i < size;i++) arr[i] = SWAPLE32(arr[i]);
+}
+static inline void swapbe32_arr(uint32_t *restrict arr, const size_t size) {
+    for (size_t i=0;i < size;i++) arr[i] = SWAPBE32(arr[i]);
+}
+static inline void arr32_map8(uint32_t *restrict arr, uint32_t *restrict out, const uint8_t size, const uint8_t *restrict map) {
+    for (uint8_t i=0;i < size;i++) out[i] = arr[map[i]];
+}
+
 typedef struct {
     int32_t MATRIX_A;
     uint32_t TEMPERING_MASK_B;
@@ -17,8 +103,8 @@ typedef struct {
     int32_t mt[MT_N];
     int32_t mti;
 } MT19937S;
-#define INIT_MT19937S(X) MT19937S X = { .MATRIX_A = (int32_t)0x9908B0DF, .TEMPERING_MASK_B = 0x9D2C5680,\
-                                        .TEMPERING_MASK_C = 0xEFC60000, .INIT_MULT = 0x6C078965,\
+#define INIT_MT19937S(X) MT19937S X = { .MATRIX_A = (int32_t)MT_MATRIX_A, .TEMPERING_MASK_B = MT_TEMPERING_MASK_B,\
+                                        .TEMPERING_MASK_C = MT_TEMPERING_MASK_C, .INIT_MULT = MT_INIT_MULT,\
                                         .mt = { 0 }, .mti = MT_N + 1 }
 void MT19937S_seed(MT19937S *restrict ctx, int32_t seed) {
     ctx->mt[0] = seed;
@@ -64,8 +150,8 @@ typedef struct {
     uint32_t mt[MT_N];
     uint32_t mti;
 } MT19937U;
-#define INIT_MT19937U(X) MT19937U X = { .MATRIX_A = 0x9908B0DF, .TEMPERING_MASK_B = 0x9D2C5680,\
-                                        .TEMPERING_MASK_C = 0xEFC60000, .INIT_MULT = 0x6C078965,\
+#define INIT_MT19937U(X) MT19937U X = { .MATRIX_A = MT_MATRIX_A, .TEMPERING_MASK_B = MT_TEMPERING_MASK_B,\
+                                        .TEMPERING_MASK_C = MT_TEMPERING_MASK_C, .INIT_MULT = MT_INIT_MULT,\
                                         .mt = { 0 }, .mti = MT_N + 1 }
 void MT19937U_seed(MT19937U *restrict ctx, uint32_t seed) {
     ctx->mt[0] = seed;
@@ -102,8 +188,6 @@ uint32_t MT19937U_rand(MT19937U *restrict ctx) {
     return y;
 }
 
-#define MICRO_C_RAND_A 0x358D
-#define MICRO_C_RAND_C 0x3619
 uint16_t micro_c_rand(uint16_t state) {
     return state * MICRO_C_RAND_A + MICRO_C_RAND_C;
 }
@@ -177,32 +261,22 @@ EXPORT void decrypt_tea(const uint8_t *restrict src, const size_t size, uint8_t 
     uint32_t *out = (uint32_t *)dst;
     size_t bc = size / 4;
 
-    if (!le)
-        for (int i=0;i < 4;i++) k[i] = SWAP32(k[i]);
+    #define TEA_SWAP32(x) (le) ? SWAPLE32((x)) : SWAPBE32((x))
+    for (int i=0;i < 4;i++) k[i] = TEA_SWAP32(k[i]);
 
-    const uint32_t DLT = 0x9e3779b9;
     for (size_t p=0;p < bc;p+=2) {
-        uint32_t v0 = inp[p];
-        uint32_t v1 = inp[p + 1];
-        if (!le) {
-            v0 = SWAP32(v0);
-            v1 = SWAP32(v1);
-        }
+        uint32_t v0 = TEA_SWAP32(inp[p]);
+        uint32_t v1 = TEA_SWAP32(inp[p + 1]);
 
-        uint32_t sv = (DLT * 32) & 0xFFFFFFFF;
+        uint32_t sv = (TEA_DELTA * 32) & 0xFFFFFFFF;
         for (int i = 0; i < 32; i++) {
             v1 -= ((v0 << 4) + k[2]) ^ (v0 + sv) ^ ((v0 >> 5) + k[3]);
             v0 -= ((v1 << 4) + k[0]) ^ (v1 + sv) ^ ((v1 >> 5) + k[1]);
-            sv -= DLT;
+            sv -= TEA_DELTA;
         }
 
-        if (!le) {
-            v0 = SWAP32(v0);
-            v1 = SWAP32(v1);
-        }
-
-        out[p] = v0;
-        out[p + 1] = v1;
+        out[p] = TEA_SWAP32(v0);
+        out[p + 1] = TEA_SWAP32(v1);
     }
 }
 EXPORT void decrypt_rsdk3(uint8_t *restrict buf, const size_t size,
@@ -457,7 +531,7 @@ EXPORT void decrypt_camelot_xor(uint8_t *restrict buf, const size_t size, const 
     uint8_t pre = buf[size - 1];
     for (ssize_t p=size - 2;p >= 0;p--) {
         uint8_t tpre = buf[p];
-        buf[p] ^= ROT8R(pre) ^ tkey;
+        buf[p] ^= ROT8R(pre, 1) ^ tkey;
         pre = tpre;
         tkey += key;
     }
@@ -465,7 +539,7 @@ EXPORT void decrypt_camelot_xor(uint8_t *restrict buf, const size_t size, const 
 EXPORT void decrypt_camelot_rand(uint8_t *restrict buf, const size_t size, const uint8_t key, const uint32_t seed, const size_t drop) {
     if (size < 2) return;
     INIT_MT19937U(mt);
-    mt.TEMPERING_MASK_C = 0xFFC78000;
+    mt.TEMPERING_MASK_C = MT_CAMELOT_TEMPERING_MASK_C;
     MT19937U_seed(&mt,seed);
     for (size_t i=0;i < drop;i++) MT19937U_rand(&mt);
 
@@ -473,14 +547,14 @@ EXPORT void decrypt_camelot_rand(uint8_t *restrict buf, const size_t size, const
     uint8_t pre = buf[size - 1];
     for (ssize_t p=size - 2;p >= 0;p--) {
         uint8_t tpre = buf[p];
-        buf[p] ^= ROT8R(pre) ^ tkey ^ (uint8_t)MT19937U_rand(&mt);
+        buf[p] ^= ROT8R(pre, 1) ^ tkey ^ (uint8_t)MT19937U_rand(&mt);
         pre = tpre;
         tkey += key;
     }
 }
 EXPORT int8_t decrypt_zipd(uint8_t *restrict buf, const size_t size) {
     if (size < 7) return -1;
-    const uint8_t chk[6] = {0, 0, 0, 0, 5, 0x78};
+    const uint8_t chk[6] = ZIPD_CHECK;
 
     uint16_t s=0;
     while (1) {
@@ -512,7 +586,7 @@ EXPORT void decrypt_ady_glue(uint8_t *restrict buf, const size_t size,
                        const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
     for (size_t p=0;p < size;p++) {
-        buf[p] = ROT8R(buf[p] - key[kc++]);
+        buf[p] = ROT8R(buf[p] - key[kc++], 1);
         if (kc >= ksize) kc = 0;
     }
 }
@@ -611,7 +685,7 @@ EXPORT void mac_cmac_tfit(uint8_t *restrict src, const size_t size, uint8_t *res
 
 EXPORT int8_t hash_crc_init(uint8_t *restrict t, const uint32_t size, const uint64_t poly, const int8_t reflect) {
     if (size % 8 || size == 0 || size > 64) return -1;
-    const uint64_t mm = (size == 64) ? ~0ULL : (1ULL << size) - 1;
+    const uint64_t mm = MASK(size);
     const uint8_t ref = reflect != 0;
     uint64_t pol = poly & mm;
     if (ref) pol = REFLECT(pol, size);
@@ -663,6 +737,27 @@ EXPORT uint64_t hash_crc(const uint8_t *restrict src, const uint32_t size, const
             h = ((h << 8) & mm) ^ *(uint64_t *)(t + 5 + ((src[p] ^ (h >> sh)) & 0xFF) * 8);
     }
     return h ^ xor;
+}
+EXPORT uint64_t hash_fletcher(const uint8_t *restrict src, const size_t size, const uint64_t init,
+                              const uint8_t bits, const uint64_t base) {
+    const uint8_t s = bits / 2;
+    uint64_t h1 = init & MASK(s);
+    uint64_t h2 = (init >> s) & MASK(s);
+    for (size_t p=0;p < size;p++) {
+        h1 = (h1 + src[p]) % base;
+        h2 = (h2 + h1) % base;
+    }
+    return ((h2 << s) | h1) & MASK(bits);
+}
+EXPORT uint32_t hash_prng32(const uint8_t *restrict src, const size_t size, const uint32_t init, const uint32_t mult, const uint32_t add) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) h = h * mult + add + src[p];
+    return h;
+}
+EXPORT uint64_t hash_prng64(const uint8_t *restrict src, const size_t size, const uint64_t init, const uint64_t mult, const uint64_t add) {
+    uint64_t h = init;
+    for (size_t p=0;p < size;p++) h = h * mult + add + src[p];
+    return h;
 }
 
 EXPORT uint32_t hash_pivotal(const uint8_t *restrict src, const size_t size) {
@@ -778,7 +873,6 @@ EXPORT uint32_t hash_ap(const uint8_t *restrict src, const size_t size) {
     }
     return h;
 }
-#define MURMUR2_32_M 0x5bd1e995
 EXPORT uint32_t hash_murmur2_le(const uint8_t *restrict src, const size_t size, const uint32_t seed) {
     uint32_t h = seed ^ (uint32_t)size;
     uint8_t rem = size & 3;
@@ -897,7 +991,6 @@ EXPORT uint32_t hash_murmur2A_be(const uint8_t *restrict src, const size_t size,
 
     return h;
 }
-#define MURMUR2_64_M 0xc6a4a7935bd1e995
 EXPORT uint64_t hash_murmur2_64A_le(const uint8_t *restrict src, const size_t size, const uint64_t seed) {
     uint64_t h = seed ^ ((uint64_t)size * MURMUR2_64_M);
     uint8_t rem = size & 7;
@@ -1050,7 +1143,7 @@ EXPORT uint32_t hash_empire_magic(const uint8_t *restrict src, const size_t size
 }
 EXPORT uint32_t hash_westwood(const uint32_t *restrict src, const size_t size) {
     uint32_t h = 0;
-    for (size_t p=0;p < size;p++) h = ROT32L(h) + src[p];
+    for (size_t p=0;p < size;p++) h = ROT32L(h, 1) + src[p];
     return h;
 }
 EXPORT uint64_t hash_fnv1_64(const uint8_t *restrict src, const size_t size, const uint64_t seed, const uint64_t prime) {
@@ -1071,16 +1164,6 @@ EXPORT uint32_t hash_fnv1_32(const uint8_t *restrict src, const size_t size, con
 EXPORT uint32_t hash_fnv1a_32(const uint8_t *restrict src, const size_t size, const uint32_t seed, const uint32_t prime) {
     uint32_t h = seed;
     for (size_t p=0;p < size;p++) h = (h ^ src[p]) * prime;
-    return h;
-}
-EXPORT uint32_t hash_bkdr(const uint8_t *restrict src, const size_t size, const uint32_t init, const uint32_t seed) {
-    uint32_t h = init;
-    for (size_t p=0;p < size;p++) h = h * seed + src[p];
-    return h;
-}
-EXPORT uint64_t hash_bkdr64(const uint8_t *restrict src, const size_t size, const uint64_t init, const uint64_t seed) {
-    uint64_t h = init;
-    for (size_t p=0;p < size;p++) h = h * seed + src[p];
     return h;
 }
 EXPORT uint32_t hash_sdbm(const uint8_t *restrict src, const size_t size, const uint32_t init, const uint32_t seed) {
@@ -1121,6 +1204,896 @@ EXPORT uint32_t hash_luas(const uint8_t *restrict src, const size_t size) {
     uint32_t h = size;
     for (size_t p=size;p >= stp;p-=stp) h ^= h * 0x20 + (h >> 2) + src[p - 1];
     return h;
+}
+EXPORT uint16_t hash_bsdsum(const uint8_t *restrict src, const size_t size, const uint16_t init) {
+    uint16_t h = init;
+    for (size_t p=0;p < size;p++) h = ROT16R(h, 1) + src[p];
+    return h;
+}
+EXPORT uint16_t hash_sysvsum(const uint8_t *restrict src, const size_t size) {
+    uint32_t s = SUMB(src, size);
+    uint32_t r = (s & 0xFFFF) + (s >> 16);
+    return (r & 0xFFFF) + (r >> 16);
+}
+
+static inline uint32_t dha256_sigma0(uint32_t x) { return ROT32L(x, 7 ) ^ ROT32L(x, 22) ^ x; }
+static inline uint32_t dha256_sigma1(uint32_t x) { return ROT32L(x, 13) ^ ROT32L(x, 27) ^ x; }
+static inline void dha256_block(hash256_t *restrict H, const uint32_t buf[16]) {
+    PHASH256_ABC(H);
+    uint32_t W[0x40];
+    for (int i=0;i < 0x10;i++) W[i] = SWAPBE32(buf[i]);
+    for (int i=0x10;i < 0x40;i++)
+        W[i] = dha256_sigma1(W[i-15]) + W[i-9] + dha256_sigma0(W[i-1]) + W[i-16];
+    for (int i=0;i < 0x40;i++) {
+        uint32_t t1 = (ROT32L(h, 19) ^ ROT32L(h, 29) ^ h) +
+                        (f & g ^ g & h ^ f & h) + e + SHA256_K[i] + W[i];
+        uint32_t t2 = (ROT32L(d, 11) ^ ROT32L(d, 25) ^ d) +
+                        (~b & d ^ b & c) + a + SHA256_K[i] + W[i];
+        a = b;
+        b = ROT32L(c, 17);
+        c = d;
+        d = t1;
+        e = f;
+        f = ROT32L(g, 2);
+        g = h;
+        h = t2;
+    }
+
+    H->d[0] += a;
+    H->d[1] += b;
+    H->d[2] += c;
+    H->d[3] += d;
+    H->d[4] += e;
+    H->d[5] += f;
+    H->d[6] += g;
+    H->d[7] += h;
+}
+EXPORT hash256_t hash_dha256(const uint8_t *restrict src, const size_t size) {
+    hash256_t H;
+    memcpy(H.d, SHA256_H0, sizeof(H.d));
+    uint32_t tbuf[0x10];
+
+    size_t p = 0;
+    for (;p + 0x40 <= size;p+=0x40) {
+        memcpy(tbuf, src + p, 0x40);
+        dha256_block(&H, tbuf);
+    }
+    uint8_t buf[0x40] = {0};
+    uint8_t c = size - p;
+    memcpy(buf, src + p, c);
+    md_pad64(buf, c, &H, SWAPBE64(size * 8), dha256_block);
+    swapbe32_arr(H.d, 8);
+    return H;
+}
+
+#define K SHA256_K
+static inline uint32_t fork256_F(uint32_t x) { return x + (ROT32L(x, 7 ) ^ ROT32L(x, 22)); }
+static inline uint32_t fork256_G(uint32_t x) { return x ^ (ROT32L(x, 13) + ROT32L(x, 27)); }
+static inline void fork256_step(uint32_t *restrict W, const uint32_t v1, const uint32_t v2, const uint32_t v3, const uint32_t v4) {
+    uint32_t t1 = fork256_G(W[4] + v2);
+    uint32_t t2 = fork256_F(W[4] + v2 + v4);
+    uint32_t t3 = fork256_F(W[0] + v1);
+    uint32_t t4 = fork256_G(W[0] + v1 + v3);
+
+    uint32_t t = (W[7] + ROT32L(t1, 21)) ^ ROT32L(t2, 17);
+          W[7] = (W[6] + ROT32L(t1, 9 )) ^ ROT32L(t2, 5 );
+          W[6] = (W[5] + t1) ^ t2;
+          W[5] =  W[4] + v2 + v4;
+          W[4] = (W[3] + ROT32L(t3, 17)) ^ ROT32L(t4, 21);
+          W[3] = (W[2] + ROT32L(t3, 5 )) ^ ROT32L(t4, 9 );
+          W[2] = (W[1] + t3) ^ t4;
+          W[1] =  W[0] + v1 + v3;
+          W[0] = t;
+}
+static inline void fork256_block(hash256_t *restrict H, const uint32_t buf[16]) {
+    uint32_t D[0x10];
+    for (int i=0;i < 0x10;i++) D[i] = SWAPBE32(buf[i]);
+    uint32_t t1[0x10];uint32_t t2[0x10];uint32_t t3[0x10];uint32_t t4[0x10];
+    memcpy(t1, H->d, sizeof(t1));memcpy(t2, H->d, sizeof(t2));
+    memcpy(t3, H->d, sizeof(t3));memcpy(t4, H->d, sizeof(t4));
+
+    fork256_step(t1, D[0 ], D[1 ], K[0 ], K[1 ]);
+    fork256_step(t1, D[2 ], D[3 ], K[2 ], K[3 ]);
+    fork256_step(t1, D[4 ], D[5 ], K[4 ], K[5 ]);
+    fork256_step(t1, D[6 ], D[7 ], K[6 ], K[7 ]);
+    fork256_step(t1, D[8 ], D[9 ], K[8 ], K[9 ]);
+    fork256_step(t1, D[10], D[11], K[10], K[11]);
+    fork256_step(t1, D[12], D[13], K[12], K[13]);
+    fork256_step(t1, D[14], D[15], K[14], K[15]);
+
+    fork256_step(t2, D[14], D[15], K[15], K[14]);
+    fork256_step(t2, D[11], D[9 ], K[13], K[12]);
+    fork256_step(t2, D[8 ], D[10], K[11], K[10]);
+    fork256_step(t2, D[3 ], D[4 ], K[9 ], K[8 ]);
+    fork256_step(t2, D[2 ], D[13], K[7 ], K[6 ]);
+    fork256_step(t2, D[0 ], D[5 ], K[5 ], K[4 ]);
+    fork256_step(t2, D[6 ], D[7 ], K[3 ], K[2 ]);
+    fork256_step(t2, D[12], D[1 ], K[1 ], K[0 ]);
+
+    fork256_step(t3, D[7 ], D[6 ], K[1 ], K[0 ]);
+    fork256_step(t3, D[10], D[14], K[3 ], K[2 ]);
+    fork256_step(t3, D[13], D[2 ], K[5 ], K[4 ]);
+    fork256_step(t3, D[9 ], D[12], K[7 ], K[6 ]);
+    fork256_step(t3, D[11], D[4 ], K[9 ], K[8 ]);
+    fork256_step(t3, D[15], D[8 ], K[11], K[10]);
+    fork256_step(t3, D[5 ], D[0 ], K[13], K[12]);
+    fork256_step(t3, D[1 ], D[3 ], K[15], K[14]);
+
+    fork256_step(t4, D[5 ], D[12], K[14], K[15]);
+    fork256_step(t4, D[1 ], D[8 ], K[12], K[13]);
+    fork256_step(t4, D[15], D[0 ], K[10], K[11]);
+    fork256_step(t4, D[13], D[11], K[8 ], K[9 ]);
+    fork256_step(t4, D[3 ], D[10], K[6 ], K[7 ]);
+    fork256_step(t4, D[9 ], D[2 ], K[4 ], K[5 ]);
+    fork256_step(t4, D[7 ], D[14], K[2 ], K[3 ]);
+    fork256_step(t4, D[4 ], D[6 ], K[0 ], K[1 ]);
+
+    for (int i=0;i < 8;i++)
+        H->d[i] += (t1[i] + t2[i]) ^ (t3[i] + t4[i]);
+}
+EXPORT hash256_t hash_fork256(const uint8_t *restrict src, const size_t size) {
+    hash256_t H;
+    memcpy(H.d, SHA256_H0, sizeof(H.d));
+    uint32_t tbuf[0x10];
+
+    size_t p = 0;
+    for (;p + 0x40 <= size;p+=0x40) {
+        memcpy(tbuf, src + p, 0x40);
+        fork256_block(&H, tbuf);
+    }
+    uint8_t buf[0x40] = {0};
+    uint8_t c = size - p;
+    memcpy(buf, src + p, c);
+    md_pad64(buf, c, &H, SWAPBE64(size * 8), fork256_block);
+    swapbe32_arr(H.d, 8);
+    return H;
+}
+#undef K
+
+static inline void echo_block(uint32_t *restrict V, const int8_t big, uint128_t *restrict C, const uint32_t *restrict buf) {
+    uint128_t K;
+    uint128_cpy(&K, C);
+    uint32_t W[0x40];
+    const int Vsize = big ? 0x20 : 0x10;
+    memcpy(W, V, sizeof(uint32_t) * Vsize);
+    for (int i=0;i < 0x40 - Vsize;i++) W[i + Vsize] = SWAPLE32(buf[i]);
+
+    for (int i=0;i < (big ? 10 : 8);i++) {
+        for (int j=0;j < 0x40;j+=4) {
+            uint32_t y0 = AES0[(W[j + 0] >> 0 ) & 0xFF] ^ AES1[(W[j + 1] >> 8 ) & 0xFF]
+                        ^ AES2[(W[j + 2] >> 16) & 0xFF] ^ AES3[(W[j + 3] >> 24) & 0xFF] ^ uint128_32(&K,0);
+            uint32_t y1 = AES0[(W[j + 1] >> 0 ) & 0xFF] ^ AES1[(W[j + 2] >> 8 ) & 0xFF]
+                        ^ AES2[(W[j + 3] >> 16) & 0xFF] ^ AES3[(W[j + 0] >> 24) & 0xFF] ^ uint128_32(&K,1);
+            uint32_t y2 = AES0[(W[j + 2] >> 0 ) & 0xFF] ^ AES1[(W[j + 3] >> 8 ) & 0xFF]
+                        ^ AES2[(W[j + 0] >> 16) & 0xFF] ^ AES3[(W[j + 1] >> 24) & 0xFF] ^ uint128_32(&K,2);
+            uint32_t y3 = AES0[(W[j + 3] >> 0 ) & 0xFF] ^ AES1[(W[j + 0] >> 8 ) & 0xFF]
+                        ^ AES2[(W[j + 1] >> 16) & 0xFF] ^ AES3[(W[j + 2] >> 24) & 0xFF] ^ uint128_32(&K,3);
+            W[j + 0] = AES0[(y0 >> 0 ) & 0xFF] ^ AES1[(y1 >> 8 ) & 0xFF]
+                     ^ AES2[(y2 >> 16) & 0xFF] ^ AES3[(y3 >> 24) & 0xFF];
+            W[j + 1] = AES0[(y1 >> 0 ) & 0xFF] ^ AES1[(y2 >> 8 ) & 0xFF]
+                     ^ AES2[(y3 >> 16) & 0xFF] ^ AES3[(y0 >> 24) & 0xFF];
+            W[j + 2] = AES0[(y2 >> 0 ) & 0xFF] ^ AES1[(y3 >> 8 ) & 0xFF]
+                     ^ AES2[(y0 >> 16) & 0xFF] ^ AES3[(y1 >> 24) & 0xFF];
+            W[j + 3] = AES0[(y3 >> 0 ) & 0xFF] ^ AES1[(y0 >> 8 ) & 0xFF]
+                     ^ AES2[(y1 >> 16) & 0xFF] ^ AES3[(y2 >> 24) & 0xFF];
+            uint128_add(&K, 1);
+        }
+        shiftlx_arr32(W, 4, 0x10, 4);
+        shiftlx_arr32(W, 5, 0x10, 4);
+        shiftlx_arr32(W, 6, 0x10, 4);
+        shiftlx_arr32(W, 7, 0x10, 4);
+        swap_arr32(W, 0x08, 0x28);swap_arr32(W, 0x18, 0x38);
+        swap_arr32(W, 0x09, 0x29);swap_arr32(W, 0x19, 0x39);
+        swap_arr32(W, 0x0A, 0x2A);swap_arr32(W, 0x1A, 0x3A);
+        swap_arr32(W, 0x0B, 0x2B);swap_arr32(W, 0x1B, 0x3B);
+        shiftrx_arr32(W, 0xC, 0x10, 4);
+        shiftrx_arr32(W, 0xD, 0x10, 4);
+        shiftrx_arr32(W, 0xE, 0x10, 4);
+        shiftrx_arr32(W, 0xF, 0x10, 4);
+        aes_mix(W, 0,  1,  2,  3);
+        aes_mix(W, 4,  5,  6,  7);
+        aes_mix(W, 8,  9,  10, 11);
+        aes_mix(W, 12, 13, 14, 15);
+    }
+
+    if (big) {
+        for (int i=0;i < 0x20;i++)
+            V[i] ^= SWAPLE32(buf[i]) ^ W[i] ^ W[i + 0x20];
+    } else {
+        for (int i=0;i < 0x10;i++) {
+            V[i] ^= SWAPLE32(buf[i + 0x00]) ^ SWAPLE32(buf[i + 0x10]) ^ SWAPLE32(buf[i + 0x20])
+                ^ W[i] ^ W[i + 0x10] ^ W[i + 0x20] ^ W[i + 0x30];
+        }
+    }
+}
+EXPORT hash512_t hash_echo(const uint8_t *restrict src, const size_t size, const uint16_t bits) {
+    const int8_t big = (bits > 0x100) ? 1 : 0;
+    const uint8_t block_size = big ? 0x80 : 0xC0;
+
+    uint32_t tbuf[0x30];
+    uint32_t V[0x20] = {0};
+    for (int i=0;i < (big ? 8 : 4);i++) V[i*4] = bits;
+    uint128_t C = uint128(0, 0);
+
+    size_t p = 0;
+    for (;p + block_size <= size;p+=block_size) {
+        uint128_add(&C, block_size * 8);
+        memcpy(tbuf, src + p, block_size);
+        echo_block(V, big, &C, tbuf);
+    }
+
+    uint16_t c = size - p;
+    uint128_add(&C, c * 8);
+    uint8_t buf[0xC0] = {0};
+    memcpy(buf, src + p, c);
+    buf[c++] = 0x80;
+    if (c > block_size - 0x12) {
+        memcpy(tbuf, buf, block_size);
+        echo_block(V, big, &C, tbuf);
+        c = 0;
+        for (int i=0;i < block_size - 0x12;i++) buf[i] = 0;
+    }
+    buf[block_size - 0x12] = bits & 0xFF;
+    buf[block_size - 0x11] = bits >> 8;
+    memcpy(tbuf, buf, block_size);
+    uint64_t tCv = SWAPLE64(C.l);
+    memcpy(tbuf + block_size / 4 - 4, &tCv, 8);
+    tCv = SWAPLE64(C.h);
+    memcpy(tbuf + block_size / 4 - 2, &tCv, 8);
+    if (c == 0 || c == 1) C = uint128(0, 0);
+    echo_block(V, big, &C, tbuf);
+
+    hash512_t h;
+    for (int i=0;i < bits / 32;i++) h.d[i] = SWAPLE32(V[i]);
+    return h;
+}
+
+static inline uint32_t sparkle_ELL(const uint32_t x) {
+    return ROT32R(x ^ (x << 16), 16);
+}
+static inline void sparkle_opt(uint32_t *restrict W, const uint16_t s, const uint8_t r) {
+    for (int i=0;i < r;i++) {
+        W[1] ^= SPARKLE_RCON[i & 7];
+        W[3] ^= i;
+
+        for (int j=0;j < s*2;j+=2) {
+            const uint32_t rc = SPARKLE_RCON[j / 2];
+            W[j] += ROT32R(W[j + 1], 31);
+            W[j + 1] ^= ROT32R(W[j], 24);
+            W[j] ^= rc;
+
+            W[j] += ROT32R(W[j + 1], 17);
+            W[j + 1] ^= ROT32R(W[j], 17);
+            W[j] ^= rc;
+
+            W[j] += W[j + 1];
+            W[j + 1] ^= ROT32R(W[j], 31);
+            W[j] ^= rc;
+
+            W[j] += ROT32R(W[j + 1], 24);
+            W[j + 1] ^= ROT32R(W[j], 16);
+            W[j] ^= rc;
+        }
+
+        uint32_t t0 = W[0];uint32_t t1 = W[1];
+        uint32_t x0 = t0;uint32_t y0 = t1;
+        for (int j=2;j < s;j+=2) {
+            t0 ^= W[j];
+            t1 ^= W[j + 1];
+        }
+        t0 = sparkle_ELL(t0);
+        t1 = sparkle_ELL(t1);
+        for (int j=2;j < s;j+=2) {
+            W[j - 2] = W[j + s] ^ W[j] ^ t1;
+            W[j + s] = W[j];
+            W[j - 1] = W[j + s + 1] ^ W[j + 1] ^ t0;
+            W[j + s + 1] = W[j + 1];
+        }
+        W[s - 2] = W[s] ^ x0 ^ t1;
+        W[s] = x0;
+        W[s - 1] = W[s + 1] ^ y0 ^ t0;
+        W[s + 1] = y0;
+    }
+}
+EXPORT hash512_t hash_esch(const uint8_t *restrict src, const size_t size,
+                           const uint16_t digtl, const uint16_t statl, const uint16_t ratel,
+                           const uint8_t bigc, const uint8_t slic) {
+    const uint16_t state_bs = statl / 64;
+    const uint16_t state_ws = statl / 32;
+    const uint16_t rate_ws = ratel / 32;
+    const uint16_t rate_bs = ratel / 8;
+    const uint16_t dig_bs = digtl / 8;
+
+    uint32_t t0,t1;
+    size_t il = size;
+    size_t ip = 0;
+    uint32_t W[0x10] = {0};
+
+    while (il > rate_bs) {
+        t0 = 0;t1 = 0;
+        for (int i=0;i < rate_ws;i+=2) {
+            t0 ^= read32le(src + ip + i * 4);
+            t1 ^= read32le(src + ip + i * 4 + 4);
+        }
+        t0 = sparkle_ELL(t0);
+        t1 = sparkle_ELL(t1);
+        for (int i=0;i < rate_ws;i+=2) {
+            W[i] ^= read32le(src + ip + i * 4) ^ t1;
+            W[i + 1] ^= read32le(src + ip + i * 4 + 4) ^ t0;
+        }
+        for (int i=rate_ws;i < state_bs;i+=2) {
+            W[i] ^= t1;
+            W[i + 1] ^= t0;
+        }
+        sparkle_opt(W, state_bs, slic);
+        il -= rate_bs;ip += rate_bs;
+    }
+    W[state_bs - 1] ^= (il < rate_bs) ? 0x1000000 : 0x2000000;
+    uint32_t buf[8] = {0};
+    memcpy(buf, src + ip, il);
+    if (il < rate_bs) buf[il >> 2] |= 0x80U << ((il & 3) * 8);
+    t0 = 0;t1 = 0;
+    for (int i=0;i < rate_ws;i+=2) {
+        t0 ^= buf[i];
+        t1 ^= buf[i + 1];
+    }
+    t0 = sparkle_ELL(t0);
+    t1 = sparkle_ELL(t1);
+    for (int i=0;i < rate_ws;i+=2) {
+        W[i] ^= buf[i] ^ t1;
+        W[i + 1] ^= buf[i + 1] ^ t0;
+    }
+    for (int i=rate_ws;i < state_bs;i+=2) {
+        W[i] ^= t1;
+        W[i + 1] ^= t0;
+    }
+    sparkle_opt(W, state_bs, bigc);
+
+    hash512_t ret;
+    memcpy(ret.d, W, state_ws * 4);
+    uint16_t op = rate_bs;
+    while (op < dig_bs) {
+        sparkle_opt(W, state_bs, slic);
+        uint32_t l = (dig_bs - op) / 4;
+        if (l > rate_ws) l = rate_ws;
+        memcpy(ret.d + op / 4, W, l * 4);
+        op += rate_bs;
+    }
+    return ret;
+}
+
+static inline void fugue_smix(uint32_t *restrict S , const uint32_t i0, const uint32_t i1, const uint32_t i2, const uint32_t i3) {
+    #define M0 FUGUE_MIX0
+    #define M1 FUGUE_MIX1
+    #define M2 FUGUE_MIX2
+    #define M3 FUGUE_MIX3
+    uint32_t c0,c1,c2,c3,r0,r1,r2,r3,t,xt;
+
+    xt = S[i0];
+    c0  = M0[(xt >> 24) & 0xFF];
+    t   = M1[(xt >> 16) & 0xFF];
+    c0 ^= t;r1 = t;
+    t   = M2[(xt >>  8) & 0xFF];
+    c0 ^= t;r2 = t;
+    t   = M3[(xt >>  0) & 0xFF];
+    c0 ^= t;r3 = t;
+
+    xt = S[i1];
+    t   = M0[(xt >> 24) & 0xFF];
+    c1  = t;r0 = t;
+    c1 ^= M1[(xt >> 16) & 0xFF];
+    t   = M2[(xt >>  8) & 0xFF];
+    c1 ^= t;r2 ^= t;
+    t   = M3[(xt >>  0) & 0xFF];
+    c1 ^= t;r3 ^= t;
+
+    xt = S[i2];
+    t   = M0[(xt >> 24) & 0xFF];
+    c2  = t;r0 ^= t;
+    t   = M1[(xt >> 16) & 0xFF];
+    c2 ^= t;r1 ^= t;
+    c2 ^= M2[(xt >>  8) & 0xFF];
+    t   = M3[(xt >>  0) & 0xFF];
+    c2 ^= t;r3 ^= t;
+
+    xt = S[i3];
+    t   = M0[(xt >> 24) & 0xFF];
+    c3  = t;r0 ^= t;
+    t   = M1[(xt >> 16) & 0xFF];
+    c3 ^= t;r1 ^= t;
+    t   = M2[(xt >>  8) & 0xFF];
+    c3 ^= t;r2 ^= t;
+    c3 ^= M3[(xt >>  0) & 0xFF];
+
+    S[i0] = ((c0 ^ (r0 <<  0)) & 0xFF000000)
+          | ((c1 ^ (r1 <<  0)) & 0x00FF0000)
+          | ((c2 ^ (r2 <<  0)) & 0x0000FF00)
+          | ((c3 ^ (r3 <<  0)) & 0x000000FF);
+    S[i1] = ((c1 ^ (r0 <<  8)) & 0xFF000000)
+          | ((c2 ^ (r1 <<  8)) & 0x00FF0000)
+          | ((c3 ^ (r2 <<  8)) & 0x0000FF00)
+          | ((c0 ^ (r3 >> 24)) & 0x000000FF);
+    S[i2] = ((c2 ^ (r0 << 16)) & 0xFF000000)
+          | ((c3 ^ (r1 << 16)) & 0x00FF0000)
+          | ((c0 ^ (r2 >> 16)) & 0x0000FF00)
+          | ((c1 ^ (r3 >> 16)) & 0x000000FF);
+    S[i3] = ((c3 ^ (r0 << 24)) & 0xFF000000)
+          | ((c0 ^ (r1 >>  8)) & 0x00FF0000)
+          | ((c1 ^ (r2 >>  8)) & 0x0000FF00)
+          | ((c2 ^ (r3 >>  8)) & 0x000000FF);
+
+    #undef M0
+    #undef M1
+    #undef M2
+    #undef M3
+}
+static inline void fugue_cmix(uint32_t *restrict S, const uint32_t size) {
+    S[ 0] ^= S[4];
+    S[ 1] ^= S[5];
+    S[ 2] ^= S[6];
+    const uint32_t o = size / 2;
+    S[o+0] ^= S[4];
+    S[o+1] ^= S[5];
+    S[o+2] ^= S[6];
+}
+#define O(x) ((x) + 30 - o) % 30
+static inline void fugue2xx_block(uint32_t *restrict S ,uint32_t *restrict rshift, uint32_t d) {
+    const uint32_t o = *rshift * 6;
+    S[O(10)] ^= S[O(0 )];
+    S[O(0 )] = d;
+    S[O(8 )] ^= S[O(0 )];
+    S[O(1 )] ^= S[O(24)];
+    S[O(27)] ^= S[O(1 )];
+    S[O(28)] ^= S[O(2 )];
+    S[O(29)] ^= S[O(3 )];
+    S[O(12)] ^= S[O(1 )];
+    S[O(13)] ^= S[O(2 )];
+    S[O(14)] ^= S[O(3 )];
+    fugue_smix(S, O(27), O(28), O(29), O(0 ));
+    S[O(24)] ^= S[O(28)];
+    S[O(25)] ^= S[O(29)];
+    S[O(26)] ^= S[O(0 )];
+    S[O(9 )] ^= S[O(28)];
+    S[O(10)] ^= S[O(29)];
+    S[O(11)] ^= S[O(0 )];
+    fugue_smix(S, O(24), O(25), O(26), O(27));
+    *rshift = (*rshift + 1) % 5;
+}
+#undef O
+#define O(x) ((x) + 36 - o) % 36
+static inline void fugue384_block(uint32_t *restrict S ,uint32_t *restrict rshift, uint32_t d) {
+    const uint32_t o = *rshift * 9;
+    S[O(16)] ^= S[O(0 )];
+    S[O(0 )] = d;
+    S[O(8 )] ^= S[O(0 )];
+    S[O(1 )] ^= S[O(27)];
+    S[O(4 )] ^= S[O(30)];
+    S[O(33)] ^= S[O(1 )];
+    S[O(34)] ^= S[O(2 )];
+    S[O(35)] ^= S[O(3 )];
+    S[O(15)] ^= S[O(1 )];
+    S[O(16)] ^= S[O(2 )];
+    S[O(17)] ^= S[O(3 )];
+    fugue_smix(S, O(33), O(34), O(35), O(0 ));
+    S[O(30)] ^= S[O(34)];
+    S[O(31)] ^= S[O(35)];
+    S[O(32)] ^= S[O(0 )];
+    S[O(12)] ^= S[O(34)];
+    S[O(13)] ^= S[O(35)];
+    S[O(14)] ^= S[O(0 )];
+    fugue_smix(S, O(30), O(31), O(32), O(33));
+    S[O(27)] ^= S[O(31)];
+    S[O(28)] ^= S[O(32)];
+    S[O(29)] ^= S[O(33)];
+    S[O(9 )] ^= S[O(31)];
+    S[O(10)] ^= S[O(32)];
+    S[O(11)] ^= S[O(33)];
+    fugue_smix(S, O(27), O(28), O(29), O(30));
+    *rshift = (*rshift + 1) % 4;
+}
+static inline void fugue512_block(uint32_t *restrict S ,uint32_t *restrict rshift, uint32_t d) {
+    const uint32_t o = *rshift * 12;
+    S[O(22)] ^= S[O(0 )];
+    S[O(0 )] = d;
+    S[O(8 )] ^= S[O(0 )];
+    S[O(1 )] ^= S[O(24)];
+    S[O(4 )] ^= S[O(27)];
+    S[O(7 )] ^= S[O(30)];
+    S[O(33)] ^= S[O(1 )];
+    S[O(34)] ^= S[O(2 )];
+    S[O(35)] ^= S[O(3 )];
+    S[O(15)] ^= S[O(1 )];
+    S[O(16)] ^= S[O(2 )];
+    S[O(17)] ^= S[O(3 )];
+    fugue_smix(S, O(33), O(34), O(35), O(0 ));
+    S[O(30)] ^= S[O(34)];
+    S[O(31)] ^= S[O(35)];
+    S[O(32)] ^= S[O(0 )];
+    S[O(12)] ^= S[O(34)];
+    S[O(13)] ^= S[O(35)];
+    S[O(14)] ^= S[O(0 )];
+    fugue_smix(S, O(30), O(31), O(32), O(33));
+    S[O(27)] ^= S[O(31)];
+    S[O(28)] ^= S[O(32)];
+    S[O(29)] ^= S[O(33)];
+    S[O(9 )] ^= S[O(31)];
+    S[O(10)] ^= S[O(32)];
+    S[O(11)] ^= S[O(33)];
+    fugue_smix(S, O(27), O(28), O(29), O(30));
+    S[O(24)] ^= S[O(28)];
+    S[O(25)] ^= S[O(29)];
+    S[O(26)] ^= S[O(30)];
+    S[O(6 )] ^= S[O(28)];
+    S[O(7 )] ^= S[O(29)];
+    S[O(8 )] ^= S[O(30)];
+    fugue_smix(S, O(24), O(25), O(26), O(27));
+    *rshift = (*rshift + 1) % 3;
+}
+#undef O
+EXPORT hash512_t hash_fugue(const uint8_t *restrict src, const size_t size, const uint16_t bits) {
+    uint32_t S[0x24] = {0};
+    void (*fugue_block)(uint32_t *restrict S, uint32_t *restrict rshift, uint32_t d);
+    switch (bits) {
+    case 224:
+        fugue_block = fugue2xx_block;
+        memcpy(S + (30 - 7), FUGUE224_IV, 0x1C);
+        break;
+    case 256:
+        fugue_block = fugue2xx_block;
+        memcpy(S + (30 - 8), FUGUE256_IV, 0x20);
+        break;
+    case 384:
+        fugue_block = fugue384_block;
+        memcpy(S + (36 - 12), FUGUE384_IV, 0x30);
+        break;
+    case 512:
+        fugue_block = fugue512_block;
+        memcpy(S + (36 - 16), FUGUE512_IV, 0x40);
+        break;
+    }
+    uint32_t rshift = 0;
+
+    size_t ip = 0;
+    for (;ip + 4 <= size;ip+=4) fugue_block(S, &rshift, read32be(src + ip));
+    uint8_t l = size - ip;
+    if (l > 0) {
+        uint32_t d = 0;
+        for (int i=0;i < l;i++) d = (d << 8) + src[ip + i];
+        for (int i=l;i < 4;i++) d <<= 8;
+        fugue_block(S, &rshift, d);
+    }
+
+    uint64_t c = size * 8;
+    fugue_block(S, &rshift, c >> 32);
+    fugue_block(S, &rshift, c & 0xFFFFFFFF);
+
+    hash512_t h;
+    uint32_t St[0x24];
+    switch (bits) {
+    case 224:
+    case 256:
+        arr32_swap(S, St, 0x1E, 6 * rshift);
+        for (int i=0;i < 10;i++) {
+            arr32_swap(S, St, 0x1E, 3);
+            fugue_cmix(S, 0x1E);
+            fugue_smix(S, 0, 1, 2, 3);
+        }
+        for (int i=0;i < 13;i++) {
+            S[4] ^= S[0];S[15] ^= S[0];
+            arr32_swap(S, St, 0x1E, 15);
+            fugue_smix(S, 0, 1, 2, 3);
+            S[4] ^= S[0];S[16] ^= S[0];
+            arr32_swap(S, St, 0x1E, 14);
+            fugue_smix(S, 0, 1, 2, 3);
+        }
+        S[4] ^= S[0];S[15] ^= S[0];
+        h.d[0] = SWAPBE32(S[ 1]);
+        h.d[1] = SWAPBE32(S[ 2]);
+        h.d[2] = SWAPBE32(S[ 3]);
+        h.d[3] = SWAPBE32(S[ 4]);
+        h.d[4] = SWAPBE32(S[15]);
+        h.d[5] = SWAPBE32(S[16]);
+        h.d[6] = SWAPBE32(S[17]);
+        if (bits >= 256) h.d[7] = SWAPBE32(S[18]);
+        break;
+    case 384:
+        arr32_swap(S, St, 0x24, 9 * rshift);
+        for (int i=0;i < 18;i++) {
+            arr32_swap(S, St, 0x24, 3);
+            fugue_cmix(S, 0x24);
+            fugue_smix(S, 0, 1, 2, 3);
+        }
+        for (int i=0;i < 13;i++) {
+            S[ 4] ^= S[0];
+            S[12] ^= S[0];
+            S[24] ^= S[0];
+            arr32_swap(S, St, 0x24, 12);
+            fugue_smix(S, 0, 1, 2, 3);
+            S[ 4] ^= S[0];
+            S[13] ^= S[0];
+            S[24] ^= S[0];
+            arr32_swap(S, St, 0x24, 12);
+            fugue_smix(S, 0, 1, 2, 3);
+            S[ 4] ^= S[0];
+            S[13] ^= S[0];
+            S[25] ^= S[0];
+            arr32_swap(S, St, 0x24, 11);
+            fugue_smix(S, 0, 1, 2, 3);
+        }
+        S[ 4] ^= S[0];
+        S[12] ^= S[0];
+        S[24] ^= S[0];
+        h.d[ 0] = SWAPBE32(S[ 1]);
+        h.d[ 1] = SWAPBE32(S[ 2]);
+        h.d[ 2] = SWAPBE32(S[ 3]);
+        h.d[ 3] = SWAPBE32(S[ 4]);
+        h.d[ 4] = SWAPBE32(S[12]);
+        h.d[ 5] = SWAPBE32(S[13]);
+        h.d[ 6] = SWAPBE32(S[14]);
+        h.d[ 7] = SWAPBE32(S[15]);
+        h.d[ 8] = SWAPBE32(S[24]);
+        h.d[ 9] = SWAPBE32(S[25]);
+        h.d[10] = SWAPBE32(S[26]);
+        h.d[11] = SWAPBE32(S[27]);
+        break;
+    case 512:
+        arr32_swap(S, St, 0x24, 12 * rshift);
+        for (int i=0;i < 32;i++) {
+            arr32_swap(S, St, 0x24, 3);
+            fugue_cmix(S, 0x24);
+            fugue_smix(S, 0, 1, 2, 3);
+        }
+        for (int i=0;i < 13;i++) {
+            S[ 4] ^= S[0];S[ 9] ^= S[0];
+            S[18] ^= S[0];S[27] ^= S[0];
+            arr32_swap(S, St, 0x24, 9);
+            fugue_smix(S, 0, 1, 2, 3);
+            S[ 4] ^= S[0];S[10] ^= S[0];
+            S[18] ^= S[0];S[27] ^= S[0];
+            arr32_swap(S, St, 0x24, 9);
+            fugue_smix(S, 0, 1, 2, 3);
+            S[ 4] ^= S[0];S[10] ^= S[0];
+            S[19] ^= S[0];S[27] ^= S[0];
+            arr32_swap(S, St, 0x24, 9);
+            fugue_smix(S, 0, 1, 2, 3);
+            S[ 4] ^= S[0];S[10] ^= S[0];
+            S[19] ^= S[0];S[28] ^= S[0];
+            arr32_swap(S, St, 0x24, 8);
+            fugue_smix(S, 0, 1, 2, 3);
+        }
+        S[ 4] ^= S[0];S[ 9] ^= S[0];
+        S[18] ^= S[0];S[27] ^= S[0];
+        h.d[ 0] = SWAPBE32(S[ 1]);
+        h.d[ 1] = SWAPBE32(S[ 2]);
+        h.d[ 2] = SWAPBE32(S[ 3]);
+        h.d[ 3] = SWAPBE32(S[ 4]);
+        h.d[ 4] = SWAPBE32(S[ 9]);
+        h.d[ 5] = SWAPBE32(S[10]);
+        h.d[ 6] = SWAPBE32(S[11]);
+        h.d[ 7] = SWAPBE32(S[12]);
+        h.d[ 8] = SWAPBE32(S[18]);
+        h.d[ 9] = SWAPBE32(S[19]);
+        h.d[10] = SWAPBE32(S[20]);
+        h.d[11] = SWAPBE32(S[21]);
+        h.d[12] = SWAPBE32(S[27]);
+        h.d[13] = SWAPBE32(S[28]);
+        h.d[14] = SWAPBE32(S[29]);
+        h.d[15] = SWAPBE32(S[30]);
+        break;
+    }
+
+    return h;
+}
+
+static inline has160_block(hash160_t *restrict H, const uint32_t buf[16]) {
+    PHASH160_ABC(H);
+    uint32_t t;
+    uint32_t W[0x14];
+    for (int i=0;i < 0x10;i++) W[i] = SWAPLE32(buf[i]);
+
+    W[16] = W[0 ] ^ W[1 ] ^ W[2 ] ^ W[3 ];
+    W[17] = W[4 ] ^ W[5 ] ^ W[6 ] ^ W[7 ];
+    W[18] = W[8 ] ^ W[9 ] ^ W[10] ^ W[11];
+    W[19] = W[12] ^ W[13] ^ W[14] ^ W[15];
+    for (int i=0;i < 20;i++) {
+        t = ROT32L(a, HAS160_ROT[i]) + ((b & c) | (~b & d)) + e + W[HAS160_NDX[i]];
+        e = d;d = c;
+        c = ROT32L(b, 10);
+        b = a;a = t;
+    }
+
+    W[16] = W[3 ] ^ W[6 ] ^ W[9 ] ^ W[12];
+    W[17] = W[2 ] ^ W[5 ] ^ W[8 ] ^ W[15];
+    W[18] = W[1 ] ^ W[4 ] ^ W[11] ^ W[14];
+    W[19] = W[0 ] ^ W[7 ] ^ W[10] ^ W[13];
+    for (int i=0;i < 20;i++) {
+        t = ROT32L(a, HAS160_ROT[i]) + (b ^ c ^ d) + e + W[HAS160_NDX[i + 20]] + SHA1_K[0];
+        e = d;d = c;
+        c = ROT32L(b, 17);
+        b = a;a = t;
+    }
+
+    W[16] = W[5 ] ^ W[7 ] ^ W[12] ^ W[14];
+    W[17] = W[0 ] ^ W[2 ] ^ W[9 ] ^ W[11];
+    W[18] = W[4 ] ^ W[6 ] ^ W[13] ^ W[15];
+    W[19] = W[1 ] ^ W[3 ] ^ W[8 ] ^ W[10];
+    for (int i=0;i < 20;i++) {
+        t = ROT32L(a, HAS160_ROT[i]) + (c ^ (b | ~d)) + e + W[HAS160_NDX[i + 40]] + SHA1_K[1];
+        e = d;d = c;
+        c = ROT32L(b, 25);
+        b = a;a = t;
+    }
+
+    W[16] = W[2 ] ^ W[7 ] ^ W[8 ] ^ W[13];
+    W[17] = W[3 ] ^ W[4 ] ^ W[9 ] ^ W[14];
+    W[18] = W[0 ] ^ W[5 ] ^ W[10] ^ W[15];
+    W[19] = W[1 ] ^ W[6 ] ^ W[11] ^ W[12];
+    for (int i=0;i < 20;i++) {
+        t = ROT32L(a, HAS160_ROT[i]) + (b ^ c ^ d) + e + W[HAS160_NDX[i + 60]] + SHA1_K[2];
+        e = d;d = c;
+        c = ROT32L(b, 30);
+        b = a;a = t;
+    }
+
+    H->d[0] += a;
+    H->d[1] += b;
+    H->d[2] += c;
+    H->d[3] += d;
+    H->d[4] += e;
+}
+EXPORT hash160_t hash_has160(const uint8_t *restrict src, const size_t size) {
+    hash160_t H;
+    memcpy(H.d, SHA1_H0, 0x14);
+    uint32_t tbuf[0x10];
+
+    size_t p = 0;
+    for (;p + 0x40 <= size;p+=0x40) {
+        memcpy(tbuf, src + p, 0x40);
+        has160_block(&H, tbuf);
+    }
+
+    uint32_t c = size - p;
+    uint8_t buf[0x40] = {0};
+    memcpy(buf, src + p, c);
+    md_pad64(buf, c, &H, SWAPLE64(size * 8), has160_block);
+    swaple32_arr(H.d, 5);
+    return H;
+}
+
+static inline uint32_t haval_ff(uint32_t a[8], const uint32_t w, const uint32_t c, const uint32_t r, const uint32_t y) {
+    uint32_t x[7];
+    uint32_t of;
+    if (y < 3) of = y * 3 + r - 3;
+    else if (y == 3) of = 9 + r - 4;
+    else if (y == 4) of = 11 + r - 5;
+
+    arr32_map8(a + 1, x, 7, HAVAL_PHI + of*7);
+    #define X(i) x[6 - (i)]
+
+    uint32_t t;
+    switch (y) {
+    case 0: t = X(1) & (X(0) ^  X(4)) ^ X(2) &  X(5)  ^ X(3) & X(6)  ^ X(0);break;
+    case 1: t = X(2) & (X(1) & ~X(3)  ^ X(4) &  X(5)  ^ X(6) ^ X(0)) ^ X(4)  & (X(1) ^  X(5)) ^ X(3) & X(5) ^ X(0);break;
+    case 2: t = X(3) & (X(1) &  X(2)  ^ X(6) ^  X(0)) ^ X(1) & X(4)  ^ X(2)  &  X(5) ^  X(0);break;
+    case 3: t = X(4) & (X(5) & ~X(2)  ^ X(3) & ~X(6)  ^ X(1) ^ X(6)  ^ X(0)) ^  X(3) & (X(1)  & X(2) ^ X(5) ^ X(6)) ^ X(2) & X(6) ^ X(0);break;
+    case 4: t = X(0) & (X(1) &  X(2)  & X(3) ^ ~X(5)) ^ X(1) & X(4)  ^ X(2)  &  X(5) ^  X(3)  & X(6);break;
+    }
+    #undef X
+
+    return ROT32R(t, 7) + ROT32R(a[0],11) + w + c;
+}
+static inline void haval_block(hash256_t *restrict H, const uint32_t buf[32], const uint8_t rounds) {
+    uint32_t X[0x20];
+    for (int i=0;i < 0x20;i++) X[i] = SWAPLE32(buf[i]);
+    uint32_t t[8];
+    memcpy(t, H->d, 0x20);
+
+    if (rounds > 0) {
+        #define T(i) t[7 - ((i) % 8)]
+        for (int ix=0;ix < 32;ix++) {
+            uint32_t tarr[8] = {T(ix + 0), T(ix + 1), T(ix + 2), T(ix + 3),
+                                T(ix + 4), T(ix + 5), T(ix + 6), T(ix + 7)};
+            T(ix) = haval_ff(tarr, X[ix], 0, rounds, 0);
+        }
+        for (int ri=0;ri < rounds - 1;ri++) {
+            for (int ix=0;ix < 32;ix++) {
+                uint32_t tarr[8] = {T(ix + 0), T(ix + 1), T(ix + 2), T(ix + 3),
+                                    T(ix + 4), T(ix + 5), T(ix + 6), T(ix + 7)};
+                T(ix) = haval_ff(tarr, X[HAVAL_XI[ix + 0x20 * ri]], HAVAL_C[ix + 0x20 * ri], rounds, ri + 1);
+            }
+        }
+        #undef T
+    }
+
+    H->d[0] += t[0];
+    H->d[1] += t[1];
+    H->d[2] += t[2];
+    H->d[3] += t[3];
+    H->d[4] += t[4];
+    H->d[5] += t[5];
+    H->d[6] += t[6];
+    H->d[7] += t[7];
+}
+EXPORT hash256_t hash_haval(const uint8_t *restrict src, const size_t size,
+                            const uint16_t bits, const uint8_t rounds, const uint8_t version) {
+    hash256_t H;
+    memcpy(H.d, HAVAL_H0, 0x20);
+    uint32_t tbuf[0x20];
+    size_t p = 0;
+    for (;p + 0x80 <= size;p+=0x80) {
+        memcpy(tbuf, src + p, 0x80);
+        haval_block(&H, tbuf, rounds);
+    }
+
+    uint8_t buf[0x80] = {0};
+    uint8_t c = size - p;
+    memcpy(buf, src + p, c);
+    buf[c++] = 1;
+    if (c > 0x76) c = 0;
+    if (c == 0) {
+        memcpy(tbuf, buf, 0x80);
+        haval_block(&H, tbuf, rounds);
+    }
+    for (int i=c;i < 0x76;i++) buf[i] = 0;
+    c = 0x76;
+    buf[c++] = ((bits & 3) << 6) | ((rounds & 7) << 3) | (version & 7);
+    buf[c++] = bits >> 2;
+    memcpy(tbuf, buf, 0x80);
+    const uint64_t bil = SWAPLE64((uint64_t)size * 8);
+    memcpy(tbuf + 0x1E, &bil, 8);
+    haval_block(&H, tbuf, rounds);
+
+    uint32_t t;
+    switch (bits) {
+    case 128:
+        t = (H.d[7] & 0x000000FF) | (H.d[6] & 0xFF000000) | (H.d[5] & 0x00FF0000) | (H.d[4] & 0x0000FF00);
+        H.d[0] += ROT32R(t, 8);
+        t = (H.d[7] & 0x0000FF00) | (H.d[6] & 0x000000FF) | (H.d[5] & 0xFF000000) | (H.d[4] & 0x00FF0000);
+        H.d[1] += ROT32R(t, 16);
+        t = (H.d[7] & 0x00FF0000) | (H.d[6] & 0x0000FF00) | (H.d[5] & 0x000000FF) | (H.d[4] & 0xFF000000);
+        H.d[2] += ROT32R(t, 16);
+        t = (H.d[7] & 0xFF000000) | (H.d[6] & 0x00FF0000) | (H.d[5] & 0x0000FF00) | (H.d[4] & 0x000000FF);
+        H.d[3] += ROT32R(t, 8);
+        break;
+    case 160:
+        t = (H.d[7] & 0x0000003F) | (H.d[6] & 0xFE000000) | (H.d[5] & 0x01F80000);
+        H.d[0] += ROT32R(t, 19);
+        t = (H.d[7] & 0x00000FC0) | (H.d[6] & 0x0000003F) | (H.d[5] & 0xFE000000);
+        H.d[1] += ROT32R(t, 25);
+        t = (H.d[7] & 0x0007F000) | (H.d[6] & 0x00000FC0) | (H.d[5] & 0x0000003F);
+        H.d[2] += t;
+        t = (H.d[7] & 0x01F80000) | (H.d[6] & 0x0007F000) | (H.d[5] & 0x00000FC0);
+        H.d[3] += t >> 6;
+        t = (H.d[7] & 0xFE000000) | (H.d[6] & 0x01F80000) | (H.d[5] & 0x0007F000);
+        H.d[4] += t >> 12;
+        break;
+    case 192:
+        t = (H.d[7] & 0x0000001F) | (H.d[6] & 0xBC000000);
+        H.d[0] += ROT32R(t, 26);
+        t = (H.d[7] & 0x000003E0) | (H.d[6] & 0x0000001F);
+        H.d[1] += t;
+        t = (H.d[7] & 0x0000FC00) | (H.d[6] & 0x000003E0);
+        H.d[2] += t >> 5;
+        t = (H.d[7] & 0x001F0000) | (H.d[6] & 0x0000FC00);
+        H.d[3] += t >> 10;
+        t = (H.d[7] & 0x03E00000) | (H.d[6] & 0x001F0000);
+        H.d[4] += t >> 16;
+        t = (H.d[7] & 0xFC000000) | (H.d[6] & 0x03E00000);
+        H.d[5] += t >> 21;
+        break;
+    case 224:
+        H.d[0] += (H.d[7] >> 27) & 0x1F;
+        H.d[1] += (H.d[7] >> 22) & 0x1F;
+        H.d[2] += (H.d[7] >> 18) & 0x0F;
+        H.d[3] += (H.d[7] >> 13) & 0x1F;
+        H.d[4] += (H.d[7] >> 9 ) & 0x0F;
+        H.d[5] += (H.d[7] >> 4 ) & 0x1F;
+        H.d[6] += H.d[7] & 0x0F;
+        break;
+    }
+
+    for (int i=0;i < bits / 32;i++) H.d[i] = SWAPLE32(H.d[i]);
+    return H;
 }
 
 #ifdef __cplusplus

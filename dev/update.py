@@ -61,7 +61,7 @@ GFMTS = {
     'WebAssembly/wabt':lambda tag:f'wabt-{tag}-windows-x64.tar.gz',
     'WolvenKit/WolvenKit-nightly-releases':lambda tag:f'WolvenKit.Console-{tag}.zip',
     'widberg/bff':lambda tag:f'bff-windows-{tag}.zip',
-    'git-for-windows/git':lambda tag:f'MinGit-{tag[1:].split(".windows.")[0]}-64-bit.zip',
+    'git-for-windows/git':lambda tag:f'MinGit-{tag[1:].split(".windows.")[0]}{"" if "-" in tag else ("." + tag.split(".")[-1])}-64-bit.zip',
     'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_26.2.1_{tag}.zip',
     'ProjectorRays/ProjectorRays':lambda tag:f'projectrrays-{tag[1:]}.exe',
     'hellobertrand/zxc':lambda tag:f'zxc-{tag[1:]}-windows-x86_64.zip',
@@ -212,7 +212,11 @@ def supdate(c:Cache,k:str,inf:dict):
                 if m[2] != u: u = m[2]
                 else: ts = 0
         elif dom.endswith('.wiimm.de'):
-            s = c.get(f'https://{dom}/download.html')
+            for _ in range(7):
+                try: s = c.get(f'https://{dom}/download.html')
+                except (httpx.ConnectTimeout,httpx.ConnectError): pass
+                else: break
+            else: raise httpx.ConnectTimeout(f'https://{dom}/download.html')
             m = re.search(r'<a href="(/download/[^"]+-cygwin64\.zip)">[^<\n]*</a>[^,\n]+, (\d{4}-\d\d-\d\d)',s)
             ts = ft(m[2],'%Y-%m-%d')
             nu = f'https://{dom}{m[1]}'
@@ -239,10 +243,11 @@ def supdate(c:Cache,k:str,inf:dict):
                     for kx in list(f['x']): f['x'][bdir + '/' + kx.split('/',1)[0]] = f['x'][kx]
                 else: ts = 0
         elif dom == 'wimlib.net':
-            for _ in range(5):
+            for _ in range(7):
                 try: s = c.get('https://wimlib.net/')
                 except (httpx.ConnectTimeout,httpx.ConnectError): pass
                 else: break
+            else: raise httpx.ConnectTimeout('https://wimlib.net/')
             m = re.search(r'Current release: (wimlib\-\d+\.\d+\.\d+) \(released (\w+ \d{1,2}, \d{4})\)',s)
             ts = ft(m[2],'%B %d, %Y')
             if ts > ots:
@@ -287,12 +292,26 @@ def supdate(c:Cache,k:str,inf:dict):
 
     inf['fs'] = nfs
     if tts >= 0: inf['ts'] = tts
+def supdate_pip(c:Cache,k:str,inf:dict):
+    tts = inf.get('ts',0)
+
+    r = c.get('https://pypi.org/rss/project/' + inf['pip'].split('[')[0] + '/releases.xml')
+    try: ts = re.search(r'<pubDate>[A-Z][a-z]{2}, (\d\d [A-Z][a-z]{2} \d{4} \d\d:\d\d:\d\d) GMT</pubDate>',r)[1]
+    except:
+        print(k,inf)
+        raise
+    ts = ft(ts,'%d %b %Y %H:%M:%S')
+
+    if ts > tts:
+        print(k,'->',re.search(r'<item>\s*<title>(.+)</title>',r)[1])
+        inf['ts'] = ts
 def update():
     c = Cache()
 
     locale.setlocale(locale.LC_TIME,'en_US')
     with ThreadPool() as p:
         p.starmap(supdate,[(c,k,inf) for k,inf in DLDB.items() if 'fs' in inf])
+        p.starmap(supdate_pip,[(c,k,inf) for k,inf in DLDB.items() if 'pip' in inf and not '=' in inf['pip'] and not '://' in inf['pip']])
     locale.setlocale(locale.LC_TIME,'')
 
     out = json.dumps(DLDB,ensure_ascii=False,separators=(',',':'),indent=4).replace(

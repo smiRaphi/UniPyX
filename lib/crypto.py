@@ -12,14 +12,19 @@ def asrt(c:bool,*r,err:Exception=ValueError):
 def swap32(i:bytes):
     c = len(i) // 4
     return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
+def swap32i(i:int): return int.from_bytes(i.to_bytes(4,'big'),'little')
 def reflecti(v:int,w:int):
     r = 0
     for _ in range(w):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
-def rot8l(v:int): return ((v << 1) & 0xFF) | (v >> 7)
-def rot8r(v:int): return (v >> 1) | ((v & 1) << 7)
+def rotxl(v:int,w:int,r:int=1): return ((v << r) & ((1 << w) - 1)) | (v >> (w - r))
+def rotxr(v:int,w:int,r:int=1): return (v >> r) | ((v & ((1 << r) - 1)) << (w - r))
+def rot8l(v:int,r:int=1): return rotxl(v,8,r)
+def rot8r(v:int,r:int=1): return rotxr(v,8,r)
+def rot16l(v:int,r:int=1): return rotxl(v,16,r)
+def rot16r(v:int,r:int=1): return rotxr(v,16,r)
 
 UPXX = None
 def uxx():
@@ -49,7 +54,20 @@ BASEXXNS = {'base16':'b16',
             'nin32':'n32','nintendo32':'n32',}
 PYCRHSHM = {
     'KECCAK':'keccak',
-    'RIPEMD_160':'RIPEMD160',
+}
+PYCRCIPM = {
+    'aes':'AES',
+    'rc2':'ARC2','arc2':'ARC2',
+    'rc4':'ARC4','arc4':'ARC4',
+    'cast':'CAST','cast5':'CAST',
+    'des':'DES','des3':'DES3',
+    'blowfish':'Blowfish',
+    'chacha20':'ChaCha20','tls_chacha20':'ChaCha20','xchacha20':'ChaCha20',
+}
+CRYOCIPM = {
+    'camellia':'Camellia','blowfish':'Blowfish','aes':'AES',
+    'des3':'TripleDES','cast':'CAST5','cast5':'CAST5',
+    'seed':'SEED','idea':'IDEA','sm4':'SM4',
 }
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
@@ -84,9 +102,21 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_rolr(i,key or b'\0')
 
-        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm':
-            from Cryptodome.Cipher import AES
-            m = algo[4:-3 if algo.endswith(('_be','_le')) else None] or 'cbc'
+        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm'|'aes_ccm'|'aes_eax'|\
+             'aes_ocb3'|'aes_ocb'|'aes_siv'|'aes_cfb'|'aes_ofb'|'aes_openpgp'|'aes_kw'|'aes_kwp'|'rc2'|\
+             'rc2_ecb'|'rc2_cbc'|'rc2_cfb'|'rc2_ofb'|'rc2_ctr'|'rc2_openpgp'|'rc2_eax'|'arc2'|'arc2_ecb'|\
+             'arc2_cbc'|'arc2_cfb'|'arc2_ofb'|'arc2_ctr'|'arc2_openpgp'|'arc2_eax'|'cast'|'cast_ecb'|'cast_cbc'|\
+             'cast_cfb'|'cast_ofb'|'cast_ctr'|'cast_openpgp'|'cast_eax'|'cast5'|'cast5_ecb'|'cast5_cbc'|'cast5_cfb'|\
+             'cast5_ofb'|'cast5_ctr'|'cast5_openpgp'|'cast5_eax'|'des'|'des_ecb'|'des_cbc'|'des_cfb'|\
+             'des_ofb'|'des_ctr'|'des_openpgp'|'des_eax'|'des3'|'des3_ecb'|'des3_cbc'|'des3_cfb'|'des3_ofb'|\
+             'des3_ctr'|'des3_openpgp'|'des3_eax'|'blowfish'|'blowfish_ecb'|'blowfish_cbc'|'blowfish_cfb'|\
+             'blowfish_ofb'|'blowfish_ctr'|'blowfish_openpgp'|'blowfish_eax':
+            if not '_' in algo:
+                if algo == 'aes': algo += '_cbc'
+                else: algo += '_ecb'
+            n,m = algo.split('_',1)
+            if m.endswith(('_be','_le')): m = m[:-3]
+            if m == 'ocb3': m = 'ocb'
 
             kw = kwargs
             if m in {'ccm','eax','gcm','siv','ocb'}: kw['nonce'] = iv
@@ -100,10 +130,14 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
                 kw['counter'] = Counter.new(kwargs.pop('bits',len(key)*8),prefix=pref,suffix=suf,initial_value=iv,
                                             little_endian=algo.endswith('_le'),allow_wraparound=True)
-            obj = AES.new(key,mode=getattr(AES,f'MODE_{m.upper()}'),**kw)
-            if i is None: return obj
+            c = __import__('Cryptodome.Cipher.' + PYCRCIPM[n],fromlist=['*'])
+            c = c.new(key,mode=getattr(c,f'MODE_{m.upper()}'),**kw)
+            if m in {'kw','kwp'}:
+                c.decrypt = c.unseal
+                c.encrypt = c.seal
+            if i is None: return c
 
-            return obj.decrypt(i)
+            return c.decrypt(i)
         case 'aes_xts':
             from cryptography.hazmat.primitives.ciphers import Cipher,algorithms,modes
 
@@ -124,16 +158,13 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 od.append(c.decryptor().update(i[ix*secs:(ix+1)*secs]) + c.decryptor().finalize())
 
             return b''.join(od)
-        case 'blowfish'|'blowfish_ecb'|'blowfish_cbc':
-            from Cryptodome.Cipher import Blowfish
-            m = algo[9:] or 'ecb'
-
-            kw = kwargs
-            if m in {'cbc','cfb','ofb','openpgp'}: kw['iv'] = iv
-            elif m in {'eax','ctr'}: kw['nonce'] = iv
-
-            return Blowfish.new(key,getattr(Blowfish,f'MODE_{m.upper()}'),**kw).decrypt(i)
-        case 'blowfish_le'|'blowfish_le_ecb': return swap32(decrypt(swap32(i),'blowfish' + algo[12:],key,iv))
+        case 'aes_gcm_siv':
+            from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
+            c = AESGCMSIV(key)
+            if i is None: return c
+            return c.decrypt(iv,i,kwargs.get('aad'))
+        case 'blowfish_le'|'blowfish_le_ecb'|'blowfish_le_cbc'|'blowfish_le_cfb'|'blowfish_le_ofb'|'blowfish_le_ctr'|\
+             'blowfish_le_openpgp'|'blowfish_le_eax': return swap32(decrypt(swap32(i),'blowfish' + algo[12:],key,iv,**kwargs))
         case 'salsa20':
             import ctypes
             from Cryptodome.Cipher import Salsa20
@@ -264,6 +295,57 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return uxx().decrypt_tea(i[:-lo or None],key,le=algo == 'tea_pad_le') + (i[-lo:] if lo else b'')
         case 'transformit'|'tfit':
             return uxx().decrypt_tfit(i,key,kwargs['table'],iv,kwargs['block_size'])
+        case 'cobblestone'|'cobblestone128'|'cobblestone256':
+            from cryptography.cobblestone import Cobblestone128Decryptor,Cobblestone256Decryptor
+            if algo == 'cobblestone256': c = Cobblestone256Decryptor
+            else: c = Cobblestone128Decryptor
+            c = c(key,iv or b'')
+            return c.update(i) + c.finalize()
+        case 'fernet':
+            from cryptography.fernet import Fernet
+            if len(key) == 0x20: key = encrypt(key,'b64url')
+            c = Fernet(key)
+            r = c.decrypt(i)
+            if kwargs.get('time'): return r,c.extract_timestamp(i)
+            return r
+        case 'camellia'|'camellia_cbc'|'camellia_ecb'|'camellia_ctr'|'camellia_ofb'|'camellia_cfb1'|'camellia_cfb'|\
+             'camellia_gcm'|'aes_cfb1'|'sm4'|'sm4_cbc'|'sm4_ecb'|'sm4_ctr'|'sm4_ofb'|'sm4_cfb1'|'sm4_cfb'|'sm4_gcm'|\
+             'des3_cfb1'|'cast_cfb1'|'cast5_cfb1'|'blowfish_cfb1'|'seed'|'seed_cbc'|'seed_ecb'|'seed_ctr'|'seed_ofb'|\
+             'seed_cfb1'|'seed_cfb'|'seed_gcm'|'idea'|'idea_cbc'|'idea_ecb'|'idea_ctr'|'idea_ofb'|'idea_cfb1'|'idea_cfb'|\
+             'idea_gcm':
+                from cryptography.hazmat.primitives.ciphers import Cipher,algorithms,modes
+                from cryptography.hazmat.decrepit.ciphers import algorithms as dalgorithms,modes as dmodes
+
+                if not '_' in algo: algo += '_cbc'
+                n,m = algo.split('_',1)
+                if m == 'cfb': m = 'cfb8'
+                elif m == 'cfb1': m = 'cfb'
+
+                kw = kwargs
+                if m in {'ecb',}: mds = modes
+                elif m in {'cbc','gcm'}: kw['initialization_vector'],mds = iv,modes
+                elif m in {'ctr',}: kw['nonce'],mds = iv,modes
+                elif m in {'ofb','cfb','cfb8'}: kw['initialization_vector'],mds = iv,dmodes
+                if n in {'aes','sm4'}: ags = algorithms
+                elif n in {'camellia','des3','cast','cast5','seed','idea','blowfish'}: ags = dalgorithms
+
+                c = Cipher(getattr(ags,CRYOCIPM[n])(key),getattr(mds,m.upper())(**kw)).decryptor()
+                return c.update(i) + c.finalize()
+        case 'ascon_aead128':
+            import ascon
+            return ascon.ascon_decrypt(key,iv,kwargs.get('aad',b''),i,'Ascon-AEAD128')
+        case 'ascon_128'|'ascon_128a'|'ascon_80pq'|'ascon_128_be'|'ascon_128a_be'|'ascon_80pq_be'|'ascon_128_le'|'ascon_128a_le'|'ascon_80pq_le':
+            if algo.endswith('_le'): import ascon_old_le as ascon
+            else: import ascon_old as ascon
+            return ascon.ascon_decrypt(key,iv,kwargs.get('aad',b''),i,'Ascon-' + algo[6:])
+        case 'hpke_aes128_gcm'|'hpke_aes256_gcm'|'hpke_chacha20_poly1305':
+            from Cryptodome.Protocol import HPKE
+            c = HPKE.new(receiver_key=key,enc=iv,psk=kwargs.get('psk'),info=kwargs.get('info'),
+                         aead_id={'aes128_gcm':HPKE.AEAD.AES128_GCM,'aes256_gcm':HPKE.AEAD.AES256_GCM,'chacha20_poly1305':HPKE.AEAD.CHACHA20_POLY1305}[algo[5:]])
+            c.decrypt = c.unseal
+            c.encrypt = c.seal
+            if i is None: return c
+            return c.decrypt(i)
 
         case 'rsdk3':
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
@@ -343,8 +425,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)
         case 'base64url'|'b64url':
-            from urllib.parse import unquote_to_bytes
-            return decrypt(unquote_to_bytes(i),'base64',**kwargs)
+            import base64
+            r = base64.urlsafe_b64decode(i)
+            return r if kwargs.get('bytes',True) else r.decode('latin-1')
         case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|'zbase85'|\
              'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
             algo = BASEXXNS.get(algo,algo)
@@ -353,22 +436,21 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 if isinstance(i,str): i = i.encode('latin-1')
                 i += b'=' * (-len(i) % 4)
 
-            return getattr(base64,algo + 'decode')(i)
+            r = getattr(base64,algo + 'decode')(i)
+            return r if kwargs.get('bytes',True) else r.decode('latin-1')
         case 'base92'|'base58'|'gamespy64'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|\
              'b92'|'b58'|'g64'|'z32'|'c32'|'n32':
             algo = BASEXXNS.get(algo,algo)
             if isinstance(BASEXX_DEC[algo],str): BASEXX_DEC[algo] = BaseXX(BASEXX_DEC[algo])
             if isinstance(i,bytes): i = i.decode('latin-1')
             r = BASEXX_DEC[algo].decode(i)
-            if kwargs.get('bytes',True): return r
-            return r.decode('latin-1')
+            return r if kwargs.get('bytes',True) else r.decode('latin-1')
         case 'basexx'|'bxx':
             asrt(isinstance(key,str),err=TypeError)
             if key not in BASEXX_DEC: BASEXX_DEC[key] = BaseXX(key)
             if isinstance(i,bytes): i = i.decode('latin-1')
             r = BASEXX_DEC[key].decode(i)
-            if kwargs.get('bytes',True): return r
-            return r.decode('latin-1')
+            return r if kwargs.get('bytes',True) else r.decode('latin-1')
         case 'uu'|'uue'|'uuencode'|'uuencoded':
             if isinstance(i,str): i = i.encode('latin-1')
             import binascii
@@ -383,6 +465,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             if not kwargs.get('bytes',True): return unquote(i,errors='strict')
             return unquote_to_bytes(i)
+        case 'rfc1751':
+            from Cryptodome.Util import RFC1751
+            r = RFC1751.key_to_english(i)
+            return r.encode('latin-1') if kwargs.get('bytes',True) else r
 
     raise NotImplementedError(algo)
 def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
@@ -409,16 +495,6 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             o = decrypt(None,algo,key,iv,**kwargs)
             if i is None: return o
             return o.encrypt(i)
-        case 'pbkdf2'|'pbkdf2_sha1'|'pbkdf2_hmac_sha1'|'pbkdf2_sha256'|'pbkdf2_hmac_sha256':
-            asrt(isinstance(iv,int))
-            if algo == 'pbkdf2': algo = 'sha1'
-            elif algo.startswith('pbkdf2_hmac_'): algo = algo[12:]
-            else: algo = algo[7:]
-            algo = algo.upper()
-
-            from Cryptodome.Protocol.KDF import PBKDF2
-            h = __import__('Cryptodome.Hash.' + PYCRHSHM.get(algo,algo),fromlist=['*'])
-            return PBKDF2(i,key,kwargs['size'] if 'size' in kwargs else h.digest_size,iv,hmac_hash_module=h)
 
         case 'zrif'|'zrif_b64':
             asrt(len(key) == 0x400)
@@ -442,6 +518,10 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'hex':
             r = i.hex()
             return r if kwargs.get('bytes',False) else r.encode('ascii')
+        case 'base64url'|'b64url':
+            import base64
+            r = base64.urlsafe_b64encode(i)
+            return r if kwargs.get('bytes',True) else r.decode('latin-1')
         case 'base16'|'base32'|'base32hex'|'base64'|'base85'|'ascii85'|\
              'b16'|'b32'|'b32hex'|'b32h'|'b64'|'b85'|'a85'|'z85':
             algo = BASEXXNS.get(algo,algo)
@@ -468,6 +548,11 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             r = (quote_from_bytes if isinstance(i,bytes) else quote)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
             return r.encode('utf-8') if kwargs.get('bytes',False) else r
+        case 'rfc1751':
+            from Cryptodome.Util import RFC1751
+            if isinstance(i,(tuple,list)): i = ' '.join(x.decode('latin-1') if isinstance(x,(bytes,bytearray)) else x for x in i)
+            if isinstance(i,(bytes,bytearray)): i = i.decode('latin-1')
+            return RFC1751.english_to_key(i)
 
     raise NotImplementedError(algo)
 class BaseXX:
@@ -504,6 +589,7 @@ class BaseXX:
         n = 0
         for c in s: n = n * self.base + self.lookup[c]
         if n: r = n.to_bytes((n.bit_length() + 7) // 8,'big')
+        else: r = b""
         return (b'\0' * zc) + r
 
 CRC8  = {   # poly,init,xor ,reflect
@@ -600,8 +686,29 @@ CRC64 = {   # poly              , init             , xor              , reflect
     'redis': (0xAD93D23594C935A9,0x0000000000000000,0x0000000000000000,True ),
     'jones': (0xAD93D23594C935A9,0xFFFFFFFFFFFFFFFF,0x0000000000000000,True ),
     'ms':    (0x259C84CBA6426349,0xFFFFFFFFFFFFFFFF,0x0000000000000000,True ),
-    'go_iso':(0x000000000000001B,0x0000000000000000,0x0000000000000000,True ),
+    'trembl':(0x000000000000001B,0x0000000000000000,0x0000000000000000,True ),
+    'go_iso':(0x000000000000001B,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,True ),
     'nvme':  (0xAD93D23594C93659,0xFFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF,True ),
+}
+PRNG32 = {  # mult,      add,       init
+'bkdr32_ltr':(131,       0,         0         ),'bkdr':(131,0,0),'bkdr32':(131,0,0),'bkdr_ltr':(131,0,0),
+ 'aststrsum':(0x63C63CD9,0x9C39C33D,0         ),'ast_strsum':(0x63C63CD9,0x9C39C33D,0),
+    'java':  (31,        0,         0         ),
+    'slf':   (33,        0,         0         ),
+    'nlg':   (33,        0,         0xFFFFFFFF), # Next Level Games
+   'solaris':(0x01000193,0,         0x811c9dc5),
+}
+PRNG64 = {
+'bkdr64_ltr':(131,       0,         0),'bkdr64':(131,0,0),
+    'sxm':   (137,       0,         0), # Sunday vs. Magazine
+}
+FLETCH = { #   width,init,base
+    'adler8':   (8, 1,0xD),
+    'adler16':  (16,1,0xFB),
+    'adler32':  (32,1,0xFFF1),
+'adler32_rsync':(32,1,0x10000),
+    'adler64':  (64,1,0xFFFFFFFB),
+ 'fletcher16':  (16,0,0xFF),
 }
 def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
@@ -645,7 +752,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32[algo[5 + (1 if algo[5] == '_' else 0):]]
             fnc = uxx().hash_crc
         case 'crc64'|'crc64_xz'|'crc64_go_ecma'|'crc64_ecma'|'crc64_ecma_182'|'crc64_we'|'crc64_redis'|'crc64_jones'|'crc64_ms'|\
-             'crc64_go_iso'|'crc64_nvme':
+             'crc64_go_iso'|'crc64_nvme'|'crc64_trembl':
             if algo == 'crc64': algo = 'crc64_ecma'
             kwargs['size'] = 64
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC64[algo[6:]]
@@ -656,23 +763,41 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC40[algo[6:]]
             fnc = uxx().hash_crc
         case 'crc32_16': return crc_hash(i,'crc32',**kwargs) & 0xFFFF
-
+        case 'crc32_php': return swap32i(crc_hash(i,'crc32_bzip2',**kwargs))
+        case 'bkdr'|'bkdr_ltr'|'bkdr32'|'bkdr32_ltr'|'aststrsum'|'ast_strsum'|'java'|'slf'|'nlg'|'solaris':
+            kwargs['mult'],kwargs['add'],init = PRNG32[algo]
+            if not 'init' in kwargs: kwargs['init'] = init
+            fnc = uxx().hash_prng32
+        case 'bkdr64'|'bkdr64_ltr'|'sxm':
+            kwargs['mult'],kwargs['add'],init = PRNG64[algo]
+            if not 'init' in kwargs: kwargs['init'] = init
+            fnc = uxx().hash_prng64
         case 'adler32':
             import zlib
             if 'init' in kwargs: kwargs['value'] = kwargs.pop('init')
             fnc = zlib.adler32
+        case 'adler8'|'adler16'|'adler32'|'adler32_rsync'|'adler64'|'fletcher16':
+            kwargs['width'],kwargs['init'],kwargs['base'] = FLETCH[algo]
+            fnc = uxx().hash_fletcher
+
+        case 'fnv0_32':
+            if not 'init' in kwargs: kwargs['init'] = 0
+            fnc = uxx().hash_fnv1_32
+        case 'fnv0_64':
+            if not 'init' in kwargs: kwargs['init'] = 0
+            fnc = uxx().hash_fnv1_64
         case 'fnv1_32': fnc = uxx().hash_fnv1_32
         case 'fnv1a_32': fnc = uxx().hash_fnv1a_32
         case 'fnv1_64': fnc = uxx().hash_fnv1_64
         case 'fnv1a_64': fnc = uxx().hash_fnv1a_64
-        case 'bkdr'|'bkdr_ltr'|'bkdr32'|'bkdr32_ltr': fnc = uxx().hash_bkdr
         case 'bkdr_rtl'|'bkdr32_rtl':
             i = i[::-1]
-            fnc = uxx().hash_bkdr
-        case 'bkdr64'|'bkdr64_ltr': fnc = uxx().hash_bkdr64
+            kwargs['mult'],kwargs['add'] = 131,0
+            fnc = uxx().hash_prng32
         case 'bkdr64_rtl':
             i = i[::-1]
-            fnc = uxx().hash_bkdr64
+            kwargs['mult'],kwargs['add'] = 131,0
+            fnc = uxx().hash_prng64
         case 'sdbm'|'sdbm_ltr': fnc = uxx().hash_sdbm
         case 'sdbm_rtl':
             i = i[::-1]
@@ -692,28 +817,28 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'aphash': fnc = uxx().hash_ap
         case 'murmur2'|'mmh2'|'murmur2_32'|'mmh2_32'|'murmur2_le'|'mmh2_le'|'murmur2_32_le'|'mmh2_32_le':
             fnc = uxx().hash_murmur2_le
-            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+            if not 'init' in kwargs: kwargs['init'] = 0x9747b28c
         case 'murmur2_be'|'mmh2_be'|'murmur2_32_be'|'mmh2_32_be':
             fnc = uxx().hash_murmur2_be
-            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+            if not 'init' in kwargs: kwargs['init'] = 0x9747b28c
         case 'murmur2a'|'mmh2a'|'murmur2_32a'|'mmh2_32a'|'murmur2a_le'|'mmh2a_le'|'murmur2_32a_le'|'mmh2_32a_le':
             fnc = uxx().hash_murmur2A_le
-            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+            if not 'init' in kwargs: kwargs['init'] = 0x9747b28c
         case 'murmur2a_be'|'mmh2a_be'|'murmur2_32a_be'|'mmh2_32a_be':
             fnc = uxx().hash_murmur2A_be
-            if not 'seed' in kwargs: kwargs['seed'] = 0x9747b28c
+            if not 'init' in kwargs: kwargs['init'] = 0x9747b28c
         case 'murmur2_64'|'mmh2_64'|'murmur2_64a'|'mmh2_64a'|'murmur2_64_le'|'mmh2_64_le'|'murmur2_64a_le'|'mmh2_64a_le':
             fnc = uxx().hash_murmur2_64A_le
-            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+            if not 'init' in kwargs: kwargs['init'] = 0xe17a1465
         case 'murmur2_64_be'|'mmh2_64_be'|'murmur2_64a_be'|'mmh2_64a_be':
             fnc = uxx().hash_murmur2_64A_be
-            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+            if not 'init' in kwargs: kwargs['init'] = 0xe17a1465
         case 'murmur2_64b'|'mmh2_64b'|'murmur2_64b_le'|'mmh2_64b_le':
             fnc = uxx().hash_murmur2_64B_le
-            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+            if not 'init' in kwargs: kwargs['init'] = 0xe17a1465
         case 'murmur2_64b_be'|'mmh2_64b_be':
             fnc = uxx().hash_murmur2_64B_be
-            if not 'seed' in kwargs: kwargs['seed'] = 0xe17a1465
+            if not 'init' in kwargs: kwargs['init'] = 0xe17a1465
         case 'murmur3'|'mmh3'|'murmur3_32'|'mmh3_32'|'murmur3_128'|'mmh3_128':
             import mmh3
             return getattr(mmh3,f'mmh3_{"x64_128" if "128" in algo else "32"}_uintdigest')(i,kwargs.get('seed',0) & 0xFFFFFFFF)
@@ -728,6 +853,8 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 s = kwargs.pop('seed')
                 kwargs['seed1'] = s & 0xFFFFFFFFFFFFFFFF
                 kwargs['seed2'] = s >> 64
+        case 'bsdsum'|'bsd': fnc = uxx().hash_bsdsum
+        case 'sysvsum'|'sysv': fnc = uxx().hash_sysvsum
         case 'sum': return sum(i)
         case 'sum8'|'sum16'|'sum24'|'sum32'|'sum40'|'sum48'|'sum56'|'sum64':
             return sum(i) & ((1 << int(algo[3:])) - 1)
@@ -791,18 +918,159 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = h.new(i,**kwargs).digest()
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
+        case 'ed2k'|'emule'|'edonkey':
+            BS = 0x947000
+            from Cryptodome.Hash import MD4
+
+            c1 = MD4.new()
+            if BS > len(i):
+                c1.update(i)
+                return c1.digest()
+
+            c2 = MD4.new()
+            p = 0
+            while p < len(i):
+                c1.update(i[p:p+BS])
+                if p + BS <= len(i):
+                    c2.update(c1.digest())
+                    c1 = MD4.new()
+                p += BS
+            c2.update(c1.digest())
+            r = c2.digest()
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
         case 'keccak'|'keccak224'|'keccak256'|'keccak384'|'keccak512':
             from Cryptodome.Hash import keccak
-            h = keccak.new(digest_bits=kwargs['digest_bits'] if algo == 'keccak' else int(algo[6:]),**kwargs)
+            oby = kwargs.pop('bytes',False)
+            h = keccak.new(digest_bits=kwargs.pop('size')*8 if algo == 'keccak' else int(algo[6:]),**kwargs)
             if i is None: return h
             h.update(i)
             r = h.digest()
-            if kwargs.get('bytes'): return r
+            if oby: return r
             return int.from_bytes(r,'big')
+        case 'tuplehash'|'tuplehash128'|'tuplehash256':
+            from Cryptodome.Hash import TupleHash128,TupleHash256
+            oby = kwargs.pop('bytes',False)
+            h = {'tuplehash':TupleHash128,'tuplehash128':TupleHash128,
+                 'tuplehash256':TupleHash256}[algo].new(digest_bytes=kwargs.pop('size',0x40))
+            if i is None: return h
+            if isinstance(i,(bytes,bytearray)): h.update(i)
+            else: h.update(*i)
+            r = h.digest()
+            if oby: return r
+            return int.from_bytes(r,'big')
+        case 'cshake128'|'cshake_128'|'cshake256'|'cshake_256'|'kangaroo_twelve'|'k12'|'kangaroo12'|'turboshake128'|'turboshake_128'|\
+             'turboshake256'|'turboshake_256':
+            NMP = {'cshake128':'cSHAKE128','cshake256':'cSHAKE256',
+                   'kangarootwelve':'KangarooTwelve','k12':'KangarooTwelve','kangaroo12':'KangarooTwelve',
+                   'turboshake128':'TurboSHAKE128','turboshake256':'TurboSHAKE256'}
+
+            oby = kwargs.pop('bytes',False)
+            sz = kwargs.pop('size')
+            h = __import__('Cryptodome.Hash.' + NMP[algo.replace('_','')]).new(custom=kwargs.get('custom'),fromlist=['*'])
+            if i is None: return h
+            h.update(i)
+            r = h.read(sz)
+            if oby: return r
+            return int.from_bytes(r,'big')
+        case 'ascon_hash256'|'ascon256':
+            import ascon
+            r = ascon.ascon_hash(i,'Ascon-Hash256',0x20)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'ascon_xof128':
+            import ascon
+            r = ascon.ascon_hash(i,'Ascon-XOF128',kwargs['size'])
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'ascon_cxof128':
+            import ascon
+            r = ascon.ascon_hash(i,'Ascon-CXOF128',kwargs['size'],kwargs['key'])
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'ascon_hash'|'ascon_hasha'|'ascon_hash_be'|'ascon_hasha_be'|'ascon_hash_le'|'ascon_hasha_le':
+            if algo.endswith('_le'): import ascon_old_le as ascon
+            else: import ascon_old as ascon
+            r = ascon.ascon_hash(i,'Ascon-Hash' + algo[10:11].strip('_'),0x20)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'ascon_xof'|'ascon_xofa'|'ascon_xof_be'|'ascon_xofa_be'|'ascon_xof_le'|'ascon_xofa_le':
+            if algo.endswith('_le'): import ascon_old_le as ascon
+            else: import ascon_old as ascon
+            r = ascon.ascon_hash(i,'Ascon-Xof' + algo[9:10].strip('_'),kwargs['size'])
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'blake3':
+            import blake3
+            oby = kwargs.pop('bytes',False)
+            kw = {}
+            if 'key' in kwargs: kw['key'] = kwargs['key']
+            if 'iv' in kwargs: kw['derive_key_context'] = kwargs['iv']
+            h = blake3.blake3(**kw)
+            if i is None: return h
+            h.update(i)
+            kw = {'length':kwargs.get('size',0x20)}
+            if 'offset' in kwargs: kw['seek'] = kwargs['offset']
+            r = h.digest(**kw)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'blake'|'blake224'|'blake256'|'blake384'|'blake512':
+            if algo == 'blake': s = kwargs['size']*8
+            else: s = int(algo[5:])
+
+            import blake
+            h = blake.BLAKE(s)
+            if 'key' in kwargs: h.addsalt(kwargs['key'])
+            if i is None: return h
+            h.update(i)
+            r = h.digest()
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'dha256'|'fork256'|'has160':
+            r = getattr(uxx(),'hash_' + algo)(i)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'echo224'|'echo256'|'echo384'|'echo512':
+            r = uxx().hash_echo(i,int(algo[4:7]))
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'esch256'|'esch384':
+            r = uxx().hash_esch(i,*{ # digest len, state len, block len, big rounds, slim rounds
+                'esch256':(256,384,128,11,7),
+                'esch384':(384,512,128,12,8),
+            }[algo])
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'fugue224'|'fugue256'|'fugue384'|'fugue512':
+            r = uxx().hash_fugue(i,int(algo[5:8]))
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'haval'|'haval128'|'haval160'|'haval192'|'haval224'|'haval256':
+            raise NotImplementedError
+            if '_' in algo:
+                algo,r = algo.split('_',1)
+                r = int(r)
+            else: r = 3
+            r = uxx().hash_haval(i,int(algo[5:] or 128),r)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
 
         case 'cmac_transformit'|'cmac_tfit':
             asrt(isinstance(kwargs['key'],bytes) and isinstance(kwargs['table'],bytes))
             r = uxx().mac_cmac_tfit(i,kwargs['key'],kwargs['table'])
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+        case 'cmac'|'cmac_aes'|'cmac_rc2'|'cmac_arc2'|'cmac_blowfish'|'cmac_des'|'cmac_des3'|'cmac_cast'|'cmac_cast5':
+            from Cryptodome.Hash import CMAC
+            if not '_' in algo: n = 'aes'
+            else: n = algo[5:]
+            oby = kwargs.pop('bytes',False)
+            sz = kwargs.pop('size',None)
+            c = CMAC.new(kwargs.pop('key'),ciphermod=__import__('Cryptodome.Cipher.' + PYCRCIPM[n],fromlist=['*']),cipher_params=kwargs,mac_len=sz,update_after_digest=True)
+            if i is None: return c
+            c.update(i)
+            r = c.digest()
+            if oby: return r
+            return int.from_bytes(r,'big')
+        case 'cmac_camellia'|'cmac_sm4'|'cmac_idea'|'cmac_seed':
+            from cryptography.hazmat.primitives import cmac
+            from cryptography.hazmat.primitives.ciphers import algorithms
+            from cryptography.hazmat.decrepit.ciphers import algorithms as dalgorithms
+
+            n = CRYOCIPM[algo[5:]]
+            if n == 'SM4': c = getattr(algorithms,n)
+            else: c = getattr(dalgorithms,n)
+            c = cmac.CMAC(c(kwargs['key']))
+            if i is None: return c
+            c.update(i)
+            r = c.finalize()
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
         case 'ctr_drbg_hmac_sha256':
@@ -821,9 +1089,41 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = bytes(o)[:s]
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
-        case 'hmac_sha1':
+        case 'hmac_sha1'|'hmac_md5'|'hmac_sha256'|'hmac_sha384'|'hmac_sha512'|'hmac_sha224'|'hmac_sha3_224'|'hmac_sha3_256'|\
+             'hmac_sha3_384'|'hmac_sha3_512'|'hmac_blake2b'|'hmac_blake2s'|'hmac_ripemd160'|'hmac_sm3':
             import hashlib,hmac
-            r = hmac.new(kwargs['key'],i,hashlib.sha1).digest()
+            c = hmac.new(kwargs['key'],i,getattr(hashlib,algo[5:]))
+            if i is None: return c
+            r = c.digest()
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+        case 'hmac_md2'|'hmac_md4':
+            from Cryptodome.Hash import HMAC
+            algo = algo[5:].upper()
+            h = HMAC.new(kwargs['key'],digestmod=__import__('Cryptodome.Hash.' + PYCRHSHM.get(algo,algo),fromlist=['*']))
+            if i is None: return h.new(**kwargs)
+            r = h.new(i,**kwargs).digest()
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+        case 'hmac_blake3':
+            import blake3,hmac
+            c = hmac.new(kwargs['key'],i,blake3.blake3)
+            if i is None: return c
+            r = c.digest()
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+        case 'poly1305_aes'|'poly1305_chacha20'|'poly1305_xchacha20'|'poly1305_tls_chacha20':
+            from Cryptodome.Hash import Poly1305
+            if 'iv' in kwargs and not kwargs.get('nonce'): kwargs['nonce'] = kwargs['iv']
+            h = Poly1305.new(kwargs['key'],cipher=__import__('Cryptodome.Cipher.' + PYCRCIPM[algo[5:]],fromlist=['*']),nonce=kwargs['nonce'])
+            if i is None: return h
+            r = h.update(i).digest()
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
+        case 'kmac128'|'kmac256':
+            h = __import__('Cryptodome.Hash.' + algo.upper(),fromlist=['*']).new(kwargs['key'],mac_len=kwargs.get('size',0x40),custom=kwargs.get('custom'))
+            if i is None: return h
+            r = h.update(i).digest()
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
         case 'eac':
@@ -836,22 +1136,132 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
 
             if kwargs.get('bytes'): return b
             return int.from_bytes(b,'big')
+        case 'ascon_mac'|'ascon_prf'|'ascon_prf_short':
+            import ascon
+            r = ascon.ascon_mac(kwargs['key'],i,{'mac':'Ascon-Mac','prf':'Ascon-Prf','prf_short':'Ascon-PrfShort'}[algo[6:]],kwargs.get('size',0x10))
+            return r if kwargs.get('bytes') else int.from_bytes(r,'big')
+        case 'ascon_mac_old'|'ascon_maca'|'ascon_prf_old'|'ascon_prfa'|'ascon_prf_short_old'|'ascon_maca_le'|'ascon_prfa_le':
+            if algo.endswith('_old'): algo = algo[:-4]
+            if algo.endswith('_le'):
+                algo = algo[:-3]
+                import ascon_old_le as ascon
+            else: import ascon_old as ascon
+            r = ascon.ascon_mac(kwargs['key'],i,'Ascon-' + {'mac':'Mac','maca':'Maca','prf':'Prf','prfa':'Prfa','prf_short':'PrfShort'}[algo[6:]],kwargs.get('size',0x10))
+            return r if kwargs.get('bytes') else int.from_bytes(r,'big')
+
+        case 'pbkdf2'|'pbkdf2_sha1'|'pbkdf2_sha224'|'pbkdf2_sha256'|'pbkdf2_sha384'|'pbkdf2_sha512'|'pbkdf2_sha3_224'|\
+             'pbkdf2_sha3_256'|'pbkdf2_sha3_384'|'pbkdf2_sha3_512'|'pbkdf2_md2'|'pbkdf2_md4'|'pbkdf2_md5'|'pbkdf2_ripemd160'|\
+             'pbkdf1'|'pbkdf1_sha1'|'pbkdf1_sha224'|'pbkdf1_sha256'|'pbkdf1_sha384'|'pbkdf1_sha512'|'pbkdf1_sha3_224'|\
+             'pbkdf1_sha3_256'|'pbkdf1_sha3_384'|'pbkdf1_sha3_512'|'pbkdf1_md2'|'pbkdf1_md4'|'pbkdf1_md5'|'pbkdf1_ripemd160':
+            df1 = algo.startswith('pbkdf1')
+            if not '_' in algo: algo = 'sha1'
+            else: algo = algo[7:]
+            algo = algo.upper()
+
+            from Cryptodome.Protocol.KDF import PBKDF2,PBKDF1
+            h = __import__('Cryptodome.Hash.' + PYCRHSHM.get(algo,algo),fromlist=['*'])
+            args = (i,kwargs['key'],kwargs['size'] if 'size' in kwargs else h.digest_size,kwargs['c'])
+            if df1: r = PBKDF1(*args,hashAlgo=h)
+            else: r = PBKDF2(*args,hmac_hash_module=h)
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'scrypt':
+            from Cryptodome.Protocol.KDF import scrypt
+            r = scrypt(i,kwargs['key'],kwargs['size'],kwargs['c'],kwargs.get('r',8),kwargs.get('p',1),kwargs.get('num',1))
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'bcrypt':
+            from Cryptodome.Protocol.KDF import bcrypt
+            r = bcrypt(i,kwargs['c'],salt=kwargs.get('key'))
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'bcrypt_b64_sha1'|'bcrypt_b64_sha224'|'bcrypt_b64_sha256'|'bcrypt_b64_sha384'|'bcrypt_b64_sha512'|\
+             'bcrypt_b64_sha3_224'|'bcrypt_b64_sha3_256'|'bcrypt_b64_sha3_384'|'bcrypt_b64_sha3_512'|'bcrypt_b64_md2'|\
+             'bcrypt_b64_md4'|'bcrypt_b64_md5'|'bcrypt_b64_ripemd160'|'bcrypt_b64_blake2b'|'bcrypt_b64_blake2s'|'bcrypt_b64_blake3'|\
+             'bcrypt_b64_ascon256'|'bcrypt_b64_ascon_hash256':
+            from Cryptodome.Protocol.KDF import bcrypt
+            return crc_hash(encrypt(crc_hash(i,algo[11:],bytes=True),'base64'),'bcrypt',**kwargs)
+        case 'hkdf'|'hkdf_sha1'|'hkdf_sha224'|'hkdf_sha256'|'hkdf_sha384'|'hkdf_sha512'|'hkdf_sha3_224'|'hkdf_sha3_256'|\
+             'hkdf_sha3_384'|'hkdf_sha3_512'|'hkdf_md2'|'hkdf_md4'|'hkdf_md5'|'hkdf_ripemd160':
+            if algo == 'hkdf': algo = 'sha512'
+            else: algo = algo[5:]
+            algo = algo.upper()
+
+            from Cryptodome.Protocol.KDF import HKDF
+            h = __import__('Cryptodome.Hash.' + PYCRHSHM.get(algo,algo),fromlist=['*'])
+            r = HKDF(i,kwargs['size'] if 'size' in kwargs else h.digest_size,kwargs['key'],h,kwargs.get('num',1),context=kwargs.get('iv'))
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'sp800_108_counter_cmac_transformit'|'sp800_108_counter_cmac_tfit':
+            from Cryptodome.Protocol.KDF import SP800_108_Counter
+            tab = kwargs['table']
+            def prf(s,x): return crc_hash(x,'cmac_tfit',key=s,table=tab,bytes=True)
+            r = SP800_108_Counter(i,kwargs['size'],prf,kwargs.get('num',1),kwargs.get('iv',b''),kwargs.get('nonce',b''))
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'sp800_108_counter_cmac_aes'|'sp800_108_counter_cmac_rc2'|'sp800_108_counter_cmac_arc2'|'sp800_108_counter_cmac_cast'|'sp800_108_counter_cmac_cast5'|\
+             'sp800_108_counter_cmac_blowfish'|'sp800_108_counter_cmac_des'|'sp800_108_counter_cmac_des3'|'sp800_108_counter_cmac_idea'|\
+             'sp800_108_counter_cmac_seed'|'sp800_108_counter_cmac_sm4'|'sp800_108_counter_cmac_camellia'|'sp800_108_counter_hmac_sha1'|\
+             'sp800_108_counter_hmac_sha224'|'sp800_108_counter_hmac_sha256'|'sp800_108_counter_hmac_sha384'|'sp800_108_counter_hmac_sha512'|\
+             'sp800_108_counter_hmac_sha3_224'|'sp800_108_counter_hmac_sha3_256'|'sp800_108_counter_hmac_sha3_384'|'sp800_108_counter_hmac_sha3_512'|\
+             'sp800_108_counter_hmac_md2'|'sp800_108_counter_hmac_md4'|'sp800_108_counter_hmac_md5'|'sp800_108_counter_hmac_ripemd160':
+            from Cryptodome.Protocol.KDF import SP800_108_Counter
+            def prf(s,x): return crc_hash(x,algo,key=s,bytes=True)
+            r = SP800_108_Counter(i,kwargs['size'],prf,kwargs.get('num',1),kwargs.get('iv',b''),kwargs.get('nonce',b''))
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'argon2d'|'argon2i'|'argon2id':
+            import cryptography.hazmat.primitives.kdf.argon2 as argon2
+            c = getattr(argon2,algo.capitalize())(salt=kwargs['salt'],length=kwargs['size'],iterations=kwargs.get('c',1),lanes=kwargs.get('p',4),memory_cost=kwargs['m'],
+                                                  ad=kwargs.get('iv'),secret=kwargs.get('key'))
+            if i is None: return c
+            r = c.derive(i)
+            if kwargs.get('bytes',True): return r
+            return int.from_bytes(r,'big')
+        case 'concatkdf'|'concatkdf_sha1'|'concatkdf_sha224'|'concatkdf_sha256'|'concatkdf_sha384'|'concatkdf_sha512'|'concatkdf_sha3_224'|'concatkdf_sha3_256'|\
+             'concatkdf_sha3_384'|'concatkdf_sha3_512'|'concatkdf_md5'|'concatkdf_sm3'|'concatkdf_blake2b'|'concatkdf_blake2s'|'concatkdf_shake128'|'concatkdf_shake256'|\
+             'concatkdf_hmac'|'concatkdf_hmac_sha1'|'concatkdf_hmac_sha224'|'concatkdf_hmac_sha256'|'concatkdf_hmac_sha384'|'concatkdf_hmac_sha512'|'concatkdf_hmac_sha3_224'|\
+             'concatkdf_hmac_sha3_256'|'concatkdf_hmac_sha3_384'|'concatkdf_hmac_sha3_512'|'concatkdf_hmac_md5'|'concatkdf_hmac_sm3'|'concatkdf_hmac_blake2b'|'concatkdf_hmac_blake2s'|\
+             'concatkdf_hmac_shake128'|'concatkdf_hmac_shake256'|\
+             'hkdfexpand'|'hkdfexpand_sha1'|'hkdfexpand_sha224'|'hkdfexpand_sha256'|'hkdfexpand_sha384'|'hkdfexpand_sha512'|'hkdfexpand_sha3_224'|'hkdfexpand_sha3_256'|\
+             'hkdfexpand_sha3_384'|'hkdfexpand_sha3_512'|'hkdfexpand_md5'|'hkdfexpand_sm3'|'hkdfexpand_blake2b'|'hkdfexpand_blake2s'|'hkdfexpand_shake128'|'hkdfexpand_shake256'|\
+             'x963kdf'|'x963kdf_sha1'|'x963kdf_sha224'|'x963kdf_sha256'|'x963kdf_sha384'|'x963kdf_sha512'|'x963kdf_sha3_224'|'x963kdf_sha3_256'|'x963kdf_sha3_384'|\
+             'x963kdf_sha3_512'|'x963kdf_md5'|'x963kdf_sm3'|'x963kdf_blake2b'|'x963kdf_blake2s'|'x963kdf_shake128'|'x963kdf_shake256':
+                from cryptography.hazmat.primitives import hashes
+                for pn in ('concatkdf_hmac','concatkdf','hkdfexpand','x963kdf'):
+                    if algo.startswith(pn): n = pn;break
+                if n == 'concatkdf':
+                    from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
+                    c = ConcatKDFHash
+                elif n == 'concatkdf_hmac':
+                    from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHMAC
+                    c = ConcatKDFHMAC
+                elif n == 'hkdfexpand':
+                    from cryptography.hazmat.primitives.kdf.hkdf import HKDFExpand
+                    c = HKDFExpand
+                elif n == 'x963kdf':
+                    from cryptography.hazmat.primitives.kdf.x963kdf import X963KDF
+                    c = X963KDF
+
+                if algo == n: m = 'sha256'
+                else: m = algo[len(n) + 1:]
+                if m == 'blake2b': args = (0x40,)
+                elif m == 'blake2s': args = (0x20,)
+                elif m in {'shake128','shake256'}: args = (kwargs['hash_size'],)
+                else: args = ()
+
+                kw = {}
+                if n in {'concatkdf','x963kdf'}: kw['otherinfo'] = kwargs.get('iv')
+                elif n =='concatkdf_hmac': kw['salt'],kw['otherinfo'] = kwargs['key'],kwargs.get('iv')
+                elif n == 'hkdfexpand': kw['info'] = kwargs.get('iv')
+                c = c(getattr(hashes,m.upper())(*args),length=kwargs['size'],**kw)
+                if i is None: return c
+                r = c.derive(i)
+                if kwargs.get('bytes',True): return r
+                return int.from_bytes(r,'big')
 
         case 'tarzan': fnc = uxx().hash_tarzan
         case 'luas': fnc = uxx().hash_luas
-        case 'java':
-            kwargs['seed'] = 31
-            fnc = uxx().hash_bkdr
-        case 'sxm':
-            kwargs['seed'] = 137
-            fnc = uxx().hash_bkdr64
-        case 'slf':
-            kwargs['seed'] = 33
-            fnc = uxx().hash_bkdr
-        case 'nlg':
-            kwargs['seed'] = 33
-            kwargs['init'] = kwargs.get('init',0xFFFFFFFF)
-            fnc = uxx().hash_bkdr
         case 'hash40':
             import zlib
             return ((len(i) & 0xFF) << 32) | zlib.crc32(i,kwargs.get('value') or 0)
@@ -867,14 +1277,16 @@ HASHTS = {
     f'crc24_{x}':3 for x in CRC24}|{
     f'crc32{"_" if len(x)>1 else ""}{x}':4 for x in CRC32}|{
     f'crc40_{x}':5 for x in CRC40}|{
-    f'crc64_{x}':8 for x in CRC64}|\
+    f'crc64_{x}':8 for x in CRC64}|{
+    x:4 for x in PRNG32}|{
+    x:8 for x in PRNG64}|{
+    x:FLETCH[x][0]//8 for x in FLETCH}|\
 {
-    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,'crc32_16':2,
-    'adler32':4,
-    'fnv1_32':4,'fnv1a_32':4,
-    'fnv1_64':8,'fnv1a_64':8,
-    'bkdr':4,'bkdr_ltr':4,'bkdr_rtl':4,'bkdr32':4,'bkdr32_ltr':4,'bkdr32_rtl':4,
-    'bkdr64':8,'bkdr64_ltr':8,'bkdr64_rtl':8,
+    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,'crc32_16':2,'crc32_php':4,
+    'adler8':1,'adler16':2,'adler32':4,'adler64':8,
+    'fnv1_32':4,'fnv1a_32':4,'fnv0_32':4,
+    'fnv1_64':8,'fnv1a_64':8,'fnv0_64':8,
+    'bkdr_rtl':4,'bkdr32_rtl':4,'bkdr64_rtl':8,
     'sdbm':4,'sdbm_ltr':4,'sdbm_rtl':4,
     'djb2':4,'djb2_ltr':4,'djb2_rtl':4,
     'djb2a':4,'djb2a_ltr':4,'djb2a_rtl':4,
@@ -890,20 +1302,32 @@ HASHTS = {
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
     'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
+    'bsdsum':2,'bsd':2,'sysv':2,'sysvsum':2,
     'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
     'sum8_rotl':1,'sum16_rotl':2,'sum24_rotl':3,'sum32_rotl':4,'sum40_rotl':5,'sum48_rotl':6,'sum56_rotl':7,'sum64_rotl':8,
     'sum8_rotr':1,'sum16_rotr':2,'sum24_rotr':3,'sum32_rotr':4,'sum40_rotr':5,'sum48_rotr':6,'sum56_rotr':7,'sum64_rotr':8,
     'xor':1,'xor8':1,
     'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,'md2':16,'md4':16,
+    'ed2k':16,'emule':16,'edonkey':16,
     'md5x':4,'md5_lh5':4,
     'sha224':28,'sha256':32,'sha384':48,'sha512':64,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,
     'sha512_224':28,'sha512_256':32,
+    'blake224':28,'blake256':32,'blake384':48,'blake512':64,
     'blake2b':64,'blake2s':32,
+    'blake3':32,
     'shake128':16,'shake256':32,'shake_128':16,'shake_256':32,
     'ripemd160':20,'sm3':32,
     'keccak224':28,'keccak256':32,'keccak384':48,'keccak512':64,
-    'tarzan':4,'luas':4,'sxm':8,'slf':4,'hash40':5,'pivotal':4,'java':4,'nlg':4,
+    'tuplehash':64,'tuplehash128':64,'tuplehash256':64,
+    'ascon_hash':32,'ascon_hasha':32,'ascon_hash_be':32,'ascon_hasha_be':32,'ascon_hash_le':32,'ascon_hasha_le':32,
+    'ascon_hash256':32,'ascon256':32,
+    'dha256':32,'fork256':32,'has160':20,
+    'esch256':32,'esch384':48,
+    'echo224':28,'echo256':32,'echo384':48,'echo512':64,
+    'fugue224':28,'fugue256':32,'fugue384':48,'fugue512':64,
+    'haval':16,'haval128':16,'haval160':20,'haval192':24,'haval224':28,'haval256':32,
+    'tarzan':4,'luas':4,'hash40':5,'pivotal':4,
     'empire_magic':2,'westwood':4,
 }
 from .pyob import PyOBin,PyOFunc

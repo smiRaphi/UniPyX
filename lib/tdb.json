@@ -855,7 +855,7 @@
     "IRIX IDB":[
         "irix software distribution format installation db (f)"
     ],
-    "Z":[
+    "Unix Compress":[
         "compress",
         "compress by spencer thomas",
         "compress compressed data",
@@ -1741,5 +1741,9 @@
     "WarpIN Archive":[
         "os/2 warpin archive",
         "warpin installer"
+    ],
+    "HTTP Archive":[
+        "http archive",
+        "http archive format"
     ]
 }

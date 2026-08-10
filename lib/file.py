@@ -1,5 +1,4 @@
 import struct,io,sys
-from datetime import datetime
 from lib.unipyxx import X
 
 __FNCT = type(lambda:None)
@@ -27,12 +26,6 @@ def reflecti(v:int,w:int):
         r = (r << 1) | (v & 1)
         v >>= 1
     return r
-def pdosdate(d:int,t:int,ms=0):
-    asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
-    if d == 0: d = 0x21
-    dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 11) & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
-    if ms: dt.replace(microsecond=ms*1000000)
-    return dt.timestamp()
 def by2bi(b:bytes): return f'{int.from_bytes(b,"big"):0{len(b)*8}b}'
 def bi2by(b:str):
     b += '0' * (-len(b) % 8)
@@ -575,6 +568,15 @@ def uxx():
 OODLE = GDEFLATE = UCL = LIBBLAST = None
 NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
 LHZC = {f'lh{x}':f'-lh{x}-'.encode('latin1') for x in {0,5,6,7}}
+LZWM = {
+    'mb':'max_bits','ics':'init_code_size','1c':'first_code','cc':'clear_code','ec':'end_code',
+    'be':'be','md':'max_dict','vp':'vax_padding','rc':'early_change',
+
+    'lzw':   {'mb':13,'ics':9, '1c':0x102,'cc':0x100, 'ec':0x101, 'be':False},
+    'lzw_lg':{'mb':14,'ics':14,'1c':0x100,'cc':0x3FFE,'ec':0x3FFF,'be':True,'md':0x3FFE},
+    'z':     {        'ics':9, '1c':0x100,            'be':False,'vp':True},
+    'zb':    {        'ics':9, '1c':0x101,'cc':0x100, 'be':False,'vp':True},
+}
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     global OODLE,GDEFLATE,UCL,LIBBLAST
     match algo:
@@ -649,6 +651,11 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             asrt(i[:10] == b'SZDD\x88\xF0\x27\x33\x41\x00')
             return uxx().decompress_szdd_raw(i[14:],int.from_bytes(i[10:14],'little'))
         case 'szdd_raw': return uxx().decompress_szdd_raw(i,kwargs['usize'])
+        case 'z'|'compress'|'unix_compress':
+            raise NotImplementedError
+            asrt(i[:2] == b'\x1F\x9D' and i[2] & 0x60 == 0)
+            kw = {LZWM[k]:v for k,v in LZWM['zb' if i[2] & 0x80 else 'z'].items()}
+            return uxx().decompress_lzw(i[3:],kwargs.get('usize',len(i) * 10),max_bits=i[2] & 0x1F,**kw)
 
         case 'lzma'|'lzma_alone':
             import lzma
@@ -829,12 +836,12 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
         case 'lzw'|'lzw_lg':
-            p = {
-                'lzw':(13,9,0x102,0x100,0x101,False),
-                'lzw_lg':(14,14,0x100,0x3FFE,0x3FFF,True,0x3FFE),
-            }[algo]
+            kw = kwargs.copy()
+            for k,v in LZWM[algo].items():
+                rk = LZWM[k]
+                if not rk in kw: kw[rk] = v
 
-            return uxx().decompress_lzw(i,kwargs['usize'],*[kwargs.get(x,p[ix] if ix < len(p) else None) for ix,x in enumerate(('max_bits','init_code_size','first_code','clear_code','end_code','be','max_dict'))])
+            return uxx().decompress_lzw(i,kwargs['usize'],**kw)
         case 'rtl_lz':
             if 'usize' in kwargs: us = kwargs['usize']
             else: us,i = int.from_bytes(i[:8],'little'),i[8:]

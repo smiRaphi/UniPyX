@@ -19,14 +19,23 @@ import ctypes
 cint = ctypes.c_int
 u8 = ctypes.c_uint8
 s8 = ctypes.c_int8
-u32 = ctypes.c_uint32
 u16 = ctypes.c_uint16
+u32 = ctypes.c_uint32
+s32 = ctypes.c_int32
 u64 = ctypes.c_uint64
 szt = ctypes.c_size_t
 sszt = ctypes.c_ssize_t
 void = ctypes.c_void_p
 voidp = ctypes.POINTER(ctypes.c_void_p)
 P = ctypes.POINTER
+class h128(ctypes.Structure):
+    _fields_ = [('d',u32 * 4)]
+class h160(ctypes.Structure):
+    _fields_ = [('d',u32 * 5)]
+class h256(ctypes.Structure):
+    _fields_ = [('d',u32 * 8)]
+class h512(ctypes.Structure):
+    _fields_ = [('d',u32 * 16)]
 
 class XMemCodecParametersLZX(ctypes.Structure):
     _pack_ = 4
@@ -65,9 +74,15 @@ def _3base_func(fnc,src):
 def _4base_func(fnc,src):
     i = (u8 * len(src)).from_buffer_copy(src)
     return int(fnc(i,len(src)))
-def _5base_func(fnc,src,seed):
+def _5base_func(fnc,src,init):
     i = (u8 * len(src)).from_buffer_copy(src)
-    return int(fnc(i,len(src),seed))
+    return int(fnc(i,len(src),init))
+def _6base_func(fnc,src):
+    i = (u8 * len(src)).from_buffer_copy(src)
+    return bytes(fnc(i,len(src)))
+def _7base_func(fnc,src,bits):
+    i = (u8 * len(src)).from_buffer_copy(src)
+    return bytes(fnc(i,len(src),bits))[:bits // 8]
 
 import struct
 from hashlib import md5,sha256
@@ -79,7 +94,7 @@ class X:
         if not os.path.exists(DLLP): raise FileNotFoundError
         if os.path.exists(os.path.dirname(DLLP) + '/.is_dev'):
             ch = sha256()
-            for f in sorted(('comp.c','crypt.c','ext.c','unipyxx.c','util.h')):
+            for f in sorted(('comp.c','crypt.c','ext.c','unipyxx.c','util.h','const.h')):
                 with open(os.path.join(PRJP,f),'rb') as f:
                     ch.update(f.read().replace(b'\r',b'').strip())
             ch = ch.digest()
@@ -112,7 +127,7 @@ class X:
             ('decompress_camelot_blz',(P(u8),szt,P(u8),sszt), sszt,1),
             ('decompress_szdd_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_hammer',   (P(u8),szt,P(u8)),        sszt,0),
-            ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u16,u16,u16,u16),sszt,0),
+            ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u32,u16,u16,s32,s32,u8),sszt,0),
             ('decompress_lbalzss',  (P(u8),szt,P(u8),sszt,u8),sszt,0),
             ('decompress_cc3',      (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
@@ -166,14 +181,24 @@ class X:
             ('hash_fnv1a_64',(P(u8),szt,u64,u64),u64,0),
             ('hash_fnv1_32',(P(u8),szt,u32,u32),u32,0),
             ('hash_fnv1a_32',(P(u8),szt,u32,u32),u32,0),
-            ('hash_bkdr',(P(u8),szt,u32,u32),u32,0),
-            ('hash_bkdr64',(P(u8),szt,u64,u64),u64,0),
+            ('hash_prng32',(P(u8),szt,u32,u32,u32),u32,0),
+            ('hash_prng64',(P(u8),szt,u64,u64,u64),u64,0),
             ('hash_sdbm',(P(u8),szt,u32,u32),u32,0),
             ('hash_djb2',(P(u8),szt,u32),u32,0),
             ('hash_djb2a',(P(u8),szt,u32),u32,0),
             ('hash_joaat',(P(u8),szt,u32),u32,0),
             ('hash_tarzan',(P(u8),szt),u32,4),
             ('hash_luas',(P(u8),szt),u32,4),
+            ('hash_fletcher',(P(u8),szt,u64,u8,u64),u64,0),
+            ('hash_bsdsum',(P(u8),szt,u16),u16,0),
+            ('hash_sysvsum',(P(u8),szt),u16,4),
+            ('hash_dha256',(P(u8),szt),h256,6),
+            ('hash_fork256',(P(u8),szt),h256,6),
+            ('hash_echo',(P(u8),szt,u16),h512,7),
+            ('hash_esch',(P(u8),szt,u16,u16,u16,u8,u8),h512,0),
+            ('hash_fugue',(P(u8),szt,u16),h512,7),
+            ('hash_has160',(P(u8),szt),h160,6),
+            ('hash_haval',(P(u8),szt,u16,u8,u8),h256,0),
             ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
             ('hash_crc_init',(P(u8),u32,u64,s8),s8,0),
             ('hash_crc',(P(u8),u32,P(u8),u64,u64,u64,s8),u64,0),
@@ -205,7 +230,11 @@ class X:
                 elif e[3] == 4:
                     def wrapper(src,_f=fnc): return _4base_func(_f,src)
                 elif e[3] == 5:
-                    def wrapper(src,seed,_f=fnc): return _5base_func(_f,src,seed)
+                    def wrapper(src,init,_f=fnc): return _5base_func(_f,src,init)
+                elif e[3] == 6:
+                    def wrapper(src,_f=fnc): return _6base_func(_f,src)
+                elif e[3] == 7:
+                    def wrapper(src,bits,_f=fnc): return _7base_func(_f,src,bits)
                 setattr(self,e[0],wrapper)
 
     def decompress_lz10_raw(src:bytes,usize:int) -> bytes: ...
@@ -376,11 +405,15 @@ class X:
         od = ctypes.string_at(o,r)
         if usize == -1: self._free(o)
         return od
-    def decompress_lzw(self,src:bytes,usize:int,max_bits:int,init_code_size:int,first_code:int,clear_code:int,end_code:int,be=False,max_dict:int=None):
+    def decompress_lzw(self,src:bytes,usize:int,max_bits:int,init_code_size:int,first_code:int,clear_code:int=None,end_code:int=None,max_dict:int=None,
+                            be:bool=False,vax_padding:bool=False,early_change:bool=False):
+        if clear_code is None: clear_code = -1
+        if end_code is None: end_code = -1
         if max_dict is None or max_dict < 0: max_dict = 1 << max_bits
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * usize)()
-        r = self.dll.decompress_lzw(i,len(src),o,usize,max_bits,max_dict,init_code_size,first_code,clear_code,end_code,1 if be else 0)
+        r = self.dll.decompress_lzw(i,len(src),o,usize,max_bits,max_dict,init_code_size,first_code,clear_code,end_code,
+                                    (1 if be else 0) | (2 if vax_padding else 0) | (4 if early_change else 0))
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
     def decompress_hammer(self,src:bytes):
@@ -509,10 +542,9 @@ class X:
         return self.SELENE[seed]
     def decrypt_selene(self,src:bytes,key:bytes) -> bytes:
         mk = self.init_selene(key)
-        i = (u8 * len(src)).from_buffer_copy(src)
-        o = (u8 * len(src))()
-        self.dll.decrypt_xor(i,len(src),o,mk,len(mk))
-        return bytes(o)
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_xor(b,len(src),mk,len(mk))
+        return bytes(b)
     def decrypt_rc4_playpond(self,src:bytes,key:bytes,drop:int=0) -> bytes:
         b = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * len(key)).from_buffer_copy(key)
@@ -570,16 +602,23 @@ class X:
     def hash_super_fast_be(self,src:bytes) -> int: ...
     def hash_elf(self,src:bytes) -> int: ...
     def hash_ap(self,src:bytes) -> int: ...
-    def hash_murmur2_le(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2_be(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2A_le(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2A_be(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2_64A_le(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2_64A_be(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2_64B_le(self,src:bytes,seed:int) -> int: ...
-    def hash_murmur2_64B_be(self,src:bytes,seed:int) -> int: ...
+    def hash_murmur2_le(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2_be(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2A_le(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2A_be(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2_64A_le(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2_64A_be(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2_64B_le(self,src:bytes,init:int) -> int: ...
+    def hash_murmur2_64B_be(self,src:bytes,init:int) -> int: ...
     def hash_tarzan(self,src:bytes) -> int: ...
     def hash_luas(self,src:bytes) -> int: ...
+    def hash_sysvsum(self,src:bytes) -> int: ...
+    def hash_dha256(self,src:bytes) -> bytes: ...
+    def hash_fork256(self,src:bytes) -> bytes: ...
+    def hash_echo(self,src:bytes,bits:int) -> bytes: ...
+    def hash_fugue(self,src:bytes,bits:int) -> bytes: ...
+    def hash_has160(self,src:bytes) -> bytes: ...
+
     def hash_empire_magic(self,src:bytes,end:bool=False) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
         return self.dll.hash_empire_magic(b,len(src),1 if end else 0)
@@ -587,24 +626,18 @@ class X:
         src += bytes(-len(src) % 4)
         b = (u32 * (len(src) // 4)).from_buffer_copy(src)
         return self.dll.hash_westwood(b,len(src) // 4)
-    def hash_fnv1_64(self,src:bytes,seed:int=0xCBF29CE484222645,prime:int=0x100000001B3) -> int:
+    def hash_fnv1_64(self,src:bytes,init:int=0xCBF29CE484222645,prime:int=0x100000001B3) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_fnv1_64(b,len(src),seed,prime)
-    def hash_fnv1a_64(self,src:bytes,seed:int=0xCBF29CE484222645,prime:int=0x100000001B3) -> int:
+        return self.dll.hash_fnv1_64(b,len(src),init,prime)
+    def hash_fnv1a_64(self,src:bytes,init:int=0xCBF29CE484222645,prime:int=0x100000001B3) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_fnv1a_64(b,len(src),seed,prime)
-    def hash_fnv1_32(self,src:bytes,seed:int=0x811C9DC5,prime:int=0x1000193) -> int:
+        return self.dll.hash_fnv1a_64(b,len(src),init,prime)
+    def hash_fnv1_32(self,src:bytes,init:int=0x811C9DC5,prime:int=0x1000193) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_fnv1_32(b,len(src),seed,prime)
-    def hash_fnv1a_32(self,src:bytes,seed:int=0x811C9DC5,prime:int=0x1000193) -> int:
+        return self.dll.hash_fnv1_32(b,len(src),init,prime)
+    def hash_fnv1a_32(self,src:bytes,init:int=0x811C9DC5,prime:int=0x1000193) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_fnv1a_32(b,len(src),seed,prime)
-    def hash_bkdr(self,src:bytes,init:int=0,seed:int=131) -> int:
-        b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_bkdr(b,len(src),init,seed)
-    def hash_bkdr64(self,src:bytes,init:int=0,seed:int=131) -> int:
-        b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_bkdr64(b,len(src),init,seed)
+        return self.dll.hash_fnv1a_32(b,len(src),init,prime)
     def hash_sdbm(self,src:bytes,init:int=0,seed:int=0x1003F) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
         return self.dll.hash_sdbm(b,len(src),init,seed)
@@ -617,6 +650,15 @@ class X:
     def hash_joaat(self,src:bytes,init:int=0) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
         return self.dll.hash_joaat(b,len(src),init)
+    def hash_bsdsum(self,src:bytes,init:int=0) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_bsdsum(b,len(src),init)
+    def hash_esch(self,src:bytes,digtl:int,statl:int,ratel:int,bigc:int,slic:int):
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return bytes(self.dll.hash_esch(b,len(src),digtl,statl,ratel,bigc,slic))[:digtl // 8]
+    def hash_haval(self,src:bytes,bits:int,rounds:int=3,version:int=1) -> bytes:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return bytes(self.dll.hash_haval(b,len(src),bits,rounds,version))[:bits // 8]
     def mac_cmac_tfit(self,src:bytes,key:bytes,table:bytes) -> bytes:
         asrt(len(key) == 4*4*13 and len(table) == 4*0x100*0x10*13)
         s = (u8 * len(src)).from_buffer_copy(src)
@@ -637,5 +679,14 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         r = self.dll.hash_crc(i,len(src),self.CRC[k],init,xor,value or 0,0 if value is None else 1)
         return r
+    def hash_fletcher(self,src:bytes,base:int,width:int,init:int=0) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_fletcher(b,len(src),init,width,base)
+    def hash_prng32(self,src:bytes,mult:int,add:int=0,init:int=0) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_prng32(b,len(src),init,mult,add)
+    def hash_prng64(self,src:bytes,mult:int,add:int=0,init:int=0) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_prng64(b,len(src),init,mult,add)
 
     def _free(self,p): self.dll.free_exp(ctypes.cast(p,voidp))

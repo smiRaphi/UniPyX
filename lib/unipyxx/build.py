@@ -6,13 +6,14 @@ SRCD = os.path.dirname(os.path.abspath(__file__))
 def get_src(p:str): return os.path.join(SRCD,p)
 LIBD = os.path.join(SRCD,'.lib')
 os.makedirs(LIBD,exist_ok=True)
+HSFS = ('unipyxx.c','util.h','comp.c','crypt.c','ext.c','const.h')
 FS = [get_src(x) for x in ('unipyxx.c','util.h','comp.c','crypt.c','ext.c')]
 XEXR = re.compile(r'(?m)^XEXPORT [^\(]+ ([\w_]+)\('.encode())
 IMPR = re.compile(r'(?m)^XIMPORT\(([^\)]+)\)'.encode())
 DLLP = SRCD + ('.dll' if sys.platform == 'win32' else '.so')
 
 def remove(f:str):
-    for _ in range(5):
+    for t in range(5):
         try: os.remove(f)
         except PermissionError: sleep(0.1)
         else: break
@@ -50,8 +51,8 @@ def compile(quiet=False):
     ch = sha256()
     libs = set()
     xfncs = set()
-    for x in sorted(FS):
-        d = open(x,'rb').read().replace(b'\r',b'').strip(b'\n')
+    for x in sorted(HSFS):
+        d = open(get_src(x),'rb').read().replace(b'\r',b'').strip(b'\n')
         ch.update(d)
         for fn in XEXR.findall(d): xfncs.add(fn.decode('utf-8'))
         for lns in IMPR.findall(d):
@@ -73,8 +74,7 @@ def compile(quiet=False):
     if cc is None: raise ValueError('No C compiler found')
 
     if os.path.exists(DLLP):
-        if os.path.exists(DLLP + '.bak'): remove(DLLP + '.bak')
-        os.rename(DLLP,DLLP + '.bak')
+        os.replace(DLLP,DLLP + '.bak')
     pls = os.listdir()
     r = subprocess.call([cc] + cmd + [l for l in libs if l.endswith(('.a','.lib'))],env=env,stdout=-3 if quiet else None,stderr=-2 if quiet else None)
     ex = ('exp','lib','a','pdb','obj')

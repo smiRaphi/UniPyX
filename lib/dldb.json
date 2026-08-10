@@ -1,6 +1,7 @@
 {
     "httpx":{
-        "pip":"httpx"
+        "pip":"httpx",
+        "ts":1757945710
     },
     "msdos":{
         "p":"msdos.exe",
@@ -57,12 +58,13 @@
             "x":{
                 "triddefs.trd":"trid/triddefs.trd"
             },
-            "ts":1784844000
+            "ts":1785535200
         }],
-        "ts":1784844000
+        "ts":1785535200
     },
     "stringzilla":{
-        "pip":"stringzilla"
+        "pip":"stringzilla",
+        "ts":1785514849
     },
     "file":{
         "p":"file/file.exe",
@@ -123,15 +125,17 @@
             "x":{
                 "*":"DiE"
             },
-            "ts":1785016800
+            "ts":1785708000
         }],
-        "ts":1785016800
+        "ts":1785708000
     },
     "Cryptodome":{
-        "pip":"pycryptodomex"
+        "pip":"pycryptodomex",
+        "ts":1747495327
     },
     "cryptography":{
-        "pip":"cryptography"
+        "pip":"cryptography",
+        "ts":1785500613
     },
     "7z":{
         "p":"7z/7z.exe",
@@ -203,10 +207,10 @@
                 "System.ValueTuple.dll":"GARbro/System.ValueTuple.dll",
                 "ZstdSharp.dll":"GARbro/ZstdSharp.dll"
             },
-            "nightly_run":30111493117,
-            "ts":1785072199
+            "nightly_run":30730825495,
+            "ts":1785765699
         }],
-        "ts":1785072199
+        "ts":1785765699
     },
     "hxcfe":{
         "p":"hxcfe/hxcfe.exe",
@@ -516,13 +520,13 @@
     "dolphintool":{
         "p":"DolphinTool.exe",
         "fs":[{
-            "u":"https://dl.dolphin-emu.org/builds/9a/0b/dolphin-master-2606-186-x64.7z",
+            "u":"https://dl.dolphin-emu.org/builds/c1/11/dolphin-master-2606-257-x64.7z",
             "x":{
                 "Dolphin-x64/DolphinTool.exe":"DolphinTool.exe"
             },
-            "ts":1784946649
+            "ts":1785673318
         }],
-        "ts":1784946649
+        "ts":1785673318
     },
     "wit":{
         "p":"WIT/wit.exe",
@@ -659,14 +663,14 @@
     "chdman":{
         "p":"chdman.exe",
         "fs":[{
-            "u":"https://github.com/mamedev/mame/releases/download/mame0288/mame0288b_x64.exe",
+            "u":"https://github.com/mamedev/mame/releases/download/mame0289/mame0289b_x64.exe",
             "ex":".7z",
             "x":{
                 "chdman.exe":"chdman.exe"
             },
-            "ts":1779974553
+            "ts":1785443939
         }],
-        "ts":1779974553
+        "ts":1785443939
     },
     "mdnds":{
         "p":"mdnds.exe",
@@ -961,10 +965,10 @@
     "3dt":{
         "p":"3dt_x86_64-windows-gnu.exe",
         "fs":[[
-            "https://github.com/trapexit/3dt/releases/download/1.3.0/3dt_x86_64-windows-gnu.exe",
+            "https://github.com/trapexit/3dt/releases/download/1.4.0/3dt_x86_64-windows-gnu.exe",
             "3dt.exe"
         ]],
-        "ts":1781897914
+        "ts":1785239255
     },
     "assamunpack":{
         "p":"assamUnpack.exe",
@@ -1076,7 +1080,8 @@
         "ts":0
     },
     "webarchive":{
-        "pip":"pywebarchive"
+        "pip":"pywebarchive",
+        "ts":1695561961
     },
     "arq":{
         "p":"ARQ.EXE",
@@ -2002,15 +2007,15 @@
     "gdre_tools":{
         "p":"GDRETools/gdre_tools.exe",
         "fs":[{
-            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.6.0/GDRE_tools-v2.6.0-windows.zip",
+            "u":"https://github.com/GDRETools/gdsdecomp/releases/download/v2.6.3/GDRE_tools-v2.6.3-windows.zip",
             "x":{
                 "gdre_tools.exe":"GDRETools/gdre_tools.exe",
                 "GodotMonoDecompNativeAOT.dll":"GDRETools/GodotMonoDecompNativeAOT.dll",
                 "gdre_tools.pck":"GDRETools/gdre_tools.pck"
             },
-            "ts":1784190705
+            "ts":1785270722
         }],
-        "ts":1784190705
+        "ts":1785270722
     },
     "uncrush":{
         "p":"UNCRUSH.EXE",
@@ -2208,7 +2213,8 @@
         }]
     },
     "npkpy":{
-        "pip":"npkPy"
+        "pip":"npkPy",
+        "ts":1634911094
     },
     "pea":{
         "p":"pea.exe",
@@ -2295,23 +2301,23 @@
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
-            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46186/SDLVICE-3.10-win64-r46186.7z",
+            "u":"https://github.com/VICE-Team/svn-mirror/releases/download/r46195/SDLVICE-3.10-win64-r46195.7z",
             "x":{
-                "SDLVICE-3.10-win64-r46186/c1541.exe":"VICE/c1541.exe",
-                "SDLVICE-3.10-win64-r46186/zlib1.dll":"VICE/zlib1.dll",
-                "SDLVICE-3.10-win64-r46186/SDL.dll":"VICE/SDL.dll",
-                "SDLVICE-3.10-win64-r46186/libstdc++-6.dll":"VICE/libstdc++-6.dll",
-                "SDLVICE-3.10-win64-r46186/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
-                "SDLVICE-3.10-win64-r46186/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
+                "SDLVICE-3.10-win64-r46195/c1541.exe":"VICE/c1541.exe",
+                "SDLVICE-3.10-win64-r46195/zlib1.dll":"VICE/zlib1.dll",
+                "SDLVICE-3.10-win64-r46195/SDL.dll":"VICE/SDL.dll",
+                "SDLVICE-3.10-win64-r46195/libstdc++-6.dll":"VICE/libstdc++-6.dll",
+                "SDLVICE-3.10-win64-r46195/libgcc_s_seh-1.dll":"VICE/libgcc_s_seh-1.dll",
+                "SDLVICE-3.10-win64-r46195/libwinpthread-1.dll":"VICE/libwinpthread-1.dll"
             },
-            "ts":1785001950
+            "ts":1785504402
         },{
             "u":"https://spiro.trikaliotis.net/download/opencbm-0.4.99.104/opencbm-0.4.99.104.zip",
             "x":{
                 "opencbm-0.4.99.104/amd64/opencbm.dll":"VICE/opencbm.dll"
             }
         }],
-        "ts":1785001950
+        "ts":1785504402
     },
     "pfs2tar":{
         "p":"pfs2tar.exe",
@@ -2657,14 +2663,14 @@
     "renderdoccmd":{
         "p":"RenderDoc/renderdoccmd.exe",
         "fs":[{
-            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_07_25_e434ebbb_32.zip",
+            "u":"https://renderdoc.org/autobuilds/v1.x/2026/RenderDoc_2026_08_02_4e59f62a_32.zip",
             "x":{
-                "RenderDoc_2026_07_25_e434ebbb_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
-                "RenderDoc_2026_07_25_e434ebbb_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
+                "RenderDoc_2026_08_02_4e59f62a_32/renderdoccmd.exe":"RenderDoc/renderdoccmd.exe",
+                "RenderDoc_2026_08_02_4e59f62a_32/renderdoc.dll":"RenderDoc/renderdoc.dll"
             },
-            "ts":1784930400
+            "ts":1785621600
         }],
-        "ts":1784930400
+        "ts":1785621600
     },
     "bsc-m03":{
         "p":"bsc-m03.exe",
@@ -2716,13 +2722,13 @@
     "zxc":{
         "p":"zxc.exe",
         "fs":[{
-            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.13.1/zxc-0.13.1-windows-x86_64.zip",
+            "u":"https://github.com/hellobertrand/zxc/releases/download/v0.13.2/zxc-0.13.2-windows-x86_64.zip",
             "x":{
                 "bin/zxc.exe":"zxc.exe"
             },
-            "ts":1784081042
+            "ts":1785387719
         }],
-        "ts":1784081042
+        "ts":1785387719
     },
     "vlaz":{
         "p":"vlaz.exe",
@@ -5282,7 +5288,8 @@
         "ts":1768118137
     },
     "lz4":{
-        "pip":"lz4"
+        "pip":"lz4",
+        "ts":1762171284
     },
     "fastlz_tool":{
         "p":"fastlz_tool.exe",
@@ -5412,15 +5419,16 @@
     },
     "splat":{
         "pip":"splat64[mips]",
-        "ts":1773586899
+        "ts":1785167305
     },
     "crunch64":{
-        "pip":"crunch64"
+        "pip":"crunch64",
+        "ts":1774728972
     },
     "wolvenkit.cli":{
         "p":"WolvenKit.Console/WolvenKit.CLI.exe",
         "fs":[{
-            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.19.1-nightly.2026-07-26/WolvenKit.Console-8.19.1-nightly.2026-07-26.zip",
+            "u":"https://github.com/WolvenKit/WolvenKit-nightly-releases/releases/download/8.19.1-nightly.2026-08-02/WolvenKit.Console-8.19.1-nightly.2026-08-02.zip",
             "x":{
                 "appsettings.json":"WolvenKit.Console/appsettings.json",
                 "CommunityToolkit.Mvvm.dll":"WolvenKit.Console/CommunityToolkit.Mvvm.dll",
@@ -5473,9 +5481,9 @@
                 "WolvenKit.Modkit.dll":"WolvenKit.Console/WolvenKit.Modkit.dll",
                 "WolvenKit.RED4.dll":"WolvenKit.Console/WolvenKit.RED4.dll"
             },
-            "ts":1785064743
+            "ts":1785669537
         }],
-        "ts":1785064743
+        "ts":1785669537
     },
     "noodle":{
         "p":"oo2core_win64.dll",
@@ -5525,7 +5533,7 @@
     "git":{
         "p":"git/git.exe",
         "fs":[{
-            "u":"https://github.com/git-for-windows/git/releases/download/v2.55.0-rc1.windows.1/MinGit-2.55.0-rc1-64-bit.zip",
+            "u":"https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip",
             "x":{
                 "mingw64/bin/git.exe":"git/git.exe",
                 "mingw64/bin/libiconv-2.dll":"git/libiconv-2.dll",
@@ -5534,9 +5542,9 @@
                 "mingw64/bin/libwinpthread-1.dll":"git/libwinpthread-1.dll",
                 "mingw64/bin/zlib1.dll":"git/zlib1.dll"
             },
-            "ts":1781757983
+            "ts":1784047291
         }],
-        "ts":1781757983
+        "ts":1784047291
     },
     "bsab":{
         "p":"bsab.exe",
@@ -5568,7 +5576,8 @@
         "ts":1772892778
     },
     "flatbuffers":{
-        "pip":"flatbuffers"
+        "pip":"flatbuffers",
+        "ts":1766182573
     },
     "flatc":{
         "p":"flatc.exe",
@@ -5581,7 +5590,8 @@
         "ts":0
     },
     "mmh3":{
-        "pip":"mmh3"
+        "pip":"mmh3",
+        "ts":1772722420
     },
     "gdeflate":{
         "p":"gdeflate.dll",
@@ -5620,7 +5630,8 @@
         }]
     },
     "xxhash":{
-        "pip":"xxhash"
+        "pip":"xxhash",
+        "ts":1783327420
     },
     "tapclean":{
         "p":"TAPClean.exe",
@@ -5640,16 +5651,20 @@
         "ts":0
     },
     "yaml":{
-        "pip":"PyYAML"
+        "pip":"PyYAML",
+        "ts":1758828706
     },
     "lhafile":{
-        "pip":"lhafile"
+        "pip":"lhafile",
+        "ts":1740430754
     },
     "inflate64":{
-        "pip":"inflate64"
+        "pip":"inflate64",
+        "ts":1764323661
     },
     "pyppmd":{
-        "pip":"pyppmd"
+        "pip":"pyppmd",
+        "ts":1764277642
     },
     "wvunpack":{
         "p":"wvunpack.exe",
@@ -5680,11 +5695,32 @@
         "ts":0
     },
     "spookyhash":{
-        "pip":"spookyhash"
+        "pip":"spookyhash",
+        "ts":1762721299
     },
     "pprp":{
         "pip":"pprp==0.2.6",
         "$":"pure-Python Rijndael and PBKDF2, 0.2.7+ is broken (strictly ascii decryption)"
+    },
+    "ascon":{
+        "pip":"https://raw.githubusercontent.com/meichlseder/pyascon/refs/heads/master/ascon.py",
+        "dl":"ascon.py"
+    },
+    "ascon_old_le":{
+        "pip":"https://raw.githubusercontent.com/meichlseder/pyascon/1ad53264d74e7b58d8482ba2e1d8251f339e4e41/ascon.py",
+        "dl":"ascon_old_le.py"
+    },
+    "ascon_old":{
+        "pip":"https://raw.githubusercontent.com/meichlseder/pyascon/5ee786cdc8a74d9c0f7b3c81f99f5dcb5490ca00/ascon.py",
+        "dl":"ascon_old.py"
+    },
+    "blake3":{
+        "pip":"blake3",
+        "ts":1782144106
+    },
+    "blake":{
+        "pip":"http://www.seanet.com/~bugbee/crypto/blake/blake.py",
+        "dl":"blake.py"
     },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",
@@ -5720,7 +5756,7 @@
     "ffdec":{
         "p":"jpexs/ffdec.jar",
         "fs":[{
-            "u":"https://github.com/jindrapetrik/jpexs-decompiler/releases/download/nightly3533/ffdec_26.2.1_nightly3533.zip",
+            "u":"https://github.com/jindrapetrik/jpexs-decompiler/releases/download/nightly3537/ffdec_26.2.1_nightly3537.zip",
             "x":{
                 "ffdec.jar":"jpexs/ffdec.jar",
                 "lib/ffdec_lib.jar":"jpexs/lib/ffdec_lib.jar",
@@ -5732,9 +5768,9 @@
                 "lib/gif.jar":"jpexs/lib/gif.jar",
                 "lib/flacomdoc.jar":"jpexs/lib/flacomdoc.jar"
             },
-            "ts":1785042633
+            "ts":1785751007
         }],
-        "ts":1785042633
+        "ts":1785751007
     },
     "wasm2c":{
         "p":"wasm2c.exe",
@@ -5796,13 +5832,16 @@
         "ts":0
     },
     "pefile":{
-        "pip":"pefile"
+        "pip":"pefile",
+        "ts":1724698718
     },
     "dnfile":{
-        "pip":"dnfile"
+        "pip":"dnfile",
+        "ts":1769832549
     },
     "nefile":{
-        "pip":"nefile"
+        "pip":"nefile",
+        "ts":1695563437
     },
     "amitools":{
         "p":"amitools/__init__.py",
@@ -7010,7 +7049,7 @@
         "fs":[
         "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/keys.pyob"
         ],
-        "ts":1785069786
+        "ts":1786228502
     },
     "forza_keys":{
         "p":"forza_keys.pyob",

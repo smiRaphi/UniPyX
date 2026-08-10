@@ -66,7 +66,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
     match t:
         case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'LZIP'|'CPIO'|'Asar'|'ARJZ'|\
-             'DiskDupe IMG'|'XAR'|'Z'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer'|'RPM Package'|\
+             'DiskDupe IMG'|'XAR'|'Unix Compress'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer'|'RPM Package'|\
              'Microsoft Compound Document':
             _,_,e = zip7(i,o,t)
             if 'ERROR: Unsupported Method : ' in e and readfile(i,size=2) == b'MZ':
@@ -76,7 +76,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 run([i,'x','-o' + o,'-y'],print_try=False)
             if listdir(o) and not exists(o + '/.rsrc'):
                 if t == 'MSCAB': fix_cab(o);return
-                elif t in {'Z','xz','BZip2','LZIP'}: return fix_tar(o)
+                elif t in {'Unix Compress','xz','BZip2','LZIP'}: return fix_tar(o)
                 else: return
         case 'ZSTD':
             db.try_custom()
@@ -443,8 +443,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             }
             db.try_custom()
             import json
-            from lib.file import File,decompress,pdosdate,by2bi
-            from lib.crypto import decrypt,encrypt,crc_hash
+            from lib.file import File,decompress,by2bi
+            from lib.crypto import decrypt,crc_hash
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
@@ -560,7 +560,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 ct,cd = f.readu16(),f.readu16()
                 if not trrntzip:
-                    try: fe['ts']['m'] = unix2filetime(pdosdate(cd,ct))
+                    try: fe['ts']['m'] = unix2filetime(dos2unix(ct,cd))
                     except ValueError: pass
                 fe['crc'] = f.readu32()
                 fe['chk'] = (cd >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
@@ -761,7 +761,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if ct == 99 and 'aes' in fe:
                     sml,kml = (0,8,12,16)[fe['aes']['m']],(0,16,24,32)[fe['aes']['m']]
                     salt,kvr,auth,d = d[:sml],d[sml:sml+2],d[-10:],d[sml+2:-10]
-                    k = encrypt(KEY,'pbkdf2',salt,1000,size=kml*2 + 2)
+                    k = crc_hash(KEY,'pbkdf2',key=salt,c=1000,size=kml*2 + 2)
                     asrt(k[-2:] == kvr,'Password verification failed')
                     asrt(crc_hash(d,'hmac_sha1',key=k[kml:-2],bytes=True)[:10] == auth,'Authentication failed')
                     d = decrypt(d,'aes_ctr_le',k[:kml],bits=0x80)
@@ -1392,7 +1392,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'Bootable FAT16 IMG':
             db.try_custom()
-            from lib.file import File,pdosdate
+            from lib.file import File
             f = File(i,endian='<')
 
             f.seek(0xA0B)
@@ -1428,7 +1428,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     ct = f.readu16()
                     cd = f.readu16()
 
-                fs.append((fn,f.readu16(),f.readu32(),pdosdate(cd,ct,rcd[0] if sum(rcd) else 0)))
+                fs.append((fn,f.readu16(),f.readu32(),dos2unix(ct,cd,rcd[0] if sum(rcd) else 0)))
 
             csf = []
             for fe in fs:
@@ -1455,7 +1455,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'Web ARchive':
             db.try_custom()
-            from lib.crypto import decrypt
+            from lib.file import decompress
             import json
             f = xopen(i,'rb')
 
@@ -1478,35 +1478,33 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     rhd = read_http_head(f.readline,p - len(gv))
                     hds['$http'] = {'$header':gv.strip().decode('utf-8')} | rhd.copy()
                     rhd = {k.lower():v for k,v in rhd.items()}
-
-                    if 'content-disposition' in rhd and\
-                       'attachment' in rhd['content-disposition'].lower() and\
-                       'filename'   in rhd['content-disposition'].lower():
-                        rfn = rhd['content-disposition'].split('; ',1)[1]
-                        rfn = rfn[8:].strip()
-                        if rfn[:1] == '*':
-                            enc,rfn = rfn[2:].strip().split("''",1)
-                            rfn = rfn.strip().split()[0]
-                            fn = decrypt(rfn,'url').decode(enc)
-                        else:
-                            rfn = rfn[1:].strip()
-                            if rfn[:1] == '"':
-                                rfn,rfn = rfn[1:].split('"')[0]
-                                if '; ' in rfn and 'filename' in rfn.lower() and "''" in rfn:
-                                    enc,rfn = rfn[2:].strip().split("''",1)
-                                    rfn = rfn.strip().split()[0]
-                                    fn = decrypt(rfn,'url').decode(enc.decode('latin1'))
-                                else: fn = decrypt(rfn,'url').decode('latin1')
-                    elif 'content-type' in rhd: fn = 'content.' + mime2ext(rhd['content-type'])
-                    else: fn = 'content.bin'
+                    fn = http_head_filename(rhd)
 
                     ll = min(int(rhd.get('content-length',bp + p)),p-(f.tell()-bp))
-                    if ll: writefile(bfn + fn,f.read(ll))
+                    if ll:
+                        enc = rhd.get('content-encoding','none')
+                        if enc.startswith('x-'): enc = enc[2:]
+                        if enc == 'identity': enc = 'none'
+                        if enc in {'sdch','dcb','dcz'}: raise NotImplementedError('Dictionary compression',enc)
+                        if rhd.get('transfer-encoding') == 'chunked':
+                            ep = bp + p
+                            d = bytearray()
+                            while f.tell() < ep:
+                                l = int(f.readline().strip(),16)
+                                d.extend(f.read(l))
+                                asrt(f.readline() == b'\r\n')
+                                if l == 0: break
+                        else: d = f.read(ll)
+                        writefile(bfn + fn,decompress(d,enc))
                     f.seek(bp + p)
                 else: raise NotImplementedError(hd['warc-type'])
                 json.dump(hds,xopen(bfn + 'header.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
                 tr[hd['warc-type']] += 1
-                f.readline();f.readline()
+                while True:
+                    l = f.readline()
+                    if l != b'\r\n':
+                        f.seek(-len(l),1)
+                        break
 
             f.close()
             if tr: return
@@ -1702,9 +1700,109 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/' + fe[1],decrypt(fe[2],'base64'))
 
             if listdir(o): return
+        case 'HTTP Archive':
+            db.try_custom()
+            from lib.crypto import decrypt
+            di = readfile(i,'j')
+            asrt(list(di) == ['log'])
+            di = di['log']
+
+            inf = {}
+            for x in ('version','creator','pages'):
+                if x in di: inf[x] = di[x]
+            if inf:
+                if di.get('pages'):
+                    cts = max(str2unix(x['startedDateTime']) for x in di['pages'])
+                    mts = max(str2unix(x['startedDateTime']) + x['pageTimings'].get('onContentLoad',x['pageTimings']['onLoad']) for x in di['pages'])
+                else: cts = mts = None
+                writefile(o + '/$info.json',inf,'j',indent=4)
+                set_ftime(o + '/$info.json',ct=cts,mt=mts)
+
+            for ix,x in enumerate(di['entries']):
+                ct = str2unix(x['startedDateTime'])
+                mt = ct + x['time']
+                inf = {}
+                for y in x:
+                    if y not in {'request','response'}: inf[y] = x[y]
+                fn = f'{o}/{ix:02d}_$info.json'
+                writefile(fn,inf,'j',indent=4)
+                set_ftime(fn,ct=ct,mt=mt)
+
+                qx = x['request']
+                rq = {}
+                for y in qx:
+                    if y == 'headers':
+                        rq[y] = {}
+                        for z in qx[y]:
+                            k,v = z['name'],z['value']
+                            if k in rq[y]: rq[y][k] += ', ' + v
+                            else: rq[y][k] = v
+                    else: rq[y] = qx[y]
+                fn = f'{o}/{ix:02d}_$request.json'
+                writefile(fn,rq,'j',indent=4)
+                set_ftime(fn,ct=ct)
+
+                sx = x['response']
+                rs = {}
+                for y in sx:
+                    if y == 'headers':
+                        rs[y] = {}
+                        for z in sx[y]:
+                            k,v = z['name'],z['value']
+                            if k in rs[y]: rs[y][k] += ', ' + v
+                            else: rs[y][k] = v
+                    elif y == 'content':
+                        rs[y] = {zk:zv for zk,zv in sx[y].items() if zk in {'size','mimeType','compression'}}
+                    else: rs[y] = sx[y]
+                fn = f'{o}/{ix:02d}_$response.json'
+                writefile(fn,rs,'j',indent=4)
+                set_ftime(fn,ct=ct,mt=mt)
+
+                if 'content' in sx:
+                    cx = sx['content']
+                    asrt(all(y in {'size','mimeType','text','encoding','compression'} for y in cx),list(cx))
+
+                    hs = {yk.lower():yv for yk,yv in rs['headers'].items()}
+                    if not 'content-type' in hs and 'mimeType' in cx: hs['content-type'] = cx['mimeType']
+                    fn = f'{o}/{ix:02d}_{http_head_filename(hs)}'
+
+                    if 'text' in cx:
+                        d = cx['text']
+                        if 'encoding' in cx: d = decrypt(d,cx['encoding'])
+                    else:
+                        fn += '.null'
+                        d = b''
+                    writefile(fn,d)
+                    set_ftime(fn,ct=ct,mt=mt)
+
+            if di['entries']: return
 
     return 1
 
+def http_head_filename(h:dict):
+    from lib.crypto import decrypt
+    if 'content-disposition' in h and\
+        'attachment' in h['content-disposition'].lower() and\
+        'filename'   in h['content-disposition'].lower():
+        rfn = h['content-disposition'].split('; ',1)[1]
+        rfn = rfn[8:].strip()
+        if rfn[:1] == '*':
+            enc,rfn = rfn[2:].strip().split("''",1)
+            rfn = rfn.strip().split()[0]
+            fn = decrypt(rfn,'url').decode(enc)
+        else:
+            rfn = rfn[1:].strip()
+            if rfn[:1] == '"':
+                rfn,rfn = rfn[1:].split('"')[0]
+                if '; ' in rfn and 'filename' in rfn.lower() and "''" in rfn:
+                    enc,rfn = rfn[2:].strip().split("''",1)
+                    rfn = rfn.strip().split()[0]
+                    fn = decrypt(rfn,'url').decode(enc.decode('latin1'))
+                else: fn = decrypt(rfn,'url').decode('latin1')
+            else: fn = rfn
+    elif 'content-type' in h: fn = '$content.' + mime2ext(h['content-type'])
+    else: fn = '$content.bin'
+    return fn
 def read_http_head(readline,max:int=None,idn=False):
     o = {}
     p = 0
@@ -1722,5 +1820,7 @@ def read_http_head(readline,max:int=None,idn=False):
         if not l: break
         try: lr = l.decode('utf-8');asrt(lr.isprintable())
         except: lr = l.decode('latin1')
-        o[lr.split(': ',1)[0]] = lr.split(': ',1)[1]
+        k,v = lr.split(':',1)[0].strip(),lr.split(':',1)[1].strip()
+        if k in o: o[k] += ', ' + v
+        else: o[k] = v
     return o

@@ -1,10 +1,11 @@
 import sys,os,subprocess
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-os.makedirs(BDIR + '\\bin\\pip',exist_ok=True)
-sys.path.insert(0,BDIR + '\\bin\\pip')
+PIPDIR = BDIR + '\\bin\\pip'
+os.makedirs(PIPDIR,exist_ok=True)
+sys.path.insert(0,PIPDIR)
 def pip(*pkgs,error=False):
-    r = subprocess.run([sys.executable,'-m','pip','install',*pkgs,'-U','-t',BDIR + '\\bin\\pip'],stdout=-1,stderr=-2)
+    r = subprocess.run([sys.executable,'-m','pip','install',*pkgs,'-U','-t',PIPDIR],stdout=-1,stderr=-2)
     if error and r.returncode: raise RuntimeError(r.stdout.decode('cp437'))
     return r.stdout.decode('cp437')
 
@@ -72,7 +73,7 @@ class DLDB:
                 if n in self.pdb:
                     if n not in self.pipinstalled: self.pipinstalled[n] = 0
                     self.pipinstalled[n] += 1
-                    if n in self.udb and self.udb[n] < self.pdb[n].get('ts',0): self.pip(n)
+                    if not n in self.udb or self.udb[n] < self.pdb[n].get('ts',0): self.pip(n)
 
         sys.meta_path.insert(1,DLDBPipUpdate)
         sys.meta_path.append(DLDBPip)
@@ -303,10 +304,13 @@ class DLDB:
             self.ghthp.join()
     def pip(self,n:str,install=False) -> dict:
         e = self.pdb[n]
-        if n in self.udb and self.udb[n] > e.get('ts',0) and not install: return e
+        if n in self.udb and self.udb[n] > e.get('ts',0) and not install and (not 'dl' in e or os.path.exists(PIPDIR + '/' + e['dl'])): return e
         print('Downloading',n)
         t = int(time())
-        self.piptries[n] = pip(e['pip'])
+        if e.get('dl'):
+            self.dl(e['pip'],PIPDIR + '/' + e['dl'])
+            self.piptries[n] = 'Success'
+        else: self.piptries[n] = pip(e['pip'])
         self.udb[n] = t
         self.save()
         return e

@@ -6,6 +6,7 @@ import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil,inspec
 from time import sleep
 from queue import Queue
 from ctypes import wintypes
+from datetime import datetime
 from multiprocessing import cpu_count
 from shutil import rmtree,copytree,copyfile
 from multiprocessing.pool import ThreadPool
@@ -122,6 +123,7 @@ def console(back=0):
                 print('  ' + next(ex).strip('\n\r')[4:])
             print(f'\x1B[91m{e.__class__.__name__}: {e}\x1B[0m')
 
+shutil = shutil
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
 basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
 rename = os.rename
@@ -183,6 +185,15 @@ def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
 def readfile(f:str,m='rb',off=0,size=None,encoding='utf-8',newline=None,**kwargs) -> bytes|str:
     asrt(not any(x in m for x in 'wax') and not '+' in m)
     if not 'r' in m and not '+' in m: m += 'r'
+
+    if 'j' in m:
+        m = m.replace('j','') or 'rb'
+        if 'b' in m: o = xopen(f,m)
+        else: o = xopen(f,m,encoding=encoding,newline=newline)
+        r = json.load(o,**kwargs)
+        o.close()
+        return r
+
     if 'b' in m: o = xopen(f,m,**kwargs)
     else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
     fs = o.seek(0,2)
@@ -192,10 +203,27 @@ def readfile(f:str,m='rb',off=0,size=None,encoding='utf-8',newline=None,**kwargs
     r = o.read(size)
     o.close()
     return r
-def writefile(f:str,d:bytes|str,m=None,encoding='utf-8',newline=None,**kwargs):
-    if m is None: m = 't' if isinstance(d,str) else 'b'
+def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,**kwargs):
+    if m is None:
+        if isinstance(d,(bytes,bytearray,memoryview)): m = 'b'
+        elif isinstance(d,str): m = 't'
+        elif isinstance(d,(dict,list)): m = 'j'
+        else: raise TypeError("couldn't guess mode")
     else: asrt(not 'r' in m and not '+' in m)
     if not 'w' in m and not 'a' in m and not 'x' in m and not '+' in m: m += 'w'
+
+    if 'j' in m:
+        m = m.replace('j','')
+        asrt(not 'b' in m)
+        o = xopen(f,m,encoding=encoding,newline=newline)
+        if encoding is not None and encoding != 'ascii' and not 'ensure_ascii' in kwargs: kwargs['ensure_ascii'] = False
+        if kwargs.pop('minify',False):
+            kwargs['indent'] = None
+            kwargs['separators'] = (',',':')
+        r = o.write(json.dumps(d,**kwargs))
+        o.close()
+        return r
+
     if 'b' in m: o = xopen(f,m,**kwargs)
     else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
     r = o.write(d)
@@ -270,9 +298,66 @@ def sanitize_relative(p:str):
     if p[-1] not in '\\/' and r[-1] in '\\/': r = r[:-1]
     elif p[-1] != r[-1]: r = r[:-1] + p[-1]
     return r
+
 def unix2filetime(t:int): return int(t * 10000000 + 116444736000000000)
 def filetime2unix(t:int): return (t - 116444736000000000) / 10000000
 def vms2filetime(t:int): return t + 81377568000000000
+def dos2unix(t:int=0,d:int=0,ms:float=0):
+    asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
+    if d == 0: d = 0x21
+    dt = datetime(1980 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 11) & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
+    if ms: dt.replace(microsecond=ms*1000000)
+    return dt.timestamp()
+def dosr2unix(d:int=0,t:int=0,ms:float=0): return dos2unix(t,d,ms)
+def strp2re(fmt:str):
+    p = 0
+    rg = []
+    while p < len(fmt):
+        c = fmt[p];p += 1
+        if c == '%':
+            c = fmt[p];p += 1
+            if c in 'wu': rg.append(r'\d')
+            elif c in 'dmyHIMSUWV': rg.append(r'\d{2}')
+            elif c == 'j': rg.append(r'\d{3}')
+            elif c in 'YG': rg.append(r'\d{4}')
+            elif c == 'f': rg.append(r'\d{6}')
+            elif c == 'z': rg.append(r'[-+]\d{4}(\d{2}(\.\d{6})?)?')
+            elif c == 'p': rg.append(r'[A-Za-z]{2}')
+            elif c == 'Z': rg.append(r'[A-Z]{3}')
+            elif c == 'b': rg.append(r'[A-Z][a-z]{2}')
+            elif c == 'a': rg.append(r'[A-Z][a-z]{1,2}')
+            elif c in 'AB': rg.append(r'[A-Z][a-z]{2,}')
+            elif c == ':' and fmt[p] in 'zm':
+                c = fmt[p];p += 1
+                if c == 'z': rg.append(r'[-+]\d{2}:\d{2}(\:\d{2}(\.\d{6})?)?')
+                elif c == 'm': rg.append(r'(?P<mls>\d{3})') # milliseconds, unofficial
+            elif c == '%': rg.append('%')
+            else: raise NotImplementedError(f"'%{c}' @ {p - 2} of '{fmt}'")
+        else: rg.append(re.escape(c))
+    return re.compile('^' + ''.join(rg) + '$')
+TS_FMTS = [(strp2re(x),x) for x in (
+    "%Y-%m-%dT%H:%M:%SZ",
+    "%Y-%m-%dT%H:%M:%S.%fZ",
+    "%Y-%m-%d %H:%M:%S %Z",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%dT%H:%M:%S%z",
+    "%m/%d/%Y",
+    "%Y-%m-%d",
+    "%Y-%m-%dT%H:%M:%S.%:mZ",
+)]
+MLS_TSR = re.compile(r'%(:m|%)')
+def str2unix(t:str,fmt=None,locale=None):
+    if fmt is None:
+        for x,y in TS_FMTS:
+            if x.match(t):
+                fmt = y
+                break
+        else: raise NotImplementedError(f"Unknown timestamp format '{t}'")
+    if ':m' in MLS_TSR.findall(fmt):
+        if fmt == "%Y-%m-%dT%H:%M:%S.%:mZ":
+            return datetime.fromisoformat(t).timestamp()
+        else: raise NotImplementedError(f"Timestamp format with milliseconds '{t}' (not ISO)")
+    else: return datetime.strptime(t,fmt).timestamp()
 def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
     if ct is None and at is None and mt is None: return
     if ct is None: ct = 0
@@ -285,12 +370,12 @@ def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
         wat = unix2filetime(at)
         wmt = unix2filetime(mt)
     else: wct,wat,wmt = ct,at,mt
-    fct = wintypes.FILETIME(wct & 0xFFFFFFFF,wct >> 32)
-    fat = wintypes.FILETIME(wat & 0xFFFFFFFF,wat >> 32)
-    fmt = wintypes.FILETIME(wmt & 0xFFFFFFFF,wmt >> 32)
 
     h = None
     try:
+        fct = wintypes.FILETIME(wct & 0xFFFFFFFF,wct >> 32)
+        fat = wintypes.FILETIME(wat & 0xFFFFFFFF,wat >> 32)
+        fmt = wintypes.FILETIME(wmt & 0xFFFFFFFF,wmt >> 32)
         h = ctypes.windll.kernel32.CreateFileW(p,256,0,None,3,128,None)
         ctypes.windll.kernel32.SetFileTime(h,ctypes.byref(fct),ctypes.byref(fat),ctypes.byref(fmt))
     except: pass
@@ -302,6 +387,7 @@ def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
         at = filetime2unix(at)
         mt = filetime2unix(mt)
     os.utime(p,(at,mt))
+
 TEXTBL = {'\0','\1','\2','\3','\4','\5','\6','\7','\x08','\x0B','\x0C','\x0E','\x0F','\x10','\x11','\x12','\x13','\x14','\x15','\x16','\x17','\x18','\x19','\x1A','\x1B','\x1C','\x1D','\x1E','\x1F','\x7F'}
 def istext(d:bytes,encoding='ascii'):
     try: dd = d.decode(encoding)
@@ -1364,6 +1450,7 @@ MIMEMP = {
     'video/matroska-3d':'mkv',
     'video/mpeg':'mpg',
     'video/mpeg4-generic':'mp4',
+    'x-unknown':'bin',
 }
 def mime2ext(m:str):
     if type(m) == bytes: m = m.decode('latin1')

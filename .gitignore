@@ -1,21 +1,20 @@
 __pycache__
+*.pyc
 /.vscode
 
 /bin/*
 !/bin/AssetRipper
 /bin/AssetRipper/*
-!/bin/UTMT_CLI
-/bin/UTMT_CLI/*
 /out
 *.exe
 *.dll
 !/lib/unipyxx.dll
-*.pyc
 *.pyo
 *.pyob
 *.bhl
 /lib/unipyxx/.lib
 /lib/unipyxx/.libx
+/lib/unipyxx.dll.bak
 /lib/.is_dev
 /dev/_namespaces.py
 /dev/namespaces.py

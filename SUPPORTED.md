@@ -1,8 +1,8 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1054
+# Supported Formats: 1055
 
-## "Common" Archives/Compressors/Encodings (150)
+## "Common" Archives/Compressors/Encodings (151)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -94,6 +94,7 @@ Google Authenticator Migration URL | otpauth-migration:// | Custom |
 Google Update Installer | .exe | [7-Zip](https://7-zip.org/) |
 GZIP | .gz | Custom |
 HA | .ha | [HA](https://www.sac.sk/download/pack/ha0999.zip) |
+HTTP Archive | .har .harc | Custom |
 HTTP Response | .txt | Custom |
 HxC Floppy IMG | .hxc .img | [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 IMG | .img .dsk | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
@@ -136,6 +137,7 @@ Turbo Range Coder | .trc | [Turbo Range Coder](https://github.com/powturbo/Turbo
 UDF | .udf | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 UFA | .ufa | [UFA](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 UHARC | .uha .uhc | [UHARC](https://www.sac.sk/download/pack/uharc06b.zip) |
+Unix Compress | .z | [7-Zip](https://7-zip.org/) |
 Unix Fast Filesystem | .fs | [Aaru](https://github.com/aaru-dps/Aaru) |
 UUencoded | .uu .uue | Custom |
 UUencoded Base64 | .b64 | Custom |
@@ -149,7 +151,6 @@ xz | .xz | [7-Zip](https://7-zip.org/) |
 YAC | .yac .yc | [YAC](https://www.sac.sk/download/pack/yac102.zip) |
 Yamazaki Zipper | .yz | [yzdec](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/yz1/deepf106.zip)(src?) |
 yEnc | .ntx .yenc | [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
-Z | .z | [7-Zip](https://7-zip.org/) |
 ZIP | .zip .zipx .exe | Custom, [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) |
 ZLIB | .zlib | [zlib](https://docs.python.org/3/library/zlib.html) |
 ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https://bioruebe.com/dev/uniextract/)(src?) |

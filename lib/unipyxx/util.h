@@ -1,5 +1,6 @@
-#include <stdint.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdarg.h>
 
 #ifdef _WIN32
     #define EXPORT __declspec(dllexport)
@@ -21,6 +22,23 @@ extern "C" {
     typedef long ssize_t;
 #endif
 
+typedef struct {
+    uint64_t l;
+    uint64_t h;
+} uint128_t;
+static inline uint128_t uint128(uint64_t l, uint64_t h) { return (uint128_t){l, h}; }
+static inline void uint128_cpy(uint128_t *restrict a, uint128_t *restrict b) { a->l = b->l; a->h = b->h; }
+static inline void uint128_add(uint128_t *restrict a, uint64_t b) {
+    a->l += b;
+    if (a->l < b) a->h++;
+}
+static inline uint32_t uint128_32(uint128_t *restrict a, const uint8_t i) {
+    if (i == 3) return a->h >> 32;
+    if (i == 2) return a->h & 0xFFFFFFFF;
+    if (i == 1) return a->l >> 32;
+    return a->l & 0xFFFFFFFF;
+}
+
 #define CONCAT(a,b) a##b
 #define CONCATX(a,b) CONCAT(a,b)
 #define D_PRAGMA(x) _Pragma(#x)
@@ -31,13 +49,21 @@ extern "C" {
 
 #if defined(__GNUC__) || defined(__clang__)
     #define SWAP32(x) __builtin_bswap32(x)
+    #define SWAP64(x) __builtin_bswap64(x)
 #elif defined(_MSC_VER)
     unsigned long __cdecl _byteswap_ulong(unsigned long);
     #pragma intrinsic(_byteswap_ulong)
     #define SWAP32(x) _byteswap_ulong(x)
+    unsigned long long __cdecl _byteswap_uint64(unsigned long long);
+    #pragma intrinsic(_byteswap_uint64)
+    #define SWAP64(x) _byteswap_uint64(x)
 #else
     static inline uint32_t SWAP32(uint32_t x) {
         return ((x & 0xFF) << 24 | (x & 0xFF00) << 8 | (x & 0xFF0000) >> 8 | (x & 0xFF000000) >> 24);
+    }
+    static inline uint64_t SWAP64(uint64_t x) {
+        return ((x & 0xFF) << 56 | (x & 0xFF00) << 40 | (x & 0xFF0000) << 24 | (x & 0xFF000000) << 8 |
+                (x & 0xFF00000000) >> 8 | (x & 0xFF0000000000) >> 24 | (x & 0xFF000000000000) >> 40 | (x & 0xFF00000000000000) >> 56);
     }
 #endif
 static inline uint16_t SWAP16(uint16_t x) {
@@ -46,19 +72,32 @@ static inline uint16_t SWAP16(uint16_t x) {
 static inline uint8_t SWAP8(uint8_t x) {
     return ((uint8_t)x << 4) | (x >> 4);
 }
+#define SWAPLE32(x) x
+#define SWAPLE64(x) x
+#define SWAPBE32(x) SWAP32(x)
+#define SWAPBE64(x) SWAP64(x)
 
-static inline uint64_t ROTATER(uint64_t x, const size_t n) {
-    return (x >> 1) | (x << (n - 1));
+#define MASK(w) ((w == 64) ? ~0ULL : (1ULL << w) - 1)
+
+static inline uint64_t ROTATER(uint64_t x, const uint8_t w, const uint8_t r) {
+    return (x >> r) | (x << (w - r));
 }
-static inline uint64_t ROTATEL(uint64_t x, const size_t n) {
-    return (x << 1) | (x >> (n - 1));
+static inline uint64_t ROTATEL(uint64_t x, const uint8_t w, const uint8_t r) {
+    return (x << r) | (x >> (w - r));
 }
-static inline uint8_t ROT8R(uint8_t x) { return ROTATER(x, 8); }
-static inline uint8_t ROT8L(uint8_t x) { return ROTATEL(x, 8); }
-static inline uint16_t ROT16R(uint16_t x) { return ROTATER(x, 16); }
-static inline uint16_t ROT16L(uint16_t x) { return ROTATEL(x, 16); }
-static inline uint32_t ROT32R(uint32_t x) { return ROTATER(x, 32); }
-static inline uint32_t ROT32L(uint32_t x) { return ROTATEL(x, 32); }
+static inline uint8_t  ROT8R (uint8_t  x, const uint8_t r) { return ROTATER(x, 8,  r); }
+static inline uint8_t  ROT8L (uint8_t  x, const uint8_t r) { return ROTATEL(x, 8,  r); }
+static inline uint16_t ROT16R(uint16_t x, const uint8_t r) { return ROTATER(x, 16, r); }
+static inline uint16_t ROT16L(uint16_t x, const uint8_t r) { return ROTATEL(x, 16, r); }
+static inline uint32_t ROT32R(uint32_t x, const uint8_t r) { return ROTATER(x, 32, r); }
+static inline uint32_t ROT32L(uint32_t x, const uint8_t r) { return ROTATEL(x, 32, r); }
+
+static inline uint64_t ADDW(uint64_t x, const uint64_t a, const uint8_t w) {
+    return (x + a) & ((1 << w) - 1);
+}
+static inline uint64_t INCW(uint64_t x, const uint8_t w) { return ADDW(x, 1, w); }
+#define INCWi(X,w) X = INCW(X, w)
+#define ADDWi(X,a,w) X = ADDW(X, a, w)
 
 static inline uint64_t REFLECT(uint64_t x, const size_t n) {
     uint64_t r = 0;
@@ -82,6 +121,12 @@ static inline void DBLGF(uint8_t *src, uint8_t *dst) {
     dst[15] = a ^ (src[15] << 1);
     for (int i=14;i >= 0;i--)
         dst[i] = (src[i + 1] >> 7) | (src[i] << 1);
+}
+
+static inline uint64_t SUMB(const uint8_t *restrict src, const size_t size) {
+    uint64_t sum = 0;
+    for (size_t i=0;i < size;i++) sum += src[i];
+    return sum;
 }
 
 static inline uint16_t read16le(const uint8_t *restrict ptr) {
@@ -167,6 +212,9 @@ static inline uint64_t get_bits_l(BitReader *br, size_t n) {
 }
 static inline int is_eof(BitReader *br) {
     return br->ptr >= br->end && !br->bits;
+}
+static inline int is_eofn(BitReader *br, size_t n) {
+    return (br->end - br->ptr) + br->bits < n;
 }
 
 #ifdef __cplusplus

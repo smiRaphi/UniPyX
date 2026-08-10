@@ -1624,7 +1624,7 @@ def extract4_5(inp:str,out:str,t:str):
         case 'Maximus Installer FIZ':
             db.try_custom()
             from lib.crypto import crc_hash
-            from lib.file import File,pdosdate
+            from lib.file import File
             f = File(i,endian='<')
 
             while f:
@@ -1634,7 +1634,7 @@ def extract4_5(inp:str,out:str,t:str):
                 crc = f.readu16()
                 us,zs = f.readu32(),f.readu32()
                 ts = (f.readu16(),f.readu16())
-                try: ts = pdosdate(ts[1],ts[0])
+                try: ts = dos2unix(*ts)
                 except ValueError: ts = None
                 n = f.reads(nl,'ascii')
 
@@ -1648,7 +1648,7 @@ def extract4_5(inp:str,out:str,t:str):
         case 'Maximus Installer ACopy':
             db.try_custom()
             from lib.crypto import crc_hash
-            from lib.file import File,pdosdate
+            from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(10) == b'ACOPY011a\x1A')
 
@@ -1663,7 +1663,7 @@ def extract4_5(inp:str,out:str,t:str):
                 d = f.decompress(fe[6],(0,'none','lzw')[fe[0]],usize=fe[5])
                 asrt(crc_hash(d,'crc16') == fe[7])
                 writefile(o + '/' + fe[1],d)
-                if fe[4]: set_ftime(o + '/' + fe[1],pdosdate(fe[4],fe[3]))
+                if fe[4]: set_ftime(o + '/' + fe[1],dos2unix(fe[3],fe[4]))
 
             f.close()
             if fs: return

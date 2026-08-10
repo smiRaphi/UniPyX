@@ -45,10 +45,13 @@ Hydrate H2O Dry | .dry | https://discmaster.textfiles.com/search?format=dryArchi
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
-- lib/file.py:crc_hash SipHash
-- lib/file.py:crc_hash City/Farm Hash
-- lib/file.py:crc_hash Blake3
+- lib/crypto.py:crc_hash SipHash
+- lib/crypto.py:crc_hash City/Farm Hash
 - RE Engine PAK: ree.unpacker -> Custom
+- lib/crypto.py:crc_hash KBKDF HMAC/CMAC https://cryptography.io/en/latest/hazmat/primitives/key-derivation-functions/#kbkdf
+- lib/crypto.py:decrypt/crc_hash non pure python ascon
+- lib/crypto.py:crc_hash non pure python blake
+- lib/crypto.py:crc_hash blake2bp/blake2sp
 
 ### CD-i RTF dev interview:
 > Q: what is a .rtr file?

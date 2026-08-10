@@ -2517,7 +2517,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             db.try_custom()
             from lib.crypto import crc_hash
-            from lib.file import EXE,pdosdate
+            from lib.file import EXE
             f = EXE(i)
             f.seek(f.ovl_off)
             m = f.readu32()
@@ -2556,7 +2556,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     n = f.read0s('cp1252',0xFF)
                     n = f.read0s('cp1252',0xFF) + '/' + n
                     grp = f.read0s('cp1252',maxl=0xFF)
-                    ts = pdosdate(f.readu16(),f.readu16())
+                    ts = dosr2unix(f.readu16(),f.readu16())
                     zs,us,hsh = f.readu32(),f.readu32(),f.readu32()
                     m = f.readu8()
                     f.skip(6)
@@ -2602,7 +2602,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     n = f.readc(0x20).split(b'\0')[0].decode('cp1252') + '/' + n
                     f.padc(1)
                     grp = f.readc(5).split(b'\0')[0].decode('cp1252')
-                    ts = pdosdate(f.readu16(),f.readu16())
+                    ts = dosr2unix(f.readu16(),f.readu16())
                     f.padc(2)
                     zs,us,hsh = f.readu32(),f.readu32(),f.readu32()
                     m = f.readu8()

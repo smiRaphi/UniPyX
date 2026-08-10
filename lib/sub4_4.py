@@ -752,7 +752,7 @@ def extract4_4(inp:str,out:str,t:str):
             from lib.pyob import PyOBinX
             keys = PyOBinX.dl('keys',db)
             from lib.file import File
-            from lib.crypto import decrypt
+            from lib.crypto import decrypt,crc_hash
             from multiprocessing.pool import ThreadPool
             f = File(i,endian='<')
             asrt(f.read(4) == b'KCAP')
@@ -760,38 +760,65 @@ def extract4_4(inp:str,out:str,t:str):
             c = f.readu32()
             fs = []
             for _ in range(c):
-                fn = f.read(0x40).rstrip(b'\0').decode('shift-jis')
-                asrt(fn,f.pos-0x40)
-                f.skip(8)
-                fs.append((fn,f.readu32(),f.readu32(),f.readu32()))
-                asrt(fs[-1][3] in {0,1})
+                fn = f.readc(0x40).rstrip(b'\0').decode('shift-jis')
+                f.skip(4)
+                fs.append((fn,f.readu32(),f.readu32(),f.readu32(),f.readbool32()))
 
             if any(fe[3] for fe in fs):
-                wav = [fe for fe in fs if fe[3] == 1 and fe[0].lower().endswith('.wav') and fe[2] >= 4]
-                asrt(wav,"Can't guess key")
-                wav = wav[0]
-                f.seek(wav[1])
-                d = f.readc(4)
                 keys.wait()
-                for k in keys['selene']: # this also initializes all key tables!!! which would otherwise cause Threading issues
-                    if decrypt(d,'selene',k) == b'RIFF':
-                        key = k
-                        break
-                else: raise RuntimeError('Unknown key')
+                # this also initializes all key tables, which would otherwise cause Threading issues
+                for ge in (('.png',b'\x89PNG\r\n\x1A\n'),
+                           (('.jpg','.jpeg','.jfif'),b'\xFF\xD8\xFF\xE0\x00\x10JFIF\x00'),
+                           ('.ogg',b'OggS'),
+                           ('.wav',b'RIFF'),
+                           ('.sff',b'FFS\0')):
+                    gf = [fe for fe in fs if fe[4] == 1 and fe[0].lower().endswith(ge[0]) and fe[3] >= len(ge[1])]
+                    if not gf: continue
+                    f.seek(gf[0][2])
+                    d = f.readc(len(ge[1]))
+                    for k in keys['selene']:
+                        if decrypt(d,'selene',k) == ge[1]:
+                            key = k
+                            break
+                    else: continue
+                    break
+                else:
+                    key = None
+                    gf = [fe for fe in fs if fe[4] == 1 and fe[0].lower().endswith(('.tgf','.txt')) and fe[3] > 0x20]
+                    if gf:
+                        gf = min(gf,key=lambda x:x[3])
+                        f.seek(gf[2])
+                        d = f.read(gf[3])
+                        for k in keys['selene']:
+                            if istext(decrypt(d,'selene',k),'shift-jis'):
+                                key = k
+                                break
+                    if not key:
+                        gf = [fe for fe in fs if fe[4] == 1 and fe[0].lower().endswith('.bin') and fe[3] >= 0x10]
+                        if not gf: raise RuntimeError('Unknown key')
+                        gf = max(gf,key=lambda x:x[3])
+                        f.seek(gf[2])
+                        d = f.read(min(gf[3],0x1000))
+                        for k in keys['selene']:
+                            if bytes(0x10) in decrypt(d,'selene',k):
+                                key = k
+                                break
+                        else: raise RuntimeError('Unknown key')
 
-            def writed(d,fn,flg):
-                if flg: d = decrypt(d,'selene',key)
-                writefile(o + '/' + fn,d)
+            def writed(d,fe):
+                asrt(crc_hash(d,'crc32') == fe[1])
+                if fe[4]: d = decrypt(d,'selene',key)
+                writefile(o + '/' + fe[0],d)
             p = ThreadPool()
             pcs = []
             for fe in fs:
-                f.seek(fe[1])
-                pcs.append(p.apply_async(writed,(f.readc(fe[2]),fe[0],fe[3])))
+                f.seek(fe[2])
+                pcs.append(p.apply_async(writed,(f.readc(fe[3]),fe)))
+
+            f.close()
             for pc in pcs: pc.get()
             p.close()
             p.join()
-
-            f.close()
             if fs: return
         case 'Konami NKP':
             db.try_custom()

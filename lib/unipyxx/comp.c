@@ -907,10 +907,11 @@ eof:
     #undef CHKi
     return op;
 }
+// flags: 1 - big endian, 2 - VAX/unix bugs, 4 - early code size change
 EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
                                     uint8_t *restrict dst, const ssize_t usize,
                               const uint8_t max_bits, const uint32_t max_dict, const uint16_t init_code_size,
-                              const uint16_t first_code, const uint16_t clear_code, const uint16_t end_code, const int8_t be) {
+                              const uint16_t first_code, const int32_t clear_code, const int32_t end_code, const uint8_t flags) {
     if (max_bits > 16 || max_dict > 0x10000) return -1;
 
     uint8_t *dict_data = malloc(max_dict * sizeof(uint16_t) + max_dict * sizeof(uint8_t) * 2);
@@ -927,15 +928,25 @@ EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
     uint8_t firstc = 0;
     ssize_t op = 0;
 
-    while (!is_eof(&br) && (usize == -1 || op < usize)) {
-        uint16_t code = be ? get_bits(&br, code_size) : get_bits_l(&br, code_size);
-        if (code == clear_code) {
-            next_code = first_code;
+    uint8_t chng_off = (flags & 4) ? 1 : 0;
+    uint8_t vax_cc = 0;
+    while (!is_eofn(&br, code_size) && (usize == -1 || op < usize)) {
+        uint16_t code = (flags & 1) ? get_bits(&br, code_size) : get_bits_l(&br, code_size);
+        vax_cc++;
+
+        if (clear_code != -1 && code == clear_code) {
+            if (flags & 2) {
+                for (uint8_t i=0;i < (8 - (vax_cc % 8)) % 8;i++)
+                    (flags & 1) ? get_bits(&br, code_size) : get_bits_l(&br, code_size);
+                vax_cc = 0;
+            }
+
+            next_code = (flags & 2) ? (first_code - 1) : first_code;
             code_size = init_code_size;
             old_code = -1;
             continue;
         }
-        if (code == end_code) break;
+        if (end_code != -1 && code == end_code) break;
         if (old_code == -1) {
             dst[op++] = code;
             old_code = code;
@@ -970,15 +981,21 @@ EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
             next_code++;
         }
 
-        if (next_code >= (1 << code_size) && code_size < max_bits)
+        if (next_code >= (1 << code_size) - chng_off && code_size < max_bits) {
+            if (flags & 2) {
+                for (uint8_t i=0;i < (8 - (vax_cc % 8)) % 8;i++)
+                    (flags & 1) ? get_bits(&br, code_size) : get_bits_l(&br, code_size);
+                vax_cc = 0;
+            }
+
             code_size++;
+        }
 
         old_code = code;
     }
 
 eof:
     free(dict_data);
-
     return op;
 }
 static inline uint32_t hammer_transp(const uint32_t s, const uint32_t max, const uint8_t fmt) {

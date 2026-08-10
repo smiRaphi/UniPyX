@@ -12,6 +12,7 @@
         "./bin/Torch",
         "./bin/py360",
         "./bin/graalvm",
+        "./lib/unipyxx.dll.bak"
     ],
     "typeCheckingMode": "off"
 }

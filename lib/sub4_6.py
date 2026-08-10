@@ -81,16 +81,16 @@ def extract4_6(inp:str,out:str,t:str):
             if fs: return
         case 'ZPackage':
             db.try_custom()
-            from lib.file import File,pdosdate
+            from lib.file import File
             f = File(i,endian='<')
             asrt(f.read(10) == b'ZPackage1\0')
 
             while f:
                 xo = f.readu32()
                 n = o + '/' + f.read0s('ascii')
-                ts = (f.readu16(),f.readu16())
+                ts = dos2unix(f.readu16(),f.readu16())
                 writefile(n,f.decompress(xo - f.pos,'zlib'))
-                set_ftime(n,pdosdate(ts[1],ts[0]))
+                set_ftime(n,ts)
 
             f.close()
             if listdir(o): return

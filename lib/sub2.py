@@ -423,7 +423,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     inf,ouf = xopen(fi,'rb'),xopen(fo,'wb')
                     tid = crc_hash(sec + (tmd.title_id.to_bytes(8,'big').lstrip(b'\0') or b'\0'),'md5',bytes=True)
                     for ix in pids:
-                        aes = decrypt(None,'aes_cbc',encrypt(keys['tmd']['p'][ix],'pbkdf2_sha1',tid,0x14,size=0x10),
+                        aes = decrypt(None,'aes_cbc',crc_hash(keys['tmd']['p'][ix],'pbkdf2_sha1',key=tid,c=0x14,size=0x10),
                                                      c.index.to_bytes(2,'big') + bytes(14))
                         hsh = crc_hash(None,('sha1','sha256')[tmd.version])
                         inf.seek(0)
