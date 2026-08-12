@@ -147,8 +147,6 @@ class X:
             ('decrypt_rsdk4', (P(u8),szt,u32,u32,P(u8),P(u8)),void,0),
             ('decrypt_rsdk5', (P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_hornby',(P(u8),szt,u8,u8),void,0),
-            ('init_mmfs',     (P(u8),P(u8)),void,0),
-            ('decrypt_mmfs',  (P(u8),szt,P(u8)),void,0),
             ('init_selene',   (P(u8),P(u8),szt,u32),void,0),
             ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2),
@@ -160,6 +158,7 @@ class X:
             ('decrypt_zipd',  (P(u8),szt),s8,0),
             ('decrypt_legaia2',(P(u8),szt,u32),void,0),
             ('decrypt_ady_glue',(P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_airrc4',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
@@ -447,6 +446,8 @@ class X:
     def decrypt_rolr(src:bytes,key:bytes) -> bytes: ...
     def decrypt_xor(src:bytes,key:bytes) -> bytes: ...
     def decrypt_zipcrypto(src:bytes,key:bytes) -> bytes: ...
+    def decrypt_ady_glue(src:bytes,key:bytes) -> bytes: ...
+    def decrypt_airrc4(src:bytes,key:bytes) -> bytes: ...
 
     def decrypt_rxor(self,src:bytes,key:bytes|int) -> bytes:
         if isinstance(key,bytes): key = key[0]
@@ -517,21 +518,6 @@ class X:
         d = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_hornby(d,len(src),key,msk)
         return bytes(d)[1:]
-    def init_mmfs(self,key:bytes):
-        if key not in self.MMFS:
-            key = key.replace(b'\0',b'')
-            k = bytearray(key)[:0x80] + b'\0'*0x80
-            if len(key) < 0xFF: k[len(key) + 1] = (sum(key) * 2) & 0xFF
-            ik = (u8 * len(k)).from_buffer_copy(k)
-            mk = (u8 * 0x100).from_buffer_copy(bytes(range(0x100)))
-            self.dll.init_mmfs(mk,ik)
-            self.MMFS[key] = mk
-        return self.MMFS[key]
-    def decrypt_mmfs(self,src:bytes,key:bytes) -> bytes:
-        mk = self.init_mmfs(key)
-        d = (u8 * len(src)).from_buffer_copy(src)
-        self.dll.decrypt_mmfs(d,len(src),mk)
-        return bytes(d)
     def init_selene(self,key:bytes):
         seed = crc32(key)
         if seed not in self.SELENE:

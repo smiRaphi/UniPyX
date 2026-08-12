@@ -53,8 +53,13 @@
     },
     {
         "rqr":["Java Archive","Java archive data (JAR)"],
-        "d":[["contain","optifine/xdelta/licence.txtPK\\1\\2",[-256,256]],["contain","patch/notch/com/mojang/",[-250000,250000]]],
+        "d":[["ziph","optifine/xdelta/licence.txt"],["ziph","patch/notch/com/mojang/"]],
         "rs":"OptiFine Installer","s":1
+    },
+    {
+        "rq":"ZIP",
+        "d":[["ziph","META-INF/AIR/application.xml"],["zipc","mimetype","application/vnd.adobe.air-application-installer-package+zip"]],
+        "rs":"AIRNovel Package","s":1
     },
     {
         "rq":"Excelsior Installer",
@@ -66,6 +71,16 @@
         "t":"url",
         "d":["isat","otpauth-migration://offline?data=",0],
         "rs":"Google Authenticator Migration URL","s":1
+    },
+    {
+        "t":"url",
+        "d":[["isat","data:",0],["contain","/",6,60],["contain",";base64,",8,70]],
+        "rs":"Base64 Data URL","s":1
+    },
+    {
+        "t":"text",
+        "d":[["isat","data:",0],["contain","/",6,60],["contain",";base64,",8,70]],
+        "rs":"Base64 Data URL","s":1
     },
     {
         "rq":"ISO",
@@ -120,7 +135,7 @@
     },
     {
         "rq":"InstallShield Setup",
-        "d":["contain","MSIEng.isc",[-5000000,null]],
+        "d":["contain","MSIEng.isc",-5000000,null],
         "rs":"InstallShield MSI","s":1
     },
     {
@@ -144,16 +159,16 @@
         "rs":"Encrypted EAC Payload","s":1
     },
     {
-        "d":[["contain","# This is a shell archive.  Remove anything before this line,",[0,2500]],
-             ["contain","# This is a shell archive, meaning:\\n# 1. Remove everything ",[0,2500]],
-             ["contain","# This is a shell archive (produced by GNU sharutils"         ,[0,2500]],
-             ["contain","# This is a shell archive (shar"                              ,[0,2500]],
-             ["contain","# This is a shell archive.  To extract the files,"            ,[0,2500]],
-             ["contain",": \"This is a shell archive, meaning:"                        ,[0,2500]],
-             ["contain",": This is a shar archive.  Extract with sh, not csh."         ,[0,2500]],
-             ["contain",":  SHAR archive format.  Archive created "                    ,[0,2500]],
-             ["contain","# shar:\\tShell Archiver\\n"                                  ,[0,500 ]],
-             ["contain","#  execute this shell (sh) script on a clean directory to\\n#  install this version of",[0,500]]],"qq":true,
+        "d":[["contain","# This is a shell archive.  Remove anything before this line,",0,2500],
+             ["contain","# This is a shell archive, meaning:\\n# 1. Remove everything ",0,2500],
+             ["contain","# This is a shell archive (produced by GNU sharutils"         ,0,2500],
+             ["contain","# This is a shell archive (shar"                              ,0,2500],
+             ["contain","# This is a shell archive.  To extract the files,"            ,0,2500],
+             ["contain",": \"This is a shell archive, meaning:"                        ,0,2500],
+             ["contain",": This is a shar archive.  Extract with sh, not csh."         ,0,2500],
+             ["contain",":  SHAR archive format.  Archive created "                    ,0,2500],
+             ["contain","# shar:\\tShell Archiver\\n"                                  ,0,500 ],
+             ["contain","#  execute this shell (sh) script on a clean directory to\\n#  install this version of",0,500]],"qq":true,
         "rs":"Shell Archive"
     },
     {
@@ -163,12 +178,12 @@
     },
     {
         "t":"text",
-        "d":["contain","RCLONE_ENCRYPT_V0:\\n",[0,100]],
+        "d":["contain","RCLONE_ENCRYPT_V0:\\n",0,100],
         "rs":"Encrypted Rclone Config"
     },
     {
         "rqr":"Generic Win/DOS Executable",
-        "d":[["isat","GDPC",-4],["contain","pck\\0\\0\\0\\0\\0",[384,911]]],
+        "d":[["isat","GDPC",-4],["contain","pck\\0\\0\\0\\0\\0",384,911]],
         "rs":"Godot Game","s":1
     },
     {
@@ -179,13 +194,13 @@
     {
         "rq":null,
         "rqr":"Win64 Executable (generic)",
-        "d":[["contain","G\\x00o\\x00o\\x00g\\x00l\\x00e\\x00U\\x00p\\x00d\\x00a\\x00t\\x00e\\x00I\\x00s\\x00M\\x00a\\x00c\\x00h\\x00i\\x00n\\x00e\\x00\\x00\\x00",[1024,16384]]],
+        "d":[["contain","G\\x00o\\x00o\\x00g\\x00l\\x00e\\x00U\\x00p\\x00d\\x00a\\x00t\\x00e\\x00I\\x00s\\x00M\\x00a\\x00c\\x00h\\x00i\\x00n\\x00e\\x00\\x00\\x00",1024,16384]],
         "rs":"Google Update Installer","s":1
     },
     {
         "rq":null,
         "rqr":"DOS Executable Generic",
-        "d":["contain","LHarc's SFX ",[36,64]],
+        "d":["contain","LHarc's SFX ",36,64],
         "rs":"LHARC","s":1
     },
     {
@@ -239,7 +254,7 @@
         "rs":"SLUDGE Data File","s":1
     },
     {
-        "d":[["isat","#!/bin/sh",0],["contain"," /dev/cloop $1",[32,128]],["isat","\\0\\0\\0\\0",124]],
+        "d":[["isat","#!/bin/sh",0],["contain"," /dev/cloop $1",32,128],["isat","\\0\\0\\0\\0",124]],
         "rs":"Cloop IMG","s":1
     },
     {
@@ -501,7 +516,7 @@
     },
     {
         "rqr":"Visual Studio 2005",
-        "d":[["isat",".rdata\\0\\0",528],["isat","\\0\\xC0\\0\\0",544],["isat","\\0\\x30\\0\\0",584],["hash","1E9D83E375386F3410BDF3C23FB176CF63AF12FE",4192,4400],["contain","BZh91AY&SY",[327680,49152]]],
+        "d":[["isat",".rdata\\0\\0",528],["isat","\\0\\xC0\\0\\0",544],["isat","\\0\\x30\\0\\0",584],["hash","1E9D83E375386F3410BDF3C23FB176CF63AF12FE",4192,4400],["contain","BZh91AY&SY",327680,49152]],
         "rs":"Tixati Installer"
     },
     {
@@ -551,7 +566,7 @@
         "rs":"Sumo Digital XPAC"
     },
     {
-        "d":[["s%",2048],["isat","\\0\\x10\\0\\0",20],["contain",".DEF\\0",[0,16]],["n0",4,16],["n0",4,20],["n0",4,40],["n0",4,44],["str0",0,16,5],["str0",24,16,5],["py","f.seek(16);s=f.readi(4,'<');fo=f.readi(4,'<')\nif fo%2048 or fo>65536:return\nf.seek(fo-24)\nif sum(f.read(24)):return\no=fo+s+-s%2048\nf.seek(24)\nfor _ in range(fo//24-1):\n if not sum(f.read(16)):break\n s=f.readi(4,'<')\n if o!=f.readi(4,'<'):return\n o+=s+-s%2048\nreturn True"]],
+        "d":[["s%",2048],["isat","\\0\\x10\\0\\0",20],["contain",".DEF\\0",0,16],["n0",4,16],["n0",4,20],["n0",4,40],["n0",4,44],["str0",0,16,5],["str0",24,16,5],["py","f.seek(16);s=f.readi(4,'<');fo=f.readi(4,'<')\nif fo%2048 or fo>65536:return\nf.seek(fo-24)\nif sum(f.read(24)):return\no=fo+s+-s%2048\nf.seek(24)\nfor _ in range(fo//24-1):\n if not sum(f.read(16)):break\n s=f.readi(4,'<')\n if o!=f.readi(4,'<'):return\n o+=s+-s%2048\nreturn True"]],
         "rs":"The Pagemaster DAT"
     },
     {
@@ -597,7 +612,7 @@
     },
     {
         "rqr":null,
-        "d":["contain","\\x01CD001\\x01\\0",[32769,255]],
+        "d":["contain","\\x01CD001\\x01\\0",32769,255],
         "rs":"Shifted ISO"
     },
     {
@@ -614,7 +629,7 @@
         "rs":"Metropolis Software ZAP","s":1
     },
     {
-        "d":[["size",[16400,null]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",[24,32768]],["py","f.seek(4);fo=f.read(4);e='big' if int.from_bytes(fo,'little')>int.from_bytes(fo,'big') else 'little';fo=int.from_bytes(fo,e);o=fo+int.from_bytes(f.read(4),e)\nif fo%16 or fo>40960:return\nwhile f.tell()<fo:\n if not f.readi(4):break\n fo=int.from_bytes(f.read(4),e)\n if fo!=o and fo<o and fo%16:return\n o=fo+int.from_bytes(f.read(4),e)\nreturn o==fsz"]],
+        "d":[["size",[16400,null]],["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0",24,32768],["py","f.seek(4);fo=f.read(4);e='big' if int.from_bytes(fo,'little')>int.from_bytes(fo,'big') else 'little';fo=int.from_bytes(fo,e);o=fo+int.from_bytes(f.read(4),e)\nif fo%16 or fo>40960:return\nwhile f.tell()<fo:\n if not f.readi(4):break\n fo=int.from_bytes(f.read(4),e)\n if fo!=o and fo<o and fo%16:return\n o=fo+int.from_bytes(f.read(4),e)\nreturn o==fsz"]],
         "rs":"Pivotal Games DAT"
     },
     {
@@ -645,7 +660,7 @@
     {
         "rq":null,
         "t":"text",
-        "d":[["contain","\\r\\n",[1,7]],["contain","/|",[8,120]],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split(b'|')\nif len(l)!=4 or l[1][-1:]!=b'/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
+        "d":[["contain","\\r\\n",1,7],["contain","/|",8,120],["isat","\\r\\n",-2],["py","if not exists(splitext(inp)[0]+'.hff'):return\ntry:int(f.readline().strip())\nexcept:return\nl=f.readline().strip().split(b'|')\nif len(l)!=4 or l[1][-1:]!=b'/':return\ntry:int(l[2]);int(l[3])\nexcept:return\nreturn True"]],
         "rs":"Lucky Chicken TOC+HFF"
     },
     {
@@ -750,7 +765,7 @@
         "rs":"Motocross Mania DAT"
     },
     {
-        "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",[14,16]]],
+        "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",14,16]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },
     {
@@ -856,12 +871,12 @@
         "rs":"Nintendo ASH0","s":1
     },
     {
-        "d":[["isatS","\\0",24,-28],["n0",4,-32],["n0",4,-4],["contain","END \\0\\0\\0\\0\\0\\0\\0\\0",[-64,32]],["py","f.seek(-4,2);b=f.read(4);f.seek(-32,1)\nif b!=f.read(4):return\nf.seek(int.from_bytes(b,'little'));return f.read(4)==b'STR ' and f.readi(4)"]],
+        "d":[["isatS","\\0",24,-28],["n0",4,-32],["n0",4,-4],["contain","END \\0\\0\\0\\0\\0\\0\\0\\0",-64,32],["py","f.seek(-4,2);b=f.read(4);f.seek(-32,1)\nif b!=f.read(4):return\nf.seek(int.from_bytes(b,'little'));return f.read(4)==b'STR ' and f.readi(4)"]],
         "rs":"7 Studios FS"
     },
     {
         "rqr":"DLL",
-        "d":["contain","U\\0n\\0m\\0a\\0n\\0a\\0g\\0e\\0d\\0 \\0l\\0o\\0a\\0d\\0e\\0r\\0 \\0s\\0h\\0i\\0m\\0 \\0f\\0o\\0r\\0 \\0E\\0x\\0c\\0e\\0l\\0-\\0D\\0N\\0A\\0 \\0A\\0d\\0d\\0-\\0I\\0n\\0s\\0\\0\\0",[-27000,null]],
+        "d":["contain","U\\0n\\0m\\0a\\0n\\0a\\0g\\0e\\0d\\0 \\0l\\0o\\0a\\0d\\0e\\0r\\0 \\0s\\0h\\0i\\0m\\0 \\0f\\0o\\0r\\0 \\0E\\0x\\0c\\0e\\0l\\0-\\0D\\0N\\0A\\0 \\0A\\0d\\0d\\0-\\0I\\0n\\0s\\0\\0\\0",-27000,null],
         "rs":"Excel DNA XLL","s":1
     },
     {
@@ -1031,7 +1046,7 @@
     },
     {
         "rqr":".NET Core",
-        "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",[-20480,null]],["str",6,-6]],
+        "d":[["contain","\\6\\0\\0\\0\\0\\0\\0\\0",-20480,null],["str",6,-6]],
         "rs":".NET Packer 1"
     },
     {
@@ -1045,7 +1060,7 @@
     },
     {
         "rq":"CUE+BIN",
-        "d":["contain","  TRACK 01 CDI/2352",[0,null]],
+        "d":["contain","  TRACK 01 CDI/2352",0,null],
         "rs":"CDI CUE+BIN","s":1
     },
     {
@@ -1055,7 +1070,7 @@
     },
     {
         "t":"binary",
-        "d":["contain","\\0name=KryoFlux DiskSystem",[0,208]],
+        "d":["contain","\\0name=KryoFlux DiskSystem",0,208],
         "rs":"KryoFlux","s":1
     },
     {
@@ -1063,7 +1078,7 @@
         "rs":"RDB","s":1
     },
     {
-        "d":[["isat","<html>",0],["contain","<!-- Gwtar self-extracting HTML archive, v1 -->",[6,55]]],
+        "d":[["isat","<html>",0],["contain","<!-- Gwtar self-extracting HTML archive, v1 -->",6,55]],
         "rs":"Gwtar","s":1
     },
     {
@@ -1160,7 +1175,7 @@
     },
         {
             "rq":"HAL XBIN",
-            "d":[["contain","YAML",[16,8]],["py","f.seek(4);e={18:'>',52:'<'}[f.read(2)[0]];v=f.read(2)[0];f.seek(20 if v>=4 else 16);return f.read(4)==b'YAML' and f.readi(4,e)in{2,4,5}and f.readi(4,e)in{1,2,3,4,5,6}"]],
+            "d":[["contain","YAML",16,8],["py","f.seek(4);e={18:'>',52:'<'}[f.read(2)[0]];v=f.read(2)[0];f.seek(20 if v>=4 else 16);return f.read(4)==b'YAML' and f.readi(4,e)in{2,4,5}and f.readi(4,e)in{1,2,3,4,5,6}"]],
             "rs":"HAL XBIN YAML","s":1
         },
     {"rq":"HAL XBIN","rs":"HAL XBIN","s":1},
@@ -1287,7 +1302,7 @@
     {
         "d":[["isat","ARC0",0],["isat","\\xFF\\0\\0\\0",76],["isatS","\\0",12,64],["isat","\\0",-1],["n0",4,4],["py","f.seek(4);c=f.readi(4,'<');f.seek(48+c*16)\nif f.readi(4):return\no=f.readi(4,'<')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=f.readi(3,'>');return (64+c*16+o+s+-s%1024)in{fsz,fsz-1024}"]],
         "rs":"Eutechnyx ARC","s":1},{
-        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isatS","\\0",16,112],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",[128,192]],["n0",4,4],["py","f.seek(4);c=f.readi(4,'<');f.seek(112+c*16)\nif f.readi(4):return\no=f.readi(4,'<')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=f.readi(3,'>');return (128+c*16+o+s)==fsz"]],
+        "d":[["isat","ARC",0],["isin",["X","P","C"],3],["isatS","\\0",16,112],["isat","\\0",-1],["contain","\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xFF\\0\\0\\0",128,192],["n0",4,4],["py","f.seek(4);c=f.readi(4,'<');f.seek(112+c*16)\nif f.readi(4):return\no=f.readi(4,'<')\nif f.read(5)!=b'\\xFF\\xFF\\xFF\\xFF\\xFD':return\ns=f.readi(3,'>');return (128+c*16+o+s)==fsz"]],
         "rs":"Eutechnyx ARC","s":1},{
         "d":[["s%",128],["isat","ARCN",0],["isat","\\0\\0\\0\\0\\xDE\\xC0\\xDE\\xC0",112],["n0",4,4],["n0",4,120],["n0",4,128],["py","f.seek(120);s=f.readi(4,'<');return s<f.readi(4,'<')and(128+s+-s%128)==fsz"]],
         "rs":"Eutechnyx ARC","s":1
@@ -1416,7 +1431,7 @@
         "rs":"Burut Creative Team PAK","s":1
     },
     {
-        "d":[["isat","**************************************************************\\r\\n** Sinergy GUT File\\r\\n**\\r\\n** [",0],["contain","\\0",[272,240]]],
+        "d":[["isat","**************************************************************\\r\\n** Sinergy GUT File\\r\\n**\\r\\n** [",0],["contain","\\0",272,240]],
         "rs":"Sinergy GUT","s":1
     },
     {
@@ -1623,7 +1638,7 @@
         "rs":"Neox Package","s":1
     },
     {
-        "d":[["isat","CRA.\\0\\2\\0\\1",0],["n0",4,8],["n0",4,12],["n0",8,16],["n0",4,24],["n0",4,28],["contain","\\1\\0\\2\\0.ARC",[16384,16384]]],
+        "d":[["isat","CRA.\\0\\2\\0\\1",0],["n0",4,8],["n0",4,12],["n0",8,16],["n0",4,24],["n0",4,28],["contain","\\1\\0\\2\\0.ARC",16384,16384]],
         "rs":"Camelot ARC","s":1
     },
     {
@@ -1651,11 +1666,11 @@
         "rs":"Six Guns Encrypted Save","s":1
     },
     {
-        "d":[["isatS","\\0",8,24],["isatS","\\0",4,-4],["contain","\\t",[1,11]],["contain","\\n\\0",[3,21]],["py","d,p=f.read(32).split(b'\\n')\nif sum(p)or not b'\\t' in d:return\ntry:z,u=int(d.split(b'\\t')[0],16)+4,int(d.split(b'\\t')[1],16)\nexcept:return\nreturn u>z and (z+32)==fsz"]],
+        "d":[["isatS","\\0",8,24],["isatS","\\0",4,-4],["contain","\\t",1,11],["contain","\\n\\0",3,21],["py","d,p=f.read(32).split(b'\\n')\nif sum(p)or not b'\\t' in d:return\ntry:z,u=int(d.split(b'\\t')[0],16)+4,int(d.split(b'\\t')[1],16)\nexcept:return\nreturn u>z and (z+32)==fsz"]],
         "rs":"Capcom YZ2 Compressed"
     },
     {
-        "d":[["isatS","\\0",8,24],["contain","\\t",[1,11]],["contain","\\n\\0",[3,21]],["py","d,p=f.read(32).split(b'\\n')\nif sum(p)or not b'\\t' in d:return\ntry:z,u=int(d.split(b'\\t')[0],16),int(d.split(b'\\t')[1],16)\nexcept:return\nreturn u>z and (z+32)==fsz"]],
+        "d":[["isatS","\\0",8,24],["contain","\\t",1,11],["contain","\\n\\0",3,21],["py","d,p=f.read(32).split(b'\\n')\nif sum(p)or not b'\\t' in d:return\ntry:z,u=int(d.split(b'\\t')[0],16),int(d.split(b'\\t')[1],16)\nexcept:return\nreturn u>z and (z+32)==fsz"]],
         "rs":"Sengoku Basara 2 Compressed"
     },
     {
@@ -1911,12 +1926,12 @@
     },
     {
         "rqr":"C source text",
-        "d":[["isat","/* THIS FILE HAS BEEN AUTOMATICALLY GENERATED BY MKBINTABLE */",0],["contain","#ifndef BINTABLE_H_",[85,59]],["contain","#define BINTABLE_H_",[104,65]]],
+        "d":[["isat","/* THIS FILE HAS BEEN AUTOMATICALLY GENERATED BY MKBINTABLE */",0],["contain","#ifndef BINTABLE_H_",85,59],["contain","#define BINTABLE_H_",104,65]],
         "rs":"CryptPE BinTable.h","s":1
     },
     {
         "rqr":"Microsoft Visual Studio",
-        "d":[["contain","\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFFexpand 32-byte kexpand 16-byte k",[10240,3584]],["contain","MemoryLoadLibrary() failed.\\n\\0\\0\\0\\0main\\0\\0\\0\\0MemoryGetProcAddress() couldn't fine main().\\n\\0\\0\\0",[10272,3584]]],
+        "d":[["contain","\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFFexpand 32-byte kexpand 16-byte k",10240,3584],["contain","MemoryLoadLibrary() failed.\\n\\0\\0\\0\\0main\\0\\0\\0\\0MemoryGetProcAddress() couldn't fine main().\\n\\0\\0\\0",10272,3584]],
         "rs":"CryptPE"
     },
     {
@@ -1957,7 +1972,7 @@
         "rs":"Orange Juice LAG","s":1
     },
     {
-        "d":[["isat","SuperScape (c) New Dimension International Ltd.\\0\\0\\n\\n\\rVRT file",0],["isat","\\0\\0\\0\\0.VRT\\0\\0",240],["contain","\\n\\r\\x1A\\0\\0\\0",[64,160]],["n0",4,248]],
+        "d":[["isat","SuperScape (c) New Dimension International Ltd.\\0\\0\\n\\n\\rVRT file",0],["isat","\\0\\0\\0\\0.VRT\\0\\0",240],["contain","\\n\\r\\x1A\\0\\0\\0",64,160],["n0",4,248]],
         "rs":"SuperScape VRT","s":1
     },
     {
@@ -2009,7 +2024,7 @@
     },
     {
         "rqr":"GLIBC",
-        "d":[["contain","GPEComp ",[30928,10047],false],
+        "d":[["contain","GPEComp ",30928,10047,false],
              ["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43592],["isat","\\x00\\xE9UCL\\xFF\\x01\\x1A",43632]],"qq":true,
         "rs":"GPEComp","s":1
     },
@@ -2021,8 +2036,8 @@
     {
         "t":"text",
         "rqr":"E-Mail message (Var. 2)",
-        "d":[["contain","diff --git a/",[120,3500]],["contain","--- a/",[130,3500]],["contain","+++ b/",[135,3500]]],
-        "rs":"Diff Patch"
+        "d":[["contain","Content-Type: multipart/mixed; boundary=\"",120,1000]],
+        "rs":"Unix Mailbox"
     },
     {
         "d":[["isat","CTPK\\1\\0",0],["isat","\\0\\0\\0",45],["isatS","\\0",8,24],["isin",["\\0","\\1","\\2","\\x03","\\x04","\\x05","\\x06","\\x07","\\x08","\\x09","\\x0A","\\x0B","\\x0C","\\x0D"],44],["n0",2,6],["n0",4,8],["n0",4,16],["n0",4,20],["n0",4,32],["n0",4,36],["n0",2,48],["n0",2,50]],
@@ -2059,11 +2074,11 @@
         "rs":"DWC","s":1
     },
     {
-        "d":["contain","(This file must be converted with BinHex 4.0)",[0,1000]],
+        "d":["contain","(This file must be converted with BinHex 4.0)",0,1000],
         "rs":"BinHex"
     },
     {
-        "d":["contain","FiLeStArTfIlEsTaRt\\n",[0,1000]],
+        "d":["contain","FiLeStArTfIlEsTaRt\\n",0,1000],
         "rs":"BinSCII"
     },
     {
@@ -2089,7 +2104,7 @@
     },
     {
         "rqr":"Generic XML (ASCII)",
-        "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",[35,250]],
+        "d":["contain","<FILE type=\"VFSM\" hash=\"0\" providerCert=\"",35,250],
         "rs":"Iron Sky GPK","s":1
     },
     {
@@ -2102,7 +2117,7 @@
         "rs":"Unity Assets"
     },
     {
-        "d":[["isat","\\x7D\\x46\\x41\\x5C\\x51\\x6E\\x7B\\x28\\x28\\x28",0],["isat","\\x06",13],["contain","\\x06",[15,4]],["contain","\\x28\\x1A\\x18",[17,6]]],
+        "d":[["isat","\\x7D\\x46\\x41\\x5C\\x51\\x6E\\x7B\\x28\\x28\\x28",0],["isat","\\x06",13],["contain","\\x06",15,4],["contain","\\x28\\x1A\\x18",17,6]],
         "rs":"DDLC+ Encrypted Unity Bundle","s":1
     },
     {
@@ -2277,7 +2292,7 @@
         "rs":"Apple Partition Map","s":1
     },
     {
-        "d":["contain","\\xE1\\x12\\x6F\\x5A",[-269,null]],
+        "d":["contain","\\xE1\\x12\\x6F\\x5A",-269,null],
         "rs":"UE4 Package"
     },
     {
@@ -2290,7 +2305,7 @@
     },
     {
         "rqr":"JavaScript source",
-        "d":[["contain","var REMOTE_PACKAGE_BASE = ",[0,2480]],["contain","function loadPackage(metadata) {",[0,2480]],["contain","function fetchRemotePackage(packageName, packageSize, callback, errback) {",[0,2480]]],
+        "d":[["contain","var REMOTE_PACKAGE_BASE = ",0,2480],["contain","function loadPackage(metadata) {",0,2480],["contain","function fetchRemotePackage(packageName, packageSize, callback, errback) {",0,2480]],
         "rs":"Unreal Engine Web Package","s":1
     },
     {
@@ -2432,12 +2447,12 @@
     },
     {
         "rq":"UCEXE",
-        "d":[["size",[12992,null]],["contain","UC2SFX Header",[12976,1616]]],
+        "d":[["size",[12992,null]],["contain","UC2SFX Header",12976,1616]],
         "rs":"UltraCompressor 2","s":1
     },
     {
         "rq":"PKLITE",
-        "d":[["size",[16400,null]],["contain","HLSQZ1",[16384,8192]]],
+        "d":[["size",[16400,null]],["contain","HLSQZ1",16384,8192]],
         "rs":"Squeeze It","s":1
     },
     {
@@ -2447,7 +2462,7 @@
     },
     {
         "rqr":"Borland Cpp for Win32 1995",
-        "d":[["isat","DATA\\0\\0\\0\\0",544],["isat","\\0\\x5E\\0\\0",564],["isat","FI",33312],["contain","\\0fimain.ico\\0",[24208,256]],["contain","\\0lzpunz2.dll\\0",[24208,256]],["contain","\\0fimain.exe\\0",[24208,256]],["contain","\\0LzpUnzClose\\0",[24464,256]]],
+        "d":[["isat","DATA\\0\\0\\0\\0",544],["isat","\\0\\x5E\\0\\0",564],["isat","FI",33312],["contain","\\0fimain.ico\\0",24208,256],["contain","\\0lzpunz2.dll\\0",24208,256],["contain","\\0fimain.exe\\0",24208,256],["contain","\\0LzpUnzClose\\0",24464,256]],
         "rs":"FI Installer","s":1
     },
     {
@@ -2496,7 +2511,7 @@
     },
     {
         "rqr":"XML 1.0 document text",
-        "d":[["contain","<PriInfo>",[40,50]],["contain","<PriHeader>",[60,50]]],
+        "d":[["contain","<PriInfo>",40,50],["contain","<PriHeader>",60,50]],
         "rs":"Package Resource Index XML"
     },
     {
@@ -2533,7 +2548,7 @@
         "rs":"d0lLZ 3","s":1
     },
     {
-        "d":[["isat","\\0\\0\\1\\0",0],["isat","\\0\\0\\x06\\x40",28],["isat","DLZ\\x02",1600],["contain","*www.tehskeen.net!",[1536,64]]],
+        "d":[["isat","\\0\\0\\1\\0",0],["isat","\\0\\0\\x06\\x40",28],["isat","DLZ\\x02",1600],["contain","*www.tehskeen.net!",1536,64]],
         "rs":"d0lLZ 2","s":1
     },
     {
@@ -2560,7 +2575,7 @@
     },
     {
         "t":"text",
-        "d":[["size",[404,null]],["contain","[\"\\\\x41\\\\x42\\\\x43\\\\x44\\\\x45\\\\x46\\\\x47\\\\x48\\\\x49\\\\x4A\\\\x4B\\\\x4C\\\\x4D\\\\x4E\\\\x4F\\\\x50\\\\x51\\\\x52\\\\x53\\\\x54\\\\x55\\\\x56\\\\x57\\\\x58\\\\x59\\\\x5A\\\\x61\\\\x62\\\\x63\\\\x64\\\\x65\\\\x66\\\\x67\\\\x68\\\\x69\\\\x6A\\\\x6B\\\\x6C\\\\x6D\\\\x6E\\\\x6F\\\\x70\\\\x71\\\\x72\\\\x73\\\\x74\\\\x75\\\\x76\\\\x77\\\\x78\\\\x79\\\\x7A\\\\x30\\\\x31\\\\x32\\\\x33\\\\x34\\\\x35\\\\x36\\\\x37\\\\x38\\\\x39\\\\x2B\\\\x2F\\\\x3D\",\"\",\"\\\\x63\\\\x68\\\\x61\\\\x72\\\\x41\\\\x74\",\"\\\\x69\\\\x6E\\\\x64\\\\x65\\\\x78\\\\x4F\\\\x66\",\"\\\\x66\\\\x72\\\\x6F\\\\x6D\\\\x43\\\\x68\\\\x61\\\\x72\\\\x43\\\\x6F\\\\x64\\\\x65\",\"\\\\x6C\\\\x65\\\\x6E\\\\x67\\\\x74\\\\x68\"]",[0,600]]],
+        "d":[["size",[404,null]],["contain","[\"\\\\x41\\\\x42\\\\x43\\\\x44\\\\x45\\\\x46\\\\x47\\\\x48\\\\x49\\\\x4A\\\\x4B\\\\x4C\\\\x4D\\\\x4E\\\\x4F\\\\x50\\\\x51\\\\x52\\\\x53\\\\x54\\\\x55\\\\x56\\\\x57\\\\x58\\\\x59\\\\x5A\\\\x61\\\\x62\\\\x63\\\\x64\\\\x65\\\\x66\\\\x67\\\\x68\\\\x69\\\\x6A\\\\x6B\\\\x6C\\\\x6D\\\\x6E\\\\x6F\\\\x70\\\\x71\\\\x72\\\\x73\\\\x74\\\\x75\\\\x76\\\\x77\\\\x78\\\\x79\\\\x7A\\\\x30\\\\x31\\\\x32\\\\x33\\\\x34\\\\x35\\\\x36\\\\x37\\\\x38\\\\x39\\\\x2B\\\\x2F\\\\x3D\",\"\",\"\\\\x63\\\\x68\\\\x61\\\\x72\\\\x41\\\\x74\",\"\\\\x69\\\\x6E\\\\x64\\\\x65\\\\x78\\\\x4F\\\\x66\",\"\\\\x66\\\\x72\\\\x6F\\\\x6D\\\\x43\\\\x68\\\\x61\\\\x72\\\\x43\\\\x6F\\\\x64\\\\x65\",\"\\\\x6C\\\\x65\\\\x6E\\\\x67\\\\x74\\\\x68\"]",0,600]],
         "rs":"JS MyObfuscate.com","s":1
     },
     {
@@ -2715,7 +2730,7 @@
         "rs":"GEM Resource"
     },
     {
-        "d":[["isat","HTTP/",0],["contain","\\r\\n",[10,90]],["py","d=f.read(256).split(b'\\r\\n')[0]\ntry:d=d.decode('utf-8')\nexcept:return\nreturn d.split()[0].split('/')[1] in{'0.9','1.0','1.1','2','3'}and d.split()[1].isdigit()"]],
+        "d":[["isat","HTTP/",0],["contain","\\r\\n",10,90],["py","d=f.read(256).split(b'\\r\\n')[0]\ntry:d=d.decode('utf-8')\nexcept:return\nreturn d.split()[0].split('/')[1] in{'0.9','1.0','1.1','2','3'}and d.split()[1].isdigit()"]],
         "rs":"HTTP Response"
     },
     {
@@ -2863,7 +2878,7 @@
     },
     {
         "t":"text",
-        "d":[["contain","I'll post them here separated by a line of underscore characters.",[50,500]],["contain","\\r\\n_____________________________________________________________________\\r\\n",[200,500]]],
+        "d":[["contain","I'll post them here separated by a line of underscore characters.",50,500],["contain","\\r\\n_____________________________________________________________________\\r\\n",200,500]],
         "rs":"Concatinated C Code"
     },
     {
@@ -3083,5 +3098,20 @@
     {
         "d":[["size",[5,null]],["isat","\\0",0],["n0",3,1],["py","f.seek(1);return (f.readi(3,'<')+4)==fsz"]],
         "rs":"0Size24 Data"
+    },
+    {
+        "t":"text",
+        "d":[["size",[6,102400]],["isin",["a","d"],0],["isat","\\n",-1],["isin",["1","2","3","4","5","6","7","8","9"],1],["contain"," ",2,3],["contain","\\n",5,5],["py","while f.neof():\n l=f.readline().rstrip(b'\\r\\n')\n if not l:continue\n s=l[1:].split(b' ')\n if not l[0]in{97,100}or len(s)!=2 or not all(s)or not (s[0]+s[1]).isdigit() or s[0][0]==48 or s[1][0]==48:return\n if l[0]==97 and not all(f.readline() for _ in range(int(s[1]))):return\nelse:return True"]],
+        "rs":"RCS Diff"
+    },
+    {
+        "t":"text",
+        "d":[["ext",[".diff",".patch"]],["size",[7,102400]],["isin",["1","2","3","4","5","6","7","8","9"],0],["py","while f.neof():\n l=f.readline().rstrip(b'\\r\\n')\n if not l:continue\n if b'c' in l:\n  s=l.split(b'c')\n  if len(s)!=2:return\n  s1,s2=s[0].split(b','),s[1].split(b',')\n  if len(s1)>2 or not all(x.isdigit() and x[0]!=48 for x in s1+s2):return\n  if len(s1)==2:c1=int(s1[1])-int(s1[0])+1\n  else:c1=1\n  if len(s2)==2:c2=int(s2[1])-int(s2[0])+1\n  else:c2=1\n  if not all(f.readline().startswith(b'< ') for _ in range(c1)) or f.readline().rstrip(b'\\r\\n')!=b'---' or not all(f.readline().startswith(b'> ') for _ in range(c2)):return\n elif b'a' in l:\n  s=l.split(b'a')\n  if len(s)!=2 or not s[0].isdigit():return\n  s=s[1].split(b',')\n  if len(s)>2 or not all(x.isdigit() and x[0]!=48 for x in s):return\n  if len(s)==2:c=int(s[1])-int(s[0])+1\n  else:c=1\n  if not all(f.readline().startswith(b'> ') for _ in range(c)):return\n else:return\nelse: return True"]],
+        "rs":"Normal Diff"
+    },
+    {
+        "t":"text",
+        "d":[["ext",[".diff",".patch",".ed"]],["size",[6,102400]],["isat","\\n",-1],["contain","\\n.",-4,3],["isin",["1","2","3","4","5","6","7","8","9"],0],["py","while f.neof():\n l=f.readline().rstrip(b'\\r\\n')\n if not l:continue\n if not l[-1]in{97,99}:return\n s=l[:-1].split(b',')\n if len(s)>2 or not all(x.isdigit()and x[0]!=48 for x in s):return\n while l!=b'.':\n  l=f.readline()\n  if not l:return\n  l=l.rstrip(b'\\r\\n')\nelse:return True"]],
+        "rs":"Ed Script Diff"
     }
 ]

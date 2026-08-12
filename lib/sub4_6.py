@@ -153,5 +153,50 @@ def extract4_6(inp:str,out:str,t:str):
 
             f.close()
             if ps: return
+        case 'AIRNovel Package':
+            db.try_custom()
+            import zipfile
+            z = zipfile.ZipFile(i,'r',strict_timestamps=False,metadata_encoding='utf-8')
+            nl = z.namelist()
+            z.close()
+
+            db.set_temp_print(False)
+            r = extract(i,o,'ZIP')
+            db.reset_temp_print()
+            if r: return r
+
+            import xml.etree.ElementTree as ET
+            app = ET.fromstring(XMLNSRG.sub('',readfile(o + '/META-INF/AIR/application.xml','rt')))
+            swf = app.find('initialWindow').find('content').text
+            del app
+
+            osw = os.path.join(o,'$' + os.path.basename(swf))
+            r = extract(os.path.join(o,swf),osw,'Shockwave Flash')
+            if r: return r
+
+            if any(x.endswith('_') for x in nl):
+                prj = ET.parse(o + '/config.anprj').getroot()
+                cl = prj.find('coder').get('len')
+                if cl.startswith('0x'): cl = int(cl[2:],16)
+                else: cl = int(cl)
+                del prj
+
+                import re,ast
+                from lib.crypto import decrypt
+
+                mng = readfile(osw + '/scripts/com/fc2/blog38/famibee/AIRNovel/LoadMng.as','rt')
+                k = re.search(r'new CriptRC4\((".+?")\);',mng)
+                if k: k = k[1]
+                else: k = re.search(r'private static const (?P<n>[\w_]+):String = (".+?");\s*private static var [_\w]+:CriptRC4 = new CriptRC4\((?P=n)\);',mng)[2]
+                key = ast.literal_eval(k).encode('utf-8')
+                fullr = re.compile(re.search(r'private static const REG_EXT_FULL_CODE:RegExp = /(.+)/;',mng)[1])
+                for x in nl:
+                    if x.endswith('_') and isfile(o + '/' + x):
+                        d = readfile(o + '/' + x)
+                        if fullr.match(x): ed = len(d)
+                        else: ed = min(len(d),cl)
+                        writefile(o + '/' + x[:-1],decrypt(d[:ed],'airrc4',key) + d[ed:])
+                        remove(o + '/' + x)
+            return
 
     return 1

@@ -1555,7 +1555,7 @@ def extract4_5(inp:str,out:str,t:str):
                         symlink(tfn,fn)
                     else:
                         writefile(fn,f.readc(fe['s']))
-                        set_ftime(fn,fe['t'][2],fe['t'][1],fe['t'][0])
+                        set_ftime(fn,ct=fe['t'][2],at=fe['t'][1],mt=fe['t'][0])
 
             f.close()
             if xinf:

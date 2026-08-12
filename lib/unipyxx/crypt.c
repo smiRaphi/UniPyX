@@ -396,28 +396,6 @@ EXPORT void decrypt_hornby(uint8_t *restrict buf, const size_t size,
     buf[1] ^= key;
     for (size_t i=1;i < size;i++) buf[i] ^= buf[i - 1] ^ (buf[i] & msk);
 }
-EXPORT void init_mmfs(uint8_t *restrict dst, const uint8_t *restrict key) {
-    size_t kp = 0;
-    uint8_t i2 = 0;
-    for (int i1=0;i1 < 0x100;i1++) {
-        if (!key[kp]) kp = 0;
-        i2 += key[kp++] + dst[i1];
-        uint8_t b = dst[i2];
-        dst[i2] = dst[i1];
-        dst[i1] = b;
-    }
-}
-EXPORT void decrypt_mmfs(uint8_t *restrict buf, const size_t size, uint8_t *restrict key) {
-    uint8_t i1 = 0;
-    uint8_t i2 = 0;
-    for (size_t p=0;p < size;p++) {
-        i2 += key[++i1];
-        uint8_t b = key[i2];
-        key[i2] = key[i1];
-        key[i1] = b;
-        buf[p] ^= key[(uint8_t)(key[i1] + key[i2])];
-    }
-}
 EXPORT void init_selene(uint8_t *restrict dst, const uint8_t *restrict key, const size_t ksize, const uint32_t seed) {
     INIT_MT19937S(mt);
     MT19937S_seed(&mt,seed);
@@ -448,16 +426,14 @@ EXPORT void decrypt_rc4_playpond(uint8_t *restrict buf, const size_t size, const
     j = 0;
     uint8_t i = 0;
     for (size_t ix=0;ix < drop;ix++) {
-        i += 1;
-        j += S[i];
+        j += S[++i];
         uint8_t b = S[j];
         S[j] = S[i];
         S[i] = b;
     }
 
     for (size_t p=0;p < size;p++) {
-        i += 1;
-        j += S[i];
+        j += S[++i];
         uint8_t b = S[j];
         S[j] = S[i];
         S[i] = b;
@@ -588,6 +564,29 @@ EXPORT void decrypt_ady_glue(uint8_t *restrict buf, const size_t size,
     for (size_t p=0;p < size;p++) {
         buf[p] = ROT8R(buf[p] - key[kc++], 1);
         if (kc >= ksize) kc = 0;
+    }
+}
+EXPORT void decrypt_airrc4(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize) {
+    uint8_t S[0x100];
+    for (uint16_t i=0;i < 0x100;i++) S[i] = i;
+    uint8_t j = 0;
+    size_t kp = 0;
+    for (uint16_t i=0;i < 0x100;i++) {
+        j += S[i] + key[kp++];
+        if (kp >= ksize) kp = 0;
+        S[i] ^= S[j];
+        S[j] ^= S[i];
+        S[i] ^= S[j];
+    }
+
+    uint8_t i = 0;
+    j = 0;
+    for (size_t p=0;p < size;p++) {
+        j += S[++i];
+        S[i] ^= S[j];
+        S[j] ^= S[i];
+        S[i] ^= S[j];
+        buf[p] ^= S[(S[i] + S[j]) & 0xFF];
     }
 }
 
@@ -1960,6 +1959,7 @@ EXPORT hash160_t hash_has160(const uint8_t *restrict src, const size_t size) {
     return H;
 }
 
+// Not working! https://github.com/jonelo/jacksum/blob/6106715ee964047eb88dc322ed0bd7abd4c6f1b7/src/main/java/net/jacksum/zzadopt/gnu/crypto/hash/Haval.java
 static inline uint32_t haval_ff(uint32_t a[8], const uint32_t w, const uint32_t c, const uint32_t r, const uint32_t y) {
     uint32_t x[7];
     uint32_t of;

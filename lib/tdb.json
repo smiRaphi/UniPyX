@@ -27,7 +27,8 @@
         "winzip win32 self-extracting archive (generic)",
         "torrentzip compressed archive",
         "java archive",
-        "java archive data (jar)"
+        "java archive data (jar)",
+        "adobe integrated runtime"
     ],
     "LHARC":[
         "lharc/lzark compressed archive (generic)",
@@ -1608,8 +1609,10 @@
         "diskcopy 4.2 1440k mfm disk image",
         "apple diskcopy 4.2 image"
     ],
-    "Diff Patch":[
-        "diff output text"
+    "Unified Diff":[
+        "diff output text",
+        "unified diff output text",
+        "unified diff output"
     ],
     "Microsoft .NET ResX":[
         "microsoft .net xml resource template (utf-8)"
@@ -1745,5 +1748,8 @@
     "HTTP Archive":[
         "http archive",
         "http archive format"
+    ],
+    "Context Diff":[
+        "context diff output"
     ]
 }

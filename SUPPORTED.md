@@ -1,12 +1,11 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1055
+# Supported Formats: 1062
 
 ## "Common" Archives/Compressors/Encodings (151)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
-777 | .777 | [777](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 7z | .7z .exe | [7-Zip](https://7-zip.org/) |
 Aaru | .aaru | [Aaru](https://github.com/aaru-dps/Aaru) |
 ABE | .abe | [DABE](http://cd.textfiles.com/simtel/simtel9510/disk2/DISC2/DECODE/ABE.ZIP) |
@@ -38,17 +37,15 @@ Asar | .asar | [7-Zip](https://7-zip.org/) + [Asar7z](https://www.tc4shell.com/e
 ASD | .asd .exe | (Custom + ) [ASD](https://www.sac.sk/download/pack/asd020.exe) |
 BBC Micro SSD | .ssd | Custom |
 Base64 | .b64 | Custom |
+Base64 Data URL | data:*;base64, | Custom |
 Bencode | .torrent | Custom |
 BinHex | .bhx | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/), [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 BinSCII | .bsc | Custom + [deark](https://entropymine.com/deark/) |
-BIX | .bix | [BIX](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 BlakHole | .bh | [izArc](https://www.izarc.org/) |
 Bootable FAT16 IMG | .img .dsk | Custom |
 Brotli | .br .brotli | Custom |
 BZip | .bz | [BZip](https://sourceware.org/pub/bzip2/)
 BZip2 | .bz2 | [7-Zip](https://7-zip.org/) |
-BZip3 | .bz3 | [bzip3](https://github.com/iczelia/bzip3) |
-CarComp | .car | [CAR](https://www.sac.sk/download/pack/carcom11.zip) |
 CAZIP | ??? | [deark](https://entropymine.com/deark/) |
 CDI CUE + BIN | .cue+.bin | [Aaru](https://github.com/aaru-dps/Aaru) |
 CDI ISO | .iso | [Aaru](https://github.com/aaru-dps/Aaru) |
@@ -58,6 +55,7 @@ Compact | ??? | [Ancient](https://github.com/temisu/ancient) |
 Compact Pro | ??? | [unar](https://theunarchiver.com/command-line) |
 Compaq QRST IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
 Compressed ISO | .ciso .cso | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
+Context Diff | .diff .patch | Custom |
 CopyQM IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
 CP Shrink | ??? | [deark](https://entropymine.com/deark/) |
 CPC IMG | .img | [Amstrad CPC Explorer](https://github.com/muckypaws/AmstradDSKExplorer) |
@@ -70,12 +68,12 @@ DAR | .dar | [DAR](https://sourceforge.net/projects/dar/) |
 DIET | \* | [deark](https://entropymine.com/deark/) |
 DietDisk | \* | [DietDisk](http://cd.textfiles.com/nightowl/nopv06/010A/DIETDISC.ZIP) |
 CUE + BIN | .cue+.bin | [Aaru](https://github.com/aaru-dps/Aaru), [bin2iso](https://gitlab.com/bunnylin/bin2iso) + [7-Zip](https://7-zip.org/) |
-Diff Patch | .diff .patch | Custom |
 Disk Doubler | ??? | [unar](https://theunarchiver.com/command-line) |
 DiskDupe IMG | .ddi | [7-Zip](https://7-zip.org/) |
 DOS Backup | ??? | [deark](https://entropymine.com/deark/) |
 DOS IMG | .img .dsk | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 DWC | .dwc | [DWC](https://www.sac.sk/download/pack/dwc-a510.exe) |
+Ed Script Diff | .diff .patch .ed | Custom |
 EGG | .egg | [ALZip](https://altools.co.kr/product/ALZIP) |
 EPOC App Info | ??? | [deark](https://entropymine.com/deark/) |
 EPOC Install Package | ??? | [deark](https://entropymine.com/deark/) |
@@ -114,11 +112,13 @@ Microsoft SZDD | .??_ | Custom |
 Motorola S-Record | .srec | Custom |
 MSCAB | .cab | [7-Zip](https://7-zip.org/) + file name correction |
 Nero CD IMG | .nrg | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
+Normal Diff | .diff .patch | Custom |
 NTFS | .ntfs .img | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 PDF | .pdf | [xpdf](https://www.xpdfreader.com/download.html) |
 PeaZip | .pea | [peazip](https://github.com/peazip/PeaZip) |
 PowerPacker | .pp | [unar](https://theunarchiver.com/command-line), [Ancient](https://github.com/temisu/ancient) |
 OS/2 Installation Package | .pak .pkg | [deark](https://entropymine.com/deark/) |
+RCS Diff | .diff .patch | Custom | doesn't output to correct lines cause I've no clue how that gets calculated
 RAR | .rar .exe | [unrar](https://bioruebe.com/dev/uniextract/)([src](https://www.win-rar.com/)), [7-Zip](https://7-zip.org/) |
 RESOF | .sof | Custom |
 Rob Northen Compression | .rnc | [Ancient](https://github.com/temisu/ancient) |
@@ -135,10 +135,11 @@ The Compressor | ??? | [deark](https://entropymine.com/deark/) |
 TTComp | .??_ | [ttdecomp](https://www.exelana.com/techie/c/ttdecomp.html) |
 Turbo Range Coder | .trc | [Turbo Range Coder](https://github.com/powturbo/Turbo-Range-Coder) |
 UDF | .udf | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
-UFA | .ufa | [UFA](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 UHARC | .uha .uhc | [UHARC](https://www.sac.sk/download/pack/uharc06b.zip) |
+Unified Diff | .diff .patch | Custom |
 Unix Compress | .z | [7-Zip](https://7-zip.org/) |
 Unix Fast Filesystem | .fs | [Aaru](https://github.com/aaru-dps/Aaru) |
+Unix Mailbox | .mbox | Custom |
 UUencoded | .uu .uue | Custom |
 UUencoded Base64 | .b64 | Custom |
 VHD | .vhd | [7-Zip](https://7-zip.org/) |
@@ -149,7 +150,6 @@ XAR | .xar | [7-Zip](https://7-zip.org/) |
 XX34 | .x34 | [XX34](https://www.sac.sk/download/utilfile/xx3402.zip)
 xz | .xz | [7-Zip](https://7-zip.org/) |
 YAC | .yac .yc | [YAC](https://www.sac.sk/download/pack/yac102.zip) |
-Yamazaki Zipper | .yz | [yzdec](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/yz1/deepf106.zip)(src?) |
 yEnc | .ntx .yenc | [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 ZIP | .zip .zipx .exe | Custom, [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) |
 ZLIB | .zlib | [zlib](https://docs.python.org/3/library/zlib.html) |
@@ -375,7 +375,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (571)
+## Various (572)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -399,6 +399,7 @@ Adventure Time VOLume | .vol | Custom |
 AFS | .afs | [AFSPacker](https://github.com/MaikelChan/AFSPacker) |
 Afterlife Game Data | ??? | Custom |
 Agon Game Archive | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+AIRNovel Package | .air | Custom + [ffdec](https://github.com/jindrapetrik/jpexs-decompiler) |
 Air Adrenaline Data 1 | ??? | Custom |
 Air Adrenaline Data 2 | ??? | Custom |
 Alien Vs Predator FFL | .ffl | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -952,10 +953,11 @@ ZPackage | .zpk | Custom |
 ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (123)
+## Compression Enthusiasts/One-Off Formats (129)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
+777 | .777 | [777](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 ACEAPEX | .aet | [ACEAPEX](https://github.com/yasha1971-coder/aceapex) |
 Ai | .ai | [ai](https://www.sac.sk/download/pack/ai11.zip) |
 ARHANGEL | .arh | [ARHANGEL](https://www.sac.sk/download/pack/arh140.zip) |
@@ -963,6 +965,7 @@ B1 | .b1 | [b1-pack-tool](http://dev.b1.org/) |
 BALZ | ??? | [BALZ](https://sourceforge.net/projects/balz/) |
 BCM | .bcm | [BCM](https://compressme.net/) |
 Binary \]\[ Archive | ??? | [nulib2](https://nulib.com/) |
+BIX | .bix | [BIX](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 BLINK | ??? | [blink](https://www.sac.sk/download/pack/blink.zip) |
 BOA Constrictor | .boa | [BOA](https://www.sac.sk/download/pack/boa058.zip) |
 BriefLZ | ??? | [blzpack](https://github.com/jibsen/brieflz) |
@@ -970,6 +973,8 @@ BSArc | .bsa | [BSA](https://www.sac.sk/download/pack/bsa.zip) |
 bsc | .bsc | [bsc](https://github.com/IlyaGrebnov/libbsc) |
 bsc-m03 | .bsc | [bsc-m03](https://github.com/IlyaGrebnov/bsc-m03) |
 BTSPK | ??? | [BTSPK](https://www.sac.sk/download/pack/btspk.arj) |
+BZip3 | .bz3 | [bzip3](https://github.com/iczelia/bzip3) |
+CarComp | .car | [CAR](https://www.sac.sk/download/pack/carcom11.zip) |
 Deflate64 | .deflate64 | Custom |
 Density Chamleon | ??? | [density-rs](https://github.com/g1mv/density) |
 Density Cheetah | ??? | [density-rs](https://github.com/g1mv/density) |
@@ -1065,8 +1070,10 @@ TERSE | ??? | [tersedecompress++](https://github.com/openmainframeproject/tersed
 THOR | ??? | [THOR](https://web.archive.org/web/20140115050229/http://www.maximumcompression.com/thor_096.zip) |
 TANGELO | .tangelo | [TANGELO](https://encode.su/threads/1738-TANGELO-new-compressor-(derived-from-PAQ8-FP8)) |
 UCLPack | .ucl | Custom |
+UFA | .ufa | [UFA](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 ULZ | .ulz | [ULZ](https://compressme.net/) |
 Vlaz | .vlaz | [Vlaz](https://encode.su/threads/4450-Vlaz-LZAV-codec-client) |
+Yamazaki Zipper | .yz | [yzdec](https://github.com/sourcekris/uniextract/blob/main/toolsdist/win32/yz1/deepf106.zip)(src?) |
 Yappy | .yap | [yappy](http://nishi.dreamhosters.com/u/yappy_v0.rar)(src?) |
 YBS | .ybs | [ybs](https://compression.ru/compression.ru/ybs/ybs003fw.zip)(src?) |
 ZCM | .zcm | [ZCM](https://web.archive.org/web/20250219173903/http://heartofcomp.altervista.org/zcm093.zip) |

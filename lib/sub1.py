@@ -571,7 +571,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fe['xa'] = f.readu32()
                 fe['of'] = f.readu32() + reb
                 fnb = f.readc(nl)
-                fe['n'] = fnb.rstrip(b'\0').decode('utf-8' if fe['fl'] & 0x800 else 'cp437')
+                fn = fnb.rstrip(b'\0')
+                if fe['fl'] & 0x800 or istext(fn,'utf-8',filename=True): fe['n'] = fn.decode('utf-8')
+                else: fe['n'] = fn.decode('cp437')
                 if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
 
                 ep = f.pos + xl
@@ -1151,14 +1153,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             run(['unzoo','-x','-o','-j',o + '\\',i])
             if listdir(o): return
-        case 'YAC': return msdos(['yac','x',i],cwd=o)
-        case 'Yamazaki Zipper':
-            run(['yzdec','-d' + o,'-y',i])
-            if listdir(o): return
-        case '777'|'BIX'|'UFA':
-            # merge 7z predecessors
-            run([t.lower(),'x','-y','-o' + o,i])
-            if listdir(o): return
         case 'Brotli':
             db.try_custom()
             from lib.file import decompress
@@ -1166,12 +1160,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if d:
                 writefile(o + '/' + tbasename(i),d)
                 return fix_tar(o)
-        case 'BZip3':
-            tf = o + '/' + basename(i)
-            symlink(i,tf)
-            run(['bzip3','-d','-f','-k',tf])
-            remove(tf)
-            if listdir(o): return fix_tar(o)
         case 'Turbo Range Coder':
             of = o + '/' + tbasename(i)
             run(['turborc','-d',i,of])
@@ -1246,7 +1234,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
             run(['ancient','decompress',i,of])
             if exists(of) and getsize(of): return
         case 'ABE': return msdos(['dabe','-v','+i',i],cwd=o)
-        case 'CarComp': return msdos(['car','x',i],cwd=o)
         case 'PeaZip':
             td = o + '\\tmp' + os.urandom(4).hex()
             run(['pea','UNPEA',i,td,'RESETDATE','SETATTR','EXTRACT2DIR','HIDDEN'])
@@ -1569,67 +1556,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
             of = o + '/' + ext_expand(basename(i))
             run(['ttdecomp',i,of])
             if exists(of) and getsize(of): return
-        case 'Diff Patch':
-            db.try_custom()
-            f = open(i,encoding='utf-8')
-
-            ix = 0
-            fs = {}
-            l = f.readline()
-            while True:
-                cc = ''
-                while True:
-                    if not l: break
-                    if l.startswith('--- '): break
-                    cc += l
-                    l = f.readline()
-                if not l: break
-                writefile(f'{o}/$comments/{ix:03d}.txt',cc,'w')
-                ix += 1
-
-                mip = l[4:-1]
-                l = f.readline()
-                asrt(l.startswith('+++ '))
-                plp = l[4:-1]
-                if not mip in fs: fs[mip] = []
-                if not plp in fs: fs[plp] = []
-
-                l = f.readline()
-                while True:
-                    if not l.startswith('@@ '): break
-                    ml,pl = l[3:-1].split('@@',1)[0].strip().split()
-                    asrt(ml[0] == '-' and pl[0] == '+')
-                    mlo = int(ml[1:].split(',',1)[0])
-                    plo = int(pl[1:].split(',',1)[0])
-                    mb = []
-                    pb = []
-                    while True:
-                        l = f.readline()
-                        if not l: break
-                        if l[0] == ' ':
-                            mb.append(l[1:-1])
-                            pb.append(l[1:-1])
-                        elif l[0] == '-': mb.append(l[1:-1])
-                        elif l[0] == '+': pb.append(l[1:-1])
-                        else: break
-                    if l == "\\ No newline at end of file\n": l = f.readline()
-                    else:
-                        mb.append('')
-                        pb.append('')
-
-                    fs[mip].append((mlo,mb))
-                    fs[plp].append((plo,pb))
-            f.close()
-
-            if '/dev/null' in fs: fs.pop('/dev/null')
-            for x in fs:
-                ls = []
-                for yo,yd in fs[x]:
-                    if (yo+len(yd)) > len(ls): ls.extend(['']*(yo+len(yd)-len(ls)))
-                    for ix,l in enumerate(yd): ls[yo+ix] = l
-                writefile(o + '/' + x,'\n'.join(ls),'w')
-
-            if fs: return
         case 'Google Authenticator Migration URL':
             ALGM = {1:'SHA1',2:'SHA256',3:'SHA512',4:'MD5'}
             DIGM = {1:6,2:8}
@@ -1776,6 +1702,290 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     set_ftime(fn,ct=ct,mt=mt)
 
             if di['entries']: return
+        case 'Base64 Data URL':
+            db.try_custom()
+            from lib.crypto import decrypt
+            if not i.startswith('data:') and exists(i): d = readfile(i,'rt').split(':',1)[1].strip()
+            else: d = i.split(':',1)[1]
+            mim,d = d.split(';',1)
+            asrt(d.startswith('base64,'))
+            writefile(o + '/' + basename(o) + '.' + mime2ext(mim),decrypt(d[7:],'base64'))
+            return
+        case 'Unix Mailbox':
+            db.try_custom()
+            import ast
+            f = xopen(i,'rb')
+
+            l = f.readline()
+            eol = b'\r\n' if l.endswith(b'\r\n') else b'\n'
+            inf = {'$header':l.rstrip(eol).decode('utf-8')}
+            inf |= read_http_head(f.readline,idn=True)
+            hd = {k.lower():v for k,v in inf.items()}
+            if 'date' in hd: cts = str2unix(hd['date'].strip())
+            else:
+                cts = inf['$header'].split(' ',2)
+                if len(cts) > 2: cts = str2unix(cts[2].strip())
+                else: cts = None
+            writefile(o + '/$info.json',inf,'j',ct=cts,indent=4)
+
+            boud = hd['content-type'].split(';',1)[1].lstrip()
+            asrt(boud.startswith('boundary='),boud)
+            if boud[9] == '"': boud = ast.literal_eval('b' + boud[9:])
+            else: boud = boud[9:].encode('utf-8')
+
+            head = []
+            while True:
+                l = f.readline()
+                if not l:
+                    f.close()
+                    return 1
+                if l == b'--' + boud + eol: break
+                head.append(l)
+            if head: writefile(o + '/$header.txt',b''.join(head))
+
+            d = []
+            c = 0
+            while True:
+                if not d:
+                    h = read_http_head(f.readline,idn=True)
+                    if h:
+                        writefile(f'{o}/{c:02d}_$header.json',h,'j',ct=cts,indent=4)
+                        h = {k.lower():v for k,v in h.items()}
+                    else: h = {'content-type':'text/plain'}
+                l = f.readline()
+                if not l or l == b'--' + boud + b'--' + eol:
+                    writefile(f'{o}/{c:02d}_{http_head_filename(h)}',b''.join(d),ct=cts)
+                    c += 1
+                    break
+                if l == boud + eol:
+                    writefile(f'{o}/{c:02d}_{http_head_filename(h)}',b''.join(d),ct=cts)
+                    d = []
+                    c += 1
+                else: d.append(l)
+
+            f.close()
+            if c: return
+        case 'Unified Diff':
+            db.try_custom()
+            d = readfile(i,'rt').splitlines(True)
+
+            c = p = 0
+            fs = {}
+            while True:
+                cc = []
+                for sp in range(p,len(d)):
+                    if len(d) - sp < 2:
+                        p = -1
+                        break
+                    if d[sp].startswith('--- ') and d[sp+1].startswith('+++ '):
+                        p = sp
+                        break
+                    cc.append(d[sp])
+                else: p = -1
+                if p == -1:
+                    if cc: writefile(o + '/$comments/footer.txt',''.join(cc))
+                    break
+                if cc: writefile(f'{o}/$comments/{c:03d}.txt',''.join(cc))
+                c += 1
+
+                mip,*mit = d[p][4:].rstrip('\r\n').split('\t',1);p += 1
+                plp,*plt = d[p][4:].rstrip('\r\n').split('\t',1);p += 1
+                if not mip in fs: fs[mip] = [mit]
+                else: fs[mip][0].extend(mit)
+                if not plp in fs: fs[plp] = [plt]
+                else: fs[plp][0].extend(plt)
+
+                while p < len(d):
+                    if not d[p].startswith('@@ '): break
+                    ml,pl = d[p][3:-1].split('@@',1)[0].strip().split();p += 1
+                    asrt(ml[0] == '-' and pl[0] == '+')
+                    mlo,mll = ml[1:].split(',',1)
+                    plo,pll = pl[1:].split(',',1)
+                    mlo = int(mlo);mll = int(mll)
+                    plo = int(plo);pll = int(pll)
+                    mb = []
+                    pb = []
+                    while (len(mb) < mll or len(pb) < pll) and p < len(d):
+                        l = d[p];p += 1
+                        if l[0] == ' ':
+                            mb.append(l[1:])
+                            pb.append(l[1:])
+                        elif l[0] == '-': mb.append(l[1:])
+                        elif l[0] == '+': pb.append(l[1:])
+                        else: raise ValueError(l.rstrip('\r\n'))
+                    if d[p].rstrip('\r\n') == '\\ No newline at end of file':
+                        if mb: mb[-1] = mb[-1].rstrip('\r\n')
+                        if pb: pb[-1] = pb[-1].rstrip('\r\n')
+                        p += 1
+                    fs[mip].append((mlo - 1,mb))
+                    fs[plp].append((plo - 1,pb))
+
+            fs.pop('/dev/null',None)
+            for x in fs:
+                ls = []
+                eol = '\r\n' if len(fs[x]) > 1 and len(fs[x][1][1]) > 0 and fs[x][1][1][0].endswith('\r\n') else '\n'
+                for yo,yd in fs[x][1:]:
+                    if (yo+len(yd)) > len(ls): ls.extend([eol]*(yo+len(yd)-len(ls)))
+                    for ix,l in enumerate(yd): ls[yo+ix] = l
+                writefile(o + '/' + sanitize_relative(x),''.join(ls),ct=max([str2unix(ts) for ts in fs[x][0]],default=None))
+
+            if fs: return
+        case 'Context Diff':
+            db.try_custom()
+            d = readfile(i,'rt').splitlines(True)
+
+            c = p = 0
+            fs = {}
+            while True:
+                cc = []
+                for sp in range(p,len(d)):
+                    if len(d) - sp < 3:
+                        p = -1
+                        break
+                    if d[sp].startswith('*** ') and d[sp+1].startswith('--- ') and d[sp+2].rstrip('\r\n') == '***************':
+                        p = sp
+                        break
+                    cc.append(d[sp])
+                else: p = -1
+                if p == -1:
+                    if cc: writefile(o + '/$comments/footer.txt',''.join(cc))
+                    break
+                if cc: writefile(f'{o}/$comments/{c:03d}.txt',''.join(cc))
+                c += 1
+
+                mip,*mit = d[p][4:].rstrip('\r\n').split('\t',1);p += 1
+                plp,*plt = d[p][4:].rstrip('\r\n').split('\t',1);p += 1
+                if not mip in fs: fs[mip] = [mit]
+                else: fs[mip][0].extend(mit)
+                if not plp in fs: fs[plp] = [plt]
+                else: fs[plp][0].extend(plt)
+                p += 1
+
+                while p < len(d):
+                    l = d[p].rstrip('\r\n')
+                    if not ((l.startswith('*** ') and l.endswith(' ****')) or (l.startswith('--- ') and l.endswith(' ----'))): break
+                    ty = l[0]
+                    vlo,vll = l[4:-5].split(',',1);p += 1
+                    vlo = int(vlo);vll = int(vll)
+                    vb = []
+
+                    for sp in range(p,p + vll):
+                        if d[sp][0] not in ' !+' or d[sp][1] != ' ': raise ValueError(d[sp].rstrip('\r\n'))
+                        vb.append(d[sp][2:])
+                    p += vll
+                    if d[p].rstrip('\r\n') == '\\ No newline at end of file':
+                        if vb: vb[-1] = vb[-1].rstrip('\r\n')
+                        p += 1
+                    fs[mip if ty == '*' else plp].append((vlo - 1,vb))
+
+            fs.pop('/dev/null',None)
+            for x in fs:
+                ls = []
+                eol = '\r\n' if len(fs[x]) > 1 and len(fs[x][1][1]) > 0 and fs[x][1][1][0].endswith('\r\n') else '\n'
+                for yo,yd in fs[x][1:]:
+                    if (yo+len(yd)) > len(ls): ls.extend([eol]*(yo+len(yd)-len(ls)))
+                    for ix,l in enumerate(yd): ls[yo+ix] = l
+                writefile(o + '/' + sanitize_relative(x),''.join(ls),ct=max([str2unix(ts) for ts in fs[x][0]],default=None))
+
+            if fs: return
+        case 'Normal Diff':
+            db.try_custom()
+            d = readfile(i,'rt').splitlines(True)
+
+            p = 0
+            ml,pl = [],[]
+            while p < len(d):
+                h = d[p].rstrip('\r\n');p += 1
+                if not h: continue
+                if 'c' in h: s = h.split('c')
+                elif 'a' in h: s = h.split('a')
+                else: raise ValueError(h)
+
+                s1,s2 = s[0].split(','),s[1].split(',')
+
+                if 'c' in h:
+                    if len(s1) == 2: c = int(s1[1]) - int(s1[0]) + 1
+                    else: c = 1
+                    l = []
+                    for _ in range(c):
+                        if p >= len(d): break
+                        l.append(d[p]);p += 1
+                    asrt(all(x.startswith('< ') for x in l),p)
+                    ml.append((int(s1[0]) - 1,l))
+                    if p >= len(d): continue
+                    asrt(d[p].rstrip('\r\n') == '---',p);p += 1
+
+                if len(s2) == 2: c = int(s2[1]) - int(s2[0]) + 1
+                else: c = 1
+                l = []
+                for _ in range(c):
+                    if p >= len(d): break
+                    l.append(d[p]);p += 1
+                asrt(all(x.startswith('> ') for x in l),p)
+                pl.append((int(s2[0]) - 1,l))
+
+            for x,fn in ((ml,'input.txt'),(pl,'output.txt')):
+                ls = []
+                eol = '\r\n' if len(x) > 1 and len(x[0][1]) > 0 and x[0][1][0].endswith('\r\n') else '\n'
+                for yo,yd in x:
+                    if (yo+len(yd)) > len(ls): ls.extend([eol]*(yo+len(yd)-len(ls)))
+                    for ix,l in enumerate(yd): ls[yo+ix] = l[2:]
+                writefile(o + '/' + fn,''.join(ls))
+
+            if ml or pl: return
+        case 'Ed Script Diff':
+            db.try_custom()
+            d = readfile(i,'rt').splitlines(True)
+
+            p = 0
+            vl = []
+            while p < len(d):
+                h = d[p].rstrip('\r\n');p += 1
+                if not h: continue
+                asrt(h[-1] in 'ac',h)
+                vo = int(h[:-1].split(',',1)[0])
+                if ',' in h: vo -= 1
+                else: vo += 1
+                l = []
+                while p < len(d) and d[p].rstrip('\r\n') != '.':
+                    l.append(d[p]);p += 1
+                p += 1
+                vl.append((vo,l))
+
+            ls = []
+            eol = '\r\n' if len(vl) > 1 and len(vl[0][1]) > 0 and vl[0][1][0].endswith('\r\n') else '\n'
+            for yo,yd in vl:
+                if (yo+len(yd)) > len(ls): ls.extend([eol]*(yo+len(yd)-len(ls)))
+                for ix,l in enumerate(yd): ls[yo+ix] = l
+            writefile(f'{o}/{tbasename(i)}.txt',''.join(ls))
+            if vl: return
+        case 'RCS Diff':
+            db.try_custom()
+            d = readfile(i,'rt').splitlines(True)
+
+            p = 0
+            vl = []
+            while p < len(d):
+                h = d[p].rstrip('\r\n');p += 1
+                if not h: continue
+                asrt(h[0] in 'ad',h)
+                vo,vs = h[1:].split(' ',1)
+                vo,vs = int(vo),int(vs)
+                if h[0] == 'd': continue
+
+                l = []
+                for _ in range(vs):
+                    if p >= len(d): break
+                    l.append(d[p]);p += 1
+                vl.append((vo,l))
+
+            ls = []
+            eol = '\r\n' if len(vl) > 1 and len(vl[0][1]) > 0 and vl[0][1][0].endswith('\r\n') else '\n'
+            for yo,yd in vl:
+                if (yo+len(yd)) > len(ls): ls.extend([eol]*(yo+len(yd)-len(ls)))
+                for ix,l in enumerate(yd): ls[yo+ix] = l
+            writefile(f'{o}/{tbasename(i)}.txt',''.join(ls))
+            if vl: return
 
     return 1
 
@@ -1820,7 +2030,7 @@ def read_http_head(readline,max:int=None,idn=False):
         if not l: break
         try: lr = l.decode('utf-8');asrt(lr.isprintable())
         except: lr = l.decode('latin1')
-        k,v = lr.split(':',1)[0].strip(),lr.split(':',1)[1].strip()
+        k,v = lr.split(':',1)[0].rstrip(),lr.split(':',1)[1].lstrip()
         if k in o: o[k] += ', ' + v
         else: o[k] = v
     return o

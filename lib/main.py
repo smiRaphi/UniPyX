@@ -2,7 +2,7 @@ import sys
 if sys.version_info < (3,13):
     raise RuntimeError("Python 3.13+ is required")
 
-import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil,inspect,threading
+import re,json,ast,os,errno,subprocess,hashlib,ctypes,types,typing,shutil,inspect,threading,locale
 from time import sleep
 from queue import Queue
 from ctypes import wintypes
@@ -36,6 +36,8 @@ if typing.TYPE_CHECKING:
     utf8,utf16=str
     padding=skip=align=types.NoneType
     from dev.namespaces import *
+
+XMLNSRG = re.compile(r'\bxmlns="[^"]*"')
 
 def asrt(c:bool,*r,err:Exception=ValueError,debug=False):
     if not c:
@@ -203,7 +205,7 @@ def readfile(f:str,m='rb',off=0,size=None,encoding='utf-8',newline=None,**kwargs
     r = o.read(size)
     o.close()
     return r
-def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,**kwargs):
+def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,ct:int=None,mt:int=None,at:int=None,**kwargs):
     if m is None:
         if isinstance(d,(bytes,bytearray,memoryview)): m = 'b'
         elif isinstance(d,str): m = 't'
@@ -223,11 +225,13 @@ def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,**kwarg
         r = o.write(json.dumps(d,**kwargs))
         o.close()
         return r
+    else:
+        if 'b' in m: o = xopen(f,m,**kwargs)
+        else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
+        r = o.write(d)
+        o.close()
+    set_ftime(f,ct=ct,mt=mt,at=at)
 
-    if 'b' in m: o = xopen(f,m,**kwargs)
-    else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
-    r = o.write(d)
-    o.close()
     return r
 def rldir(i:str,files=True) -> list[str]:
     i = str(i)
@@ -312,6 +316,7 @@ def dosr2unix(d:int=0,t:int=0,ms:float=0): return dos2unix(t,d,ms)
 def strp2re(fmt:str):
     p = 0
     rg = []
+    loc = None
     while p < len(fmt):
         c = fmt[p];p += 1
         if c == '%':
@@ -321,44 +326,86 @@ def strp2re(fmt:str):
             elif c == 'j': rg.append(r'\d{3}')
             elif c in 'YG': rg.append(r'\d{4}')
             elif c == 'f': rg.append(r'\d{6}')
-            elif c == 'z': rg.append(r'[-+]\d{4}(\d{2}(\.\d{6})?)?')
-            elif c == 'p': rg.append(r'[A-Za-z]{2}')
+            elif c == 'z': rg.append(r'[\-\+]\d{4}(\d{2}(\.\d{6})?)?')
+            elif c == 'p':
+                if loc == 'en_US': rg.append(r'(?:AM|PM)')
+                else: rg.append(r'[A-Za-z]{2}')
             elif c == 'Z': rg.append(r'[A-Z]{3}')
-            elif c == 'b': rg.append(r'[A-Z][a-z]{2}')
-            elif c == 'a': rg.append(r'[A-Z][a-z]{1,2}')
-            elif c in 'AB': rg.append(r'[A-Z][a-z]{2,}')
-            elif c == ':' and fmt[p] in 'zm':
+            elif c == 'b':
+                if loc == 'en_US': rg.append(r'(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)')
+                else: rg.append(r'[A-Z][a-z]{2}')
+            elif c == 'a':
+                if loc == 'en_US': rg.append(r'(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)')
+                else: rg.append(r'[A-Z][a-z]{1,2}')
+            elif c == 'B':
+                if loc == 'en_US': rg.append(r'(?:January|February|March|April|May|June|July|August|September|October|November|December)')
+                else: rg.append(r'[A-Z][a-z]{2,}')
+            elif c == 'A':
+                if loc == 'en_US': rg.append(r'(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)')
+                else: rg.append(r'[A-Z][a-z]{3,}')
+            elif c == ':' and fmt[p] in 'zmln':
                 c = fmt[p];p += 1
                 if c == 'z': rg.append(r'[-+]\d{2}:\d{2}(\:\d{2}(\.\d{6})?)?')
-                elif c == 'm': rg.append(r'(?P<mls>\d{3})') # milliseconds, unofficial
+                elif c == 'm':
+                    rg.append(r'(?P<mls>\d{3})') # milliseconds, unofficial
+                    fmt = fmt[:p - 3] + '\0m\0' + fmt[p:]
+                elif c == 'n':
+                    rg.append(r'(?P<ns>\d{9})') # nanoseconds, unofficial
+                    fmt = fmt[:p - 3] + '\0\0\0\0ns\0\0\0' + fmt[p:]
+                    p += 6
+                elif c == 'l': # locale, unofficial
+                    asrt(loc is None,'Only one locale allowed per format string')
+                    l,fmt = fmt[p:p+7],fmt[:p - 3] + fmt[p + 7:]
+                    p -= 3
+                    asrt(l[0] == l[6] == ':')
+                    loc = l[1:6]
             elif c == '%': rg.append('%')
-            else: raise NotImplementedError(f"'%{c}' @ {p - 2} of '{fmt}'")
+            elif c == 'c' and loc == 'en_US':
+                rg.append(r'(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun) (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{2} \d{2}:\d{2}:\d{2} \d{4}')
+            else: raise NotImplementedError(f"'%{c}' @ {p - 2} of '{fmt}' ({loc})")
         else: rg.append(re.escape(c))
-    return re.compile('^' + ''.join(rg) + '$')
-TS_FMTS = [(strp2re(x),x) for x in (
+    if fmt.startswith('%:l:'): fmt = fmt[10:]
+    return re.compile('^' + ''.join(rg) + '$'),loc,fmt
+TS_FMTS = [strp2re(x) for x in (
     "%Y-%m-%dT%H:%M:%SZ",
     "%Y-%m-%dT%H:%M:%S.%fZ",
+    "%Y-%m-%d %H:%M:%S.%:n %z",
     "%Y-%m-%d %H:%M:%S %Z",
     "%Y-%m-%dT%H:%M:%S",
     "%Y-%m-%dT%H:%M:%S%z",
     "%m/%d/%Y",
     "%Y-%m-%d",
     "%Y-%m-%dT%H:%M:%S.%:mZ",
+    "%:l:en_US:%c",
+    "%:l:en_US:%a, %d %b %Y %H:%M:%S %z",
 )]
-MLS_TSR = re.compile(r'%(:m|%)')
-def str2unix(t:str,fmt=None,locale=None):
-    if fmt is None:
-        for x,y in TS_FMTS:
-            if x.match(t):
-                fmt = y
-                break
-        else: raise NotImplementedError(f"Unknown timestamp format '{t}'")
-    if ':m' in MLS_TSR.findall(fmt):
-        if fmt == "%Y-%m-%dT%H:%M:%S.%:mZ":
-            return datetime.fromisoformat(t).timestamp()
-        else: raise NotImplementedError(f"Timestamp format with milliseconds '{t}' (not ISO)")
-    else: return datetime.strptime(t,fmt).timestamp()
-def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
+XTSPS = (
+    ('\0m\0','mls'),
+    ('\0\0\0\0ns\0\0\0','ns')
+)
+def str2unix(t:str):
+    for x,l,y in TS_FMTS:
+        m = x.match(t)
+        if m:
+            fmt = y
+            loc = l
+            mtc = m
+            break
+    else: raise NotImplementedError(f"Unknown timestamp format '{t}'")
+    if not loc is None: locale.setlocale(locale.LC_TIME,loc)
+
+    mod = 0
+    for x in XTSPS:
+        p = fmt.find(x[0])
+        if p == -1: continue
+        fmt = fmt[:p] + mtc.group(x[1]) + fmt[p + len(x[0]):]
+        mod += int(mtc.group(x[1])) / 10 ** len(x[0])
+
+    try: r = datetime.strptime(t,fmt).timestamp() + mod
+    finally:
+        if not loc is None: locale.setlocale(locale.LC_TIME,'')
+    return r
+def set_ftime(p:str,ct:int=None,mt:int=None,at:int=None,unix=True):
     if ct is None and at is None and mt is None: return
     if ct is None: ct = 0
     if mt is None: mt = ct
@@ -389,11 +436,13 @@ def set_ftime(p:str,ct:int=None,at:int=None,mt:int=None,unix=True):
     os.utime(p,(at,mt))
 
 TEXTBL = {'\0','\1','\2','\3','\4','\5','\6','\7','\x08','\x0B','\x0C','\x0E','\x0F','\x10','\x11','\x12','\x13','\x14','\x15','\x16','\x17','\x18','\x19','\x1A','\x1B','\x1C','\x1D','\x1E','\x1F','\x7F'}
-def istext(d:bytes,encoding='ascii'):
+TXTFBL = TEXTBL | {'\r','\n','\t','?','*','<','>','|'}
+def istext(d:bytes,encoding='ascii',filename=False):
     try: dd = d.decode(encoding)
     except UnicodeDecodeError: return False
     if dd[-1] == '\x1A': dd = dd[:-1] # strip EOF
-    return not any(c in TEXTBL for c in dd)
+    bl = TXTFBL if filename else TEXTBL
+    return not any(c in bl for c in dd)
 
 TMP = os.getenv('TEMP').strip('\\') + '\\'
 def gtmp(suf=''): return TMP + 'tmp' + os.urandom(8).hex() + suf
@@ -543,11 +592,11 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
     global TRDB
 
     if BENCHMARK:
-        print('[B] Input:',inp)
+        print('[B] Input:',inp[:0x100])
         st = rst = time.perf_counter()
 
     db.set_temp_print(False)
-    if '://' in inp[:0x20]: typ = 'url'
+    if '://' in inp[:0x20] or ':' in inp[2:8]: typ = 'url'
     else:
         inp = cleanp(inp)
         if isdir(inp): typ = 'directory'
@@ -708,6 +757,21 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
         f.skip = lambda n: f.seek(n,1)
         f.neof = lambda: bool(f.skip(-1) or 1 if f.read(1) else 0)
         fsz = f.seek(0,2)
+
+        zipd = [None,{}]
+        def load_zip():
+            if zipd[0] is None:
+                import zipfile
+                zipfile._ZipExtFile = zipfile.ZipExtFile
+                class ZipExtFile(zipfile._ZipExtFile):
+                    def _update_crc(self,*_,**__): pass
+                zipfile.ZipExtFile = ZipExtFile
+
+                zipd[0] = zipfile.ZipFile(inp,'r',strict_timestamps=False)
+                for x in zipd[0].infolist():
+                    zipd[1][x.filename.lower()] = x
+                    zipd[1][x.filename] = x
+            return zipd[0]
     elif typ == 'url': fsz = len(inp)
     elif typ == 'directory':
         fll = [x.lower().replace('\\','/') for x in listdir(inp)]
@@ -796,28 +860,28 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             elif type(x[0]) == bool and x[0] == False: tret = ret = False
             elif typ in {'binary','text','null'}:
                 if x[0] == 'contain':
-                    cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
-                    sp = x[2][0]
+                    cv = ast.literal_eval('b"' + x[1].replace('"','\\"') + '"')
+                    sp = x[2]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
-                    ret = cv in f.read(x[2][1])
+                    ret = cv in f.read(x[3])
                 elif x[0] == 'isat':
-                    cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
+                    cv = ast.literal_eval('b"' + x[1].replace('"','\\"') + '"')
                     sp = x[2]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(len(cv)) == cv
                 elif x[0] == 'isatS':
-                    cv = ast.literal_eval('"' + x[1].replace('"','\\"') + '"').encode('latin1')
+                    cv = ast.literal_eval('b"' + x[1].replace('"','\\"') + '"')
                     sp = x[3]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(x[2]*len(cv)) == (cv*x[2])
                 elif x[0] == 'isin':
-                    cvs = [ast.literal_eval('"' + cv.replace('"','\\"') + '"').encode('latin1') for cv in x[1]]
+                    cvs = [ast.literal_eval('b"' + cv.replace('"','\\"') + '"') for cv in x[1]]
                     sp = x[2]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
@@ -990,6 +1054,19 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
 
                             return True
                         ret = chk(jsd,x[1])
+                elif x[0] == 'ziph':
+                    load_zip()
+                    if not isinstance(x[1],list): x[1] = [x[1]]
+                    for y in x[1]:
+                        if y.endswith('/'): tr = any(z.startswith(y) for z in zipd[1])
+                        else: tr = y in zipd[1]
+                        ret = tr
+                        if not ret: break
+                elif x[0] == 'zipc':
+                    cv = ast.literal_eval('b"' + x[2].replace('"','\\"') + '"')
+                    load_zip()
+                    try: ret = zipd[0].read(zipd[1][x[1]]) == cv
+                    except KeyError: ret = False
                 else: raise ValueError('Unknown detection instruction: ' + str(x))
             elif typ == 'url':
                 if x[0] == 'isat':
@@ -1454,7 +1531,7 @@ MIMEMP = {
 }
 def mime2ext(m:str):
     if type(m) == bytes: m = m.decode('latin1')
-    m = m.split(';')[0].lower()
+    m = m.split(';')[0].lower().strip()
     if m in MIMEMP: return MIMEMP[m]
     m = m.split('/')[1].split('+')[-1]
     if m.startswith('x-'): m = m[2:]
@@ -1531,7 +1608,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
     out = cleanp(out)
     #asrt(not exists(out),'Output directory already exists')
-    if not '://' in inp: inp = cleanp(inp)
+    if not '://' in inp and not ':' in inp[2:8]: inp = cleanp(inp)
     if ts == None: ts = analyze(inp,quiet=quiet)
     if not ts:
         if rs: asrt(ts,'Unknown file type')

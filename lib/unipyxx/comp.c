@@ -908,6 +908,7 @@ eof:
     return op;
 }
 // flags: 1 - big endian, 2 - VAX/unix bugs, 4 - early code size change
+// Unix compress: Not working! https://github.com/vapier/ncompress/blob/main/compress.c
 EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
                                     uint8_t *restrict dst, const ssize_t usize,
                               const uint8_t max_bits, const uint32_t max_dict, const uint16_t init_code_size,

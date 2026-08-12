@@ -56,13 +56,14 @@ if __name__ == '__main__':
     if scan: argv.remove('-os')
 
     inp = argv[1]
-    if not '://' in inp:
+    url = '://' in inp or ':' in inp[2:8]
+    if not url:
         inp = os.path.abspath(inp)
         assert os.path.exists(inp),'Input file does not exist'
 
     if len(argv) > 2: out = os.path.abspath(argv[2])
     else:
-        out = bout = 'output' if '://' in inp else os.path.splitext(inp)[0]
+        out = bout = 'output' if url else os.path.splitext(inp)[0]
         c = 1
         while os.path.exists(out): out = bout + '_' + str(c);c += 1
 

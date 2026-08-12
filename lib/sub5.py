@@ -436,6 +436,21 @@ def extract5(inp:str,out:str,t:str) -> bool:
             d = readfile(i) # usize calc based on official demo code
             writefile(o + '/' + tbasename(i),decompress(d,'lzfse',usize=len(d) * 4))
             return
+        case 'YAC': return msdos(['yac','x',i],cwd=o)
+        case 'Yamazaki Zipper':
+            run(['yzdec','-d' + o,'-y',i])
+            if listdir(o): return
+        case '777'|'BIX'|'UFA':
+            # merge 7z predecessors
+            run([t.lower(),'x','-y','-o' + o,i])
+            if listdir(o): return
+        case 'BZip3':
+            tf = o + '/' + basename(i)
+            symlink(i,tf)
+            run(['bzip3','-d','-f','-k',tf])
+            remove(tf)
+            if listdir(o): return fix_tar(o)
+        case 'CarComp': return msdos(['car','x',i],cwd=o)
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

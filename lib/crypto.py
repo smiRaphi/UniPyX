@@ -25,6 +25,9 @@ def rot8l(v:int,r:int=1): return rotxl(v,8,r)
 def rot8r(v:int,r:int=1): return rotxr(v,8,r)
 def rot16l(v:int,r:int=1): return rotxl(v,16,r)
 def rot16r(v:int,r:int=1): return rotxr(v,16,r)
+def odd_parity(v:int):
+    v &= 0xFE
+    return v | ((v.bit_count() % 2) ^ 1)
 
 UPXX = None
 def uxx():
@@ -194,7 +197,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return obj.decrypt(i)
         case 'rc4'|'arc4':
             from Cryptodome.Cipher import ARC4
-            return ARC4.new(key,drop=iv or 0).decrypt(i)
+            o = ARC4.new(key,drop=iv or 0)
+            if i is None: return o
+            return o.decrypt(i)
         case 'zipcrypto': return uxx().decrypt_zipcrypto(i,key)
         case 'rsa_raw'|'rsa_raw_le':
             from Cryptodome.PublicKey import RSA
@@ -369,7 +374,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return decrypt(i,'xor',bytes(key))
         case 'mmfs':
             asrt(isinstance(key,bytes),err=TypeError)
-            return uxx().decrypt_mmfs(i,key)
+            key = key.replace(b'\0',b'')
+            k = bytearray(key)[:0x80] + b'\0'*0x80
+            if len(key) < 0xFF: k[len(key) + 1] = (sum(key) * 2) & 0xFF
+            return decrypt(i,'rc4',k.split(b'\0')[0],iv)
         case 'rc4_pp'|'rc4_playpond':
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_rc4_playpond(i,key,iv or 0)
@@ -421,6 +429,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 key = int.from_bytes(key,'little')
             return uxx().decrypt_legaia2(i,key)
         case 'ady_glue': return uxx().decrypt_ady_glue(i,key)
+        case 'airrc4'|'criptrc4': return uxx().decrypt_airrc4(i,key)
 
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)
@@ -487,7 +496,15 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_roll(i,key or b'\0')
 
-        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm':
+        case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm'|'aes_ccm'|'aes_eax'|\
+             'aes_ocb3'|'aes_ocb'|'aes_siv'|'aes_cfb'|'aes_ofb'|'aes_openpgp'|'aes_kw'|'aes_kwp'|'rc2'|\
+             'rc2_ecb'|'rc2_cbc'|'rc2_cfb'|'rc2_ofb'|'rc2_ctr'|'rc2_openpgp'|'rc2_eax'|'arc2'|'arc2_ecb'|\
+             'arc2_cbc'|'arc2_cfb'|'arc2_ofb'|'arc2_ctr'|'arc2_openpgp'|'arc2_eax'|'cast'|'cast_ecb'|'cast_cbc'|\
+             'cast_cfb'|'cast_ofb'|'cast_ctr'|'cast_openpgp'|'cast_eax'|'cast5'|'cast5_ecb'|'cast5_cbc'|'cast5_cfb'|\
+             'cast5_ofb'|'cast5_ctr'|'cast5_openpgp'|'cast5_eax'|'des'|'des_ecb'|'des_cbc'|'des_cfb'|\
+             'des_ofb'|'des_ctr'|'des_openpgp'|'des_eax'|'des3'|'des3_ecb'|'des3_cbc'|'des3_cfb'|'des3_ofb'|\
+             'des3_ctr'|'des3_openpgp'|'des3_eax'|'blowfish'|'blowfish_ecb'|'blowfish_cbc'|'blowfish_cfb'|\
+             'blowfish_ofb'|'blowfish_ctr'|'blowfish_openpgp'|'blowfish_eax':
             o = decrypt(None,algo,key,iv,**kwargs)
             if i is None: return o
             return o.encrypt(i)
@@ -1041,6 +1058,29 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             else: r = 3
             r = uxx().hash_haval(i,int(algo[5:] or 128),r)
             return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'mdc2':
+            h = bytearray(b'\x52'*8 + b'\x25'*8)
+
+            def g(a:bytearray,m:int):
+                r = a.copy()
+                r[0] = (r[0] & 0x9F) | m
+                for i in range(8): r[i] = odd_parity(r[i])
+                return r
+            def block(d:bytes):
+                k1 = g(h[:8],0x40)
+                k2 = g(h[8:],0x20)
+                c1 = encrypt(encrypt(d,'des',k1),'xor',d)
+                c2 = encrypt(encrypt(d,'des',k2),'xor',d)
+                h[0:4] = c1[0:4]
+                h[4:8] = c2[4:8]
+                h[8:12] = c2[0:4]
+                h[12:16] = c1[4:8]
+
+            for p in range(0,len(i),8):
+                d = i[p:p+8]
+                block(d + bytes(-len(d) % 8))
+            r = bytes(h)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
 
         case 'cmac_transformit'|'cmac_tfit':
             asrt(isinstance(kwargs['key'],bytes) and isinstance(kwargs['table'],bytes))
@@ -1327,6 +1367,7 @@ HASHTS = {
     'echo224':28,'echo256':32,'echo384':48,'echo512':64,
     'fugue224':28,'fugue256':32,'fugue384':48,'fugue512':64,
     'haval':16,'haval128':16,'haval160':20,'haval192':24,'haval224':28,'haval256':32,
+    'mdc2':16,
     'tarzan':4,'luas':4,'hash40':5,'pivotal':4,
     'empire_magic':2,'westwood':4,
 }
