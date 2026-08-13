@@ -478,6 +478,20 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             from Cryptodome.Util import RFC1751
             r = RFC1751.key_to_english(i)
             return r.encode('latin-1') if kwargs.get('bytes',True) else r
+        case 'git_base85'|'git_b85':
+            if isinstance(i,(list,tuple)):
+                if isinstance(i[0],str): i = '\n'.join(i)
+                else: i = b'\n'.join(i)
+            if isinstance(i,str): i = i.encode('latin-1')
+            import base64
+            o = bytearray()
+            for l in i.splitlines():
+                if not l: continue
+                s = l[0]
+                if s > 0x60: s -= 0x46
+                else: s -= 0x40
+                o.extend(base64.b85decode(l[1:])[:s])
+            return bytes(o)
 
     raise NotImplementedError(algo)
 def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:

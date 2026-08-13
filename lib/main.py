@@ -604,16 +604,9 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             f = open(inp,'rb')
             idt = f.read(0x4000)
             f.close()
-            isz = sum(idt) != 0
-            try:
-                ttxt = idt.decode('utf-8')
-                if ttxt.endswith('\x1A') and len(idt) < 0x4000: ttxt = ttxt[:-1]
-                assert ttxt.replace('\r','').replace('\n','').replace('\t','').isprintable()
-            except: typ = 'binary'
-            else:
-                if isz: typ = 'text'
-                else: typ = 'binary'
-            if typ == 'binary' and not isz: typ = 'null'
+            if idt.endswith(b'\x1A') and len(idt) < 0x4000: idt = idt[:-1]
+            typ = 'text' if istext(idt,'utf-8') else 'binary'
+            if typ == 'binary' and not sum(idt): typ = 'null'
 
     if BENCHMARK:
         tt = time.perf_counter()
@@ -1122,6 +1115,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
 
 def extract(inp:str,out:str,t:str) -> bool:
     from .sub1 import extract1
+    from .sub1_1 import extract1_1
     from .sub2 import extract2
     from .sub3 import extract3
     from .sub4 import extract4
@@ -1133,7 +1127,8 @@ def extract(inp:str,out:str,t:str) -> bool:
     from .sub4_6 import extract4_6
     from .sub5 import extract5
 
-    for f in (extract1,extract2,extract3,extract4,extract4_1,extract4_2,extract4_3,extract4_4,extract4_5,extract4_6,extract5):
+    for f in (extract1,extract1_1,extract2,extract3,extract4,
+              extract4_1,extract4_2,extract4_3,extract4_4,extract4_5,extract4_6,extract5):
         r = f(inp,out,t)
         if not r: return r
 

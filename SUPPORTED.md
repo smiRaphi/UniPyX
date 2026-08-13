@@ -2,7 +2,7 @@
 
 # Supported Formats: 1062
 
-## "Common" Archives/Compressors/Encodings (151)
+## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -41,10 +41,8 @@ Base64 Data URL | data:*;base64, | Custom |
 Bencode | .torrent | Custom |
 BinHex | .bhx | [unar](https://theunarchiver.com/command-line), [deark](https://entropymine.com/deark/), [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
 BinSCII | .bsc | Custom + [deark](https://entropymine.com/deark/) |
-BlakHole | .bh | [izArc](https://www.izarc.org/) |
 Bootable FAT16 IMG | .img .dsk | Custom |
 Brotli | .br .brotli | Custom |
-BZip | .bz | [BZip](https://sourceware.org/pub/bzip2/)
 BZip2 | .bz2 | [7-Zip](https://7-zip.org/) |
 CAZIP | ??? | [deark](https://entropymine.com/deark/) |
 CDI CUE + BIN | .cue+.bin | [Aaru](https://github.com/aaru-dps/Aaru) |
@@ -72,7 +70,6 @@ Disk Doubler | ??? | [unar](https://theunarchiver.com/command-line) |
 DiskDupe IMG | .ddi | [7-Zip](https://7-zip.org/) |
 DOS Backup | ??? | [deark](https://entropymine.com/deark/) |
 DOS IMG | .img .dsk | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
-DWC | .dwc | [DWC](https://www.sac.sk/download/pack/dwc-a510.exe) |
 Ed Script Diff | .diff .patch .ed | Custom |
 EGG | .egg | [ALZip](https://altools.co.kr/product/ALZIP) |
 EPOC App Info | ??? | [deark](https://entropymine.com/deark/) |
@@ -133,7 +130,6 @@ StuffIt | .sit | [unar](https://theunarchiver.com/command-line) |
 TAR | .tar | [7-Zip](https://7-zip.org/) |
 The Compressor | ??? | [deark](https://entropymine.com/deark/) |
 TTComp | .??_ | [ttdecomp](https://www.exelana.com/techie/c/ttdecomp.html) |
-Turbo Range Coder | .trc | [Turbo Range Coder](https://github.com/powturbo/Turbo-Range-Coder) |
 UDF | .udf | [Aaru](https://github.com/aaru-dps/Aaru), [7-Zip](https://7-zip.org/) |
 UHARC | .uha .uhc | [UHARC](https://www.sac.sk/download/pack/uharc06b.zip) |
 Unified Diff | .diff .patch | Custom |
@@ -953,7 +949,7 @@ ZPackage | .zpk | Custom |
 ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (129)
+## Compression Enthusiasts/One-Off Formats (133)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
@@ -966,6 +962,7 @@ BALZ | ??? | [BALZ](https://sourceforge.net/projects/balz/) |
 BCM | .bcm | [BCM](https://compressme.net/) |
 Binary \]\[ Archive | ??? | [nulib2](https://nulib.com/) |
 BIX | .bix | [BIX](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
+BlakHole | .bh | [izArc](https://www.izarc.org/) |
 BLINK | ??? | [blink](https://www.sac.sk/download/pack/blink.zip) |
 BOA Constrictor | .boa | [BOA](https://www.sac.sk/download/pack/boa058.zip) |
 BriefLZ | ??? | [blzpack](https://github.com/jibsen/brieflz) |
@@ -973,6 +970,7 @@ BSArc | .bsa | [BSA](https://www.sac.sk/download/pack/bsa.zip) |
 bsc | .bsc | [bsc](https://github.com/IlyaGrebnov/libbsc) |
 bsc-m03 | .bsc | [bsc-m03](https://github.com/IlyaGrebnov/bsc-m03) |
 BTSPK | ??? | [BTSPK](https://www.sac.sk/download/pack/btspk.arj) |
+BZip | .bz | [BZip](https://sourceware.org/pub/bzip2/)
 BZip3 | .bz3 | [bzip3](https://github.com/iczelia/bzip3) |
 CarComp | .car | [CAR](https://www.sac.sk/download/pack/carcom11.zip) |
 Deflate64 | .deflate64 | Custom |
@@ -992,6 +990,7 @@ CSArc | ??? | [CSArc](https://github.com/fusiyuan2010/CSC) |
 CSC | .csc | [CSC](https://github.com/fusiyuan2010/CSC) |
 Dark | ??? | [dark](https://darchiver.narod.ru/dark/dark-0.51-win.zip) |
 DGCA | ??? | [dgcac](https://web.archive.org/web/20190306080212/http://www.emit.jp/dgca/dgca_v110.zip) |
+DWC | .dwc | [DWC](https://www.sac.sk/download/pack/dwc-a510.exe) |
 Dzip | .dzip | [dzip](https://quake.speeddemosarchive.com/quake/downloads/dzip31.zip) |
 ESP | .esp .exe | [UNESP](https://www.sac.sk/download/pack/esp_v192.exe) |
 Fast PAQ8 | .fp8 | [fp8](https://encode.su/threads/613-FP8-(-Fast-PAQ8)) |
@@ -1069,6 +1068,7 @@ SZIP | .szip .szp | [szip](http://www.compressconsult.com/szip/szip_112a_win32.z
 TERSE | ??? | [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp) |
 THOR | ??? | [THOR](https://web.archive.org/web/20140115050229/http://www.maximumcompression.com/thor_096.zip) |
 TANGELO | .tangelo | [TANGELO](https://encode.su/threads/1738-TANGELO-new-compressor-(derived-from-PAQ8-FP8)) |
+Turbo Range Coder | .trc | [Turbo Range Coder](https://github.com/powturbo/Turbo-Range-Coder) |
 UCLPack | .ucl | Custom |
 UFA | .ufa | [UFA](https://web.archive.org/web/20040405052006/http://www.7-zip.org/utils.html) |
 ULZ | .ulz | [ULZ](https://compressme.net/) |

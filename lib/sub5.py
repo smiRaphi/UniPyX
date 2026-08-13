@@ -444,6 +444,11 @@ def extract5(inp:str,out:str,t:str) -> bool:
             # merge 7z predecessors
             run([t.lower(),'x','-y','-o' + o,i])
             if listdir(o): return
+        case 'BZip':
+            _,f,_ = run(['bzip','-dkc',basename(i)],cwd=dirname(i),text=False)
+            if f:
+                writefile(o + '/' + tbasename(i),f)
+                return
         case 'BZip3':
             tf = o + '/' + basename(i)
             symlink(i,tf)
@@ -451,6 +456,27 @@ def extract5(inp:str,out:str,t:str) -> bool:
             remove(tf)
             if listdir(o): return fix_tar(o)
         case 'CarComp': return msdos(['car','x',i],cwd=o)
+        case 'Turbo Range Coder':
+            of = o + '/' + tbasename(i)
+            run(['turborc','-d',i,of])
+            if exists(of) and getsize(of): return
+        case 'DWC':
+            tf = i
+            f = xopen(i,'rb')
+            if f.read(2) == b'MZ':
+                siz = f.seek(0,2)
+                f.seek(0)
+                tf = TmpFile('.dwc')
+                d = f.read(siz-0x10)
+                tf.write(d + f.read(0x10).rsplit(b'DWC')[0] + b'DWC')
+                del d
+            f.close()
+            r = msdos(['dwc','x',tf],cwd=o)
+            if hasattr(tf,'destroy'): tf.destroy()
+            return r
+        case 'BlakHole':
+            run(['izarccl','-e','-o','-p' + o,i])
+            if listdir(o): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)
