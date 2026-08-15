@@ -1,6 +1,6 @@
 from .main import *
 
-def extract4_6(inp:str,out:str,t:str):
+def extract4_6(inp:str,out:str,t:str) -> bool:
     run = db.run
     i,o = inp,out
 
@@ -198,5 +198,72 @@ def extract4_6(inp:str,out:str,t:str):
                         writefile(o + '/' + x[:-1],decrypt(d[:ed],'airrc4',key) + d[ed:])
                         remove(o + '/' + x)
             return
+        case 'MSKN 2 Archive':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(9) == b'_MCT\0KSLZ')
+            f = f.decompress(File,'zlib',_close=True)
+
+            writefile(o + '/$info.txt',f"""Name: {f.reads(f.readu32())}
+Version: {f.reads(f.readu32())}
+Author: {f.reads(f.readu32())}
+Unknown 1: {f.reads(f.readu32())}
+Unknown 2: {f.reads(f.readu32())}""")
+            c = f.readu8()
+            f.skip(1)
+            for _ in range(c):
+                f.skip(2)
+                n = f.reads(f.readu32())
+                w,h = f.readu32(),f.readu32()
+                writefile(f'{o}/Images/{n}.{w}x{h}.rgba8',f.readc(w*h*4))
+
+            f.skip(2)
+            c = f.readu16()
+            f.skip(2)
+            for ix in range(c):
+                n = f.reads(f.readu32())
+                writefile(f'{o}/Layouts/{ix}.{n}',f.readc(f.readu32()))
+
+            kv = {}
+            c = f.readu8() + 1
+            for _ in range(c):
+                k = f.reads(f.readu32())
+                asrt(f.reads(f.readu32()) == ':',f.pos)
+                kv[k] = f.reads(f.readu32())
+            writefile(o + '/config0.json',kv,'j',indent=4)
+            kv = {}
+            c = f.readu32()
+            for _ in range(c):
+                k = f.reads(f.readu32())
+                asrt(f.reads(f.readu32()) == ':',f.pos)
+                kv[k] = f.reads(f.readu32())
+            writefile(o + '/config1.json',kv,'j',indent=4)
+            kv = {}
+            c = f.readu8() + 1
+            for _ in range(c):
+                k = f.reads(f.readu32())
+                asrt(f.reads(f.readu32()) == ':',f.pos)
+                kv[k] = f.reads(f.readu32())
+            writefile(o + '/config2.json',kv,'j',indent=4)
+            return
+        case 'Origin Systems Setup Archive':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(0x1C) == b'(C) 1994 Origin Systems Inc.')
+            f.padc(0x34)
+
+            f.skip(4)
+            c = f.readu32()
+            f.seek(0x80)
+            fs = [(f.readu32(),f.readu32(),f.reads(13).rstrip('\0')) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                fn = fe[2] or f'${ix:02d}.bin'
+                writefile(o + '/' + fn,f.readc(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1

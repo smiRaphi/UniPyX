@@ -117,7 +117,10 @@ def console(back=0):
             if i.startswith(('from ','import ','def ','class ','async ')) or\
                any(x.type == tokenize.OP and x.string in {'=','+=','-=','*=','**=','/=','//=','%=','>>=','<<=','&=','|=','^=',':=','@='} for x in tokenize.tokenize(io.BytesIO(i.encode()).readline)):
                 exec(i,locals=loc)
-            else: print(eval(i,locals=loc))
+            else:
+                try: print(eval(i,locals=loc))
+                except KeyboardInterrupt as e:
+                    print(f'\x1B[91m{e.__class__.__name__}\x1B[0m')
         except Exception as e:
             if e.__class__ == SyntaxError:
                 ex = TracebackException.from_exception(e)._format_syntax_error(None)
@@ -1118,6 +1121,7 @@ def extract(inp:str,out:str,t:str) -> bool:
     from .sub1_1 import extract1_1
     from .sub2 import extract2
     from .sub3 import extract3
+    from .sub3_1 import extract3_1
     from .sub4 import extract4
     from .sub4_1 import extract4_1
     from .sub4_2 import extract4_2
@@ -1127,7 +1131,7 @@ def extract(inp:str,out:str,t:str) -> bool:
     from .sub4_6 import extract4_6
     from .sub5 import extract5
 
-    for f in (extract1,extract1_1,extract2,extract3,extract4,
+    for f in (extract1,extract1_1,extract2,extract3,extract3_1,extract4,
               extract4_1,extract4_2,extract4_3,extract4_4,extract4_5,extract4_6,extract5):
         r = f(inp,out,t)
         if not r: return r

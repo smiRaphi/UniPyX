@@ -14,7 +14,7 @@ OMTFS_XMP = {
     '0MFS':'omf',
 }
 
-def extract4_3(inp:str,out:str,t:str):
+def extract4_3(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
     o = out

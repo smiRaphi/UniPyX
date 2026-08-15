@@ -260,7 +260,30 @@ def extract4(inp:str,out:str,t:str) -> bool:
         case 'iQiyi PAK':
             run(['iqipack',i,o])
             if listdir(o): return
-        case 'LEGO JAM': return quickbms('legoracer_jam')
+        case 'LEGO JAM':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'LJAM')
+
+            fs = []
+            def reade(p):
+                mkdir(p)
+                c = f.readu32()
+                fs.extend([(p + '/' + f.readc(12).split(b'\0')[0].decode('ascii'),f.readu32(),f.readu32()) for _ in range(c)])
+                c = f.readu32()
+                ds = [(p + '/' + f.readc(12).split(b'\0')[0].decode('ascii'),f.readu32()) for _ in range(c)]
+                for x in ds:
+                    f.seek(x[1])
+                    reade(x[0])
+            reade(o)
+
+            for x in fs:
+                f.seek(x[1])
+                writefile(x[0],f.readc(x[2]))
+
+            f.close()
+            if fs: return
         case 'Metroid Samus Returns PKG': return quickbms('metroid_sr_3ds')
         case 'DDR DAT':
             db.try_custom()

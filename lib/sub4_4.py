@@ -1,6 +1,6 @@
 from lib.main import *
 
-def extract4_4(inp:str,out:str,t:str):
+def extract4_4(inp:str,out:str,t:str) -> bool:
     i = inp
     o = out
 

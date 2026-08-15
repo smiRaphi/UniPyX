@@ -1,6 +1,6 @@
 from lib.main import *
 
-def extract4_5(inp:str,out:str,t:str):
+def extract4_5(inp:str,out:str,t:str) -> bool:
     run = db.run
     i,o = inp,out
 

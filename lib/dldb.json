@@ -5722,6 +5722,10 @@
         "pip":"http://www.seanet.com/~bugbee/crypto/blake/blake.py",
         "dl":"blake.py"
     },
+    "elftools":{
+        "pip":"pyelftools",
+        "ts":1780052180
+    },
     "ilspycmd":{
         "p":"ilspycmd/ilspycmd.dll",
         "fs":[{
@@ -6048,13 +6052,6 @@
         }],
         "ts":0
     },
-    "decrypteacpayload":{
-        "p":"DecryptEACPayload.exe",
-        "fs":[
-        "https://github.com/lguilhermee/EAC-Extractor-Utility/releases/download/v2.0.0/DecryptEACPayload.exe"
-        ],
-        "ts":0
-    },
     "unarc-cpp":{
         "p":"unarc-cpp.exe",
         "fs":[{
@@ -6336,14 +6333,6 @@
         "fs":[[
             "https://mirror.aluigi.org/bms/rayman_dcz.bms",
             "BMS/rayman_dcz.bms"
-        ]],
-        "ts":0
-    },
-    "legoracer_jam":{
-        "p":"BMS/legoracer_jam.bms",
-        "fs":[[
-            "https://mirror.aluigi.org/bms/legoracer_jam.bms",
-            "BMS/legoracer_jam.bms"
         ]],
         "ts":0
     },
@@ -7049,7 +7038,7 @@
         "fs":[
         "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/keys.pyob"
         ],
-        "ts":1786228502
+        "ts":1786820303
     },
     "forza_keys":{
         "p":"forza_keys.pyob",

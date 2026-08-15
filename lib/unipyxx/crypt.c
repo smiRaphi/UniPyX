@@ -589,6 +589,14 @@ EXPORT void decrypt_airrc4(uint8_t *restrict buf, const size_t size, const uint8
         buf[p] ^= S[(S[i] + S[j]) & 0xFF];
     }
 }
+EXPORT void decrypt_eac(uint8_t *restrict buf, const size_t size, const uint8_t key) {
+    if (size < 2) return;
+
+    buf[size - 1] += key - key * size;
+    for (size_t p=size - 2;p > 0;p--)
+        buf[p] += -key * p - buf[p + 1];
+    buf[0] -= buf[1];
+}
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
     return t[0x100 * x + buf[x]];

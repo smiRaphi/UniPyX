@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1062
+# Supported Formats: 1065
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -229,7 +229,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (137)
+## Executables/Packers/Installers (138)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -285,7 +285,7 @@ Diet Packed | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Dn.COM Cruncher | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 DOLPAK | .dol | [dolpak](https://www.gc-forever.com/forums/viewtopic.php?t=431) -> 7z |
 EDI Install Archive | ??? | [ediextract](http://cd.textfiles.com/cica/cica9603/disk1/disc1/util/wramp12.zip)
-Encrypted EAC Payload | .bin | [DecryptEACPayload](https://github.com/lguilhermee/EAC-Extractor-Utility) |
+Encrypted EAC Payload | .bin | Custom | elf isn't properly unpacked
 Envelope | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Excel DNA XLL | .dll | [exceldna-unpack](https://github.com/augustoproiete/exceldna-unpackv) |
 Excelsior Installer | .exe | Custom |
@@ -300,6 +300,7 @@ ICE | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP
 Inno Archive | .bin | Custom |
 Inno Installer | .exe | [innounp-2](https://github.com/jrathlev/InnoUnpacker-Windows-GUI/tree/master/innounp-2), [innounp](https://sourceforge.net/projects/innounp/), [innoextract](https://github.com/czoins/innoextract) |
 Install Creator Pro | .exe | [cicdec](https://github.com/Bioruebe/cicdec) |
+install4j | .exe | Custom |
 InstallShield Archive | .cab | [i6comp](https://bioruebe.com/dev/uniextract/)(src?), [i5comp](https://www.sac.sk/download/pack/i5comp21.rar), [iscab](https://dl.dropboxusercontent.com/s/juxy8fc79ccfqra/InstallShield_Cabinet_File_Viewer.zip)(src?) |
 InstallShield Setup | .exe | Custom, [ISx](https://github.com/lifenjoiner/ISx), [isxunpack](http://www.compdigitec.com/labs/files/isxunpack.exe), [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
 InstallShield Z | .z .lib | [icomp](https://www.sac.sk/download/pack/icomp95.zip) |
@@ -371,7 +372,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (572)
+## Various (574)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -646,7 +647,7 @@ L.A. Rush Compressed | .k9z | Custom |
 L.A. Rush DIR+RES | .dir+.res | Custom |
 Legaia 2 DIR+BIN | .dir+.bin | Custom |
 Lego Creator QUBE | .q | Custom | highly WIP
-LEGO JAM | .jam | [legoracer_jam.bms](https://mirror.aluigi.org/bms/legoracer_jam.bms) |
+LEGO JAM | .jam | Custom |
 Level5 ARC | .arc | [3ds-xfsatool](https://github.com/MeltyPlayer/MeltyTool/tree/main/cli/tools/3ds-xfsatool) |
 Level5 Encrypted CRI CPK | .cpk | [Viola](https://github.com/SuperTavor/Viola) + [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
 Level5 XPCK | .xpck | [3ds-xfsatool](https://github.com/MeltyPlayer/MeltyTool/tree/main/cli/tools/3ds-xfsatool) |
@@ -696,6 +697,7 @@ Monolith Productions LTAR | ??? | [shadow_of_mordor.bms](https://mirror.aluigi.o
 Monsters Inc. Scream Team Training WAD | .wad | Custom |
 Motocross Mania DAT | .dat | [e_biker.bms](https://mirror.aluigi.org/bms/e_biker.bms) |
 MotoGP ARK | .ark | Custom |
+MSKN 2 Archive | .mskn | Custom |
 mTropolis MDM | .q3 | Custom |
 mTropolis MPL | .mpl | Custom |
 Music Pen MDF+CMF | .mdf+.cmf | Custom |
@@ -750,6 +752,7 @@ Opalium Engine PAK | .opk .obp .ovp .osp | Custom |
 Open Media Toolkit Formatted Stream | .omt | Custom |
 Orange Juice Encrypted | .dat | [qpcrypt](https://github.com/jwilins/qptk) |
 Orange Juice LAG | .lag | Custom |
+Origin Systems Setup Archive | .cam .flx | Custom |
 Other Ocean Interactive ARC | .arc | Custom |
 Package Resource Index | .pri | [makepri](https://www.nuget.org/packages/Microsoft.Windows.SDK.BuildTools/) |
 Package Resource Index XML | .xml | Custom |

@@ -17,7 +17,7 @@ CTRPIXM = (
     ("etc1_a4",8),
 )
 
-def extract4_1(inp:str,out:str,t:str):
+def extract4_1(inp:str,out:str,t:str) -> bool:
     run = db.run
     i = inp
     o = out

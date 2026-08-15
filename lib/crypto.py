@@ -430,6 +430,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return uxx().decrypt_legaia2(i,key)
         case 'ady_glue': return uxx().decrypt_ady_glue(i,key)
         case 'airrc4'|'criptrc4': return uxx().decrypt_airrc4(i,key)
+        case 'eac': # Easy Anti-Cheat
+            if isinstance(key,bytes): key = key[0]
+            asrt(isinstance(key,int),err=TypeError)
+            return uxx().decrypt_eac(i,key)
 
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)
@@ -1180,7 +1184,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = h.update(i).digest()
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
-        case 'eac':
+        case 'eac': # Exact Audio Copy
             b = kwargs.get('iv',kwargs.get('iv',b'\0'*0x20))
             asrt(len(b) == len(kwargs['key']) == 0x20)
             o = encrypt(None,'rijndael256',kwargs['key'])

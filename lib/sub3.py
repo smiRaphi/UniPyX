@@ -1014,16 +1014,105 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case 'VMProtect': raise NotImplementedError
         case 'Encrypted EAC Payload':
-            hookshot(['decrypteacpayload','-e',i],{'C:\\EAC_Dumps':o})
+            # json info: <game path>/EasyAntiCheat/Settings.json
+            # samples: https://modules-cdn.eac-prod.on.epicgames.com/modules/<productid>/<deploymentid>/<win64|win32|linux64|linux32|...>
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            import re
+            from lib.file import ext_exe,decompress
+            from lib.crypto import decrypt
 
-            for f in listdir(o):
-                p = o + '\\' + f
-                if f.startswith('Dump_') and isdir(p) and exists(p + '/EAC_Launcher_decrypted.dll'): break
-            else: return 1
+            d = decrypt(readfile(i),'eac',keys.wait()['eac'])
+            e = ext_exe(d)
+            elf = e.EXTEXE_TYPE[0] == b'\x7FELF'
+            writefile(o + '/EAC_Launcher.' + ('elf' if elf else 'dll'),d)
 
-            remove(p + '/original_eac.bin',p + '/eac_.bin')
-            copydir(p,o,True)
-            if readfile(o + '/EAC_Launcher_decrypted.dll',size=4) in {b'MZ\x90\x00',b'\x7FELF'}: return
+            if elf:
+                x64 = e.elfclass == 64
+                dsc = e.get_section_by_name('.rodata')
+                ed = max(dsc.data().rsplit(b'\0'*16),key=len)
+                ed += b'\0'*16
+
+                nps = []
+                p = 0
+                while True:
+                    p = ed.find(b'\0\0',p)
+                    if p == -1: break
+                    nps.append(p)
+                    p += 2
+
+                for ix,x in enumerate(nps):
+                    if ix == 0: dst = x
+                    else: dst = x - nps[ix - 1]
+                    if dst > 0x200: break
+                six = ix - 1
+
+                for ix,x in enumerate(nps[six:]):
+                    if ix == 0: dst = x
+                    else: dst = x - nps[six + ix - 1]
+                    if dst < 8: break
+                eix = six + ix
+
+                dd = decrypt(ed[nps[six] + 2:nps[eix]].strip(b'\0'),'eac',keys['eac'])
+                if dd[:4] != b'\x7FELF': return 1
+                writefile(o + '/EAC_Driver.elf',dd)
+            else:
+                x64 = e.PE_TYPE == 0x20B
+
+                ENCRG = re.compile(rb'(?s)\x48\x8D\x05(.{4})\x89\x54\x24')
+                if x64:
+                    LEARG = re.compile(rb'(?s)\x48\x8D[\x0D\x15](.{4})')
+                    MOVRG = re.compile(rb'(?s).*\x8B\x15(.{4})')
+                    MOVRGS = [re.compile(x) for x in (
+                        rb'(?s)\x44\x8B\x35(.{4})\x41\x8B\xCE',
+                        rb'(?s)\x44\x8B\x35(.{4})\x33\xD2',
+                        rb'(?s)\x44\x8B\x3D(.{4})\x49\x3B\x40',
+                    )]
+                else:
+                    if '.rdata' in e.SECTIONS and d[e.SECTIONS['.rdata'].PointerToRawData:].startswith(b'32-bit start_protected_game.exe is not supported anymore.'):
+                        e.close()
+                        return
+                    raise NotImplementedError
+                    PUSHRG = re.compile(rb'(?s)\xFF\x35(.{4})\x99\x68')
+
+                dsc = e.SECTIONS['.data']
+                dva = dsc.VirtualAddress
+                acb = e.OPTIONAL_HEADER.BaseOfCode
+                fcb = e.get_offset_from_rva(acb)
+                cd = d[fcb:fcb + e.OPTIONAL_HEADER.SizeOfCode]
+                if ENCRG.search(cd): raise NotImplementedError('encrypted')
+
+                if x64:
+                    for r in MOVRGS:
+                        m = r.search(cd)
+                        if not m: continue
+                        drvsa = acb + m.start() + 7 + int.from_bytes(m[1],'little')
+                        break
+                    else:
+                        for m in LEARG.finditer(cd):
+                            adr = int.from_bytes(m[1],'little')
+                            if acb + m.start() + 7 + adr != dva: continue
+
+                            mov = MOVRG.search(cd[max(m.start() - 0x50,0):m.start()])
+                            drvsa = acb + max(m.start() - 0x50,0) + mov.end() + int.from_bytes(mov[1],'little')
+                            break
+                        else: return 1
+                del cd
+
+                drvs = e.get_dword_at_rva(drvsa)
+                if not drvs is None and 0 < drvs < dsc.SizeOfRawData:
+                    dd = d[dsc.PointerToRawData:dsc.PointerToRawData + drvs]
+                    if dd[12:14] != b'MZ': dd = decrypt(dd,'eac',keys['eac'])
+                    if dd[12:14] == b'MZ':
+                        ds = int.from_bytes(dd[:4],'little')
+                        dd = decompress(dd[4:],'oodle_kraken',usize=ds,db=db)
+                    else: dd = decompress(dd,'deflate_noerror')
+                    writefile(o + '/EAC_Driver.sys',dd)
+                else: return 1
+
+            e.close()
+            return
         case 'Chromium Delta Update':
             run(['android-ota-extract',i],cwd=o)
             if listdir(o): return

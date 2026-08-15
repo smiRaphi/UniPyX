@@ -67,10 +67,9 @@ def _2base_func(fnc,src,key):
     fnc(b,len(src),k,len(key))
     return bytes(b)
 def _3base_func(fnc,src):
-    i = (u8 * len(src)).from_buffer_copy(src)
-    o = (u8 * len(src))()
-    fnc(i,len(src),o)
-    return bytes(o)
+    b = (u8 * len(src)).from_buffer_copy(src)
+    fnc(b,len(src))
+    return bytes(b)
 def _4base_func(fnc,src):
     i = (u8 * len(src)).from_buffer_copy(src)
     return int(fnc(i,len(src)))
@@ -159,6 +158,7 @@ class X:
             ('decrypt_legaia2',(P(u8),szt,u32),void,0),
             ('decrypt_ady_glue',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_airrc4',(P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_eac',   (P(u8),szt,u8),void,0),
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
@@ -572,6 +572,10 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_legaia2(b,len(src),key)
         return bytes(b)[0x10:]
+    def decrypt_eac(self,src:bytes,key:int) -> bytes:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_eac(b,len(src),key)
+        return bytes(b)
 
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)

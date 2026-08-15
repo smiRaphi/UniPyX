@@ -37,10 +37,10 @@ class File:
         asrt(not 't' in mode)
         self.mode = mode.replace('b','') + 'b'
         self.name = None
-        if type(f) == str:
+        if isinstance(f,str):
             self.name = f
             self._f = open(f,self.mode)
-        elif type(f) == bytes:
+        elif isinstance(f,(bytes,bytearray,memoryview)):
             self._f = io.BytesIO(f)
         else: self._f = f
         self._end = endian
@@ -284,11 +284,15 @@ class File:
         return v
 
     def add_file(self,f):
-        if type(f) == str: f = open(f,'rb')
+        if isinstance(f,str):
+            cl = True
+            f = open(f,'rb')
+        else: cl = False
         while True:
             p = f.read(0x4000)
             if not p: break
             self.write(p)
+        if cl: f.close()
     def peek(self,fnc,*args,poffset=0,**kwargs):
         if isinstance(fnc,str):
             if fnc in {'u8','s8','u16','s16','u24','s24','u32','s32','u40','s40','u48','s48','u64','s64','u128','s128','f16','f32','f64','bool','bool32'}: fnc = ('write' if 'w' in self.mode else 'read') + fnc
@@ -314,7 +318,14 @@ class File:
                 if hf: d.extend(obj.flush())
             self.back(len(obj.unused_data))
             return bytes(d)
-        else: return decompress(self.readc(size),algo,*args,**kwargs)
+        else:
+            f = size is File
+            if f: fc = kwargs.pop('_close',False)
+            r = decompress(self.readc(None if f else size),algo,*args,**kwargs)
+            if f:
+                r = File(r,endian=self._end)
+                if fc: self.close()
+            return r
 
     @property
     def pos(self): return self.tell()
@@ -521,35 +532,49 @@ def ext_exe(i:str|bytes,dotnet=False,custom=False):
     if isinstance(i,str): kw = {'name':i}
     elif isinstance(i,(bytes,bytearray)): kw = {'data':i}
     else: raise TypeError
+
     if dotnet:
         import dnfile
         return dnfile.dnPE(**kw)
     elif custom: return EXE(i)
     else:
+        st = None
         if isinstance(i,str):
             f = open(i,'rb')
-            f.seek(0x3C)
-            f.seek(int.from_bytes(f.read(4),'little'))
-            if f.tell() == 0: t = None
-            else: t = f.read(2)
+            pt = f.read(2)
+            if pt == b'MZ':
+                f.seek(0x3C)
+                f.seek(int.from_bytes(f.read(4),'little'))
+                if f.tell() != 0: st = f.read(2)
+            else: pt += f.read(2)
             f.close()
         else:
-            of = int.from_bytes(i[0x3C:0x40],'little')
-            t = None if of == 0 else i[of:of+2]
+            pt = i[:2]
+            if pt == b'MZ':
+                of = int.from_bytes(i[0x3C:0x40],'little')
+                if of != 0: st = i[of:of+2]
+            else: pt += i[2:4]
 
-        if t == b'PE':
+        if pt == b'\x7FELF':
+            from elftools.elf.elffile import ELFFile
+            if 'data' in kw: i = io.BytesIO(kw.pop('data'))
+            elif 'name' in kw: i = open(kw.pop('name'),'rb')
+            r = ELFFile(i)
+        elif pt == b'MZ' and st == b'PE':
             import pefile
             if not 'fast_load' in kw: kw['fast_load'] = True
             r = pefile.PE(**kw)
             r.SECTIONS = {s.Name.rstrip(b'\0').decode('latin-1'):s for s in r.sections}
-            return r
-        elif t == b'NE':
+        elif pt == b'MZ' and st == b'NE':
             import nefile
             if 'name' in kw: kw['filepath'] = kw.pop('name')
             if 'data' in kw: kw['stream'] = io.BytesIO(kw.pop('data'))
-            return nefile.NE(i)
-        elif t is None: return EXE(i,dos=True)
-        else: raise NotImplementedError(t.decode('latin-1'))
+            r = nefile.NE(i)
+        elif pt == b'MZ' and st is None:
+            r = EXE(i,dos=True)
+        else: raise NotImplementedError(pt.decode('latin-1'),st.decode('latin-1'))
+        r.EXTEXE_TYPE = (pt,st)
+        return r
 
 def iszl(d:bytes):
     if len(d) < 8 or d[0] != 0x78 or d[1] not in {0x01,0x5E,0x9C,0xDA}: return False
@@ -618,7 +643,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if type(om) == int and om == 1:
                 asrt(len(z.namelist()) == 1)
                 r = z.read(z.namelist()[0])
-            elif type(om) == str:
+            elif isinstance(om,str):
                 z.extractall(om)
                 r = z.namelist()
             elif om == {}:

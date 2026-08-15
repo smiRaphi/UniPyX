@@ -155,7 +155,10 @@
     },
     {
         "rqr":null,
-        "d":[["isat","\\xA7\\xED\\x96\\x0C\\x0F\\x0F\\x12\\x19\\x1C\\x1B\\x1E\\x20\\x22\\x26\\x2A\\xE5\\xE8\\x33\\x36\\x39\\x3C\\x3F\\x42\\x85\\x88\\x4B\\x4E\\x51\\x54\\x57\\x5A\\x5D",0],["isat","\\x0B\\x41\\x42\\x14\\xB4\\x87",552]],
+        "d":[["isat","\\xA7",0],["isat","\\x0F\\x12\\x19\\x1C\\x1B\\x1E",5],["isat","\\x33\\x36\\x39\\x3C\\x3F\\x42\\x85\\x88\\x4B\\x4E\\x51\\x54\\x57\\x5A\\x5D",17]],
+        "rs":"Encrypted EAC Payload","s":1},{
+        "rqr":null,
+        "d":[["isat","\\xC4\\x94\\x98\\x51\\x0F\\x11",0],["isat","\\x18\\x1B\\x1E\\x21\\x24\\x27\\x2A\\x30\\x33\\x71\\x74\\x3A\\x3D\\x3F\\x42",8]],
         "rs":"Encrypted EAC Payload","s":1
     },
     {
@@ -1478,6 +1481,10 @@
     {
         "d":[["n0",4,0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,36],["py","f.seek(4);c=f.readi(4,'<');s=(12+32*c);f.seek(36);return (s+(-s%2048))==f.readi(4,'<')"]],
         "rs":"Doom 3 Xbox Graph"
+    },
+    {
+        "d":[["isat","_MCT\\0KSLZx",0],["isin",["\\1","\\x5E","\\x9C","\\xDA"],10]],
+        "rs":"MSKN 2 Archive","s":1
     },
     {
         "d":[["s%",16],["isat","\\x4F\\xF3\\x2F\\xAC\\0\\0\\1\\0",0],["n0",4,8],["n0",4,12],["str0e",16,64,5],["py","f.seek(8);o=f.readi(4,'<');c=o+16+f.readi(4,'<')*24;f.seek(o+28);return (c+-c%16)==f.readi(4,'<')"]],
