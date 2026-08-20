@@ -2104,6 +2104,19 @@ EXPORT hash256_t hash_haval(const uint8_t *restrict src, const size_t size,
     return H;
 }
 
+EXPORT void derive_protectit2(uint8_t *restrict buf) {
+    for (int8_t i=0;i < 16;i+=2) {
+        buf[i+0] = (buf[i+0] ^ 0xA5) << 2;
+        buf[i+1] = ((buf[i+1] ^ 0x5A) & 0x3F) << 2;
+    }
+    uint8_t tmp[0x10];
+    memcpy(tmp, buf, 4);
+    memcpy(tmp + 4, buf + 12,4);
+    memcpy(tmp + 8, buf + 8, 4);
+    memcpy(tmp + 12,buf + 4, 4);
+    memcpy(buf, tmp, 0x10);
+}
+
 #ifdef __cplusplus
 }
 #endif

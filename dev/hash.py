@@ -38,14 +38,19 @@ else:
 DN = set()
 cs = []
 for x in hshs:
-    crc = crc_hash(i,x)
-    if (HASHTS[x],crc) in DN: continue
-    DN.add((HASHTS[x],crc))
-    cs.append((x,crc))
+    if x in HASHTS:
+        crc = crc_hash(i,x)
+        sz = HASHTS[x]
+    else:
+        crc = crc_hash(i,x,bytes=True)
+        sz = len(crc)
+        crc = int.from_bytes(crc,'big')
+    if (sz,crc) in DN: continue
+    DN.add((sz,crc))
+    cs.append((x,sz,crc))
 
 mx = max([len(x) for x in hshs])
-cs.sort(key=lambda x:(HASHTS[x[0]],x[1]))
-for x,crc in cs:
-    if crc.bit_length() > HASHTS[x] * 8: print(x,crc)
-    cb = crc.to_bytes(HASHTS[x],'big')
-    print(f'{x.ljust(mx)} | {crc:0{HASHTS[x]*2}X}')
+cs.sort(key=lambda x:(x[1],x[2]))
+for x,sz,crc in cs:
+    if crc.bit_length() > sz * 8: print(x,crc)
+    print(f'{x.ljust(mx)} | {crc:0{sz*2}X}')

@@ -338,68 +338,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 tf.destroy()
             return
         case 'ZIP'|'InstallShield Setup ForTheWeb'|'RESOF':
-            ZFMTM = {
-                0:'none',
-                1:'shrink',
-                2:'reduce1',
-                3:'reduce2',
-                4:'reduce3',
-                5:'reduce4',
-                6:'pkzip_implode',
-                7:'tokenize', # reserved, no implementation, unsupported
-                8:'deflate',
-                9:'deflate64',
-                10:'pkware_implode',
-                12:'bzip2',
-                14:'lzma_zip',
-                15:'oodle', # unofficial, used by "New World: Aeternum", untested
-                16:'cmpsc', # unsupported, https://github.com/Fish-Git/cmpsctst
-                18:'terse', # unsupported, https://github.com/openmainframeproject/tersedecompress/tree/master/cpp/src
-              # 18:'xceed_bwt', # unofficial
-                19:'lz77z', # unsupported
-                20:'zstd', # deprecated
-              # 20:'lpaq8', # unofficial
-                22:'forza_encrypted', # unofficial, custom encryption + deflate, untested
-                92:'reference', # WinZip
-                93:'zstd',
-                94:'packmp3', # WinZip
-              # 94:'lz4', # unofficial, OTEr ZIP, untested
-                95:'xz',
-                96:'zipx_jpeg', # unsupported, WinZip, not packjpg
-                97:'wavpack', # WinZip
-              # 97:'brotli', # unofficial, OTEr ZIP, untested
-                98:'ppmd8',
-                99:'aes',
-              # 99:'lzfse', # unofficial, Apple
-               100:'lzfse', # unofficial, OTEr ZIP, untested, https://github.com/trufae/otezip
-            }
-            BUNFMTM = ( # https://github.com/r-lyeh-archived/bundle
-                'none', # RAW
-                'shoco', # unsupported
-                'lz4f', # unsupported
-                'zlib', # MINIZ
-                'lzip', # unsupported
-                'lzma', # LZMA20
-                'zpaq', # unsupported
-                'lz4', # error
-                'brotli', # BROTLI9, error
-                'zstd', # error
-                'lzma', # LZMA25
-                'bsc', # unsupported
-                'brotli', # BROTLI11, error
-                'shrinker', # unsupported
-                'csc20', # unsupported
-                'zstdf', # unsupported
-                'bcm', # unsupported
-                'zling', # unsupported
-                'mcm', # unsupported
-                'tangelo', # unsupported
-                'zmolly', # unsupported
-                'crush', # unsupported
-                'lzjb', # unsupported
-                'bzip2',
-            )
-
             FRZK = None
             FRH3NK = {
                 'l':'a',
@@ -448,14 +386,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
-            SIG66 = b'PK\6\6'
-            SIG56 = b'PK\5\6'
+            PK66 = b'PK\6\6'
+            PK56 = b'PK\5\6'
             if t == 'RESOF':
-                SIG12 = b'PK\1\4'
-                SIG34 = b'PK\3\6'
+                PK12 = b'PK\1\4'
+                PK34 = b'PK\3\6'
             else:
-                SIG12 = b'PK\1\2'
-                SIG34 = b'PK\3\4'
+                PK12 = b'PK\1\2'
+                PK34 = b'PK\3\4'
 
             TESTDS = 0x10061 # max EOCD32 + EOCD64
             f.seek(-TESTDS)
@@ -472,10 +410,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             trrntzip = None
             bp = f.pos - len(d)
             po = len(d)
-            if SIG66 in d:
+            if PK66 in d:
                 while True:
-                    p = d.rfind(SIG66 + b'\x2C\0\0\0\0\0\0\0',None,po)
-                    if p == -1: return 1
+                    p = d.rfind(PK66 + b'\x2C\0\0\0\0\0\0\0',None,po)
+                    if p == -1:
+                        f.close()
+                        return 1
                     po = p
                     f.seek(bp + p + 4 + 8 + 4 + 8)
                     if f.read(8) != f.read(8): continue
@@ -489,8 +429,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 cds,cdo = f.readu64(),f.readu64()
             else:
                 while True:
-                    p = d.rfind(SIG56,0x4C,po)
-                    if p == -1: return 1
+                    p = d.rfind(PK56,0x4C,po)
+                    if p == -1:
+                        f.close()
+                        db.set_temp_print(False)
+                        r = extract1(i,o,'Truncated ZIP')
+                        db.reset_temp_print()
+                        return r
                     po = p
                     f.seek(bp + p + 4)
                     mult = sum(f.read(4))
@@ -499,7 +444,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     sz,of = f.readu32(),f.readu32()
                     if t == 'RESOF': sz ^= 0xFFFFFFFF
                     if (of + sz) <= (bp + p): break
-                    if not SIG56 in d[:p] and (of + sz - 0x40) <= (bp + p): break
+                    if not PK56 in d[:p] and (of + sz - 0x40) <= (bp + p): break
 
                 f.seek(bp + p + 4)
                 if sum(f.read(4)): raise NotImplementedError('Multi file zip')
@@ -532,7 +477,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             f.seek(cdo)
             reb = 0
-            if c > 0 and not f.peek(4) == SIG12:
+            if c > 0 and not f.peek(4) == PK12:
                 f.seek(bp + p - cds)
                 reb = f.pos - cdo
 
@@ -543,8 +488,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             fs = []
             for _ in range(c):
                 blkn = f.read(4)
-                if blkn in {SIG56,SIG66}: break
-                asrt(blkn == SIG12)
+                if blkn in {PK56,PK66}: break
+                asrt(blkn == PK12)
                 fe = {
                     'cv':f.readu16(),
                     'xv':f.readu16(),
@@ -558,12 +503,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     from lib.pyob import PyOBinX
                     FRZK = PyOBinX.dl('forza_keys',db)
 
-                ct,cd = f.readu16(),f.readu16()
+                mts,mdt = f.readu16(),f.readu16()
                 if not trrntzip:
-                    try: fe['ts']['m'] = unix2filetime(dos2unix(ct,cd))
+                    try: fe['ts']['m'] = unix2filetime(dos2unix(mts,mdt))
                     except ValueError: pass
                 fe['crc'] = f.readu32()
-                fe['chk'] = (cd >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
+                fe['chk'] = (mdt >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
                 fe['zs'],fe['us'] = f.readu32(),f.readu32()
                 nl,xl,cml = f.readu16(),f.readu16(),f.readu16()
                 fe['dsk'] = f.readu16()
@@ -576,139 +521,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else: fe['n'] = fn.decode('cp437')
                 if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
 
-                ep = f.pos + xl
-                if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',poffset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.reads(xl,'latin-1')):
-                    f.seek(ep) # JAR shit
-                while (f.pos + 4) < ep:
-                    tg,s = f.readc(2),f.readu16()
-                    xep = f.pos + s
-                    match tg:
-                        case b'\0\0': pass # empty
-                        case b'\1\0': # Zip64
-                            asrt(s >= 8)
-                            fe['us'] = f.readu64()
-                            if s > 8:
-                                asrt(s >= 0x10)
-                                fe['zs'] = f.readu64()
-                            if s > 0x10:
-                                asrt(s >= 0x18)
-                                fe['of'] = f.readu64()
-                            if s > 0x18:
-                                asrt(s >= 0x1C)
-                                fe['dsk'] = f.readu32()
-                        case b'\x07\0': # AV Info
-                            fe['avinf'] = f.read(s)
-                        case b'\x09\0': # OS/2
-                            fe['os2x'] = True
-                        case b'\x0A\0': # NTFS
-                            asrt(s >= 0x20)
-                            f.padc(4)
-                            asrt(f.readu16() == 1 and f.readu16() == 0x18,f.pos)
-                            ts = f.readu64() # FILETIME
-                            if ts: fe['ts']['m'] = ts
-                            ts = f.readu64()
-                            if ts: fe['ts']['a'] = ts
-                            ts = f.readu64()
-                            if ts: fe['ts']['c'] = ts
-                        case b'\x0C\0': # OpenVMS
-                            asrt(s >= 4)
-                            f.skip(4)
-                            while (f.pos + 4) < xep:
-                                vtg,vs = f.readu16(),f.readu16()
-                                vep = f.pos + vs
-                                asrt(vep <= xep)
-                                match vtg:
-                                    case 4|19|20|13|21|22|23|29: pass # RECATTR, EXPDATE, BAKDATE, ASCDATES, UIC, FPRO, RPRO, JOURNAL
-                                    case 3: # UCHAR
-                                        asrt(vs >= 4)
-                                        fe['vms'] = f.readu32()
-                                    case 17: # CREDATE
-                                        asrt(vs >= 8)
-                                        ts = f.readu64()
-                                        if ts: fe['ts']['c'] = vms2filetime(ts)
-                                    case 18: # REVDATE
-                                        asrt(vs >= 8)
-                                        ts = f.readu64()
-                                        if ts: fe['ts']['m'] = vms2filetime(ts)
-                                    case _: raise NotImplementedError(f'Unknown OpenVMS tag {vtg} @ 0x{f.pos - 4:08X}')
-                                f.seek(vep)
-                        case b'\1\x99': # AE-x
-                            asrt(fe['ct'] == 99,'AE-x entry without AE-x compression type')
-                            asrt(s == 7)
-                            fe['aes'] = {
-                                'vv':f.readu16(),
-                                'v':f.read(2),
-                                'm':f.readu8(),
-                            }
-                            asrt(fe['aes']['v'] == b'AE' and fe['aes']['vv'] in {1,2},f'Unsupported AE-x vendor {repr(fe['aes']['v'])[2:-1]}-{fe["aes"]["vv"]}')
-                            asrt(fe['aes']['m'] in {1,2,3},f'Unsupported AE-x mode {fe["aes"]["m"]}')
-                            fe['ct'] = f.readu16()
-                        case b'\x03\x99': # WinZip Reference
-                            pass
-                        case b'\x1E\xA1': # Data Stream Alignment
-                            pass # u16 ?
-                        case b'\x20\xA2': # Microsoft Open Packaging Growth Hint
-                            pass # u64 growth hint, 0x10 padding
-                        case b'\x23\x11': # ?, seen in Forza Horizon 6
-                            pass # u32 data offset
-                        case b'AC': # Acorn
-                            asrt(s >= 4)
-                            asrt(f.read(4) == b'ARC0')
-                        case b'KV': # KeyValuePairs
-                            asrt(s >= 14)
-                            asrt(f.read(13)[:9] == b'KeyValuePairs'[:9]) # only verify first couple bytes
-                            kvc = f.readu8()
-                            fe['kv'] = dict((f.reads(f.readu16(),'utf-8'),f.reads(f.readu16(),'utf-8')) for _ in range(kvc))
-                        case b'NU': # Xcess unicode
-                            asrt(s >= 10 and f.read(4) == b'NUCX')
-                            ns = f.readu32()
-                            asrt((ns*2+8) <= s)
-                            fe['n'] = f.readutf16(ns)
-                            fe['xcess'] = True
-                        case b'Q\x1A': # minizip hash
-                            asrt(s > 4)
-                            ht,hs = f.readu16(),f.readu16()
-                            asrt((hs + 4) <= s)
-                            fe[{10:'md5',20:'sha1',23:'sha256'}[ht]] = f.read(hs)
-                        case b'SD': # windows ACL
-                            pass
-                        case b'UT':
-                            asrt(s >= 1)
-                            utfl = f.readu8()
-                            asrt(not utfl >> 3)
-                            for ix,mn in enumerate('mac'):
-                                if (f.pos + 4) > xep: break
-                                if utfl & (1 << ix):
-                                    ts = f.readu32()
-                                    if ts: fe['ts'][mn] = unix2filetime(ts)
-                        case b'UX': # Unix
-                            asrt(s >= 8)
-                            ts = f.readu32()
-                            if ts: fe['ts']['a'] = unix2filetime(ts)
-                            ts = f.readu32()
-                            if ts: fe['ts']['m'] = unix2filetime(ts)
-                            # optional u16 UID & u16 GID
-                        case b'Ux': # Previous new Unix
-                            pass # optional u16 UID & u16 GID
-                        case b'e\0': # IBM S/390 attributes uncompressed
-                            pass
-                        case b'nu': # ASi unix
-                            pass
-                        case b'up': # Info-ZIP unicode
-                            asrt(s > 5)
-                            asrt(f.readu8() == 1)
-                            if crc_hash(fnb,'crc32') == f.readu32(): fe['n'] = f.readc(s - 5).decode('utf-8')
-                        case b'ux': # New Unix
-                            pass # u16 tag (?), u16 len (?), u8 v, u8 UIDlen, u8 UID[UIDlen], u8 GIDlen, u8 GID[GIDlen]
-                        case b'\xC5\x10': # minizip CMS signature
-                            pass # eh, no
-                        case b'\xCD\xCD': # minizip central directory
-                            asrt(s >= 8)
-                            fe['mzc'] = f.readu64()
-                            raise NotImplementedError('minizip central directory')
-                        case _: raise NotImplementedError(f'{repr(tg)[1:]} @ 0x{f.pos - 4:08X}')
-                    f.seek(xep)
-                f.seek(ep)
+                read_zip_extra(**locals())
                 fe['cm'] = f.readc(cml)
                 if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0) or ('vms' in fe and fe['vms'] & 0x1000): mkdir(o + '/' + sanitize_relative(fe['n']))
                 else: fs.append(fe)
@@ -728,7 +541,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             drefs = {}
             for fe in fs:
                 f.seek(fe['of'])
-                asrt(f.read(4) == SIG34,lambda:f.fmt('§@§'))
+                asrt(f.read(4) == PK34,lambda:f.fmt('§@§'))
                 v = f.readu16()
                 if 'aes' in fe: ct = 99
                 else: ct = fe['ct']
@@ -823,7 +636,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
                 if 9 >= ct >= 1: pass
-                elif ct == 0 and len(d) >= 0x1E and d[0] == 0x70 and len(BUNFMTM) > d[1] > 0:
+                elif ct == 0 and len(d) >= 0x1E and d[0] == 0x70 and len(ZBUNFMTM) > d[1] > 0:
                     tf = File(d[:0x20])
                     tf.skip(2)
                     try: bus,bzs = tf.readleb128u(),tf.readleb128u() + 0x1A
@@ -851,7 +664,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 ex = None
                 for fe in fs:
                     if not 'bun' in fe: continue
-                    ct = BUNFMTM[fe['bun']['ct']]
+                    ct = ZBUNFMTM[fe['bun']['ct']]
                     kw = {'usize':fe['bun']['us']}
                     if ct == 'lzma': kw['null_usize'] = True
                     elif ct == 'zstd': kw['db'] = db
@@ -901,6 +714,157 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 with zipfile.ZipFile(i,'r') as z: z.extractall(o)
             except: pass
             else: return
+        case 'Truncated ZIP':
+            db.try_custom()
+            from lib.file import File,decompress,by2bi
+            from lib.crypto import crc_hash,decrypt
+            f = File(i,endian='<')
+
+            PK34 = b'PK\3\4'
+            hrefs = False
+            while f:
+                if f.read(4) != PK34: break
+                f.skip(4)
+                ct = f.readu16()
+                if ct == 92:
+                    hrefs = True
+                    break
+                elif ct == 99: raise ValueError("Can't decrypt AES without central directory")
+                elif ct == 22: raise NotImplementedError("Forza encryption in truncated ZIP")
+                f.skip(8)
+                zs = f.readu32()
+                f.skip(4)
+                f.skip(f.readu16() + f.readu16() + zs)
+
+            BUNDLE = []
+            refs = []
+            drefs = {}
+            fs = []
+            f.seek(0)
+            while f:
+                if f.read(4) != PK34: break
+                fe = {
+                    'v':f.readu16(),
+                    'fl':f.readu16(),
+                    'ct':f.readu16(),
+                    'ts':{},
+                }
+                mts,mdt = f.readu16(),f.readu16()
+                try: fe['ts']['m'] = unix2filetime(dos2unix(mts,mdt))
+                except ValueError: pass
+                fe['crc'] = f.readu32()
+                fe['chk'] = (mdt >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
+                fe['zs'],fe['us'] = f.readu32(),f.readu32()
+                nl,xl = f.readu16(),f.readu16()
+                fnb = f.readc(nl)
+                fn = fnb.rstrip(b'\0')
+                if fe['fl'] & 0x800 or istext(fn,'utf-8',filename=True): fe['n'] = fn.decode('utf-8')
+                else: fe['n'] = fn.decode('cp437')
+
+                read_zip_extra(**locals())
+                fn = o + '/' + sanitize_relative(fe['n'])
+                if (fe['n'].endswith('/') and fe['us'] == 0) or ('vms' in fe and fe['vms'] & 0x1000):
+                    if not os.path.exists(fn): mkdir(fn)
+                    f.skip(fe['zs'])
+                    continue
+                fs.append(fe)
+
+                d = f.read(fe['zs']) # not readc!
+                if fe['fl'] & 1:
+                    raise ValueError("No key for zip file")
+                    d = decrypt(d,'zipcrypto',KEY)
+                    asrt(d[11] == fe['chk'])
+                    d = d[12:]
+
+                c = 0
+                while exists(fn):
+                    fn = o + '/' + fe['n'] + '_' + str(c)
+                    c += 1
+                fe['ffn'] = fn
+
+                if fe['ct'] == 92:
+                    fe['sha1'] = d
+                    refs.append(fe)
+                    continue
+                if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
+                    d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
+                elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
+                    d = decompress(d,'lzfse',usize=fe['us'])
+                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD':
+                    d = decompress(d,'lpaq8',usize=fe['us'])
+                elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
+                elif fe['ct'] == 97 and d[:4] != b'wvpk': d = decompress(d,'brotli',usize=fe['us'])
+                elif fe['ct'] in {94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
+                else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
+                if len(d) == fe['us']:
+                    for pht in ('sha256','sha1','md5'):
+                        if pht in fe:
+                            asrt(crc_hash(d,pht,bytes=True) == fe[pht],f'Hash mismatch ({pht})')
+                            break
+                    else:
+                        if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'],'Checksum mismatch (crc32)')
+
+                if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
+                if 9 >= ct >= 1: pass
+                elif ct == 0 and len(d) >= 0x1E and d[0] == 0x70 and len(ZBUNFMTM) > d[1] > 0:
+                    tf = File(d[:0x20])
+                    tf.skip(2)
+                    try: bus,bzs = tf.readleb128u(),tf.readleb128u() + 0x1A
+                    except EOFError: BUNDLE.append(False)
+                    else:
+                        BUNDLE.append(bzs == (len(d) - tf.pos))
+                        if BUNDLE[-1]: fe['bun'] = {'zs':bzs,'us':bus,'ct':d[1]}
+                    del tf
+                else: BUNDLE.append(False)
+
+                writefile(fn,d)
+                ts = [0,0,0]
+                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
+                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
+                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
+                set_ftime(fn,*ts,unix=False)
+
+                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
+                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
+                if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
+                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+            f.close()
+
+            if BUNDLE and not any(x is False for x in BUNDLE):
+                ex = None
+                for fe in fs:
+                    if not 'bun' in fe: continue
+                    ct = ZBUNFMTM[fe['bun']['ct']]
+                    kw = {'usize':fe['bun']['us']}
+                    if ct == 'lzma': kw['null_usize'] = True
+                    elif ct == 'zstd': kw['db'] = db
+
+                    try: writefile(fe['ffn'],decompress(readfile(fe['ffn'])[-fe['bun']['zs']:],ct,**kw))
+                    except NotImplementedError as e:
+                        mv(fe['ffn'],fe['ffn'] + '.$uns.' + ct)
+                        ex = e
+                    except Exception as e:
+                        if not ct in {'zstd','brotli','lz4'}: raise
+                        mv(fe['ffn'],fe['ffn'] + '.$err.' + ct)
+                        ex = e
+                if not ex is None: raise ex
+
+            for fe in refs:
+                fn = fe['ffn']
+                copyfile(drefs[fe['sha1']],fn)
+                ts = [0,0,0]
+                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
+                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
+                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
+                set_ftime(fn,*ts,unix=False)
+                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
+                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
+                if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
+                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+            if fs: return
+
+            zip7(i,o,'ZIP',True)
+            if listdir(o): return
         case 'ZLIB':
             if db.print_try: print('Trying with zlib')
             import zlib
@@ -1787,3 +1751,200 @@ def read_http_head(readline,max:int=None,idn=False):
         if k in o: o[k] += ', ' + v
         else: o[k] = v
     return o
+def read_zip_extra(**l):
+    f,fe,xl,crc_hash = l['f'],l['fe'],l['xl'],l['crc_hash']
+    ep = f.pos + xl
+    if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',poffset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.peek(xl).decode('latin-1')):
+        f.seek(ep) # JAR shit
+    while (f.pos + 4) < ep:
+        tg,s = f.readc(2),f.readu16()
+        xep = f.pos + s
+        match tg:
+            case b'\0\0': pass # empty
+            case b'\1\0': # Zip64
+                asrt(s >= 8)
+                fe['us'] = f.readu64()
+                if s > 8:
+                    asrt(s >= 0x10)
+                    fe['zs'] = f.readu64()
+                if s > 0x10:
+                    asrt(s >= 0x18)
+                    fe['of'] = f.readu64()
+                if s > 0x18:
+                    asrt(s >= 0x1C)
+                    fe['dsk'] = f.readu32()
+            case b'\x07\0': # AV Info
+                fe['avinf'] = f.read(s)
+            case b'\x09\0': # OS/2
+                fe['os2x'] = True
+            case b'\x0A\0': # NTFS
+                asrt(s >= 0x20)
+                f.padc(4)
+                asrt(f.readu16() == 1 and f.readu16() == 0x18,f.pos)
+                ts = f.readu64() # FILETIME
+                if ts: fe['ts']['m'] = ts
+                ts = f.readu64()
+                if ts: fe['ts']['a'] = ts
+                ts = f.readu64()
+                if ts: fe['ts']['c'] = ts
+            case b'\x0C\0': # OpenVMS
+                asrt(s >= 4)
+                f.skip(4)
+                while (f.pos + 4) < xep:
+                    vtg,vs = f.readu16(),f.readu16()
+                    vep = f.pos + vs
+                    asrt(vep <= xep)
+                    match vtg:
+                        case 4|19|20|13|21|22|23|29: pass # RECATTR, EXPDATE, BAKDATE, ASCDATES, UIC, FPRO, RPRO, JOURNAL
+                        case 3: # UCHAR
+                            asrt(vs >= 4)
+                            fe['vms'] = f.readu32()
+                        case 17: # CREDATE
+                            asrt(vs >= 8)
+                            ts = f.readu64()
+                            if ts: fe['ts']['c'] = vms2filetime(ts)
+                        case 18: # REVDATE
+                            asrt(vs >= 8)
+                            ts = f.readu64()
+                            if ts: fe['ts']['m'] = vms2filetime(ts)
+                        case _: raise NotImplementedError(f'Unknown OpenVMS tag {vtg} @ 0x{f.pos - 4:08X}')
+                    f.seek(vep)
+            case b'\1\x99': # AE-x
+                asrt(fe['ct'] == 99,'AE-x entry without AE-x compression type')
+                asrt(s == 7)
+                fe['aes'] = {
+                    'vv':f.readu16(),
+                    'v':f.read(2),
+                    'm':f.readu8(),
+                }
+                asrt(fe['aes']['v'] == b'AE' and fe['aes']['vv'] in {1,2},f'Unsupported AE-x vendor {repr(fe['aes']['v'])[2:-1]}-{fe["aes"]["vv"]}')
+                asrt(fe['aes']['m'] in {1,2,3},f'Unsupported AE-x mode {fe["aes"]["m"]}')
+                fe['ct'] = f.readu16()
+            case b'\x03\x99': # WinZip Reference
+                pass
+            case b'\x1E\xA1': # Data Stream Alignment
+                pass # u16 ?
+            case b'\x20\xA2': # Microsoft Open Packaging Growth Hint
+                pass # u64 growth hint, 0x10 padding
+            case b'\x23\x11': # ?, seen in Forza Horizon 6
+                pass # u32 data offset
+            case b'AC': # Acorn
+                asrt(s >= 4)
+                asrt(f.read(4) == b'ARC0')
+            case b'KV': # KeyValuePairs
+                asrt(s >= 14)
+                asrt(f.read(13)[:9] == b'KeyValuePairs'[:9]) # only verify first couple bytes
+                kvc = f.readu8()
+                fe['kv'] = dict((f.reads(f.readu16(),'utf-8'),f.reads(f.readu16(),'utf-8')) for _ in range(kvc))
+            case b'NU': # Xcess unicode
+                asrt(s >= 10 and f.read(4) == b'NUCX')
+                ns = f.readu32()
+                asrt((ns*2+8) <= s)
+                fe['n'] = f.readutf16(ns)
+                fe['xcess'] = True
+            case b'Q\x1A': # minizip hash
+                asrt(s > 4)
+                ht,hs = f.readu16(),f.readu16()
+                asrt((hs + 4) <= s)
+                fe[{10:'md5',20:'sha1',23:'sha256'}[ht]] = f.read(hs)
+            case b'SD': # windows ACL
+                pass
+            case b'UT':
+                asrt(s >= 1)
+                utfl = f.readu8()
+                asrt(not utfl >> 3)
+                for ix,mn in enumerate('mac'):
+                    if (f.pos + 4) > xep: break
+                    if utfl & (1 << ix):
+                        ts = f.readu32()
+                        if ts: fe['ts'][mn] = unix2filetime(ts)
+            case b'UX': # Unix
+                asrt(s >= 8)
+                ts = f.readu32()
+                if ts: fe['ts']['a'] = unix2filetime(ts)
+                ts = f.readu32()
+                if ts: fe['ts']['m'] = unix2filetime(ts)
+                # optional u16 UID & u16 GID
+            case b'Ux': # Previous new Unix
+                pass # optional u16 UID & u16 GID
+            case b'e\0': # IBM S/390 attributes uncompressed
+                pass
+            case b'nu': # ASi unix
+                pass
+            case b'up': # Info-ZIP unicode
+                asrt(s > 5)
+                asrt(f.readu8() == 1)
+                if crc_hash(l['fnb'],'crc32') == f.readu32(): fe['n'] = f.readc(s - 5).decode('utf-8')
+            case b'ux': # New Unix
+                pass # u16 tag (?), u16 len (?), u8 v, u8 UIDlen, u8 UID[UIDlen], u8 GIDlen, u8 GID[GIDlen]
+            case b'\xC5\x10': # minizip CMS signature
+                pass # eh, no
+            case b'\xCD\xCD': # minizip central directory
+                asrt(s >= 8)
+                fe['mzc'] = f.readu64()
+                raise NotImplementedError('minizip central directory')
+            case _: raise NotImplementedError(f'{repr(tg)[1:]} @ 0x{f.pos - 4:08X}')
+        f.seek(xep)
+    f.seek(ep)
+
+ZFMTM = {
+    0:'none',
+    1:'shrink',
+    2:'reduce1',
+    3:'reduce2',
+    4:'reduce3',
+    5:'reduce4',
+    6:'pkzip_implode',
+    7:'tokenize', # reserved, no implementation, unsupported
+    8:'deflate',
+    9:'deflate64',
+    10:'pkware_implode',
+    12:'bzip2',
+    14:'lzma_zip',
+    15:'oodle', # unofficial, used by "New World: Aeternum", untested
+    16:'cmpsc', # unsupported, https://github.com/Fish-Git/cmpsctst
+    18:'terse', # unsupported, https://github.com/openmainframeproject/tersedecompress/tree/master/cpp/src
+    # 18:'xceed_bwt', # unofficial
+    19:'lz77z', # unsupported
+    20:'zstd', # deprecated
+    # 20:'lpaq8', # unofficial
+    22:'forza_encrypted', # unofficial, custom encryption + deflate, untested
+    92:'reference', # WinZip
+    93:'zstd',
+    94:'packmp3', # WinZip
+    # 94:'lz4', # unofficial, OTEr ZIP, untested
+    95:'xz',
+    96:'zipx_jpeg', # unsupported, WinZip, not packjpg
+    97:'wavpack', # WinZip
+    # 97:'brotli', # unofficial, OTEr ZIP, untested
+    98:'ppmd8',
+    99:'aes',
+    # 99:'lzfse', # unofficial, Apple
+    100:'lzfse', # unofficial, OTEr ZIP, untested, https://github.com/trufae/otezip
+}
+ZBUNFMTM = ( # https://github.com/r-lyeh-archived/bundle
+    'none', # RAW
+    'shoco', # unsupported
+    'lz4f', # unsupported
+    'zlib', # MINIZ
+    'lzip', # unsupported
+    'lzma', # LZMA20
+    'zpaq', # unsupported
+    'lz4', # error
+    'brotli', # BROTLI9, error
+    'zstd', # error
+    'lzma', # LZMA25
+    'bsc', # unsupported
+    'brotli', # BROTLI11, error
+    'shrinker', # unsupported
+    'csc20', # unsupported
+    'zstdf', # unsupported
+    'bcm', # unsupported
+    'zling', # unsupported
+    'mcm', # unsupported
+    'tangelo', # unsupported
+    'zmolly', # unsupported
+    'crush', # unsupported
+    'lzjb', # unsupported
+    'bzip2',
+)

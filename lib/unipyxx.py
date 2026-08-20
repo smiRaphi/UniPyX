@@ -198,6 +198,7 @@ class X:
             ('hash_fugue',(P(u8),szt,u16),h512,7),
             ('hash_has160',(P(u8),szt),h160,6),
             ('hash_haval',(P(u8),szt,u16,u8,u8),h256,0),
+            ('derive_protectit2',(P(u8),),void,0),
             ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
             ('hash_crc_init',(P(u8),u32,u64,s8),s8,0),
             ('hash_crc',(P(u8),u32,P(u8),u64,u64,u64,s8),u64,0),
@@ -649,6 +650,10 @@ class X:
     def hash_haval(self,src:bytes,bits:int,rounds:int=3,version:int=1) -> bytes:
         b = (u8 * len(src)).from_buffer_copy(src)
         return bytes(self.dll.hash_haval(b,len(src),bits,rounds,version))[:bits // 8]
+    def derive_protectit2(self,src:bytes) -> bytes:
+        b = (u8 * 0x10).from_buffer_copy(src[:0x10].ljust(0x10,b'\0'))
+        self.dll.derive_protectit2(b)
+        return bytes(b)
     def mac_cmac_tfit(self,src:bytes,key:bytes,table:bytes) -> bytes:
         asrt(len(key) == 4*4*13 and len(table) == 4*0x100*0x10*13)
         s = (u8 * len(src)).from_buffer_copy(src)

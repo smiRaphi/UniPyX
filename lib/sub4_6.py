@@ -265,5 +265,21 @@ Unknown 2: {f.reads(f.readu32())}""")
 
             f.close()
             if fs: return
+        case 'ProtectIt/2 Encrypted':
+            db.try_custom()
+            from lib.file import File
+            from lib.crypto import decrypt
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'PIT2')
+
+            # key = crc_hash(key, 'protectit2')
+            # original program just uses this as verification for the processed key but it's just the actual key so yay
+            k = decrypt(f.readc(0x10),'xor',b'ProtectIt/2 OS/2')
+            fn = f.reads(0x100,'ascii').rstrip('\0')
+            f.padc(4)
+            d = f.read()
+            f.close()
+            writefile(o + '/' + fn,decrypt(d,'xor',k))
+            return
 
     return 1

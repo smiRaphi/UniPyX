@@ -1760,5 +1760,8 @@
     "install4j":[
         "ovl : install4j / exe4j Runtime DATA",
         "www.ej-technologies.com"
+    ],
+    "ProtectIt/2 Encrypted":[
+        "protectit/2 encrypted"
     ]
 }

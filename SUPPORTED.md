@@ -1,6 +1,6 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 
-# Supported Formats: 1065
+# Supported Formats: 1066
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -372,7 +372,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (574)
+## Various (575)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -780,6 +780,7 @@ PlayStation Trophy File | .trp | Custom |
 PlayStation V2 Trophy File | .ucp | Custom |
 Pokemon FSYS | .fsys | Custom |
 Project IGI Resource | .res | Custom |
+ProtectIt/2 Encrypted | .zie | Custom |
 PS2 Memory Card | ??? | [mymc](http://www.csclub.uwaterloo.ca:11068/mymc/) |
 PS3/PSV PUP | .pup | Custom |
 Pseudo Interactive PIX | .pix | Custom |

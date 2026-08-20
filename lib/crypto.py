@@ -960,7 +960,8 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             c1 = MD4.new()
             if BS > len(i):
                 c1.update(i)
-                return c1.digest()
+                r = c1.digest()
+                return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
 
             c2 = MD4.new()
             p = 0
@@ -1317,6 +1318,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 r = c.derive(i)
                 if kwargs.get('bytes',True): return r
                 return int.from_bytes(r,'big')
+        case 'protectit2': return uxx().derive_protectit2(i)
 
         case 'tarzan': fnc = uxx().hash_tarzan
         case 'luas': fnc = uxx().hash_luas
@@ -1384,7 +1386,7 @@ HASHTS = {
     'esch256':32,'esch384':48,
     'echo224':28,'echo256':32,'echo384':48,'echo512':64,
     'fugue224':28,'fugue256':32,'fugue384':48,'fugue512':64,
-    'haval':16,'haval128':16,'haval160':20,'haval192':24,'haval224':28,'haval256':32,
+    #'haval':16,'haval128':16,'haval160':20,'haval192':24,'haval224':28,'haval256':32,
     'mdc2':16,
     'tarzan':4,'luas':4,'hash40':5,'pivotal':4,
     'empire_magic':2,'westwood':4,

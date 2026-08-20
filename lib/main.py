@@ -757,13 +757,14 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
         zipd = [None,{}]
         def load_zip():
             if zipd[0] is None:
-                import zipfile
+                import zipfile,io
                 zipfile._ZipExtFile = zipfile.ZipExtFile
                 class ZipExtFile(zipfile._ZipExtFile):
                     def _update_crc(self,*_,**__): pass
                 zipfile.ZipExtFile = ZipExtFile
 
-                zipd[0] = zipfile.ZipFile(inp,'r',strict_timestamps=False)
+                try: zipd[0] = zipfile.ZipFile(inp,'r',strict_timestamps=False)
+                except: zipd[0] = zipfile.ZipFile(io.BytesIO(),'a')
                 for x in zipd[0].infolist():
                     zipd[1][x.filename.lower()] = x
                     zipd[1][x.filename] = x
