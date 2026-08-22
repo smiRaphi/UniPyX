@@ -1,6 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
+[//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1066
+# Supported Formats: 1067
 
 ## "Common" Archives/Compressors/Encodings (147)
 Name | Extension(s) | Extractor(s) | Comment
@@ -147,7 +148,7 @@ XX34 | .x34 | [XX34](https://www.sac.sk/download/utilfile/xx3402.zip)
 xz | .xz | [7-Zip](https://7-zip.org/) |
 YAC | .yac .yc | [YAC](https://www.sac.sk/download/pack/yac102.zip) |
 yEnc | .ntx .yenc | [7-Zip](https://7-zip.org/) + [eDecoder](https://www.tc4shell.com/en/7zip/edecoder/) |
-ZIP | .zip .zipx .exe | Custom, [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) |
+ZIP | .zip .zipx .exe | Custom, [unzip](https://bioruebe.com/dev/uniextract/)([src](https://github.com/madler/unzip)), [7-Zip](https://7-zip.org/), [zipfile](https://docs.python.org/3/library/zipfile.html), [GARbro](https://github.com/crskycode/GARbro) | [custom checklist](#custom-zip-features-checklist)
 ZLIB | .zlib | [zlib](https://docs.python.org/3/library/zlib.html) |
 ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https://bioruebe.com/dev/uniextract/)(src?) |
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
@@ -229,7 +230,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (138)
+## Executables/Packers/Installers (139)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -356,6 +357,7 @@ SpaceMaker | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mast
 Steam DRM | .exe | [Steamless](https://github.com/atom0s/Steamless) |
 T-PACK | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 Tenth Planet Soft | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
+Themida | .exe .dll .sys .scr | [mal_unpack](https://github.com/hasherezade/mal_unpack) | requires admin rights for sandboxing, will prompt with UAC
 TinyProg | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Tixati Installer | .exe | Custom |
 TSCRUNCH | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
@@ -1089,3 +1091,104 @@ ZX5 | .zx5 | [dzx5](https://github.com/einar-saukas/ZX5) |
 ZX7 | .zx7 | [dzx7](https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7) |
 ZXC | .zxc | [zxc](https://github.com/hellobertrand/zxc) |
 Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives.damiendebin.net/zzip/files/zzip-win32.zip) |
+
+
+### custom ZIP features checklist
+ x | Type | Name | Comment | URL
+-- | ---- | ---- | ------- | ---
+| <ul><li>[x] </li></ul> | Base  | ZIP64 | |
+| <ul><li>[x] </li></ul> | Base  | RESOF | | http://fileformats.archiveteam.org/wiki/SOF_(Spectrum_Software)
+| <ul><li>[ ] </li></ul> | Base  | Split archives | |
+| <ul><li>[x] </li></ul> | Base  | EOCD padded with 0x00 | |
+| <ul><li>[x] </li></ul> | Base  | shifted offsets | |
+| <ul><li>[x] </li></ul> | Base  | No EOCD/only LFH | |
+| <ul><li>[x] </li></ul> | Comp. | None | type = 0, uncompressed |
+| <ul><li>[x] </li></ul> | Comp. | Shrink | type = 1 |
+| <ul><li>[x] </li></ul> | Comp. | Reduce 1-4 | type = 2-5 |
+| <ul><li>[x] </li></ul> | Comp. | Implode (old) | type = 6 |
+| <ul><li>[ ] </li></ul> | Comp. | Tokenize | type = 7, no implementation exists |
+| <ul><li>[x] </li></ul> | Comp. | Deflate | type = 8 |
+| <ul><li>[x] </li></ul> | Comp. | Deflate64 | type = 9 |
+| <ul><li>[x] </li></ul> | Comp. | Implode (new) | type = 10 |
+| <ul><li>[x] </li></ul> | Comp. | BZip2 | type = 11 |
+| <ul><li>[x] </li></ul> | Comp. | LZMA | type = 14, special zip version |
+| <ul><li>[x] </li></ul> | Comp. | Oodle | type = 15, unofficial, used by "New World: Aeternum" |
+| <ul><li>[ ] </li></ul> | Comp. | CMPSC | type = 16, IBM, never seen | https://github.com/Fish-Git/cmpsctst
+| <ul><li>[ ] </li></ul> | Comp. | TERSE | type = 18, IBM, never seen | https://github.com/openmainframeproject/tersedecompress/tree/master/cpp/src
+| <ul><li>[x] </li></ul> | Comp. | Xceed BWT | type = 18, unofficial, stripped bzip2 | https://xceed.com/documentation/xceed-zip-for-activex/BWT.html
+| <ul><li>[ ] </li></ul> | Comp. | LZ77Z | type = 19, IBM, never seen |
+| <ul><li>[x] </li></ul> | Comp. | ZSTD | type = 20, deprecated |
+| <ul><li>[x] </li></ul> | Comp. | LPAQ8 | type = 20, unofficial | https://code.google.com/archive/p/paqzip/
+| <ul><li>[x] </li></ul> | Enc.  | Forza Encrypted | type = 22, unofficial, used by Forza games |
+| <ul><li>[x] </li></ul> | Comp. | Reference | type = 92, WinZip, basically a symlink |
+| <ul><li>[x] </li></ul> | Comp. | ZSTD | type = 93 |
+| <ul><li>[x] </li></ul> | Comp. | PackMP3 | type = 94, WinZip |
+| <ul><li>[x] </li></ul> | Comp. | LZ4 | type = 94, unofficial, OTEr ZIP | https://github.com/trufae/otezip
+| <ul><li>[x] </li></ul> | Comp. | XZ | type = 95 |
+| <ul><li>[ ] </li></ul> | Comp. | ZIPX JPEG | type = 96, WinZip |
+| <ul><li>[x] </li></ul> | Comp. | WavPack | type = 97, WinZip |
+| <ul><li>[x] </li></ul> | Comp. | Brotli | type = 97, unofficial, OTEr ZIP | https://github.com/trufae/otezip
+| <ul><li>[x] </li></ul> | Comp. | PPMD8 | type = 98 |
+| <ul><li>[x] </li></ul> | Enc.  | AES | type = 99 |
+| <ul><li>[x] </li></ul> | Comp. | LZFSE | type = 99, unofficial, Apple |
+| <ul><li>[x] </li></ul> | Comp. | LZFSE | type = 100, unofficial, OTEr ZIP | https://github.com/trufae/otezip
+| <ul><li>[x] </li></ul> | Bun. Comp. | None | type = 0, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | Shoco | type = 1, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | LZ4F | type = 2, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[x] </li></ul> | Bun. Comp. | ZLib | type = 3, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | LZip | type = 4, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[x] </li></ul> | Bun. Comp. | LZMA20 | type = 5, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | ZPAQ | type = 6, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | LZ4 | type = 7, Bundle, errors | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | Brotli9 | type = 8, Bundle, errors | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | ZSTD | type = 9, Bundle, errors | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[X] </li></ul> | Bun. Comp. | LZMA25 | type = 10, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | BSC | type = 11, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | Brotli11 | type = 12, Bundle, errors | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | Shrinker | type = 13, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | CSC20 | type = 14, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | ZSTDF | type = 15, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | BCM | type = 16, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | ZLing | type = 17, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | MCM | type = 18, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | TANGELO | type = 19, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | ZMolly | type = 20, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | CRUSH | type = 21, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[ ] </li></ul> | Bun. Comp. | LZJB | type = 22, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[x] </li></ul> | Bun. Comp. | BZip2 | type = 23, Bundle | https://github.com/r-lyeh-archived/bundle
+| <ul><li>[x] </li></ul> | Enc.  | ZipCrypto | flag = 1 |
+| <ul><li>[x] </li></ul> | Enc.  | Bubble Fighter keygen + ZipCrypto | extension = .bfz, flag = 1 |
+| <ul><li>[x] </li></ul> | Meta  | UTF8 filenames | flag = 0x800 |
+| <ul><li>[x] </li></ul> | Meta  | detect UTF8 filenames | flag = * |
+| <ul><li>[x] </li></ul> | Meta  | CP437 filenames | flag != 0x800 |
+| <ul><li>[x] </li></ul> | Meta  | DOS Date + Time | time & date != 0 |
+| <ul><li>[x] </li></ul> | CRC   | CRC32 IEEE | crc32 != 0 |
+| <ul><li>[x] </li></ul> | CRC   | MD5 | minizip |
+| <ul><li>[x] </li></ul> | CRC   | SHA1 | minizip |
+| <ul><li>[x] </li></ul> | CRC   | SHA256 | minizip |
+| | #Comment# | | tag = big endian |
+| <ul><li>[x] </li></ul> | Extra | Empty | tag = 0 |
+| <ul><li>[x] </li></ul> | Extra | Zip64 | tag = 1 |
+| <ul><li>[x] </li></ul> | Extra | AV Info | tag = 7, some sort of signature, get's dumped raw |
+| <ul><li>[x] </li></ul> | Extra | OS/2 | tag = 9, get's decompressed, verified and dumped raw |
+| <ul><li>[x] </li></ul> | Extra | NTFS | tag = 10, timestamps |
+| <ul><li>[x] </li></ul> | Extra | OpenVMS | tag = 12, timestamps & directory attribute |
+| <ul><li>[x] </li></ul> | Extra | AE-x | tag = 0x199, AES encryption |
+| <ul><li>[x] </li></ul> | Extra | WinZip Reference | tag = 0x399, unneeded data for comp. type = 92 |
+| <ul><li>[x] </li></ul> | Extra | Data Stream Alignment | tag = 0x1EA1, u16: ? |
+| <ul><li>[x] </li></ul> | Extra | Microsoft Open Packaging Growth Hint | tag = 0x20A2, u64: hint, padding: 0x10 |
+| <ul><li>[x] </li></ul> | Extra | Forza Data Offset | tag = 0x20A2, u32: data offset |
+| <ul><li>[x] </li></ul> | Extra | Acorn | tag = 0x4143/AC, verifies magic |
+| <ul><li>[x] </li></ul> | Extra | KeyValuePairs | tag = 0x4B56/KV, get's read and dumped as json |
+| <ul><li>[x] </li></ul> | Extra | Xceed Unicode | tag = 0x4E55/NU, verifies magic and overwrites filename |
+| <ul><li>[x] </li></ul> | Extra | minizip hash | tag = 0x511A, overwrites crc32, supported list in CRC section |
+| <ul><li>[x] </li></ul> | Extra | Windows ACL | tag = 0x5344/SD, ignored |
+| <ul><li>[x] </li></ul> | Extra | Unix Extended Timestamp | tag = 0x5554/UT, timestamps |
+| <ul><li>[x] </li></ul> | Extra | Unix | tag = 0x5558/UX, timestamps |
+| <ul><li>[x] </li></ul> | Extra | Previous new Unix | tag = 0x5578/Ux, ignored |
+| <ul><li>[x] </li></ul> | Extra | IBM S/390 attributes (uncompressed) | tag=0x6500, ignored |
+| <ul><li>[x] </li></ul> | Extra | ASi Unix | tag = 0x6E75/nu, ignored |
+| <ul><li>[x] </li></ul> | Extra | Info-ZIP Unicode | tag = 0x7570/up, overwrites filename if crc32 matches |
+| <ul><li>[x] </li></ul> | Extra | New Unix | tag = 0x7578/ux, ignored |
+| <ul><li>[ ] </li></ul> | Extra | minizip CMS Signature | tag = 0xC510, ignored because I'm lazy |
+| <ul><li>[ ] </li></ul> | Extra | minizip central directory | tag = 0xCDCD |

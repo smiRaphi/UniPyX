@@ -82,7 +82,10 @@ if __name__ == '__main__':
         for x in sorted(set(rts)): print(x)
     else:
         from lib.main import main_extract as extract
-        extract(inp,out,quiet=False,rs=True)
+        ts = []
+        for x in argv[3:]:
+            if x.startswith('-T'): ts.append(x[2:])
+        extract(inp,out,ts=ts or None,quiet=False,rs=True)
 else:
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     from lib.main import analyze,main_extract as extract,extract as sub_extract

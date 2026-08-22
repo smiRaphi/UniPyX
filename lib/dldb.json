@@ -5722,6 +5722,54 @@
         "pip":"http://www.seanet.com/~bugbee/crypto/blake/blake.py",
         "dl":"blake.py"
     },
+    "sandboxie":{
+        "p":"sandboxie/Start.exe",
+        "fs":[{
+            "u":"https://github.com/sandboxie-plus/Sandboxie/releases/download/v1.18.2/Sandboxie-Plus-x64-v1.18.2.exe",
+            "ex":"inno",
+            "x":{
+                "*":"sandboxie"
+            },
+            "cmd":[[
+                {"cwd":"sandboxie"},
+                "SbieIni.exe",
+                "set",
+                "UniPyX",
+                "Enabled",
+                "y"
+            ],[
+                {"cwd":"sandboxie"},
+                "SbieIni.exe",
+                "set",
+                "UserSettings_Default",
+                "SbieCtrl_UserName",
+                "UniPyX"
+            ],[
+                {"cwd":"sandboxie"},
+                "SbieIni.exe",
+                "set",
+                "UserSettings_Default",
+                "SbieCtrl_AutoRunSoftCompat",
+                "n"
+            ]],
+            "del":[
+                "sandboxie/32/SbieDll.pdb",
+                "sandboxie/SbieDrv.pdb",
+                "sandboxie/SdbieDll.pdb",
+                "sandboxie/imdisk_files.cab",
+                "sandboxie/imdisk_install.bat"
+            ]
+        }]
+    },
+    "mal_unpack":{
+        "p":"mal_unpack.exe",
+        "fs":[{
+            "u":"https://github.com/hasherezade/mal_unpack/releases/download/1.0/mal_unpack64.zip",
+            "x":{
+                "mal_unpack.exe":"mal_unpack.exe"
+            }
+        }]
+    },
     "elftools":{
         "pip":"pyelftools",
         "ts":1780052180
@@ -7038,7 +7086,7 @@
         "fs":[
         "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/keys.pyob"
         ],
-        "ts":1786820303
+        "ts":1787235058
     },
     "forza_keys":{
         "p":"forza_keys.pyob",

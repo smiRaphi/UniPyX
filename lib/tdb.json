@@ -1763,5 +1763,14 @@
     ],
     "ProtectIt/2 Encrypted":[
         "protectit/2 encrypted"
+    ],
+    "Themida":[
+        "themida & winlicense 2.0",
+        "themida v2010 v2065 or newer",
+        "themida/winlicense",
+        "themida/winlicense(2.0.1.0-2.1.8.0)",
+        "themida/winlicense(2.x)",
+        "themidawinlicense v2100 p oreans technologies 20090917",
+        "struct (hide from pe scanners ii-v) www.oreans.com"
     ]
 }

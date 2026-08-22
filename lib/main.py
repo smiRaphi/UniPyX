@@ -130,9 +130,12 @@ def console(back=0):
 
 shutil = shutil
 isfile,isdir,exists = os.path.isfile,os.path.isdir,os.path.exists
-basename,dirname,abspath = os.path.basename,os.path.dirname,os.path.abspath
+basename,abspath = os.path.basename,os.path.abspath
 rename = os.rename
 getsize,listdir = os.path.getsize,os.listdir
+def dirname(p:str,n=1):
+    for i in range(n): p = os.path.dirname(p)
+    return p
 def splitext(i:str):
     bn = basename(i)
     if bn[0] == '.': return i[:-len(bn)],bn
@@ -457,14 +460,26 @@ class TmpDir:
     def destroy(self):
         try: rmdir(self.p)
         except FileNotFoundError: pass
+    def link(self,p:str):
+        np = os.path.join(self.p,basename(p))
+        symlink(p,np)
+        return np
+    def copy(self,p:str):
+        np = os.path.join(self.p,basename(p))
+        cp(p,np)
+        return np
     def __str__(self): return self.p
     def __add__(self,i): return self.p + i
     def __radd__(self,i): return i + self.p
     def __del__(self): self.destroy()
 class TmpFile:
     def __init__(self,suf='',name='',path=TMP): self.p = path.strip('\\/') + '\\' + (name or ('tmp' + os.urandom(8).hex() + suf))
-    def link(self,i:str): symlink(i,self.p)
-    def copy(self,i:str): cp(i,self.p)
+    def link(self,i:str):
+        symlink(i,self.p)
+        return self.p
+    def copy(self,i:str):
+        cp(i,self.p)
+        return self.p
     def destroy(self):
         try: os.remove(self.p)
         except FileNotFoundError: pass

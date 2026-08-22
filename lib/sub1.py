@@ -339,50 +339,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
             return
         case 'ZIP'|'InstallShield Setup ForTheWeb'|'RESOF':
             FRZK = None
-            FRH3NK = {
-                'l':'a',
-                '`':'b',
-                '^':'c',
-                '6':'d',
-                'q':'e',
-                'v':'f',
-                '{':'g',
-                '@':'h',
-                '$':'i',
-                '7':'j',
-                's':'k',
-                'b':'l',
-                'g':'m',
-                '8':'n',
-                'h':'o',
-                'u':'p',
-                'f':'q',
-                '4':'r',
-                '~':'s',
-                '1':'t',
-                '=':'u',
-                "'":"v",
-                'm':'w',
-                ']':'x',
-                '!':'y',
-                ',':'z',
-                'y':'_',
-                '_':'-',
-                '[':'0',
-                '0':'1',
-                'w':'2',
-                'k':'3',
-                '(':'4',
-                '2':'5',
-                'j':'6',
-                '}':'7',
-                ';':'8',
-                '+':'9',
-            }
             db.try_custom()
             import json
-            from lib.file import File,decompress,by2bi
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
             from lib.crypto import decrypt,crc_hash
+            from lib.file import File,decompress,by2bi
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
@@ -484,6 +446,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if not trrntzip is None:
                 asrt(crc_hash(f.peek(cds),'crc32') == trrntzip)
                 trrntzip = True
+            if fh3ne: fh3k = (keys.wait()['frzh3n'],)
 
             fs = []
             for _ in range(c):
@@ -519,17 +482,22 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fn = fnb.rstrip(b'\0')
                 if fe['fl'] & 0x800 or istext(fn,'utf-8',filename=True): fe['n'] = fn.decode('utf-8')
                 else: fe['n'] = fn.decode('cp437')
-                if fh3ne: fe['n'] = decrypt(fe['n'],'fh3name',FRH3NK)
+                if fh3ne: fe['n'] = decrypt(fe['n'],'table',fh3k)
 
                 read_zip_extra(**locals())
                 fe['cm'] = f.readc(cml)
                 if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0) or ('vms' in fe and fe['vms'] & 0x1000): mkdir(o + '/' + sanitize_relative(fe['n']))
                 else: fs.append(fe)
 
+            BFZ = None
             if any(fe['fl'] & 1 for fe in fs):
-                # TODO: add key db
-                KEY = None
-                raise ValueError('No key for zip file')
+                if all(fe['ct'] in {0,8} for fe in fs) and i.lower().endswith('.bfz'):
+                    BFZ = tuple(keys.wait()['bubble_fighter'])
+                    BFZK = {}
+                else:
+                    # TODO: add key db
+                    KEY = None
+                    raise ValueError('No key for zip file')
             if FRZK:
                 FRZK.wait()
                 FRMK = [x for x in FRZK['c'] if x['n'].startswith('fm') and x['t'] == 'file']
@@ -568,7 +536,6 @@ def extract1(inp:str,out:str,t:str) -> bool:
                                 os2 = decompress(f.readc(s - 10),ZFMTM[xct],usize=xus)
                                 if xcrc: asrt(crc_hash(os2,'crc32') == xcrc)
                                 fe['os2x'] = os2
-                                
                         f.seek(xep)
                 f.seek(ep)
 
@@ -601,7 +568,14 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if v == 1: d = d[:-pad]
                     fe['ct'] = 8 # deflate
                 elif fe['fl'] & 1:
+                    if BFZ:
+                        bp = dirname(fe['n']).upper()
+                        bp += '/' + basename(bp) + '.BFZ'
+                        bp = bp.replace('\\','/').encode('ascii')
+                        if not bp in BFZK: BFZK[bp] = decrypt(bp,'table',BFZ,size=0x40)
+                        KEY = BFZK[bp]
                     d = decrypt(d,'zipcrypto',KEY)
+                    console()
                     asrt(d[11] == fe['chk'])
                     d = d[12:]
 
@@ -714,7 +688,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 with zipfile.ZipFile(i,'r') as z: z.extractall(o)
             except: pass
             else: return
-        case 'Truncated ZIP':
+        case 'Truncated ZIP': # only internal! used by 'ZIP'
             db.try_custom()
             from lib.file import File,decompress,by2bi
             from lib.crypto import crc_hash,decrypt
@@ -1849,7 +1823,7 @@ def read_zip_extra(**l):
                 fe[{10:'md5',20:'sha1',23:'sha256'}[ht]] = f.read(hs)
             case b'SD': # windows ACL
                 pass
-            case b'UT':
+            case b'UT': # unix extended timestamp
                 asrt(s >= 1)
                 utfl = f.readu8()
                 asrt(not utfl >> 3)

@@ -132,5 +132,62 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
                 remove(o + '/.install4j/jre.tar.gz')
 
             if fs: return
+        case 'Themida':
+            import signal
+            td = TmpDir(path=o)
+            db.sandbox(['mal_unpack','/exe',td.link(i),'/timeout','10000','/dmode','3','/rebase','/imp','A','/dir',td],
+                       sandbox_allow=[td,dirname(i)],sandbox_kill=True,cwd=td)
+
+            mo = td + '/' + basename(i) + '.out'
+            ofs = []
+            if exists(mo) and listdir(mo):
+                pids = set()
+                for x in rldir(mo):
+                    if x.endswith(('dump_report.json','scan_report.json')): pids.add(int(readfile(x,'j')['pid']))
+                for pid in pids:
+                    try: os.kill(int(pid),signal.SIGTERM if os.name == 'nt' else signal.SIGKILL)
+                    except ProcessLookupError: pass
+                    except OSError as e:
+                        if e.winerror != 87: raise
+                    except:
+                        print(', '.join(pids))
+                        td.destroy()
+                        raise
+
+                dmps = []
+                for x in rldir(mo):
+                    if x.endswith('dump_report.json'):
+                        d = readfile(x,'j')
+                        for y in d['dumps']:
+                            p = dirname(x,2) + '/' + d['output_dir'] + '/'
+                            dmps.append((p + y['dump_file'],y['dump_file'][len(y['module']) + 1:]))
+
+                r = None
+                # aoe = None
+                if len(dmps) == 1:
+                    of = o + '/' + dmps[0][1]
+                    mv(dmps[0][0],of)
+
+                    # f = xopen(of,'rb')
+                    # f.seek(0x3C)
+                    # f.seek(int.from_bytes(f.read(4),'little'))
+                    # if f.read(4) == b'PE\0\0':
+                    #     f.seek(0x10,1)
+                    #     ops = int.from_bytes(f.read(2),'little')
+                    #     f.seek(2,1)
+                    #     if ops >= 0x14 and f.read(2) == b'\x0B\x01':
+                    #         aoeo = f.seek(14,1)
+                    #         aoe = int.from_bytes(f.read(4),'little')
+                    # f.close()
+                elif len(dmps) == 0: r = 1
+                else:
+                    for ix,fe in enumerate(dmps): mv(fe[0],ofs[-1])
+            else: r = 1
+            td.destroy()
+
+            # if r is None and not aoe is None and aoe == 0:
+            #     pass
+
+            return r
 
     return 1

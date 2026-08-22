@@ -462,8 +462,9 @@ EXPORT void decrypt_zipcrypto(uint8_t *restrict buf, const size_t size, const ui
         k1 = k1 * 0x8088405 + 1;\
         k2 = crc32(k2,k1 >> 24);
 
-    for (size_t p=0;p < ksize;p++)
+    for (size_t p=0;p < ksize;p++) {
         mix(key[p]);
+    }
 
     for (size_t p=0;p < size;p++) {
         uint32_t k = k2 | 2;

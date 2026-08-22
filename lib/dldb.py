@@ -2,6 +2,7 @@ import sys,os,subprocess
 
 BDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PIPDIR = BDIR + '\\bin\\pip'
+ADMINP = BDIR + '\\lib\\admin.py'
 os.makedirs(PIPDIR,exist_ok=True)
 sys.path.insert(0,PIPDIR)
 def pip(*pkgs,error=False):
@@ -14,7 +15,7 @@ except (ImportError,ModuleNotFoundError):
     pip('httpx')
     import httpx
 
-import json,zipfile,tarfile,importlib.util
+import json,zipfile,tarfile,importlib.util,base64,ctypes
 from shutil import copyfile,copytree,rmtree
 from time import sleep,time
 from multiprocessing.pool import ThreadPool
@@ -39,6 +40,7 @@ class DLDB:
         self.c = httpx.Client()
         self.print_try = False
         self._old_print_try = []
+        self._sandboxie_first = True
 
         self.db = json.load(xopen(self.dbp))
         self.pdb = {x:self.db[x] for x in self.db if 'pip' in self.db[x]}
@@ -78,10 +80,14 @@ class DLDB:
         sys.meta_path.insert(1,DLDBPipUpdate)
         sys.meta_path.append(DLDBPip)
 
-    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,print_out=False,**kwargs) -> tuple[int,str|bytes,str|bytes]:
-        if print_try and self.print_try: print('Trying with',cmd[0])
-        if type(cmd) == list and getexe: cmd[0] = self.get(cmd[0])
-        if type(stdin) == str and not text: stdin = stdin.encode()
+    def run(self,cmd:list,stdin:bytes|str=None,text=True,getexe=True,timeout=0,useos=False,print_try=True,print_out=False,encoding='cp437',**kwargs) -> tuple[int,str|bytes,str|bytes]:
+        if 'cwd' in kwargs: kwargs['cwd'] = str(kwargs['cwd'])
+        if type(cmd) == list:
+            exen = cmd[0]
+            if getexe: cmd[0] = self.get(cmd[0])
+            if exen == cmd[0] and not os.path.exists(cmd[0]) and 'cwd' in kwargs and os.path.exists(os.path.join(kwargs['cwd'],cmd[0])): cmd[0] = os.path.join(kwargs['cwd'],cmd[0])
+            if print_try and self.print_try: print('Trying with',exen)
+        if type(stdin) == str and not text: stdin = stdin.encode(encoding)
         if useos:
             if stdin:
                 tfi = gtmp('.i')
@@ -99,9 +105,9 @@ class DLDB:
             os.remove(tfo)
             os.remove(tfe)
             if stdin: os.remove(tfi)
-            if text: o,e = o.decode('cp437'),e.decode('cp437')
+            if text: o,e = o.decode(encoding),e.decode(encoding)
         else:
-            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=('cp437' if text else None),stdout=None if print_out else -1,stderr=None if print_out else -1,stdin=-1 if stdin is not None else None,**kwargs)
+            p = subprocess.Popen([str(x) for x in cmd] if type(cmd) == list else cmd,text=text,encoding=(encoding if text else None),stdout=None if print_out else -1,stderr=None if print_out else -1,stdin=-1 if stdin is not None else None,**kwargs)
             if timeout:
                 for _ in range(int(timeout*10)):
                     if p.poll() != None: break
@@ -112,6 +118,103 @@ class DLDB:
             r = p.returncode
         return r,o,e
     def get(self,exei:str): return self.update(exei)[0]
+    def admin(self,cmds:list,print_try=True,getexe=True):
+        if isinstance(cmds,dict):
+            sing = True
+            cmds = [cmds]
+        else: sing = False
+        cmds = [x if isinstance(x,dict) else {'c':x,'k':{}} for x in cmds]
+        exen = cmds[-1]['c'][0]
+        for c in cmds:
+            if not 'k' in c: c['k'] = {}
+            if 'cwd' in c['k']: c['k']['cwd'] = str(c['k']['cwd'])
+            if c['k'].get('getexe',getexe): c['c'][0] = self.get(c['c'][0])
+            if not os.path.exists(c['c'][0]) and 'cwd' in c['k']\
+               and os.path.exists(os.path.join(c['k']['cwd'],c['c'][0])):
+                   c['c'][0] = os.path.join(c['k']['cwd'],c['c'][0])
+            assert os.path.exists(c['c'][0]),c['c'][0]
+        if print_try and self.print_try: print('Trying with',exen)
+
+        of = gtmp('.bin')
+        si = []
+        cms = []
+        txts = []
+        for x in cmds:
+            stdi = x['k'].pop('stdin',None)
+            enc = x['k'].pop('encoding','cp437')
+            txts.append((x['k'].pop('text',True),enc))
+            tim = x['k'].pop('timeout',None)
+            if not tim is None: tim = int(tim*10)
+            if stdi is not None:
+                if isinstance(stdi,str): stdi = stdi.encode(enc)
+                si.append(base64.b85encode(stdi).decode('utf-8'))
+            cms.append({
+                'si':len(si) - 1 if not stdi is None else None,
+                'c':x['c'],
+                't':tim,
+                'k':x['k'],
+            })
+        cmd = [ADMINP,base64.b85encode(json.dumps(cms,ensure_ascii=False,separators=(',',':')).encode('utf-8')).decode('utf-8'),
+               of] + si
+        ctypes.windll.shell32.ShellExecuteW(None,"runas",sys.executable,subprocess.list2cmdline(cmd),None,1)
+
+        while not os.path.exists(of): sleep(0.1)
+        while True:
+            try: os.rename(of,of)
+            except PermissionError: sleep(0.1)
+            else: break
+        f = open(of,'rb')
+        if f.read(3) != b'OK\n':
+            trc = f.read().decode('utf-8')
+            f.close()
+            print(trc)
+            raise ValueError('Python error in admin.py')
+        r = []
+        for c in txts:
+            ro = (int.from_bytes(f.read(4),'little'),
+                  f.read(int.from_bytes(f.read(8),'little')),
+                  f.read(int.from_bytes(f.read(8),'little')))
+            if c[0]: r.append((ro[0],ro[1].decode(c[1]),ro[2].decode(c[1])))
+            else: r.append(ro)
+        f.close()
+        os.remove(of)
+
+        if sing: return r[0]
+        return r
+    def sandbox(self,cmd:list,getexe=True,print_try=True,sandbox_kill=False,sandbox_allow:list[str]=[],**kwargs):
+        cmd = [str(x) for x in cmd]
+        if getexe: exe = self.get(cmd[0])
+        else: exe = cmd[0]
+        if print_try and self.print_try: print('Trying with',cmd[0])
+
+        sandp = self.get('sandboxie')
+        sbp = os.path.dirname(sandp)
+        sini = os.path.join(sbp,'SbieIni.exe')
+        sandbox_allow = [os.path.abspath(str(x)) for x in sandbox_allow]
+        for x in sandbox_allow:
+            self.run([sini,'set','UniPyX','OpenFilePath',x],getexe=False,print_try=False)
+        if sandbox_allow and not self._sandboxie_first: self.run([sandp,'/reload'],getexe=False,print_try=False)
+
+        cmd = [sandp,'/box:UniPyX','/wait','/silent',exe] + cmd[1:]
+        if self._sandboxie_first:
+            kmdp = os.path.join(sbp,'KmdUtil.exe')
+            r = self.admin([{'c':[kmdp,'install','SbieDrv',os.path.join(sbp,'SbieDrv.sys'),'type=kernel','start=demand',f'msgfile={os.path.join(sbp,"SbieMsg.dll")}','altitude=86900'],
+                             'k':{'cwd':sbp}},
+                            {'c':[kmdp,'install','SbieSvc',os.path.join(sbp,'SbieSvc.exe'),'type=own','start=demand',f'msgfile={os.path.join(sbp,"SbieMsg.dll")}','display=Sandboxie Service','group=UIGroup'],
+                             'k':{'cwd':sbp}},
+                            {'c':cmd,'k':kwargs}],print_try=False,getexe=False)
+            self._sandboxie_first = False
+        else: r = self.run(cmd,print_try=False,getexe=False,**kwargs)
+        if sandbox_kill: self.run([sandp,'/box:UniPyX','/terminate','/silent'],getexe=False,print_try=False)
+
+        for x in sandbox_allow:
+            self.run([sini,'delete','UniPyX','OpenFilePath',x],getexe=False,print_try=False)
+        if sandbox_allow: self.run([sandp,'/reload'],getexe=False,print_try=False)
+
+        return r
+    def kill_sandbox(self):
+        self.run(['sandboxie','/box:UniPyX','/terminate','/silent'],print_try=False)
+
     def update(self,exei:str):
         exe = exei.lower()
         up = False
@@ -153,7 +256,15 @@ class DLDB:
 
                         self.print_try = bk
                         if e['u'] != '.': os.remove(p)
-                    if 'cmd' in e: self.run(e['cmd'],print_try=False,cwd=self.bin_path[:-1])
+                    if 'cmd' in e:
+                        cmds = e['cmd']
+                        if isinstance(cmds[0],str): cmds = [cmds]
+                        for cmd in cmds:
+                            cwd = self.bin_path
+                            if isinstance(cmd[0],dict):
+                                xcm = cmd.pop(0)
+                                if 'cwd' in xcm: cwd += xcm['cwd']
+                            self.run(cmd,print_try=False,cwd=cwd.rstrip('\\/'))
                     if 'del' in e:
                         for d in e['del']:
                             if os.path.exists(self.bin_path + d):
@@ -239,7 +350,11 @@ class DLDB:
             td = gtmp()
             os.makedirs(td,exist_ok=True)
             self.run(['innounp-2','-x','-b','-m','-d' + td,'-u','-h','-o','-y',p])
-            for tx in xl: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,self.bin_path + xl[tx])
+            for tx in xl:
+                if tx == '*':
+                    for tx1 in os.listdir(td + '/{app}'):
+                        copy(td + '/{app}/' + tx1,self.bin_path + xl[tx] + '/' + tx1)
+                else: copy(td + '/' + ('{app}/' if not tx.startswith(('{app}/','{tmp}/')) else '') + tx,self.bin_path + xl[tx])
             rmtree(td)
         elif ex == 'run':
             td = gtmp()

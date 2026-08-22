@@ -35,8 +35,6 @@ def uxx():
     if UPXX is None: UPXX = X()
     return UPXX
 
-MMFS_DEC = {}
-FH3N_DEC = {}
 BASEXX_DEC = {
     'b58':'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
     'b92':'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~+!$%\'()*,:@/?;^{}[]<>&|"=`',
@@ -72,6 +70,9 @@ CRYOCIPM = {
     'des3':'TripleDES','cast':'CAST5','cast5':'CAST5',
     'seed':'SEED','idea':'IDEA','sm4':'SM4',
 }
+
+MMFS_DEC = {}
+SUB_TABS = {}
 def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
     match algo:
         case 'xor':
@@ -389,30 +390,6 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'selene':
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_selene(i,key or b'\0')
-        case 'fh3name':
-            istr = isinstance(i,str)
-            if istr:
-                i = i.encode('latin-1')
-            if isinstance(key,dict):
-                kh = hash(tuple(key.items()))
-                if kh in FH3N_DEC: k = FH3N_DEC[kh]
-                else:
-                    k = bytearray(0x100)
-                    for ix in range(0x100):
-                        if ix in key: v = key[ix]
-                        elif chr(ix) in key: v = key[chr(ix)]
-                        elif ix.to_bytes(1) in key: v = key[ix.to_bytes(1)]
-                        else: v = ix
-                        if isinstance(v,str): v = v.encode('latin-1')[0]
-                        elif isinstance(v,bytes): v = v[0]
-                        k[ix] = v
-                    k = bytes(k)
-                    FH3N_DEC[kh] = k
-            else: k = key
-            asrt(isinstance(i,bytes) and isinstance(k,bytes) and len(k) == 0x100,err=TypeError)
-            r = i.translate(k)
-            if istr: r = r.decode('latin-1')
-            return r
         case 'remedy_ras':
             if isinstance(key,bytes): key = int.from_bytes(key,'little')
             asrt(isinstance(key,int),err=TypeError)
@@ -435,6 +412,52 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             asrt(isinstance(key,int),err=TypeError)
             return uxx().decrypt_eac(i,key)
 
+        case 'table':
+            enc = kwargs.get('encoding','latin-1')
+            if isinstance(i,str): i = i.encode(enc)
+            if isinstance(key,dict): kh = hash(tuple(key.items()))
+            else: kh = hash(key)
+            if kh in SUB_TABS: t = SUB_TABS[kh]
+            elif isinstance(key,dict):
+                t = bytearray(0x100)
+                for ix in range(0x100):
+                    if ix in key: v = key[ix]
+                    elif chr(ix) in key: v = key[chr(ix)]
+                    elif ix.to_bytes(1) in key: v = key[ix.to_bytes(1)]
+                    else: v = ix
+                    if isinstance(v,str): v = v.encode('latin-1')[0]
+                    elif isinstance(v,bytes): v = v[0]
+                    elif not isinstance(v,int): raise TypeError
+                    t[ix] = v
+                t = (bytes(t),)
+                SUB_TABS[kh] = t
+            elif isinstance(key,tuple): t = SUB_TABS[kh] = key
+            else:
+                if isinstance(key,(bytes,bytearray,memoryview,str)): key = (key,)
+                t = []
+                for x in key:
+                    if isinstance(x,(bytes,bytearray,memoryview)): x = bytes(x)
+                    elif isinstance(x,str): x = x.encode(enc)
+                    else: raise TypeError
+                    t.append(x)
+                t = tuple(t)
+                SUB_TABS[kh] = t
+
+            if i is None: return t
+            if 'size' in kwargs:
+                r = bytearray()
+                s = kwargs['size']
+                for ix in range(s):
+                    st = t[ix % len(t)]
+                    r.append(st[i[ix % len(i)] % len(st)])
+            elif len(t) == 1 and len(t[0]) == 0x100: r = i.translate(t[0])
+            else:
+                r = bytearray()
+                for ix,x in enumerate(i):
+                    st = t[ix % len(t)]
+                    r.append(st[x % len(st)])
+            if kwargs.get('decode'): return r.decode(enc)
+            return bytes(r)
         case 'ddhex4': return uxx().decrypt_swp4(bytes.fromhex(i))
         case 'hex': return bytes.fromhex(i)
         case 'base64url'|'b64url':
@@ -1328,6 +1351,18 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'pivotal': fnc = uxx().hash_pivotal
         case 'empire_magic': fnc = uxx().hash_empire_magic
         case 'westwood': fnc = uxx().hash_westwood
+        case 'aud_verify'|'aud_verify101':
+            T = (b'\r\r',b'\r\n',b'\r\t',b'\r ',
+                 b'  '  ,b' \r' ,b' \t' ,b' \n',
+                 b'\t\t',b'\t\r',b'\t ' ,b'\t\n',
+                 b'\n\n',b'\n\r',b'\n ' ,b'\n\t')
+
+            import zlib
+            h = bytearray()
+            c = zlib.crc32(i)
+            for p in range(32,0,-4):
+                h.extend(T[(c >> (p - 4)) & 0xF])
+            return bytes(h) if kwargs.get('bytes',False) else int.from_bytes(h,'big')
         case _: raise NotImplementedError(algo)
     return fnc(i,**kwargs)
 
@@ -1390,6 +1425,7 @@ HASHTS = {
     'mdc2':16,
     'tarzan':4,'luas':4,'hash40':5,'pivotal':4,
     'empire_magic':2,'westwood':4,
+    'aud_verify':16,'aud_verify101':16,
 }
 from .pyob import PyOBin,PyOFunc
 class HashLib(PyOBin):

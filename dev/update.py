@@ -65,6 +65,7 @@ GFMTS = {
     'jindrapetrik/jpexs-decompiler':lambda tag:f'ffdec_26.2.1_{tag}.zip',
     'ProjectorRays/ProjectorRays':lambda tag:f'projectrrays-{tag[1:]}.exe',
     'hellobertrand/zxc':lambda tag:f'zxc-{tag[1:]}-windows-x86_64.zip',
+    'sandboxie-plus/Sandboxie':lambda tag:f'Sandboxie-Plus-x64-{tag}.exe',
 }
 NCHKS = {
     'jfdelnero/HxCFloppyEmulator':'hxcfloppyemulator-winx64-'
