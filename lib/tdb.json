@@ -215,6 +215,10 @@
     "InstallShield Setup ForTheWeb":[
         "installshield packagefortheweb setup module"
     ],
+    "InstallShield 2000":[
+        "install shield 2000",
+        "installshield 2000 additional"
+    ],
     "InstallShield Z":[
         "installshield z archive"
     ],

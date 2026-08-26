@@ -328,7 +328,7 @@ def strp2re(fmt:str):
         if c == '%':
             c = fmt[p];p += 1
             if c in 'wu': rg.append(r'\d')
-            elif c in 'dmyHIMSUWV': rg.append(r'\d{2}')
+            elif c in 'dmyHIMSUWV': rg.append(r'\d{1,2}')
             elif c == 'j': rg.append(r'\d{3}')
             elif c in 'YG': rg.append(r'\d{4}')
             elif c == 'f': rg.append(r'\d{6}')
@@ -382,6 +382,7 @@ TS_FMTS = [strp2re(x) for x in (
     "%m/%d/%Y",
     "%Y-%m-%d",
     "%Y-%m-%dT%H:%M:%S.%:mZ",
+    "%:l:en_US:%m/%d/%Y %I:%M:%S %p",
     "%:l:en_US:%c",
     "%:l:en_US:%a, %d %b %Y %H:%M:%S %z",
 )]

@@ -190,7 +190,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             asrt(f.read(8) in {b'R2D2pack',b'2D2Rkcap'})
 
             f.seek(0x30)
-            f._end = {b'R2D2':'<',b'2D2R':'>'}[f.read(4)]
+            f.endian = {b'R2D2':'<',b'2D2R':'>'}[f.read(4)]
             f.skip(8)
             s = f.readu32()
             f.seek(0x30 + 0x10 + s - 1)
@@ -221,7 +221,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
 
             d = f.decompress(None,'zlib',usize=f.readu32())
             f.close()
-            f = File(d,endian=f._end)
+            f = File(d,endian=f.endian)
 
             of,c = f.readu32(),f.readu32()
             f.seek(of)
@@ -634,7 +634,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             fds = {}
             id = dirname(i)
             for k,v in dns.items():
-                if exists(id + '/' + v): fds[k] = f if v == basename(i).lower() else File(id + '/' + v,endian=f._end)
+                if exists(id + '/' + v): fds[k] = f if v == basename(i).lower() else File(id + '/' + v,endian=f.endian)
                 else: fds[k] = None
             if all(x is None for x in fds.values()):
                 asrt(len(fds) == 1,"Couldn't find any data files and data file count is over 1, so won't use base file")
@@ -711,7 +711,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             asrt(fd.read(4) == b'RAS\0')
 
             key = fd.readu32()
-            f = File(decrypt(fd.readc(0x20),'remedy_ras',key),endian=fd._end)
+            f = File(decrypt(fd.readc(0x20),'remedy_ras',key),endian=fd.endian)
             fc,dc,isz,fsz = f.readu32(),f.readu32(),f.readu32(),f.readu32()
             v = f.readf32()
             f.skip(12)
@@ -725,7 +725,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                 fds = fdd[:-1].decode('ascii').split('\0')
                 asrt(len(fds) == dc)
             else:
-                f = File(fdd,endian=fd._end)
+                f = File(fdd,endian=fd.endian)
                 fds = []
                 for _ in range(dc):
                     fds.append(f.read0s('ascii'))
@@ -735,7 +735,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             fds = [o + '/' + x.strip('/\\') for x in fds]
             for p in fds: mkdir(p)
 
-            f = File(id,endian=fd._end)
+            f = File(id,endian=fd.endian)
             for _ in range(fc):
                 n = f.read0s('ascii')
                 s = f.readu32()
@@ -1043,7 +1043,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                 hs = 6 + f.peek('u16') * 12
                 hd = f.readc(hs + (-hs % 8))
 
-            hd = File(hd,endian=f._end)
+            hd = File(hd,endian=f.endian)
             c = hd.readu16()
             hd.skip(4) # data size
             fs = []
@@ -1697,7 +1697,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
 
             us,zs = f.readu32(),f.readu32()
             asrt(f.readu32() == 8 and f.readu32() == 1)
-            f = File(f.decompress(zs,'lbalzss2',usize=us),endian=f._end)
+            f = File(f.decompress(zs,'lbalzss2',usize=us),endian=f.endian)
             f.skip(8)
             dc = f.readu32()
 
@@ -1873,10 +1873,10 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             if exists(i[:-5] + '.dict'): f = File(i[:-5] + '.dict')
             else: f = File(i)
             m = f.readu32('<')
-            if m == 0xA9F32458: f._end = '<'
-            elif m == 0x5824F3A9: f._end = '>'
+            if m == 0xA9F32458: f.endian = '<'
+            elif m == 0x5824F3A9: f.endian = '>'
             else: raise ValueError
-            fd = File(noext(i) + '.data',endian=f._end)
+            fd = File(noext(i) + '.data',endian=f.endian)
 
             v = f.readu16()
             # 0x100: https://github.com/KillzXGaming/Metroid-Fed-Force-Dumper
@@ -1919,7 +1919,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                 if bd is False:
                     mkdir(op + '.deleted')
                     continue
-                f = File(bd,endian=fd._end)
+                f = File(bd,endian=fd.endian)
                 gcs = []
                 fs = []
                 dups = set()
@@ -1945,7 +1945,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                     if bd is False:
                         mkdir(op + '.deleted')
                         continue
-                    f = File(bd,endian=f._end)
+                    f = File(bd,endian=f.endian)
                     for gix,ge in enumerate(gcs):
                         if not 'ho' in ge or gix in dups: continue
                         asrt(ge['hs'] == 8)

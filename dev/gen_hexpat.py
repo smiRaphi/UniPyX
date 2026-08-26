@@ -223,9 +223,9 @@ class File(_File):
         return super().close()
 
     @property
-    def _end(self): return self.__end
-    @_end.setter
-    def _end(self,v):
+    def endian(self): return self.__end
+    @endian.setter
+    def endian(self,v):
         self.__end = v
         if 'e' in self.obj and self.obj['e'] is None: self.obj['e'] = (v,)
         else:

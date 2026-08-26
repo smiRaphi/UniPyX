@@ -345,7 +345,7 @@ class PyOBin:
         fd = f.read()
         f.close()
         if fd[0] == 0xF1: fd = dedeflate0(fd[1:])
-        f = File(fd,endian=f._end)
+        f = File(fd,endian=f.endian)
         del fd
         ty = f.readu8()
         asrt((ty & 0b1111) in {7,8,9})

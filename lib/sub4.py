@@ -187,7 +187,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             f = File(i)
             asrt(f.read(4) == b'#AMB')
 
-            f._end = '>' if f.readu8() == 0 else '<'
+            f.endian = '>' if f.readu8() == 0 else '<'
             f.seek(0x10)
             c = f.readu32()
             iof = f.readu32()
@@ -524,7 +524,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 idx = decrypt(idx,'aes_ecb',ky)
             else: ky = None
 
-            idx = File(idx,endian=f._end)
+            idx = File(idx,endian=f.endian)
             def reads(fu=idx):
                 l = fu.reads32()
                 if l < 0:
@@ -551,7 +551,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                 fidx = f.readc(idx.readu64())
                 idx.skip(0x14)
                 if enc: fidx = decrypt(fidx,'aes_ecb',ky)
-                fidx = File(fidx,endian=f._end)
+                fidx = File(fidx,endian=f.endian)
 
                 fddc = fidx.readu32()
                 fds = []
@@ -561,7 +561,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
                     for _ in range(fdfc): fds.append((sanitize_relative(dn + '/' + reads(fidx)),fidx.reads32()))
                 del fidx
 
-                ee = File(idx.readc(idx.readu32()),endian=f._end)
+                ee = File(idx.readc(idx.readu32()),endian=f.endian)
                 neec = idx.readu32()
                 nee = []
                 for _ in range(neec):
@@ -832,7 +832,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             fv = f.readu64()
             if fv > 0xFFFFFFFFFFF:
                 f.skip(-8)
-                f._end = '>'
+                f.endian = '>'
                 fv = f.readu64()
 
             asrt(fv in {1,2}) # PS3,PSV
@@ -1192,11 +1192,11 @@ def extract4(inp:str,out:str,t:str) -> bool:
             asrt(f.read(4) == b'FORM')
             lng = f.readu32()
             if lng != f.size:
-                f._end = '<'
+                f.endian = '<'
                 f.back(4)
                 nlng = f.readu32()
                 if nlng != f.size and abs(f.size-nlng) > abs(f.size-lng):
-                    f._end = '>'
+                    f.endian = '>'
             BTYPE = f.read(4)
 
             cnt = 0
@@ -2009,7 +2009,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i)
             asrt(f.read(4) == b'XBIN')
-            f._end = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
+            f.endian = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
 
             v = f.readu8()
             f.padc(1)
@@ -2072,7 +2072,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i)
             asrt(f.read(12) == b'BEZSHAPK\0\0\1\0')
-            f._end = {b'\xFF\xFE':'<',b'\xFE\xFF':'>'}[f.read(2)]
+            f.endian = {b'\xFF\xFE':'<',b'\xFE\xFF':'>'}[f.read(2)]
             f.skip(0x12)
 
             boff = f.readu64()

@@ -150,7 +150,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
                     dn = dirname(i)
                     bn = OFS[-1].replace('\0',str(id))
                     pcs = [dn + '/' + x for x in listdir(dn) if noext(x).upper() == bn and x.lower().endswith('.mpx')]
-                    if pcs: OFS[id] = File(pcs[0],endian=f._end)
+                    if pcs: OFS[id] = File(pcs[0],endian=f.endian)
                     else:
                         print(f'WARNING: {dirname(i)}/{bn}.* not found! skipping entries')
                         OFS[id] = None
@@ -335,7 +335,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             fs = [(f.readu64(),f.readu32(),f.readu32()) for _ in range(c)]
             f.close()
 
-            fd = File(noext(i) + '.ard',endian=f._end)
+            fd = File(noext(i) + '.ard',endian=f.endian)
             hl.wait()
             for fe in fs:
                 fn = hl.get(fe[0])
@@ -623,7 +623,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             from lib.file import File
 
             f = File(noext(i) + '.in' + t[21])
-            f._end = {0x101:'>',0x202:'<'}[f.readu16()]
+            f.endian = {0x101:'>',0x202:'<'}[f.readu16()]
             fd = File(noext(i) + '.dbb',endian='>')
             asrt(f.readu16() == 5 and f.readu16() == 1)
             f.padc(4)
@@ -740,12 +740,12 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
         case 'DDLC+ Encrypted Unity Bundle':
             db.try_custom()
             from lib.pyob import PyOBinX
-            key = PyOBinX.dl('keys',db)
+            keys = PyOBinX.dl('keys',db)
             from lib.crypto import decrypt
             of = f'{o}/{tbasename(i)}.bundle'
-            key.wait()
-            writefile(of,decrypt(readfile(i),'xor',key['DDLC']))
-            r = extract(of,o,'Unity Bundle')
+            d = readfile(i)
+            writefile(of,decrypt(d,'xor',keys.wait()['DDLC']))
+            extract(of,o,'Unity Bundle')
             return
         case 'Selene Pack':
             db.try_custom()
@@ -1104,7 +1104,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             v = f.readu32()
             if v >> 24:
                 f.back(4)
-                f._end = '>'
+                f.endian = '>'
                 v = f.readu32()
             asrt(v in {1,3})
 
@@ -1123,7 +1123,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             nof = [f.readu32() for _ in range(nc)]
             ids = {}
             for ix in range(nc):
-                if f._end == '>': ty,id = f.readu8(),f.readu24()
+                if f.endian == '>': ty,id = f.readu8(),f.readu24()
                 else: id,ty = f.readu24(),f.readu8()
                 if ty in {0,0x20}: continue
                 asrt(ty == 0x40,f'unknown type 0x{ty:02X} @ 0x{f.pos-4:06X}')
@@ -1199,7 +1199,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             f = File(i,endian='<')
             asrt(f.read(3) == b'ARC')
             v = f.reads(1,'ascii')
-            if v == 'N': f._end = '>'
+            if v == 'N': f.endian = '>'
 
             c = f.readu32()
             fs = []
@@ -1214,7 +1214,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
                 zs,us = f.readu32('<'),f.readu32('<')
                 d = f.decompress(zs,'lzo1x',usize=us,db=db)
                 f.close()
-                f = File(d,endian=f._end)
+                f = File(d,endian=f.endian)
             f.seek(bo)
             bo += c*0x10
             for _ in range(c):
@@ -1282,7 +1282,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             k1 = (f.readu32() ^ 0xFFFFFFFF).to_bytes(4,'little')
             f.seek(0x18)
             do = f.readu32() ^ int.from_bytes(k1,'little')
-            ft = File(decrypt(f.readc(do - 0x1C),'xor',k1),endian=f._end)
+            ft = File(decrypt(f.readc(do - 0x1C),'xor',k1),endian=f.endian)
             c = ft.readu32()
             szs = [ft.readu32() for _ in range(c)]
             offs = [ft.readu32() for _ in range(c)]
@@ -1378,7 +1378,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             f.close()
             if not fns: return 1
 
-            f = File(bn + '_F.BIN',endian=f._end)
+            f = File(bn + '_F.BIN',endian=f.endian)
             f.seek(12)
             fs = []
             while f:
@@ -1387,7 +1387,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             f.close()
             if not fs: return 1
 
-            f = File(bn + '.XPK',endian=f._end)
+            f = File(bn + '.XPK',endian=f.endian)
             for fe in fns:
                 f.seek(fs[fe[0]][0])
                 writefile(fe[1],f.readc(fs[fe[0]][1]))
@@ -1522,7 +1522,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i)
             asrt(f.read(4) == b'XBIN')
-            f._end = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
+            f.endian = {b'\x34\x12':'<',b'\x12\x34':'>'}[f.read(2)]
             v = f.readu8()
             f.padc(1)
             f.skip(8)
@@ -1703,7 +1703,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
 
             vb = f.peek('u32','>',poffset=4)
             vl = f.peek('u32','<',poffset=4)
-            f._end = '>' if vb < vl else '<'
+            f.endian = '>' if vb < vl else '<'
             fo = f.peek('u32',poffset=4)
 
             fs = []
@@ -2016,7 +2016,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             f.skip(8)
             c,ifs = f.readu32(),f.readu32()
             f.skip(0x34)
-            fi = File(decrypt(f.readc(ifs),'rc4_pp',*keys[v]),endian=f._end)
+            fi = File(decrypt(f.readc(ifs),'rc4_pp',*keys[v]),endian=f.endian)
             for _ in range(c):
                 fn = fi.readc(fi.readu32()).rstrip(b'\0').decode('ascii')
                 f.seek(fi.readu32())
@@ -2155,7 +2155,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
 
             of,us,zs,c,a = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
             f.seek(of * a)
-            tf = File(f.decompress(zs,'zlib',usize=us),endian=f._end)
+            tf = File(f.decompress(zs,'zlib',usize=us),endian=f.endian)
             for _ in range(c):
                 asrt(tf.read(4) == b'ARCH',tf.pos)
                 f.seek(tf.readu32() * a)
@@ -2284,7 +2284,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             asrt(f.read(4) == b'BIGB')
 
             v = f.peek('u32','<',poffset=4)
-            f._end = '>' if v > f.peek('u32','>',poffset=4) else '<'
+            f.endian = '>' if v > f.peek('u32','>',poffset=4) else '<'
 
             do = 0x10 + f.readu32()
             v = f.readu32()
@@ -2298,9 +2298,9 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             writefile(o + '/$comment.txt',x + f.readc(0x100).split(b'\0')[0] + b'\n')
 
             f.seek(do)
-            fd = File(f.decompress(zs1,'vicious_lz',usize=s1),'rb+',endian=f._end)
+            fd = File(f.decompress(zs1,'vicious_lz',usize=s1),'rb+',endian=f.endian)
             writefile(o + '/$index.bin',fd.readall())
-            ops = list(struct.unpack(f'{f._end}{s2 // 4}I',f.decompress(zs2,'vicious_lz',usize=s2)))
+            ops = list(struct.unpack(f'{f.endian}{s2 // 4}I',f.decompress(zs2,'vicious_lz',usize=s2)))
             writefile(o + '/$ops.bin',struct.pack(f'<{len(ops)}I',*ops))
             f.align(0x800)
             if s3:

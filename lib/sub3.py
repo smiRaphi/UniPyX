@@ -458,7 +458,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'CExe':
             db.try_custom()
             from lib.file import ext_exe,decompress,iszl
-            e = ext_exe(i)
+            e = ext_exe(i,fast_load=False)
 
             for x in e.DIRECTORY_ENTRY_RESOURCE.entries[0].directory.entries:
                 id = x.id
@@ -1549,7 +1549,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Fatpack':
             db.try_custom()
             from lib.file import ext_exe,decompress
-            f = ext_exe(i)
+            f = ext_exe(i,fast_load=False)
 
             if '.fpack  ' in f.SECTIONS: d = f.SECTIONS['.fpack  '].get_data()
             else:
@@ -1580,7 +1580,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'Tixati Installer':
             db.try_custom()
             from lib.file import ext_exe,decompress
-            f = ext_exe(i)
+            f = ext_exe(i,fast_load=False)
 
             nms = [x.decode('utf-8').strip('\\/') for x in f.SECTIONS['.rdata'].get_data().split('Copy program files...'.encode('utf-16le'))[1].split(b'\0') if x]
             fnd = bool(nms)
@@ -1714,8 +1714,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
             prcs = []
             for bid in range(4):
                 if not (bid + 0x5555) in ofis or not (bid + 0x6666) in ofis: continue
-                od = File(ofis[bid + 0x5555],endian=f._end)
-                dd = File(ofis[bid + 0x6666],endian=f._end)
+                od = File(ofis[bid + 0x5555],endian=f.endian)
+                dd = File(ofis[bid + 0x6666],endian=f.endian)
                 offs = sorted(set([od.readu32() - 0x104 for _ in range(od.size//4)]))
                 del od
                 while offs and offs[0] < 1: offs.pop(0)
@@ -2261,7 +2261,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 hshs = [f.readu128() for _ in range(pc)]
                 szs = f.readil(4,pc)
 
-                idx = File(f.decompress(idxs - 1,cmm[f.readu8()]),endian=f._end)
+                idx = File(f.decompress(idxs - 1,cmm[f.readu8()]),endian=f.endian)
                 asrt(idx.read(8) == b'CFS2.200')
                 fs = []
                 def readce(p):
@@ -2407,7 +2407,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.crypto import crc_hash
             from lib.file import File,ext_exe,iszl
-            e = ext_exe(i)
+            e = ext_exe(i,fast_load=False)
             oo = e.get_overlay_data_start_offset()
             for x in e.DIRECTORY_ENTRY_RESOURCE.entries:
                 if x.id == 0x10:
@@ -2749,7 +2749,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             bss = f.readu32()
             do = f.readu64()
             f.seek(mof)
-            m = File(f.decompress(mzs,'excelsior_lzma'),endian=f._end)
+            m = File(f.decompress(mzs,'excelsior_lzma'),endian=f.endian)
             asrt(m.read(12) == b'ExcelsiorII1')
             vmj,vmi = m.readu8(),m.readu8()
             asrt(vmj == 1 and vmi in {0,5,6,7},vmj,vmi)
@@ -2899,7 +2899,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             e.align(0x10)
             e.padc(0x100)
 
-            f1 = File(o + '/1.EXE','wb',endian=e._end)
+            f1 = File(o + '/1.EXE','wb',endian=e.endian)
             f1.write(b'MZ')
             d1 = e.readc(e.ovl_off - e.pos)
             hs = 0x1C + rc*4
@@ -2926,7 +2926,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             ss,sp,cs,ip = ind2
             e.seek(0)
-            f2 = File(o + '/2.EXE','wb',endian=e._end)
+            f2 = File(o + '/2.EXE','wb',endian=e.endian)
             d2 = e.read(ep)
             e.close()
             if not len(d2) % 0x200 and sum(d2[-0x200:]): d2 = d2[:-1]

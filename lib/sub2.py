@@ -664,7 +664,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             from lib.file import File
 
             f = File(i)
-            f._end = {b'RIFF':'<',b'FFIR':'>'}[f.read(4)]
+            f.endian = {b'RIFF':'<',b'FFIR':'>'}[f.read(4)]
             f.skip(4)
             asrt(f.read(4) == b'AMS!')
             cns = {}
@@ -2076,9 +2076,9 @@ def _Nintendo(db):
             if fe.version == 0: continue
             asrt(fe.version == 2)
             if fe.hash_type in {2,5}:
-                fe.hierarchical_hash_data = NCAHierachialSha256Data(fe.hash_data,nca._end)
+                fe.hierarchical_hash_data = NCAHierachialSha256Data(fe.hash_data,nca.endian)
             elif fe.hash_type in {3,6}:
-                fe.integrity_hash_data = NCAIntegrityMetaInfoData(fe.hash_data,nca._end)
+                fe.integrity_hash_data = NCAIntegrityMetaInfoData(fe.hash_data,nca.endian)
 
         return nca
     def dump_nca(i:str,o:str,title_key:bytes=None):
@@ -2107,7 +2107,7 @@ def _Nintendo(db):
             else: raise NotImplementedError(f'hash type {fse.hash_type}')
             tf = open(of,'rb');tf.seek(off)
             if fse.fstype == 0:
-                rfs = Nintendo.NCARomFS(tf,endian=nca._end)
+                rfs = Nintendo.NCARomFS(tf,endian=nca.endian)
                 rfs.seek(rfs.dir_meta_tab_off)
                 dirs = {0:f'{o}/{ix}'}
                 idpos = lambda: rfs.pos - rfs.dir_meta_tab_off

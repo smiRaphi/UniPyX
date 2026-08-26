@@ -54,7 +54,7 @@ def extract4_6(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import File
             f = File(File(i).decompress(None,'zlib'),endian='<')
-            fd = File(noext(i),endian=f._end)
+            fd = File(noext(i),endian=f.endian)
 
             c = f.readu32()
             fs = [(f.readu32(),f.readu64()) for _ in range(c)]
@@ -63,7 +63,7 @@ def extract4_6(inp:str,out:str,t:str) -> bool:
 
             for ix,fe in enumerate(fs[:-1]):
                 fd.seek(fe[1])
-                f = File(fd.decompress(fs[ix + 1][1] - fe[1],'zlib'),endian=fd._end)
+                f = File(fd.decompress(fs[ix + 1][1] - fe[1],'zlib'),endian=fd.endian)
                 dn = f'{o}/{fe[0]:08X}'
                 mkdir(dn)
                 c = f.readu32()
@@ -411,5 +411,116 @@ Unknown 2: {f.reads(f.readu32())}""")
             else:
                 f.close()
                 raise NotImplementedError('unsupported TOC type')
+        case 'Etrange Overlord Encrypted Unity Bundle':
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt,crc_hash
+            d = readfile(i)
+            k = crc_hash(keys.wait()['etrange'],'pbkdf2_sha1',key=tbasename(i)[:0x10].ljust(0x10,'_').encode('utf-8'),c=1000,size=0x10)
+            of = o + '/' + basename(i)
+            dd = decrypt(d[:0x80],'aes_ctr_le',k)
+            asrt(dd[:8] == b'UnityFS\0')
+            writefile(of,dd + d[0x80:])
+            extract(of,o,'Unity Bundle')
+            return
+        case 'Synetic SYN':
+            db.try_custom()
+            from lib.file import File,decompress
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'FNYS')
+
+            c = f.readu32()
+            f.padc(8)
+            fs = [(f.reads(0x18,'latin-1').split('\0')[0],f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                asrt(fe[2] > 4)
+                d = f.readc(fe[2])
+                if d[:4] == b'!SSM':
+                    raise NotImplementedError('MSS! encrypted')
+                    us = int.from_bytes(d[4:8],'little')
+                    d = d[0x10:]
+                else:
+                    us = int.from_bytes(d[:4],'little')
+                    d = d[4:]
+                d = decompress(d,'lzss0_msb',usize=us)
+                writefile(o + '/' + fe[0],d)
+
+            f.close()
+            if fs: return
+        case 'MediaStation CXT':
+            db.try_custom()
+            from lib.file import File
+            fnm = {}
+            if exists(dirname(i) + '/PROFILE._ST'):
+               for fn in readfile(dirname(i) + '/PROFILE._ST','rt').split('\n!\n',2)[1].split('\n'):
+                   if not fn: continue
+                   fn,id,*_ = fn.split()
+                   if fn == '*': continue
+                   fnm[int(id)] = fn
+
+            f = File(i,endian='<')
+            asrt(f.readu32() == 0x4949 and f.readu32() == 0xEEEE)
+            c = f.readu32()
+            f.seek(f.readu32())
+            fs = [(f.readu16(),f.readu32(),f.readu32(),f.padc(4)) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                d = f.readc(fe[2])
+                fn = fnm.get(fe[0],str(fe[0])) + '.'
+                if d[:4] == b'RIFF' and d[8:12] == b'IMTS': fn += 'stm'
+                else: fn += guess_ext(d)
+                writefile(o + '/' + fn,d)
+
+            f.close()
+            if fs: return
+        case 'Marvel Ultimate Alliance 2 PAK':
+            db.try_custom()
+            from lib.file import File
+            from lib.crypto import crc_hash
+            f = File(i,endian='>')
+            asrt(f.read(4) == b'\x1AAGI' and f.readu32() == 4)
+
+            inf = {}
+            if exists(noext(i) + '.igx'):
+                import xml.etree.ElementTree as ET
+                xml = ET.parse(noext(i) + '.igx').getroot()
+                asrt(xml.tag == 'igx')
+                for fe in xml.findall('object[@buildInfo]'):
+                    n = fe.get('buildInfo').lower().split('.')
+                    asrt(len(n) == 2 and n[0] == n[1])
+                    si = {}
+                    fn = fe.find('var[@name="_fileName"]')
+                    if not fn is None: si['fn'] = fn.get('value')
+                    dt = fe.find('comment[@name="creation_time"]')
+                    if not dt is None: si['dt'] = dt.get('value')
+                    if si: inf[n[0]] = si
+                del xml
+
+            f.skip(4)
+            c = f.readu32()
+            f.skip(8)
+            so = f.seek(f.readu32())
+            ss = [f.seekc(so + x).read0s('utf-8') for x in f.readil(4,c,end='<')]
+            ss = {crc_hash(x.encode('utf-8'),'fnv1a_32'):sub_path(x) for x in ss}
+
+            f.seek(0x30)
+            hshs = f.readil(4,c)
+            fs = []
+            for ix in range(c):
+                fs.append((ss[hshs[ix]],f.readu32(),f.readu32()))
+                asrt(f.reads32() == -1,f.pos)
+
+            for fe in fs:
+                f.seek(fe[1])
+                bn = basename(fe[0]).lower()
+                if bn in inf and 'fn' in inf[bn]: fn = inf[bn]['fn']
+                else: fn = fe[0]
+                writefile(o + '/' + fn,f.readc(fe[2]))
+                if bn in inf and 'dt' in inf[bn]: set_ftime(o + '/' + fn,str2unix(inf[bn]['dt']))
+
+            f.close()
+            if fs: return
 
     return 1

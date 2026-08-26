@@ -175,5 +175,78 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
             #     pass
 
             return r
+        case 'Pyckage':
+            db.try_custom()
+            import tokenize,ast,io
+            from lib.crypto import decrypt
+            from lib.file import decompress
+            d = readfile(i,'rt')
+
+            if d.startswith('from lzma import decompress as x;'):
+                eq = '='
+                hd,d = d.split('d' + eq,1)
+                b85 = ';from base64 import b85decode as x1;' in hd
+            elif d.startswith('dc=lambda:(x:=__import__("lzma").decompress,'):
+                eq = ':='
+                hd,d = d.split('d' + eq,1)
+                b85 = 'x1:=__import__("base64").b85decode,' in hd
+            toks = tokenize.generate_tokens(io.StringIO(d).readline)
+            for tok in toks:
+                if tok.type == tokenize.STRING and tok.string.startswith('b'):
+                    pl = ast.literal_eval(tok.string)
+                    break
+            else: return 1
+            if b85:
+                pl = decrypt(pl,'base85')
+                asrt(next(toks).string == ')')
+
+            asrt(next(toks).string == ',')
+            fmt = int(next(toks).string)
+            asrt(next(toks).string == ',' and next(toks).string == 'filters' and next(toks).string == '=')
+            flt = [next(toks).string]
+            asrt(flt[0] == '[')
+            for tok in toks:
+                flt.append(tok.string)
+                if tok.type == tokenize.OP and tok.string == ']': break
+            else: return 1
+            asrt(next(toks).string == ')')
+            pl = decompress(pl,'lzma_raw',format=fmt,filters=ast.literal_eval(''.join(flt)))
+
+            while next(toks).string != eq: pass
+            fs = [next(toks).string]
+            asrt(fs[0] == '{')
+            for tok in toks:
+                fs.append(tok.string)
+                if tok.type == tokenize.OP and tok.string == '}': break
+            else: return 1
+            fs = ast.literal_eval(''.join(fs))
+
+            l = 0
+            for fn,of in fs.items():
+                writefile(o + '/' + fn,pl[l:of])
+                l = of
+
+            del d,pl
+            if fs: return
+        case 'InstallShield 2000':
+            db.try_custom()
+            import re
+            from lib.file import ext_exe
+            e = ext_exe(i,fast_load=False)
+
+            txt = e.SECTIONS['.text'].get_data()
+            drs = e.DIRECTORY_ENTRY_RESOURCE.entries
+            rsc = {}
+            while drs:
+                res = drs.pop(0)
+                if res.id is None: drs.extend(res.directory.entries)
+                else: rsc[res.id] = res
+            for x in re.findall(rb'\x68([\x00-\xFF]{4})\x6A\x00\xFF\xD6\x8B[\x00-\xFF]*?\x6A\x00\x68\x01\x10\x00\x00\x68([\x00-\xFF]{4})',txt):
+                fn = e.get_string_at_rva(int.from_bytes(x[1],'little') - e.OPTIONAL_HEADER.ImageBase).decode('ascii')
+                d = rsc[int.from_bytes(x[0],'little')].directory.entries[0].data.struct
+                writefile(o + '/' + fn,e.get_data(d.OffsetToData,d.Size))
+
+            del e
+            if listdir(o): return
 
     return 1

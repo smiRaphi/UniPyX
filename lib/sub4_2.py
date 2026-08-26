@@ -1073,7 +1073,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
                 s = f.readu32()
                 if not s: break
                 f.align(0x800)
-                sf = File(f.decompress(s,'zlib'),endian=f._end)
+                sf = File(f.decompress(s,'zlib'),endian=f.endian)
                 c = sf.readu32()
 
                 for _ in range(c):
@@ -1169,7 +1169,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
         case 'Monolith Productions LTAR':
             from lib.file import File
             f = File(i)
-            f._end = {b'LTAR':'<',b'RATL':'>'}[f.read(4)]
+            f.endian = {b'LTAR':'<',b'RATL':'>'}[f.read(4)]
 
             v = f.readu32()
             f.skip(12)
@@ -1180,7 +1180,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
             if v == 4 and u1 == 1 and not u2: s = 'shadow_of_mordor'
             elif v == 3 and u1 == 0 and u2: s = 'condemned2'
             elif v == 3 and u1 == 1 and u2: s = 'f.e.a.r.'
-            else: raise NotImplementedError(f'Unknown LTAR Signature\nEndian: {f._end} Version: {v} u1: {u1} u2: {u2}')
+            else: raise NotImplementedError(f'Unknown LTAR Signature\nEndian: {f.endian} Version: {v} u1: {u1} u2: {u2}')
 
             return quickbms(s)
         case 'Michigan: Report From Hell LF':
@@ -1518,7 +1518,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
                 f.seek(file_syso+secs)
                 v = 5
 
-            tb = File(tb,endian=f._end)
+            tb = File(tb,endian=f.endian)
             tb.skip(4)
             cs = [tb.readu32() for _ in range(9)]
             tc = (tb.readu32(),tb.readu32())
@@ -1759,7 +1759,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
 
             db.set_temp_print(False)
             if ver in {1,2}:
-                f._end = '>' if f.readu8() else '<'
+                f.endian = '>' if f.readu8() else '<'
                 f.skip(1)
                 secc = f.readu8()
                 f.skip(1)
@@ -1810,7 +1810,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
                             if not exists(ebf):
                                 print('WARNING:',ebf,f'({bf})',"doesn't exist, skipping")
                                 continue
-                            ofs[ebf] = File(ebf,endian=f._end)
+                            ofs[ebf] = File(ebf,endian=f.endian)
                             ofs[ebf].count = 0
                             asrt(ofs[ebf].read(4) == b'BILR')
                             ofs[ebf].skip(0x14)
@@ -1860,7 +1860,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
                     f.back(4)
                     id2 = f.readu32('>')
                     if id > id2:
-                        f._end = '>'
+                        f.endian = '>'
                         id = id2
                 ob.append(f'{id}: {n}')
             f.close()

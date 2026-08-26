@@ -57,7 +57,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
                 if fe[2]:
                     asrt(d[:4] == b'GARC',d[:4])
                     asrt(d[8:12] == b'zlib',d[8:12])
-                    d = File(d,endian=f._end)
+                    d = File(d,endian=f.endian)
                     d.skip(0x10)
 
                     while d:
@@ -132,11 +132,11 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             asrt(f.read(4) == b'GRF\x05')
 
             v = (b'\x01FRG',b'GRF\x01').index(f.read(4))
-            if v == 0: f._end = '>'
-            elif v == 1: f._end = '<'
+            if v == 0: f.endian = '>'
+            elif v == 1: f.endian = '<'
 
             f.seek(f.readu32())
-            ft = File(f.decompress(None,'zlib'),endian=f._end)
+            ft = File(f.decompress(None,'zlib'),endian=f.endian)
             fs = []
             if v == 0:
                 ft.skip(6)
@@ -930,7 +930,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
 
             if f.read(4) == b'BINA':
                 f.skip(3)
-                f._end = {b'L':'<',b'B':'>'}[f.read(1)]
+                f.endian = {b'L':'<',b'B':'>'}[f.read(1)]
                 f.skip(8)
                 asrt(f.read(4) == b'DATA')
                 f.skip(4)
@@ -943,7 +943,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
                 to += do
                 te += to
             else:
-                f._end = '>'
+                f.endian = '>'
                 to = f.readu32()
                 te = f.readu32()
                 f.skip(8)
@@ -1639,7 +1639,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i)
 
-            f._end = '>' if f.readu8() == 1 else '<'
+            f.endian = '>' if f.readu8() == 1 else '<'
             f.skip(7)
             asrt(f.read(7) == b'FSM_v1.')
             v = f.read(1)[0]-0x30
@@ -1663,9 +1663,9 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             f.seek(align+-align%0x20)
 
             def readce():
-                be = f._end
+                be = f.endian
 
-                f._end = '>' if f.readu8() == 1 else '<'
+                f.endian = '>' if f.readu8() == 1 else '<'
                 ct = f.readu8()
                 asrt(ct in {0,3,5,7},ct)
                 asrt(ct != 5,f'{ct} not implemented (FUN_002ff030)')
@@ -1673,13 +1673,13 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
                 us,zs = f.readu32(),f.readu32()
                 f.skip(ces - 12)
 
-                d = f.decompress(zs,('none',0,0,'lzss16c',0,1,0,'zlib')[ct],usize=us,big_endian=f._end == '>')
+                d = f.decompress(zs,('none',0,0,'lzss16c',0,1,0,'zlib')[ct],usize=us,big_endian=f.endian == '>')
                 f.align(align)
 
-                f._end = be
+                f.endian = be
                 return d
 
-            ft = File(readce(),endian=f._end)
+            ft = File(readce(),endian=f.endian)
             ft_readv = ft.readu32 if tab_is else ft.readu16
             ovs = [ft_readv() for _ in range(c)]
             ft.align(4)
@@ -1721,7 +1721,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             db.set_temp_print()
             f = File(i)
-            f._end = '>' if f.readu8() == 1 else '<'
+            f.endian = '>' if f.readu8() == 1 else '<'
 
             f.skip(1)
             aln = f.readu16()
@@ -2247,7 +2247,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             fd.skip(4)
 
             cs = fd.readu32()
-            f = File(fd.decompress(cs,'msf'),endian=fd._end)
+            f = File(fd.decompress(cs,'msf'),endian=fd.endian)
             fs = []
             while f:
                 try: fs.append((f.read0s().decode('ascii'),f.readu32() + cs + 8,f.readu32()))

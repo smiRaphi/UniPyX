@@ -1208,9 +1208,9 @@ def extract4_1(inp:str,out:str,t:str) -> bool:
             off = f.readu32('<')
             if off > 0xffff:
                 f.skip(-4)
-                f._end = '>'
+                f.endian = '>'
                 off = f.readu32()
-            else: f._end = '<'
+            else: f.endian = '<'
 
             if v <= 4:
                 f.skip(4)
@@ -1563,7 +1563,7 @@ def extract4_1(inp:str,out:str,t:str) -> bool:
             f.skip(-4)
             dob = f.readu32('>')
             f.skip(-4)
-            if dol > dob: f._end = '>'
+            if dol > dob: f.endian = '>'
             do = f.readu32()
             f.skip(4)
             f.seek(f.readu32())
@@ -1591,7 +1591,7 @@ def extract4_1(inp:str,out:str,t:str) -> bool:
             hsl = f.readu32('<')
             f.skip(-4)
             hsb = f.readu32('>')
-            if hsl > hsb: f._end = '>'
+            if hsl > hsb: f.endian = '>'
             f.seek(0)
             cs = f.readu32()
             f.skip(f.readu32()-4)

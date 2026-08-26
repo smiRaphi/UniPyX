@@ -1419,6 +1419,10 @@
         "rs":"Red Faction II TOC Group+Packfile"
     },
     {
+        "d":[["isat","FNYS",0],["isatS","\\0",8,8],["n0",4,4],["n0",4,40],["str0e",16,24,3],["py","f.seek(4);c=f.readi(4,'<');f.seek(40);return (16+c*32)==f.readi(4,'<')"]],
+        "rs":"Synetic SYN","s":1
+    },
+    {
         "d":[["hash","B66C96E78603E4D1EC4780BC91E9D3E8061AEE3F",256]],
         "rs":"SouthPeak Interactive Puzzle Archive","s":1
     },
@@ -1789,6 +1793,14 @@
         "rs":"The Indian In The Cupboard Data"
     },
     {
+        "d":[["isat","II\\0\\0\\xEE\\xEE\\0\\0",0],["isatS","\\0",4,-4],["n0",4,8],["n0",4,12],["py","f.seek(8);return f.readi(4,'<')*14+f.readi(4,'<')==fsz"]],
+        "rs":"MediaStation CXT"
+    },
+    {
+        "d":[["isat","\\x1AAGI\\0\\0\\0\\4",0],["n0",4,8],["n0",4,12],["n0",4,24],["n0",4,28],["py","f.seek(8)\nif f.readi(4,'>')!=f.readi(4,'>')*16:return\nf.seek(24);return f.readi(4,'>')+f.readi(4,'>')==fsz"]],
+        "rs":"Marvel Ultimate Alliance 2 PAK","s":1
+    },
+    {
         "d":[["n0",4,-4],["isatS","\\0",4,-8],["n0",8,-16],["py","f.seek(-4,2);o=f.readi(4,'<');f.seek(-16,2)\nif (o+24)>fsz or(f.readi(4,'<')+f.readi(4,'<'))!=o:return\nf.seek(o);f.skip(f.readi(4,'<'));return f.readi(4)==0"]],
         "rs":"Mattel SMB"
     },
@@ -2141,6 +2153,11 @@
     {
         "d":[["isat","\\x7D\\x46\\x41\\x5C\\x51\\x6E\\x7B\\x28\\x28\\x28",0],["isat","\\x06",13],["contain","\\x06",15,4],["contain","\\x28\\x1A\\x18",17,6]],
         "rs":"DDLC+ Encrypted Unity Bundle","s":1
+    },
+    {
+        "rqr":null,
+        "d":[["ext",".bundle",false],["contain",".resource",128,256],["contain","CAB-",128,256,false],["contain",".resS",128,256]],"qq":true,
+        "rs":"Etrange Overlord Encrypted Unity Bundle","s":1
     },
     {
         "d":[["isat","-==--==--==--==-",0 ],
@@ -2609,6 +2626,14 @@
         "t":"text",
         "d":[["size",[25,null]],["reg","^var [\\w,_ ]+;\n?\\(function ?\\(\\) ?\\{\n? *var [a-zA-Z]{3,} ?= ?(\\'\\'|\"\"),",0]],
         "rs":"Javascript Obfuscator.com"
+    },
+    {
+        "t":"text",
+        "d":[["isat","from lzma import decompress as x;",0],["reg","(?m)^from lzma import decompress as x;(from os import system(,remove)?;)?(from base64 import b85decode as x1;)?(print\\(\"decompressing\\.{3}\"\\)[,;])?d=x\\((x1\\()?b(?P<q>['\"]).+?(?P=q)\\)?,3,filters=\\[[^\\]]+\\]\\);t=\\{(\"[^\"]+\":\\d+,?)+\\}(;print\\(\"writing files\\.{3}\"\\))?;(open\\(list\\(t\\)\\[0\\],\"wb\"\\)\\.write\\(d\\);system\\(list\\(t\\)\\[0\\]\\)(;remove\\(list\\(t\\)\\[0\\]\\))?|l=0;\\[open\\(x,\"wb\"\\)\\.write\\(d\\[l\\:t\\[x\\]\\]\\)\\.__eq__\\(exec\\(\"l=x\"\\)\\) for x in t\\](;print\\(\"finished\"\\))?)(;d.*)?$"]],
+        "rs":"Pyckage","s":1},{
+        "t":"text",
+        "d":[["isat","dc=lambda:(x:=__import__(\"lzma\").decompress,",0],["reg","(?m)^dc=lambda:\\(x:=__import__\\(\"lzma\"\\)\\.decompress,(system:=__import__\\(\"os\"\\)\\.system,?(remove:=__import__\\(\"os\"\\)\\.remove,?)?)?(x1:=__import__\\(\"base64\"\\)\\.b85decode,)?(print\\(\"decompressing\\.{3}\"\\),)?d:=x\\((x1\\()?b(?P<q>[\"']).+?(?P=q)\\)?,3,filters=\\[[^\\]]+\\]\\),t:=\\{(\"[^\"]+\":\\d+,?)+\\},(print\\(\"writing files\\.{3}\"\\),)?l:=0,\\[open\\(x,\"wb\"\\)\\.write\\(d\\[l\\:t\\[x\\]\\]\\)\\.__eq__\\(exec\\(\"l=x\"\\)\\) for x in t\\](,print\\(\"finished\"\\))?\\)\\[\\-1\\](;d.*)?$"]],
+        "rs":"Pyckage","s":1
     },
     {
         "rq":"UPX",

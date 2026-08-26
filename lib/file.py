@@ -43,7 +43,7 @@ class File:
         elif isinstance(f,(bytes,bytearray,memoryview)):
             self._f = io.BytesIO(f)
         else: self._f = f
-        self._end = endian
+        self.endian = endian
 
         self._start_pos = self._f.tell()
         if type(f) == bytes: self._size = len(f)
@@ -115,18 +115,18 @@ class File:
         return bytes(o)
     def unpack(self,fmt:str,end=None):
         d = self.readc(struct.calcsize(fmt))
-        end = end or self._end
+        end = end or self.endian
         if end == '-':
             d = self.middle_scramble(d)
             end = '>'
         return struct.unpack(end + fmt,d)[0]
     def readi(self,n:int,signed=False,end=None):
         d = self.readc(n)
-        end = end or self._end
+        end = end or self.endian
         if end == '-': d = self.middle_scramble(d)
         return int.from_bytes(d,ENDMAP[end],signed=bool(signed))
     def readil(self,n:int|float,c:int,signed=False,end=None,eoferr=True) -> list[int|float]:
-        end = end or self._end
+        end = end or self.endian
         asrt(end != '-')
         t = ILSTRM[n]
         if signed: t = t.lower()
@@ -142,7 +142,7 @@ class File:
                 c = len(d) // n
         return list(struct.unpack(f'{end}{c}{t}',d))
     def writei(self,i:int,n:int,signed=False,end=None):
-        d = i.to_bytes(n,ENDMAP[end or self._end],signed=bool(signed))
+        d = i.to_bytes(n,ENDMAP[end or self.endian],signed=bool(signed))
         if end == '-': d = self.middle_scramble(d)
         return self.write(d)
 
@@ -233,7 +233,7 @@ class File:
         r = self.readu(maxl=maxl,chks=chks)
         if encoding is not None: r = r.decode(encoding)
         return r
-    def readutf16(self,l:int,end=None): return self.readc(l * 2).decode('utf-16' + UTFENDM[end or self._end])
+    def readutf16(self,l:int,end=None): return self.readc(l * 2).decode('utf-16' + UTFENDM[end or self.endian])
     def read0s16(self,maxl:int=None,chks=0x40,end=None):
         r = []
         while self and (maxl is None or len(r) < maxl):
@@ -245,7 +245,7 @@ class File:
                 break
             r.extend(v)
 
-        return struct.pack(f'<{len(r)}H',*r).decode('utf-16' + UTFENDM[end or self._end])
+        return struct.pack(f'<{len(r)}H',*r).decode('utf-16' + UTFENDM[end or self.endian])
 
     def writeu8 (self,v:int): return self.writei(v,1,0)
     def writeu16(self,v:int,end=None): return self.writei(v,2,0,end)
@@ -261,9 +261,9 @@ class File:
     def writes48(self,v:int,end=None): return self.writei(v,6,1,end)
     def writes64(self,v:int,end=None): return self.writei(v,8,1,end)
     def writes128(self,v:int,end=None):return self.writei(v,16,1,end)
-    def writef16(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'e',v))
-    def writef32(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'f',v))
-    def writef64(self,v:float,end=None): return self.write(struct.pack((end or self._end)+'d',v))
+    def writef16(self,v:float,end=None): return self.write(struct.pack((end or self.endian)+'e',v))
+    def writef32(self,v:float,end=None): return self.write(struct.pack((end or self.endian)+'f',v))
+    def writef64(self,v:float,end=None): return self.write(struct.pack((end or self.endian)+'d',v))
     def writebool(self,v:bool): return self.writeu8(1 if v else 0)
     def writebool16(self,v:bool,end=None): return self.writeu16(1 if v else 0,end)
     def writebool32(self,v:bool,end=None): return self.writeu32(1 if v else 0,end)
@@ -323,7 +323,7 @@ class File:
             if f: fc = kwargs.pop('_close',False)
             r = decompress(self.readc(None if f else size),algo,*args,**kwargs)
             if f:
-                r = File(r,endian=self._end)
+                r = File(r,endian=self.endian)
                 if fc: self.close()
             return r
 
@@ -339,7 +339,7 @@ class File:
     def fmt(self,*fmt,back=0):
         fmt = ' '.join(map(str,fmt))
         p = f'0x{self.pos - back:08X}'
-        r = fmt.replace('§@§',p).replace('§f§',(self.name or '<memory>').replace('\\','/').split('/')[-1]).replace('§m§',self.mode).replace('§e§',self._end)
+        r = fmt.replace('§@§',p).replace('§f§',(self.name or '<memory>').replace('\\','/').split('/')[-1]).replace('§m§',self.mode).replace('§e§',self.endian)
         if r.endswith('§@'): r = r[:-3 if r.endswith(' §@') else -2] + ' @ ' + p
         return r
     def update_size(self,current=True):
@@ -372,7 +372,7 @@ class FileStruct(File):
             elif t in {'u8','s8','u16','s16','f16','u24','s24','u32','s32','f32','u40','s40','u48','s48','u64','s64','f64','u128','s128'}:
                 v = getattr(self,'read' + t)()
             elif t == bool: v = bool(self.readu8())
-            elif issubclass(t,FileStruct): v = t(self._f,endian=self._end)
+            elif issubclass(t,FileStruct): v = t(self._f,endian=self.endian)
             return v
         for k,t in self.__class__.__annotations__.items():
             if k in _FILESTRUCTBL or k.startswith('_'): raise KeyError(k)
@@ -612,7 +612,7 @@ class EXE(File):
             self.entry_point:int = self.code_start + self.readu16() + self.readu16() * 0x10
         self.seek(0)
     def get_overlay_data_start_offset(self): return self.ovl_off
-def ext_exe(i:str|bytes,dotnet=False,custom=False):
+def ext_exe(i:str|bytes,dotnet=False,custom=False,**kwargs):
     if isinstance(i,str): kw = {'name':i}
     elif isinstance(i,(bytes,bytearray)): kw = {'data':i}
     else: raise TypeError
@@ -646,7 +646,7 @@ def ext_exe(i:str|bytes,dotnet=False,custom=False):
             r = ELFFile(i)
         elif pt == b'MZ' and st == b'PE':
             import pefile
-            if not 'fast_load' in kw: kw['fast_load'] = True
+            kw['fast_load'] = kwargs.pop('fast_load',True)
             r = pefile.PE(**kw)
             r.SECTIONS = {s.Name.rstrip(b'\0').decode('latin-1'):s for s in r.sections}
         elif pt == b'MZ' and st == b'NE':
@@ -785,6 +785,10 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if 'props' in kwargs: f = lzma._decode_filter_properties(lzma.FILTER_LZMA1,kwargs['props'])
             else: f = {'id':lzma.FILTER_LZMA1,'dict_size':kwargs['dict_size'],'lc':kwargs['lc'],'lp':kwargs['lp'],'pb':kwargs['pb']}
             return lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[f]).decompress(i,kwargs.get('usize',-1))
+        case 'lzma_raw':
+            import lzma
+            us = kwargs.pop('usize',-1)
+            return lzma.LZMADecompressor(**kwargs).decompress(i,us)
         case 'excelsior_lzma':
             asrt(len(i) >= 13)
             import lzma

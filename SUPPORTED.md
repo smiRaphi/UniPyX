@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1072
+# Supported Formats: 1078
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -232,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (139)
+## Executables/Packers/Installers (141)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -304,6 +304,7 @@ Inno Archive | .bin | Custom |
 Inno Installer | .exe | [innounp-2](https://github.com/jrathlev/InnoUnpacker-Windows-GUI/tree/master/innounp-2), [innounp](https://sourceforge.net/projects/innounp/), [innoextract](https://github.com/czoins/innoextract) |
 Install Creator Pro | .exe | [cicdec](https://github.com/Bioruebe/cicdec) |
 install4j | .exe | Custom |
+InstallShield 2000 | .exe | Custom |
 InstallShield Archive | .cab | [i6comp](https://bioruebe.com/dev/uniextract/)(src?), [i5comp](https://www.sac.sk/download/pack/i5comp21.rar), [iscab](https://dl.dropboxusercontent.com/s/juxy8fc79ccfqra/InstallShield_Cabinet_File_Viewer.zip)(src?) |
 InstallShield Setup | .exe | Custom, [ISx](https://github.com/lifenjoiner/ISx), [isxunpack](http://www.compdigitec.com/labs/files/isxunpack.exe), [InstExpl](https://bioruebe.com/dev/uniextract/)(src?) |
 InstallShield Z | .z .lib | [icomp](https://www.sac.sk/download/pack/icomp95.zip) |
@@ -332,6 +333,7 @@ PlayStation 2 BIOS | .bin | [romman](https://github.com/israpps/romman) |
 PlayStation 2 IOPRP IMG | .img | [romman](https://github.com/israpps/romman) |
 PlayStation 3 SELF/SPRX | .self .sprx | [ps3_unself](https://github.com/wargio/ps3tools) |
 PMWLite | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
+Pyckage | .py | Custom |
 PyInstaller | .exe | [pyinstxtractor-ng](https://github.com/pyinstxtractor/pyinstxtractor-ng) |
 Python Compiled Module | .pyc | [pycdc](https://github.com/extremecoders-re/decompyle-builds) |
 Qt IFW | .exe | [QtInstallerFramework](https://download.qt.io/official_releases/qt-installer-framework/4.8.1/), [7-Zip](https://7-zip.org/) |
@@ -376,7 +378,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (579)
+## Various (583)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -553,6 +555,7 @@ Escal Compressed | \* | [na_game_tool](https://nihav.org/game_tool.html) |
 eSMART Data | .bin | Custom |
 eSMART String Data | ??? | Custom |
 Etherlords 2 Resource | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
+Etrange Overlord Encrypted Unity Bundle | .bundle | Custom -> Unity Bundle |
 Europe Racer IND+IMG | .ind+.img | Custom |
 Eutechnyx ARC | .arc | Custom |
 Eutechnyx CDFILES.DAT+AR | .dat+.ar | Custom |
@@ -671,10 +674,12 @@ Macross: Do You Remember Love? GKO | .gko | Custom |
 Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
 Marmalade Resource Group | .group.bin | Custom |
+Marvel Ultimate Alliance 2 PAK | .pak+(.igx) | Custom | igx is optional, it provides better filenames & creation dates
 Mattel SMB | .smb | Custom |
 Maximus Installer ACopy | .fiz | Custom |
 Maximus Installer FIZ | .fiz | Custom |
 MediaMobile PAK | .pak | Custom |
+MediaStation CXT | .cxt+(PROFILE._ST) | Custom | PROFILE._ST is optional but you won't have proper filenames without it
 Messiah Image Resource | .1 | Custom |
 Metal Slug 3D PAK | .pak | Custom |
 Metroid Prime 4 RFRM ENUM | ??? | Custom |
@@ -881,6 +886,7 @@ Super Monkey Ball Tip 'n Tilt PAK | .pak | Custom |
 Super Monkey Ball Tip 'n Tilt String Data | ??? | Custom |
 SuperScape VRT | .vca | Custom |
 Surreal Software SRSC | .adu .mdu .odu .qdu .sdu .tdu .xdu .lvl .ldu .vdu | Custom |
+Synetic SYN | .syn | Custom | no decryption
 Taiko no Tatsujin Data 1 | ??? | Custom |
 Taiko no Tatsujin Data 2 | ??? | Custom |
 Taiko no Tatsujin Data 3 | ??? | Custom |
