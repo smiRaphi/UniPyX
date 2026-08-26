@@ -336,5 +336,80 @@ Unknown 2: {f.reads(f.readu32())}""")
 
             del d
             if fs: return
+        case 'Rage Software MNG':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'ZGWH')
+
+            c = f.readu32()
+            fs = [(f.read0s('ascii'),f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[3])
+                writefile(o + '/' + fe[0],f.decompress(fe[1],'zlib' if fe[1] != fe[2] else 'none',usize=fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Deep Silver Volition VPP':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu32() == 0x51890ACE and f.readu32() in {1,3})
+
+            c = f.readu32()
+            f.skip(4)
+            a = f.readu32()
+            f.align(a)
+            fs = [(f.reads(0x18,'ascii').rstrip('\0'),f.readu32(),f.readu32()) for _ in range(c)]
+            f.align(a)
+
+            for fe in fs:
+                writefile(o + '/' + fe[0],f.decompress(fe[2],'zlib',usize=fe[1]))
+                f.align(a)
+            f.close()
+            if fs: return
+        case 'Slayer Engine DAT':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            asrt(c <= 0xB4) # max file entries in fixed size 0x4000 header
+            f.padc(0x21C)
+            fs = [(f.readu32(),f.readu32(),f.reads(0x50,'ascii').rstrip('\0')) for _ in range(c)]
+
+            f.seek(0x4000)
+            for fe in fs:
+                ep = f.pos + fe[1]
+                writefile(o + '/' + fe[2],f.readc(fe[0]))
+                f.seek(ep)
+
+            f.close()
+            if fs: return
+        case 'Red Faction II TOC Group+Packfile':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            f.read0s('ascii') # name
+            dr = f.read0s('ascii')
+
+            ty = f.readu32()
+            bc = f.readu32()
+            if ty & 2:
+                asrt(bc == 1,'more than one packfile')
+                fd = File(dirname(i) + '/' + os.path.relpath(f.read0s('ascii'),dr))
+                c = f.readu32()
+                for _ in range(c):
+                    n,s = f.read0s('ascii'),f.readu32()
+                    fd.seek(f.readu32())
+                    writefile(o + '/' + n,fd.readc(s))
+
+                f.close()
+                fdp = fd.pos
+                fd.close()
+                if fdp != 0: return
+            else:
+                f.close()
+                raise NotImplementedError('unsupported TOC type')
 
     return 1

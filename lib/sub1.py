@@ -478,8 +478,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fe['ia'] = f.readu16()
                 fe['xa'] = f.readu32()
                 fe['of'] = f.readu32() + reb
-                fnb = f.readc(nl)
-                fn = fnb.rstrip(b'\0')
+                fe['fnb'] = f.readc(nl)
+                fn = fe['fnb'].rstrip(b'\0')
                 if fe['fl'] & 0x800 or istext(fn,'utf-8',filename=True): fe['n'] = fn.decode('utf-8')
                 else: fe['n'] = fn.decode('cp437')
                 if fh3ne: fe['n'] = decrypt(fe['n'],'table',fh3k)
@@ -489,11 +489,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0) or ('vms' in fe and fe['vms'] & 0x1000): mkdir(o + '/' + sanitize_relative(fe['n']))
                 else: fs.append(fe)
 
-            BFZ = None
+            BFZ = LEADS = None
             if any(fe['fl'] & 1 for fe in fs):
                 if all(fe['ct'] in {0,8} for fe in fs) and i.lower().endswith('.bfz'):
                     BFZ = tuple(keys.wait()['bubble_fighter'])
                     BFZK = {}
+                elif all(fe['ct'] in {0,8} for fe in fs) and i.lower().endswith('.pak'):
+                    LEADS = keys.wait()['leadwerks']
                 else:
                     # TODO: add key db
                     KEY = None
@@ -574,8 +576,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         bp = bp.replace('\\','/').encode('ascii')
                         if not bp in BFZK: BFZK[bp] = decrypt(bp,'table',BFZ,size=0x40)
                         KEY = BFZK[bp]
+                    elif LEADS:
+                        KEY = crc_hash(fe['fnb'],'leadwerks',key=LEADS,size=fe['us'])
                     d = decrypt(d,'zipcrypto',KEY)
-                    console()
                     asrt(d[11] == fe['chk'])
                     d = d[12:]
 

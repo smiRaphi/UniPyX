@@ -1205,7 +1205,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             if listdir(o): return
         case '7th Level BIN'|'Access Software AP'|'Bureau 13 GL'|'Braid Dead 13 DAT'|'Beam Software GOB'|'Conquest Earth WAD'|'Cryo BigFile'|\
              'Escal Compressed'|'Gabriel Knight 3 Barn'|'Goosebumps CFS'|'Hell: A Cyberpunk Thriller Library'|\
-             'SouthPeak Interactive Puzzle Archive'|'Hostile Waters MNG'|'Tsunami Media RLB'|'Coktel Vision STK'|'Coktel Vision STK2':
+             'SouthPeak Interactive Puzzle Archive'|'Tsunami Media RLB'|'Coktel Vision STK'|'Coktel Vision STK2':
             MP = {
                 '7th Level BIN':'7lev_bin','Access Software AP':'access_ap','Bureau 13 GL':'b13_gl','Braid Dead 13 DAT':'bd13_dat','Beam Software GOB':'beam_gob',
                 'Conquest Earth WAD':'ce_wad','Cryo BigFile':'cryo_archive','Escal Compressed':'escal-z','Gabriel Knight 3 Barn':'gk3_barn','Goosebumps CFS':'goosebumps',

@@ -34,5 +34,7 @@
 "Portable Float Map color bitmap",
 "PCX bitmap (v2.5)",
 "Windows Device Dependent Bitmap",
-"Continuous Wave Accelerometry data"
+"Continuous Wave Accelerometry data",
+"DIY-Thermocam raw data",
+"Memo File Apollo Database Engine"
 ]

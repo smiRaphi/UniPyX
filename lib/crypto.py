@@ -531,6 +531,11 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,int): key = key.to_bytes(1)
             asrt(isinstance(key,bytes),err=TypeError)
             return uxx().decrypt_xor(i,key or b'\0')
+        case 'dxor':
+            if type(key) == int: key = key.to_bytes(1)
+            if type(iv) == int: iv = iv.to_bytes(1)
+            asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
+            return uxx().decrypt_dxor(i,key or b'\0',iv or b'\0')
         case 'inv'|'invert': return uxx().decrypt_inv(i)
         case 'inv_len': return uxx().decrypt_xor(i,(-1 - len(i)).to_bytes(1,signed=True))
         case 'swp4'|'swap4': return uxx().decrypt_swap4(i)
@@ -1357,6 +1362,11 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             else:
                 r = bytes((ix + (ix % 3 + 2) * i[-1 - ix % len(i)]) & 0xFF for ix in range(sz))
             return r
+        case 'leadwerks':
+            i = bytearray(i)
+            while len(i) < 0x20: i.extend(b'\x2D\x39\xC2' + i)
+            x1 = f'{kwargs["size"]}. _'.encode('ascii')
+            return encrypt(i,'dxor',x1,kwargs['key']).split(b'\0',1)[0]
 
         case 'tarzan': fnc = uxx().hash_tarzan
         case 'luas': fnc = uxx().hash_luas

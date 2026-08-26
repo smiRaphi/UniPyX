@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1069
+# Supported Formats: 1072
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -376,7 +376,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (576)
+## Various (579)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -509,6 +509,7 @@ Deadly Premonition Serial | .001 .002 .003 | Custom |
 Death End re:Quest 2 GDAT | .dat | Custom |
 Death End re:Quest 2 ZLIB | \* | Custom |
 Deathloop Resource | .resource | Custom + [deathloop.bms](https://mirror.aluigi.org/bms/deathloop.bms) |
+Deep Silver Volition VPP | .vpp | Custom |
 Def Jam Fight For NY: The Takeover PAKN | .pakn | Custom |
 DEL CUTSEQ | ??? | Custom |
 DelphiX Picture Collection | .dxc | Custom -> Borland Form |
@@ -617,7 +618,6 @@ Hokuto No Ken IDX+BIN | .idx+.bin | Custom |
 Holistic Design MUK | .muk | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Hollow Knight Save | ??? | Custom |
 Hornby BSF | .bsf | Custom |
-Hostile Waters MNG | .mng | [na_game_tool](https://nihav.org/game_tool.html) |
 Hudson Arc Dat | .bin | Custom |
 IBM AIX Backup | .bff .bck .img .ima \* | Custom |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
@@ -797,11 +797,13 @@ Quake 3D WAD | .wad | [Game Extractor Server](https://github.com/Sembiance/dexve
 Quake PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Quantum3 DIR+WAD | .dir+.wad | Custom |
 Quest3D ZICB | .cgr .q3d | Custom |
+Rage Software MNG | .mng | Custom |
 RARC | .arc .rarc | [WSZST](https://szs.wiimm.de/) |
 Rayman DCZ | .dcz | [rayman_dcz.bms](https://mirror.aluigi.org/bms/rayman_dcz.bms) |
 RDB | .rdb | [Cethleann](https://github.com/yretenai/Cethleann) |
 RE Engine PAK | .pak | [REE.Unpacker](https://github.com/Ekey/REE.PAK.Tool) |
 Red Baron VOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)), Custom |
+Red Faction II TOC Group+Packfile | .toc_group+.packfile | Custom |
 REDengine Archive | .archive | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 REDengine W2ResourCe | [a lot](https://wiki.redmodding.org/cyberpunk-2077-modding/for-mod-creators-theory/files-and-what-they-do/file-formats#w2rc-file-format-table) | [WolvenKit.CLI](https://wiki.redmodding.org/wolvenkit/wolvenkit-cli/wolvenkit-console) |
 Relic Chunky Container | .rgt .rsh .wtp .fda .sgb .whm .whe | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
@@ -843,6 +845,7 @@ Siren 2 PAK | .pak | Custom |
 Siren 2 SLPK ROM | .slpk | Custom |
 Six Guns Encrypted Save | ` ` | Custom |
 Sky CoTL Preferences | .pref | Custom |
+Slayer Engine DAT | .dat | Custom |
 Slayer Engine RPE | .rpe | Custom |
 SLUDGE Data File | .sludge | Custom |
 Smiles Fortune Hunters PAK | .pak | Custom |
@@ -1161,6 +1164,7 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Bun. Comp. | BZip2 | type = 23, Bundle | https://github.com/r-lyeh-archived/bundle
 | <ul><li>[x] </li></ul> | Enc.  | ZipCrypto | flag = 1 |
 | <ul><li>[x] </li></ul> | Enc.  | Bubble Fighter keygen + ZipCrypto | extension = .bfz, flag = 1 |
+| <ul><li>[x] </li></ul> | Enc.  | Leadwerks Engine keygen + ZipCrypto | extension = .pak, flag = 1 |
 | <ul><li>[x] </li></ul> | Meta  | UTF8 filenames | flag = 0x800 |
 | <ul><li>[x] </li></ul> | Meta  | detect UTF8 filenames | flag = * |
 | <ul><li>[x] </li></ul> | Meta  | CP437 filenames | flag != 0x800 |
