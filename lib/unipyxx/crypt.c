@@ -691,6 +691,85 @@ EXPORT void mac_cmac_tfit(uint8_t *restrict src, const size_t size, uint8_t *res
     encrypt_tfit_block(tmp, dst, NULL, 13, key, table);
 }
 
+static inline uint32_t snow_amul(const uint32_t v) {
+    return (v << 8) ^ SOSEMANUK_MUL[v >> 24];
+}
+static inline uint32_t snow_adiv(const uint32_t v) {
+    return (v >> 8) ^ SOSEMANUK_DIV[v & 0xFF];
+}
+static inline uint32_t snow2_clock(uint32_t *restrict S, uint32_t *restrict R0, uint32_t *restrict R1, const uint8_t c) {
+    S[c & 0xF] = snow_amul(S[c & 0xF]) ^ S[(c + 2) & 0xF] ^ snow_adiv(S[(c + 11) & 0xF]);
+    uint32_t tmp = *R1 + S[(c + 5) & 0xF];
+    *R1 = AES0[(*R0 >> 0) & 0xFF] ^ AES1[(*R0 >> 8) & 0xFF] ^ AES2[(*R0 >> 16) & 0xFF] ^ AES3[(*R0 >> 24) & 0xFF];
+    *R0 = tmp;
+    return (*R0 + S[c & 0xF]) ^ *R1 ^ S[(c + 1) & 0xFF];
+}
+EXPORT void decrypt_snow2(uint8_t *restrict buf, const size_t size, const uint32_t *restrict iv, const uint32_t *restrict key, const uint8_t ksize) {
+    uint32_t R0 = 0,R1 = 0;
+    uint32_t S[16];
+
+    if (ksize == 16) {
+        for (int8_t i=0;i < 4;i++) S[15 - i] = SWAPBE32(key[i]);
+        for (int8_t i=0;i < 4;i++) S[11 - i] = ~S[15 - i];
+        memcpy(S, S + 8, 8 * sizeof(uint32_t));
+    } else if (ksize == 32) {
+        for (int8_t i=0;i < 8;i++) S[15 - i] = SWAPBE32(key[i]);
+        for (int8_t i=0;i < 8;i++) S[7 - i] = ~S[15 - i];
+    }
+    S[15] ^= iv[3];
+    S[12] ^= iv[2];
+    S[10] ^= iv[1];
+    S[9] ^= iv[0];
+
+    for (int8_t c=0;c < 32;c++) {
+        uint32_t tmp = (R0 + S[(c + 15) & 0xF]) ^ R1;
+        S[c & 0xF] = snow_amul(S[c & 0xF]) ^ S[(c + 2) & 0xF] ^ snow_adiv(S[(c + 11) & 0xF]) ^ tmp;
+        tmp = R1 + S[(c + 5) & 0xF];
+        R1 = AES0[(R0 >> 0) & 0xFF] ^ AES1[(R0 >> 8) & 0xFF] ^ AES2[(R0 >> 16) & 0xFF] ^ AES3[(R0 >> 24) & 0xFF];
+        R0 = tmp;
+    }
+
+    for (size_t p = 0;p < size;p+=4) {
+        const uint32_t k = snow2_clock(S,&R0,&R1,p >> 2);
+        for (int8_t i=0;i < ((p + 4 <= size) ? 4 : (size - p));i++) buf[p + i] ^= k >> (i * 8);
+    }
+}
+static inline uint32_t snow2_nexon_clock(uint32_t *restrict S, uint32_t *restrict R0, uint32_t *restrict R1, const uint8_t c) {
+    S[(15 - c) & 0xF] = snow_amul(S[(15 - c) & 0xF]) ^ S[(13 - c) & 0xF] ^ snow_adiv(S[(4 - c) & 0xF]);
+    uint32_t tmp = *R1 + S[(10 - c) & 0xF];
+    *R1 = AES0[(*R0 >> 0) & 0xFF] ^ AES1[(*R0 >> 8) & 0xFF] ^ AES2[(*R0 >> 16) & 0xFF] ^ AES3[(*R0 >> 24) & 0xFF];
+    *R0 = tmp;
+    return (*R0 + S[(15 - c) & 0xF]) ^ *R1 ^ S[(14 - c) & 0xF];
+}
+EXPORT void decrypt_snow2_nexon(uint32_t *restrict buf, const size_t size, const uint32_t *restrict iv, const uint32_t *restrict key, const uint8_t ksize) {
+    uint32_t R0 = 0,R1 = 0;
+    uint32_t S[16];
+
+    if (ksize == 16) {
+        for (int8_t i=0;i < 4;i++) S[i] = SIGNEXT32(SWAPBE32(key[i]));
+        for (int8_t i=0;i < 4;i++) S[4 + i] = ~S[i];
+        memcpy(S + 8, S, 8 * sizeof(uint32_t));
+    } else if (ksize == 32) {
+        for (int8_t i=0;i < 8;i++) S[i] = SIGNEXT32(SWAPBE32(key[i]));
+        for (int8_t i=0;i < 8;i++) S[8 + i] = ~S[i];
+    }
+    S[0] ^= iv[0]; // unconfirmed
+    S[3] ^= iv[1];
+    S[5] ^= iv[2];
+    S[6] ^= iv[3];
+
+    for (int8_t c=0;c < 32;c++) {
+        uint32_t tmp = (R0 + S[(0 - c) & 0xF]) ^ R1;
+        S[(15 - c) & 0xF] = snow_amul(S[(15 - c) & 0xF]) ^ S[(13 - c) & 0xF] ^ snow_adiv(S[(4 - c) & 0xF]) ^ tmp;
+        tmp = R1 + S[(10 - c) & 0xF];
+        R1 = AES0[(R0 >> 0) & 0xFF] ^ AES1[(R0 >> 8) & 0xFF] ^ AES2[(R0 >> 16) & 0xFF] ^ AES3[(R0 >> 24) & 0xFF];
+        R0 = tmp;
+    }
+
+    for (size_t p = 0;p < size >> 2;p++)
+        buf[p] = SWAPLE32(SWAPLE32(buf[p]) - snow2_nexon_clock(S,&R0,&R1,p));
+}
+
 EXPORT int8_t hash_crc_init(uint8_t *restrict t, const uint32_t size, const uint64_t poly, const int8_t reflect) {
     if (size % 8 || size == 0 || size > 64) return -1;
     const uint64_t mm = MASK(size);

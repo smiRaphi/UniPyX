@@ -34,7 +34,7 @@ if typing.TYPE_CHECKING:
     u8=s8=u16=s16=u24=s24=u32=s32=u40=s40=u48=s48=u64=s64=u128=s128=int
     f16=f32=f64=float
     utf8,utf16=str
-    padding=skip=align=types.NoneType
+    padding=skip=align=seek=types.NoneType
     from dev.namespaces import *
 
 XMLNSRG = re.compile(r'\bxmlns="[^"]*"')

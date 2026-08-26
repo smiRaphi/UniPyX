@@ -1677,6 +1677,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if c: return
+        case 'Hex Data':
+            db.try_custom()
+            from lib.crypto import decrypt
+            d = decrypt(readfile(i),'hex')
+            writefile(o + '/' + basename(i),d)
+            return
 
     return 1
 

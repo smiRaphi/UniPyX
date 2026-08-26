@@ -2068,11 +2068,6 @@
         "rs":"WUX","s":1
     },
     {
-        "rqr":null,
-        "d":["isat","PFS0",0],
-        "rs":"NSP","s":1
-    },
-    {
         "rq":null,
         "d":["isat","BCM2",0],
         "rs":"BCM","s":1
@@ -2628,7 +2623,7 @@
     },
     {
         "t":"directory",
-        "d":[["containsext",[".nca",".cert",".tik",".cnmt.nca"]]],
+        "d":[["containsext",[".cnmt.nca",".nca",".cert",".tik"]]],
         "rs":"Switch Unpacked","s":1
     },
     {
@@ -3098,6 +3093,11 @@
         "rs":"JDownloader2 Encrypted Accounts"
     },
     {
+        "rqr":null,
+        "d":[["s%",4],["ext",".pkn"]],
+        "rs":"Nexon PKN"
+    },
+    {
         "d":["ext",[".ligru_v0_90",".ligru_v0_91",".ligru_v0_92"]],
         "rs":"Li-GRU"
     },
@@ -3106,12 +3106,19 @@
         "rs":"Snappy"
     },
     {
+        "t":"binary",
         "d":["ext",".tde"],
         "rs":"Teardown Encrypted"
     },
     {
         "d":[["size",[5,null]],["isat","\\0",0],["n0",3,1],["py","f.seek(1);return (f.readi(3,'<')+4)==fsz"]],
         "rs":"0Size24 Data"
+    },
+    {
+        "rqr":null,
+        "t":"text",
+        "d":[["s%",2],["size",[2,104857600]],["py","return all(x in {48,49,50,51,52,53,54,55,56,57,65,66,67,68,69,70,97,98,99,100,101,102} for x in f.read())"]],
+        "rs":"Hex Data"
     },
     {
         "t":"text",

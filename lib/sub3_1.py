@@ -133,27 +133,13 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
 
             if fs: return
         case 'Themida':
-            import signal
             td = TmpDir(path=o)
             db.sandbox(['mal_unpack','/exe',td.link(i),'/timeout','10000','/dmode','3','/rebase','/imp','A','/dir',td],
-                       sandbox_allow=[td,dirname(i)],sandbox_kill=True,cwd=td)
+                       sandbox_allow=[td,dirname(i)],sandbox_kill=True,fake_admin=True,cwd=td)
 
             mo = td + '/' + basename(i) + '.out'
             ofs = []
             if exists(mo) and listdir(mo):
-                pids = set()
-                for x in rldir(mo):
-                    if x.endswith(('dump_report.json','scan_report.json')): pids.add(int(readfile(x,'j')['pid']))
-                for pid in pids:
-                    try: os.kill(int(pid),signal.SIGTERM if os.name == 'nt' else signal.SIGKILL)
-                    except ProcessLookupError: pass
-                    except OSError as e:
-                        if e.winerror != 87: raise
-                    except:
-                        print(', '.join(pids))
-                        td.destroy()
-                        raise
-
                 dmps = []
                 for x in rldir(mo):
                     if x.endswith('dump_report.json'):

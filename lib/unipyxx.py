@@ -160,6 +160,8 @@ class X:
             ('decrypt_airrc4',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_eac',   (P(u8),szt,u8),void,0),
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
+            ('decrypt_snow2', (P(u8),szt,P(u32),P(u32),u8),void,0),
+            ('decrypt_snow2_nexon',(P(u32),szt,P(u32),P(u32),u8),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
             ('hash_super_fast_le',(P(u8),szt),u32,4),
@@ -587,6 +589,20 @@ class X:
         iv = (u8 * 0x10).from_buffer_copy(iv)
         self.dll.decrypt_tfit(i,len(src),o,iv,k,t,block_size)
         return bytes(o)
+    def decrypt_snow2(self,src:bytes,key:bytes,iv:bytes) -> bytes:
+        asrt(len(iv) == 16 and len(key) in {16,32})
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u32 * (len(key) // 4)).from_buffer_copy(key)
+        iv = (u32 * 4).from_buffer_copy(iv)
+        self.dll.decrypt_snow2(b,len(src),iv,k,len(key))
+        return bytes(b)
+    def decrypt_snow2_nexon(self,src:bytes,key:bytes,iv:bytes) -> bytes:
+        asrt(len(iv) == 16 and len(src) % 4 == 0 and len(key) in {16,32})
+        b = (u32 * (len(src) // 4)).from_buffer_copy(src)
+        k = (u32 * (len(key) // 4)).from_buffer_copy(key)
+        iv = (u32 * 4).from_buffer_copy(iv)
+        self.dll.decrypt_snow2_nexon(b,len(src),iv,k,len(key))
+        return bytes(b)
 
     def hash_pivotal(self,src:bytes) -> int: ...
     def hash_super_fast_le(self,src:bytes) -> int: ...

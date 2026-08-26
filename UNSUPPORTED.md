@@ -52,6 +52,7 @@ Hydrate H2O Dry | .dry | https://discmaster.textfiles.com/search?format=dryArchi
 - lib/crypto.py:decrypt/crc_hash non pure python ascon
 - lib/crypto.py:crc_hash non pure python blake
 - lib/crypto.py:crc_hash blake2bp/blake2sp
+- Themida: mal_unpack -> https://github.com/Hendi48/Magicmida/issues/60 or https://github.com/TopSoftdeveloper/UnpackThemida/issues/3
 
 ### CD-i RTF dev interview:
 > Q: what is a .rtr file?

@@ -181,7 +181,7 @@ class DLDB:
 
         if sing: return r[0]
         return r
-    def sandbox(self,cmd:list,getexe=True,print_try=True,sandbox_kill=False,sandbox_allow:list[str]=[],**kwargs):
+    def sandbox(self,cmd:list,getexe=True,print_try=True,sandbox_kill=False,sandbox_allow:list[str]=[],fake_admin=False,**kwargs):
         cmd = [str(x) for x in cmd]
         if getexe: exe = self.get(cmd[0])
         else: exe = cmd[0]
@@ -195,7 +195,8 @@ class DLDB:
             self.run([sini,'set','UniPyX','OpenFilePath',x],getexe=False,print_try=False)
         if sandbox_allow and not self._sandboxie_first: self.run([sandp,'/reload'],getexe=False,print_try=False)
 
-        cmd = [sandp,'/box:UniPyX','/wait','/silent',exe] + cmd[1:]
+        env = kwargs.pop('env',{})
+        cmd = [sandp,'/box:UniPyX','/wait','/silent'] + [f'/env:{k}={v}' for k,v in env.items()] + (['/fake_admin'] if fake_admin else []) + [exe] + cmd[1:]
         if self._sandboxie_first:
             kmdp = os.path.join(sbp,'KmdUtil.exe')
             r = self.admin([{'c':[kmdp,'install','SbieDrv',os.path.join(sbp,'SbieDrv.sys'),'type=kernel','start=demand',f'msgfile={os.path.join(sbp,"SbieMsg.dll")}','altitude=86900'],

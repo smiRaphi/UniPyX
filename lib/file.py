@@ -358,7 +358,7 @@ class File:
     def __gt__(self,other:int): return self.pos > other
     def __le__(self,other:int): return self.pos <= other
     def __ge__(self,other:int): return self.pos >= other
-_FILESTRUCTBL = {'data','offsets','sizes','values'} | set(File.__dict__.keys())
+_FILESTRUCTBL = {'data','offsets','sizes','values','name','mode'} | set(File.__dict__.keys())
 class FileStruct(File):
     def __init__(self,f,endian='<',full_data=False):
         d = self.__class__.__dict__
@@ -390,6 +390,10 @@ class FileStruct(File):
                 s = d.get(k,1)
                 t = t.__args__[0]
                 v = [interp(t) for _ in range(self.__values.get(s,s))]
+            elif t == 'seek':
+                s = d.get(k,0)
+                self.seek(self.__values.get(s,s))
+                continue
             elif t in {'skip','padding'}:
                 s = d.get(k,1)
                 self.skip(self.__values.get(s,s))
@@ -421,6 +425,86 @@ class FileStruct(File):
         d = self.__data
         if k is None: return d
         return d[self.__offs[k]:self.__offs[k] + self.__sizes[k]]
+def filestruct2hexpat(f:type[FileStruct],p:str):
+    o = []
+    d = f.__dict__
+    if '_ENDIAN' in d and not p is None: o.append(f'#pragma endian {ENDMAP[d["_ENDIAN"]]}\n')
+    o.append(f'struct {f.__name__} {{')
+    var = set()
+
+    imp = {}
+    def interp(t):
+        if t == float: v = 'f32'
+        elif t in {'u8','s8','u16','s16','f16','u24','s24','u32','s32','f32','u40','s40','u48','s48','u64','s64','f64','u128','s128'}:
+            v = t
+        elif t == bool: v = 'bool'
+        elif issubclass(t,FileStruct):
+            v = t.__name__
+            if not v in imp:
+                imp.update(dict(filestruct2hexpat(t,None)))
+            if '_ENDMAP' in t.__dict__:
+                v = UTFENDM[t.__dict__['_ENDMAP']] + ' ' + v
+        return v
+    def hexfmt(i:int):
+        if isinstance(i,int) and i >= 0x10: return hex(i)
+        return str(i)
+
+    for k,t in f.__annotations__.items():
+        if k in _FILESTRUCTBL or k.startswith('_'): raise KeyError(k)
+        if t == bytes:
+            if not k in d: o.append(f'    u8 {k};')
+            else:
+                s = d[k]
+                if not isinstance(s,int): assert s in var,s
+                o.append(f'    u8 {k}[{hexfmt(s)}];')
+        elif t in {str,'utf8'}:
+            if not k in d: o.append(f'    char {k};')
+            else:
+                s = d[k]
+                if not isinstance(s,int): assert s in var,s
+                o.append(f'    char {k}[{hexfmt(s)}];')
+        elif t == 'utf16':
+            if not k in d: o.append(f'    char16 {k};')
+            else:
+                s = d.get(k,1)
+                if not isinstance(s,int): assert s in var,s
+                o.append(f'    char16 {k}[{hexfmt(s)}];')
+        elif hasattr(t,'__args__') and t.__name__ == 'list' and t.__args__:
+            s = d.get(k,1)
+            t = t.__args__[0]
+            if not isinstance(s,int): assert s in var,s
+            o.append(f'    {interp(t)} {k}[{hexfmt(s)}];')
+        elif t == 'seek':
+            s = d.get(k,0)
+            if not isinstance(s,int): assert s in var,s
+            o.append(f'    $ = {hexfmt(s)};')
+            continue
+        elif t == 'skip':
+            s = d.get(k,1)
+            if not isinstance(s,int): assert s in var,s
+            if isinstance(s,int) and s < 0: o.append(f'    $ -= {hexfmt(-s)};')
+            else: o.append(f'    $ += {hexfmt(s)};')
+            continue
+        elif t == 'padding':
+            s = d.get(k,1)
+            if not isinstance(s,int): assert s in var,s
+            o.append(f'    padding[{hexfmt(s)}];')
+            continue
+        elif t == 'align':
+            s = d.get(k,1)
+            if not isinstance(s,int): assert s in var,s
+            o.append(f'    $ += -$ % {hexfmt(s)};')
+            continue
+        else: o.append(f'    {interp(t)} {k};')
+        var.add(k)
+    o.append('};\n')
+
+    if p is None: return list(imp.items()) + [(f.__name__,'\n'.join(o))]
+    if o[0].startswith('#pragma endian '): o = o[:1] + list(imp.values()) + o[1:]
+    else: o = list(imp.values()) + o
+    o.append(f'{f.__name__} {f.__name__} @ $;\n')
+    with open(p,'w',encoding='utf-8') as f:
+        f.write('\n'.join(o))
 
 class BitReader:
     def __init__(self,d:bytes|io.BytesIO):

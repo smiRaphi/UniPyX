@@ -1,9 +1,9 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1067
+# Supported Formats: 1069
 
-## "Common" Archives/Compressors/Encodings (147)
+## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 2MG | .2mg | [cadius](https://github.com/mach-kernel/cadius), [acx](https://github.com/AppleCommander/AppleCommander) |
@@ -90,6 +90,7 @@ Google Authenticator Migration URL | otpauth-migration:// | Custom |
 Google Update Installer | .exe | [7-Zip](https://7-zip.org/) |
 GZIP | .gz | Custom |
 HA | .ha | [HA](https://www.sac.sk/download/pack/ha0999.zip) |
+Hex Data | .hex | Custom |
 HTTP Archive | .har .harc | Custom |
 HTTP Response | .txt | Custom |
 HxC Floppy IMG | .hxc .img | [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
@@ -213,8 +214,9 @@ Snowboard Kids 2 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) +
 SPS IPF | .ipf | [uaeunp](https://www.winuae.net/download/), [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 StudyBox IMG | .img | Custom |
 Super Smash Bros. N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [SSB Decomp YAML](https://github.com/VetriTheRetri/ssb-decomp-re) + Custom |
-Switch NCA | .nca | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
-Switch NSP | .nsp | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
+Switch NCA | .nca | Custom |
+Switch NSP | .nsp | Custom |
+Switch Unpacked | /\*.nca /\*.nca.cnmt | Custom |
 Switch XCI | .xci | [hac2l](https://github.com/Atmosphere-NX/hac2l) |
 TR-DOS Disk | .trd | Custom |
 Virtua Striker 3 A | ??? | Custom |
@@ -374,7 +376,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (575)
+## Various (576)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -712,6 +714,7 @@ Neox Package | .npk | Custom |
 Nemea File Archive | .bin | Custom |
 New York Race KIX+KBF | .kix+.kbf | Custom |
 Nexas New PAC | .pac | [GARbro](https://github.com/crskycode/GARbro) |
+Nexon PKN | .pkn | Custom |
 Next Level Games DICT+DATA | .dict+.data | Custom |
 Nicktoons Gravjet Racing LIN | .lin | Custom |
 Ninja Shadow of Darkness PAK | .pak | Custom |

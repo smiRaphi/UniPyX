@@ -2,7 +2,7 @@ import os,re
 
 ob = []
 imps = ['from typing import NewType','from ..lib.main import *']
-RG = re.compile(r'(?m)^@namespace(?:\(.*\))?\ndef (\w+)\(.*\):\n((?: {4}[^\n]+\n|\n)+)')
+RG = re.compile(r'(?m)^@namespace(?:\([^\(\)]*\))?\ndef (\w+)\(.*\):\n((?: {4}[^\n]+\n|\n)+)')
 nms = []
 for f in os.listdir('lib'):
     if f.endswith('.py') and f.startswith('sub'):

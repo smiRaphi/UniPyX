@@ -7,7 +7,7 @@ lng = 16 if 'L' in d else 8
 COLC = 4 if lng == 16 else 8
 #d = [int(x,16) for x in re.findall(r'0x([A-F\d]{8})',d)]
 #d = [int(x) for x in re.findall(r'\bX(\d[\d ]),',d)]
-d = ast.literal_eval('[' + d.replace('L','') + ']')
+d = ast.literal_eval('[' + d.strip('{};').replace('L','') + ']')
 
 for x in range(ceil(len(d) / COLC)):
     c = []

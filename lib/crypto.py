@@ -352,6 +352,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             c.encrypt = c.seal
             if i is None: return c
             return c.decrypt(i)
+        case 'snow2'|'snow2_nexon':
+            if iv is None: iv = b'\0'*16
+            asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
+            return getattr(uxx(),'decrypt_' + algo)(i,key,iv)
 
         case 'rsdk3':
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
@@ -1342,6 +1346,17 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 if kwargs.get('bytes',True): return r
                 return int.from_bytes(r,'big')
         case 'protectit2': return uxx().derive_protectit2(i)
+        case 'snow2_nexon':
+            if not isinstance(i,str): i = i.decode()
+            i = i.encode('utf-16le')[::2]
+            i = struct.unpack(f'{len(i)}b',i)
+            sz = kwargs.get('size',0x10)
+            if 'key' in kwargs:
+                k = kwargs['key']
+                r = bytes((ix + i[ix % len(i)] * (k[ix % len(k)] + ix % 5 + 2)) & 0xFF for ix in range(sz))
+            else:
+                r = bytes((ix + (ix % 3 + 2) * i[-1 - ix % len(i)]) & 0xFF for ix in range(sz))
+            return r
 
         case 'tarzan': fnc = uxx().hash_tarzan
         case 'luas': fnc = uxx().hash_luas

@@ -281,5 +281,60 @@ Unknown 2: {f.reads(f.readu32())}""")
             f.close()
             writefile(o + '/' + fn,decrypt(d,'xor',k))
             return
+        case 'Nexon PKN':
+            from lib.file import File,decompress
+            from lib.crypto import decrypt,crc_hash
+
+            d = readfile(i)
+            for k in (basename(i),basename(i).lower()):
+                k = crc_hash(k,'snow2_nexon',size=16)
+                for p in range(0x3DA): # block size - min entry size
+                    d1 = decrypt(d[p:p + 0x30],'snow2_nexon',k)
+                    nl = int.from_bytes(d1[:4],'little')
+                    if nl > 0x1FFF or nl == 0: continue
+                    if not istext(d1[4:4 + nl*2],'utf-16le',filename=True): continue
+                    break
+                else:continue
+                break
+            else: return 1
+
+            if len(d) > p + 0x2000000: fss = 0x2000000
+            else: fss = len(d) - p - (-p % 4)
+            f = File(decrypt(d[p:p + fss],'snow2_nexon',k),endian='<')
+            hchk = bool(f.peek('u32',poffset=4 + f.peek('u32')*2) >> 3)
+
+            fs = []
+            while f:
+                nl = f.readu32()
+                if nl > 0x1FFF or nl == 0: break
+                try: n = f.readutf16(nl)
+                except UnicodeDecodeError: break
+                if hchk: chk = f.readu32()
+                fe = (f.readu32(),f.readu32(),f.readu32(),f.readu32())
+                k = f.readc(0x10)
+                if hchk: asrt(chk == crc_hash((*fe,*k),'sum32'))
+                fs.append((n,*fe,k))
+            bp = p + f.pos + -f.pos % 4
+            bp += -bp % 0x400
+            del f
+
+            if not hchk: bn = tbasename(i).rstrip('0123456789_')
+            for fe in fs:
+                if fe[1] & 6:
+                    hn = fe[0].replace('\\','/')
+                    if not hchk: hn = bn + '/' + hn
+                    k = crc_hash(hn,'snow2_nexon',size=16,key=fe[5])
+
+                of = bp + fe[2] * 0x400
+                fd = d[of:of + fe[4] + (-fe[4] % 4)]
+                if fe[1] & 2: fd = decrypt(fd,'snow2_nexon',k)[:fe[4]]
+                if fe[1] & 4:
+                    sz = min(0x400,fe[4]) - (-fe[4] % 4)
+                    fd = decrypt(fd[:sz],'snow2_nexon',k) + fd[sz:]
+                if fe[1] & 1: fd = decompress(fd,'zlib',usize=fe[3])
+                writefile(o + '/' + fe[0],fd)
+
+            del d
+            if fs: return
 
     return 1

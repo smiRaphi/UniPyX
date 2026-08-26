@@ -91,6 +91,12 @@ static inline uint16_t ROT16R(uint16_t x, const uint8_t r) { return ROTATER(x, 1
 static inline uint16_t ROT16L(uint16_t x, const uint8_t r) { return ROTATEL(x, 16, r); }
 static inline uint32_t ROT32R(uint32_t x, const uint8_t r) { return ROTATER(x, 32, r); }
 static inline uint32_t ROT32L(uint32_t x, const uint8_t r) { return ROTATEL(x, 32, r); }
+static inline uint32_t SIGNEXT32(uint32_t x) {
+    if      (x & 0x00000080) x |= 0xFFFFFF00;
+    else if (x & 0x00008000) x |= 0xFFFF0000;
+    else if (x & 0x00800000) x |= 0xFF000000;
+    return x;
+}
 
 static inline uint64_t ADDW(uint64_t x, const uint64_t a, const uint8_t w) {
     return (x + a) & ((1 << w) - 1);

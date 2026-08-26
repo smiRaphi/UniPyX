@@ -185,66 +185,87 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 writefile(o + '/meta',f.readc(mts))
             f.close()
             return
-        case 'Switch NSP\0':
+        case 'Switch NSP':
             db.try_custom()
-            from lib.file import File
-            f = File(i,endian='<')
-            asrt(f.read(4) == b'PFS0')
+            f = Nintendo(db).PFS0(i)
+            asrt(f.magic == b'PFS0')
 
-            c = f.readu32()
-            sts = f.readu32()
-            f.padc(4)
-            fs = []
-            for _ in range(c):
-                fs.append((f.readu64(),f.readu64(),f.readu32()))
-                f.padc(4)
-            so = f.pos
-
-            for fe in fs:
-                f.seek(so + fe[2])
+            so = f.offsets('files') + f.sizes('files')
+            for fe in f.files:
+                f.seek(so + fe.name_offset)
                 fn = f.read0s('utf-8')
-                f.seek(so + sts + fe[0])
-                writefile(o + '/' + fn,f.readc(fe[1]))
+                f.seek(so + f.strtab_size + fe.offset)
+                writefile(o + '/' + fn,f.readc(fe.fsize))
 
             f.close()
-            if fs:
+            if f.files:
+                db.set_temp_print(False)
                 extract2(o,o,'Switch Unpacked')
+                db.reset_temp_print()
                 return
-        case 'Switch Unpacked\0':
+        case 'Switch Unpacked':
             db.try_custom()
             from lib.file import File
             inf = [x for x in listdir(i) if x.lower().endswith('.cnmt.nca')]
             asrt(len(inf) == 1)
-            inf = i + '/' + inf[0]
 
-            f = File(inf,endian='<')
-            nca = Nintendo(db).parse_nca(f)
-        case 'Switch NCA\0':
+            tik = {}
+            for x in [x for x in listdir(i) if x.lower().endswith('.tik')]:
+                copy(i + '/' + x,o + '/' + x)
+                tik[bytes.fromhex(x[:-4])] = Nintendo(db).parse_nxtik(i + '/' + x)
+            if exists(o + '/cetk'): copy(o + '/cetk',o + '/cetk')
+            if not tik and exists(o + '/cetk'):
+                tik = Nintendo(db).parse_nxtik(o + '/cetk')
+            for x in [x for x in listdir(i) if x.lower().endswith('.cert')]:
+                copy(i + '/' + x,o + '/' + x)
+            if exists(o + '/cert'): copy(o + '/cert',o + '/cert')
+
+            db.set_temp_print(False)
+            Nintendo(db).dump_nca(i + '/' + inf[0],o + '/cnmt',tik)
+            asrt(listdir(o + '/cnmt') == ['$nca_header.dec','0','0.PartitionFS'])
+            remove(o + '/cnmt/0.PartitionFS')
+            copydir(o + '/cnmt/0',o + '/cnmt',True)
+            cnmt = Nintendo(db).CNMT([x for x in rldir(o + '/cnmt') if x.lower().endswith('.cnmt')][0])
+            cnmt.close()
+
+            tc = {}
+            for fe in cnmt.content_info:
+                inf = f'{i}/{fe.content_id.hex()}.nca'
+                if not exists(inf):
+                    print('WARNING: Missing',inf)
+                    continue
+                od = o + '/' + (
+                    'Meta','Program','Data','Control','HtmlDocument','LegalInformation','DeltaFragment',
+                )[fe.content_type]
+                if fe.content_type in tc: od += f'_{tc[fe.content_type]}'
+                else: tc[fe.content_type] = 0
+                tc[fe.content_type] += 1
+                Nintendo.dump_nca(inf,od,tik)
+
+                if fe.content_type == 1:
+                    if '0' in listdir(od):
+                        mv(od + '/0',od + '/ExeFS')
+                        remove(od + '/' + [x for x in listdir(od) if x.startswith('0.')][0])
+                    if '1':
+                        mv(od + '/1',od + '/RomFS')
+                        remove(od + '/' + [x for x in listdir(od) if x.startswith('1.')][0])
+                    if '2':
+                        mv(od + '/2',od + '/Startup')
+                        remove(od + '/' + [x for x in listdir(od) if x.startswith('2.')][0])
+                elif len(listdir(od)) == 3:
+                    remove(od + '/' + [x for x in listdir(od) if x != '$nca_header.dec' and isfile(od + '/' + x)][0])
+                    copydir(od + '/0',od,True,True)
+                else:
+                    for f in listdir(od):
+                        if f == '$nca_header.dec' or isdir(od + '/' + f): continue
+                        if exists(od + '/' + f.split('.',1)[0]) and listdir(od + '/' + f.split('.',1)[0]): remove(od + '/' + f)
+
+            if tc: return
+            db.reset_temp_print()
+        case 'Switch NCA':
             db.try_custom()
-            from lib.crypto import decrypt
-            from lib.file import File
-            f = File(i,endian='<')
-            nca = Nintendo(db).parse_nca(f)
-            v = nca.version
-
-            writefile(o + '/$header.dec',nca.data())
-            for ix in range(4):
-                sec = nca.section_entries[ix]
-                if not sec.start_offset: continue
-                off = sec.start_offset * 0x200
-                f.seek(off)
-                d = f.readc(sec.end_offset * 0x200 - off)
-                fse = nca.fs_header_entries[ix]
-                if nca.version <= 0: fse.values['enc_type'] = -1
-                if fse.enc_type == 1: pass # decrypted
-                elif fse.enc_type == 3: d = decrypt(d,'aes_ctr_be',nca.decrypted_keys[1],off >> 4,prefix=fse.aes_ctr_upper_iv,bits=0x40)
-                else: raise NotImplementedError(f'encryption type {fse.enc_type}')
-                if fse.fstype == 1: asrt(d[0x20:0x24] == b'PFS0',ix)
-                writefile(f'{o}/{ix}.{("RomFS","PartitionFS")[fse.fstype]}',d)
-
-            f.close()
-            return
-        case 'Switch NSP'|'Switch NCA'|'Switch XCI':
+            return Nintendo(db).dump_nca(i,o)
+        case 'Switch NSP\0'|'Switch NCA\0'|'Switch XCI':
             import re
 
             st = {'Switch NSP':'pfs','Switch NCA':'nca','Switch XCI':'xci'}[t]
@@ -1620,7 +1641,9 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
     return 1
 
-@namespace(include=['NCA','parse_nca','AmiiboRaw','amiibo_raw_decrypt','parse_tmd','parse_tmd_tik','parse_tmd_cert'])
+@namespace(include=['PFS0','CNMT','NCARomFS','NCA','parse_nca','dump_nca','parse_nxtik',
+                    'AmiiboRaw','amiibo_raw_decrypt',
+                    'parse_tmd','parse_tmd_tik','parse_tmd_cert'])
 def _Nintendo(db):
     from lib.file import File,FileStruct
     from lib.crypto import decrypt,crc_hash
@@ -1683,6 +1706,7 @@ def _Nintendo(db):
             case 0x010000|0x010003: d,p = 0x200,0x3C
             case 0x010001|0x010004: d,p = 0x100,0x3C
             case 0x010002|0x010005: d,p = 0x3C,0x40
+            case 0x010006: d,p = 0x14,0x28 # only NX
             case _: raise Exception(f'Unknown signature type: {r.type:06X}')
         r.value = f.readc(d)
         r.padding = f.readc(p)
@@ -1808,6 +1832,60 @@ def _Nintendo(db):
 
     CRYPTO_TYPES = ('application','ocean','system')
 
+    class CNMTContentMetaInfo(FileStruct):
+        id:'u64'
+        version:'u32'
+        content_meta_type:'u8'
+        content_meta_attr:'u8'
+        padding:'padding' = 2
+    class CNMTPackagedContentInfo(FileStruct):
+        sha256:bytes = 0x20
+        content_id:bytes = 0x10
+        content_size:'u48'
+        content_type:'u8'
+        idoff:'u8'
+    class CNMT(FileStruct):
+        _ENDIAN = '<'
+        title_id:'u64'
+        version:'u32'
+        content_meta_type:'u8'
+        content_meta_platform:'u8'
+        ext_head_size:'u16'
+        content_count:'u16'
+        content_meta_count:'u16'
+        content_meta_attr:'u8'
+        storage_id:'u8'
+        content_install_type:'u8'
+        padding1:'padding' = 1
+        req_dl_sys_ver:'u32'
+        padding2:'padding' = 4
+        ext_head:bytes = 'ext_head_size'
+        content_info:list[CNMTPackagedContentInfo] = 'content_count'
+        content_meta_info:list[CNMTContentMetaInfo] = 'content_meta_count'
+        dev_sha256:bytes = 0x20
+    class NCARomFS(FileStruct):
+        _ENDIAN = '<'
+        header_size:'u64'
+        dir_hash_tab_off:'u64'
+        dir_hash_tab_size:'u64'
+        dir_meta_tab_off:'u64'
+        dir_meta_tab_size:'u64'
+        file_hash_tab_off:'u64'
+        file_hash_tab_size:'u64'
+        file_meta_tab_off:'u64'
+        file_meta_tab_size:'u64'
+        data_off:'u64'
+    class PFS0FileEntry(FileStruct):
+        offset:'u64'
+        fsize:'u64'
+        name_offset:'u64'
+    class PFS0(FileStruct):
+        _ENDIAN = '<'
+        magic:bytes = 4
+        count:'u32'
+        strtab_size:'u32'
+        padding:'padding' = 4
+        files:list[PFS0FileEntry] = 'count'
     class NCASectionEntry(FileStruct):
         start_offset:'u32'
         end_offset:'u32'
@@ -1821,12 +1899,48 @@ def _Nintendo(db):
         aes_ctr_ex_size:'s64'
         aes_ctr_ex_header_offset:'s64'
         aes_ctr_ex_header_size:'s64'
+    class NCABucketHeader(FileStruct):
+        magic:bytes = 4
+        version:'u32'
+        count:'u32'
+        padding:'padding' = 4
     class NCASparseInfo(FileStruct):
         bucket_offset:'s64'
         bucket_size:'s64'
+        header:NCABucketHeader
         physical_offset:'s64'
         generation:'u16'
         padding:'padding' = 6
+    class NCACompressionInfo(FileStruct):
+        bucket_offset:'s64'
+        bucket_size:'s64'
+        header:NCABucketHeader
+        padding:'padding' = 8
+    class NCAMetaHashDataInfo(FileStruct):
+        table_offset:'s64'
+        table_size:'s64'
+        table_hash:bytes = 0x20
+    class NCALayerRegion(FileStruct):
+        layer_offset:'u64'
+        layer_size:'u64'
+    class NCAHierachialSha256Data(FileStruct):
+        master_hash:bytes = 0x20
+        block_size:'u32'
+        layer_count:'u32'
+        layers:list[NCALayerRegion] = 'layer_count'
+    class NCAIntegrityLevelInfo(FileStruct):
+        logical_offset:'u64'
+        hash_size:'u64'
+        block_size:'u32'
+        padding:'padding' = 4
+    class NCAIntegrityMetaInfoData(FileStruct):
+        magic:bytes = 4
+        version:'u32'
+        master_hash_size:'u32'
+        level_count:'u32'
+        levels:list[NCAIntegrityLevelInfo] = 6
+        signature_salt:bytes = 0x20
+        master_hash:bytes = 'master_hash_size'
     class NCAFSHeaderEntry(FileStruct):
         version:'u16'
         fstype:'u8'
@@ -1834,16 +1948,12 @@ def _Nintendo(db):
         enc_type:'u8'
         meta_hash_type:'u8'
         padding1:'padding' = 2
-        hash_data:bytes = 0x98
+        hash_data:bytes = 0xF8
         patch_info:NCAPatchInfo
         aes_ctr_upper_iv:bytes = 8
         sparse_info:NCASparseInfo
-        compression_info_bucket_offset:'s64'
-        compression_info_bucket_size:'s64'
-        compression_info_padding:'padding' = 8
-        meta_hash_data_info_offset:'s64'
-        meta_hash_data_info_size:'s64'
-        meta_hash_data_info_hash:bytes = 0x20
+        compression_info:NCACompressionInfo
+        meta_hash_data_info:NCAMetaHashDataInfo
         padding2:'padding' = 0x30        
     class NCA(FileStruct):
         fixed_key_sig:bytes = 0x100
@@ -1952,12 +2062,103 @@ def _Nintendo(db):
                 tdkey = decrypt(ekey,'aes_ecb',kaek)
                 dkey = tdkey[:0x20],tdkey[0x20:0x30],tdkey[0x30:0x40],tdkey[0x40:0x50]
         else:
-            tdkey = decrypt(title_key,'aes_ecb',tkeys[f'titlekek_{ct:02X}'])
-            dkey = tdkey[:0x20],tdkey[0x20:0x30],tdkey[0x30:0x40],tdkey[0x40:0x50]
+            asrt(title_key,'No title key')
+            if isinstance(title_key,dict): title_key = title_key[nca.rights_id]
+            asrt(len(title_key) == 0x10,'No title key')
+            tdkey = decrypt(title_key,'aes_ecb',tkeys[f'titlekek_{ct:02x}'])
+            dkey = (None,tdkey,None,None)
         nca.values['decrypted_keys'] = dkey
         nca.values['decrypted'] = not enc
         nca.values['dev'] = dev
         nca.values['version'] = v
+
+        for fe in nca.fs_header_entries:
+            if fe.version == 0: continue
+            asrt(fe.version == 2)
+            if fe.hash_type in {2,5}:
+                fe.hierarchical_hash_data = NCAHierachialSha256Data(fe.hash_data,nca._end)
+            elif fe.hash_type in {3,6}:
+                fe.integrity_hash_data = NCAIntegrityMetaInfoData(fe.hash_data,nca._end)
+
         return nca
+    def dump_nca(i:str,o:str,title_key:bytes=None):
+        f = File(i,endian='<')
+        nca = Nintendo(db).parse_nca(f,title_key=title_key)
+        v = nca.version
+
+        writefile(o + '/$nca_header.dec',nca.data())
+        for ix in range(4):
+            sec = nca.section_entries[ix]
+            if not sec.start_offset: continue
+            off = sec.start_offset * 0x200
+            f.seek(off)
+            d = f.readc(sec.end_offset * 0x200 - off)
+            fse = nca.fs_header_entries[ix]
+            if nca.version <= 0: fse.values['enc_type'] = -1
+            if fse.enc_type == 1: pass # decrypted
+            elif fse.enc_type == 3: d = decrypt(d,'aes_ctr_be',nca.decrypted_keys[1],off >> 4,prefix=fse.aes_ctr_upper_iv[::-1],bits=0x40)
+            else: raise NotImplementedError(f'encryption type {fse.enc_type}')
+            of = f'{o}/{ix}.{("RomFS","PartitionFS")[fse.fstype]}'
+            writefile(of,d)
+            del d
+
+            if fse.hash_type in {2,5}: off = fse.hierarchical_hash_data.layers[-1].layer_offset
+            elif fse.hash_type in {3,6}: off = fse.integrity_hash_data.levels[-1].logical_offset
+            else: raise NotImplementedError(f'hash type {fse.hash_type}')
+            tf = open(of,'rb');tf.seek(off)
+            if fse.fstype == 0:
+                rfs = Nintendo.NCARomFS(tf,endian=nca._end)
+                rfs.seek(rfs.dir_meta_tab_off)
+                dirs = {0:f'{o}/{ix}'}
+                idpos = lambda: rfs.pos - rfs.dir_meta_tab_off
+                while idpos() < rfs.dir_meta_tab_size:
+                    id = idpos()
+                    pid = rfs.readu32()
+                    rfs.skip(0x10)
+                    n = rfs.reads(rfs.readu32(),'utf-8')
+                    rfs.align(4)
+                    if id == 0:
+                        if n: dirs[pid] += '/' + n
+                    else: dirs[id] = dirs[pid] + '/' + n
+
+                fs = []
+                rfs.seek(rfs.file_meta_tab_off)
+                while rfs.pos - rfs.file_meta_tab_off < rfs.file_meta_tab_size:
+                    pid = rfs.readu32()
+                    rfs.skip(4)
+                    fe = (rfs.data_off + rfs.readu64(),rfs.readu64())
+                    rfs.skip(4)
+                    fs.append((*fe,dirs[pid] + '/' + rfs.reads(rfs.readu32(),'utf-8')))
+                    rfs.align(4)
+
+                for de in dirs.values(): mkdir(de)
+                for fe in fs:
+                    rfs.seek(fe[0])
+                    writefile(fe[2],rfs.readc(fe[1]))
+            elif fse.fstype == 1:
+                pfs = Nintendo.PFS0(tf)
+                asrt(pfs.magic == b'PFS0')
+                so = pfs.offsets('files') + pfs.sizes('files')
+                for fe in pfs.files:
+                    pfs.seek(so + fe.name_offset)
+                    fn = pfs.read0s('utf-8')
+                    pfs.seek(so + pfs.strtab_size + fe.offset)
+                    writefile(f'{o}/{ix}/{fn}',pfs.readc(fe.fsize))
+                pfs.close()
+
+        f.close()
+    def parse_nxtik(i:str):
+        f = File(i,endian='<') # not big endian for NX!
+        f.skip({
+            0x010000:0x23C,0x010003:0x23C,
+            0x010001:0x13C,0x010004:0x13C,
+            0x010002:0x7C ,0x010005:0x7C,
+            0x010006:0x3C ,
+        }[f.readu32()] + 0x40)
+        r = f.readc(0x100)
+        f.skip(1)
+        if f.readu8() == 0: r = r[:0x10]
+        f.close()
+        return r
 
     return locals()
