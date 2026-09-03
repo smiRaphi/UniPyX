@@ -1809,7 +1809,7 @@ def _Nintendo(db):
         r.limits = f.readc(0x40)
 
         if r.version == 1:
-            r.content_index_size = f.peek('u32',poffset=4)
+            r.content_index_size = f.peek('u32',offset=4)
             r.content_index = f.readc(r.content_index_size)
         if f: r.certificates = [parse_tmd_cert(f) for _ in range(2)]
         return r

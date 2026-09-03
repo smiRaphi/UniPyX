@@ -1701,10 +1701,10 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             from lib.file import File
             f = File(i)
 
-            vb = f.peek('u32','>',poffset=4)
-            vl = f.peek('u32','<',poffset=4)
+            vb = f.peek('u32','>',offset=4)
+            vl = f.peek('u32','<',offset=4)
             f.endian = '>' if vb < vl else '<'
-            fo = f.peek('u32',poffset=4)
+            fo = f.peek('u32',offset=4)
 
             fs = []
             while f < fo:
@@ -2283,8 +2283,8 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             f = File(i)
             asrt(f.read(4) == b'BIGB')
 
-            v = f.peek('u32','<',poffset=4)
-            f.endian = '>' if v > f.peek('u32','>',poffset=4) else '<'
+            v = f.peek('u32','<',offset=4)
+            f.endian = '>' if v > f.peek('u32','>',offset=4) else '<'
 
             do = 0x10 + f.readu32()
             v = f.readu32()

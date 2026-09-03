@@ -405,7 +405,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     if not (cdc == tcdc or (not mult and cdc == 0 and tcdc != 0)): continue
                     sz,of = f.readu32(),f.readu32()
                     if t == 'RESOF': sz ^= 0xFFFFFFFF
-                    if (of + sz) <= (bp + p): break
+                    if (of + sz) <= (bp + p) and f.peek(4,offset=[of]) == PK12: break
                     if not PK56 in d[:p] and (of + sz - 0x40) <= (bp + p): break
 
                 f.seek(bp + p + 4)
@@ -505,13 +505,20 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 FRMK = [x for x in FRZK['c'] if x['n'].startswith('fm') and x['t'] == 'file']
                 FRHK = [x for x in FRZK['c'] if x['n'].startswith('fh') and x['t'] == 'file']
 
+            if len(fs) > 1:
+                # ignore up to 1 invalid/missing entry
+                f.seek(fs[0]['of'])
+                if f.peek(4) != PK34:
+                    print(f'WARNING: 1st zip entry missing ({fs[0]["n"]})')
+                    fs.pop(0)
+
             BUNDLE = []
             hrefs = any(fe['ct'] == 92 for fe in fs)
             refs = []
             drefs = {}
             for fe in fs:
                 f.seek(fe['of'])
-                asrt(f.read(4) == PK34,lambda:f.fmt('§@§'))
+                asrt(f.read(4) == PK34,lambda:f.fmt('§@§',back=4))
                 v = f.readu16()
                 if 'aes' in fe: ct = 99
                 else: ct = fe['ct']
@@ -520,7 +527,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.skip(0x10) # f.skip(4);crc2,zs2,us2 = f.readu32(),f.readu32(),f.readu32()
                 fnl2,xfl2 = f.readu16(),f.readu16()
                 fnb2 = f.reads(fnl2,'cp437')
-                if ct == 18 and ct2 == 8 and not fe['fl'] & 0x800 and fnb2.isprintable() and all(x & 0x80 for x in fe['n'].encode('cp437')):
+                # not sure which zipper from ~2000 fucks up the CDFH ct by +10
+                if ((ct == 18 and ct2 == 8) or (ct == 10 and ct2 == 0)) and not fe['fl'] & 0x800 and fnb2.isprintable():
                     fe['n'] = fnb2
                     ct = fe['ct'] = ct2
                 asrt(ct == ct2)
@@ -624,17 +632,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     del tf
                 else: BUNDLE.append(False)
 
-                writefile(fn,d)
-                ts = [0,0,0]
-                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
-                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
-                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
-                set_ftime(fn,*ts,unix=False)
-
-                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
-                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
-                if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
-                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+                writefile_zip(fe,d)
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):
@@ -696,9 +694,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
             from lib.file import File,decompress,by2bi
             from lib.crypto import crc_hash,decrypt
             f = File(i,endian='<')
-
             PK34 = b'PK\3\4'
+
+            if f.peek(4) != PK34:
+                d = f.read(0x10000)
+                p = d.find(PK34)
+                if p == -1:
+                    f.close()
+                    return 1
+            else: p = 0
+
             hrefs = False
+            f.seek(p)
             while f:
                 if f.read(4) != PK34: break
                 f.skip(4)
@@ -717,7 +724,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             refs = []
             drefs = {}
             fs = []
-            f.seek(0)
+            f.seek(p)
             while f:
                 if f.read(4) != PK34: break
                 fe = {
@@ -794,17 +801,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     del tf
                 else: BUNDLE.append(False)
 
-                writefile(fn,d)
-                ts = [0,0,0]
-                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
-                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
-                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
-                set_ftime(fn,*ts,unix=False)
-
-                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
-                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
-                if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
-                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+                writefile_zip(fe,d)
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):
@@ -885,7 +882,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 elif not '.' in fn and fl & 1: fn += '.txt'
             if fl & 0x10: writefile(o + '/$comment.txt',f.read0s())
             if fl & 2:
-                hd = f.peek(f.pos,poffset=-f.pos)
+                hd = f.peek(f.pos,offset=-f.pos)
                 asrt(crc_hash(hd,'crc32_16') == f.readu16())
 
             if bs:
@@ -1737,7 +1734,7 @@ def read_http_head(readline,max:int=None,idn=False):
 def read_zip_extra(**l):
     f,fe,xl,crc_hash = l['f'],l['fe'],l['xl'],l['crc_hash']
     ep = f.pos + xl
-    if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',poffset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.peek(xl).decode('latin-1')):
+    if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',offset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.peek(xl).decode('latin-1')):
         f.seek(ep) # JAR shit
     while (f.pos + 4) < ep:
         tg,s = f.readc(2),f.readu16()
@@ -1756,6 +1753,17 @@ def read_zip_extra(**l):
                 if s > 0x18:
                     asrt(s >= 0x1C)
                     fe['dsk'] = f.readu32()
+            case b'\1\x99': # AE-x
+                asrt(fe['ct'] == 99,'AE-x entry without AE-x compression type')
+                asrt(s == 7)
+                fe['aes'] = {
+                    'vv':f.readu16(),
+                    'v':f.read(2),
+                    'm':f.readu8(),
+                }
+                asrt(fe['aes']['v'] == b'AE' and fe['aes']['vv'] in {1,2},f'Unsupported AE-x vendor {repr(fe['aes']['v'])[2:-1]}-{fe["aes"]["vv"]}')
+                asrt(fe['aes']['m'] in {1,2,3},f'Unsupported AE-x mode {fe["aes"]["m"]}')
+                fe['ct'] = f.readu16()
             case b'\x07\0': # AV Info
                 fe['avinf'] = f.read(s)
             case b'\x09\0': # OS/2
@@ -1792,17 +1800,6 @@ def read_zip_extra(**l):
                             if ts: fe['ts']['m'] = vms2filetime(ts)
                         case _: raise NotImplementedError(f'Unknown OpenVMS tag {vtg} @ 0x{f.pos - 4:08X}')
                     f.seek(vep)
-            case b'\1\x99': # AE-x
-                asrt(fe['ct'] == 99,'AE-x entry without AE-x compression type')
-                asrt(s == 7)
-                fe['aes'] = {
-                    'vv':f.readu16(),
-                    'v':f.read(2),
-                    'm':f.readu8(),
-                }
-                asrt(fe['aes']['v'] == b'AE' and fe['aes']['vv'] in {1,2},f'Unsupported AE-x vendor {repr(fe['aes']['v'])[2:-1]}-{fe["aes"]["vv"]}')
-                asrt(fe['aes']['m'] in {1,2,3},f'Unsupported AE-x mode {fe["aes"]["m"]}')
-                fe['ct'] = f.readu16()
             case b'\x03\x99': # WinZip Reference
                 pass
             case b'\x1E\xA1': # Data Stream Alignment
@@ -1811,9 +1808,15 @@ def read_zip_extra(**l):
                 pass # u64 growth hint, 0x10 padding
             case b'\x23\x11': # ?, seen in Forza Horizon 6
                 pass # u32 data offset
+            case b'\x29\x09': # ?, seen in libzip test file "testfile-plus-extra.zip"
+                if not 'libzip_cm' in fe: fe['libzip_cm'] = []
+                fe['libzip_cm'].append(f.read(s))
             case b'AC': # Acorn
                 asrt(s >= 4)
                 asrt(f.read(4) == b'ARC0')
+            case b'FK': # FWKCS
+                asrt(s == 0x13 and f.read(3) == b'MD5')
+                fe['md5'] = f.read(16)
             case b'KV': # KeyValuePairs
                 asrt(s >= 14)
                 asrt(f.read(13)[:9] == b'KeyValuePairs'[:9]) # only verify first couple bytes
@@ -1869,6 +1872,20 @@ def read_zip_extra(**l):
             case _: raise NotImplementedError(f'{repr(tg)[1:]} @ 0x{f.pos - 4:08X}')
         f.seek(xep)
     f.seek(ep)
+def writefile_zip(fe:dict,d:bytes):
+    fn = fe['ffn']
+    writefile(fn,d)
+    ts = [0,0,0]
+    if 'c' in fe['ts']: ts[0] = fe['ts']['c']
+    if 'm' in fe['ts']: ts[1] = fe['ts']['m']
+    if 'a' in fe['ts']: ts[2] = fe['ts']['a']
+    set_ftime(fn,*ts,unix=False)
+
+    if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
+    if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
+    if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
+    if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+    if 'libzip_cm' in fe: writefile(fn + '.$libzip_comment.txt',b'\n'.join(fe['libzip_cm']))
 
 ZFMTM = {
     0:'none',
@@ -1897,7 +1914,7 @@ ZFMTM = {
     94:'packmp3', # WinZip
     # 94:'lz4', # unofficial, OTEr ZIP, untested
     95:'xz',
-    96:'zipx_jpeg', # unsupported, WinZip, not packjpg
+    96:'winzip_jpeg', #  WinZip, not packjpg
     97:'wavpack', # WinZip
     # 97:'brotli', # unofficial, OTEr ZIP, untested
     98:'ppmd8',

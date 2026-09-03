@@ -43,7 +43,7 @@ def asrt(c:bool,*r,err:Exception=ValueError,debug=False):
     if not c:
         if len(r) == 1 and isinstance(r[0],types.FunctionType): r = r[0]()
         if r:
-            if hasattr(r,'__iter__'): r = ' '.join(str(x) for x in r)
+            if isinstance(r,(list,tuple,set)): r = ' '.join(str(x) for x in r)
             else: r = str(r)
         else: r = ''
         if debug:
@@ -143,7 +143,9 @@ def splitext(i:str):
 def tbasename(i:str): return splitext(basename(str(i)))[0]
 def extname(i:str): return splitext(str(i))[1]
 def noext(i:str): return splitext(str(i))[0]
-def mkdir(i:str): os.makedirs(i,exist_ok=True)
+def mkdir(i:str):
+    if not i: return
+    os.makedirs(i,exist_ok=True)
 def rmdir(i:str,r=True): rmtree(str(i)) if r else os.rmdir(str(i))
 def copy(i:str,o:str):
     if o.endswith(('/','\\')):
@@ -375,6 +377,7 @@ def strp2re(fmt:str):
 TS_FMTS = [strp2re(x) for x in (
     "%Y-%m-%dT%H:%M:%SZ",
     "%Y-%m-%dT%H:%M:%S.%fZ",
+    "%Y-%m-%dT%H:%M:%S.%f",
     "%Y-%m-%d %H:%M:%S.%:n %z",
     "%Y-%m-%d %H:%M:%S %Z",
     "%Y-%m-%dT%H:%M:%S",
@@ -607,6 +610,7 @@ class FileStub:
     @property
     def mode(self): raise FileStubbed
     def __bool__(self): return False
+def parse_pystr(i:str,binary=True) -> bytes|str: return ast.literal_eval(('b' if binary else '') + '"""' + i.replace('"','\\"') + '"""')
 def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str],str]:
     global TRDB
 
@@ -838,7 +842,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                 if not chf: continue
 
         tret = 0
-        if not 'd' in xv or not xv['d']:
+        if not xv.get('d'):
             dl = []
             tret = True
         else:
@@ -873,28 +877,28 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
             elif type(x[0]) == bool and x[0] == False: tret = ret = False
             elif typ in {'binary','text','null'}:
                 if x[0] == 'contain':
-                    cv = ast.literal_eval('b"' + x[1].replace('"','\\"') + '"')
+                    cv = parse_pystr(x[1])
                     sp = x[2]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = cv in f.read(x[3])
                 elif x[0] == 'isat':
-                    cv = ast.literal_eval('b"' + x[1].replace('"','\\"') + '"')
+                    cv = parse_pystr(x[1])
                     sp = x[2]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(len(cv)) == cv
                 elif x[0] == 'isatS':
-                    cv = ast.literal_eval('b"' + x[1].replace('"','\\"') + '"')
+                    cv = parse_pystr(x[1])
                     sp = x[3]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
                     f.seek(sp)
                     ret = f.read(x[2]*len(cv)) == (cv*x[2])
                 elif x[0] == 'isin':
-                    cvs = [ast.literal_eval('b"' + cv.replace('"','\\"') + '"') for cv in x[1]]
+                    cvs = [parse_pystr(cv) for cv in x[1]]
                     sp = x[2]
                     if sp < 0: sp = fsz + sp
                     if sp < 0: sp = 0
@@ -1076,7 +1080,7 @@ def analyze(inp:str,raw=False,quiet=True) -> list[str]|tuple[list[str],list[str]
                         ret = tr
                         if not ret: break
                 elif x[0] == 'zipc':
-                    cv = ast.literal_eval('b"' + x[2].replace('"','\\"') + '"')
+                    cv = parse_pystr(x[2])
                     load_zip()
                     try: ret = zipd[0].read(zipd[1][x[1]]) == cv
                     except KeyError: ret = False

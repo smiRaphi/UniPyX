@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1078
+# Supported Formats: 1082
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -378,7 +378,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (583)
+## Various (587)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -479,6 +479,7 @@ Codename Kids Next Door JAM2/FSTA | .jam .fst | Custom |
 Coktel Vision STK | .stk | [na_game_tool](https://nihav.org/game_tool.html) |
 Coktel Vision STK2 | .itk | [na_game_tool](https://nihav.org/game_tool.html) |
 Colin McRae Rally 2 BFL | .bfl | Custom |
+Compart Character Set | .html | Custom |
 Compressed File Library | .cfl | [uncfl](https://solhsa.com/cfl/index.html) |
 Conquest Earth WAD | .wad | [na_game_tool](https://nihav.org/game_tool.html) |
 Construct 2 Array | .hsp .hsm .hsd | Custom |
@@ -623,6 +624,7 @@ Hollow Knight Save | ??? | Custom |
 Hornby BSF | .bsf | Custom |
 Hudson Arc Dat | .bin | Custom |
 IBM AIX Backup | .bff .bck .img .ima \* | Custom |
+IBM XMIT Transmit | .xmit .xmi | [xmitviewer](https://github.com/Hanspe-3019/xmitviewer) |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |
 idTech 7 Resource | .resource | Custom |
@@ -831,6 +833,7 @@ RTL Ski Jumping 2001 PAK | .pak | Custom |
 RTL Ski Jumping 2002 PAK | .pak | Custom |
 RTX Remix Package | .pkg | Custom | gdeflate compression is nonstandard?
 Safari WebArchive | ??? | [pywebarchive](https://pypi.org/project/pywebarchive/) |
+Sandustry Save | .save .save.backup | Custom |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
 SDFTool SDF.bin | .bin | Custom |
@@ -937,7 +940,7 @@ Vietcong Compressed Big File | .cbf | [CBF.wcx](http://www.vietcong-coop.net/sit
 Violentmonkey Config Export | .json | Custom |
 Viper Flash IMG | .vip | Custom |
 Vulkan Pipeline Cache | .bin | Custom |
-Wallpaper Engine PKG | .pkg | [RePKG](https://github.com/notscuffed/repkg) |
+Wallpaper Engine PKG | .pkg | Custom |
 Wangan Midnight TOC+DAT | .toc+.dat | Custom |
 WarioWare Mega Party Game PAC | .pac | Custom |
 WarpIN Archive | .wip | Custom |
@@ -960,6 +963,7 @@ ZDA Game Archive | ??? | Custom |
 Zeebo FUFS | .fs | Custom |
 Zeebo PLZP | .plzp | Custom |
 Zeebo Resources | ??? | Custom |
+[Zip-Archive](http://fileformats.archiveteam.org/wiki/ZAR_(Zip-Archiv)) | .zar | Custom | not PKZIP
 ZIPD Encrypted | .piz | Custom |
 ZLARC | .zl .zlarc | Custom |
 Zlib + Uncompressed Size | \* | Custom |
@@ -1137,7 +1141,7 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Comp. | PackMP3 | type = 94, WinZip |
 | <ul><li>[x] </li></ul> | Comp. | LZ4 | type = 94, unofficial, OTEr ZIP | https://github.com/trufae/otezip
 | <ul><li>[x] </li></ul> | Comp. | XZ | type = 95 |
-| <ul><li>[ ] </li></ul> | Comp. | ZIPX JPEG | type = 96, WinZip |
+| <ul><li>[x] </li></ul> | Comp. | WinZip JPEG | type = 96, WinZip |
 | <ul><li>[x] </li></ul> | Comp. | WavPack | type = 97, WinZip |
 | <ul><li>[x] </li></ul> | Comp. | Brotli | type = 97, unofficial, OTEr ZIP | https://github.com/trufae/otezip
 | <ul><li>[x] </li></ul> | Comp. | PPMD8 | type = 98 |
@@ -1191,7 +1195,9 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Extra | Data Stream Alignment | tag = 0x1EA1, u16: ? |
 | <ul><li>[x] </li></ul> | Extra | Microsoft Open Packaging Growth Hint | tag = 0x20A2, u64: hint, padding: 0x10 |
 | <ul><li>[x] </li></ul> | Extra | Forza Data Offset | tag = 0x20A2, u32: data offset |
+| <ul><li>[x] </li></ul> | Extra | libzip extra field | tag = 0x2909, *: comment | https://github.com/nih-at/libzip/blob/main/regress/data/testfile-plus-extra.zip
 | <ul><li>[x] </li></ul> | Extra | Acorn | tag = 0x4143/AC, verifies magic |
+| <ul><li>[x] </li></ul> | Extra | FWKCS | tag = 0x464B/FK, MD5, untested |
 | <ul><li>[x] </li></ul> | Extra | KeyValuePairs | tag = 0x4B56/KV, get's read and dumped as json |
 | <ul><li>[x] </li></ul> | Extra | Xceed Unicode | tag = 0x4E55/NU, verifies magic and overwrites filename |
 | <ul><li>[x] </li></ul> | Extra | minizip hash | tag = 0x511A, overwrites crc32, supported list in CRC section |

@@ -49,7 +49,7 @@ def extract4(inp:str,out:str,t:str) -> bool:
 
             ro = f.readu32()
             f.seek(ro)
-            if f.peek('u8') == 1: nc = f.peek('u32',poffset=8)
+            if f.peek('u8') == 1: nc = f.peek('u32',offset=8)
             else: nc = 1
             ns = [(f.readu8(),f.readu24(),f.readu32(),f.readu32()) for _ in range(nc)]
             so = f.pos
@@ -1558,8 +1558,21 @@ def extract4(inp:str,out:str,t:str) -> bool:
             get_fst(0,o + '/NAND')
             if listdir(o + '/NAND'): return
         case 'Wallpaper Engine PKG':
-            run(['repkg','extract','-o',o,'-n','--no-tex-convert','--overwrite',i])
-            if listdir(o): return
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            m = f.reads(f.readu32())
+            asrt(m[:4] == 'PKGV' and m[4:].isdigit(),m)
+
+            c = f.readu32()
+            fs = [(f.reads(f.readu32()),f.readu32(),f.readu32()) for _ in range(c)]
+            bp = f.pos
+            for fe in fs:
+                f.seek(bp + fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
         case 'AMOS Memory Bank':
             db.try_custom()
             d = readfile(i)[0x14:]

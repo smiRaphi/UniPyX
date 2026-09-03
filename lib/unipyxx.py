@@ -136,11 +136,14 @@ class X:
             ('decrypt_swp4',  (P(u8),szt),          void,3),
             ('decrypt_roll',  (P(u8),szt,P(u8),szt),void,2),
             ('decrypt_rolr',  (P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_croll', (P(u8),szt,P(u8),szt),void,0),
+            ('decrypt_crolr', (P(u8),szt,P(u8),szt),void,0),
             ('decrypt_xor',   (P(u8),szt,P(u8),szt),void,2),
             ('decrypt_rxor',  (P(u8),szt,u8),       void,0),
             ('decrypt_cxor',  (P(u8),szt,P(u8),szt),void,0),
             ('decrypt_cxori', (P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_dxor',  (P(u8),szt,P(u8),szt,P(u8),szt),void,0),
+            ('decrypt_rlcg',  (P(u8),szt,u8,u8),    void,0),
             ('decrypt_tea',   (P(u8),szt,P(u8),P(u8),s8),void,0),
             ('decrypt_rsdk3', (P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_rsdk4', (P(u8),szt,u32,u32,P(u8),P(u8)),void,0),
@@ -215,6 +218,7 @@ class X:
             ('decompress_lzfse',(P(u8),szt,P(u8),szt),sszt,1),
             ('decompress_lpaq8',(P(u8),szt,P(u8),szt),sszt,1),
             ('decompress_zstd',(P(u8),szt,P(P(u8)),szt,P(u8),szt),sszt,0),
+            ('decompress_winzip_jpeg',(P(u8),szt,P(u8),szt),sszt,1),
 
             ('free_exp',(voidp,),void,0),
         ):
@@ -457,6 +461,18 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_rxor(b,len(src),key)
         return bytes(b)
+    def decrypt_croll(self,src:bytes,key:bytes,iv:int=0) -> bytes:
+        if iv: key = bytes((x + iv) & 0xFF for x in key)
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_croll(b,len(src),k,len(key))
+        return bytes(b)
+    def decrypt_crolr(self,src:bytes,key:bytes,iv:int=0) -> bytes:
+        if iv: key = bytes((x + iv) & 0xFF for x in key)
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_crolr(b,len(src),k,len(key))
+        return bytes(b)
     def decrypt_cxor(self,src:bytes,key:bytes,iv:int=0) -> bytes:
         if iv: key = bytes((x + iv) & 0xFF for x in key)
         b = (u8 * len(src)).from_buffer_copy(src)
@@ -477,6 +493,12 @@ class X:
             self.dll.decrypt_xor(k1,len(key1),mk,k2,len(key2))
             self.dll.decrypt_xor(b,len(src),mk,len(key1))
         else: self.dll.decrypt_dxor(b,len(src),k1,len(key1),k2,len(key2))
+        return bytes(b)
+    def decrypt_rlcg(self,src:bytes,key:bytes|int,iv:bytes|int):
+        if isinstance(key,bytes): key = key[0]
+        if isinstance(iv,bytes): iv = iv[0]
+        b = (u8 * len(src)).from_buffer_copy(src)
+        self.dll.decrypt_rlcg(b,len(src),key,iv)
         return bytes(b)
     def decrypt_tea(self,src:bytes,key:bytes,le:bool=False) -> bytes:
         asrt(len(key) == 0x10 and not len(src) % 8)

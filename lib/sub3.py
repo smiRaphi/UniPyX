@@ -2039,7 +2039,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 c = f.readu16()
                 xd.append([reads() for _ in range(c)])
 
-            [f.skip(2) for _ in whilelc(lambda:not (f.peek('u16') > 1 and 20 >= f.peek('u16',poffset=2) >= 10 and f.peek(6,poffset=4).lower() == b'dunzip'))]
+            [f.skip(2) for _ in whilelc(lambda:not (f.peek('u16') > 1 and 20 >= f.peek('u16',offset=2) >= 10 and f.peek(6,offset=4).lower() == b'dunzip'))]
 
             c = f.readu16()
             fs = [(reads(),f.readu32(),f.readu32()) for _ in range(c)]
@@ -2336,10 +2336,10 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             f.skip(4)
             ms = f.readu32()
-            if f.peek('u32') == 0 and f.peek(0x12,poffset=ms + 4) == b"$_BIM_CONFIG_END_$": v = 0
+            if f.peek('u32') == 0 and f.peek(0x12,offset=ms + 4) == b"$_BIM_CONFIG_END_$": v = 0
             else:
                 ms = f.readu32()
-                if f.peek('u32') == 0 and f.peek(0x12,poffset=ms + 4) == b"$_BIM_CONFIG_END_$": v = 1
+                if f.peek('u32') == 0 and f.peek(0x12,offset=ms + 4) == b"$_BIM_CONFIG_END_$": v = 1
                 else: raise ValueError
 
             f.seek(oo + 0x18)
@@ -2472,7 +2472,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 writefile(fn,d)
                 set_ftime(fn,tss[ix])
 
-            eof = max(x + f.peek('u32',poffset=x - f.pos) for x in ofs[len(res):])
+            eof = max(x + f.peek('u32',offset=x - f.pos) for x in ofs[len(res):])
             ds = {}
             while f < eof:
                 p = []
@@ -2481,7 +2481,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     if l == 0xFE: break
                     if l == 0xFF:
                         pk = f.peek('u32')
-                        if pk == 0 or (pk >= 8 and f.pos + 4 + pk <= eof and iszl(f.peek(8,poffset=4))):
+                        if pk == 0 or (pk >= 8 and f.pos + 4 + pk <= eof and iszl(f.peek(8,offset=4))):
                             p = None
                             break
                     else: p.append(f.reads(l,'cp1252'))
@@ -2673,7 +2673,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 bix += 1
                 if ep > f: f.seek(ep)
 
-            if f.left >= 0x60C and f.peek('u32',poffset=0x608) == MAG:
+            if f.left >= 0x60C and f.peek('u32',offset=0x608) == MAG:
                 bp = f.pos - 4
                 fc = f.readu16()
                 asrt(f.readu16() == 1)

@@ -70,9 +70,9 @@ def extract4_6(inp:str,out:str,t:str) -> bool:
                 for ix in range(c):
                     s = f.peek('u32')
                     asrt(s >= 8)
-                    if s >= 12: n = f'{f.peek("u32",poffset=8):08X}'
+                    if s >= 12: n = f'{f.peek("u32",offset=8):08X}'
                     else: n = f'{ix:03d}'
-                    tid = f.peek("u32",poffset=4)
+                    tid = f.peek("u32",offset=4)
                     if not tid in TMAP: ex = f'{tid:08X}'
                     else: ex = TMAP[tid]
                     writefile(f'{dn}/{n}.{ex}',f.readc(s))
@@ -275,8 +275,7 @@ Unknown 2: {f.reads(f.readu32())}""")
             # key = crc_hash(key, 'protectit2')
             # original program just uses this as verification for the processed key but it's just the actual key so yay
             k = decrypt(f.readc(0x10),'xor',b'ProtectIt/2 OS/2')
-            fn = f.reads(0x100,'ascii').rstrip('\0')
-            f.padc(4)
+            fn = f.reads(0x104,'ascii').rstrip('\0')
             d = f.read()
             f.close()
             writefile(o + '/' + fn,decrypt(d,'xor',k))
@@ -301,7 +300,7 @@ Unknown 2: {f.reads(f.readu32())}""")
             if len(d) > p + 0x2000000: fss = 0x2000000
             else: fss = len(d) - p - (-p % 4)
             f = File(decrypt(d[p:p + fss],'snow2_nexon',k),endian='<')
-            hchk = bool(f.peek('u32',poffset=4 + f.peek('u32')*2) >> 3)
+            hchk = bool(f.peek('u32',offset=4 + f.peek('u32')*2) >> 3)
 
             fs = []
             while f:
@@ -522,5 +521,154 @@ Unknown 2: {f.reads(f.readu32())}""")
 
             f.close()
             if fs: return
+        case 'Sandustry Save':
+            db.try_custom()
+            import json
+            from lib.file import decompress
+            inf,d = readfile(i).split(b'\n',1)
+
+            h = json.loads(inf.decode('utf-8'))
+            ts = str2unix(h['timestamp'])
+            ts = (ts - h['playTime'] / 1000,ts)
+            console()
+            writefile(o + '/info.json',inf)
+            set_ftime(o + '/info.json',*ts)
+            if d.startswith(b'\x1F\x8B'): d = decompress(d,'gzip')
+            writefile(o + '/data.json',d)
+            set_ftime(o + '/data.json',*ts)
+            return
+        case 'Zip-Archive':
+            db.try_custom()
+            from lib.file import File
+            from lib.crypto import decrypt
+            f = File(i,endian='<')
+            f.seek(-3)
+            asrt(f.read(3) == b'PT&')
+
+            f.back(7)
+            flg = f.peek('u16')
+            tabs = f.peek('u16',offset=2)
+            pws = flg >> 3
+            # files aren't encrypted, password just get's checked by application
+            if pws:
+                f.back(pws)
+                writefile(o + '/$password.txt',decrypt(f.peek(pws),'croll',flg & 3).decode('cp850'))
+
+            ep = f.back(tabs) + tabs
+            if flg & 4:
+                asrt(f.readu8() == 0)
+                bn = sub_path(f.reads(f.readu8(),'cp850'))
+                mkdir(o + '/' + bn)
+            fs = []
+            while f < ep:
+                if flg & 4:
+                    if not fs: dr = bn
+                    else: dr = bn[:f.readu8()] + f.reads(f.readu8(),'cp850')
+                else: dr = ''
+                fnl = f.readu8()
+                # asrt(fnl & 0x80,lambda:f.fmt('§@§')) # changing this does not seem to do anything (tested with hex edited sample)
+                fs.append((dr + f.reads(fnl & 0x7F,'cp850'),f.readu32()))
+
+            f.seek(0)
+            for fe in fs:
+                writefile(o + '/' + sanitize_relative(fe[0]),f.decompress(fe[1],'implode',db=db))
+
+            f.close()
+            if fs: return
+        case 'Compart Character Set':
+            REPL = {
+                'SP':'\x20',
+                'NBSP':'\xA0',
+                'ST':'\x9C',
+                'SSA':'\x86',
+                'EPA':'\x97',
+                'RI':'\x8D',
+                'SS2':'\x8E',
+                'OSC':'\x9D',
+                'NEL':'\x85',
+                'ESA':'\x87',
+                'EOM':'EM',
+                'PU2':'\x92',
+                'SS3':'\x8F',
+                'PAD':'\x80',
+                'HOP':'\x81',
+                'BPH':'\x82',
+                'NBH':'\x83',
+                'IND':'\x84',
+                'HTS':'\x88',
+                'HTJ':'\x89',
+                'VTS':'\x8A',
+                'PLD':'\x8B',
+                'PLU':'\x8C',
+                'DCS':'\x90',
+                'PU1':'\x91',
+                'STS':'\x93',
+                'CCH':'\x94',
+                'MW':'\x95',
+                'SPA':'\x96',
+                'SOS':'\x98',
+                'SGC':'\x99',
+                'SCI':'\x9A',
+                'CSI':'\x9B',
+                'PM':'\x9E',
+                'SHY':'\xAD',
+                'APC':'\x9F',
+            }
+
+            db.try_custom()
+            import re
+            from lib.crypto import decrypt
+            d = decrypt(readfile(i,'rt'),'html')
+            n = re.search(r'<title>[^“„<]*[“„]([^”“]+)[”“]</title>',d)[1]
+            chrs = re.findall(r'(<span class="text">(.+?)</span>|<div class="item blank"></div>)',d)
+            asrt(len(chrs) == 0x100)
+
+            ob = [f'{ix:02X}' if x[0].startswith('<div') else f'{ix:02X}={REPL.get(x[1],x[1])}' for ix,x in enumerate(chrs)]
+            writefile(o + '/' + sub_path(n,slash=True) + '.tbl','\n'.join(ob) + '\n')
+            return
+        case 'IBM XMIT Transmit':
+            if db.print_try: print('Trying with xmi-reader')
+            oj = OSJump()
+            oj.jump(dirname(db.get('libmagic'))) # xmi needs libmagic.dll
+            import xmi
+            oj.back()
+            f = xmi.open_file(i,outputfolder=o,quiet=True)
+            asrt(not f.has_message(),err=NotImplementedError,debug=True)
+
+            ob = f._get_clean_json_no_text()
+            ob.pop('CONFIG',None)
+            ob.pop('file',None)
+            writefile(o + '/$db.json',ob,indent=4)
+
+            suc = False
+            for dn in f.get_files():
+                if f.is_pds(dn):
+                    de = f.get_file_info_simple(dn) | f.get_file_info_detailed(dn)
+                    ts = {}
+                    if 'created' in de: ts['ct'] = str2unix(de['created'])
+                    if 'modified' in de: ts['mt'] = str2unix(de['modified'])
+                    bn = o + '/' + sub_path(dn,slash=True)
+                    mkdir(bn)
+                    for fn in f.get_members(dn):
+                        try: fe = f.get_member_info(dn,fn)
+                        except KeyError:
+                            if fn.startswith('DELETED??'):
+                                p = f'{bn}/$deleted{fn[9:]}.null'
+                                xopen(p,'x').close()
+                                set_ftime(p,**ts)
+                                continue
+                            raise
+                        fts = {}
+                        if 'modified' in fe: fts['mt'] = str2unix(fe['modified'])
+                        p = bn + '/' + sub_path(fn,slash=True) + fe['extension']
+                        try: writefile(p,f.get_member_decoded(dn,fn))
+                        except KeyError:
+                            if 'alias' in fe: symlink(sub_path(fe['alias'],slash=True) + fe['extension'],p)
+                            else: raise FileNotFoundError(f'{dn}/{fn}')
+                        set_ftime(p,**(ts | fts))
+                        suc = True
+                else: raise NotImplementedError(dn)
+
+            if suc: return
 
     return 1

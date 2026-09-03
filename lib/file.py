@@ -293,7 +293,7 @@ class File:
             if not p: break
             self.write(p)
         if cl: f.close()
-    def peek(self,fnc,*args,poffset=0,**kwargs):
+    def peek(self,fnc,*args,offset:int|list[int]=0,**kwargs):
         if isinstance(fnc,str):
             if fnc in {'u8','s8','u16','s16','u24','s24','u32','s32','u40','s40','u48','s48','u64','s64','u128','s128','f16','f32','f64','bool','bool32'}: fnc = ('write' if 'w' in self.mode else 'read') + fnc
             fnc = getattr(self,fnc)
@@ -301,7 +301,8 @@ class File:
             args = (fnc,)
             fnc = self.read
         p = self.pos
-        self.seek(p + poffset)
+        if isinstance(offset,(list,tuple)): self.seek(offset[0])
+        else: self.seek(p + offset)
         try: r = fnc(*args,**kwargs)
         finally: self.seek(p)
         return r
@@ -820,7 +821,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return decompress(d,'zstd',**kwargs)
         case 'lz4'|'lz4_block':
             import lz4.block
-            return lz4.block.decompress(i,uncompressed_size=(len(i) * 8) if kwargs.get('no_size') else kwargs['usize'])
+            return lz4.block.decompress(i,uncompressed_size=(len(i) * 8) if kwargs['usize'] is None else kwargs['usize'])
         case 'lz4_frame':
             import lz4.frame
             return lz4.frame.decompress(i)
@@ -1134,6 +1135,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             d.extend(b'\1\0\0')
             return decompress(d,'zstd',**kwargs)
 
+        case 'winzip_jpeg'|'zipx_jpeg': return uxx().decompress_winzip_jpeg(i,kwargs['usize'])
         case 'wavpack'|'wv':
             asrt('db' in kwargs)
             r,o,e = kwargs['db'].run(['wvunpack','-','-'],stdin=i,text=False,print_try=False)

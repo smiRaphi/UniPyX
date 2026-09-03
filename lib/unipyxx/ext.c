@@ -181,6 +181,14 @@ cleanup:
     return r;
 }
 
+XIMPORT(Aaru.Compression.Native.WinZipJpeg)
+EXPORT ssize_t decompress_winzip_jpeg(const uint8_t *restrict src, const size_t zsize,
+                                            uint8_t *restrict dst, ssize_t usize) {
+    int32_t r = AARU_zip_winzipjpeg_decode_buffer(src, zsize, dst, &usize);
+    if (r < 0) return r;
+    return usize;
+}
+
 EXPORT void free_exp(void *ptr) { free(ptr); }
 
 #ifdef __cplusplus

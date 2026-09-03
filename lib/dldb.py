@@ -320,7 +320,7 @@ class DLDB:
             rmtree(td)
         elif ex in {'.7z','.arj','.zipx','nsis','.lha'}:
             td = gtmp()
-            self.run(['7z','x','-y','-o' + td,'-aoa',p])
+            self.run(['7z','x','-y','-o' + td,'-aoa',p,*xl])
             for tx in xl: copy(td + '/' + tx,self.bin_path + xl[tx])
             for _ in range(5):
                 try: rmtree(td)

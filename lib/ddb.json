@@ -74,6 +74,11 @@
     },
     {
         "t":"url",
+        "d":[["isat","http://ha.mr#",0],["isat","https://ha.mr#",0],["isat","http://ha.mr/#",0],["isat","https://ha.mr/#",0]],"qq":true,
+        "rs":"Hammer Compressed URL","s":1
+    },
+    {
+        "t":"url",
         "d":[["isat","data:",0],["contain","/",6,60],["contain",";base64,",8,70]],
         "rs":"Base64 Data URL","s":1
     },
@@ -81,6 +86,11 @@
         "t":"text",
         "d":[["isat","data:",0],["contain","/",6,60],["contain",";base64,",8,70]],
         "rs":"Base64 Data URL","s":1
+    },
+    {
+        "t":"text",
+        "d":[["isat","<!DOCTYPE html>",0],["contain"," xmlns:dff=\"http://www.compart.com/ns/dff\" xmlns:cp=\"http://www.compart.com/ns/mffauxiliary/xpp\">",10,600]],
+        "rs":"Compart Character Set"
     },
     {
         "rq":"ISO",
@@ -152,6 +162,10 @@
         "rqr":["Win16 NE executable (generic)","MS-DOS executable"],
         "d":[["isat","MZ",0],["isin",["P","*","!"],2],["py","f.seek(60);f.seek(f.readi(4,'<'))\nif f.read(2)!=b'NE':return\nf.skip(4)\nif f.readi(2,'<')>40:return\nf.skip(4)\nif (f.readi(1)&243)!=1 or(f.readi(1)>>2)!=32:return\nf.skip(4)\nif f.readi(2):return\nf.skip(16);return f.read(2)!=f.read(2)"]],
         "rs":"NE Resource DLL"
+    },
+    {
+        "d":[["isat","\\xE9",0],["isat","FWKCS(TM) Contents_Signature System",3]],
+        "rs":"FWKCS Content Signature System","s":1
     },
     {
         "rqr":null,
@@ -557,6 +571,10 @@
         "rs":"TREVA SDPC","s":1
     },
     {
+        "d":[["isat","\\xE0\\xC9\\xD5\\xD4\\xD9\\xF0\\xF1",1]],
+        "rs":"IBM XMIT Transmit","s":1
+    },
+    {
         "d":[["isat","FILELINK_____END\\0\\0\\0\\0",8],["n0",4,0],["n0",4,0],["py","return not f.readi(4,'<')%8"]],
         "rs":"WayForward PAK","s":1
     },
@@ -586,8 +604,16 @@
         "rs":"Ninja Shadow of Darkness PAK","s":1
     },
     {
+        "d":[["isat","\\x08\\0\\0\\0PKGV",0],["str",4,8],["n0",4,12],["n0",4,16]],
+        "rs":"Wallpaper Engine PKG","s":1
+    },
+    {
         "d":["isat","\\0\\1\\0\\0\\0\\xFF\\xFF\\xFF\\xFF\\1\\0\\0\\0\\0\\0\\0\\0\\x06\\1\\0\\0\\0",0],
         "rs":"Hollow Knight Save","s":1
+    },
+    {
+        "d":[["isat","{\"id\":\"",0,false],["contain","\"}\\n\\x1F\\x8B\\x08",160,3939],["contain","\"}\\n{",160,3937]],"qq":true,
+        "rs":"Sandustry Save"
     },
     {
         "d":[["isat","APak\\0\\0\\0\\x05",0],["isatS","\\0",4,12],["n0",4,8],["n0",4,28],["n0",4,32],["n0",4,36],["n0",4,44],["py","f.seek(8);c=f.readi(4,'>');f.seek(24);us,ss=f.readi(4,'>'),f.readi(4,'>');return not us%16 and(80+us+ss+c*64)==f.readi(4,'>')"]],
@@ -1504,6 +1530,10 @@
         "rs":"MSKN 2 Archive","s":1
     },
     {
+        "d":[["isat","PT&",-3],["n0",2,-5],["py","f.seek(fsz-7);p,s=f.readi(2,'<'),f.readi(2,'<')\nif p&3!=3 or(7+(p>>3)+s)>=fsz:return\nif not p&4:return True\nf.seek(fsz-7-s-(p>>3));return f.readi(1)==0"]],
+        "rs":"Zip-Archive"
+    },
+    {
         "d":[["s%",16],["isat","\\x4F\\xF3\\x2F\\xAC\\0\\0\\1\\0",0],["n0",4,8],["n0",4,12],["str0e",16,64,5],["py","f.seek(8);o=f.readi(4,'<');c=o+16+f.readi(4,'<')*24;f.seek(o+28);return (c+-c%16)==f.readi(4,'<')"]],
         "rs":"Torque HHA"
     },
@@ -1846,10 +1876,6 @@
     {
         "d":[["s%",4096],["isat","\\x10\\0\\0\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["n0",4,8],["n0",4,16],["py","if not exists(splitext(inp)[0]+'.mdf'):return\nf.seek(8);c=f.readi(8,'<')\nfor _ in range(c):\n if f.readi(4,'<')&15!=12:return\nreturn True"]],
         "rs":"Encrypted Arsenal MTC+MDF","s":1
-    },
-    {
-        "d":[["isat","\\x08\\0\\0\\0PKGV0001",0],["n0",4,12]],
-        "rs":"Wallpaper Engine PKG","s":1
     },
     {
         "d":[["isat","NSO0",0],["isatS","\\0",8,4],["isatS","\\0",3,13],
@@ -2990,6 +3016,11 @@
     {
         "d":[["ext",".kpk"],["s%",32],["py","return any(x.lower().endswith('.exe') for x in os.listdir(dirname(inp)))"]],
         "rs":"Mitsurugi KPK"
+    },
+    {
+        "rqr":null,
+        "d":[["contain","PK\\3\\4",0,64],["contain","PK\\5\\6",-65535,65515]],
+        "rs":"ZIP"
     },
     {
         "rqr":null,

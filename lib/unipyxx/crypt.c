@@ -214,6 +214,22 @@ EXPORT void decrypt_rolr(uint8_t *restrict buf, const size_t size,
         if (kc >= ksize) kc = 0;
     }
 }
+EXPORT void decrypt_croll(uint8_t *restrict buf, const size_t size,
+                    const uint8_t *restrict key, const size_t ksize) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        buf[p] -= (key[kc++] + p);
+        if (kc >= ksize) kc = 0;
+    }
+}
+EXPORT void decrypt_crolr(uint8_t *restrict buf, const size_t size,
+                    const uint8_t *restrict key, const size_t ksize) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        buf[p] += (key[kc++] + p);
+        if (kc >= ksize) kc = 0;
+    }
+}
 EXPORT void decrypt_xor(uint8_t *restrict buf, const size_t size,
                   const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
@@ -252,6 +268,14 @@ EXPORT void decrypt_dxor(uint8_t *restrict buf,  const size_t size,
         buf[p] ^= key1[kc1++] ^ key2[kc2++];
         if (kc1 >= ksize1) kc1 = 0;
         if (kc2 >= ksize2) kc2 = 0;
+    }
+}
+EXPORT void decrypt_rlcg(uint8_t *restrict buf, const size_t size, const uint8_t key, const uint8_t iv) {
+    uint8_t tmp = iv;
+    for (size_t p=0;p < size;p++) {
+        uint8_t tmp2 = buf[p];
+        buf[p] ^= tmp + key;
+        tmp = tmp2;
     }
 }
 EXPORT void decrypt_tea(const uint8_t *restrict src, const size_t size, uint8_t *restrict dst,
@@ -2186,7 +2210,7 @@ EXPORT hash256_t hash_haval(const uint8_t *restrict src, const size_t size,
 
 EXPORT void derive_protectit2(uint8_t *restrict buf) {
     for (int8_t i=0;i < 16;i+=2) {
-        buf[i+0] = (buf[i+0] ^ 0xA5) << 2;
+        buf[i+0] = ((buf[i+0] ^ 0xA5) & 0x3F) << 2;
         buf[i+1] = ((buf[i+1] ^ 0x5A) & 0x3F) << 2;
     }
     uint8_t tmp[0x10];

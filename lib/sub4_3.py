@@ -238,7 +238,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
                 d = []
                 tg = f.peek(4)
                 while (f.pos+8) < fs[ix+1]:
-                    s = f.peek('u32',poffset=4)
+                    s = f.peek('u32',offset=4)
                     if not s: break
                     d.append(f.read(s))
 
@@ -1244,7 +1244,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             if decompress(
                 decompress(
                     decrypt(readfile(i),'capcom_mame',key['capcom_mame']['k'],iv),
-                    'lz4',no_size=True),
+                    'lz4',usize=None),
                 'zip',o=o
             ): return
         case 'Smoking Car Productions Disk Cache':
@@ -2561,7 +2561,7 @@ def sxm_block(inp,o:str,hint=None):
         case _:
             f.back(4)
             if hint in {'MODL','MOTN'}:
-                fof = f.peek('u32',poffset=0x2C)
+                fof = f.peek('u32',offset=0x2C)
                 fs = [(f.read(0x20).rstrip(b'\0').decode('ascii'),f.skip(8),f.readu32(),f.readu32()) for _ in range(fof//0x30)]
                 for fe in fs:
                     f.seek(p + fe[3])

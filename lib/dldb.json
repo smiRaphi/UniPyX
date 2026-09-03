@@ -2288,16 +2288,6 @@
             }
         }]
     },
-    "repkg":{
-        "p":"RePKG.exe",
-        "fs":[{
-            "u":"https://github.com/notscuffed/repkg/releases/download/v0.4.0-alpha/RePKG.zip",
-            "x":{
-                "RePKG.exe":"RePKG.exe"
-            }
-        }],
-        "ts":0
-    },
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{
@@ -5721,6 +5711,18 @@
     "blake":{
         "pip":"http://www.seanet.com/~bugbee/crypto/blake/blake.py",
         "dl":"blake.py"
+    },
+    "xmi":{
+        "pip":"xmi-reader"
+    },
+    "libmagic":{
+        "p":"file/libmagic.dll",
+        "fs":[{
+            "u":".",
+            "x":{
+                "libmagic.dll":"file/libmagic.dll"
+            }
+        }]
     },
     "sandboxie":{
         "p":"sandboxie/Start.exe",

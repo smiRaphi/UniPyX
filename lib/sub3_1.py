@@ -248,5 +248,42 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
 
             del e
             if listdir(o): return
+        case 'FWKCS Content Signature System':
+            db.try_custom()
+            from lib.file import File
+            from lib.crypto import decrypt
+            f = File(i,endian='<')
+            asrt(f.readu8() == 0xE9)
+
+            f.skip(f.readu16())
+            f.readu(b'\xCD\x21',maxl=0x20,include=True,eoferr=True)
+            asrt(f.readu8() == 0x73)
+            f.skip(f.readu8())
+
+            adrs = {}
+            for _ in range(5):
+                asrt(f.readu8() == 0xBE)
+                adr = f.readu16()
+                if f.readu8() != 0xB0:
+                    f.back(1)
+                    break
+                adrs[adr] = f.readu8()
+                if f.readu8() != 0xE8:
+                    f.back(1)
+                    break
+                f.skip(2)
+
+            f.readu(b'\x8A\x04',maxl=0x40,include=True,eoferr=True)
+            asrt(f.readu8() == 0x86)
+            f.skip(1)
+            asrt(f.readu8() == 0x04)
+            k = f.readu8()
+            d = f.peek(0x80,offset=[adr - 0x100])
+            if adr in adrs:
+                d = decrypt(d,'xor',adrs[adr])
+            d = decrypt(d,'rlcg',k)
+            writefile(f'{o}/{adr:04X}.bin',d)
+            f.close()
+            return
 
     return 1

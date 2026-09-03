@@ -36,23 +36,29 @@ def uxx():
     return UPXX
 
 BASEXX_DEC = {
-    'b58':'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
-    'b92':'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~+!$%\'()*,:@/?;^{}[]<>&|"=`',
-    'g64':'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]',
+    'b10':'0123456789',
+    'b26':'abcdefghijklmnopqrstuvwxyz',
     'z32':'ybndrfg8ejkmcpqxot1uwisza345h769',
     'c32':'0123456789ABCDEFGHJKMNPQRSTVWXYZ',
     'n32':'0123456789BCDFGHJKLMNPQRSTVWXYZ.',
+    'q43':'$*+-./:0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'b58':'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
+    'g64':'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]',
+    'h85':"!#$&'()*+,-./0123456789:;=?~@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]_abcdefghijklmnopqrstuvwxyz",
+    'b92':'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~+!$%\'()*,:@/?;^{}[]<>&|"=`',
 }
-BASEXXNS = {'base16':'b16',
+BASEXXNS = {'base10':'b10',
+            'base16':'b16',
+            'base26':'b26',
             'base32':'b32','base32hex':'b32hex','b32h':'b32hex',
-            'base58':'b58',
-            'base64':'b64',
-            'base85':'b85','ascii85':'a85','zbase85':'z85',
-            'base92':'b92',
-            'gamespy64':'g64',
             'zbase32':'z32',
             'cbase32':'c32','crockford32':'c32',
-            'nin32':'n32','nintendo32':'n32',}
+            'nin32':'n32','nintendo32':'n32',
+            'qr43':'q43','qrcode43':'q43',
+            'base58':'b58',
+            'base64':'b64','gamespy64':'g64',
+            'base85':'b85','ascii85':'a85','zbase85':'z85','hamr85':'h85',
+            'base92':'b92',}
 PYCRHSHM = {
     'KECCAK':'keccak',
 }
@@ -105,6 +111,15 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'rolr':
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_rolr(i,key or b'\0')
+        case 'croll':
+            if type(key) == int: key = key.to_bytes(1)
+            if isinstance(iv,bytes): iv = iv[0]
+            return uxx().decrypt_croll(i,key or b'\0',iv or 0)
+        case 'crolr':
+            if type(key) == int: key = key.to_bytes(1)
+            if isinstance(iv,bytes): iv = iv[0]
+            return uxx().decrypt_crolr(i,key or b'\0',iv or 0)
+        case 'rlcg': return uxx().decrypt_rlcg(i,key,iv or 0)
 
         case 'aes'|'aes_cbc'|'aes_ecb'|'aes_ctr'|'aes_ctr_be'|'aes_ctr_le'|'aes_gcm'|'aes_ccm'|'aes_eax'|\
              'aes_ocb3'|'aes_ocb'|'aes_siv'|'aes_cfb'|'aes_ofb'|'aes_openpgp'|'aes_kw'|'aes_kwp'|'rc2'|\
@@ -478,8 +493,8 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             r = getattr(base64,algo + 'decode')(i)
             return r if kwargs.get('bytes',True) else r.decode('latin-1')
-        case 'base92'|'base58'|'gamespy64'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|\
-             'b92'|'b58'|'g64'|'z32'|'c32'|'n32':
+        case 'base92'|'hamr85'|'gamespy64'|'base58'|'qr43'|'qrcode43'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|'base26'|'base10'|\
+             'b92'|'h85'|'g64'|'b58'|'q43'|'qrcode43'|'z32'|'c32'|'n32'|'b26'|'b10':
             algo = BASEXXNS.get(algo,algo)
             if isinstance(BASEXX_DEC[algo],str): BASEXX_DEC[algo] = BaseXX(BASEXX_DEC[algo])
             if isinstance(i,bytes): i = i.decode('latin-1')
@@ -505,6 +520,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             if not kwargs.get('bytes',True): return unquote(i,errors='strict')
             return unquote_to_bytes(i)
+        case 'html':
+            from html import unescape
+            return unescape(i)
         case 'rfc1751':
             from Cryptodome.Util import RFC1751
             r = RFC1751.key_to_english(i)
@@ -595,8 +613,8 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             import base64
             r = getattr(base64,algo + 'encode')(i)
             return r if kwargs.get('bytes',True) else r.decode('latin-1')
-        case 'base92'|'base58'|'gamespy64'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|\
-             'b92'|'b58'|'g64'|'z32'|'c32'|'n32':
+        case 'base92'|'hamr85'|'gamespy64'|'base58'|'qr43'|'qrcode43'|'zbase32'|'cbase32'|'crockford32'|'nin32'|'nintendo32'|'base26'|'base10'|\
+             'b92'|'h85'|'g64'|'b58'|'q43'|'qrcode43'|'z32'|'c32'|'n32'|'b26'|'b10':
             algo = BASEXXNS.get(algo,algo)
             if isinstance(BASEXX_DEC[algo],str): BASEXX_DEC[algo] = BaseXX(BASEXX_DEC[algo])
             if isinstance(i,str): i = i.encode('latin-1')
@@ -615,6 +633,9 @@ def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
 
             r = (quote_from_bytes if isinstance(i,bytes) else quote)(i,safe='' if kwargs.get('plus',True) else '/',encoding='utf-8',errors='strict')
             return r.encode('utf-8') if kwargs.get('bytes',False) else r
+        case 'html':
+            from html import escape
+            return escape(i)
         case 'rfc1751':
             from Cryptodome.Util import RFC1751
             if isinstance(i,(tuple,list)): i = ' '.join(x.decode('latin-1') if isinstance(x,(bytes,bytearray)) else x for x in i)
@@ -699,7 +720,7 @@ CRC16 = {   # poly  , init , xor  , reflect
     'xmodem':(0x1021,0x0000,0x0000,False),'zmodem':(0x1021,0,0,False),'acorn':(0x1021,0,0,False),
     'gsm':   (0x1021,0x0000,0xFFFF,False),
 'spi_fujitsu':(0x1021,0x1D0F,0x000,False),'aug_ccitt':(0x1021,0x1D0F,0,False),
-'ccitt_false':(0x1021,0xFFFF,0x000,False),'ibm_3740':(0x1021,0xFFFF,0,False),
+'ccitt_false':(0x1021,0xFFFF,0x000,False),'ibm_3740':(0x1021,0xFFFF,0,False),'poknds':(0x1021,0xFFFF,0,False),
    'genibus':(0x1021,0xFFFF,0xFFFF,False),'icode':(0x1021,0xFFFF,0xFFFF,False),'darc':(0x1021,0xFFFF,0xFFFF,False),'epc':(0x1021,0xFFFF,0xFFFF,False),
 'opensafety':(0x5935,0x0000,0x0000,False),'opensafety_a':(0x5935,0,0,False),
     'm17':   (0x5935,0xFFFF,0x0000,False),
@@ -798,7 +819,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
              'crc16_gsm'|'crc16_spi_fujitsu'|'crc16_aug_ccitt'|'crc16_ccitt_false'|'crc16_ibm_3740'|'crc16_genibus'|\
              'crc16_icode'|'crc16_darc'|'crc16_opensafety'|'crc16_opensafety_a'|'crc16_m17'|'crc16_dnp'|'crc16_en13757'|\
              'crc16_dect_r'|'crc16_dect_x'|'crc16_opensafety_b'|'crc16_teledisk'|'crc16_t10_dif'|'crc16_profibus'|\
-             'crc16_nrsc5'|'crc16_lj1200'|'crc16_cdma2000'|'crc16_epc':
+             'crc16_nrsc5'|'crc16_lj1200'|'crc16_cdma2000'|'crc16_epc'|'crc16_poknds':
             if algo == 'crc16': algo = 'crc16_latin1'
             kwargs['size'] = 16
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC16[algo[6:]]

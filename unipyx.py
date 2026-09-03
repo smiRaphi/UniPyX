@@ -35,20 +35,27 @@ if __name__ == '__main__':
 
         pl = []
         pn = []
+        dl = []
         if len(argv) > 2:
             for x in argv[2:]:
-                pn.append(x)
-                pl.append(db.pdb[x]['pip'])
+                if 'dl' in db.pdb[x]: dl.append(x)
+                else:
+                    pn.append(x)
+                    pl.append(db.pdb[x]['pip'])
         else:
             for x,y in db.pdb.items():
                 if y.get('old'): continue
-                pn.append(x)
-                pl.append(y['pip'])
+                if 'dl' in y: dl.append(x)
+                else:
+                    pn.append(x)
+                    pl.append(y['pip'])
         print('Downloading:')
         print(', '.join(pn))
         pip(*pl,error=True)
         t = int(time())
         for n in pn: db.udb[n] = t
+
+        for x in dl: db.pip(x)
         db.save()
         exit()
 

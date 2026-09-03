@@ -203,8 +203,8 @@ class File(_File):
         v = align(self.tell() - base,blocksize)
         self.skip(v,_basic=False)
         return v
-    def peek(self,fnc,*args,poffset=0,**kwargs):
-        self.obj['l'].append(('peek',poffset))
+    def peek(self,fnc,*args,offset=0,**kwargs):
+        self.obj['l'].append(('peek',offset))
         if isinstance(fnc,str):
             if fnc in {'u8','s8','u16','s16','u24','s24','u32','s32','u40','s40','u48','s48','u64','s64','u128','s128','f16','f32','f64','bool','bool32'}: fnc = ('write' if 'w' in self.mode else 'read') + fnc
             fnc = getattr(self,fnc)
@@ -212,7 +212,7 @@ class File(_File):
             args = (fnc,)
             fnc = self.read
         p = self.pos
-        self.seek(p + poffset,_basic=False)
+        self.seek(p + offset,_basic=False)
         try: r = fnc(*args,**kwargs)
         finally: self.seek(p,_basic=False)
         self.obj['l'].append(('peekend',))

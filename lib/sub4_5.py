@@ -1364,7 +1364,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
-            asrt(f.peek('u16') == 9 and f.peek('u8',poffset=3) == 0xEA)
+            asrt(f.peek('u16') == 9 and f.peek('u8',offset=3) == 0xEA)
 
             xinf = []
             sc = 0
@@ -1391,7 +1391,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                     f.skip(4)
                     bp = f.pos
                     while f.pos + 4 < f.size:
-                        if f.peek('u8') <= 15 and f.peek('u8',poffset=3) == 0xEA: break
+                        if f.peek('u8') <= 15 and f.peek('u8',offset=3) == 0xEA: break
                         f.skip(8)
 
                     sz = f.pos - bp
@@ -1482,7 +1482,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                     f.skip(4)
                     bp = f.pos
                     while f.pos + 4 < f.size:
-                        if f.peek('u8') != 1 and f.peek('u8',poffset=3) == 0xEA: break
+                        if f.peek('u8') != 1 and f.peek('u8',offset=3) == 0xEA: break
                         f.skip(8)
 
                     sz = f.pos - bp
@@ -1497,7 +1497,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                     f.skip(4)
                     writefile(f'{o}/$inode{sc}.tbl',f.readc(0x1E0))
                     while f.pos + 4 < f.size:
-                        if f.peek('u16') == 0x0806 and f.peek('u8',poffset=3) == 0xEA: break
+                        if f.peek('u16') == 0x0806 and f.peek('u8',offset=3) == 0xEA: break
                         f.skip(8)
                 elif byn is False and rt == 6 and rst == 8:
                     if f.left < 0x2C: break
