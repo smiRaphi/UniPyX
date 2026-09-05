@@ -189,6 +189,12 @@ EXPORT ssize_t decompress_winzip_jpeg(const uint8_t *restrict src, const size_t 
     return usize;
 }
 
+XIMPORT(tersedecompress)
+EXPORT ssize_t decompress_terse(const uint8_t *restrict src, const size_t zsize,
+                                      uint8_t *restrict dst, const ssize_t usize, const int8_t text) {
+    return tersedecompress_decompress(src, zsize, dst, usize, text);
+}
+
 EXPORT void free_exp(void *ptr) { free(ptr); }
 
 #ifdef __cplusplus

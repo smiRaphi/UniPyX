@@ -430,20 +430,19 @@ EXPORT void init_selene(uint8_t *restrict dst, const uint8_t *restrict key, cons
         if (kc >= ksize) kc = 0;
     }
 }
-EXPORT void decrypt_rc4_playpond(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize, const size_t drop) {
+EXPORT void decrypt_playpond_rc4(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize, const size_t drop) {
     uint8_t S[0x100];
-    for (size_t i=0;i < 0x100;i++) S[i] = i;
+    for (uint16_t i=0;i < 0x100;i++) S[i] = i;
 
     uint8_t j = 0;
-    size_t kc = 0;
+    size_t kp = 0;
     for (size_t ix=0;ix < 0x100;ix++) {
         for (size_t i=0;i < 0x100;i++) {
-            j += S[i] + key[kc];
+            j += S[i] + key[kp++];
+            if (kp >= ksize) kp = 0;
             uint8_t b = S[j];
             S[j] = S[i];
             S[i] = b;
-            kc += 1;
-            if (kc >= ksize) kc = 0;
         }
     }
 
@@ -621,6 +620,24 @@ EXPORT void decrypt_eac(uint8_t *restrict buf, const size_t size, const uint8_t 
     for (size_t p=size - 2;p > 0;p--)
         buf[p] += -key * p - buf[p + 1];
     buf[0] -= buf[1];
+}
+EXPORT void decrypt_blackenergy_rc4(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize) {
+    uint8_t S[0x100];
+    size_t kp = 0;
+    for (uint16_t i=0;i < 0x100;i++) {
+        S[i] = i ^ key[kp++];
+        if (kp >= ksize) kp = 0;
+    }
+    uint8_t i = 0;
+    uint8_t j = 0;
+    for (size_t p=0;p < size;p++) {
+        j += S[++i];
+        uint8_t ix = S[i] + S[j];
+        uint8_t b = S[i];
+        S[i] = S[j];
+        S[j] = b;
+        buf[p] ^= S[ix];
+    }
 }
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {

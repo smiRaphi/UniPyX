@@ -618,6 +618,31 @@ eof:
     #undef CHKo
     return op;
 }
+EXPORT ssize_t decompress_rle(const uint8_t *restrict src, const size_t zsize,
+                                    uint8_t *restrict dst, const ssize_t usize) {
+    size_t ip = 0;
+    ssize_t op = 0;
+    #define CHKi(n) if (ip + (n) >= zsize) goto eof;
+
+    while (ip < zsize && (usize == -1 || op < usize)) {
+        int16_t c = (int8_t)src[ip++];
+        if (c < 0) {
+            CHKi(0)
+            c = -c;
+            if (c > usize - op) c = usize - op;
+            memset(dst + op, src[ip++], c);
+        } else {
+            c++;
+            if (c > usize - op) c = usize - op;
+            CHKi(c)
+            memcpy(dst + op, src + ip, c);
+        }
+    }
+
+eof:
+    #undef CHKi
+    return op;
+}
 EXPORT ssize_t decompress_huffman(const uint8_t *restrict src, const size_t zsize,
                                         uint8_t *restrict dst, const ssize_t usize, const int8_t padding) {
     BitReader br;
@@ -907,12 +932,12 @@ eof:
     #undef CHKi
     return op;
 }
-// flags: 1 - big endian, 2 - VAX/unix bugs, 4 - early code size change
+// flags: 1 - big endian, 2 - VAX/unix bugs, 4 - early code size change, 8 - reset on max_dict
 // Unix compress: Not working! https://github.com/vapier/ncompress/blob/main/compress.c
 EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
                                     uint8_t *restrict dst, const ssize_t usize,
                               const uint8_t max_bits, const uint32_t max_dict, const uint16_t init_code_size,
-                              const uint16_t first_code, const int32_t clear_code, const int32_t end_code, const uint8_t flags) {
+                                    int32_t first_code, const int32_t clear_code, const int32_t end_code, const uint8_t flags) {
     if (max_bits > 16 || max_dict > 0x10000) return -1;
 
     uint8_t *dict_data = malloc(max_dict * sizeof(uint16_t) + max_dict * sizeof(uint8_t) * 2);
@@ -921,13 +946,17 @@ EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
     uint8_t *dict = dict_data + max_dict*sizeof(uint16_t);
     uint8_t *stack = dict + max_dict*sizeof(uint8_t);
 
+    ssize_t op = 0;
     BitReader br;
     init_BitReader(&br, src, zsize);
     uint16_t code_size = init_code_size;
+    if (first_code == -1) {
+        if (is_eofn(&br, code_size)) { op = -1;goto eof; };
+        first_code = get_bits_l(&br, code_size);
+    }
     uint32_t next_code = first_code;
     int32_t old_code = -1;
     uint8_t firstc = 0;
-    ssize_t op = 0;
 
     uint8_t chng_off = (flags & 4) ? 1 : 0;
     uint8_t vax_cc = 0;
@@ -974,6 +1003,13 @@ EXPORT ssize_t decompress_lzw(const uint8_t *restrict src, const size_t zsize,
         for (int32_t i=stackp-1;i >= 0;i--) {
             if (usize != -1 && op >= usize) break;
             dst[op++] = stack[i];
+        }
+
+        if (flags & 8 && next_code == max_dict - 2) {
+            next_code = first_code;
+            code_size = init_code_size;
+            old_code = -1;
+            continue;
         }
 
         if (next_code < max_dict) {
@@ -1174,6 +1210,79 @@ EXPORT ssize_t decompress_cc3(const uint8_t *restrict src, const size_t zsize,
 
 eof:
     #undef CHKi
+    return op;
+}
+static inline uint32_t aplib_get_gamma(BitReader *br) {
+    uint32_t v = 1;
+    do {
+        v = (v << 1) | get_bit(br);
+    } while (!is_eof(br) && get_bit(br));
+    return v;
+}
+EXPORT ssize_t decompress_aplib(const uint8_t *restrict src, const size_t zsize,
+                                      uint8_t *restrict dst, const ssize_t usize) {
+    if (usize == 0) return 0;
+
+    BitReader br;
+    init_BitReader(&br, src, zsize);
+    ssize_t op = 0;
+    dst[op++] = get_byte_br(&br);
+
+    uint8_t lwm = 0;
+    uint32_t loff = 0xFFFFFFFF;
+    while (!is_eof(&br) && (op < usize || usize == -1)) {
+        if (get_bit(&br)) {
+            if (get_bit(&br)) {
+                if (get_bit(&br)) {
+                    uint8_t off = 0;
+                    for (uint8_t i=0;i < 4;i++) off = (off << 1) | get_bit(&br);
+                    if (off == 0) dst[op++] = 0;
+                    else {
+                        if (off > op) off = op;
+                        dst[op] = dst[op - off];
+                        op++;
+                    }
+                    lwm = 0;
+                } else {
+                    uint8_t b = get_byte_br(&br);
+                    uint8_t off = b >> 1;
+                    if (off == 0) goto eof;
+                    loff = off;
+                    uint8_t len = 2 + (b & 1);
+                    if (off > op) off = op;
+                    if (usize != -1 && op + len > usize) len = usize - op;
+                    for (uint8_t i=0;i < len;i++,op++) dst[op] = dst[op - off];
+                    lwm = 1;
+                }
+            } else {
+                uint32_t off = aplib_get_gamma(&br);
+                uint32_t len;
+                if (lwm == 0 && off == 2) {
+                    off = loff;
+                    len = aplib_get_gamma(&br);
+                } else {
+                    off -= (lwm == 0) ? 3 : 2;
+                    off = (off << 8) | get_byte_br(&br);
+                    len = aplib_get_gamma(&br);
+                    if (off >= 32000) len++;
+                    if (off >= 1280) len++;
+                    if (off < 0x80) len += 2;
+                    loff = off;
+                }
+
+                if (off == 0) goto eof;
+                if (off > op) off = op;
+                if (usize != -1 && op + len > usize) len = usize - op;
+                for (uint32_t i=0;i < len;i++,op++) dst[op] = dst[op - off];
+                lwm = 1;
+            }
+        } else {
+            dst[op++] = get_byte_br(&br);
+            lwm = 0;
+        }
+    }
+
+eof:
     return op;
 }
 

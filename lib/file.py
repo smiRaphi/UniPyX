@@ -93,13 +93,14 @@ class File:
             o.extend(d)
             p = o.find(c,max(0,len(o) - len(d) - lnc + 1),maxl or len(o))
             if p != -1:
+                self.back(len(o) - p - (lnc if skip else 0))
                 o = o[:p + (lnc if include else 0)]
-                self.back(len(d) - p - (lnc if skip else 0))
                 break
             if len(d) != chks or (maxl is not None and len(o) >= maxl):
                 if eoferr:
                     self.back(len(o))
                     raise EOFError
+                o = o[:maxl]
                 break
         return bytes(o)
     def readall(self):
@@ -568,6 +569,7 @@ class EXE(File):
         asrt(self.read(2) == b'MZ')
         self.seek(0x3C)
         self.coff_off = self.readu32()
+        self.ovl_end_off = self.size
         if not dos and self.coff_off != 0:
             self.seek(self.coff_off)
             self.secs = {}
@@ -576,7 +578,17 @@ class EXE(File):
                 self.skip(2)
                 secs = self.readu16()
                 self.skip(12)
-                self.skip(self.readu16() + 2)
+                opts = self.readu16()
+                self.skip(2)
+                ep = self.pos + opts
+                if opts >= 0x88 and self.readu16() == 0x10B:
+                    self.skip(0x5A)
+                    rvs = self.readu32()
+                    if rvs >= 5:
+                        self.skip(0x20)
+                        certo = self.readu32()
+                        if certo: self.ovl_end_off = certo
+                self.seek(ep)
 
                 for _ in range(secs):
                     n = self.read(8).strip(b'\0').decode(errors='ignore')
@@ -680,10 +692,11 @@ NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} 
 LHZC = {f'lh{x}':f'-lh{x}-'.encode('latin1') for x in {0,5,6,7}}
 LZWM = {
     'mb':'max_bits','ics':'init_code_size','1c':'first_code','cc':'clear_code','ec':'end_code',
-    'be':'be','md':'max_dict','vp':'vax_padding','rc':'early_change',
+    'be':'be','md':'max_dict','vp':'vax_padding','rc':'early_change','rm':'reset_on_max',
 
     'lzw':   {'mb':13,'ics':9, '1c':0x102,'cc':0x100, 'ec':0x101, 'be':False},
     'lzw_lg':{'mb':14,'ics':14,'1c':0x100,'cc':0x3FFE,'ec':0x3FFF,'be':True,'md':0x3FFE},
+    'lzw_ys':{'mb':12,'ics':9, '1c':0x100,'rm':True,  'be':True, 'rc':True},
     'z':     {        'ics':9, '1c':0x100,            'be':False,'vp':True},
     'zb':    {        'ics':9, '1c':0x101,'cc':0x100, 'be':False,'vp':True},
 }
@@ -766,6 +779,17 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             asrt(i[:2] == b'\x1F\x9D' and i[2] & 0x60 == 0)
             kw = {LZWM[k]:v for k,v in LZWM['zb' if i[2] & 0x80 else 'z'].items()}
             return uxx().decompress_lzw(i[3:],kwargs.get('usize',len(i) * 10),max_bits=i[2] & 0x1F,**kw)
+        case 'terse':
+            if not 'usize' in kwargs:
+                kwargs['usize'] = len(i) * 10
+                if i[0] in {2,5}:
+                    recl = int.from_bytes(i[2:4],'big') or int.from_bytes(i[8:12],'big')
+                    if i[4] & 4: kwargs['usize'] = int.from_bytes(i[6:8],'big') * max(recl,4)
+                    if i[1]: kwargs['usize'] += int((kwargs['usize'] / recl) * 4)
+                elif i[0] in {1,7}:
+                    recl = int.from_bytes(i[4:6],'big')
+                if kwargs.get('text'): kwargs['usize'] += kwargs['usize'] // recl
+            return uxx().decompress_terse(i,**kwargs)
 
         case 'lzma'|'lzma_alone':
             import lzma
@@ -941,6 +965,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'reduce1'|'reduce2'|'reduce3'|'reduce4': return uxx().decompress_zip_reduce(i,usize=kwargs['usize'],level=int(algo[6:]))
         case 'pkzip_implode'|'zip_implode'|'pz_implode': return uxx().decompress_zip_implode(i,usize=kwargs['usize'],flags=kwargs.get('flags',0) & 6)
 
+        case 'rle': return uxx().decompress_rle(i,usize=kwargs['usize'])
         case 'huffman': return uxx().decompress_huffman(i,usize=kwargs['usize'],padding=kwargs.get('padding',False))
         case 'graw_bpe': return uxx().decompress_graw_bpe(i,usize=kwargs['usize'])
         case 'lzss0'|'lzss0_lsb': return uxx().decompress_lzss0_lsb(i,usize=kwargs['usize'])
@@ -949,13 +974,14 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return uxx().decompress_lzss0_win_lsb(i,usize=kwargs['usize'],win=kwargs.get('win'),woff=kwargs.get('woff',0xFEE))
         case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
-        case 'lzw'|'lzw_lg':
+        case 'lzw'|'lzw_lg'|'lzw_ys':
             kw = kwargs.copy()
+            asrt('usize' in kw)
             for k,v in LZWM[algo].items():
                 rk = LZWM[k]
                 if not rk in kw: kw[rk] = v
 
-            return uxx().decompress_lzw(i,kwargs['usize'],**kw)
+            return uxx().decompress_lzw(i,**kw)
         case 'rtl_lz':
             if 'usize' in kwargs: us = kwargs['usize']
             else: us,i = int.from_bytes(i[:8],'little'),i[8:]
@@ -1009,6 +1035,14 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             asrt(len(i) == zs,i[:0x10],len(i))
             if 'usize' in kwargs: asrt(kwargs['usize'] == us)
             return uxx().decompress_lzss0_lsb(i[0x10:],usize=us)
+        case 'yabukita_stream':
+            asrt(i[:2] == b'YS')
+            t = int.from_bytes(i[2:4],'little')
+            if t == 0: return uxx().decompress_lzss0_lsb(i[4:],usize=kwargs['usize']) # LZSS, untested
+            elif t == 1: return uxx().decompress_rle(i[4:],usize=kwargs['usize']) # RLE, untested
+            elif t == 2: return decompress(i[4:],'lzw_ys',usize=kwargs['usize']) # LZW
+            raise ValueError(f'Unknown stream compression type {t}')
+        case 'aplib': return uxx().decompress_aplib(i,kwargs['usize'])
 
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'

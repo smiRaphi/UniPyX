@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1082
+# Supported Formats: 1085
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -232,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (141)
+## Executables/Packers/Installers (142)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -240,7 +240,7 @@ Name | Extension(s) | Extractor(s) | Comment
 .NETZ | .exe | Custom |
 4kZIP | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 624 | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
-Advanced Installer | .exe | Input (/extract) |
+Advanced Installer | .exe | Custom |
 Ady's Glue | .exe | Custom |
 AMI Aptio Capsule | .cap | [UEFIExtract](https://github.com/LongSoft/UEFITool) |
 Amiga Kickstart ROM | .rom | [amitools](https://github.com/cnvogelg/amitools) + [ROMSplit SplitData](https://web.archive.org/web/20250808152813/http://www.doobreynet.co.uk/beta/index.html) |
@@ -253,6 +253,7 @@ Bat2Exe | .exe | Custom |
 Big EXE | .exe | Custom | Carves out EXEs and tries to extract those
 Bink Video EXE | .exe | Custom |
 BitRock Installer | .exe | Custom |
+BlackEnergy Crypter | .exe | Custom |
 bytepress | .exe | [BytePressDecompressor](https://web.archive.org/web/20201001175533/https://github.com/ribthegreat99OrN0P/BytePressDecompressor) + [bytepress.lib.dll](https://github.com/roachadam/bytepress/releases) |
 Bytessence Install Maker | .exe | Custom |
 C64 1001 CardCruncher | .prg | [unp64](https://iancoog.altervista.org/)
@@ -378,7 +379,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (587)
+## Various (589)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -624,14 +625,15 @@ Hollow Knight Save | ??? | Custom |
 Hornby BSF | .bsf | Custom |
 Hudson Arc Dat | .bin | Custom |
 IBM AIX Backup | .bff .bck .img .ima \* | Custom |
-IBM XMIT Transmit | .xmit .xmi | [xmitviewer](https://github.com/Hanspe-3019/xmitviewer) |
+IBM EBCDIC DOC JCL | .data | Custom |
+IBM XMIT Transmit | .xmit .xmi | [xmi-reader](https://pypi.org/project/xmi-reader/) |
 ICU Data | .dat | [icupkg](https://github.com/unicode-org/icu) |
 ID String0 Count8 Data | ??? | Custom |
 idTech 7 Resource | .resource | Custom |
 IFF Data | .iff \* | Custom |
 Impact Screensaver ILB | .ilb | Custom |
 Import Tuner Challenge TOC+DAT | .toc+.dat | Custom |
-Initial D XAF | .xaf | [assamUnpack](https://github.com/refint/assamUnpack) |
+Initial D XAF | .xaf | Custom |
 Ion Storm Resource | ??? | Custom |
 IPS Patch | .ips | Custom |
 IPS32 Patch | .ips | Custom |
@@ -837,6 +839,7 @@ Sandustry Save | .save .save.backup | Custom |
 SARC | .arc .sarc | [sarc.py](https://github.com/zeldamods/sarc) |
 SCS Archive | .scs | [scsgames.bms](https://mirror.aluigi.org/bms/scsgames.bms) |
 SDFTool SDF.bin | .bin | Custom |
+SEGA Yabukita Stream | .ys | Custom |
 Selene Pack | .pack | Custom |
 Sengoku Basara 2 Compressed | \* | Custom |
 SharkPortSave | ??? | Custom |
@@ -1087,7 +1090,7 @@ Squeeze It | .sqz | [SQZ](https://github.com/sourcekris/uniextract/blob/main/too
 SQUID | .sqd | [SQUID](https://compressme.net/) |
 SR3 | .sr3 | [SR3](https://mattmahoney.net/dc/#sr2) |
 SZIP | .szip .szp | [szip](http://www.compressconsult.com/szip/szip_112a_win32.zip)(src?) |
-TERSE | ??? | [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp) |
+TERSE | .pack .spack .terse | Custom |
 THOR | ??? | [THOR](https://web.archive.org/web/20140115050229/http://www.maximumcompression.com/thor_096.zip) |
 TANGELO | .tangelo | [TANGELO](https://encode.su/threads/1738-TANGELO-new-compressor-(derived-from-PAQ8-FP8)) |
 Turbo Range Coder | .trc | [Turbo Range Coder](https://github.com/powturbo/Turbo-Range-Coder) |
@@ -1130,7 +1133,7 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Comp. | LZMA | type = 14, special zip version |
 | <ul><li>[x] </li></ul> | Comp. | Oodle | type = 15, unofficial, used by "New World: Aeternum" |
 | <ul><li>[ ] </li></ul> | Comp. | CMPSC | type = 16, IBM, never seen | https://github.com/Fish-Git/cmpsctst
-| <ul><li>[ ] </li></ul> | Comp. | TERSE | type = 18, IBM, never seen | https://github.com/openmainframeproject/tersedecompress/tree/master/cpp/src
+| <ul><li>[x] </li></ul> | Comp. | TERSE | type = 18, IBM, never seen, untested | https://github.com/openmainframeproject/tersedecompress/tree/master/cpp/src
 | <ul><li>[x] </li></ul> | Comp. | Xceed BWT | type = 18, unofficial, stripped bzip2 | https://xceed.com/documentation/xceed-zip-for-activex/BWT.html
 | <ul><li>[ ] </li></ul> | Comp. | LZ77Z | type = 19, IBM, never seen |
 | <ul><li>[x] </li></ul> | Comp. | ZSTD | type = 20, deprecated |

@@ -2016,12 +2016,12 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
             f.skip(8)
             c,ifs = f.readu32(),f.readu32()
             f.skip(0x34)
-            fi = File(decrypt(f.readc(ifs),'rc4_pp',*keys[v]),endian=f.endian)
+            fi = File(decrypt(f.readc(ifs),'playpond_rc4',*keys[v]),endian=f.endian)
             for _ in range(c):
                 fn = fi.readc(fi.readu32()).rstrip(b'\0').decode('ascii')
                 f.seek(fi.readu32())
                 us,zs = fi.readu32(),fi.readu32()
-                d = decrypt(f.readc(zs),'rc4_pp',keys[v][0],(zs & 0xFFF) + 0xFF)
+                d = decrypt(f.readc(zs),'playpond_rc4',keys[v][0],(zs & 0xFFF) + 0xFF)
                 writefile(o + '/' + fn,decompress(d,'zlib',usize=us))
 
             f.close()

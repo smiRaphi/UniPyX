@@ -2279,15 +2279,6 @@
         }],
         "ts":1763655613
     },
-    "tersedecompress++":{
-        "p":"tersedecompress++.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "tersedecompress++.exe":"tersedecompress++.exe"
-            }
-        }]
-    },
     "c1541":{
         "p":"VICE/c1541.exe",
         "fs":[{

@@ -178,8 +178,15 @@ static inline uint8_t get_bit(BitReader *br) {
         br->buf = *(br->ptr++);
         br->bits = 8;
     }
-    br->bits--;
-    return (br->buf >> br->bits) & 1;
+    return (br->buf >> --br->bits) & 1;
+}
+static inline const uint8_t* get_bytes_br(BitReader *br, size_t n) {
+    const uint8_t *rp = br->ptr;
+    br->ptr += n;
+    return rp;
+}
+static inline uint8_t get_byte_br(BitReader *br) {
+    return *(br->ptr++);
 }
 static inline uint64_t get_bits(BitReader *br, size_t n) {
     uint64_t v = 0;

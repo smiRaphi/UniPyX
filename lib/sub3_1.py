@@ -6,6 +6,15 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
     o = out
 
     match t:
+        case 'Code Cruncher 3':
+            db.try_custom()
+            from lib.file import decompress
+            d = readfile(i)
+            asrt(d[:4] == b'\xF3KSA' and d[10] == 1 and d[0x19] == 0xC9)
+            od = decompress(d[0x1A + int.from_bytes(d[11:13],'little'):],'cc3')
+            if len(od) > len(d) :
+                writefile(o + '/' + basename(i),od)
+                return
         case 'install4j':
             db.try_custom()
             from lib.file import EXE
@@ -285,5 +294,28 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
             writefile(f'{o}/{adr:04X}.bin',d)
             f.close()
             return
+        case 'BlackEnergy Crypter':
+            db.try_custom()
+            from lib.file import EXE,decompress
+            from lib.crypto import decrypt
+            e = EXE(i)
+            e.seek(e.secs['.data'][0])
+
+            us = e.readu32()
+            ecs = e.readu32()
+            k = e.readu32()
+            d = e.read(e.secs['.data'][2] - e.pos)
+            e.close()
+            if ecs:
+                ed,d = d[:ecs],d[ecs:]
+                for p in range(0xFFF,-1,-1):
+                    ed = decrypt(ed,'blackenergy_rc4',(k ^ p).to_bytes(4,'little'))
+                d = ed + d
+            asrt(d[:1] == b'M' and d[2:3] == b'Z' and d[1] & 0x80 == 0)
+            d = decompress(d,'aplib',usize=us)
+            asrt(len(d) == us,len(d),us,d[:0x20])
+
+            writefile(o + '/' + basename(i),d)
+            if d: return
 
     return 1

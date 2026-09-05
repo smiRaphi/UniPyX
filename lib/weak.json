@@ -36,5 +36,9 @@
 "Windows Device Dependent Bitmap",
 "Continuous Wave Accelerometry data",
 "DIY-Thermocam raw data",
-"Memo File Apollo Database Engine"
+"Memo File Apollo Database Engine",
+"TERSE compressed data (PACK, U)",
+"TERSE compressed data (PACK, V)",
+"TERSE compressed data (SPACK, U)",
+"TERSE compressed data (SPACK, V)"
 ]

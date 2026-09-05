@@ -256,11 +256,16 @@ def extract5(inp:str,out:str,t:str) -> bool:
             writefile(o + '/' + tbasename(i),od)
             return
         case 'TERSE':
+            db.try_custom()
+            from lib.file import decompress
             of = o + '/' + (tbasename(i) if i.lower().endswith(('.pack','.spack','.terse')) else basename(i))
-            run(['tersedecompress++',i,of])
-            if exists(of) and getsize(of): return
-            run(['tersedecompress++',i,of,'-b'])
-            if exists(of) and getsize(of): return
+            id = readfile(i)
+            if id[0] in {2,5}:
+                d = decompress(id,'terse',text=True)
+                if not istext(d,'latin-1'): d = decompress(id,'terse',text=False)
+            else: d = decompress(id,'terse',text=False)
+            writefile(of,d)
+            if d: return
         case 'UCLPack':
             db.try_custom()
             from lib.file import decompress

@@ -445,12 +445,16 @@ def set_ftime(p:str,ct:int=None,mt:int=None,at:int=None,unix=True):
         mt = filetime2unix(mt)
     os.utime(p,(at,mt))
 
-TEXTBL = {'\0','\1','\2','\3','\4','\5','\6','\7','\x08','\x0B','\x0C','\x0E','\x0F','\x10','\x11','\x12','\x13','\x14','\x15','\x16','\x17','\x18','\x19','\x1A','\x1B','\x1C','\x1D','\x1E','\x1F','\x7F'}
-TXTFBL = TEXTBL | {'\r','\n','\t','?','*','<','>','|'}
-def istext(d:bytes,encoding='ascii',filename=False):
+TEXTBL = {'\x00','\x01','\x02','\x03','\x04','\x05','\x06','\x07','\x08','\x0B','\x0C','\x0E','\x0F','\x10','\x11','\x12','\x13','\x14','\x15','\x16','\x17','\x18','\x19','\x1A','\x1B','\x1C','\x1D','\x1E','\x1F','\x7F',
+          '\x80','\x81','\x82','\x83','\x84','\x85','\x86','\x87','\x88','\x89','\x8A','\x8B','\x8C','\x8D','\x8E','\x8F','\x90','\x91','\x92','\x93','\x94','\x95','\x96','\x97','\x98','\x99','\x9A','\x9B','\x9C','\x9D','\x9E','\x9F'}
+TXTFBL = TEXTBL | {'\r','\n','\t','?','*','<','>','|','"','\xA0','\xAD'}
+def istext(d:bytes,encoding='ascii',filename=False,eof=True):
     try: dd = d.decode(encoding)
     except UnicodeDecodeError: return False
-    if dd[-1] == '\x1A': dd = dd[:-1] # strip EOF
+    if eof:
+        if dd.endswith('\x1A'): dd = dd[:-1] # strip EOF
+        elif dd.endswith('\x1A\n'): dd = dd[:-2]
+        elif dd.endswith('\x1A\r\n'): dd = dd[:-3]
     bl = TXTFBL if filename else TEXTBL
     return not any(c in bl for c in dd)
 

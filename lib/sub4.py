@@ -893,8 +893,54 @@ def extract4(inp:str,out:str,t:str) -> bool:
             writefile(o + '/' + tbasename(i) + '.json',d[:-d[-1]])
             return
         case 'Initial D XAF':
-            run(['assamunpack',i],cwd=o)
-            if listdir(o): return
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'xaf0' and f.readu32() == 2)
+
+            bs,c = f.readu32(),f.readu32()
+            f.seek(0x30)
+            writefile(o + '/$info.txt',f'Game: {f.reads(0x40).rstrip("\0")}\nDeveloper: {f.reads(0x40).rstrip("\0")}\n')
+
+            f.seek(0x100)
+            ds = {-1:o}
+            fs = []
+            for ix in range(c):
+                n = f.reads(0x80).rstrip('\0')
+                fl,p = f.readu32(),f.reads32()
+                n = ds[p] + '/' + n
+                f.skip(8)
+                if fl & 1:
+                    asrt(fl & 0xFFFFFEFE == 0,lambda:f.fmt('§@§',back=0x10))
+                    f.padc(4)
+                    fe = (f.readu32(),f.readu32())
+                    f.padc(4)
+                    fs.append((n,fl,*fe,f.readu32() * bs))
+                    f.padc(12)
+                else:
+                    asrt(fl >> 1 == 0,lambda:f.fmt('§@§',back=0x10))
+                    f.padc(0x20)
+                    ds[ix] = n
+
+            for dn in ds.values(): mkdir(dn)
+            for fe in fs:
+                f.seek(fe[4])
+                try: writefile(fe[0],f.decompress(fe[3],'yabukita_stream' if fe[1] & 0x100 else 'none',usize=fe[2]))
+                except ValueError:
+                    print(fe)
+                    raise
+
+            f.close()
+            if fs: return
+        case 'SEGA Yabukita Stream':
+            db.try_custom()
+            from lib.file import decompress
+            of = o + '/' + basename(i)
+            if of.lower().endswith('.$cmp'): of = of[:-5]
+            elif of.lower().endswith('.ys'): of = of[:-3]
+            d = readfile(i)
+            writefile(of,decompress(d,'yabukita_stream',usize=len(d) * 10))
+            if getsize(of): return
         case 'Safari WebArchive':
             if db.print_try: print('Trying with pywebarchive')
             import webarchive # type: ignore

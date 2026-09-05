@@ -670,5 +670,34 @@ Unknown 2: {f.reads(f.readu32())}""")
                 else: raise NotImplementedError(dn)
 
             if suc: return
+        case 'IBM EBCDIC DOC JCL':
+            db.try_custom()
+            f = xopen(i,'rt',encoding='cp500')
+
+            fs = {}
+            while True:
+                l = f.read(0x46)
+                if not l: break
+                d = ''
+                while len(d) != 8:
+                    c = f.read(1)
+                    if not c: break
+                    if d or c != ' ': d += c
+                if d:
+                    for _ in range(2):
+                        if f.read(1) not in {'','/'}:
+                            f.seek(f.tell() - 1)
+                            break
+                else:
+                    fs['$truncated'] = [l]
+                    break
+                if not d in fs: fs[d] = []
+                fs[d].append(l)
+            f.close()
+
+            for k,v in fs.items():
+                writefile(o + '/' + sub_path(k,slash=True) + '.txt','\n'.join(v) + '\n')
+
+            if fs: return
 
     return 1

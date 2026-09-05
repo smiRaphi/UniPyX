@@ -250,6 +250,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 return
         case 'VISE Installer': return quickbms('instexpl')
         case 'MSI':
+            i = i.replace('/','\\')
+            o = o.replace('/','\\')
+            mkdir(o)
             td = TmpDir(path=o)
             run(['lessmsi','x',i,td + '\\'])
             if exists(td + '/SourceDir') and listdir(td + '/SourceDir') and sum(map(getsize,rldir(td.p))) > (getsize(i) / 50):
@@ -264,11 +267,13 @@ def extract3(inp:str,out:str,t:str) -> bool:
 
             td = TmpDir(path=o)
             run(['msiexec','/a',i,'/qn','/norestart','TARGETDIR=' + td],getexe=False)
+            r = bool(listdir(td.p))
             copydir(td,o,True)
             td.destroy()
-            if listdir(o): return
+            if r: return
+            co = listdir(o)
             zip7(i,o,t,True)
-            if listdir(o): return
+            if [x for x in listdir(o) if x not in co]: return
         case 'MSP':
             run(['msix',i,'/out',o,'/ext'])
             if listdir(o): return
@@ -440,21 +445,48 @@ def extract3(inp:str,out:str,t:str) -> bool:
             run([i,'/s','/nos_ne','/nos_o' + o],print_try=False,env=os.environ.copy() | {'__COMPAT_LAYER':'RUNASINVOKER'})
             if listdir(o): return
         case 'Advanced Installer':
-            if db.print_try: print('Trying with input (/extract)')
-            td = TmpDir()
+            db.try_custom()
+            from lib.file import EXE
+            f = EXE(i)
+            f.seek(f.ovl_end_off - 0x100)
+            f.readu(b'ADVINSTSFX',maxl=0x100,skip=False,eoferr=True)
 
-            p = subprocess.Popen([i,'/extract',td.p],stdout=-1,stderr=-1)
-            for _ in range(25):
-                if p.poll() != None: break
-                sleep(0.1)
-            else: p.kill()
+            f.back(4)
+            v = f.peek('u32')
+            if v > 0: f.back(0x20) # some hash in hex
+            f.back(12)
+            ho,to = f.readu32(),f.readu32()
+            # u32: overlay off
 
-            if listdir(td.p):
-                bp = td.p + '\\' + listdir(td.p)[0]
-                for f in listdir(bp):
-                    if not f.endswith('.msi') or extract(bp + '\\' + f,o,'MSI'): mv(bp + '\\' + f,o + '\\$INSFILES\\' + f)
-                td.destroy()
-                if listdir(o): return
+            f.seek(ho)
+            if v > 0: f.skip(8) # u32: ?, u32: ho again
+            c = f.readu32()
+            # u32: ?, only seen as 0x64
+
+            f.seek(to)
+            fs = []
+            for _ in range(c):
+                if v > 0: f.skip(12) # u32: ?, u32: id, u32: ?
+                else: f.skip(4) # id
+                fs.append((f.readu32(),f.readu32(),f.readutf16(f.readu32()) if v > 0 else f.reads(f.readu32(),'utf-8')))
+
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/$INSFILES/' + fe[2],f.read(fe[0]))
+            f.close()
+            if fs:
+                fns = [fe[2].lower() for fe in fs]
+                msi = [x for x in fns if x.endswith('.msi')]
+                suc = True
+                for fn in msi:
+                    if fn.endswith('.msi'):
+                        r = extract3(o + '/$INSFILES/' + fn,o if len(msi) == 1 else o + '/' + fn[:-4],'MSI')
+                        if not r is None: suc = False
+                if suc:
+                    for fn in fns:
+                        if fn.endswith(('.msi','.cab')): remove(o + '/$INSFILES/' + fn)
+                    if not listdir(o + '/$INSFILES'): remove(o + '/$INSFILES')
+                return
         case 'CExe':
             db.try_custom()
             from lib.file import ext_exe,decompress,iszl
@@ -2953,15 +2985,6 @@ def extract3(inp:str,out:str,t:str) -> bool:
             writefile(o + '/2.EXE',e.readc(e.ovl_off))
             del e
             return
-        case 'Code Cruncher 3':
-            db.try_custom()
-            from lib.file import decompress
-            d = readfile(i)
-            asrt(d[:4] == b'\xF3KSA' and d[10] == 1 and d[0x19] == 0xC9)
-            od = decompress(d[0x1A + int.from_bytes(d[11:13],'little'):],'cc3')
-            if len(od) > len(d) :
-                writefile(o + '/' + basename(i),od)
-                return
 
     return 1
 

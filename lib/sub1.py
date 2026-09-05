@@ -82,7 +82,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             db.try_custom()
             from lib.file import decompress
             of = o + '\\' + tbasename(i)
-            d = decompress(readfile(i),'zstd',db=db)
+            d = decompress(readfile(i),'zstd')
             writefile(of,d)
 
             xm = {b'RARC':'RARC',b'SARC':'SARC',b'NARC':'NitroARC',b'darc':'Nintendo Data ARChive'}
@@ -601,16 +601,19 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     fe['sha1'] = d
                     refs.append(fe)
                     continue
-
                 if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
                     d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
+                elif fe['ct'] == 18 and ((d[0] in {1,7} and d[1:4] == b'\x89\x69\xA5') or (d[0] in {2,5} and d[1] in {0,1})):
+                    dd = decompress(d,'terse',usize=fe['us'],text=False)
+                    if d[0] in {2,5} and len(d) != fe['us']:
+                        d = decompress(d,'terse',text=True)
+                    else: d = dd
                 elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
                     d = decompress(d,'lzfse',usize=fe['us'])
-                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD':
-                    d = decompress(d,'lpaq8',usize=fe['us'])
+                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD': d = decompress(d,'lpaq8',usize=fe['us'])
                 elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
                 elif fe['ct'] == 97 and d[:4] != b'wvpk': d = decompress(d,'brotli',usize=fe['us'])
-                elif fe['ct'] in {94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
+                elif fe['ct'] in {10,15,94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
                 else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
                 for pht in ('sha256','sha1','md5'):
                     if pht in fe:
@@ -772,13 +775,17 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     continue
                 if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
                     d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
+                elif fe['ct'] == 18 and ((d[0] in {1,7} and d[1:4] == b'\x89\x69\xA5') or (d[0] in {2,5} and d[1] in {0,1})):
+                    dd = decompress(d,'terse',usize=fe['us'],text=False)
+                    if d[0] in {2,5} and len(d) != fe['us']:
+                        d = decompress(d,'terse',text=True)
+                    else: d = dd
                 elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
                     d = decompress(d,'lzfse',usize=fe['us'])
-                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD':
-                    d = decompress(d,'lpaq8',usize=fe['us'])
+                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD': d = decompress(d,'lpaq8',usize=fe['us'])
                 elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
                 elif fe['ct'] == 97 and d[:4] != b'wvpk': d = decompress(d,'brotli',usize=fe['us'])
-                elif fe['ct'] in {94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
+                elif fe['ct'] in {10,15,94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
                 else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
                 if len(d) == fe['us']:
                     for pht in ('sha256','sha1','md5'):
@@ -1903,7 +1910,7 @@ ZFMTM = {
     14:'lzma_zip',
     15:'oodle', # unofficial, used by "New World: Aeternum", untested
     16:'cmpsc', # unsupported, https://github.com/Fish-Git/cmpsctst
-    18:'terse', # unsupported, https://github.com/openmainframeproject/tersedecompress/tree/master/cpp/src
+    18:'terse', # untested, uses https://github.com/openmainframeproject/tersedecompress/blob/master/cpp/src/TerseDecompresser.cpp
     # 18:'xceed_bwt', # unofficial
     19:'lz77z', # unsupported
     20:'zstd', # deprecated

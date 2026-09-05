@@ -118,6 +118,7 @@ class X:
             ('decompress_lzss1',    (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_rtl_lz',   (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_vicious_lz',(P(u8),szt,P(u8),sszt),  sszt,1),
+            ('decompress_rle',      (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_huffman',  (P(u8),szt,P(u8),sszt,s8),sszt,0),
             ('decompress_ash0',     (P(u8),szt,P(u8)),        sszt,0),
             ('decompress_vpk0',     (P(u8),szt,P(u8)),        sszt,0),
@@ -126,9 +127,10 @@ class X:
             ('decompress_camelot_blz',(P(u8),szt,P(u8),sszt), sszt,1),
             ('decompress_szdd_raw', (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_hammer',   (P(u8),szt,P(u8)),        sszt,0),
-            ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u32,u16,u16,s32,s32,u8),sszt,0),
+            ('decompress_lzw',      (P(u8),szt,P(u8),sszt,u8,u32,u16,s32,s32,s32,u8),sszt,0),
             ('decompress_lbalzss',  (P(u8),szt,P(u8),sszt,u8),sszt,0),
             ('decompress_cc3',      (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_aplib',    (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -150,7 +152,7 @@ class X:
             ('decrypt_rsdk5', (P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_hornby',(P(u8),szt,u8,u8),void,0),
             ('init_selene',   (P(u8),P(u8),szt,u32),void,0),
-            ('decrypt_rc4_playpond',(P(u8),szt,P(u8),szt,szt),void,0),
+            ('decrypt_playpond_rc4',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_remedy_ras',(P(u8),szt,u32),void,0),
             ('init_empire_magic',(P(u8),),void,0),
@@ -162,6 +164,7 @@ class X:
             ('decrypt_ady_glue',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_airrc4',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_eac',   (P(u8),szt,u8),void,0),
+            ('decrypt_blackenergy_rc4',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
             ('decrypt_snow2', (P(u8),szt,P(u32),P(u32),u8),void,0),
             ('decrypt_snow2_nexon',(P(u32),szt,P(u32),P(u32),u8),void,0),
@@ -218,7 +221,8 @@ class X:
             ('decompress_lzfse',(P(u8),szt,P(u8),szt),sszt,1),
             ('decompress_lpaq8',(P(u8),szt,P(u8),szt),sszt,1),
             ('decompress_zstd',(P(u8),szt,P(P(u8)),szt,P(u8),szt),sszt,0),
-            ('decompress_winzip_jpeg',(P(u8),szt,P(u8),szt),sszt,1),
+            ('decompress_winzip_jpeg',(P(u8),szt,P(u8),sszt),sszt,1),
+            ('decompress_terse',(P(u8),szt,P(u8),sszt,s8),sszt,0),
 
             ('free_exp',(voidp,),void,0),
         ):
@@ -258,6 +262,7 @@ class X:
     def decompress_capcom_yz2(src:bytes,usize:int) -> bytes: ...
     def decompress_lzfse(src:bytes,usize:int) -> bytes: ...
     def decompress_cc3(src:bytes,usize:int) -> bytes: ...
+    def decompress_aplib(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)
@@ -411,18 +416,19 @@ class X:
         od = ctypes.string_at(o,r)
         if usize == -1: self._free(o)
         return od
-    def decompress_lzw(self,src:bytes,usize:int,max_bits:int,init_code_size:int,first_code:int,clear_code:int=None,end_code:int=None,max_dict:int=None,
-                            be:bool=False,vax_padding:bool=False,early_change:bool=False):
+    def decompress_lzw(self,src:bytes,usize:int,max_bits:int,init_code_size:int,first_code:int=None,clear_code:int=None,end_code:int=None,max_dict:int=None,
+                            be:bool=False,vax_padding:bool=False,early_change:bool=False,reset_on_max:bool=False):
+        if first_code is None: first_code = -1
         if clear_code is None: clear_code = -1
         if end_code is None: end_code = -1
         if max_dict is None or max_dict < 0: max_dict = 1 << max_bits
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * usize)()
         r = self.dll.decompress_lzw(i,len(src),o,usize,max_bits,max_dict,init_code_size,first_code,clear_code,end_code,
-                                    (1 if be else 0) | (2 if vax_padding else 0) | (4 if early_change else 0))
+                                    (1 if be else 0) | (2 if vax_padding else 0) | (4 if early_change else 0) | (8 if reset_on_max else 0))
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
-    def decompress_hammer(self,src:bytes):
+    def decompress_hammer(self,src:bytes) -> bytes:
         asrt(len(src) > 8 and src[:3] == b'Hmr' and src[3] < 2)
         i = (u8 * len(src)).from_buffer_copy(src)
         o = (u8 * int.from_bytes(src[4:8],'little'))()
@@ -436,7 +442,7 @@ class X:
         r = self.dll.decompress_lbalzss(i,len(src),o,usize,fl)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
-    def decompress_lzss0_win_lsb(self,src:bytes,usize:int,win:bytes=None,woff:int=0xFEE):
+    def decompress_lzss0_win_lsb(self,src:bytes,usize:int,win:bytes=None,woff:int=0xFEE) -> bytes:
         if not win: win = b'\0'
         if len(win) == 1: win = win * 0x1000
         asrt(len(win) == 0x1000)
@@ -444,6 +450,12 @@ class X:
         o = (u8 * usize)()
         w = (u8 * 0x1000).from_buffer_copy(win)
         r = self.dll.decompress_lzss0_win_lsb(i,len(src),o,usize,w,woff)
+        if r < 0: raise ValueError(f'Decompression failed ({r})')
+        return bytes(o)[:r]
+    def decompress_terse(self,src:bytes,usize:int,text:bool=False) -> bytes:
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * usize)()
+        r = self.dll.decompress_terse(i,len(src),o,usize,1 if text else 0)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
 
@@ -455,6 +467,7 @@ class X:
     def decrypt_zipcrypto(src:bytes,key:bytes) -> bytes: ...
     def decrypt_ady_glue(src:bytes,key:bytes) -> bytes: ...
     def decrypt_airrc4(src:bytes,key:bytes) -> bytes: ...
+    def decrypt_blackenergy_rc4(src:bytes,key:bytes) -> bytes: ...
 
     def decrypt_rxor(self,src:bytes,key:bytes|int) -> bytes:
         if isinstance(key,bytes): key = key[0]
@@ -556,10 +569,10 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_xor(b,len(src),mk,len(mk))
         return bytes(b)
-    def decrypt_rc4_playpond(self,src:bytes,key:bytes,drop:int=0) -> bytes:
+    def decrypt_playpond_rc4(self,src:bytes,key:bytes,drop:int=0) -> bytes:
         b = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * len(key)).from_buffer_copy(key)
-        self.dll.decrypt_rc4_playpond(b,len(src),k,len(key),drop)
+        self.dll.decrypt_playpond_rc4(b,len(src),k,len(key),drop)
         return bytes(b)
     def decrypt_remedy_ras(self,src:bytes,key:int) -> bytes:
         b = (u8 * len(src)).from_buffer_copy(src)

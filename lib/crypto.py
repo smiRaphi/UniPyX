@@ -398,9 +398,12 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             k = bytearray(key)[:0x80] + b'\0'*0x80
             if len(key) < 0xFF: k[len(key) + 1] = (sum(key) * 2) & 0xFF
             return decrypt(i,'rc4',k.split(b'\0')[0],iv)
-        case 'rc4_pp'|'rc4_playpond':
+        case 'playpond_rc4':
             asrt(isinstance(key,bytes),err=TypeError)
-            return uxx().decrypt_rc4_playpond(i,key,iv or 0)
+            return uxx().decrypt_playpond_rc4(i,key,iv or 0)
+        case 'blackenergy_rc4':
+            asrt(isinstance(key,bytes),err=TypeError)
+            return uxx().decrypt_blackenergy_rc4(i,key)
         case 'hornby':
             iv = iv or 0xFF
             if isinstance(iv,bytes): iv = iv[0]

@@ -14,7 +14,6 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 ## Included tools
 * self compiled [hac2l](https://github.com/Atmosphere-NX/hac2l)
 * self compiled [psvpfsparser](https://github.com/motoharu-gosuto/psvpfstools/tree/io-api)
-* self compiled [assamUnpack](https://github.com/refint/assamUnpack) without input request
 * self compiled [atr](https://github.com/jhallen/atari-tools)
 * self compiled [CSC/CSArc](https://github.com/fusiyuan2010/CSC)
 * self compiled [NLZM](https://github.com/nauful/NLZM)
@@ -24,7 +23,6 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 * self compiled [MPQExtractor](https://github.com/Kanma/MPQExtractor)
 * self compiled [ZLI](https://github.com/facebook/openzl)
 * self compiled [lha](https://github.com/jca02266/lha)
-* self compiled [tersedecompress++](https://github.com/openmainframeproject/tersedecompress/blob/master/cpp)
 * self compiled [ddosutils](https://github.com/pulkomandy/ddosutils)
 * self compiled [bk_tools](https://github.com/MittenzHugg/bk_tools)
 * self compiled [paq8k3](https://github.com/JohannesBuchner/paq/tree/master/paq8k3)

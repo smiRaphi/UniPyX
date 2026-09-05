@@ -12,11 +12,6 @@
         "rs":"ARJZ","s":1
     },
     {
-        "rqr":["TERSE compressed data (PACK, U)","TERSE compressed data (PACK, V)","TERSE compressed data (SPACK, U)","TERSE compressed data (SPACK, V)"],
-        "d":["py","v=f.readi(1)\nif v in {1,7}:return True\nif not v in {2,5}:return False\nf.seek(2);r1=f.readi(2,'>');f.seek(8);r2=f.readi(4,'>')\nreturn r1+r2!=0 and(r1==0 or r2==0 or r1==r2)"],
-        "rs":"TERSE"
-    },
-    {
         "rq":["UPX","Install Creator Pro",true],
         "rs":"Install Creator Pro","s":1
     },
@@ -573,6 +568,16 @@
     {
         "d":[["isat","\\xE0\\xC9\\xD5\\xD4\\xD9\\xF0\\xF1",1]],
         "rs":"IBM XMIT Transmit","s":1
+    },
+    {
+        "d":[["isat","\\x61\\x61\\xD4\\xE5\\xE2\\xD4\\xD6\\xC4\\xE2",0],["contain","\\xC4\\xD6\\xC3\\x40\\xC6\\xC9\\xD3\\xC5\\x61\\x61",70,14]],
+        "rs":"IBM EBCDIC DOC JCL"
+    },
+    {
+        "d":[["isin",["\\1","\\7"],0],["isat","\\x89\\x69\\xA5",1],["n0",2,4]],
+        "rs":"TERSE"},{
+        "d":[["isin",["\\2","\\5"],0],["isin",["\\0","\\1"],1],["py","f.seek(2);r1,fl,r,b,r2=f.readi(2,'>'),f.readi(1),f.readi(1),f.readi(2,'>'),f.readi(4,'>');return (fl&4 or(fl==r==b==0))and(r1|r2)and not(r1 and r2 and r1!=r2)"]],
+        "rs":"TERSE"
     },
     {
         "d":[["isat","FILELINK_____END\\0\\0\\0\\0",8],["n0",4,0],["n0",4,0],["py","return not f.readi(4,'<')%8"]],
@@ -2382,8 +2387,12 @@
         "rs":"AmiPack","s":1
     },
     {
-        "d":[["isat","xaf0\\2",0],["isat","(c) SEGA CORPORATION",112]],
+        "d":[["isat","xaf0\\2\\0\\0\\0",0],["isat","(c) SEGA CORPORATION",112],["n0",4,8],["n0",4,12]],
         "rs":"Initial D XAF","s":1
+    },
+    {
+        "d":[["isat","YS",0],["isin",["\\0\\0","\\1\\0","\\2\\0"],2]],
+        "rs":"SEGA Yabukita Stream"
     },
     {
         "d":[["isat","\\x1B\\x03MASTR\\xFFEND!!!!\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x00\\x1A\\0",-31]],
