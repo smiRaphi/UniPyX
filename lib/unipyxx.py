@@ -168,6 +168,8 @@ class X:
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
             ('decrypt_snow2', (P(u8),szt,P(u32),P(u32),u8),void,0),
             ('decrypt_snow2_nexon',(P(u32),szt,P(u32),P(u32),u8),void,0),
+            ('decrypt_twofish_ecb',(P(u8),szt,P(u8),szt),void,0),
+            ('decrypt_twofish_cbc',(P(u8),szt,P(u8),szt,P(u8)),void,0),
 
             ('hash_pivotal',(P(u8),szt),u32,4),
             ('hash_super_fast_le',(P(u8),szt),u32,4),
@@ -637,6 +639,19 @@ class X:
         k = (u32 * (len(key) // 4)).from_buffer_copy(key)
         iv = (u32 * 4).from_buffer_copy(iv)
         self.dll.decrypt_snow2_nexon(b,len(src),iv,k,len(key))
+        return bytes(b)
+    def decrypt_twofish_ecb(self,src:bytes,key:bytes) -> bytes:
+        asrt(len(key) <= 32 and len(src) % 16 == 0)
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_twofish_ecb(b,len(src),k,len(key))
+        return bytes(b)
+    def decrypt_twofish_cbc(self,src:bytes,key:bytes,iv:bytes) -> bytes:
+        asrt(len(iv) == 16 and len(key) <= 32 and len(src) % 16 == 0)
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        i = (u8 * 16).from_buffer_copy(iv)
+        self.dll.decrypt_twofish_cbc(b,len(src),k,len(key),i)
         return bytes(b)
 
     def hash_pivotal(self,src:bytes) -> int: ...

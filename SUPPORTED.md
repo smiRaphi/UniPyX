@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1085
+# Supported Formats: 1090
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -232,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (142)
+## Executables/Packers/Installers (143)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -247,6 +247,7 @@ Amiga Kickstart ROM | .rom | [amitools](https://github.com/cnvogelg/amitools) + 
 Amisetup | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 AOLSetup | .exe | Custom |
 aPACK | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
+ASC2COM | .com | [deark](https://entropymine.com/deark/) |
 AVPACK | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 AXE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Bat2Exe | .exe | Custom |
@@ -295,7 +296,7 @@ Excel DNA XLL | .dll | [exceldna-unpack](https://github.com/augustoproiete/excel
 Excelsior Installer | .exe | Custom |
 EXECUTRIX-COMPRESSOR | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 ExeLITE | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
-EXEPACK | .exe .com | [deark](https://github.com/activescott/deark) |
+EXEPACK | .exe .com | [deark](https://entropymine.com/deark/) |
 Fatpack | .exe | Custom |
 GameCube DOLXZ | .dol | Custom |
 GPEComp | .elf ` ` | Custom |
@@ -318,7 +319,7 @@ JS MyObfuscate.com | .js | [js-beautify myobfuscate](https://github.com/beautifi
 LGLZ | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 LM-T2E | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Lua Bytecode | .lua .luac .lc | [unluac](https://sourceforge.net/project/unluac/), [luadec51-3](https://github.com/viruscamp/luadec) |
-LZEXE | .exe .com | [deark](https://github.com/activescott/deark) |
+LZEXE | .exe .com | [deark](https://entropymine.com/deark/) |
 MASM Installer | .exe | Custom + [7-Zip](https://7-zip.org/) |
 MSCAB SFX | .exe | [7-Zip](https://7-zip.org/), Input (/X), Input (/T), Input (-extract) |
 Multimedia Fusion 2.0 | .exe | Custom |
@@ -347,7 +348,7 @@ NE Resource DLL | .rsc .dll | Custom |
 Netopsystems FEAD | .exe | Input (/nos_ne) |
 PACKWIN | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Pascal Script Binary | .bin | [Inno Setup Decompiler](https://web.archive.org/web/20170201213810/http://vdisasm.com/isd/) |
-PKLITE | .exe .com | [deark](https://github.com/activescott/deark) |
+PKLITE | .exe .com | [deark](https://entropymine.com/deark/) |
 PKTINY | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Pro-Pack | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386), [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 RDT Compressor | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
@@ -379,7 +380,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (589)
+## Various (592)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -416,6 +417,7 @@ Alvion TIM2 Collection | .tm2col | Custom | extension is named by me as the pare
 American Conquest 2 GSC | .gsc | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 AMOS Memory Bank | ??? | Custom |
 AmusementMakers Project B.G. Archive | ??? | Custom |
+Android Boot Image | .img | Custom |
 Anna-Marie Archive | ??? | Custom |
 APETEC AIF | .aif .bin | Custom |
 Arc System Works PAC | .pac | [arcsys.bms](https://aluigi.org/bms/arcsys.bms) |
@@ -515,6 +517,7 @@ Death End re:Quest 2 ZLIB | \* | Custom |
 Deathloop Resource | .resource | Custom + [deathloop.bms](https://mirror.aluigi.org/bms/deathloop.bms) |
 Deep Silver Volition VPP | .vpp | Custom |
 Def Jam Fight For NY: The Takeover PAKN | .pakn | Custom |
+DeFrosTPAC Archive | .pac | Custom |
 DEL CUTSEQ | ??? | Custom |
 DelphiX Picture Collection | .dxc | Custom -> Borland Form |
 Delta Studio YSCE | .ysce | Custom |
@@ -674,6 +677,7 @@ LucasArts R2D2 Pack | \* | Custom |
 Lucky Chicken TOC+HFF | .toc+.hff | Custom |
 Ludia Dir | .dir | Custom |
 Ludia GWTarget | ` ` | Custom |
+LZX Archive | .lzx | [lzx](https://github.com/bitplane/amiga-lzx) |
 Macross: Do You Remember Love? GKO | .gko | Custom |
 Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
@@ -974,7 +978,7 @@ ZPackage | .zpk | Custom |
 ZUN GRZ | .grz | Custom |
 Zyclunt Game Archive | ??? | Custom |
 
-## Compression Enthusiasts/One-Off Formats (133)
+## Compression Enthusiasts/One-Off Formats (134)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 6pack | .6pack | [6unpack](https://github.com/ariya/FastLZ/blob/master/examples/6unpack.c) |
@@ -1028,6 +1032,7 @@ fxcm | .fxcm | [fxcm](https://github.com/kaitz/fxcm) |
 fxv | .fxv | [fxv](https://github.com/kaitz/fxv) |
 GDeflate | .gd | Custom |
 Gipfeli | .gipfeli | [gipfeli_tool](https://encode.su/threads/1609-gipfeli) |
+GLZA | .glza | [GLZA](https://encode.su/threads/1909-Tree-alpha-v0-1-download) |
 GMIX | .gmix | [gmix](https://github.com/byronknoll/gmix) |
 GRZip | ??? | [GRZip](https://www.sac.sk/download/pack/grzip.zip) |
 GRZipII | ??? | [GRZipII](https://www.sac.sk/download/pack/grzipiiw.zip) |
@@ -1182,6 +1187,7 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Meta  | detect UTF8 filenames | flag = * |
 | <ul><li>[x] </li></ul> | Meta  | CP437 filenames | flag != 0x800 |
 | <ul><li>[x] </li></ul> | Meta  | DOS Date + Time | time & date != 0 |
+| <ul><li>[x] </li></ul> | Meta  | InfoZIP Symlink | cos in (0x03,0x13), xa >> 28 == 0xA
 | <ul><li>[x] </li></ul> | CRC   | CRC32 IEEE | crc32 != 0 |
 | <ul><li>[x] </li></ul> | CRC   | MD5 | minizip |
 | <ul><li>[x] </li></ul> | CRC   | SHA1 | minizip |
@@ -1212,5 +1218,5 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Extra | ASi Unix | tag = 0x6E75/nu, ignored |
 | <ul><li>[x] </li></ul> | Extra | Info-ZIP Unicode | tag = 0x7570/up, overwrites filename if crc32 matches |
 | <ul><li>[x] </li></ul> | Extra | New Unix | tag = 0x7578/ux, ignored |
-| <ul><li>[ ] </li></ul> | Extra | minizip CMS Signature | tag = 0xC510, ignored because I'm lazy |
+| <ul><li>[x] </li></ul> | Extra | minizip CMS Signature | tag = 0xC510, get's extracted but not verified |
 | <ul><li>[ ] </li></ul> | Extra | minizip central directory | tag = 0xCDCD |

@@ -704,17 +704,71 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
     global OODLE,GDEFLATE,UCL,LIBBLAST
     match algo:
         case 'none': return i
+        case 'guess':
+            noe = kwargs.pop('no_error',False)
+            fb = kwargs.pop('fallback','none')
+            hint = kwargs.pop('hint',None)
+            alw = kwargs.pop('allow',None)
+            if hint in {None,'win'} and i[:10] == b'SZDD\x88\xF0\x27\x33\x41\x00' and (not alw or 'szdd' in alw):
+                a = 'szdd'
+            elif i[:8] == b'\x00\xE9UCL\xFF\x01\x1A' and not (i[10] > 10 or i[10] < 1) and i[12] in {0x2B,0x2D,0x2E} and (not alw or 'uclpack' in alw):
+                a = 'uclpack'
+            elif hint in {None,'nin'} and i[:4] == b'ASH0' and (not alw or 'ash0' in alw):
+                a = 'ash0'
+            elif hint in {None,'nin'} and i[:4] == b'vpk0' and (not alw or 'vpk0' in alw):
+                a = 'vpk0'
+            elif hint in {None,'nin'} and i[:4] == b'MIO0' and (not alw or 'mio0' in alw):
+                a = 'mio0'
+            elif hint in {None,'nin'} and i[:4] == b'Yay0' and (not alw or 'yay0' in alw):
+                a = 'yay0'
+            elif hint in {None,'nin'} and i[:4] == b'Yaz0' and (not alw or 'yaz0' in alw):
+                a = 'yaz0'
+            elif hint in {None,'xbox'} and i[:3] == b'\x0F\xF5\x12' and i[3] in {0xED,0xEE} and (not alw or 'xb' in alw):
+                a = 'xb'
+            elif i[1:4] == b'\xB5\x2F\xFD' and i[0] in {0x1E,0x22,0x23,0x24,0x25,0x26,0x27,0x28} and (not alw or 'zstd' in alw):
+                a = 'zstd'
+            elif i[:3] == b'bvx' and i[3:4] in b'$-12n':
+                a = 'lzfse'
+            elif i[:3] == b'\x1F\x8B\x08' and (not alw or 'gzip' in alw):
+                a = 'gzip_noerr' if not noe else 'gzip'
+            elif hint in {None,'unix'} and i[:2] == b'\x1F\x9D' and i[2] & 0x60 == 0 and (not alw or 'z' in alw or 'compress' in alw):
+                a = 'z'
+            elif hint in {None,'exe'} and i[:4] == b'M8Z\x90' and (not alw or 'aplib' in alw):
+                a = 'aplib'
+            elif iszl(i) and (not alw or 'zlib' in alw):
+                a = 'zlib_noerr' if not noe else 'zlib'
+            elif hint in {None,'ibm'} and (not alw or 'terse' in alw) and ((i[0] in {1,7} and i[1:4] == b'\x89\x69\xA5') or\
+                 (i[0] in {2,5} and i[1] in {0,1} and (i[4] & 4 or not sum(i[4:8])) and (((r1 := int.from_bytes(i[2:4],'big')) == (r2 := int.from_bytes(i[8:12],'big'))) or r1 == 0 or r2 == 0) and r1|r2)):
+                a = 'terse'
+            elif hint in {'nds','gba'} and i[0] == 0x10 and (not alw or 'lz10' in alw):
+                a = 'lz10'
+            elif hint in {'nds','gba'} and i[0] == 0x11 and (not alw or 'lz11' in alw):
+                a = 'lz11'
+            elif hint in {'nds','gba'} and i[0] == 0x40 and (not alw or 'lz40' in alw):
+                a = 'lz40'
+            elif hint in {'nds','gba'} and i[0] == 0x60 and (not alw or 'lz60' in alw):
+                a = 'lz60'
+            elif fb is None: raise ValueError(f"Couldn't guess compression ({i[:0x10]})")
+            else: a = fb
+            return decompress(i,a,**kwargs)
+
         case 'zlib':
             import zlib
-            if i is None: return zlib.decompressobj(wbits=kwargs.get('wbits',15))
+            if i is None: return zlib.decompressobj(wbits=kwargs.get('wbits',15),zdict=kwargs.get('dict',b''))
+            if 'dict' in kwargs: raise ValueError('use deflate_noerror instead to use a dict')
             return zlib.decompress(i,wbits=kwargs.get('wbits',15))
+        case 'zlib_noerr'|'zlib_noerror':
+            import zlib
+            obj = zlib.decompressobj(wbits=kwargs.get('wbits',15),zdict=kwargs.get('dict',b''))
+            return obj.decompress(i) + obj.flush()
         case 'deflate':
             import zlib
-            if i is None: return zlib.decompressobj(wbits=-15)
+            if i is None: return zlib.decompressobj(wbits=-15,zdict=kwargs.get('dict',b''))
+            if 'dict' in kwargs: raise ValueError('use deflate_noerror instead to use a dict')
             return zlib.decompress(i,wbits=-15)
         case 'deflate_noerr'|'deflate_noerror':
             import zlib
-            obj = zlib.decompressobj(wbits=-15)
+            obj = zlib.decompressobj(wbits=-15,zdict=kwargs.get('dict',b''))
             return obj.decompress(i) + obj.flush()
         case 'deflate0':
             import zlib
@@ -725,6 +779,10 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'gzip':
             import gzip
             return gzip.decompress(i)
+        case 'gzip_noerr'|'gzip_noerror':
+            import zlib
+            obj = zlib.decompressobj(wbits=31)
+            return obj.decompress(i) + obj.flush()
         case 'bz2'|'bzip2':
             import bz2
             if i is None: return bz2.BZ2Decompressor()
@@ -906,7 +964,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             if not mth in {0x2B,0x2D,0x2E}: raise ValueError(f'invalid uclpack method (0x{mth:02X})')
             mth = f'{mth:02x}'
             lvl = i[13]
-            if 10 < lvl < 1: raise ValueError(f'invalid uclpack level ({lvl})')
+            if lvl > 10 or lvl < 1: raise ValueError(f'invalid uclpack level ({lvl})')
             blks = int.from_bytes(i[14:18],'big')
             if (not itc) and (0x800000 < blks or blks < 0x400): raise ValueError(f'invalid uclpack block size ({blks})')
 

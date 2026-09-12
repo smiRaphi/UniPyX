@@ -393,7 +393,7 @@ XTSPS = (
     ('\0m\0','mls'),
     ('\0\0\0\0ns\0\0\0','ns')
 )
-def str2unix(t:str):
+def str2unix(t:str) -> float:
     for x,l,y in TS_FMTS:
         m = x.match(t)
         if m:
@@ -415,6 +415,8 @@ def str2unix(t:str):
     finally:
         if not loc is None: locale.setlocale(locale.LC_TIME,'')
     return r
+def ymd2unix(y:int,m:int=1,d:int=1,h:int=0,mn:int=0,s:int=0,ml:int=0,ms:int=0,ns:int=0) -> float:
+    return datetime(y,m,d,h,mn,s,ml * 1000 + ms).timestamp() + ns / 1000000000
 def set_ftime(p:str,ct:int=None,mt:int=None,at:int=None,unix=True):
     if ct is None and at is None and mt is None: return
     if ct is None: ct = 0

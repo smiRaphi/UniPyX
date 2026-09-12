@@ -699,5 +699,162 @@ Unknown 2: {f.reads(f.readu32())}""")
                 writefile(o + '/' + sub_path(k,slash=True) + '.txt','\n'.join(v) + '\n')
 
             if fs: return
+        case 'DeFrosTPAC Archive':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(f.readu8()) == b'TPAC' and f.read(f.readu8()) == b'1.6')
+
+            while f:
+                n = f.reads(f.readu8(),'ascii')
+                if len(n) < 12: f.skip(12 - len(n))
+                writefile(o + '/' + n,f.readc(f.readu32()))
+
+            f.close()
+            if listdir(o): return
+        case 'Android Boot Image':
+            db.try_custom()
+            from lib.file import File,decompress
+            f = File(i,endian='<')
+            asrt(f.read(8) == b'ANDROID!')
+
+            v = f.peek('u32',offset=0x20)
+            inf = [f'Version: {v}']
+            fs = []
+            if v >= 3:
+                sz = f.readu32()
+                if sz: fs.append(('kernel',sz))
+                sz = f.readu32()
+                if sz: fs.append(('ramdisk',sz))
+                osv = f.readu32()
+                f.skip(0x18)
+                pgs = 0x1000
+                writefile(o + '/cmd.txt',f.readc(0x600).split(b'\0',1)[0])
+            else:
+                sz,adr = f.readu32(),f.readu32()
+                if sz:
+                    fs.append(('kernel',sz))
+                    inf.append(f'Kernel Address: 0x{adr:08X}')
+                sz,adr = f.readu32(),f.readu32()
+                if sz:
+                    fs.append(('ramdisk',sz))
+                    inf.append(f'Ramdisk Address: 0x{adr:08X}')
+                sz,adr = f.readu32(),f.readu32()
+                if sz:
+                    fs.append(('second',sz))
+                    inf.append(f'Second Address: 0x{adr:08X}')
+                inf.append(f'Tags Address: 0x{f.readu32():08X}')
+                pgs = f.readu32()
+                f.skip(4)
+                osv = f.readu32()
+
+            inf.append(f'Page Size: 0x{pgs:08X}')
+            osvv = osv >> 11
+            if osvv:
+                inf.append(f'OS Version: {osv >> 14}.{(osv >> 7) & 0x7F}.{osv & 0x7F}')
+            ospv = osv & 0x7FF
+            if ospv:
+                y,m = 2000 + (ospv >> 4),ospv & 0xF
+                inf.append(f'OS Patch: {y:04d}-{m:02d}')
+                ts = ymd2unix(y,m)
+            else: ts = None
+
+            if v < 3:
+                prn = f.readc(0x10).split(b'\0',1)[0]
+                if prn: inf.append(f'Product Name: {prn.decode("utf-8")}')
+                cmd = f.readc(0x200).split(b'\0',1)[0]
+                id = f.readc(0x20)
+                if sum(id):
+                    if not sum(id[0x14:]): inf.append(f'SHA-1: {id[:0x14].hex().upper()}')
+                    else: inf.append(f'ID: {id.hex().upper()}')
+                cmd += f.readc(0x400).split(b'\0',1)[0]
+                writefile(o + '/cmd.txt',cmd)
+
+                if v > 0:
+                    sz,off = f.readu32(),f.readu64()
+                    if sz: fs.append(('recovery_dtbo',sz,off))
+                    inf.append(f'Boot Header Size: {f.readu32():08X}')
+                if v == 2:
+                    sz,adr = f.readu32(),f.readu64()
+                    if sz:
+                        fs.append(('dtb',sz))
+                        inf.append(f'DTB Address: 0x{adr:08X}')
+            if ts and exists(o + '/cmd.txt'): set_ftime(o + '/cmd.txt',ts)
+
+            if v >= 4:
+                sz = f.readu32()
+                if sz: fs.append(('boot_signature',sz))
+
+            writefile(o + '/info.txt','\n'.join(inf))
+            if ts: set_ftime(o + '/info.txt',ts)
+
+            f.align(pgs)
+            for fe in fs:
+                if len(fe) == 2:
+                    d = f.readc(fe[1])
+                    f.align(pgs)
+                else: d = f.peek(fe[1],offset=[fe[2]])
+                writefile(o + '/' + fe[0],d)
+                if ts: set_ftime(o + '/' + fe[0],ts)
+
+                if fe[0] == 'kernel':
+                    asrt(sum(d[-12:]) == 0)
+                    off = int.from_bytes(d[-0x1C:-0x18],'little')
+                    if len(d) - 0x30 > off > 0x1000:
+                        chk = (d[off:off+4],len(d) - off - 0x18)
+                        d = decompress(d[off:],'guess',noerror=True)
+                        if chk[0] != d[:4] and len(d) > chk[1]:
+                            writefile(o + '/' + fe[0] + '.dec',d)
+                            if ts: set_ftime(o + '/' + fe[0] + '.dec',ts)
+                elif fe[0] == 'ramdisk':
+                    chk = (d[:4],len(d))
+                    d = decompress(d,'guess')
+                    if chk != (d[:4],len(d)):
+                        writefile(o + '/' + fe[0] + '.dec',d)
+                        if ts: set_ftime(o + '/' + fe[0] + '.dec',ts)
+                    if d.startswith(b'0707'): extract(o + '/' + fe[0] + '.dec',o + '/' + fe[0] + '_ext','CPIO')
+
+            f.close()
+            if fs: return
+        case 'LG Encrypted EPK':
+            raise NotImplementedError
+            KEYS = (1786572797,'https://github.com/openlgtv/epk2extract/raw/refs/heads/master/keys/AES.key')
+            DBP = db.bin_path + 'epk_keys.pyob'
+
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            if exists(DBP):
+                keys = PyOBinX(DBP)
+                ts = keys.wait()['ts']
+            else: ts = 0
+            if ts < KEYS[0]:
+                import httpx,time
+                keys = PyOBinX.new(DBP,{'ts':int(time.time()),'k':[]})
+                for l in httpx.get(KEYS[1]).text.replace('\r','').split('\n'):
+                    l = l.split('#',1)[0].strip()
+                    if not l: continue
+                    l = bytes.fromhex(l)
+                    if not l in keys['k']: keys['k'].append()
+                keys.save()
+
+            from lib.file import File
+            from lib.crypto import decrypt
+            f = File(i,endian='<')
+
+            if f.peek(4) != b'EPK3':
+                tst = f.peek(0x10)
+                for k in keys['k']:
+                    tst = decrypt(tst,'aes_ecb',k)
+                    if tst[:4] == b'EPK3': break
+                else:
+                    f.close()
+                    return 1
+                h = File(decrypt(f.read(0x6B0),'aes_ecb',k),endian=f.endian)
+            else: h = f
+            asrt(h.read(4) == b'EPK3')
+        case 'LZX Archive':
+            ol = listdir(o)
+            run(['lzx','x',i,o])
+            if listdir(o) != ol: return
 
     return 1

@@ -317,5 +317,12 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
 
             writefile(o + '/' + basename(i),d)
             if d: return
+        case 'ASC2COM':
+            od = rldir(o)
+            run(['deark','-m','asc2com','-opt','text:encconv=0','-od',o,i])
+            for x in rldir(o):
+                if not x in od:
+                    mv(x,o + '/' + tbasename(i) + '.txt')
+                    return
 
     return 1

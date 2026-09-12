@@ -482,6 +482,10 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'BlakHole':
             run(['izarccl','-e','-o','-p' + o,i])
             if listdir(o): return
+        case 'GLZA':
+            of = o + '/' + basename(i)
+            if of.lower().endswith('.glza'): of = of[:-5]
+            if run(['glza','d',f'-t{cpu_count()}',i,of])[0] == 0 and exists(of): return
 
         case 'P5'|'P6'|'PAQ1'|'PAQ2'|'PAQ5':
             run([t.lower(),i],cwd=o)

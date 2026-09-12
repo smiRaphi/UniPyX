@@ -40,5 +40,6 @@
 "TERSE compressed data (PACK, U)",
 "TERSE compressed data (PACK, V)",
 "TERSE compressed data (SPACK, U)",
-"TERSE compressed data (SPACK, V)"
+"TERSE compressed data (SPACK, V)",
+"Matlab Level 4 MAT-File (big-endian)"
 ]

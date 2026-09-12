@@ -667,8 +667,8 @@ TFIT_ROUND_BLOCK(de,B, 0 ,7 ,10,13,
                        1, 4 ,11,14,
                        2, 5 ,8 ,15,
                        3, 6 ,9 ,12)
-void decrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t *iv,
-                        const size_t rounds, const uint32_t *restrict k, const uint32_t *restrict t) {
+static inline void decrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t *iv,
+                                      const size_t rounds, const uint32_t *restrict k, const uint32_t *restrict t) {
     uint8_t tmp[16];
     if (iv != NULL) {
         for (size_t i=0;i < 16;i++) tmp[i] = src[i] ^ iv[i];
@@ -680,8 +680,8 @@ void decrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t
     encrypt_tfit_roundA(tmp,k + (rounds - 1)*4,t + (rounds - 1)*0x1000);
     memcpy(dst,tmp,0x10);
 }
-void encrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t *iv,
-                        const size_t rounds, const uint32_t *restrict k, const uint32_t *restrict t) {
+static inline void encrypt_tfit_block(const uint8_t *restrict src, uint8_t *dst, const uint8_t *iv,
+                                      const size_t rounds, const uint32_t *restrict k, const uint32_t *restrict t) {
     uint8_t tmp[16];
     if (iv != NULL) {
         for (size_t i=0;i < 16;i++) tmp[i] = src[i] ^ iv[i];
@@ -809,6 +809,168 @@ EXPORT void decrypt_snow2_nexon(uint32_t *restrict buf, const size_t size, const
 
     for (size_t p = 0;p < size >> 2;p++)
         buf[p] = SWAPLE32(SWAPLE32(buf[p]) - snow2_nexon_clock(S,&R0,&R1,p));
+}
+
+int8_t twofish_initialized = 0;
+uint8_t twofish_Q0[0x100];
+uint8_t twofish_Q1[0x100];
+uint32_t twofish_MDS[0x400];
+static inline void twofish_genQ(const uint8_t *restrict t,uint8_t *restrict q) {
+    uint8_t ae,be,ao,bo;
+    for (int16_t i=0;i < 0x100;i++) {
+        ae = i >> 4;be = i & 0xF;
+        ao = ae ^ be;bo = ae ^ ROT4R(be,1) ^ ((ae << 3) & 8);
+        ae = t[0x00 + ao];be = t[0x10 + bo];
+        ao = ae ^ be;bo = ae ^ ROT4R(be,1) ^ ((ae << 3) & 8);
+        q[i] = t[0x20 + ao] | (t[0x30 + bo] << 4);
+    }
+}
+#define HXX(o,q1,q2,i,K) twofish_MDS[(o) * 0x100 + (CONCAT(twofish_Q,q1)[CONCAT(twofish_Q,q2)[i] ^ K[8 + (o)]] ^ K[o])]
+#define HXX3(o,q1,q2,q3,i,K) HXX(o,q2,q3,CONCAT(twofish_Q,q1)[i] ^ K[o + 16],K)
+#define HXX4(o,q1,q2,q3,q4,i,K) HXX3(o,q2,q3,q4,CONCAT(twofish_Q,q1)[i] ^ K[o + 24],K)
+static inline uint32_t twofish_h(const uint32_t i, const uint8_t *restrict K, const uint8_t kcycles) {
+    switch (kcycles) {
+        case 2: return HXX(0,0,0,i,K) ^ HXX(1,0,1,i,K) ^ HXX(2,1,0,i,K) ^ HXX(3,1,1,i,K);
+        case 3: return HXX3(0,1,0,0,i,K) ^ HXX3(1,1,0,1,i,K) ^ HXX3(2,0,1,0,i,K) ^ HXX3(3,0,1,1,i,K);
+        case 4: return HXX4(0,1,1,0,0,i,K) ^ HXX4(1,0,1,0,1,i,K) ^ HXX4(2,0,0,1,0,i,K) ^ HXX4(3,1,0,1,1,i,K);
+    }
+    return 0;
+}
+static inline void twofish_init(const uint8_t *restrict key, const size_t ksize, uint32_t *restrict K, uint32_t *restrict S) {
+    if (!twofish_initialized) {
+        twofish_genQ(TWOFISH_T0,twofish_Q0);
+        twofish_genQ(TWOFISH_T1,twofish_Q1);
+
+        uint32_t q,qe,q5;
+        for (int16_t i=0;i < 0x100;i++) {
+            q = twofish_Q0[i];
+            qe = (q  >> 1) ^ ((q  & 1) ? 0xB4 : 0);
+            q5 = (qe >> 1) ^ ((qe & 1) ? 0xB4 : 0) ^ q;
+            qe ^= q5;
+
+            twofish_MDS[0x100 + i] = (q  << 24) | (q5 << 16) | (qe << 8) | qe;
+            twofish_MDS[0x300 + i] = (q5 << 24) | (qe << 16) | (q  << 8) | q5;
+
+            q = twofish_Q1[i];
+            qe = (q  >> 1) ^ ((q  & 1) ? 0xB4 : 0);
+            q5 = (qe >> 1) ^ ((qe & 1) ? 0xB4 : 0) ^ q;
+            qe ^= q5;
+
+            twofish_MDS[0x000 + i] = (qe << 24) | (qe << 16) | (q5 << 8) | q;
+            twofish_MDS[0x200 + i] = (qe << 24) | (q  << 16) | (qe << 8) | q5;
+        }
+
+        twofish_initialized = 1;
+    }
+
+    uint8_t k[0x44] = {0};
+    memcpy(k,key,ksize);
+    uint8_t kcyc = (ksize + 7) / 8;
+    if (kcyc < 2) kcyc = 2;
+
+    for (int8_t i=0;i < 40;i+=2) {
+        uint32_t A = twofish_h(i,k,kcyc);
+        uint32_t B = ROT32L(twofish_h(i + 1,k + 4,kcyc),8);
+        A += B;
+        B += A;
+        K[i + 0] = A;
+        K[i + 1] = ROT32L(B,9);
+    }
+
+    uint8_t *Kp = k + 8 * kcyc;
+    uint8_t *Sp = k + 32;
+    while (Kp > k) {
+        Kp -= 8;
+        memset(Sp,0,4);
+        memcpy(Sp + 4,Kp,8);
+
+        uint8_t *t = Sp + 11;
+        while (t > Sp + 3) {
+            uint8_t b = *t;
+            t[-4] ^= b;
+            uint8_t bx = (b << 1) ^ ((b & 0x80) ? 0x14D : 0);
+            t[-2] ^= bx;
+            bx ^= (b >> 1) ^ ((b & 1) ? 0xA6 : 0);
+            t[-1] ^= bx;t[-3] ^= bx;
+            t--;
+        }
+        Sp += 8;
+    }
+
+    uint8_t *kp = k + 32;
+    switch (kcyc) {
+        case 2: {
+            for (int16_t i=0;i < 0x100;i++) {
+                S[0x000 + i] = HXX(0,0,0,i,kp);
+                S[0x100 + i] = HXX(1,0,1,i,kp);
+                S[0x200 + i] = HXX(2,1,0,i,kp);
+                S[0x300 + i] = HXX(3,1,1,i,kp);
+            }
+            break;
+        }
+        case 3: {
+            for (int16_t i=0;i < 0x100;i++) {
+                S[0x000 + i] = HXX3(0,1,0,0,i,kp);
+                S[0x100 + i] = HXX3(1,1,0,1,i,kp);
+                S[0x200 + i] = HXX3(2,0,1,0,i,kp);
+                S[0x300 + i] = HXX3(3,0,1,1,i,kp);
+            }
+            break;
+        }
+        case 4: {
+            for (int16_t i=0;i < 0x100;i++) {
+                S[0x000 + i] = HXX4(0,1,1,0,0,i,kp);
+                S[0x100 + i] = HXX4(1,0,1,0,1,i,kp);
+                S[0x200 + i] = HXX4(2,0,0,1,0,i,kp);
+                S[0x300 + i] = HXX4(3,1,0,1,1,i,kp);
+            }
+            break;
+        }
+    }
+}
+#define twofish_round(A,B,C,D,T0,T1,S,K,r)\
+    T0 = S[0x000 + ((A >> 0 ) & 0xFF)] ^ S[0x100 + ((A >> 8 ) & 0xFF)] ^ S[0x200 + ((A >> 16) & 0xFF)] ^ S[0x300 + ((A >> 24) & 0xFF)];\
+    T1 = S[0x000 + ((B >> 24) & 0xFF)] ^ S[0x100 + ((B >> 0 ) & 0xFF)] ^ S[0x200 + ((B >> 8 ) & 0xFF)] ^ S[0x300 + ((B >> 16) & 0xFF)];\
+    C = ROT32L(C,1) ^ (T0 +   T1 + K[8 + 2*(r)]);\
+    D = ROT32R(D    ^ (T0 + 2*T1 + K[8 + 2*(r) + 1]),1);
+static inline void decrypt_twofish_block(uint8_t *restrict buf, const uint32_t *restrict K, const uint32_t *restrict S) {
+    uint32_t A = read32le(buf + 0 ) ^ K[4];
+    uint32_t B = read32le(buf + 4 ) ^ K[5];
+    uint32_t C = read32le(buf + 8 ) ^ K[6];
+    uint32_t D = read32le(buf + 12) ^ K[7];
+
+    uint32_t T0,T1;
+    for (int8_t i=16;i > 0;i-=2) {
+        twofish_round(A,B,C,D,T0,T1,S,K,i - 1)
+        twofish_round(C,D,A,B,T0,T1,S,K,i - 2)
+    }
+
+    uint32_t *bp = (uint32_t *)buf;
+    bp[0] = SWAPLE32(C ^ K[0]);
+    bp[1] = SWAPLE32(D ^ K[1]);
+    bp[2] = SWAPLE32(A ^ K[2]);
+    bp[3] = SWAPLE32(B ^ K[3]);
+}
+EXPORT void decrypt_twofish_ecb(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize) {
+    uint32_t S[0x400];
+    uint32_t K[40];
+    twofish_init(key, ksize, K, S);
+    for (size_t i=0;i < size;i+=16) decrypt_twofish_block(buf + i, K, S);
+}
+EXPORT void decrypt_twofish_cbc(uint8_t *restrict buf, const size_t size, const uint8_t *restrict key, const size_t ksize, const uint8_t *iv) {
+    uint32_t S[0x400];
+    uint32_t K[40];
+    twofish_init(key, ksize, K, S);
+    uint8_t last[16];
+    memcpy(last, iv, 16);
+
+    for (size_t i=0;i < size;i+=16) {
+        uint8_t tmp[16];
+        memcpy(tmp, buf + i, 16);
+        decrypt_twofish_block(buf + i, K, S);
+        for (uint8_t j=0;j < 16;j++) buf[i + j] ^= last[j];
+        memcpy(last, tmp, 16);
+    }
 }
 
 EXPORT int8_t hash_crc_init(uint8_t *restrict t, const uint32_t size, const uint64_t poly, const int8_t reflect) {

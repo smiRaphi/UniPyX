@@ -356,7 +356,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             import ascon
             return ascon.ascon_decrypt(key,iv,kwargs.get('aad',b''),i,'Ascon-AEAD128')
         case 'ascon_128'|'ascon_128a'|'ascon_80pq'|'ascon_128_be'|'ascon_128a_be'|'ascon_80pq_be'|'ascon_128_le'|'ascon_128a_le'|'ascon_80pq_le':
-            if algo.endswith('_le'): import ascon_old_le as ascon
+            if algo.endswith('_le'):
+                import ascon_old_le as ascon
+                algo = algo[:-3]
             else: import ascon_old as ascon
             return ascon.ascon_decrypt(key,iv,kwargs.get('aad',b''),i,'Ascon-' + algo[6:])
         case 'hpke_aes128_gcm'|'hpke_aes256_gcm'|'hpke_chacha20_poly1305':
@@ -371,6 +373,13 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if iv is None: iv = b'\0'*16
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
             return getattr(uxx(),'decrypt_' + algo)(i,key,iv)
+        case 'twofish'|'twofish_ecb':
+            asrt(isinstance(key,bytes),err=TypeError)
+            return uxx().decrypt_twofish_ecb(i,key)
+        case 'twofish_cbc':
+            if iv is None: iv = b'\0'*16
+            asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)
+            return uxx().decrypt_twofish_cbc(i,key,iv)
 
         case 'rsdk3':
             asrt(isinstance(key,bytes) and isinstance(iv,bytes),err=TypeError)

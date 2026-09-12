@@ -85,6 +85,8 @@ static inline uint64_t ROTATER(uint64_t x, const uint8_t w, const uint8_t r) {
 static inline uint64_t ROTATEL(uint64_t x, const uint8_t w, const uint8_t r) {
     return (x << r) | (x >> (w - r));
 }
+static inline uint8_t  ROT4R (uint8_t  x, const uint8_t r) { return ROTATER(x, 4,  r) & 0xF; }
+static inline uint8_t  ROT4L (uint8_t  x, const uint8_t r) { return ROTATEL(x, 4,  r) & 0xF; }
 static inline uint8_t  ROT8R (uint8_t  x, const uint8_t r) { return ROTATER(x, 8,  r); }
 static inline uint8_t  ROT8L (uint8_t  x, const uint8_t r) { return ROTATEL(x, 8,  r); }
 static inline uint16_t ROT16R(uint16_t x, const uint8_t r) { return ROTATER(x, 16, r); }

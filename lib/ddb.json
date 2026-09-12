@@ -1404,9 +1404,15 @@
     },
     {
         "d":[["isat","RESET\\0\\0\\0\\0\\0",0],["isat","\\0\\0\\0\\0",12],["isat","ROMDIR\\0\\0\\0\\0",16],["n0",2,10],["n0",2,26]],
-        "rs":"PlayStation 2 IOPRP IMG","s":1},{
+        "rs":"PlayStation 2 IOPRP IMG","s":1
+    },
+    {
         "d":[["size",4194304],["isat","RESET\\0\\0\\0\\0\\0",10048],["isat","ROMDIR\\0\\0\\0\\0",10064]],
         "rs":"PlayStation 2 BIOS","s":1
+    },
+    {
+        "d":[["size",[2012,null]],["isat","\\0",1727],["isat","\\0",1743],["contain",".",1712,15],["contain",".",1728,15],["py","f.seek(336);t=f.read(16)\nif f.read(1360)!=t*85:return\nv=f.read(16).decode('latin-1').strip('\\0')\nif v.count('.')!=2 or not all(x.isdigit() for x in v.split('.')):return\nv=f.read(16).decode('latin-1').strip('\\0');return v.count('.')==2 and all(x.isdigit() for x in v.split('.'))"]],
+        "rs":"LG Encrypted EPK"
     },
     {
         "d":[["isat","Ver 1.0.",0],["n0",4,8],["n0",4,12]],
@@ -3080,6 +3086,11 @@
         "rqr":null,
         "d":["ext",[".br",".brotli"]],
         "rs":"Brotli"
+    },
+    {
+        "rqr":null,
+        "d":["ext",".glza"],
+        "rs":"GLZA"
     },
     {
         "rqr":null,

@@ -16,8 +16,9 @@ except (ImportError,ModuleNotFoundError):
     import httpx
 
 import json,zipfile,tarfile,importlib.util,base64,ctypes
-from shutil import copyfile,copytree,rmtree
 from time import sleep,time
+from urllib.parse import quote as urlquote
+from shutil import copyfile,copytree,rmtree
 from multiprocessing.pool import ThreadPool
 
 def gtmp(suf=''): return os.getenv('TEMP').strip('\\') + '\\tmp' + os.urandom(8).hex() + suf
@@ -380,7 +381,19 @@ class DLDB:
                             if r.headers.get('Content-Length') and not int(r.headers['Content-Length']): continue
                             for c in r.iter_bytes(4096):
                                 if not clfr:
-                                    if b'<title>Just a moment...</title>' in c and b'://challenges.cloudflare.com' in c: raise ValueError(f'Cloudflare ({url})')
+                                    if b'<title>Just a moment...</title>' in c and b'://challenges.cloudflare.com' in c:
+                                        f.close()
+                                        os.remove(out)
+                                        td = gtmp()
+                                        os.makedirs(td,exist_ok=True)
+                                        print(f'Cloudflare: {url}')
+                                        print(f'Please manually download and move the file into {td} (file:///{urlquote(td.replace("\\","/"),':/')})')
+                                        while not os.listdir(td): sleep(0.1)
+                                        assert len(os.listdir(td)) == 1
+                                        os.replace(td + '/' + os.listdir(td)[0],out)
+                                        os.rmdir(td)
+                                        if os.path.getsize(out): return
+                                        raise ValueError('Empty file')
                                     clfr = True
                                 f.write(c)
                         break

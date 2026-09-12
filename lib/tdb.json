@@ -605,7 +605,8 @@
         "cpio archive (portable old)",
         "cpio archive (portable new)",
         "cpio archive (byte swapped binary)",
-        "byte-swapped cpio archive"
+        "byte-swapped cpio archive",
+        "ascii cpio archive (svr4 with no crc)"
     ],
     "BOA Constrictor":[
         "boa constrictor archiver compressed archive"
@@ -1781,5 +1782,20 @@
     ],
     "BlackEnergy Crypter":[
         "blackenergy ddos bot crypter"
+    ],
+    "ASC2COM":[
+        "16bit com executable asc2com (v1.x)",
+        "16bit com executable asc2com (v1.10b)"
+    ],
+    "DeFrosTPAC Archive":[
+        "tpac archive data"
+    ],
+    "Android Boot Image":[
+        "android boot image",
+        "android bootimg"
+    ],
+    "LZX Archive":[
+        "lzx amiga compressed archive",
+        "lzx compressed archive (amiga)"
     ]
 }

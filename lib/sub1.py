@@ -454,7 +454,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if blkn in {PK56,PK66}: break
                 asrt(blkn == PK12)
                 fe = {
-                    'cv':f.readu16(),
+                    'cv':f.readu8(),
+                    'cos':f.readu8(),
                     'xv':f.readu16(),
                     'fl':f.readu16(),
                     'ct':f.readu16(),
@@ -535,7 +536,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 ep = f.pos + xfl2
                 if fe.get('os2x'):
-                    while (f.pos + 4) < ep:
+                    while f.pos + 4 < ep:
                         tg,s = f.readc(2),f.readu16()
                         xep = f.pos + s
                         if xep > ep: break
@@ -1739,6 +1740,9 @@ def read_http_head(readline,max:int=None,idn=False):
         else: o[k] = v
     return o
 def read_zip_extra(**l):
+    if typing.TYPE_CHECKING:
+        from lib.file import File
+        f:File
     f,fe,xl,crc_hash = l['f'],l['fe'],l['xl'],l['crc_hash']
     ep = f.pos + xl
     if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',offset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.peek(xl).decode('latin-1')):
@@ -1787,7 +1791,8 @@ def read_zip_extra(**l):
                 if ts: fe['ts']['c'] = ts
             case b'\x0C\0': # OpenVMS
                 asrt(s >= 4)
-                f.skip(4)
+                crc = f.readu32()
+                if crc_hash(f.peek(s - 4),'crc32') != crc: f.seek(xep)
                 while (f.pos + 4) < xep:
                     vtg,vs = f.readu16(),f.readu16()
                     vep = f.pos + vs
@@ -1835,7 +1840,7 @@ def read_zip_extra(**l):
                 asrt((ns*2+8) <= s)
                 fe['n'] = f.readutf16(ns)
                 fe['xcess'] = True
-            case b'Q\x1A': # minizip hash
+            case b'\x51\x1A': # minizip hash
                 asrt(s > 4)
                 ht,hs = f.readu16(),f.readu16()
                 asrt((hs + 4) <= s)
@@ -1871,7 +1876,7 @@ def read_zip_extra(**l):
             case b'ux': # New Unix
                 pass # u16 tag (?), u16 len (?), u8 v, u8 UIDlen, u8 UID[UIDlen], u8 GIDlen, u8 GID[GIDlen]
             case b'\xC5\x10': # minizip CMS signature
-                pass # eh, no
+                fe['mzsig'] = f.read(s)
             case b'\xCD\xCD': # minizip central directory
                 asrt(s >= 8)
                 fe['mzc'] = f.readu64()
@@ -1881,18 +1886,35 @@ def read_zip_extra(**l):
     f.seek(ep)
 def writefile_zip(fe:dict,d:bytes):
     fn = fe['ffn']
-    writefile(fn,d)
+    if fe.get('cos') in {3,0x13} and fe.get('xa',0) >> 28 == 0xA and istext(d,'utf-8',filename=True,eof=False):
+        symlink(d.decode('utf-8'),fn)
+    else: writefile(fn,d)
+    tsns = [fn]
+
+    if fe.get('cm'):
+        writefile(fn + '.$comment.txt',fe['cm'])
+        tsns.append(fn + '.$comment.txt')
+    if 'kv' in fe:
+        writefile(fn + '.$kvpairs.json',fe['kv'],indent=4)
+        tsns.append(fn + '.$kvpairs.json')
+    if 'avinf' in fe:
+        writefile(fn + '.$avinfo.bin',fe['avinf'])
+        tsns.append(fn + '.$avinfo.bin')
+    if 'mzsig' in fe:
+        writefile(fn + '.$certificate.cer',fe['mzsig'])
+        tsns.append(fn + '.$certificate.cer')
+    if 'os2x' in fe:
+        writefile(fn + '.$os2.ea',fe['os2x'])
+        tsns.append(fn + '.$os2.ea')
+    if 'libzip_cm' in fe:
+        writefile(fn + '.$libzip_comment.txt',b'\n'.join(fe['libzip_cm']))
+        tsns.append(fn + '.$libzip_comment.txt')
+
     ts = [0,0,0]
     if 'c' in fe['ts']: ts[0] = fe['ts']['c']
     if 'm' in fe['ts']: ts[1] = fe['ts']['m']
     if 'a' in fe['ts']: ts[2] = fe['ts']['a']
-    set_ftime(fn,*ts,unix=False)
-
-    if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
-    if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
-    if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
-    if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
-    if 'libzip_cm' in fe: writefile(fn + '.$libzip_comment.txt',b'\n'.join(fe['libzip_cm']))
+    for fn in tsns: set_ftime(fn,*ts,unix=False)
 
 ZFMTM = {
     0:'none',

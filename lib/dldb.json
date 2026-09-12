@@ -5208,6 +5208,21 @@
         }],
         "ts":0
     },
+    "glza":{
+        "p":"GLZA/GLZA.exe",
+        "fs":[{
+            "u":"https://encode.su/attachment.php?attachmentid=13272&d=1774294719",
+            "ex":".zipx",
+            "x":{
+                "GLZA.exe":"GLZA/GLZA.exe"
+            }
+        },{
+            "u":"https://mirrors.cicku.me/cygwin/x86_64/release/cygwin/cygwin-3.7.0-0.590.gdae171e433cd-x86_64.tar.xz",
+            "x":{
+                "usr/bin/cygwin1.dll":"GLZA/cygwin1.dll"
+            }
+        }]
+    },
     "viola.cli":{
         "p":"Viola.CLI.exe",
         "fs":[[
@@ -5712,6 +5727,15 @@
             "u":".",
             "x":{
                 "libmagic.dll":"file/libmagic.dll"
+            }
+        }]
+    },
+    "lzx":{
+        "p":"lzx.exe",
+        "fs":[{
+            "u":"https://github.com/bitplane/amiga-lzx/releases/download/v0.1.4/lzx--windows-x86_64-msvc.zip",
+            "x":{
+                "lzx--windows-x86_64-msvc/lzx.exe":"lzx.exe"
             }
         }]
     },
