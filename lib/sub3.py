@@ -626,7 +626,9 @@ def extract3(inp:str,out:str,t:str) -> bool:
             if not r: return r
         case 'PKLITE'|'LZEXE'|'EXEPACK':
             od = rldir(o)
-            run(["deark","-opt","execomp","-od",o,i])
+            if DEARKMP.get(t): cmd = ['-m',DEARKMP[t]]
+            else: cmd = []
+            run(['deark',*cmd,'-opt','execomp','-od',o,i])
             for x in rldir(o):
                 if not x in od:
                     mv(x,o + '/' + basename(i))
@@ -1281,7 +1283,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
         case 'EDI Install Archive':
             dosbox(['ediextract','/U:.',i])
             if listdir(o): return
-        case 'EDI Install LZSS': return extract(i,o,'ARX') # deark
+        case 'EDI Install LZSS': return extract(i,o,'DEA:' + t) # deark
         case '.NET Packer 1':
             db.try_custom()
             from lib.file import File

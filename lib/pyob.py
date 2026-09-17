@@ -707,6 +707,6 @@ class PyOBinX(PyOBin):
     def remove(self,k): return self.db.pop(k)
     def append(self,v): self.db.append(v)
     def extend(self,v): self.db.extend(v)
-    def insert(self,i,v): self.db.insert(i,v)
+    def insert(self,i:int,v): self.db.insert(i,v)
 
 OPS = (':',':=',',','.','@','(','[','{','}',']',')','*','*=','**','**=','+','+=','-','-=','/','/=','//','//=','=','==','<','<=','>','>=','!=','|','|=','&','&=','^','^=','~','~=','>>','>>=','<<','<<=','%','%=',';','->','...')

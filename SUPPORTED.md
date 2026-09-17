@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1090
+# Supported Formats: 1092
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -56,7 +56,7 @@ Compaq QRST IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
 Compressed ISO | .ciso .cso | [7-Zip](https://7-zip.org/) + [Iso7z](https://www.tc4shell.com/en/7zip/iso/) |
 Context Diff | .diff .patch | Custom |
 CopyQM IMG | ??? | [dskconv](https://www.seasip.info/Unix/LibDsk/) -> IMG |
-CP Shrink | ??? | [deark](https://entropymine.com/deark/) |
+CP Shrink | .cpz | [deark](https://entropymine.com/deark/) |
 CPC IMG | .img | [Amstrad CPC Explorer](https://github.com/muckypaws/AmstradDSKExplorer) |
 CPIO | .cpio | [7-Zip](https://7-zip.org/) |
 CramFS | ??? | [7-Zip](https://7-zip.org/) |
@@ -163,7 +163,7 @@ Acorn Disc Filing IMG | .img .dsk | [DiscImageManager](https://github.com/gerald
 Amiga IMG | ??? | [uaeunp](https://www.winuae.net/download/), [HxC Floppy Emulator](https://github.com/jfdelnero/HxCFloppyEmulator) |
 Atari ATR | .atr | [atr](https://github.com/jhallen/atari-tools) |
 Banjo Kazooie N64 ROM | .z64 | [bk_extract](https://github.com/MittenzHugg/bk_tools) |
-C64 IMG | .img .dsk .c64 | [c1541](https://github.com/VICE-Team/svn-mirror) |
+C64 IMG | .img .dsk .c64 | [c1541](https://github.com/VICE-Team/svn-mirror), [deark](https://entropymine.com/deark/) |
 C64 LiBRary | .lbr | [DirMaster](https://style64.org/dirmaster) |
 C64 Tape | .tap | [TAPClean](https://sourceforge.net/projects/tapclean/) |
 CPC Plus IMG | ??? | Custom |
@@ -232,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (143)
+## Executables/Packers/Installers (145)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -240,6 +240,7 @@ Name | Extension(s) | Extractor(s) | Comment
 .NETZ | .exe | Custom |
 4kZIP | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 624 | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
+Action Replay Code | .txt | Custom |
 Advanced Installer | .exe | Custom |
 Ady's Glue | .exe | Custom |
 AMI Aptio Capsule | .cap | [UEFIExtract](https://github.com/LongSoft/UEFITool) |
@@ -331,6 +332,7 @@ Nuitka Compiled | .exe | [nuitka-extractor](https://github.com/extremecoders-re/
 OptiFine Installer | .jar | Custom |
 Optilink | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 PGMPAK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
+PKLITE32 | .exe | Custom | doesn't support blocks using deflate64 (https://codeberg.org/miurahr/inflate64/issues/16)
 PlayStation 2 BIOS | .bin | [romman](https://github.com/israpps/romman) |
 PlayStation 2 IOPRP IMG | .img | [romman](https://github.com/israpps/romman) |
 PlayStation 3 SELF/SPRX | .self .sprx | [ps3_unself](https://github.com/wargio/ps3tools) |
@@ -1183,6 +1185,20 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Enc.  | ZipCrypto | flag = 1 |
 | <ul><li>[x] </li></ul> | Enc.  | Bubble Fighter keygen + ZipCrypto | extension = .bfz, flag = 1 |
 | <ul><li>[x] </li></ul> | Enc.  | Leadwerks Engine keygen + ZipCrypto | extension = .pak, flag = 1 |
+| | #Comment# | | for SES: tag = little endian & flag = 0x40 |
+| <ul><li>[x] </li></ul> | SES ERD | AES | pfl = 0 |
+| <ul><li>[ ] </li></ul> | SES ERD | 3DES | pfl = 0x4000 |
+| <ul><li>[x] </li></ul> | SES   | DES | type = 0x6601, untested |
+| <ul><li>[ ] </li></ul> | SES   | RC2 (Old) | type = 0x6602 |
+| <ul><li>[x] </li></ul> | SES   | 3DES-168 | type = 0x6603, untested |
+| <ul><li>[x] </li></ul> | SES   | 3DES-112 | type = 0x6609, untested |
+| <ul><li>[x] </li></ul> | SES   | AES-128 | type = 0x660E |
+| <ul><li>[x] </li></ul> | SES   | AES-192 | type = 0x660F, untested |
+| <ul><li>[x] </li></ul> | SES   | AES-256 | type = 0x6610 |
+| <ul><li>[x] </li></ul> | SES   | RC2 | type = 0x6702, untested |
+| <ul><li>[x] </li></ul> | SES   | Blowfish | type = 0x6720, untested |
+| <ul><li>[x] </li></ul> | SES   | Twofish | type = 0x6721, untested |
+| <ul><li>[ ] </li></ul> | SES   | RC4 | type = 0x6801 |
 | <ul><li>[x] </li></ul> | Meta  | UTF8 filenames | flag = 0x800 |
 | <ul><li>[x] </li></ul> | Meta  | detect UTF8 filenames | flag = * |
 | <ul><li>[x] </li></ul> | Meta  | CP437 filenames | flag != 0x800 |

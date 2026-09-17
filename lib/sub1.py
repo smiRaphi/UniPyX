@@ -67,7 +67,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
     match t:
         case '7z'|'MSCAB'|'Windows Help File'|'ARJ'|'JFD IMG'|'TAR'|'yEnc'|'xz'|'BZip2'|'LZIP'|'CPIO'|'Asar'|'ARJZ'|\
              'DiskDupe IMG'|'XAR'|'Unix Compress'|'EXT'|'SquashFS'|'VHD'|'Compressed ISO'|'CramFS'|'Google Update Installer'|'RPM Package'|\
-             'Microsoft Compound Document':
+             'Microsoft Compound Document'|\
+             '7Z:BinHex':
+            if t.startswith('7Z:'): t = t[3:]
             _,_,e = zip7(i,o,t)
             if 'ERROR: Unsupported Method : ' in e and readfile(i,size=2) == b'MZ':
                 rmtree(o,True)
@@ -348,8 +350,9 @@ def extract1(inp:str,out:str,t:str) -> bool:
             fh3ne = i.endswith('.,$u')
             f = File(i,endian='<')
 
-            PK66 = b'PK\6\6'
             PK56 = b'PK\5\6'
+            PK66 = b'PK\6\6'
+            PK67 = b'PK\6\7'
             if t == 'RESOF':
                 PK12 = b'PK\1\4'
                 PK34 = b'PK\3\6'
@@ -357,7 +360,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 PK12 = b'PK\1\2'
                 PK34 = b'PK\3\4'
 
-            TESTDS = 0x10061 # max EOCD32 + EOCD64
+            TESTDS = 0x10029 # max EOCD32 + EOCD64
             f.seek(-TESTDS)
             d = f.read(TESTDS)
             if not sum(d):
@@ -372,20 +375,25 @@ def extract1(inp:str,out:str,t:str) -> bool:
             trrntzip = None
             bp = f.pos - len(d)
             po = len(d)
-            if PK66 in d:
+            if PK67 in d:
                 while True:
-                    p = d.rfind(PK66 + b'\x2C\0\0\0\0\0\0\0',None,po)
+                    p = d.rfind(PK67,None,po)
                     if p == -1:
                         f.close()
                         return 1
                     po = p
-                    f.seek(bp + p + 4 + 8 + 4 + 8)
-                    if f.read(8) != f.read(8): continue
-                    sz,of = f.readu64(),f.readu64()
-                    if (of + sz) <= (bp + p): break
+                    f.seek(bp + p + 4 + 4)
+                    of = f.readu64()
+                    if of + 0x2C <= bp + p and f.peek(4,offset=[of]) == PK66: break
 
-                f.seek(bp + p + 4 + 8 + 4)
-                if sum(f.read(8)): raise NotImplementedError('Multi file zip')
+                f.seek(bp + p + 4 + 4)
+                ecdo = f.readu64()
+                asrt(f.readu32() in {0,1},'Multidisk ZIP',err=NotImplementedError)
+                f.seek(ecdo + 4)
+                ecds = f.readu64()
+                f.skip(2)
+                asrt(ecds != 0x4C or f.readu16() < 62,'Encrypted CD',err=NotImplementedError)
+                f.skip(8)
                 c = f.readu64()
                 f.skip(8)
                 cds,cdo = f.readu64(),f.readu64()
@@ -492,15 +500,12 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
             BFZ = LEADS = None
             if any(fe['fl'] & 1 for fe in fs):
+                keys.wait()
                 if all(fe['ct'] in {0,8} for fe in fs) and i.lower().endswith('.bfz'):
-                    BFZ = tuple(keys.wait()['bubble_fighter'])
+                    BFZ = tuple(keys['bubble_fighter'])
                     BFZK = {}
                 elif all(fe['ct'] in {0,8} for fe in fs) and i.lower().endswith('.pak'):
-                    LEADS = keys.wait()['leadwerks']
-                else:
-                    # TODO: add key db
-                    KEY = None
-                    raise ValueError('No key for zip file')
+                    LEADS = keys['leadwerks']
             if FRZK:
                 FRZK.wait()
                 FRMK = [x for x in FRZK['c'] if x['n'].startswith('fm') and x['t'] == 'file']
@@ -520,7 +525,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             for fe in fs:
                 f.seek(fe['of'])
                 asrt(f.read(4) == PK34,lambda:f.fmt('§@§',back=4))
-                v = f.readu16()
+                fe['xv'] = f.readu16()
                 if 'aes' in fe: ct = 99
                 else: ct = fe['ct']
                 asrt(f.readu16() & 0x087F == fe['fl'] & 0x087F)
@@ -551,92 +556,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.seek(ep)
 
                 d = f.readc(fe['zs'])
-                if ct == 99 and 'aes' in fe:
-                    sml,kml = (0,8,12,16)[fe['aes']['m']],(0,16,24,32)[fe['aes']['m']]
-                    salt,kvr,auth,d = d[:sml],d[sml:sml+2],d[-10:],d[sml+2:-10]
-                    k = crc_hash(KEY,'pbkdf2',key=salt,c=1000,size=kml*2 + 2)
-                    asrt(k[-2:] == kvr,'Password verification failed')
-                    asrt(crc_hash(d,'hmac_sha1',key=k[kml:-2],bytes=True)[:10] == auth,'Authentication failed')
-                    d = decrypt(d,'aes_ctr_le',k[:kml],bits=0x80)
-                elif ct == 22: # Forza
-                    asrt(len(d) >= 0x230) # min observed block size + fm6apex header
-                    if len(d) & 7 == 4:
-                        v = 1
-                        iv,pad,hmac,d = d[:0x10],int.from_bytes(d[0x10:0x14],'little'),d[0x14:0x24],d[0x24:]
-                        ds = len(d) - 0x24
-                        bhd = iv + pad.to_bytes(4,'little')
-                    else:
-                        v = 0
-                        iv,hmac,d = d[:0x10],d[0x10:0x20],d[0x20:]
-                        ds = len(d) - 0x20
-                        bhd = iv
-                    for ctx in (FRMK,FRHK)[v]:
-                        if ds % (ctx['b'] + 0x10): continue
-                        hd = (ds // (ctx['b'] + 0x10) * ctx['b']).to_bytes(4,'little') + bhd
-                        if crc_hash(hd,'cmac_tfit',key=ctx['mk'],table=ctx['mt']) == hmac: break
-                    else: return 1
-                    d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'],block_size=ctx['b'])
-                    if v == 1: d = d[:-pad]
-                    fe['ct'] = 8 # deflate
-                elif fe['fl'] & 1:
-                    if BFZ:
-                        bp = dirname(fe['n']).upper()
-                        bp += '/' + basename(bp) + '.BFZ'
-                        bp = bp.replace('\\','/').encode('ascii')
-                        if not bp in BFZK: BFZK[bp] = decrypt(bp,'table',BFZ,size=0x40)
-                        KEY = BFZK[bp]
-                    elif LEADS:
-                        KEY = crc_hash(fe['fnb'],'leadwerks',key=LEADS,size=fe['us'])
-                    d = decrypt(d,'zipcrypto',KEY)
-                    asrt(d[11] == fe['chk'])
-                    d = d[12:]
-
-                fn = o + '/' + sanitize_relative(fe['n'])
-                c = 0
-                while exists(fn):
-                    fn = o + '/' + fe['n'] + '_' + str(c)
-                    c += 1
-                fe['ffn'] = fn
-
-                if fe['ct'] == 92:
-                    fe['sha1'] = d
-                    refs.append(fe)
-                    continue
-                if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
-                    d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
-                elif fe['ct'] == 18 and ((d[0] in {1,7} and d[1:4] == b'\x89\x69\xA5') or (d[0] in {2,5} and d[1] in {0,1})):
-                    dd = decompress(d,'terse',usize=fe['us'],text=False)
-                    if d[0] in {2,5} and len(d) != fe['us']:
-                        d = decompress(d,'terse',text=True)
-                    else: d = dd
-                elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
-                    d = decompress(d,'lzfse',usize=fe['us'])
-                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD': d = decompress(d,'lpaq8',usize=fe['us'])
-                elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
-                elif fe['ct'] == 97 and d[:4] != b'wvpk': d = decompress(d,'brotli',usize=fe['us'])
-                elif fe['ct'] in {10,15,94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
-                else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
-                for pht in ('sha256','sha1','md5'):
-                    if pht in fe:
-                        asrt(crc_hash(d,pht,bytes=True) == fe[pht],f'Hash mismatch ({pht})')
-                        break
-                else:
-                    if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'],'Checksum mismatch (crc32)')
-
-                if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
-                if 9 >= ct >= 1: pass
-                elif ct == 0 and len(d) >= 0x1E and d[0] == 0x70 and len(ZBUNFMTM) > d[1] > 0:
-                    tf = File(d[:0x20])
-                    tf.skip(2)
-                    try: bus,bzs = tf.readleb128u(),tf.readleb128u() + 0x1A
-                    except EOFError: BUNDLE.append(False)
-                    else:
-                        BUNDLE.append(bzs == (len(d) - tf.pos))
-                        if BUNDLE[-1]: fe['bun'] = {'zs':bzs,'us':bus,'ct':d[1]}
-                    del tf
-                else: BUNDLE.append(False)
-
-                writefile_zip(fe,d)
+                writefile_zip(**locals())
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):
@@ -732,7 +652,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
             while f:
                 if f.read(4) != PK34: break
                 fe = {
-                    'v':f.readu16(),
+                    'ia':0,'xa':0,
+                    'xv':f.readu16(),
                     'fl':f.readu16(),
                     'ct':f.readu16(),
                     'ts':{},
@@ -758,58 +679,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fs.append(fe)
 
                 d = f.read(fe['zs']) # not readc!
-                if fe['fl'] & 1:
-                    raise ValueError("No key for zip file")
-                    d = decrypt(d,'zipcrypto',KEY)
-                    asrt(d[11] == fe['chk'])
-                    d = d[12:]
-
-                c = 0
-                while exists(fn):
-                    fn = o + '/' + fe['n'] + '_' + str(c)
-                    c += 1
-                fe['ffn'] = fn
-
-                if fe['ct'] == 92:
-                    fe['sha1'] = d
-                    refs.append(fe)
-                    continue
-                if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
-                    d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
-                elif fe['ct'] == 18 and ((d[0] in {1,7} and d[1:4] == b'\x89\x69\xA5') or (d[0] in {2,5} and d[1] in {0,1})):
-                    dd = decompress(d,'terse',usize=fe['us'],text=False)
-                    if d[0] in {2,5} and len(d) != fe['us']:
-                        d = decompress(d,'terse',text=True)
-                    else: d = dd
-                elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
-                    d = decompress(d,'lzfse',usize=fe['us'])
-                elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD': d = decompress(d,'lpaq8',usize=fe['us'])
-                elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
-                elif fe['ct'] == 97 and d[:4] != b'wvpk': d = decompress(d,'brotli',usize=fe['us'])
-                elif fe['ct'] in {10,15,94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
-                else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
-                if len(d) == fe['us']:
-                    for pht in ('sha256','sha1','md5'):
-                        if pht in fe:
-                            asrt(crc_hash(d,pht,bytes=True) == fe[pht],f'Hash mismatch ({pht})')
-                            break
-                    else:
-                        if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'],'Checksum mismatch (crc32)')
-
-                if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
-                if 9 >= ct >= 1: pass
-                elif ct == 0 and len(d) >= 0x1E and d[0] == 0x70 and len(ZBUNFMTM) > d[1] > 0:
-                    tf = File(d[:0x20])
-                    tf.skip(2)
-                    try: bus,bzs = tf.readleb128u(),tf.readleb128u() + 0x1A
-                    except EOFError: BUNDLE.append(False)
-                    else:
-                        BUNDLE.append(bzs == (len(d) - tf.pos))
-                        if BUNDLE[-1]: fe['bun'] = {'zs':bzs,'us':bus,'ct':d[1]}
-                    del tf
-                else: BUNDLE.append(False)
-
-                writefile_zip(fe,d)
+                writefile_zip(**locals())
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):
@@ -1061,9 +931,13 @@ def extract1(inp:str,out:str,t:str) -> bool:
             dosbox(['uharcd','x',i])
             if listdir(o): return
         case 'Stirling Compressed'|'The Compressor'|'CP Shrink'|'DIET'|'Acorn Spark'|'Aldus LZW'|'Aldus Zip'|'ARX'|'CAZIP'|'DOS Backup'|\
-             'EPOC App Info'|'EPOC Install Package'|'GEM Resource'|'OS/2 Installation Package'|'Microsoft Comic Chat Character':
+             'EPOC App Info'|'EPOC Install Package'|'GEM Resource'|'OS/2 Installation Package'|'Microsoft Comic Chat Character'|\
+             'DEA:ZOO'|'DEA:AppleSingle'|'DEA:CrLZH'|'DEA:Crunch'|'DEA:BinHex'|'DEA:BinSCII'|'DEA:C64 IMG'|'DEA:EDI Install LZSS':
+            if t.startswith('DEA:'): t = t[4:]
             od = rldir(o)
-            run(["deark","-od",o,'-a',i])
+            if DEARKMP.get(t): cmd = ['-m',DEARKMP[t]]
+            else: cmd = []
+            run(["deark",*cmd,"-od",o,'-a',i])
             for x in rldir(o):
                 if x in od: continue
                 xb = basename(x)
@@ -1078,7 +952,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'ZOO':
             if readfile(i,size=2) == b'MZ':
-                run(['deark','-od',o,i])
+                run(['deark','-m',DEARKMP[t],'-od',o,i])
                 tf = o + '\\output.000.zoo'
                 if not exists(tf): return 1
                 r = extract(tf,o,'ZOO')
@@ -1086,7 +960,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 else: remove(tf)
                 return r
 
-            r = extract(i,o,'Stirling Compressed') # deark
+            r = extract(i,o,'DEA:' + t) # deark
             if r:
                 remove(o)
                 mkdir(o)
@@ -1194,17 +1068,18 @@ def extract1(inp:str,out:str,t:str) -> bool:
             if fs: return
         case 'AppleSingle'|'CrLZH'|'Crunch':
             if not extract1(i,o,'StuffIt'): return # unar
-            if not extract1(i,o,'DIET'): return # deark
+            if not extract1(i,o,'DEA:' + t): return # deark
         case 'PowerPacker':
             if not extract1(i,o,'StuffIt'): return # unar
             if not extract1(i,o,'Amiga XPK'): return # ancient
         case 'BinHex':
-            if not extract1(i,o,'AppleSingle'): return # unar & deark
-            if not extract1(i,o,'7z'): return # 7z
+            if not extract1(i,o,'StuffIt'): return # unar
+            if not extract1(i,o,'DEA:' + t): return # deark
+            if not extract1(i,o,'7Z:' + t): return # 7z
         case 'BinSCII':
             tf = TmpFile('.bsc')
             writefile(tf.p,b'\n'.join([x.lstrip(b' ') for x in (b'FiLeStArTfIlEsTaRt' + readfile(i).split(b'FiLeStArTfIlEsTaRt',1)[1]).split(b'\n')]))
-            r = extract1(tf.p,o,'DIET') # deark
+            r = extract1(tf.p,o,'DEA:' + t) # deark
             tf.destroy()
             return r
         case 'Compaq QRST IMG'|'CopyQM IMG'|'FDCOPY CFI IMG':
@@ -1740,10 +1615,12 @@ def read_http_head(readline,max:int=None,idn=False):
         else: o[k] = v
     return o
 def read_zip_extra(**l):
+    f,fe,xl,crc_hash = l['f'],l['fe'],l['xl'],l['crc_hash']
     if typing.TYPE_CHECKING:
         from lib.file import File
+        from lib.crypto import crc_hash
         f:File
-    f,fe,xl,crc_hash = l['f'],l['fe'],l['xl'],l['crc_hash']
+
     ep = f.pos + xl
     if xl == 10 and fe['cv'] == fe['xv'] == 10 and f.peek('u16',offset=2) >= 0x3030 and all(x in '0123456789abcdefABCDEF' for x in f.peek(xl).decode('latin-1')):
         f.seek(ep) # JAR shit
@@ -1814,6 +1691,9 @@ def read_zip_extra(**l):
                     f.seek(vep)
             case b'\x03\x99': # WinZip Reference
                 pass
+            case b'\x17\0': # PKWARE Strong Encryption
+                asrt(f.readu16() == 2)
+                # rest is also included in the file data
             case b'\x1E\xA1': # Data Stream Alignment
                 pass # u16 ?
             case b'\x20\xA2': # Microsoft Open Packaging Growth Hint
@@ -1884,8 +1764,184 @@ def read_zip_extra(**l):
             case _: raise NotImplementedError(f'{repr(tg)[1:]} @ 0x{f.pos - 4:08X}')
         f.seek(xep)
     f.seek(ep)
-def writefile_zip(fe:dict,d:bytes):
-    fn = fe['ffn']
+def get_zip_keys(keys:list,**kwargs):
+    for ke in keys:
+        for k,v in ke.items():
+            if k in {'k','iv','salt','init'}: continue
+            if not k in kwargs or (not kwargs[k] in v if type(v) == list else kwargs[k] != v): break
+        else: yield ke
+    raise ValueError(f'zip key not found for search entry: {kwargs}')
+def writefile_zip(**l):
+    i,o,fe,d,ct,hrefs,refs,drefs,\
+    File,by2bi,crc_hash,decrypt,decompress,\
+    keys,BUNDLE,BFZ,LEADS = [l[x] for x in ('i','o','fe','d','ct','hrefs','refs','drefs','File','by2bi','crc_hash','decrypt','decompress','keys','BUNDLE','BFZ','LEADS')]
+    if typing.TYPE_CHECKING:
+        from lib.pyob import PyOBinX
+        from lib.crypto import crc_hash,decrypt
+        from lib.file import File,decompress,by2bi
+        d:bytes
+        fe:dict
+        ct:int
+        keys:PyOBinX
+
+    ksrc = {
+        'af':basename(i).lower(),
+        'afx':basename(i),
+        'ab':tbasename(i).lower(),
+        'abx':tbasename(i),
+        'ae':extname(i).lower(),
+        'aex':extname(i),
+        'n':fe['n'].lower().replace('\\','/'),
+        'nx':fe['n'],
+        'zs':fe['zs'],
+        's':fe['us'],
+        'crc':fe['crc'],
+        'ct':fe['ct'],
+        'eid':-1,
+    }
+    if fe['fl'] & 0x41 == 0x41 and fe['xv'] & 0xFF >= 50:
+        f = File(d,endian='<')
+        iv = f.readc(f.readu16())
+        if not iv: iv = fe['crc'].to_bytes(4,'little') + fe['us'].to_bytes(8,'little')
+        hs = f.readu32()
+        ep = f.pos + hs
+        asrt(f.readu16() == 3) # format
+        aid = f.readu16()
+        an,abls = ZEFMTM[aid]
+
+        kisz = f.readu16()
+        pfl = f.readu16()
+        asrt(not pfl & 2,'Certificate',fe,err=NotImplementedError)
+        erd = f.readc(f.readu16())
+        asrt(len(erd) % abls == 0)
+        asrt(f.readu32() == 0,'Certificate size',fe,err=NotImplementedError)
+        pwvd = f.readc(f.readu16())
+        del f
+        d = d[ep:]
+
+        if pfl & 1:
+            asrt(not pfl & 0x4000,'3DES RD',fe,err=NotImplementedError)
+            rabs = 8 if pfl & 0x4000 else 16
+            ralg = '3des_cbc' if pfl & 0x4000 else 'aes_cbc'
+            riv = iv[:rabs]
+            riv += bytes(rabs - len(riv))
+            fiv = iv[:abls]
+            fiv += bytes(abls - len(fiv))
+
+            ksrc['eid'] = aid
+            ksrc['en'] = an
+            for KEY in get_zip_keys(keys['zip'],**ksrc):
+                mk = crc_hash(KEY['k'],'zip_ses_sha1',size=32)
+                rd = decrypt(erd,ralg,mk,riv)
+                if set(rd[-rabs:]) != {rabs,}: continue
+                rd = rd[:-rd[-1]]
+
+                fk = crc_hash(iv + rd,'zip_ses_sha1',size=kisz // 8)
+                pwv = decrypt(pwvd,an,fk,fiv)
+                if crc_hash(pwv[:-4],'crc32') != int.from_bytes(pwv[-4:],'little'): continue
+                d = decrypt(pwvd + d,an,fk,fiv)[len(pwv):]
+                d = d[:-d[-1]]
+                break
+    elif fe['fl'] & 1 and fe['xv'] & 0xFF >= 20:
+        if BFZ:
+            BFZK = l['BFZK']
+            bp = dirname(fe['n']).upper()
+            bp += '/' + basename(bp) + '.BFZ'
+            bp = bp.replace('\\','/').encode('ascii')
+            if not bp in BFZK: BFZK[bp] = decrypt(bp,'table',BFZ,size=0x40)
+            d = decrypt(d,'zipcrypto',BFZK[bp])
+            asrt(d[11] == fe['chk'])
+            d = d[12:]
+        elif LEADS:
+            KEY = crc_hash(fe['fnb'],'leadwerks',key=LEADS,size=fe['us'])
+            d = decrypt(d,'zipcrypto',KEY)
+            asrt(d[11] == fe['chk'])
+            d = d[12:]
+        else:
+            ksrc['en'] = 'zipcrypto'
+            ksrc['eid'] = -1
+            for KEY in get_zip_keys(keys['zip'],**ksrc):
+                d = decrypt(d,'zipcrypto',KEY['k'])
+                if d[11] != fe['chk']: continue
+                d = d[12:]
+                break
+    if ct == 99 and 'aes' in fe:
+        sml,kml = (0,8,12,16)[fe['aes']['m']],(0,16,24,32)[fe['aes']['m']]
+        salt,kvr,auth,d = d[:sml],d[sml:sml+2],d[-10:],d[sml+2:-10]
+        ksrc['en'] = 'aes_ctr_le'
+        ksrc['eid'] = -99
+        for KEY in get_zip_keys(keys['zip'],**ksrc):
+            k = crc_hash(KEY['k'],'pbkdf2',key=salt,c=1000,size=kml*2 + 2)
+            if k[-2:] != kvr: continue
+            if crc_hash(d,'hmac_sha1',key=k[kml:-2],bytes=True)[:10] != auth: continue
+            d = decrypt(d,'aes_ctr_le',k[:kml],bits=0x80)
+            break
+    elif ct == 22: # Forza
+        FRMK,FRHK = l['FRMK'],l['FRHK']
+        asrt(len(d) >= 0x230) # min observed block size + fm6apex header
+        if len(d) & 7 == 4:
+            v = 1
+            iv,pad,hmac,d = d[:0x10],int.from_bytes(d[0x10:0x14],'little'),d[0x14:0x24],d[0x24:]
+            ds = len(d) - 0x24
+            bhd = iv + pad.to_bytes(4,'little')
+        else:
+            v = 0
+            iv,hmac,d = d[:0x10],d[0x10:0x20],d[0x20:]
+            ds = len(d) - 0x20
+            bhd = iv
+        for ctx in (FRMK,FRHK)[v]:
+            if ds % (ctx['b'] + 0x10): continue
+            hd = (ds // (ctx['b'] + 0x10) * ctx['b']).to_bytes(4,'little') + bhd
+            if crc_hash(hd,'cmac_tfit',key=ctx['mk'],table=ctx['mt']) == hmac: break
+        else: return 1
+        d = decrypt(d,'transformit',ctx['dk'],iv,table=ctx['dt'],block_size=ctx['b'])
+        if v == 1: d = d[:-pad]
+        fe['ct'] = 8 # deflate
+
+    fn = o + '/' + sanitize_relative(fe['n'])
+    c = 0
+    while exists(fn):
+        fn = o + '/' + fe['n'] + '_' + str(c)
+        c += 1
+    fe['ffn'] = fn
+
+    if fe['ct'] == 92:
+        fe['sha1'] = d
+        refs.append(fe)
+        return
+    if fe['ct'] == 18 and d[:1].isdigit() and d[1:2] == b'1' and by2bi(d[-2:]).rstrip('0').endswith('00010111'):
+        d = decompress(d,'xceed_bwt',usize=fe['us'],check=lambda x: crc_hash(x,'crc32') == fe['crc'])
+    elif fe['ct'] == 18 and ((d[0] in {1,7} and d[1:4] == b'\x89\x69\xA5') or (d[0] in {2,5} and d[1] in {0,1})):
+        dd = decompress(d,'terse',usize=fe['us'],text=False)
+        if d[0] in {2,5} and len(d) != fe['us']:
+            d = decompress(d,'terse',text=True)
+        else: d = dd
+    elif fe['ct'] == 99 and d[:4] in {b'bvx$',b'bvx-',b'bvx1',b'bvx2',b'bvxn'}:
+        d = decompress(d,'lzfse',usize=fe['us'])
+    elif fe['ct'] == 20 and d[:4] != b'\x28\xB5\x2F\xFD': d = decompress(d,'lpaq8',usize=fe['us'])
+    elif fe['ct'] == 6: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],flags=fe['fl'])
+    elif fe['ct'] == 97 and d[:4] != b'wvpk': d = decompress(d,'brotli',usize=fe['us'])
+    elif fe['ct'] in {10,15,94,97}: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'],db=db)
+    else: d = decompress(d,ZFMTM[fe['ct']],usize=fe['us'])
+    for pht in ('sha256','sha1','md5'):
+        if pht in fe:
+            asrt(crc_hash(d,pht,bytes=True) == fe[pht],f'Hash mismatch ({pht})')
+            break
+    else:
+        if fe['crc']: asrt(crc_hash(d,'crc32') == fe['crc'],'Checksum mismatch (crc32)')
+
+    if hrefs: drefs[crc_hash(d,'sha1',bytes=True)] = fn
+    if ct in {0,8} and len(d) >= 0x1E and d[0] == 0x70 and len(ZBUNFMTM) > d[1] > 0:
+        tf = File(d[:0x20])
+        tf.skip(2)
+        try: bus,bzs = tf.readleb128u(),tf.readleb128u() + 0x1A
+        except EOFError: BUNDLE.append(False)
+        else:
+            BUNDLE.append(bzs == (len(d) - tf.pos))
+            if BUNDLE[-1]: fe['bun'] = {'zs':bzs,'us':bus,'ct':d[1]}
+        del tf
+    else: BUNDLE.append(False)
+
     if fe.get('cos') in {3,0x13} and fe.get('xa',0) >> 28 == 0xA and istext(d,'utf-8',filename=True,eof=False):
         symlink(d.decode('utf-8'),fn)
     else: writefile(fn,d)
@@ -1950,6 +2006,19 @@ ZFMTM = {
     99:'aes',
     # 99:'lzfse', # unofficial, Apple
     100:'lzfse', # unofficial, OTEr ZIP, untested, https://github.com/trufae/otezip
+}
+ZEFMTM = {
+    0x6601:('des_cbc',8),
+    0x6602:('rc2_zip_cbc',8),
+    0x6603:('3des_cbc',8), # 168
+    0x6609:('3des_cbc',8), # 112
+    0x660E:('aes_cbc',16), # 128
+    0x660F:('aes_cbc',16), # 192
+    0x6610:('aes_cbc',16), # 256
+    0x6702:('rc2_cbc',8),
+    0x6720:('blowfish_cbc',8),
+    0x6721:('twofish_cbc',16),
+    # 0x6801:('rc4',None), # no clue what the iv here is
 }
 ZBUNFMTM = ( # https://github.com/r-lyeh-archived/bundle
     'none', # RAW

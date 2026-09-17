@@ -748,15 +748,19 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 a = 'lz40'
             elif hint in {'nds','gba'} and i[0] == 0x60 and (not alw or 'lz60' in alw):
                 a = 'lz60'
-            elif fb is None: raise ValueError(f"Couldn't guess compression ({i[:0x10]})")
+            elif fb is None: raise ValueError(f"Couldn't guess compression ({repr(i[:0x10])[2:-1]})")
             else: a = fb
             return decompress(i,a,**kwargs)
 
         case 'zlib':
             import zlib
             if i is None: return zlib.decompressobj(wbits=kwargs.get('wbits',15),zdict=kwargs.get('dict',b''))
-            if 'dict' in kwargs: raise ValueError('use deflate_noerror instead to use a dict')
-            return zlib.decompress(i,wbits=kwargs.get('wbits',15))
+            if 'dict' in kwargs:
+                o = zlib.decompressobj(wbits=kwargs.get('wbits',15),zdict=kwargs['dict'])
+                r = o.decompress(i) + o.flush()
+                asrt(not o.unused_data,'Truncated')
+                return r
+            return zlib.decompress(i,wbits=kwargs.get('wbits',15),bufsize=kwargs.get('usize') or 0x4000)
         case 'zlib_noerr'|'zlib_noerror':
             import zlib
             obj = zlib.decompressobj(wbits=kwargs.get('wbits',15),zdict=kwargs.get('dict',b''))
@@ -764,8 +768,12 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
         case 'deflate':
             import zlib
             if i is None: return zlib.decompressobj(wbits=-15,zdict=kwargs.get('dict',b''))
-            if 'dict' in kwargs: raise ValueError('use deflate_noerror instead to use a dict')
-            return zlib.decompress(i,wbits=-15)
+            if 'dict' in kwargs:
+                o = zlib.decompressobj(wbits=-15,zdict=kwargs['dict'])
+                r = o.decompress(i) + o.flush()
+                asrt(not o.unused_data,'Truncated')
+                return r
+            return zlib.decompress(i,wbits=-15,bufsize=kwargs.get('usize') or 0x4000)
         case 'deflate_noerr'|'deflate_noerror':
             import zlib
             obj = zlib.decompressobj(wbits=-15,zdict=kwargs.get('dict',b''))
@@ -775,7 +783,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return zlib.decompress((i[0] & 0xF8 | ((i[0] & 3) - 1) << 1 | (0 if (i[0] >> 2) & 1 else 1)).to_bytes(1) + i[1:],wbits=-15)
         case 'deflate64':
             import inflate64
-            return inflate64.Inflater().inflate(i)
+            obj = inflate64.Inflater()
+            if i is None: return obj
+            return obj.inflate(i) + obj.flush()
         case 'gzip':
             import gzip
             return gzip.decompress(i)

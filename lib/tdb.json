@@ -670,6 +670,15 @@
     "PKLITE":[
         "16bit dos exe pklite compressed"
     ],
+    "PKLITE32":[
+        "pklite32 v1.1 compressed win32 executable",
+        "pklite32 v11 pkware",
+        "pklite32 11 pkware inc",
+        "pklite32 v11 pkware inc",
+        "pklite32(tm",
+        "pklite32(1.1)",
+        "pklite32"
+    ],
     "LZOP":[
         "lzop compressed data",
         "lzop compressed"

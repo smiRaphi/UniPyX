@@ -59,6 +59,7 @@ BASEXXNS = {'base10':'b10',
             'base64':'b64','gamespy64':'g64',
             'base85':'b85','ascii85':'a85','zbase85':'z85','hamr85':'h85',
             'base92':'b92',}
+ARCODE_DEC = b"0123456789ABCDEFGHJKMNPQRTUVWXYZILOS"
 PYCRHSHM = {
     'KECCAK':'keccak',
 }
@@ -70,6 +71,7 @@ PYCRCIPM = {
     'des':'DES','des3':'DES3',
     'blowfish':'Blowfish',
     'chacha20':'ChaCha20','tls_chacha20':'ChaCha20','xchacha20':'ChaCha20',
+    'salsa20':'Salsa20',
 }
 CRYOCIPM = {
     'camellia':'Camellia','blowfish':'Blowfish','aes':'AES',
@@ -442,6 +444,12 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,bytes): key = key[0]
             asrt(isinstance(key,int),err=TypeError)
             return uxx().decrypt_eac(i,key)
+        case 'ar'|'arcode':
+            by = isinstance(i,(bytes,bytearray,memoryview))
+            if by: i = struct.unpack(f'<{len(i)//4}I',i)
+            r = uxx().decrypt_arcode(i)
+            if by: return struct.pack(f'<{len(r)}I',*r)
+            return r
 
         case 'table':
             enc = kwargs.get('encoding','latin-1')
@@ -553,6 +561,30 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
                 else: s -= 0x40
                 o.extend(base64.b85decode(l[1:])[:s])
             return bytes(o)
+        case 'ar_alpha'|'arcode_alpha':
+            def getv(i:int):
+                r = ARCODE_DEC.index(i)
+                if r in {32,33}: return 1 # I,L
+                elif r == 34: return 0 # O
+                elif r == 35: return 5 # S
+                return r
+
+            if isinstance(i,str): i = i.encode('latin-1')
+            i = i.replace(b'-',b'').replace(b' ',b'').replace(b'\r',b'').replace(b'\t',b'').upper()
+            r = []
+            for l in i.split(b'\n'):
+                if not l: continue
+                asrt(len(l) == 13)
+                va = getv(l[6]) >> 3
+                vb = getv(l[12]) >> 1
+                for ix in range(6):
+                    va |= getv(l[ix]) << ((5 - ix) * 5 + 2)
+                    vb |= getv(l[ix + 6]) << ((5 - ix) * 5 + 4)
+                vb &= 0xFFFFFFFF
+                asrt((va ^ vb).bit_count() & 1 == getv(l[12]) & 1)
+                r.append(va)
+                r.append(vb)
+            return r
 
     raise NotImplementedError(algo)
 def encrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
@@ -864,6 +896,10 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             fnc = uxx().hash_crc
         case 'crc32_16': return crc_hash(i,'crc32',**kwargs) & 0xFFFF
         case 'crc32_php': return swap32i(crc_hash(i,'crc32_bzip2',**kwargs))
+        case 'crc16_4_ar':
+            if isinstance(i,(list,tuple)): i = struct.pack(f'<{len(i)}I',*i)
+            r = crc_hash(i,'crc16_kermit')
+            return ((r >> 12) ^ (r >> 8) ^ (r >> 4) ^ r) & 0xF
         case 'bkdr'|'bkdr_ltr'|'bkdr32'|'bkdr32_ltr'|'aststrsum'|'ast_strsum'|'java'|'slf'|'nlg'|'solaris':
             kwargs['mult'],kwargs['add'],init = PRNG32[algo]
             if not 'init' in kwargs: kwargs['init'] = init
@@ -955,6 +991,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 kwargs['seed2'] = s >> 64
         case 'bsdsum'|'bsd': fnc = uxx().hash_bsdsum
         case 'sysvsum'|'sysv': fnc = uxx().hash_sysvsum
+        case 'pesum'|'pe': fnc = uxx().hash_pesum
         case 'sum': return sum(i)
         case 'sum8'|'sum16'|'sum24'|'sum32'|'sum40'|'sum48'|'sum56'|'sum64':
             return sum(i) & ((1 << int(algo[3:])) - 1)
@@ -1251,7 +1288,7 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             if kwargs.get('bytes'): return r
             return int.from_bytes(r,'big')
         case 'eac': # Exact Audio Copy
-            b = kwargs.get('iv',kwargs.get('iv',b'\0'*0x20))
+            b = kwargs.get('iv',b'\0'*0x20)
             asrt(len(b) == len(kwargs['key']) == 0x20)
             o = encrypt(None,'rijndael256',kwargs['key'])
 
@@ -1272,6 +1309,18 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             else: import ascon_old as ascon
             r = ascon.ascon_mac(kwargs['key'],i,'Ascon-' + {'mac':'Mac','maca':'Maca','prf':'Prf','prfa':'Prfa','prf_short':'PrfShort'}[algo[6:]],kwargs.get('size',0x10))
             return r if kwargs.get('bytes') else int.from_bytes(r,'big')
+        case 'ghash'|'ghash_aes':
+            k = kwargs['key']
+            if algo == 'ghash_aes':
+                from Cryptodome.Cipher import AES
+                k = AES.new(k,AES.MODE_ECB).encrypt(b'\0'*16)
+            from Cryptodome.Cipher._mode_gcm import _ghash_clmul,_ghash_portable,_GHASH
+            h = _GHASH(k,_ghash_clmul or _ghash_portable)
+            if i is None: return h
+            i += bytes(-len(i) % 0x10)
+            r = h.update(i).digest()
+            if kwargs.get('bytes'): return r
+            return int.from_bytes(r,'big')
 
         case 'pbkdf2'|'pbkdf2_sha1'|'pbkdf2_sha224'|'pbkdf2_sha256'|'pbkdf2_sha384'|'pbkdf2_sha512'|'pbkdf2_sha3_224'|\
              'pbkdf2_sha3_256'|'pbkdf2_sha3_384'|'pbkdf2_sha3_512'|'pbkdf2_md2'|'pbkdf2_md4'|'pbkdf2_md5'|'pbkdf2_ripemd160'|\
@@ -1400,6 +1449,10 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             while len(i) < 0x20: i.extend(b'\x2D\x39\xC2' + i)
             x1 = f'{kwargs["size"]}. _'.encode('ascii')
             return encrypt(i,'dxor',x1,kwargs['key']).split(b'\0',1)[0]
+        case 'zip_ses_sha1':
+            a = algo[8:]
+            h = crc_hash(i,a,bytes=True)
+            return (crc_hash(encrypt(h,'xor',0x36) + b'\x36' * (0x40 - len(h)),a,bytes=True) + crc_hash(encrypt(h,'xor',0x5C) + b'\x5C' * (0x40 - len(h)),a,bytes=True))[:kwargs.get('size',0x20)]
 
         case 'tarzan': fnc = uxx().hash_tarzan
         case 'luas': fnc = uxx().hash_luas
@@ -1435,7 +1488,8 @@ HASHTS = {
     x:8 for x in PRNG64}|{
     x:FLETCH[x][0]//8 for x in FLETCH}|\
 {
-    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,'crc32_16':2,'crc32_php':4,
+    'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,
+    'crc32_16':2,'crc32_php':4,'crc16_4_ar':1,
     'adler8':1,'adler16':2,'adler32':4,'adler64':8,
     'fnv1_32':4,'fnv1a_32':4,'fnv0_32':4,
     'fnv1_64':8,'fnv1a_64':8,'fnv0_64':8,
@@ -1455,7 +1509,7 @@ HASHTS = {
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
     'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
-    'bsdsum':2,'bsd':2,'sysv':2,'sysvsum':2,
+    'bsdsum':2,'bsd':2,'sysvsum':2,'sysv':2,'pesum':4,'pe':4,
     'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
     'sum8_rotl':1,'sum16_rotl':2,'sum24_rotl':3,'sum32_rotl':4,'sum40_rotl':5,'sum48_rotl':6,'sum56_rotl':7,'sum64_rotl':8,
     'sum8_rotr':1,'sum16_rotr':2,'sum24_rotr':3,'sum32_rotr':4,'sum40_rotr':5,'sum48_rotr':6,'sum56_rotr':7,'sum64_rotr':8,

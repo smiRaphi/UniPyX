@@ -3205,6 +3205,12 @@
         "rs":"0Size24 Data"
     },
     {
+        "rq":null,
+        "t":"text",
+        "d":[["size",[15,85000]],["isat","-",4],["isat","-",9],["contain","\\n",15,2],["py","a='0123456789ABCDEFGHJKMNPQRTUVWXYZ'\ntry:d=f.read().decode('ascii').replace('\\r','').strip()\nexcept:return\nfor l in d.split('\\n'):\n if not l:continue\n if len(l)!=15 or l[4]!='-' or l[9]!='-' or not all(x in a for x in l[:4]+l[5:9]+l[10:]):return\nreturn True"]],
+        "rs":"Action Replay Code"
+    },
+    {
         "rqr":null,
         "t":"text",
         "d":[["s%",2],["size",[2,104857600]],["py","return all(x in {48,49,50,51,52,53,54,55,56,57,65,66,67,68,69,70,97,98,99,100,101,102} for x in f.read())"]],

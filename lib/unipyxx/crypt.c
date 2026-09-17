@@ -639,6 +639,47 @@ EXPORT void decrypt_blackenergy_rc4(uint8_t *restrict buf, const size_t size, co
         buf[p] ^= S[ix];
     }
 }
+#define AR_SCRAMBLE(x1, x2, m, r, d)\
+    tmp = (x1 ^ x2) & m;\
+    x1 ^= tmp;\
+    x2 = CONCAT(ROT32,d)(x2 ^ tmp, r);
+EXPORT void decrypt_arcode(uint32_t *restrict buf, const size_t size) {
+    for (size_t p=0;p < size;p+=2) {
+        uint32_t tmp = 0;
+
+        uint32_t adr = SWAP32(buf[p]);
+        uint32_t val = SWAP32(buf[p + 1]);
+
+        val = ROT32L(val, 4);
+        AR_SCRAMBLE(adr, val, 0xF0F0F0F0, 0x14, R)
+        AR_SCRAMBLE(adr, val, 0xFFFF0000, 0x12, R)
+        AR_SCRAMBLE(adr, val, 0x33333333, 6, R)
+        AR_SCRAMBLE(adr, val, 0x00FF00FF, 9, L)
+        AR_SCRAMBLE(val, adr, 0xAAAAAAAA, 1, L)
+
+        for (uint8_t i=0;i < 32;) {
+            uint32_t t1 = ROT32R(val, 4) ^ AR_SEED[i++];
+            uint32_t t2 = val ^ AR_SEED[i++];
+            adr ^= AR_T6[t1 & 0x3F] ^ AR_T4[(t1 >> 8) & 0x3F] ^ AR_T2[(t1 >> 16) & 0x3F] ^ AR_T0[(t1 >> 24) & 0x3F]
+                 ^ AR_T7[t2 & 0x3F] ^ AR_T5[(t2 >> 8) & 0x3F] ^ AR_T3[(t2 >> 16) & 0x3F] ^ AR_T1[(t2 >> 24) & 0x3F];
+
+            t1 = ROT32R(adr, 4) ^ AR_SEED[i++];
+            t2 = adr ^ AR_SEED[i++];
+            val ^= AR_T6[t1 & 0x3F] ^ AR_T4[(t1 >> 8) & 0x3F] ^ AR_T2[(t1 >> 16) & 0x3F] ^ AR_T0[(t1 >> 24) & 0x3F]
+                 ^ AR_T7[t2 & 0x3F] ^ AR_T5[(t2 >> 8) & 0x3F] ^ AR_T3[(t2 >> 16) & 0x3F] ^ AR_T1[(t2 >> 24) & 0x3F];
+        }
+
+        val = ROT32R(val, 1);
+        AR_SCRAMBLE(val, adr, 0xAAAAAAAA, 9, R)
+        AR_SCRAMBLE(val, adr, 0x00FF00FF, 6, L)
+        AR_SCRAMBLE(val, adr, 0x33333333, 0x12, L)
+        AR_SCRAMBLE(val, adr, 0xFFFF0000, 0x14, L)
+        AR_SCRAMBLE(val, adr, 0xF0F0F0F0, 4, R)
+
+        buf[p] = SWAP32(val);
+        buf[p + 1] = SWAP32(adr);
+    }
+}
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
     return t[0x100 * x + buf[x]];
@@ -1504,6 +1545,20 @@ EXPORT uint16_t hash_sysvsum(const uint8_t *restrict src, const size_t size) {
     uint32_t s = SUMB(src, size);
     uint32_t r = (s & 0xFFFF) + (s >> 16);
     return (r & 0xFFFF) + (r >> 16);
+}
+EXPORT uint32_t hash_pesum(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = 0;
+    size_t p = 0;
+    for (;p + 2 <= size;p += 2) {
+        h += read16le(src + p);
+        h = (h & 0xFFFF) + (h >> 16);
+    }
+    if (p < size) {
+        h += src[p];
+        h = (h & 0xFFFF) + (h >> 16);
+    }
+    h = (h & 0xFFFF) + (h >> 16);
+    return ((h + (h >> 16)) & 0xFFFF) + size;
 }
 
 static inline uint32_t dha256_sigma0(uint32_t x) { return ROT32L(x, 7 ) ^ ROT32L(x, 22) ^ x; }

@@ -54,6 +54,8 @@ LG Encrypted EPK | .epk | https://www.lg.com/us/support/product/lg-OLED83B6GUA.A
 - lib/crypto.py:crc_hash non pure python blake
 - lib/crypto.py:crc_hash blake2bp/blake2sp
 - Themida: mal_unpack -> https://github.com/Hendi48/Magicmida/issues/60 or https://github.com/TopSoftdeveloper/UnpackThemida/issues/3
+- lib/crypto.py:decrypt XSalsa20
+- lib/crypto.py:crc_hash XSalsa20-Poly1305
 
 ### CD-i RTF dev interview:
 > Q: what is a .rtr file?

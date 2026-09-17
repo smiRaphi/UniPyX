@@ -319,10 +319,151 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
             if d: return
         case 'ASC2COM':
             od = rldir(o)
-            run(['deark','-m','asc2com','-opt','text:encconv=0','-od',o,i])
+            run(['deark','-m',DEARKMP[t],'-opt','text:encconv=0','-od',o,i])
             for x in rldir(o):
                 if not x in od:
                     mv(x,o + '/' + tbasename(i) + '.txt')
                     return
+        case 'PKLITE32':
+            STRIP = {b'.pklstb\0',b'.relo2\0\0'}
+
+            db.try_custom()
+            from lib.crypto import crc_hash
+            from lib.file import ext_exe,decompress
+            d = readfile(i)
+            e = ext_exe(d,fast_load=True)
+
+            imb = e.OPTIONAL_HEADER.ImageBase
+            ois = e.OPTIONAL_HEADER.SizeOfImage
+            dd = getattr(e.OPTIONAL_HEADER,'DATA_DIRECTORY',[])
+            if len(dd) > 4 and dd[4].VirtualAddress and dd[4].Size:
+                ois = min(ois,dd[4].VirtualAddress)
+            ep = e.get_offset_from_rva(e.OPTIONAL_HEADER.AddressOfEntryPoint)
+            sal = e.OPTIONAL_HEADER.SectionAlignment or 1
+            fal = e.OPTIONAL_HEADER.FileAlignment or 1
+            soh = e.OPTIONAL_HEADER.SizeOfHeaders
+            soh += -soh % fal
+            mxva = max([x.VirtualAddress + max(x.Misc_VirtualSize,x.SizeOfRawData) for x in e.sections])
+            mxva += -mxva % sal
+            miva = min([x.VirtualAddress for x in e.sections]) - soh
+            assert miva >= 0
+
+            asrt(d[ep] == d[ep + 5] == d[ep + 10] == 0x68 and d[ep + 15] == 0xE8 and d[ep + 20] == 0xE9)
+            dso = e.get_offset_from_rva(int.from_bytes(d[ep + 1:ep + 5],'little') - imb)
+            oep = e.get_rva_from_offset(ep + 20) + 5 + int.from_bytes(d[ep + 21:ep + 25],'little',signed=True)
+
+            p = dso
+            asrt(d[p:p + 4] == b'\x44\x33\x22\x11')
+            p += 8
+            oimb = int.from_bytes(d[p:p + 4],'little');p += 4
+            bc = int.from_bytes(d[p:p + 4],'little');p += 4
+            p += 4
+
+            zmi = max(miva - 0x8000,0)
+            zmem = bytearray(max(mxva - zmi,0x8000))
+            zmem[:soh] = d[:soh]
+            for sec in e.sections:
+                va = sec.VirtualAddress - zmi
+                sd = sec.get_data()[:sec.Misc_VirtualSize]
+                if len(sd) < sec.Misc_VirtualSize: sd += bytes(sec.Misc_VirtualSize - len(sd))
+                zmem[va:va + sec.Misc_VirtualSize] = sd
+
+            bs = []
+            for _ in range(bc):
+                asrt(d[p:p + 4] == b'\x44\x33\x22\x11');p += 4
+                us = int.from_bytes(d[p:p + 4],'little');p += 4
+                p += 4
+                dva = int.from_bytes(d[p:p + 4],'little');p += 4
+                zs = int.from_bytes(d[p:p + 4],'little');p += 4
+
+                if zs > 0x8000:
+                    raise NotImplementedError('deflate64 with zdict (https://codeberg.org/miurahr/inflate64/issues/16)')
+                else:
+                    zd = zmem[dva - 0x8000 - zmi:dva - zmi]
+                    bd = decompress(d[p:p + zs],'deflate',usize=us,dict=bytes(0x8000 - len(zd)) + zd);p += zs
+                    bd = bd[:us]
+                    bd += bytes(us - len(bd))
+                    zmem[dva - zmi:dva - zmi + us] = bd
+                bs.append((bd,dva))
+
+            mxva -= miva
+            mem = bytearray(mxva)
+            mem[:soh] = d[:soh]
+
+            for sec in e.sections:
+                if sec.SizeOfRawData > 0 and sec.PointerToRawData > 0:
+                    va = sec.VirtualAddress - miva
+                    if sec.Name in STRIP:
+                        if va < len(mem): mem = mem[:va]
+                        continue
+                    sz = sec.SizeOfRawData
+                    sz += -sz % fal
+                    mem[va:va + sz] = d[sec.PointerToRawData:sec.PointerToRawData + sz]
+            for bd,va in bs:
+                va -= miva
+                mem[va:va + len(bd)] = bd
+            bs = [(x[1] - miva,len(x[0])) for x in bs]
+
+            whtl = []
+            dba = cba = csz = isz = usz = 0
+            for sec in e.sections:
+                if sec.Name in STRIP:
+                    whtl.append((sec.get_file_offset(),sec.sizeof()))
+                    continue
+
+                va = sec.VirtualAddress - miva
+                sec.VirtualAddress = va
+                sec.SizeOfRawData = sec.Misc_VirtualSize + -sec.Misc_VirtualSize % fal
+                sec.PointerToRawData = sec.VirtualAddress + -sec.VirtualAddress % fal
+
+                if sec.Characteristics & 0x20:
+                    if cba == 0: cba = va
+                    else: cba = min(cba,va)
+                    csz += sec.SizeOfRawData
+                if sec.Characteristics & 0x40:
+                    if dba == 0: dba = va
+                    else: dba = min(dba,va)
+                    isz += sec.SizeOfRawData
+                if sec.Characteristics & 0x80:
+                    usz += sec.SizeOfRawData
+            asrt(cba | dba > 0)
+
+            e.FILE_HEADER.NumberOfSections = len(e.sections) - len(whtl)
+            e.OPTIONAL_HEADER.ImageBase = oimb
+            e.OPTIONAL_HEADER.AddressOfEntryPoint = oep
+            e.OPTIONAL_HEADER.BaseOfCode = cba
+            e.OPTIONAL_HEADER.BaseOfData = dba
+            e.OPTIONAL_HEADER.SizeOfImage = len(mem)
+            e.OPTIONAL_HEADER.SizeOfCode = csz
+            e.OPTIONAL_HEADER.SizeOfInitializedData = isz
+            e.OPTIONAL_HEADER.SizeOfUninitializedData = usz
+            e.OPTIONAL_HEADER.CheckSum = 0
+
+            dd = getattr(e.OPTIONAL_HEADER,'DATA_DIRECTORY',[])
+            if len(dd) > 4 and dd[4].VirtualAddress and dd[4].Size:
+                dd[4].VirtualAddress = (dd[4].VirtualAddress - ois) + len(mem)
+            mem += d[ois:]
+            del d
+
+            mem[:soh] = e.write()[:soh]
+            chko = e.OPTIONAL_HEADER.get_file_offset() + 0x40
+            del e
+            for wh in whtl:
+                mem[wh[0]:wh[0] + wh[1]] = bytes(wh[1])
+            mem[chko:chko + 4] = crc_hash(mem,'pe').to_bytes(4,'little')
+
+            writefile(o + '/' + basename(i),mem)
+            return
+        case 'Action Replay Code':
+            db.try_custom()
+            from lib.crypto import decrypt,crc_hash
+            cd = decrypt(readfile(i,'rt'),'ar_alpha')
+            cd = decrypt(cd,'ar')
+
+            crc = cd[0] >> 28
+            cd[0] &= 0x0FFFFFFF
+            asrt(crc == crc_hash(cd,'crc16_4_ar'))
+            writefile(o + '/' + basename(i),'\n'.join(f'{cd[ix]:08X} {cd[ix+1]:08X}' for ix in range(0,len(cd),2)))
+            if cd: return
 
     return 1

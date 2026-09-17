@@ -36,8 +36,14 @@ def fmtl(d:tuple[int]|list[int],l:int=None,u0x:bool=None,c:int=None):
 
 if __name__ == '__main__':
     from sys import argv
-    if len(argv) > 1: i = argv[1]
-    else: i = 'c.h'
+    if len(argv) > 1:
+        i = argv[1]
+        with open(i,'rt',encoding='utf-8') as f: d = f.read()
+    else:
+        d = ''
+        while True:
+            inp = input(': ')
+            if not inp: break
+            d += inp + '\n'
 
-    with open(i,'rt',encoding='utf-8') as f: d = f.read()
     print(fmtl(*parsec(d)))

@@ -165,6 +165,7 @@ class X:
             ('decrypt_airrc4',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_eac',   (P(u8),szt,u8),void,0),
             ('decrypt_blackenergy_rc4',(P(u8),szt,P(u8),szt),void,2),
+            ('decrypt_arcode',(P(u32),szt),void,0),
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
             ('decrypt_snow2', (P(u8),szt,P(u32),P(u32),u8),void,0),
             ('decrypt_snow2_nexon',(P(u32),szt,P(u32),P(u32),u8),void,0),
@@ -201,6 +202,7 @@ class X:
             ('hash_fletcher',(P(u8),szt,u64,u8,u64),u64,0),
             ('hash_bsdsum',(P(u8),szt,u16),u16,0),
             ('hash_sysvsum',(P(u8),szt),u16,4),
+            ('hash_pesum',(P(u8),szt),u32,4),
             ('hash_dha256',(P(u8),szt),h256,6),
             ('hash_fork256',(P(u8),szt),h256,6),
             ('hash_echo',(P(u8),szt,u16),h512,7),
@@ -616,6 +618,10 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_eac(b,len(src),key)
         return bytes(b)
+    def decrypt_arcode(self,src:list[int]) -> list[int]:
+        b = (u32 * len(src))(*src)
+        self.dll.decrypt_arcode(b,len(src))
+        return list(b)
 
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)
@@ -670,6 +676,7 @@ class X:
     def hash_tarzan(self,src:bytes) -> int: ...
     def hash_luas(self,src:bytes) -> int: ...
     def hash_sysvsum(self,src:bytes) -> int: ...
+    def hash_pesum(self,src:bytes) -> int: ...
     def hash_dha256(self,src:bytes) -> bytes: ...
     def hash_fork256(self,src:bytes) -> bytes: ...
     def hash_echo(self,src:bytes,bits:int) -> bytes: ...

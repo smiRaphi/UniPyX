@@ -846,7 +846,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
             remove(cd + '/stderr.txt',cd + '/stdout.txt')
             if listdir(o): return
 
-            if not extract(i,o,'DIET'):return # deark 
+            if not extract(i,o,'DEA:' + t): return # deark 
 
             return extract2(i,o,'C64 Tape')
         case 'Playdate Container': raise NotImplementedError

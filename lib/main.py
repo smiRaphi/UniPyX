@@ -1629,6 +1629,36 @@ def zip7(i:str,o:str,t:str,overwrite=False):
     if t in ZIP7MP: t = ZIP7MP[t]
     else: raise ValueError(f'{t} is not mapped in ZIP7MP')
     return db.run(['7z','x',i,'-o' + o,'-ao' + ('a' if overwrite else 'u')] + (['-t' + t] if t else []))
+DEARKMP = {
+    'Acorn Spark':'spark',
+    'Aldus LZW':'aldus_inst',
+    'Aldus Zip':'aldus_inst',
+    'AppleSingle':'applesd',
+    'ARX':'arx',
+    'ASC2COM':'asc2com',
+    'BinHex':'binhex',
+    'BinSCII':'binscii',
+    'C64 IMG':'d64',
+    'CAZIP':'cazip',
+    'CP Shrink':'cpshrink',
+    'CrLZH':'crlzh',
+    'Crunch':'crunch',
+    'DIET':'diet',
+    'DOS Backup':None,
+    'EDI Install LZSS':None,
+    'EPOC App Info':None,
+    'EPOC Install Package':'epocimage',
+    'EXEPACK':'exepack',
+    'GEM Resource':'rsc',
+    'LZEXE':'lzexe',
+    'Microsoft Comic Chat Character':'comicchat',
+    'OS/2 Installation Package':'os2pack',
+    'PKLITE':'pklite',
+    'Stirling Compressed':'tscomp',
+    'The Compressor':'tc_trs80',
+    'ZOO':'zoo',
+    None:None,
+}
 
 def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
     db.print_try = not quiet
@@ -1646,7 +1676,7 @@ def main_extract(inp:str,out:str,ts:list[str]=None,quiet=True,rs=False) -> bool:
         try:
             if not extract(inp,out,x):break
         except:
-            if not listdir(out): os.rmdir(out)
+            if exists(out) and not listdir(out): os.rmdir(out)
             raise
         rmtree(out)
     else:
