@@ -224,7 +224,6 @@ class PyOBin:
                     if c == 0: return []
                     sty = f.readu8()
                     if sty == 0:
-                        interp(sty,lst=True)
                         return [None] * c
                     elif sty & 0b1111 == 1:
                         o = []

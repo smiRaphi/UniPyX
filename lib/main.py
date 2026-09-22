@@ -184,9 +184,9 @@ def copydir(i:str,o:str,delete=False,reni=False):
     for x in listdir(str(i)): cfnc(i + '/' + x,o + '/' + x)
     if delete: rmdir(i)
 def remove(*inp:str): [os.remove(i) if isfile(i) or os.path.islink(i) else rmdir(i) for i in inp if exists(i)]
-def symlink(i:str,o:str):
+def symlink(i:str,o:str,target_is_directory=False):
     mkdir(dirname(o))
-    os.symlink(i,o)
+    os.symlink(i,o,target_is_directory=target_is_directory)
 def xopen(f:str,m='r',encoding='utf-8',newline=None,**kwargs):
     f = abspath(str(f))
     if 'w' in m or 'a' in m or 'x' in m or '+' in m: mkdir(dirname(f))
@@ -321,6 +321,16 @@ def dos2unix(t:int=0,d:int=0,ms:float=0):
     if ms: dt.replace(microsecond=ms*1000000)
     return dt.timestamp()
 def dosr2unix(d:int=0,t:int=0,ms:float=0): return dos2unix(t,d,ms)
+def decode_bcd(i:int):
+    r = 0
+    ix = 0
+    while i:
+        r += (i & 0xf) * (10 ** ix)
+        ix += 1
+        i >>= 4
+    return r
+def mvs2unix(d:int):
+    return datetime(decode_bcd(d >> 16),decode_bcd((d >> 8) & 0xff),decode_bcd(d & 0xff)).timestamp()
 def strp2re(fmt:str):
     p = 0
     rg = []

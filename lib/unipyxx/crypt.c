@@ -93,6 +93,9 @@ static inline void swapbe32_arr(uint32_t *restrict arr, const size_t size) {
 static inline void arr32_map8(uint32_t *restrict arr, uint32_t *restrict out, const uint8_t size, const uint8_t *restrict map) {
     for (uint8_t i=0;i < size;i++) out[i] = arr[map[i]];
 }
+static inline void arr32_map8i(uint32_t *restrict arr, uint32_t *restrict out, const uint8_t size, const uint8_t *restrict map) {
+    for (uint8_t i=0;i < size;i++) out[i] = arr[size - 1 - map[i]];
+}
 
 typedef struct {
     int32_t MATRIX_A;
@@ -639,47 +642,6 @@ EXPORT void decrypt_blackenergy_rc4(uint8_t *restrict buf, const size_t size, co
         buf[p] ^= S[ix];
     }
 }
-#define AR_SCRAMBLE(x1, x2, m, r, d)\
-    tmp = (x1 ^ x2) & m;\
-    x1 ^= tmp;\
-    x2 = CONCAT(ROT32,d)(x2 ^ tmp, r);
-EXPORT void decrypt_arcode(uint32_t *restrict buf, const size_t size) {
-    for (size_t p=0;p < size;p+=2) {
-        uint32_t tmp = 0;
-
-        uint32_t adr = SWAP32(buf[p]);
-        uint32_t val = SWAP32(buf[p + 1]);
-
-        val = ROT32L(val, 4);
-        AR_SCRAMBLE(adr, val, 0xF0F0F0F0, 0x14, R)
-        AR_SCRAMBLE(adr, val, 0xFFFF0000, 0x12, R)
-        AR_SCRAMBLE(adr, val, 0x33333333, 6, R)
-        AR_SCRAMBLE(adr, val, 0x00FF00FF, 9, L)
-        AR_SCRAMBLE(val, adr, 0xAAAAAAAA, 1, L)
-
-        for (uint8_t i=0;i < 32;) {
-            uint32_t t1 = ROT32R(val, 4) ^ AR_SEED[i++];
-            uint32_t t2 = val ^ AR_SEED[i++];
-            adr ^= AR_T6[t1 & 0x3F] ^ AR_T4[(t1 >> 8) & 0x3F] ^ AR_T2[(t1 >> 16) & 0x3F] ^ AR_T0[(t1 >> 24) & 0x3F]
-                 ^ AR_T7[t2 & 0x3F] ^ AR_T5[(t2 >> 8) & 0x3F] ^ AR_T3[(t2 >> 16) & 0x3F] ^ AR_T1[(t2 >> 24) & 0x3F];
-
-            t1 = ROT32R(adr, 4) ^ AR_SEED[i++];
-            t2 = adr ^ AR_SEED[i++];
-            val ^= AR_T6[t1 & 0x3F] ^ AR_T4[(t1 >> 8) & 0x3F] ^ AR_T2[(t1 >> 16) & 0x3F] ^ AR_T0[(t1 >> 24) & 0x3F]
-                 ^ AR_T7[t2 & 0x3F] ^ AR_T5[(t2 >> 8) & 0x3F] ^ AR_T3[(t2 >> 16) & 0x3F] ^ AR_T1[(t2 >> 24) & 0x3F];
-        }
-
-        val = ROT32R(val, 1);
-        AR_SCRAMBLE(val, adr, 0xAAAAAAAA, 9, R)
-        AR_SCRAMBLE(val, adr, 0x00FF00FF, 6, L)
-        AR_SCRAMBLE(val, adr, 0x33333333, 0x12, L)
-        AR_SCRAMBLE(val, adr, 0xFFFF0000, 0x14, L)
-        AR_SCRAMBLE(val, adr, 0xF0F0F0F0, 4, R)
-
-        buf[p] = SWAP32(val);
-        buf[p + 1] = SWAP32(adr);
-    }
-}
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
     return t[0x100 * x + buf[x]];
@@ -1070,12 +1032,12 @@ EXPORT uint64_t hash_crc(const uint8_t *restrict src, const uint32_t size, const
     return h ^ xor;
 }
 EXPORT uint64_t hash_fletcher(const uint8_t *restrict src, const size_t size, const uint64_t init,
-                              const uint8_t bits, const uint64_t base) {
+                              const uint8_t bits, const uint64_t base, const uint8_t block_size) {
     const uint8_t s = bits / 2;
     uint64_t h1 = init & MASK(s);
     uint64_t h2 = (init >> s) & MASK(s);
-    for (size_t p=0;p < size;p++) {
-        h1 = (h1 + src[p]) % base;
+    for (size_t p=0;p < size;p+=block_size) {
+        h1 = (h1 + ((*(uint64_t *)(src + p)) & MASK(block_size * 8))) % base;
         h2 = (h2 + h1) % base;
     }
     return ((h2 << s) | h1) & MASK(bits);
@@ -1559,6 +1521,61 @@ EXPORT uint32_t hash_pesum(const uint8_t *restrict src, const size_t size) {
     }
     h = (h & 0xFFFF) + (h >> 16);
     return ((h + (h >> 16)) & 0xFFFF) + size;
+}
+EXPORT uint8_t hash_rabin_fingerprint(const uint8_t *restrict src, const size_t size) {
+    if (size == 0) return 0;
+    size_t p = 0;
+    uint8_t h = (src[p++] * 0x100) % 101;
+    if (size == 1) return h;
+    for (;p < size - 1;p++) h = (((h + src[p]) % 101) * 0x100) % 101;
+    return (h + src[p]) % 101;
+}
+EXPORT uint16_t hash_ipv4(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = 0;
+    size_t p = 0;
+    for (;p + 2 <= size;p += 2)
+        h += read16be(src + p);
+    if (p < size) h += src[p];
+    while (h >> 16) h = (h & 0xFFFF) + (h >> 16);
+    return ~h;
+}
+EXPORT uint32_t hash_dek(const uint8_t *restrict src, const size_t size) {
+    uint32_t h = size;
+    for (size_t p=0;p < size;p++) h = ROT32L(h, 5) ^ src[p];
+    return h;
+}
+EXPORT uint32_t hash_rs(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t a = RS_A;
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) {
+        h = h * a + src[p];
+        a *= RS_B;
+    }
+    return h;
+}
+EXPORT uint32_t hash_js(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++)
+        h ^= (h << 5) + src[p] + (h >> 2);
+    return h;
+}
+EXPORT uint64_t hash_cyrb64(const uint8_t *restrict src, const size_t size, const uint32_t seed) {
+    uint32_t h1 = CYRB53_H1 ^ seed;
+    uint32_t h2 = CYRB53_H2 ^ seed;
+    for (size_t p=0;p < size;p++) {
+        h1 = (h1 ^ src[p]) * CYRB53_M1;
+        h2 = (h2 ^ src[p]) * CYRB53_M2;
+    }
+    h1  = (h1 ^ (h1 >> 16)) * CYRB53_M3;
+    h1 ^= (h2 ^ (h2 >> 13)) * CYRB53_M4;
+    h2  = (h2 ^ (h2 >> 16)) * CYRB53_M3;
+    h2 ^= (h1 ^ (h1 >> 13)) * CYRB53_M4;
+    return ((uint64_t)h2 << 32) | h1;
+}
+EXPORT uint32_t hash_tinysimple(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t h = init;
+    for (size_t p=0;p < size;p++) h = (h ^ src[p]) * TSH_MUL;
+    return h ^ (h >> 9);
 }
 
 static inline uint32_t dha256_sigma0(uint32_t x) { return ROT32L(x, 7 ) ^ ROT32L(x, 22) ^ x; }
@@ -2305,7 +2322,6 @@ EXPORT hash160_t hash_has160(const uint8_t *restrict src, const size_t size) {
     return H;
 }
 
-// Not working! https://github.com/jonelo/jacksum/blob/6106715ee964047eb88dc322ed0bd7abd4c6f1b7/src/main/java/net/jacksum/zzadopt/gnu/crypto/hash/Haval.java
 static inline uint32_t haval_ff(uint32_t a[8], const uint32_t w, const uint32_t c, const uint32_t r, const uint32_t y) {
     uint32_t x[7];
     uint32_t of;
@@ -2313,7 +2329,7 @@ static inline uint32_t haval_ff(uint32_t a[8], const uint32_t w, const uint32_t 
     else if (y == 3) of = 9 + r - 4;
     else if (y == 4) of = 11 + r - 5;
 
-    arr32_map8(a + 1, x, 7, HAVAL_PHI + of*7);
+    arr32_map8i(a + 1, x, 7, HAVAL_PHI + of*7);
     #define X(i) x[6 - (i)]
 
     uint32_t t;
@@ -2397,9 +2413,9 @@ EXPORT hash256_t hash_haval(const uint8_t *restrict src, const size_t size,
         t = (H.d[7] & 0x0000FF00) | (H.d[6] & 0x000000FF) | (H.d[5] & 0xFF000000) | (H.d[4] & 0x00FF0000);
         H.d[1] += ROT32R(t, 16);
         t = (H.d[7] & 0x00FF0000) | (H.d[6] & 0x0000FF00) | (H.d[5] & 0x000000FF) | (H.d[4] & 0xFF000000);
-        H.d[2] += ROT32R(t, 16);
+        H.d[2] += ROT32R(t, 24);
         t = (H.d[7] & 0xFF000000) | (H.d[6] & 0x00FF0000) | (H.d[5] & 0x0000FF00) | (H.d[4] & 0x000000FF);
-        H.d[3] += ROT32R(t, 8);
+        H.d[3] += t;
         break;
     case 160:
         t = (H.d[7] & 0x0000003F) | (H.d[6] & 0xFE000000) | (H.d[5] & 0x01F80000);
@@ -2439,6 +2455,79 @@ EXPORT hash256_t hash_haval(const uint8_t *restrict src, const size_t size,
     }
 
     for (int i=0;i < bits / 32;i++) H.d[i] = SWAPLE32(H.d[i]);
+    return H;
+}
+
+static inline uint16_t panama_block(uint32_t *restrict S, uint32_t *restrict buf, uint16_t bufp, const uint32_t *restrict data) {
+    uint16_t p1 = (bufp - 0x40) & 0xF8;
+    uint16_t p2 = (bufp - 8) & 0xF8;
+    for (int8_t i=0;i < 8;i++) {
+        buf[p1 + i] ^= buf[p2 + (i + 2) % 8];
+        buf[p2 + (i + 2) % 8] ^= ((data == 0) ? (S + 1) : data)[(i + 2) % 8];
+    }
+
+    uint32_t St[0x11];
+    for (int8_t i=0;i < 0x11;i++)
+        St[i] = S[i] ^ (S[(i + 1) % 0x11] | ~S[(i + 2) % 0x11]);
+
+    S[0] = St[0];
+    S[1] = ROT32L(St[7 ], 1);
+    S[2] = ROT32L(St[14], 3);
+    S[3] = ROT32L(St[4 ], 6);
+    S[4] = ROT32L(St[11],10);
+    S[5] = ROT32L(St[1 ],15);
+    S[6] = ROT32L(St[8 ],21);
+    S[7] = ROT32L(St[15],28);
+    S[8] = ROT32L(St[5 ], 4);
+    S[9] = ROT32L(St[12],13);
+    S[10]= ROT32L(St[2 ],23);
+    S[11]= ROT32L(St[9 ], 2);
+    S[12]= ROT32L(St[16],14);
+    S[13]= ROT32L(St[6 ],27);
+    S[14]= ROT32L(St[13], 9);
+    S[15]= ROT32L(St[3 ],24);
+    S[16]= ROT32L(St[10], 8);
+
+    for (int8_t i=0;i < 0x11;i++)
+        St[i] = S[i] ^ S[(i + 1) % 0x11] ^ S[(i + 4) % 0x11];
+
+    S[0] = St[0] ^ 1;
+    if (data == 0) {
+        uint16_t p3 = (bufp + 0x20) & 0xF8;
+        for (int8_t i=0;i < 8;i++)
+            S[i + 1] = St[i + 1] ^ buf[p3 + i];
+    } else {
+        for (int8_t i=0;i < 8;i++)
+            S[i + 1] = St[i + 1] ^ data[i];
+    }
+    uint16_t p4 = bufp ^ 0x80;
+    for (int8_t i=0;i < 8;i++)
+        S[i + 9] = St[i + 9] ^ buf[p4 + i];
+
+    return p2;
+}
+EXPORT hash256_t hash_panama(const uint8_t *restrict src, const size_t size) {
+    uint32_t S[0x11] = {0};
+    uint32_t buf[0x100] = {0};
+    size_t p = 0;
+    uint16_t bufp = 0;
+    for (;p + 0x20 <= size;p += 0x20) {
+        uint32_t d[8];
+        for (int8_t i=0;i < 8;i++) d[i] = read32le(src + p + 4 * i);
+        bufp = panama_block(S, buf, bufp, d);
+    }
+
+    uint8_t d[0x20];
+    uint8_t dp = size - p;
+    memcpy(d, src + p, dp);
+    d[dp++] = 1;
+    for (;dp < 0x20;dp++) d[dp] = 0;
+    bufp = panama_block(S, buf, bufp, (uint32_t *)d);
+    for (int8_t i=0;i < 0x20;i++)
+        bufp = panama_block(S, buf, bufp, 0);
+
+    hash256_t H;
+    for (int8_t i=0;i < 8;i++) H.d[i] = SWAPLE32(S[9 + i]);
     return H;
 }
 

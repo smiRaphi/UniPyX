@@ -165,7 +165,6 @@ class X:
             ('decrypt_airrc4',(P(u8),szt,P(u8),szt),void,2),
             ('decrypt_eac',   (P(u8),szt,u8),void,0),
             ('decrypt_blackenergy_rc4',(P(u8),szt,P(u8),szt),void,2),
-            ('decrypt_arcode',(P(u32),szt),void,0),
             ('decrypt_tfit',  (P(u8),szt,P(u8),P(u8),P(u8),P(u8),szt),void,0),
             ('decrypt_snow2', (P(u8),szt,P(u32),P(u32),u8),void,0),
             ('decrypt_snow2_nexon',(P(u32),szt,P(u32),P(u32),u8),void,0),
@@ -196,13 +195,20 @@ class X:
             ('hash_sdbm',(P(u8),szt,u32,u32),u32,0),
             ('hash_djb2',(P(u8),szt,u32),u32,0),
             ('hash_djb2a',(P(u8),szt,u32),u32,0),
-            ('hash_joaat',(P(u8),szt,u32),u32,0),
+            ('hash_joaat',(P(u8),szt,u32),u32,5),
             ('hash_tarzan',(P(u8),szt),u32,4),
             ('hash_luas',(P(u8),szt),u32,4),
             ('hash_fletcher',(P(u8),szt,u64,u8,u64),u64,0),
-            ('hash_bsdsum',(P(u8),szt,u16),u16,0),
+            ('hash_bsdsum',(P(u8),szt,u16),u16,5),
             ('hash_sysvsum',(P(u8),szt),u16,4),
             ('hash_pesum',(P(u8),szt),u32,4),
+            ('hash_rabin_fingerprint',(P(u8),szt),u8,4),
+            ('hash_ipv4',(P(u8),szt),u16,4),
+            ('hash_dek',(P(u8),szt),u32,4),
+            ('hash_rs',(P(u8),szt,u32),u32,5),
+            ('hash_js',(P(u8),szt,u32),u32,0),
+            ('hash_cyrb64',(P(u8),szt,u32),u64,0),
+            ('hash_tinysimple',(P(u8),szt,u32),u32,0),
             ('hash_dha256',(P(u8),szt),h256,6),
             ('hash_fork256',(P(u8),szt),h256,6),
             ('hash_echo',(P(u8),szt,u16),h512,7),
@@ -210,6 +216,7 @@ class X:
             ('hash_fugue',(P(u8),szt,u16),h512,7),
             ('hash_has160',(P(u8),szt),h160,6),
             ('hash_haval',(P(u8),szt,u16,u8,u8),h256,0),
+            ('hash_panama',(P(u8),szt),h256,6),
             ('derive_protectit2',(P(u8),),void,0),
             ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
             ('hash_crc_init',(P(u8),u32,u64,s8),s8,0),
@@ -244,7 +251,7 @@ class X:
                 elif e[3] == 4:
                     def wrapper(src,_f=fnc): return _4base_func(_f,src)
                 elif e[3] == 5:
-                    def wrapper(src,init,_f=fnc): return _5base_func(_f,src,init)
+                    def wrapper(src,init=0,_f=fnc): return _5base_func(_f,src,init)
                 elif e[3] == 6:
                     def wrapper(src,_f=fnc): return _6base_func(_f,src)
                 elif e[3] == 7:
@@ -618,10 +625,6 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_eac(b,len(src),key)
         return bytes(b)
-    def decrypt_arcode(self,src:list[int]) -> list[int]:
-        b = (u32 * len(src))(*src)
-        self.dll.decrypt_arcode(b,len(src))
-        return list(b)
 
     def decrypt_tfit(self,src:bytes,key:bytes,table:bytes,iv:bytes,block_size:int) -> bytes:
         asrt(len(key) == 4*4*17 and len(table) == 4*0x100*0x10*17 and len(iv) == 0x10 and len(src) % (block_size + 0x10) == 0)
@@ -677,11 +680,15 @@ class X:
     def hash_luas(self,src:bytes) -> int: ...
     def hash_sysvsum(self,src:bytes) -> int: ...
     def hash_pesum(self,src:bytes) -> int: ...
+    def hash_rabin_fingerprint(self,src:bytes) -> int: ...
+    def hash_ipv4(self,src:bytes) -> int: ...
+    def hash_dek(self,src:bytes) -> int: ...
     def hash_dha256(self,src:bytes) -> bytes: ...
     def hash_fork256(self,src:bytes) -> bytes: ...
     def hash_echo(self,src:bytes,bits:int) -> bytes: ...
     def hash_fugue(self,src:bytes,bits:int) -> bytes: ...
     def hash_has160(self,src:bytes) -> bytes: ...
+    def hash_panama(self,src:bytes) -> bytes: ...
 
     def hash_empire_magic(self,src:bytes,end:bool=False) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
@@ -711,12 +718,15 @@ class X:
     def hash_djb2a(self,src:bytes,init:int=0x1505) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
         return self.dll.hash_djb2a(b,len(src),init)
-    def hash_joaat(self,src:bytes,init:int=0) -> int:
+    def hash_js(self,src:bytes,init:int=0x4E67C6A7) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_joaat(b,len(src),init)
-    def hash_bsdsum(self,src:bytes,init:int=0) -> int:
+        return self.dll.hash_js(b,len(src),init)
+    def hash_cyrb64(self,src:bytes,seed:int=0) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_bsdsum(b,len(src),init)
+        return self.dll.hash_cyrb64(b,len(src),seed)
+    def hash_tinysimple(self,src:bytes,init:int=9) -> int:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        return self.dll.hash_tinysimple(b,len(src),init)
     def hash_esch(self,src:bytes,digtl:int,statl:int,ratel:int,bigc:int,slic:int):
         b = (u8 * len(src)).from_buffer_copy(src)
         return bytes(self.dll.hash_esch(b,len(src),digtl,statl,ratel,bigc,slic))[:digtl // 8]
@@ -747,9 +757,10 @@ class X:
         i = (u8 * len(src)).from_buffer_copy(src)
         r = self.dll.hash_crc(i,len(src),self.CRC[k],init,xor,value or 0,0 if value is None else 1)
         return r
-    def hash_fletcher(self,src:bytes,base:int,width:int,init:int=0) -> int:
+    def hash_fletcher(self,src:bytes,base:int,width:int,init:int=0,block_size:int=1) -> int:
+        src += bytes(-len(src) % block_size)
         b = (u8 * len(src)).from_buffer_copy(src)
-        return self.dll.hash_fletcher(b,len(src),init,width,base)
+        return self.dll.hash_fletcher(b,len(src),init,width,base,block_size)
     def hash_prng32(self,src:bytes,mult:int,add:int=0,init:int=0) -> int:
         b = (u8 * len(src)).from_buffer_copy(src)
         return self.dll.hash_prng32(b,len(src),init,mult,add)

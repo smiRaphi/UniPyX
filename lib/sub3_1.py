@@ -456,9 +456,12 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
             return
         case 'Action Replay Code':
             db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            import struct
             from lib.crypto import decrypt,crc_hash
             cd = decrypt(readfile(i,'rt'),'ar_alpha')
-            cd = decrypt(cd,'ar')
+            cd = list(struct.unpack(f'<{len(cd)}I',decrypt(struct.pack(f'<{len(cd)}I',*cd),'des_ecb',keys.wait()['ar'])))
 
             crc = cd[0] >> 28
             cd[0] &= 0x0FFFFFFF

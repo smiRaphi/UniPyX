@@ -479,6 +479,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 if not trrntzip:
                     try: fe['ts']['m'] = unix2filetime(dos2unix(mts,mdt))
                     except ValueError: pass
+                    else: fe['ts']['ml'] = 0
                 fe['crc'] = f.readu32()
                 fe['chk'] = (mdt >> 8) if fe['fl'] & 8 else (fe['crc'] >> 24)
                 fe['zs'],fe['us'] = f.readu32(),f.readu32()
@@ -495,8 +496,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
 
                 read_zip_extra(**locals())
                 fe['cm'] = f.readc(cml)
-                if fe['xa'] & 0x10 or (fe['n'].endswith('/') and fe['us'] == 0) or ('vms' in fe and fe['vms'] & 0x1000): mkdir(o + '/' + sanitize_relative(fe['n']))
-                else: fs.append(fe)
+                fs.append(fe)
 
             BFZ = LEADS = None
             if any(fe['fl'] & 1 for fe in fs):
@@ -1661,11 +1661,17 @@ def read_zip_extra(**l):
                 f.padc(4)
                 asrt(f.readu16() == 1 and f.readu16() == 0x18,f.pos)
                 ts = f.readu64() # FILETIME
-                if ts: fe['ts']['m'] = ts
+                if ts and (not 'm' in fe['ts'] or fe['ts']['ml'] <= 10):
+                    fe['ts']['m'] = ts
+                    fe['ts']['ml'] = 10
                 ts = f.readu64()
-                if ts: fe['ts']['a'] = ts
+                if ts and (not 'a' in fe['ts'] or fe['ts']['al'] <= 10):
+                    fe['ts']['a'] = ts
+                    fe['ts']['al'] = 10
                 ts = f.readu64()
-                if ts: fe['ts']['c'] = ts
+                if ts and (not 'c' in fe['ts'] or fe['ts']['cl'] <= 10):
+                    fe['ts']['c'] = ts
+                    fe['ts']['cl'] = 10
             case b'\x0C\0': # OpenVMS
                 asrt(s >= 4)
                 crc = f.readu32()
@@ -1682,11 +1688,15 @@ def read_zip_extra(**l):
                         case 17: # CREDATE
                             asrt(vs >= 8)
                             ts = f.readu64()
-                            if ts: fe['ts']['c'] = vms2filetime(ts)
+                            if ts and (not 'c' in fe['ts'] or fe['ts']['cl'] <= 5):
+                                fe['ts']['c'] = vms2filetime(ts)
+                                fe['ts']['cl'] = 5
                         case 18: # REVDATE
                             asrt(vs >= 8)
                             ts = f.readu64()
-                            if ts: fe['ts']['m'] = vms2filetime(ts)
+                            if ts and (not 'm' in fe['ts'] or fe['ts']['ml'] <= 5):
+                                fe['ts']['m'] = vms2filetime(ts)
+                                fe['ts']['ml'] = 5
                         case _: raise NotImplementedError(f'Unknown OpenVMS tag {vtg} @ 0x{f.pos - 4:08X}')
                     f.seek(vep)
             case b'\x03\x99': # WinZip Reference
@@ -1735,18 +1745,128 @@ def read_zip_extra(**l):
                     if (f.pos + 4) > xep: break
                     if utfl & (1 << ix):
                         ts = f.readu32()
-                        if ts: fe['ts'][mn] = unix2filetime(ts)
+                        if ts and (not mn in fe['ts'] or fe['ts'][mn + 'l'] <= 1):
+                            fe['ts'][mn] = unix2filetime(ts)
+                            fe['ts'][mn + 'l'] = 1
             case b'UX': # Unix
                 asrt(s >= 8)
                 ts = f.readu32()
-                if ts: fe['ts']['a'] = unix2filetime(ts)
+                if ts and (not 'a' in fe['ts'] or fe['ts']['al'] <= 1):
+                    fe['ts']['a'] = unix2filetime(ts)
+                    fe['ts']['al'] = 1
                 ts = f.readu32()
-                if ts: fe['ts']['m'] = unix2filetime(ts)
+                if ts and (not 'm' in fe['ts'] or fe['ts']['ml'] <= 1):
+                    fe['ts']['m'] = unix2filetime(ts)
+                    fe['ts']['ml'] = 1
                 # optional u16 UID & u16 GID
             case b'Ux': # Previous new Unix
                 pass # optional u16 UID & u16 GID
-            case b'e\0': # IBM S/390 attributes uncompressed
-                pass
+            case b'e\0': # MVS attributes uncompressed
+                mvs = ['ID: ' + f.reads(4,'cp500')]
+                while f.pos + 4 < xep:
+                    ss = f.readu16('>') - 4
+                    st = f.readu16('>')
+                    sep = f.pos + ss
+                    match st:
+                        case 0x0001: mvs.append(f"Filetype: {f.readu16('<')}")
+                        case 0x0002: mvs.append(f'NonVSAM Record Format: {f.readu8()}')
+                        case 0x0004: mvs.append(f"NonVSAM Block Size: {f.readu16('>')}")
+                        case 0x0005: mvs.append(f"Primary Space Allocation: {f.readu24('>')}")
+                        case 0x0006: mvs.append(f"Secondary Space Allocation: {f.readu24('>')}")
+                        case 0x0007: mvs.append(f'Space Allocation Type1 Flag: 0x{f.readu8():02X}')
+                        case 0x000A: mvs.append(f"PDS Directory Block Allocation: {f.readu24('>')}")
+                        case 0x000B:
+                            if ss == 0: continue
+                            mvs.append('NonVSAM Volume List:')
+                            while f.pos + 2 < sep:
+                                mvs.append(f" - {f.reads(f.readu16('>'),'cp500')}")
+                        case 0x000D: mvs.append(f"DF/SMS Management Class: {f.reads(ss,'cp500')}")
+                        case 0x000E: mvs.append(f"DF/SMS Storage Class: {f.reads(ss,'cp500')}")
+                        case 0x000F: mvs.append(f"DF/SMS Data Class: {f.reads(ss,'cp500')}")
+                        case 0x0010: mvs.append(f'PDS/PDSE Member Info: {f.read(ss).hex().upper()}')
+                        case 0x0011: mvs.append(f"VSAM Sub-filetype: {f.readu16('<')}")
+                        case 0x0012: mvs.append(f"VSAM LRECL: {f.reads(ss,'cp500')}")
+                        case 0x0014: mvs.append(f"VSAM KSDS Key Info: {f.reads(ss,'cp500')}")
+                        case 0x0015: mvs.append(f"VSAM Average LRECL: {f.reads(ss,'cp500')}")
+                        case 0x0016: mvs.append(f"VSAM Maximum LRECL: {f.reads(ss,'cp500')}")
+                        case 0x0017: mvs.append(f"VSAM KSDS Key Length: {f.reads(ss,'cp500')}")
+                        case 0x0018: mvs.append(f"VSAM KSDS Key Position: {f.reads(ss,'cp500')}")
+                        case 0x0019: mvs.append(f"VSAM Data Name: {f.reads(ss,'cp500')}")
+                        case 0x001A: mvs.append(f"VSAM KSDS Index Name: {f.reads(ss,'cp500')}")
+                        case 0x001B: mvs.append(f"VSAM Catalog Name: {f.reads(ss,'cp500')}")
+                        case 0x001C: mvs.append(f"VSAM Data Space Type: {f.reads(ss,'cp500')}")
+                        case 0x001D: mvs.append(f"VSAM Data Space Primary: {f.reads(ss,'cp500')}")
+                        case 0x001E: mvs.append(f"VSAM Data Space Secondary: {f.reads(ss,'cp500')}")
+                        case 0x0020: mvs.append(f"VSAM Data Buffer Space: {f.reads(ss,'cp500')}")
+                        case 0x0021: mvs.append(f"VSAM Data CISIZE: {f.reads(ss,'cp500')}")
+                        case 0x0022: mvs.append(f'VSAM Erase Flag: 0x{f.readu8():02X}')
+                        case 0x0023: mvs.append(f"VSAM Free CI %: {f.reads(ss,'cp500')}")
+                        case 0x0024: mvs.append(f"VSAM Free CA %: {f.reads(ss,'cp500')}")
+                        case 0x0026: mvs.append(f'VSAM Ordered Flag: 0x{f.readu8():02X}')
+                        case 0x0027: mvs.append(f'VSAM REUSE Flag: 0x{f.readu8():02X}')
+                        case 0x0028: mvs.append(f'VSAM SPANNED Flag: 0x{f.readu8():02X}')
+                        case 0x0029: mvs.append(f'VSAM Recovery Flag: 0x{f.readu8():02X}')
+                        case 0x002A: mvs.append(f'VSAM WRITECHK Flag: 0x{f.readu8():02X}')
+                        case 0x002B: mvs.append(f"VSAM Cluster/Data SHROPTS: {f.reads(ss,'cp500')}")
+                        case 0x002C: mvs.append(f"VSAM Index SHROPTS: {f.reads(ss,'cp500')}")
+                        case 0x002D: mvs.append(f"VSAM Index Space Type: {f.reads(ss,'cp500')}")
+                        case 0x002E: mvs.append(f"VSAM Index Space Primary: {f.reads(ss,'cp500')}")
+                        case 0x002F: mvs.append(f"VSAM Index Space Secondary: {f.reads(ss,'cp500')}")
+                        case 0x0030: mvs.append(f"VSAM Index CISIZE: {f.reads(ss,'cp500')}")
+                        case 0x0031: mvs.append(f'VSAM Index IMBED: 0x{f.readu8():02X}')
+                        case 0x0032: mvs.append(f'VSAM Index Ordered Flag: 0x{f.readu8():02X}')
+                        case 0x0033: mvs.append(f'VSAM REPLICATE Flag: 0x{f.readu8():02X}')
+                        case 0x0034: mvs.append(f'VSAM Index REUSE Flag: 0x{f.readu8():02X}')
+                        case 0x0035: mvs.append(f'VSAM Index WRITECHK Flag: 0x{f.readu8():02X}')
+                        case 0x0036: mvs.append(f"VSAM Owner: {f.reads(ss,'cp500')}")
+                        case 0x0037: mvs.append(f"VSAM Index Owner: {f.reads(ss,'cp500')}")
+                        case 0x0058: mvs.append(f"PDS/PDSE Member TTR Info: {f.readu48('>')}")
+                        case 0x0059: mvs.append(f"PDS 1st LMOD Text TTR: {f.readu24('>')}")
+                        case 0x005A: mvs.append(f"PDS LMOD EP Rec #: {f.readu32('>')}")
+                        case 0x005C: mvs.append(f"Max Record Length: {f.readu16('>')}")
+                        case 0x005D: mvs.append(f'PDSE Flag: 0x{f.readu8():02X}')
+                        case 0x0065:
+                            if not 'a' in fe['ts'] or fe['ts']['al'] <= -1:
+                                fe['ts']['a'] = mvs2unix(f.readu32('>'))
+                                fe['ts']['al'] = -1
+                        case 0x0066:
+                            if not 'c' in fe['ts'] or fe['ts']['cl'] <= -1:
+                                fe['ts']['c'] = mvs2unix(f.readu32('>'))
+                                fe['ts']['cl'] = -1
+                        case 0x0071: mvs.append(f'Extended NOTE Location: 0x{f.read(s).lstrip(b'\0').hex().upper()}')
+                        case 0x0072: mvs.append(f"Archive Device Unit: {f.reads(s,'cp500')}")
+                        case 0x0073: mvs.append(f"Archive 1st Volume: {f.reads(s,'cp500')}")
+                        case 0x0074: mvs.append(f'Archive 1st VOL File Seq#: {f.read(s).hex().upper()}')
+                        case 0x0075: mvs.append(f"Native I/O Flag: 0x{f.readu16('<'):04X}")
+                        case 0x0081: mvs.append(f'Unix File Type: {f.readu8()}')
+                        case 0x0082: mvs.append(f'Unix File Format: {f.readu8()}')
+                        case 0x0083: mvs.append(f"Unix File Character Set Tag Info: 0x{f.readu32('<'):08X}")
+                        case 0x0090: mvs.append(f"ZIP Environmental Processing Info: 0x{f.readu32('<'):08X}")
+                        case 0x0091: mvs.append(f'EAV EATTR Flags: 0x{f.readu8():02X}')
+                        case 0x0092: mvs.append(f'DSNTYPE Flags: 0x{f.readu8():02X}')
+                        case 0x0093: mvs.append(f"Total Space Allocation (Cyls): {f.readu32('>')}")
+                        case 0x009D: mvs.append(f"NonVSAM DSORG: {f.readu16('<')}")
+                        case 0x009E: mvs.append(f"Program Virtual Object Info: {f.readu24('<')}")
+                        case 0x009F: mvs.append(f'Encapsulated File Info: 0x{f.read(s).hex().upper()}')
+                        case 0x00A2: mvs.append(f'Cluster Log: {f.read(s).hex().upper()}')
+                        case 0x00A3: mvs.append(f'Cluster LSID Length: {f.read(s).hex().upper()}')
+                        case 0x00A4: mvs.append(f"Cluster LSID: {f.reads(s,'cp500')}")
+                        case 0x4007: mvs.append(f'Database Type Code: {f.readu8()}')
+                        case 0x400C:
+                            if not 'c' in fe['ts'] or fe['ts']['cl'] <= 1:
+                                fe['ts']['c'] = f.readu32('<')
+                                fe['ts']['cl'] = 1
+                        case 0x400D:
+                            if not 'a' in fe['ts'] or fe['ts']['al'] <= 1:
+                                fe['ts']['a'] = f.readu32('<')
+                                fe['ts']['al'] = 1
+                        case 0x400E:
+                            if not 'm' in fe['ts'] or fe['ts']['ml'] <= 1:
+                                fe['ts']['m'] = f.readu32('<')
+                                fe['ts']['ml'] = 1
+                        case _: raise NotImplementedError(f'MVS {st:04X} @ 0x{f.pos - 4:08X}')
+                    f.seek(sep)
+                fe['mvs'] = '\n'.join(mvs)
             case b'nu': # ASi unix
                 pass
             case b'up': # Info-ZIP unicode
@@ -1783,6 +1903,19 @@ def writefile_zip(**l):
         fe:dict
         ct:int
         keys:PyOBinX
+
+    fn = o + '/' + sanitize_relative(fe['n'])
+    c = 0
+    while exists(fn):
+        fn = o + '/' + fe['n'] + '_' + str(c)
+        c += 1
+    fe['ffn'] = fn
+
+    idir = fe.get('xa',0) & 0x10 or fe['n'].endswith('/') or fe.get('vms',0) & 0x1000
+    if idir: fn = fn.rstrip('/')
+    if fe['us'] == 0 and idir:
+        mkdir(fn)
+        return
 
     ksrc = {
         'af':basename(i).lower(),
@@ -1898,13 +2031,6 @@ def writefile_zip(**l):
         if v == 1: d = d[:-pad]
         fe['ct'] = 8 # deflate
 
-    fn = o + '/' + sanitize_relative(fe['n'])
-    c = 0
-    while exists(fn):
-        fn = o + '/' + fe['n'] + '_' + str(c)
-        c += 1
-    fe['ffn'] = fn
-
     if fe['ct'] == 92:
         fe['sha1'] = d
         refs.append(fe)
@@ -1942,9 +2068,14 @@ def writefile_zip(**l):
         del tf
     else: BUNDLE.append(False)
 
-    if fe.get('cos') in {3,0x13} and fe.get('xa',0) >> 28 == 0xA and istext(d,'utf-8',filename=True,eof=False):
-        symlink(d.decode('utf-8'),fn)
-    else: writefile(fn,d)
+    if fe.get('xa',0) >> 28 == 0xA and istext(d,'utf-8',filename=True,eof=False):
+        symlink(d.decode('utf-8'),fn,target_is_directory=idir)
+    elif fe.get('cos',0) == 0 and fe.get('xa',0) & 0x400 and len(d) >= 0x18 and int.from_bytes(d[4:8],'little') == len(d) - 8 and not sum(d[12:14]):
+        no,nl = int.from_bytes(d[8:10],'little'),int.from_bytes(d[10:12],'little')
+        symlink(d[no + 8:no + 8 + nl].decode('utf-16le'),fn,target_is_directory=idir)
+    else:
+        asrt(not idir,d)
+        writefile(fn,d)
     tsns = [fn]
 
     if fe.get('cm'):
@@ -1965,6 +2096,9 @@ def writefile_zip(**l):
     if 'libzip_cm' in fe:
         writefile(fn + '.$libzip_comment.txt',b'\n'.join(fe['libzip_cm']))
         tsns.append(fn + '.$libzip_comment.txt')
+    if 'mvs' in fe:
+        writefile(fn + '.$mvs.txt',fe['mvs'])
+        tsns.append(fn + '.$mvs.txt')
 
     ts = [0,0,0]
     if 'c' in fe['ts']: ts[0] = fe['ts']['c']

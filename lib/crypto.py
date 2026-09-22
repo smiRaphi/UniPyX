@@ -444,12 +444,6 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,bytes): key = key[0]
             asrt(isinstance(key,int),err=TypeError)
             return uxx().decrypt_eac(i,key)
-        case 'ar'|'arcode':
-            by = isinstance(i,(bytes,bytearray,memoryview))
-            if by: i = struct.unpack(f'<{len(i)//4}I',i)
-            r = uxx().decrypt_arcode(i)
-            if by: return struct.pack(f'<{len(r)}I',*r)
-            return r
 
         case 'table':
             enc = kwargs.get('encoding','latin-1')
@@ -793,17 +787,17 @@ CRC24 = {   # poly    , init   , xor    , reflect
 CRC32 = {   # poly      , init     , xor      , reflect
     'ludia': (0x04C11DB7,0x00000000,0x00000000,True ),
     'jamcrc':(0x04C11DB7,0xFFFFFFFF,0x00000000,True ),
-    'ieee':  (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'iso':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'iso_hdlc':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
+    'ieee':  (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'b':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'iso':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'iso_hdlc':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
     'adccp': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True ),'pkzip':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'xz':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True),'v42':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,True), # default
     'mpeg2': (0x04C11DB7,0xFFFFFFFF,0x00000000,False),
-    'posix': (0x04C11DB7,0x00000000,0xFFFFFFFF,False),'cksum':(0x04C11DB7,0,0xFFFFFFFF,False),
+    'posix': (0x04C11DB7,0x00000000,0xFFFFFFFF,False),
     'bzip2': (0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),'aal5':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),'dect_b':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),'b':(0x04C11DB7,0xFFFFFFFF,0xFFFFFFFF,False),
     'mef':   (0x741B8CD7,0xFFFFFFFF,0x00000000,True ),
     'k':     (0x741B8CD7,0xFFFFFFFF,0xFFFFFFFF,True ),'koopman':(0x741B8CD7,0xFFFFFFFF,0xFFFFFFFF,True),
     'xfer':  (0x000000AF,0x00000000,0x00000000,False),
    'autosar':(0xF4ACFB13,0xFFFFFFFF,0xFFFFFFFF,True ),
     'c':     (0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'castagnoli':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),'iscsi':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),'base91_c':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
-'intrelaken':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'nvme':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
+'interlaken':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True ),'nvme':(0x1EDC6F41,0xFFFFFFFF,0xFFFFFFFF,True),
     'd':     (0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True ),'base94':(0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True),'base94_d':(0xA833982B,0xFFFFFFFF,0xFFFFFFFF,True),
     'q':     (0x814141AB,0x00000000,0x00000000,False),'aixm':(0x814141AB,0,0,False),
 'cd_rom_edc':(0x8001801B,0x00000000,0x00000000,True ),
@@ -834,17 +828,22 @@ PRNG64 = {
 'bkdr64_ltr':(131,       0,         0),'bkdr64':(131,0,0),
     'sxm':   (137,       0,         0), # Sunday vs. Magazine
 }
-FLETCH = { #   width,init,base
-    'adler8':   (8, 1,0xD),
-    'adler16':  (16,1,0xFB),
-    'adler32':  (32,1,0xFFF1),
-'adler32_rsync':(32,1,0x10000),
-    'adler64':  (64,1,0xFFFFFFFB),
- 'fletcher16':  (16,0,0xFF),
+FLETCH = { #   width,init,base,block_size
+    'adler8':   (8, 1,0xD,       1),
+    'adler16':  (16,1,0xFB,      1),
+    'adler24':  (24,1,0xFFD,     1),
+    'adler32':  (32,1,0xFFF1,    1),
+'adler32_rsync':(32,1,0x10000,   1),
+    'adler48':  (48,1,0xFFFFFD,  1),
+    'adler64':  (64,1,0xFFFFFFFB,1),
+ 'fletcher16':  (16,0,0xFF,      1),
+'fletcher16_tcp':(16,0,0x100,    1),
+ 'fletcher32':  (32,0,0xFFFF,    2),
+ 'fletcher64':  (64,0,0xFFFFFFFF,4),
 }
 def crc_hash(i:bytes,algo:str,**kwargs) -> int:
     match algo:
-        case 'crc32'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip':
+        case 'crc32'|'crc32b'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip':
             import zlib
             return zlib.crc32(i,kwargs.get('value') or 0)
         case 'crc8'|'crc8_tech_3250'|'crc8_gsm'|'crc8_gsm_a'|'crc8_mifare_mad'|'crc8_icode'|'crc8_hitag'|\
@@ -875,9 +874,9 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC24[algo[6:]]
             fnc = uxx().hash_crc
         case 'crc32'|'crc32_jamcrc'|'crc32_ieee'|'crc32_iso'|'crc32_iso_hdlc'|'crc32_adccp'|'crc32_pkzip'|'crc32_xz'|'crc32_v42'|\
-             'crc32_mpeg2'|'crc32_posix'|'crc32_cksum'|'crc32_bzip2'|'crc32_aal5'|'crc32_dect_b'|'crc32b'|'crc32_mef'|\
+             'crc32_mpeg2'|'crc32_posix'|'crc32_bzip2'|'crc32_aal5'|'crc32_dect_b'|'crc32b'|'crc32_mef'|\
              'crc32k'|'crc32_koopman'|'crc32_xfer'|'crc32_autosar'|'crc32c'|'crc32_castagnoli'|'crc32_iscsi'|\
-             'crc32_base91_c'|'crc32_intrelaken'|'crc32_nvme'|'crc32d'|'crc32_base94'|'crc32_base94_d'|'crc32q'|\
+             'crc32_base91_c'|'crc32_interlaken'|'crc32_nvme'|'crc32d'|'crc32_base94'|'crc32_base94_d'|'crc32q'|\
              'crc32_aixm'|'crc32_cd_rom_edc'|'crc32_ludia':
             if algo == 'crc32': algo = 'crc32_ieee'
             kwargs['size'] = 32
@@ -894,12 +893,13 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             kwargs['size'] = 40
             kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC40[algo[6:]]
             fnc = uxx().hash_crc
-        case 'crc32_16': return crc_hash(i,'crc32',**kwargs) & 0xFFFF
-        case 'crc32_php': return swap32i(crc_hash(i,'crc32_bzip2',**kwargs))
         case 'crc16_4_ar':
             if isinstance(i,(list,tuple)): i = struct.pack(f'<{len(i)}I',*i)
             r = crc_hash(i,'crc16_kermit')
             return ((r >> 12) ^ (r >> 8) ^ (r >> 4) ^ r) & 0xF
+        case 'crc32_16': return crc_hash(i,'crc32',**kwargs) & 0xFFFF
+        case 'crc32_cksum': return crc_hash(i + len(i).to_bytes((len(i).bit_length() + 7) // 8,'little'),'crc32_posix')
+        case 'crc32_php': return swap32i(crc_hash(i,'crc32_bzip2',**kwargs))
         case 'bkdr'|'bkdr_ltr'|'bkdr32'|'bkdr32_ltr'|'aststrsum'|'ast_strsum'|'java'|'slf'|'nlg'|'solaris':
             kwargs['mult'],kwargs['add'],init = PRNG32[algo]
             if not 'init' in kwargs: kwargs['init'] = init
@@ -912,8 +912,8 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             import zlib
             if 'init' in kwargs: kwargs['value'] = kwargs.pop('init')
             fnc = zlib.adler32
-        case 'adler8'|'adler16'|'adler32'|'adler32_rsync'|'adler64'|'fletcher16':
-            kwargs['width'],kwargs['init'],kwargs['base'] = FLETCH[algo]
+        case 'adler8'|'adler16'|'adler24'|'adler32'|'adler32_rsync'|'adler48'|'adler64'|'fletcher16'|'fletcher16_tcp'|'fletcher32'|'fletcher64':
+            kwargs['width'],kwargs['init'],kwargs['base'],kwargs['block_size'] = FLETCH[algo]
             fnc = uxx().hash_fletcher
 
         case 'fnv0_32':
@@ -926,14 +926,11 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'fnv1a_32': fnc = uxx().hash_fnv1a_32
         case 'fnv1_64': fnc = uxx().hash_fnv1_64
         case 'fnv1a_64': fnc = uxx().hash_fnv1a_64
-        case 'bkdr_rtl'|'bkdr32_rtl':
-            i = i[::-1]
-            kwargs['mult'],kwargs['add'] = 131,0
-            fnc = uxx().hash_prng32
-        case 'bkdr64_rtl':
-            i = i[::-1]
-            kwargs['mult'],kwargs['add'] = 131,0
-            fnc = uxx().hash_prng64
+        case 'bp':
+            fnc = uxx().hash_fnv1_32
+            kwargs['prime'] = 0x80
+            if not 'init' in kwargs: kwargs['init'] = 0
+        case 'bkdr_rtl'|'bkdr32_rtl'|'bkdr64_rtl': return crc_hash(i[::-1],algo[:-4],**kwargs)
         case 'sdbm'|'sdbm_ltr': fnc = uxx().hash_sdbm
         case 'sdbm_rtl':
             i = i[::-1]
@@ -946,11 +943,18 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'djb2a_rtl':
             i = i[::-1]
             fnc = uxx().hash_djb2a
+        case 'dek'|'dek_ltr': fnc = uxx().hash_dek
+        case 'dek_rtl':
+            i = i[::-1]
+            fnc = uxx().hash_dek
         case 'joaat': fnc = uxx().hash_joaat
         case 'super_fast'|'super_fast_le': fnc = uxx().hash_super_fast_le
         case 'super_fast_be': fnc = uxx().hash_super_fast_be
         case 'elf'|'pjw': fnc = uxx().hash_elf
         case 'aphash': fnc = uxx().hash_ap
+        case 'rs': fnc = uxx().hash_rs
+        case 'js': fnc = uxx().hash_js
+        case 'tinysimple'|'tinysimplehash'|'tsh': fnc = uxx().hash_tinysimple
         case 'murmur2'|'mmh2'|'murmur2_32'|'mmh2_32'|'murmur2_le'|'mmh2_le'|'murmur2_32_le'|'mmh2_32_le':
             fnc = uxx().hash_murmur2_le
             if not 'init' in kwargs: kwargs['init'] = 0x9747b28c
@@ -989,9 +993,15 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
                 s = kwargs.pop('seed')
                 kwargs['seed1'] = s & 0xFFFFFFFFFFFFFFFF
                 kwargs['seed2'] = s >> 64
+        case 'cyrb53'|'cyrb64':
+            r = uxx().hash_cyrb64(i,kwargs.get('seed',0))
+            if algo == 'cyrb53': return r & 0x1FFFFFFFFFFFFF
+            return r
         case 'bsdsum'|'bsd': fnc = uxx().hash_bsdsum
         case 'sysvsum'|'sysv': fnc = uxx().hash_sysvsum
         case 'pesum'|'pe': fnc = uxx().hash_pesum
+        case 'rabin_fingerprint': fnc = uxx().hash_rabin_fingerprint
+        case 'ipv4': fnc = uxx().hash_ipv4
         case 'sum': return sum(i)
         case 'sum8'|'sum16'|'sum24'|'sum32'|'sum40'|'sum48'|'sum56'|'sum64':
             return sum(i) & ((1 << int(algo[3:])) - 1)
@@ -1009,6 +1019,8 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = kwargs.get('init',0)
             for b in i: r ^= b
             return r
+        case 'lrc_iso_1155':
+            return ((sum(i) ^ 0xFF) + 1) & 0xFF
 
         case 'sha1'|'sha224'|'sha256'|'sha384'|'sha512'|'sha3_224'|'sha3_256'|'sha3_384'|'sha3_512'|'sha512_224'|'sha512_256'|\
              'blake2b'|'blake2s'|'md5'|'shake128'|'shake_128'|'shake256'|'shake_256'|'ripemd160'|'sm3':
@@ -1171,13 +1183,18 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
         case 'fugue224'|'fugue256'|'fugue384'|'fugue512':
             r = uxx().hash_fugue(i,int(algo[5:8]))
             return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
-        case 'haval'|'haval128'|'haval160'|'haval192'|'haval224'|'haval256':
-            raise NotImplementedError
+        case 'haval'|'haval128'|'haval160'|'haval192'|'haval224'|'haval256'|\
+             'haval128_3'|'haval160_3'|'haval192_3'|'haval224_3'|'haval256_3'|\
+             'haval128_4'|'haval160_4'|'haval192_4'|'haval224_4'|'haval256_4'|\
+             'haval128_5'|'haval160_5'|'haval192_5'|'haval224_5'|'haval256_5':
             if '_' in algo:
                 algo,r = algo.split('_',1)
                 r = int(r)
             else: r = 3
             r = uxx().hash_haval(i,int(algo[5:] or 128),r)
+            return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
+        case 'panama':
+            r = uxx().hash_panama(i)
             return r if kwargs.get('bytes',False) else int.from_bytes(r,'big')
         case 'mdc2':
             h = bytearray(b'\x52'*8 + b'\x25'*8)
@@ -1489,7 +1506,7 @@ HASHTS = {
     x:FLETCH[x][0]//8 for x in FLETCH}|\
 {
     'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,
-    'crc32_16':2,'crc32_php':4,'crc16_4_ar':1,
+    'crc16_4_ar':1,'crc32_16':2,'crc32_php':4,'crc32_cksum':4,
     'adler8':1,'adler16':2,'adler32':4,'adler64':8,
     'fnv1_32':4,'fnv1a_32':4,'fnv0_32':4,
     'fnv1_64':8,'fnv1a_64':8,'fnv0_64':8,
@@ -1497,10 +1514,12 @@ HASHTS = {
     'sdbm':4,'sdbm_ltr':4,'sdbm_rtl':4,
     'djb2':4,'djb2_ltr':4,'djb2_rtl':4,
     'djb2a':4,'djb2a_ltr':4,'djb2a_rtl':4,
+    'dek':4,'dek_ltr':4,'dek_rtl':4,
     'joaat':4,
     'super_fast':4,'super_fast_le':4,'super_fast_be':4,
     'elf':4,'pjw':4,
-    'aphash':4,
+    'aphash':4,'rs':4,'bp':4,'js':4,
+    'tinysimple':4,'tinysimplehash':4,'tsh':4,
     'murmur2':4,'mmh2':4,'murmur2_32':4,'mmh2_32':4,'murmur2_le':4,'mmh2_le':4,'murmur2_32_le':4,'mmh2_32_le':4,'murmur2_be':4,'mmh2_be':4,'murmur2_32_be':4,'mmh2_32_be':4,
     'murmur2a':4,'mmh2a':4,'murmur2_32a':4,'mmh2_32a':4,'murmur2a_le':4,'mmh2a_le':4,'murmur2_32a_le':4,'mmh2_32a_le':4,'murmur2a_be':4,'mmh2a_be':4,'murmur2_32a_be':4,'mmh2_32a_be':4,
     'murmur2_64':8,'mmh2_64':8,'murmur2_64a':8,'mmh2_64a':8,'murmur2_64_le':8,'mmh2_64_le':8,'murmur2_64a_le':8,'mmh2_64a_le':8,'murmur2_64_be':8,'mmh2_64_be':8,'murmur2_64a_be':8,'mmh2_64a_be':8,
@@ -1509,7 +1528,9 @@ HASHTS = {
     'murmur3_128':16,'mmh3_128':16,
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
     'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
+    'cyrb53':7,'cyrb64':8,
     'bsdsum':2,'bsd':2,'sysvsum':2,'sysv':2,'pesum':4,'pe':4,
+    'rabin_fingerprint':1,'ipv4':2,'lrc_iso_1155':1,
     'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
     'sum8_rotl':1,'sum16_rotl':2,'sum24_rotl':3,'sum32_rotl':4,'sum40_rotl':5,'sum48_rotl':6,'sum56_rotl':7,'sum64_rotl':8,
     'sum8_rotr':1,'sum16_rotr':2,'sum24_rotr':3,'sum32_rotr':4,'sum40_rotr':5,'sum48_rotr':6,'sum56_rotr':7,'sum64_rotr':8,
@@ -1533,7 +1554,11 @@ HASHTS = {
     'esch256':32,'esch384':48,
     'echo224':28,'echo256':32,'echo384':48,'echo512':64,
     'fugue224':28,'fugue256':32,'fugue384':48,'fugue512':64,
-    #'haval':16,'haval128':16,'haval160':20,'haval192':24,'haval224':28,'haval256':32,
+    'haval':16,'haval128':16,'haval160':20,'haval192':24,'haval224':28,'haval256':32,
+    'haval128_3':16,'haval160_3':20,'haval192_3':24,'haval224_3':28,'haval256_3':32,
+    'haval128_4':16,'haval160_4':20,'haval192_4':24,'haval224_4':28,'haval256_4':32,
+    'haval128_5':16,'haval160_5':20,'haval192_5':24,'haval224_5':28,'haval256_5':32,
+    'panama':32,
     'mdc2':16,
     'tarzan':4,'luas':4,'hash40':5,'pivotal':4,
     'empire_magic':2,'westwood':4,

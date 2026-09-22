@@ -1203,7 +1203,8 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Meta  | detect UTF8 filenames | flag = * |
 | <ul><li>[x] </li></ul> | Meta  | CP437 filenames | flag != 0x800 |
 | <ul><li>[x] </li></ul> | Meta  | DOS Date + Time | time & date != 0 |
-| <ul><li>[x] </li></ul> | Meta  | InfoZIP Symlink | cos in (0x03,0x13), xa >> 28 == 0xA
+| <ul><li>[x] </li></ul> | Meta  | InfoZIP Symlink | xa >> 28 == 0xA |
+| <ul><li>[x] </li></ul> | Meta  | 7-Zip Symlink | cos == 0, xa & 0x400 |
 | <ul><li>[x] </li></ul> | CRC   | CRC32 IEEE | crc32 != 0 |
 | <ul><li>[x] </li></ul> | CRC   | MD5 | minizip |
 | <ul><li>[x] </li></ul> | CRC   | SHA1 | minizip |
@@ -1230,7 +1231,7 @@ Zzip | .zzip | [zzip](https://web.archive.org/web/20160530091207/http://archives
 | <ul><li>[x] </li></ul> | Extra | Unix Extended Timestamp | tag = 0x5554/UT, timestamps |
 | <ul><li>[x] </li></ul> | Extra | Unix | tag = 0x5558/UX, timestamps |
 | <ul><li>[x] </li></ul> | Extra | Previous new Unix | tag = 0x5578/Ux, ignored |
-| <ul><li>[x] </li></ul> | Extra | IBM S/390 attributes (uncompressed) | tag=0x6500, ignored |
+| <ul><li>[x] </li></ul> | Extra | IBM S/390 attributes (uncompressed) | tag=0x6500, timestamps, dumped as txt |
 | <ul><li>[x] </li></ul> | Extra | ASi Unix | tag = 0x6E75/nu, ignored |
 | <ul><li>[x] </li></ul> | Extra | Info-ZIP Unicode | tag = 0x7570/up, overwrites filename if crc32 matches |
 | <ul><li>[x] </li></ul> | Extra | New Unix | tag = 0x7578/ux, ignored |

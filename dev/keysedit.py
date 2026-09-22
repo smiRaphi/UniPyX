@@ -1,9 +1,11 @@
+import sys,os
+sys.path.append(os.getcwd())
+
 from lib.dldb import DLDB;db = DLDB()
 
 from lib.pyob import PyOBinX
 k = PyOBinX.dl('keys',db)
 
-import os
 if not os.path.exists('keys.pyo'):
     INDENT = 2
     def fmt(i,idn=0):
