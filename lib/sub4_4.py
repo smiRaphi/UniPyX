@@ -234,93 +234,147 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
 
             f.close()
             if fs: return
-        case 'Lego Creator QUBE':
-            rcbkv = sys.getrecursionlimit()
-            sys.setrecursionlimit(20000)
-
+        case 'QStudio QUBE':
             db.try_custom()
             from lib.file import File
             f = File(i,endian='<')
 
-            DN = set()
-            def readv(mx:int):
-                ty = f.reads(1,'ascii')
+            def readv(ty=None,ep:int=float('inf')):
+                if ty is None: ty = f.reads(1,'latin-1')
                 match ty:
-                    case 'i': return f.readu32()
+                    case 'B': return f.readu8()
                     case 's': return f.readu16()
-                    case '[':
-                        l = f.readu32()
-                        sty = f.reads(1,'ascii')
-                        if not sty in 'B': raise NotImplementedError(f'{ty}.{sty} @ 0x{f.pos-6:08X}')
-                        v = f.readc(l)
-                        return v
-                    case '@':
-                        v = []
-                        while f < mx: v.append(readv(mx))
-                        return v
-                    case 'B':
-                        l = f.readu8()
-                        v = []
-                        for _ in range(l):
-                            if f.pos >= mx: break
-                            v.append(readv(mx))
-                        return v
+                    case 'i': return f.readu32()
                     case 'F': return f.readf32()
                     case 'D': return f.readf64()
+                    case '@':
+                        v = []
+                        while f < ep and f.peek(1) != b'@':
+                            v.append(readv(ep=ep))
+                            if v[-1] is None:
+                                v.pop(-1)
+                                break
+                        return v
+                    case '[':
+                        s = f.readu32()
+                        st = f.reads(1,'latin-1')
+                        if st == 'B':
+                            d = f.readc(s)
+                            if s > 0 and d[-1] == 0 and istext(d[:-1],eof=False): return d[:-1].decode('ascii')
+                            return list(d)
+                        raise NotImplementedError(f.fmt(st,'§@',back=1))
                     case '\0': return None
-                    case _: raise NotImplementedError(f'{ty} @ 0x{f.pos-1:08X}')
-            def readb(p:list[str]):
-                bp = f.pos
-                ty = f.readu16() & 0x7FFF
-                if ty != 15 and bp in DN: return
-                DN.add(bp)
-                f.skip(2)
-                s = f.readu32()
-                ep = bp + s
-                if f.readu32(): return
-                f.skip(4)
-                r = []
-                while f < ep: r.append(readv(ep))
+                    case '\x88': pass # ?
+                    case _: raise NotImplementedError(f.fmt(ty,'§@',back=1))
+            def readb(p:str,rn:str='root'):
+                ep = f.pos
+                ty = f.readu8()
+                f.skip(3) # u8: flags?, u16: ?
+                ep += f.readu32()
+                f.padc(4)
+                f.skip(4) # sometimes float- or time32-like, maybe block crc? non from crypto.py matched
 
                 match ty:
                     case 1:
-                        asrt(len(r) == 1 and type(r[0]) == list)
-                        r = r[0]
-                        asrt(r[3].to_bytes(4,'little') == b'QUBE')
-
+                        r = readv(ep=ep)
+                        asrt(type(r) == list and len(r) >= 8 and r[3] == 0x45425551) # QUBE
+                        writefile(f'{p}/${rn}.json',r,'wj',indent=2,separators=(',',':'))
                         f.seek(r[6])
-                        ep = r[6]+r[7]
-                        v = []
-                        while f < ep: v.append(readv(ep))
-                        for ix,x in enumerate(v[2:]):
-                            f.seek(x)
-                            readb(p + [f'{ix:02d}'])
-                    case 2:
-                        if None in r:
-                            n = r[-1]
-                            asrt(type(n) == bytes,f'{ty} @ 0x{bp:08X}')
-                            if len(p) > 1: p.pop()
-                            p.append(n.rstrip(b'\0').decode('ascii'))
-                            asrt(p[-1].isprintable())
-                        mkdir('/'.join(p))
-                        for ix,x in enumerate(r):
-                            if x is None: break
-                            if x < BP or x >= f.size: continue
-                            f.seek(x)
-                            readb(p + [f'{ix:02d}'])
-                    case 15:
-                        if len(r) == 3 and type(r[2]) == bytes and r[0] == len(r[2]): writefile('/'.join(p) + '.' + guess_ext(r[2]),r[2])
-                        else: writefile('/'.join(p) + '.unk.txt',repr(r).replace('[','[\n').replace(']','\n]').encode('utf-8'))
-                    case _: raise NotImplementedError(f'{ty} @ 0x{bp:08X}')
+                        ofs = []
+                        while f < r[6] + r[7]:
+                            ofs.append(readv(ep=r[6] + r[7]))
+                            if ofs[-1] is None:
+                                ofs.pop(-1)
+                                break
+                        writefile(f'{p}/${rn}_blocks.json',ofs,'wj',indent=2,separators=(',',':'))
+                        # ofs[0] = end block off
+                        c = ofs[1]
+                        # ofs[2] = ofs block off
+                        if c == 1:
+                            f.seek(ofs[3])
+                            [readb(f'{p}/0',str(bix)) for bix in whilelc(lambda:f < ofs[0])]
+                        else:
+                            for ix in range(c - 1):
+                                f.seek(ofs[3 + ix * 2])
+                                [readb(f'{o}/{ix}',str(bix)) for bix in whilelc(lambda:f < ofs[3 + ix * 2 + 1])]
+                    case 2|0xF:
+                        r = []
+                        while f < ep:
+                            r.append(readv(ep=ep))
+                            if r[-1] is None:
+                                r.pop(-1)
+                                break
+                        if len(r) == 1 and type(r[0]) == list: r = r[0]
+                        if len(r) == 3 and type(r[0]) == type(r[1]) == int and type(r[2]) in {str,list} and r[0] == len(r[2]):
+                            try: d = bytes(r[2])
+                            except: pass
+                            else:
+                                r = None
+                                if d.startswith(b'// QAM Definition File '): ex = 'qam'
+                                else: ex = guess_ext(d)
+                                writefile(f'{p}/{rn}.{ex}',d)
+                                if d.startswith(b'// QAM Definition File written by QStudio on '):
+                                    set_ftime(f'{p}/{rn}.{ex}',mt=str2unix(d.split(b'\n')[0][45:].strip().decode('ascii')))
+                        if not r is None: writefile(f'{p}/${rn}.json',r,'wj',indent=2,separators=(',',':'))
+                f.seek(ep)
 
-            f.seek(4)
-            BP = f.readu32()
-            f.seek(0)
-            readb([o])
-
-            sys.setrecursionlimit(rcbkv)
+            readb(o)
             f.close()
-            if listdir(o): return
+
+            for dn in listdir(o):
+                dn = o + '/' + dn
+                if not isdir(dn): continue
+                fl = listdir(dn)
+                for bn in fl:
+                    n = dn + '/' + bn
+                    if not exists(n): continue
+                    if bn.endswith('.jpg'):
+                        d = readfile(n)
+                        if not d.startswith(b'\xFF\xD8') or d.endswith(b'\xFF\xD9'): continue
+                        f = xopen(n,'wb')
+                        f.write(d)
+                        ix = int(bn[:-4]) + 1
+                        while True:
+                            try: d = readfile(f'{dn}/{ix}.bin')
+                            except FileNotFoundError: break
+                            f.write(d)
+                            remove(f'{dn}/{ix}.bin')
+                            if d.endswith(b'\xFF\xD9'): break
+                            ix += 1
+                        f.close()
+                    elif bn.endswith('.bin') and getsize(n) == 0x1FFE0:
+                        d = readfile(n)
+                        if d[0] != 0 or d[3] != 0 or d[4] != 0 or sum(d[8:12]) != 0 or not d[1] in {0,1} or d[2] != (1 if d[1] else 2) or sum(d[12:14]) == 0 or sum(d[14:16]) == 0 or d[16] < 8 or d[16] % 8 != 0: continue
+                        if d[1]:
+                            if d[7] < 8 or sum(d[5:7]) == 0 or d[7] % 8 != 0: continue
+                        elif sum(d[5:7]) != 0: continue
+
+                        sz = 0x12
+                        if d[1]: sz += int.from_bytes(d[5:7],'little') * (d[7] // 8)
+                        sz += int.from_bytes(d[12:14],'little') * int.from_bytes(d[14:16],'little') * (d[16] // 8)
+                        sz = (sz,sz + 0x1A)
+
+                        ix = int(bn[:-4]) + 1
+                        dell = [n]
+                        while len(d) not in sz:
+                            if exists(f'{dn}/{ix}.bin'):
+                                td = readfile(f'{dn}/{ix}.bin')
+                                dell.append(f'{dn}/{ix}.bin')
+                            elif exists(f'{dn}/{ix}.tga'):
+                                td = readfile(f'{dn}/{ix}.tga')
+                                dell.append(f'{dn}/{ix}.tga')
+                            else: break
+                            if len(d) + len(td) > sz[1] or sz[0] < len(d) + len(td) < sz[1]: break
+                            if dell[-1].endswith('.tga') and len(d) + len(td) != sz[1]: break
+                            d += td
+                            ix += 1
+                        if not len(d) in sz: continue
+                        remove(*dell)
+                        f = xopen(n[:-3] + 'tga','wb')
+                        f.write(d)
+                        f.close()
+
+            return
         case 'Xenoblade Chronicles X DE ARH2':
             db.try_custom()
             from lib.file import File

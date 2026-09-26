@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1092
+# Supported Formats: 1099
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -155,7 +155,7 @@ ZOO | .zoo .exe | Custom, [deark](https://entropymine.com/deark/), [unzoo](https
 ZPAQ | .zpaq | [zpaq](https://mattmahoney.net/dc/zpaq.html) |
 ZSTD | .zst | Custom |
 
-## ROM Formats (72)
+## ROM Formats (73)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 3DO IMG | .iso | [3dt](https://github.com/trapexit/3dt) |
@@ -232,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (145)
+## Executables/Packers/Installers (146)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -382,7 +382,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (592)
+## Various (598)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -551,6 +551,7 @@ Dynamix PVOL | .vol | [Game Extractor Server](https://github.com/Sembiance/dexve
 Dynamix VOL | .vol | Custom |
 Earth And Beyond MIX | .mix | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 EBAB Animation Data | .ebab | Custom |
+Electronic Arts BIGF | .sdt | Custom |
 Electronic Arts LIB | .lib | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Empire Earth 1 SSA | .ssa | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Empire of Magic DAT | .dat | Custom |
@@ -602,6 +603,7 @@ God of Thunder Game Archive | ??? | [gamearch](https://www.shikadi.net/camoto/de
 Godot Pack | .pck | [GDRETools](https://github.com/GDRETools/gdsdecomp) |
 Golden Tee Fore! BIG | .big | Custom |
 Goosebumps CFS | .cfs | [na_game_tool](https://nihav.org/game_tool.html) |
+Great Adventures by Fisher Price Resource | .res | Custom | no file names
 Grezzo Archive | .gar .zar | Custom |
 Grezzo LzS | .lzs | Custom |
 Groove World Archive | .grv | Custom |
@@ -662,7 +664,6 @@ L.A. Rush AClump | .aclump | Custom |
 L.A. Rush Compressed | .k9z | Custom |
 L.A. Rush DIR+RES | .dir+.res | Custom |
 Legaia 2 DIR+BIN | .dir+.bin | Custom |
-Lego Creator QUBE | .q | Custom | highly WIP
 LEGO JAM | .jam | Custom |
 Level5 ARC | .arc | [3ds-xfsatool](https://github.com/MeltyPlayer/MeltyTool/tree/main/cli/tools/3ds-xfsatool) |
 Level5 Encrypted CRI CPK | .cpk | [Viola](https://github.com/SuperTavor/Viola) + [cpk.bms](https://mirror.aluigi.org/bms/cpk.bms) |
@@ -685,6 +686,7 @@ Macross: Do You Remember Love? PUD | .pud | Custom |
 Marmalade Derbh DZIP | .dz | [dzip](https://aluigi.org/misc/dzip.zip) |
 Marmalade Resource Group | .group.bin | Custom |
 Marvel Ultimate Alliance 2 PAK | .pak+(.igx) | Custom | igx is optional, it provides better filenames & creation dates
+Marvel Ultimate Alliance BIN | .bin | Custom |
 Mattel SMB | .smb | Custom |
 Maximus Installer ACopy | .fiz | Custom |
 Maximus Installer FIZ | .fiz | Custom |
@@ -808,6 +810,7 @@ Pseudo Interactive SmallF | .sf | Custom |
 PSX PFW | .pfw | Custom |
 Purple Moon Resource PRD+PRS | .prd+.prs | Custom |
 QOOB Flash IMG | ??? | Custom |
+QStudio QUBE | .q | Custom |
 Quake 3D WAD | .wad | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Quake PAK | .pak | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Quantum3 DIR+WAD | .dir+.wad | Custom |
@@ -875,6 +878,7 @@ Sonic PAC | .pac | [HedgeArcPack](https://github.com/Radfordhound/HedgeLib) |
 Sonic Shuffle Message Data | .bin | Custom |
 Soulcalibur Legends NPAC | .npac | Custom |
 Sound Source Interactive IMX | .imx | Custom | only extracts wavs & bmps except for the hardcoded entry at the beginning
+SouthPeak Interactive AGG | .agg | Custom |
 SouthPeak Interactive Puzzle Archive | .mco | [na_game_tool](https://nihav.org/game_tool.html) |
 Specnaz UFF | .bfs | Custom |
 Star Fox DAT | .dat | [star_fox_zero_dat.bms](https://mirror.aluigi.org/bms/star_fox_zero_dat.bms) |

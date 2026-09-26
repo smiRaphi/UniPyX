@@ -444,6 +444,8 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,bytes): key = key[0]
             asrt(isinstance(key,int),err=TypeError)
             return uxx().decrypt_eac(i,key)
+        case 'mua': # Marvel Ultimate Allienc
+            return uxx().decrypt_mua(i,key,**kwargs)
 
         case 'table':
             enc = kwargs.get('encoding','latin-1')

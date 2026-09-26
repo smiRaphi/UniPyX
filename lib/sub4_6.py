@@ -856,5 +856,137 @@ Unknown 2: {f.reads(f.readu32())}""")
             ol = listdir(o)
             run(['lzx','x',i,o])
             if listdir(o) != ol: return
+        case 'Great Adventures by Fisher Price Resource':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu32() == 4)
+            f.padc(8)
+
+            f.skip(8)
+            of,c = f.readu32(),f.readu32() // 8
+            f.seek(of)
+            fs = [(f.readu32(),f.readu32()) for _ in range(c)]
+            for ix,fe in enumerate(fs):
+                f.seek(fe[0])
+                d = f.readc(fe[1])
+                writefile(f'{o}/{ix:02d}.{guess_ext(d)}',d)
+
+            f.close()
+            if fs: return
+        case 'SouthPeak Interactive AGG':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu32() == 3 and f.reads(0x104,'latin-1').rstrip('\0') == 'Copyright (c) 1998 Southpeak Interactive LLC, Cary, North Carolina, USA.  All Rights Reserved.')
+
+            sl,c = f.readu32(),f.readu32()
+            asrt(sl >= c)
+            fs = []
+            for _ in range(c):
+                fe = f.readu32(),f.readu32()
+                f.skip(4) # u32: ?, the same for all entries
+                f.readbool32() # ?, only seen as 1 in .mpj entries
+                fs.append((*fe,o + '/' + sanitize_relative(sub_path(f.readc(0x104).split(b'\0')[0].decode('ascii')))))
+
+            for fe in fs:
+                f.seek(fe[0])
+                fn,ex = splitext(fe[2])
+                c = ''
+                while exists(fn + c + ex):
+                    c = '.$' + str(int(c[2:] or '0') + 1)
+                writefile(fn + c + ex,f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Marvel Ultimate Alliance BIN':
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt
+            from lib.file import File,decompress
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'\x6E\xCA\x9A\xB1' and f.readu16() == 1)
+
+            fl = f.readu8()
+            f.padc(1)
+            c = f.readu32()
+            s = f.readu32()
+            us = f.readu32()
+            zs = f.readu32()
+            f.skip(4)
+            td = f.readc(s)
+            kcnf = keys.wait()['mua']
+            if fl & 0x10: td = decrypt(td,'mua',s,**kcnf)
+            if fl & 1: td = decompress(td,'zlib',usize=c * 0x28)
+            tf = File(td,endian=f.endian)
+
+            sd = f.readc(zs)
+            if fl & 0x10: sd = decrypt(sd,'mua',zs,**kcnf)
+            if fl & 1: sd = decompress(sd,'zlib',usize=us)
+
+            bp = f.pos
+            for _ in range(c):
+                tf.skip(8)
+                n = sd[tf.readu64():].split(b'\0')[0].decode('ascii')
+                f.seek(bp + tf.readu64())
+                d = f.readc(tf.readu64())
+                if fl & 0x10: d = decrypt(d,'mua',len(d),**kcnf)
+                us = tf.readu64()
+                if fl & 1:
+                    try: d = decompress(d,'zlib',usize=us)
+                    except:
+                        print(f.pos - len(d),tf.pos - 0x28,n,len(d),us)
+                        raise
+                asrt(len(d) == us)
+                writefile(o + '/' + n,d)
+
+            f.close()
+            del tf
+            del sd
+            if c: return
+        case 'Knowledge Adventure Resource':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(6) == b'BWRF10')
+
+            c = f.readu32()
+            fs = [(f.reads(12,'ascii').rstrip('\0'),f.readu32(),f.readu32()) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[1])
+                writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Electronic Arts BIGF':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.read(4) == b'BIGF')
+            f.skip(4) # file size LE
+
+            c = f.readu32()
+            f.skip(4) # min header size?
+            fs = [(f.readu32(),f.readu32(),f.read0s('ascii')) for _ in range(c)]
+            for fe in fs:
+                f.seek(fe[0])
+                writefile(o + '/' + fe[2],f.readc(fe[1]))
+
+            f.close()
+            if fs: return
+        case 'Electronic Arts BIN Text':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.readu16() == 1)
+
+            c = f.readu16()
+            ob = [(f.readu32(),f.readu32()) for _ in range(c)]
+            ob = [f'{e[0]}: {f.seekc(e[1]).read0s16()}' for e in ob]
+            f.close()
+            if ob:
+                writefile(f'{o}/{tbasename(i)}.txt','\n'.join(ob))
+                return
 
     return 1

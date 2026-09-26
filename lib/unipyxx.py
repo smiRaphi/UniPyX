@@ -151,6 +151,7 @@ class X:
             ('decrypt_rsdk4', (P(u8),szt,u32,u32,P(u8),P(u8)),void,0),
             ('decrypt_rsdk5', (P(u8),szt,P(u8),P(u8)),void,0),
             ('decrypt_hornby',(P(u8),szt,u8,u8),void,0),
+            ('decrypt_mua',   (P(u32),szt,u16,u16,u8,u32,u32,u32),void,0),
             ('init_selene',   (P(u8),P(u8),szt,u32),void,0),
             ('decrypt_playpond_rc4',(P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_zipcrypto',(P(u8),szt,P(u8),szt),void,2),
@@ -567,6 +568,10 @@ class X:
         d = (u8 * len(src)).from_buffer_copy(src)
         self.dll.decrypt_hornby(d,len(src),key,msk)
         return bytes(d)[1:]
+    def decrypt_mua(self,src:bytes,key:int,kadd:int,kshf:int,kxor:int,mul:int,add:int) -> bytes:
+        b = (u32 * (len(src) >> 2)).from_buffer_copy(src[:len(src) >> 2 << 2])
+        self.dll.decrypt_mua(b,len(src),key,kadd,kshf,kxor,mul,add)
+        return bytes(b) + src[(len(src) >> 2 << 2):]
     def init_selene(self,key:bytes):
         seed = crc32(key)
         if seed not in self.SELENE:

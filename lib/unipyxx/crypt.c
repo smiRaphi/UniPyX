@@ -642,6 +642,17 @@ EXPORT void decrypt_blackenergy_rc4(uint8_t *restrict buf, const size_t size, co
         buf[p] ^= S[ix];
     }
 }
+EXPORT void decrypt_mua(uint32_t *restrict buf, const size_t size, const uint16_t key,
+                  const uint16_t kadd, const uint8_t kshf, const uint32_t kxor,
+                  const uint32_t mul, const uint32_t add) {
+    uint32_t k = (key + kadd) & 0xFFFF;
+    if (k & 0x8000) k |= 0xFFFF0000;
+    k = (((k << kshf) | k) ^ kxor) & 0xFFFFFFF;
+    for (size_t p=0;p < size / 4;p++) {
+        k = (k * mul + add) & 0xFFFFFFF;
+        buf[p] ^= k;
+    }
+}
 
 static inline uint32_t tfit_get_t(const uint32_t *t, const uint8_t *buf, const uint8_t x) {
     return t[0x100 * x + buf[x]];

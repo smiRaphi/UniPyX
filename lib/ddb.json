@@ -455,7 +455,7 @@
     },
     {
         "d":[["isat","\\1\\0",0],["isat","@i",16],["isat","iQUBEi\\0\\0\\0\\0",32],["isatS","\\0",4,8],["n0",4,4]],
-        "rs":"Lego Creator QUBE","s":1
+        "rs":"QStudio QUBE","s":1
     },
     {
         "d":[["isat","BCH\\0",0],["isat","\\0\\0\\0",9],["isin",["\\x38","\\x3C","\\x44"],8],["n0",2,6],["n0",4,12],["n0",4,12],["py","f.seek(4);return f.readi(1)<=f.readi(1)"]],
@@ -797,6 +797,18 @@
     {
         "d":[["size",[32,2147483648]],["isat","\\xAA\\xAA",6],["n0",4,0],["py","c=f.readi(4,'<');l=f.readi(4,'<')^0xAAAAAAAA;return len(f.read(l))==l and(f.readi(4,'<')^0xAAAAAAAA)>(4+c*20)and f.read(4)==b'\\xAA\\xAA\\xAA\\xAA'"]],
         "rs":"Motocross Mania DAT"
+    },
+    {
+        "d":[["isat","\\4\\0\\0\\0",0],["isatS","\\0",8,4],["isatS","\\0",40,28],["n0",4,12],["n0",4,16],["n0",4,20],["n0",4,24],["py","f.seek(12);o1,s1,o2,s2=[f.readi(4,'<') for _ in range(4)];return s1==s2 and o1+s1==o2 and o2+s2==fsz"]],
+        "rs":"Great Adventures by Fisher Price Resource"
+    },
+    {
+        "d":[["isat","\\0\\0\\0Copyright (c) ",1],["isat"," Southpeak Interactive LLC, Cary, North Carolina, USA.  All Rights Reserved.",22],["isatS","\\0",166,98],["n0",4,264],["n0",4,268]],
+        "rs":"SouthPeak Interactive AGG","s":1
+    },
+    {
+        "d":[["isat","\\x6E\\xCA\\x9A\\xB1\\1\\0",0],["isat","\\0",7],["isin",["\\0","\\1","\\x10","\\x11"],6]],
+        "rs":"Marvel Ultimate Alliance BIN","s":1
     },
     {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",14,16]],
@@ -1666,7 +1678,7 @@
         "rs":"GIANTS Archive","s":1
     },
     {
-        "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","c=f.read(4)\nif c!=f.read(4)or c==f.read(4):return\nc=int.from_bytes(c,'little');f.seek(8)\nfor _ in range(c):f.seek(f.readi(2,'<'),1)\nf.skip(4);return f.read(8)[:4]==b'\\0\\0\\0\\0' and f.readi(4,'<')==(f.tell()-16+c*20)"]],
+        "d":[["n0",4,0],["n0",4,4],["n0",2,8],["py","c=f.read(4)\nif c!=f.read(4)or c==f.read(4):return\nc=int.from_bytes(c,'little');f.seek(8)\nfor _ in range(c):\n f.seek(f.readi(2,'<'),1)\n if not f.neof():return\nf.skip(4);return f.read(8)[:4]==b'\\0\\0\\0\\0' and f.readi(4,'<')==(f.tell()-16+c*20)"]],
         "rs":"Petroglyph MEG"},{
         "d":[["isatS","\\xFF",3,0],["isat","\\xA4\\x70\\x7D\\x3F",4],["isin",["\\xFF","\\x8F"],3],["n0",4,8],["n0",4,12],["n0",4,16],["n0",4,20],["py","f.seek(12);return f.read(4)==f.read(4)"]],
         "rs":"Petroglyph MEG","s":1
@@ -1842,6 +1854,10 @@
         "rs":"Marvel Ultimate Alliance 2 PAK","s":1
     },
     {
+        "d":[["isat","BWRF10",0],["n0",4,6],["n0",4,22],["str0",12,10,3],["py","f.seek(6);c=f.readi(4,'<');f.seek(22);return 10+c*20==f.readi(4,'<')"]],
+        "rs":"Knowledge Adventure Resource","s":1
+    },
+    {
         "d":[["n0",4,-4],["isatS","\\0",4,-8],["n0",8,-16],["py","f.seek(-4,2);o=f.readi(4,'<');f.seek(-16,2)\nif (o+24)>fsz or(f.readi(4,'<')+f.readi(4,'<'))!=o:return\nf.seek(o);f.skip(f.readi(4,'<'));return f.readi(4)==0"]],
         "rs":"Mattel SMB"
     },
@@ -1953,6 +1969,14 @@
     {
         "d":[["s%",128],["size",[256,2684354560]],["n0",4,0],["n0",4,4],["n0",4,8],["py","s=f.readi(4,'<')*8+4;o=f.readi(4,'<')\nif o%128 or(s+-s%128)!=o:return\nf.seek(s);return not sum(f.read(-s%128))and f.read(4)==b'SCHl'"]],
         "rs":"Harry Potter and Prisoner of Azkaban SDT"
+    },
+    {
+        "d":[["isat","BIGF",0],["n0",4,4],["n0",4,8],["n0",4,12],["n0",4,16],["py","f.seek(4);s=f.readi(4,'<')\nif s!=fsz:\n f.seek(4)\n if f.readi(4,'>')!=fsz:return\nc=f.readi(4,'>');s=f.readi(4,'>');return 16+c*12<=s and f.readi(4,'>')>=s"]],
+        "rs":"Electronic Arts BIGF","s":1
+    },
+    {
+        "d":[["isat","\\1\\0",0],["isat","\\0\\0",-2],["n0",2,2],["n0",4,8],["py","f.seek(2);c=f.readi(2,'<');f.seek(8);return 4+c*8==f.readi(4,'<')"]],
+        "rs":"Electronic Arts BIN Text"
     },
     {
         "d":[["size",[136,null]],["isat","\\x58\\0\\0\\0",0],["isat","{\"applicationSettings\":{",92],["isat","}}",-2],["str",4,88]],

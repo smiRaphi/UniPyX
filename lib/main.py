@@ -87,7 +87,10 @@ def namespace(_func=None,include=[],keep_init=True):
     return f1(_func)
 class Empty: pass
 def whilelc(fnc):
-    while fnc(): yield
+    ix = 0
+    while fnc():
+        yield ix
+        ix += 1
 NOCONSOLE = False
 def console(back=0):
     global NOCONSOLE
@@ -398,6 +401,8 @@ TS_FMTS = [strp2re(x) for x in (
     "%:l:en_US:%m/%d/%Y %I:%M:%S %p",
     "%:l:en_US:%c",
     "%:l:en_US:%a, %d %b %Y %H:%M:%S %z",
+    "%:l:en_US:%d. %b %H:%M:%S %Y",
+    "%:l:en_US:%a %d. %b %H:%M:%S %Y",
 )]
 XTSPS = (
     ('\0m\0','mls'),
@@ -1374,13 +1379,16 @@ def guess_ext(d:bytes) -> str:
                     d[2] & 6 != 6 and not (not d[2] & 6 and d[2] >> 3) and (d[2] & 6 == 2 or (
                    ((d[3] << 8 | d[4]) == (~(d[5] << 8 | d[6]) & 0xFFFF)) if not d[2] & 6 else (
                     (d[2] >> 3) < 30 and (d[3] & 31) < 30))): ext = 'zlib'
+    elif s >= 0x14 and d[0] == d[1] == d[0x11] == sum(d[3:12]) == 0 and d[2] == 2 and sum(d[12:14]) != 0 and sum(d[14:16]) != 0 and\
+         d[0x10] >= 8 and d[0x10] % 8 == 0 and s == 0x12 + ifb(d[12:14],'little') * ifb(d[14:16],'little') * (d[0x10] // 8): ext = 'tga'
+    elif s >= 0x14 and d[0] == d[3] == d[4] == d[0x11] == sum(d[8:12]) == 0 and d[1] == d[2] == 1 and d[7] >= 8 and d[7] % 8 == 0 and d[0x10] >= 8 and d[0x10] % 8 == 0 and\
+         s == 0x12 + ifb(d[5:7],'little') * (d[7] // 8) + ifb(d[12:14],'little') * ifb(d[14:16],'little') * (d[0x10] // 8): ext = 'tga'
 
     return ext
 def guess_ext_zeebo(d:bytes,hint:int=None):
     if not d: return 'null'
 
     if d[:4] == b'PLZP': ext = 'plzp'
-    elif not hint is None and hint <= 3: ext = ('image','audio','txt','bin')[hint]
     else: ext = guess_ext(d)
 
     if not hint is None:
