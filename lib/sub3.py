@@ -781,10 +781,6 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     symlink(sym,op)
             for f in cps: cps[f].close()
             if cps: return
-        case 'Compressed Nintendo Switch Executable':
-            of = o + '/' + tbasename(i) + '.nso'
-            run(['nsnsotool',i,of])
-            if exists(of) and getsize(of): return
         case 'GameCube DOLXZ'|'Wii DOLXZ':
             db.try_custom()
             from lib.file import decompress
@@ -2007,7 +2003,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.skip(8)
             cdss = f.readu32()
             f.seek(dsfo)
-            if fl & 4: d = f.decompress(cdss,'zstd' if fl & 0x80 else 'lz4',usize=dss)
+            if fl & 4: d = f.decompress(cdss,'zbic' if fl & 0x80 else 'lz4',usize=dss)
             else: d = f.readc(dss)
 
             keys.wait()

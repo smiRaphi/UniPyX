@@ -811,6 +811,14 @@
         "rs":"Marvel Ultimate Alliance BIN","s":1
     },
     {
+        "d":[["isat","\\0\\1\\0\\0",0],["n0",4,4],["n0",4,12],["n0",4,20],["py","f.seek(4);return 24+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')*8+f.readi(4,'>')*12==fsz"]],
+        "rs":"Who Wants to Be a Millionaire DAT"
+    },
+    {
+        "d":[["isat","\\0\\2",0],["isatS","\\0",4,28],["n0",4,4],["n0",4,24],["py","f.seek(4);return 32+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')+f.readi(4,'>')==fsz"]],
+        "rs":"Who Wants to Be a Millionaire Sound DAT"
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",14,16]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },
@@ -1910,7 +1918,7 @@
         "rs":"Camelot Obfuscated NSO","s":1
     },
     {
-        "rqr":"Nintendo Switch executable",
+        "rqr":"Nintendo Switch executable (NSO)",
         "d":[["isat","NSO0",0],["isatS","\\0",8,4],["isatS","\\0",3,13],["isatS","\\0",28,108],["n0",1,12],["n0",4,16],["n0",4,24],["py","f.seek(12);return f.readi(1)&7"]],
         "rs":"Compressed Nintendo Switch Executable","s":1
     },
@@ -2568,6 +2576,11 @@
         "rqr":"Borland Cpp for Win32 1995",
         "d":[["isat","DATA\\0\\0\\0\\0",544],["isat","\\0\\x5E\\0\\0",564],["isat","FI",33312],["contain","\\0fimain.ico\\0",24208,256],["contain","\\0lzpunz2.dll\\0",24208,256],["contain","\\0fimain.exe\\0",24208,256],["contain","\\0LzpUnzClose\\0",24464,256]],
         "rs":"FI Installer","s":1
+    },
+    {
+        "rqr":"UPX compressed Win32 Executable",
+        "d":[["py","f.seek(60);f.seek(f.readi(4,'<')+328)\nif f.read(8)!=b'.rsrc\\0\\0\\0':return\nf.skip(12);f.seek(f.readi(4,'<'));return b'\\x09\\0M\\0P\\x003\\0P\\0L\\0A\\0Y\\0E\\0R\\0' in f.read(512)"]],
+        "rs":"MP3 EXE","s":1
     },
     {
         "rqr":null,

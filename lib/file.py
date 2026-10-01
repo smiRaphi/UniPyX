@@ -723,6 +723,8 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 a = 'yay0'
             elif hint in {None,'nin'} and i[:4] == b'Yaz0' and (not alw or 'yaz0' in alw):
                 a = 'yaz0'
+            elif hint in {None,'nin','nx','switch'} and i[:4] == b'ZBIC' and (not alw or 'zbic' in alw):
+                a = 'zbic'
             elif hint in {None,'xbox'} and i[:3] == b'\x0F\xF5\x12' and i[3] in {0xED,0xEE} and (not alw or 'xb' in alw):
                 a = 'xb'
             elif i[1:4] == b'\xB5\x2F\xFD' and i[0] in {0x1E,0x22,0x23,0x24,0x25,0x26,0x27,0x28} and (not alw or 'zstd' in alw):
@@ -1236,6 +1238,9 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 p += s
             d.extend(b'\1\0\0')
             return decompress(d,'zstd',**kwargs)
+        case 'zbic':
+            import zbic
+            return zbic.decompress(i)
 
         case 'winzip_jpeg'|'zipx_jpeg': return uxx().decompress_winzip_jpeg(i,kwargs['usize'])
         case 'wavpack'|'wv':

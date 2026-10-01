@@ -1806,5 +1806,21 @@
     "LZX Archive":[
         "lzx amiga compressed archive",
         "lzx compressed archive (amiga)"
+    ],
+    "PELOCK NT":[
+        "pe lock nt v204",
+        "pe lock nt v204 marquisdesoire",
+        "pelocknt",
+        "pelocknt 204",
+        "pelocknt(2.04)"
+    ],
+    "PE-PACK":[
+        "pe pack 10",
+        "pe pack v10 by anakin 1998",
+        "pe pack v10",
+        "pe pack v10 anakin",
+        "pe-pack",
+        "pe-pack(1.0)",
+        "pe-pack v 1.0 (c) 1998 by anakin"
     ]
 }

@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1099
+# Supported Formats: 1103
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -232,7 +232,7 @@ ZArchive | .zar .wua | [ZArchive](https://github.com/Exzap/ZArchive) |
 Zelda N64 ROM | .z64 | [ZRE](https://shedevr.org.ru/zelda64rus/downloads.html) |
 ZX Spectrum Tape IMG | .tap | [tapsplit](http://www.seasip.info/ZX/unix.html) |
 
-## Executables/Packers/Installers (146)
+## Executables/Packers/Installers (148)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 .NET Executable | .exe .dll | [ILSpyCmd](https://github.com/icsharpcode/ILSpy/blob/master/ICSharpCode.ILSpyCmd/README.md) |
@@ -277,7 +277,7 @@ COM RLE Packer | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/
 com2txt | .txt | [COM2TXT](https://www.sac.sk/download/utilprog/com2t111.rar) |
 COMPACK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 Compress-EXE | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
-Compressed Nintendo Switch Executable | .nso | [nsnsotool](https://github.com/0CBH0/nsnsotool) |
+Compressed Nintendo Switch Executable | .nso | Custom |
 Concatinated C Code | .c .h | Custom | similar implementation as SHAR, missing more samples
 Cruncher | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/dos/CUP386) |
 CryptPE | .exe | Custom |
@@ -322,6 +322,7 @@ LM-T2E | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/master/d
 Lua Bytecode | .lua .luac .lc | [unluac](https://sourceforge.net/project/unluac/), [luadec51-3](https://github.com/viruscamp/luadec) |
 LZEXE | .exe .com | [deark](https://entropymine.com/deark/) |
 MASM Installer | .exe | Custom + [7-Zip](https://7-zip.org/) |
+MP3 EXE | .exe | Custom |
 MSCAB SFX | .exe | [7-Zip](https://7-zip.org/), Input (/X), Input (/T), Input (-extract) |
 Multimedia Fusion 2.0 | .exe | Custom |
 Myriad Install | .exe | Custom |
@@ -331,6 +332,7 @@ NSIS Installer | .exe | [7-Zip](https://7-zip.org/), [InstExpl](https://bioruebe
 Nuitka Compiled | .exe | [nuitka-extractor](https://github.com/extremecoders-re/nuitka-extractor) |
 OptiFine Installer | .jar | Custom |
 Optilink | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
+PELOCK NT | .exe | [PEUNLOCK-NT](http://www.gbppr.net/cracking/protools/unpackers.htm#peunlocknt) |
 PGMPAK | .exe .com | [UNP](https://github.com/Sembiance/dexvert/blob/master/dos/UNP.EXE) |
 PKLITE32 | .exe | Custom | doesn't support blocks using deflate64 (https://codeberg.org/miurahr/inflate64/issues/16)
 PlayStation 2 BIOS | .bin | [romman](https://github.com/israpps/romman) |
@@ -382,7 +384,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (598)
+## Various (600)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -960,6 +962,8 @@ WarpIN Archive | .wip | Custom |
 WATCOM Archive | ??? | [WPACK](https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE) |
 WayForward PAK | .pak | Custom |
 Westwood Encrypted MIX | .mix | Custom |
+Who Wants to Be a Millionaire DAT | .dat | Custom |
+Who Wants to Be a Millionaire Sound DAT | .dat | Custom |
 Wii Exported Save Data | .bin | Custom |
 WIM | .wim | [wimlib](https://wimlib.net/), [7-Zip](https://www.7-zip.org/) |
 X-Files Resources | ??? | Custom |

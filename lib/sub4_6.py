@@ -988,5 +988,63 @@ Unknown 2: {f.reads(f.readu32())}""")
             if ob:
                 writefile(f'{o}/{tbasename(i)}.txt','\n'.join(ob))
                 return
+        case 'Who Wants to Be a Millionaire DAT':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.readu16() == 1 and f.readu16() == 0)
+
+            ds,dss,fss,dc,fc = f.readu32(),f.readu32(),f.readu32(),f.readu32(),f.readu32()
+            f.skip(ds)
+            ep = f.pos + dss
+            dstr = [f.reads(f.readu8(),'ascii') for _ in whilelc(lambda:f < ep)]
+            f.seek(ep)
+            ep = f.pos + fss
+            fstr = [f.reads(f.readu8(),'ascii') for _ in whilelc(lambda:f < ep)]
+            f.seek(ep)
+
+            ds = [(dstr[ix],f.readu32(),f.readu32()) for ix in range(dc)]
+            ds = [(range(x[1],x[1] + x[2]),x[0]) for x in ds]
+            fs = [(f.readu32(),f.readu32(),f.readu32()) for _ in range(fc)]
+
+            for x in ds:
+                mkdir(o + '/' + x[1])
+            for ix,fe in enumerate(fs):
+                dn = [x[1] for x in ds if ix in x[0]]
+                asrt(len(dn) == 1)
+                f.seek(fe[1])
+                writefile(o + '/' + dn[0] + '/' + fstr[fe[0]],f.readc(fe[2]))
+
+            f.close()
+            if fs: return
+        case 'Who Wants to Be a Millionaire Sound DAT':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='>')
+            asrt(f.readu16() == 2)
+            f.skip(2)
+
+            ds,dss,dts,fss,uts,fts = [f.readu32() for _ in range(6)]
+            f.padc(4)
+            ep = f.skip(ds) + dss
+            dss = [(f.reads(f.readu8(),'ascii'),f.readu16()) for _ in whilelc(lambda:f < ep)]
+            dss = {x[1]:x[0] for x in dss}
+            ep = f.pos + dts
+            ds = [(f.readu32(),f.readu16() + f.padc(2)) for _ in whilelc(lambda:f < ep)]
+            ds = [(range(x[0],x[0] + x[1]),dss[ix]) for ix,x in enumerate(ds)]
+            ep = f.skip(fss + uts) + fts
+            fs = [(f.readu32(),f.readu32(),f.skip(0x14)) for _ in whilelc(lambda:f < ep)]
+
+            for x in ds:
+                mkdir(o + '/' + x[1])
+            for ix,fe in enumerate(fs):
+                dn = [x for x in ds if ix in x[0]]
+                asrt(len(dn) == 1)
+                dn = dn[0]
+                f.seek(fe[0])
+                writefile(f'{o}/{dn[1]}/{ix - dn[0].start}.snd',f.readc(fe[1]))
+
+            f.close()
+            if fs: return
 
     return 1

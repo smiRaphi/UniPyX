@@ -1821,7 +1821,7 @@ def _Nintendo(db):
         if dev:
             if _NXDKEYS is None: 
                 k = db.get('devkeys')
-                if k: _NXDKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k).split('\n') if x.strip()}
+                if k: _NXDKEYS = {x.split('=')[0].strip().lower():bytes.fromhex(x.split('=')[1].strip()) for x in readfile(k,'rt').split('\n') if x.strip()}
                 else: _NXDKEYS = {}
             return _NXDKEYS
         if _NXPKEYS is None: 

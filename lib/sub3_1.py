@@ -468,5 +468,83 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
             asrt(crc == crc_hash(cd,'crc16_4_ar'))
             writefile(o + '/' + basename(i),'\n'.join(f'{cd[ix]:08X} {cd[ix+1]:08X}' for ix in range(0,len(cd),2)))
             if cd: return
+        case 'PELOCK NT':
+            copy(i,o + '/a.exe')
+            db.run(['peunlck','a.exe'],cwd=o)
+            if getsize(i) != getsize(o + '/a.exe'):
+                mv(o + '/a.exe',o + '/' + basename(i))
+                return
+            remove(o + '/a.exe')
+        case 'MP3 EXE':
+            db.try_custom()
+            from lib.file import EXE
+            f = EXE(i)
+            if f.ovl_end_off - f.ovl_off >= 0x48:
+                f.seek(f.ovl_off)
+                writefile(f'{o}/{tbasename(i)}.mp3',f.readc(f.ovl_end_off - f.ovl_off))
+                f.close()
+                return
+            f.close()
+        case 'Compressed Nintendo Switch Executable':
+            db.try_custom()
+            from lib.file import File
+            from lib.crypto import crc_hash
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'NSO0' and f.readu32() == 0)
+            f.padc(4)
+
+            fl = f.readu32()
+            asrt(fl & 7)
+
+            fs = [[0,f.readu32(),f.readu32(),f.readu32()]]
+            mdo = f.readu32()
+            fs.append([1,f.readu32(),f.readu32(),f.readu32()])
+            mde = (mdo,f.readu32())
+            fs.append([2,f.readu32(),f.readu32(),f.readu32()])
+            f.skip(0x24)
+            for ix in range(3): fs[ix].append(f.readu32())
+            fs.append([3,mde[0],None,None,mde[1]])
+            f.skip(0x34)
+            for ix in range(3): fs[ix].append(f.readc(0x20))
+            fs = sorted([x for x in fs if x[4] > 0],key=lambda x:x[1])
+
+            of = File(o + '/' + tbasename(i) + '.nso','wb',endian='<')
+            of.write(f.peek(12,offset=[0]))
+            of.writeu32(fl & 0xFFFFFF78)
+            f.seek(0x10)
+
+            for fe in fs:
+                if f < fe[1]: of.write(f.read(fe[1] - f.pos))
+                fe[1] = of.pos
+                if fe[0] < 3:
+                    if fl & (1 << fe[0]):
+                        d = f.decompress(fe[4],'zbic' if fl & 0x80 else 'lz4',usize=fe[3])
+                        fe[4] = fe[3]
+                    else: d = f.readc(fe[4])
+                    if (fl >> 3) & (1 << fe[0]) and sum(fe[5]):
+                        hs = crc_hash(d,'sha256nso',bytes=True)
+                        if fe[5] != hs:
+                            f.close()
+                            of.close()
+                            remove(of.name)
+                            raise ValueError(f'{hs.hex()} != {fe[5].hex()} ({fe[0]})')
+                else: d = f.readc(fe[4])
+                of.write(d)
+            if f: of.write(f.read())
+            f.close()
+
+            for fe in fs:
+                if fe[0] < 3:
+                    of.seek(0x10 + fe[0] * 0x10)
+                    of.writeu32(fe[1])
+                    of.writeu32(fe[2])
+                    of.writeu32(fe[3])
+                    of.seekc(0x60 + fe[0] * 4).writeu32(fe[4])
+                elif fe[0] == 3:
+                    of.seekc(0x1C).writeu32(fe[1])
+                    of.seekc(0x2C).writeu32(fe[4])
+
+            of.close()
+            return
 
     return 1

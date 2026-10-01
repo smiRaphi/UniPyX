@@ -480,6 +480,9 @@ static const uint8_t TWOFISH_T1[0x40] = {
     0xB,0x9,0x5,0x1,0xC,0x3,0xD,0xE,0x6,0x4,0x7,0xF,0x2,0x0,0x8,0xA,
 };
 
+#define GOLDEN_RATIO32 0x9E3779B9
+#define DEADBEEF 0xDEADBEEF
+
 #define MT_N 624
 #define MT_M 397
 #define MT_MSK_U (int32_t)0x80000000
@@ -494,8 +497,6 @@ static const uint8_t TWOFISH_T1[0x40] = {
 #define MICRO_C_RAND_A 0x358D
 #define MICRO_C_RAND_C 0x3619
 
-#define TEA_DELTA 0x9e3779b9
-
 #define ZIPD_CHECK {0, 0, 0, 0, 5, 0x78}
 
 #define MURMUR2_32_M 0x5bd1e995
@@ -504,7 +505,7 @@ static const uint8_t TWOFISH_T1[0x40] = {
 #define RS_A 0xF8C9
 #define RS_B 0x05C6B7
 
-#define CYRB53_H1 0xDEADBEEF
+#define CYRB53_H1 DEADBEEF
 #define CYRB53_H2 0x41C6CE57
 #define CYRB53_M1 0x9E3779B1
 #define CYRB53_M2 0x5F356495

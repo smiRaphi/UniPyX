@@ -46,7 +46,6 @@ LG Encrypted EPK | .epk | https://www.lg.com/us/support/product/lg-OLED83B6GUA.A
 
 ## Other Todos
 - Unreal ZenLoader: ZenTool -> [retoc](https://github.com/trumank/retoc)
-- lib/crypto.py:crc_hash SipHash
 - lib/crypto.py:crc_hash City/Farm Hash
 - RE Engine PAK: ree.unpacker -> Custom
 - lib/crypto.py:crc_hash KBKDF HMAC/CMAC https://cryptography.io/en/latest/hazmat/primitives/key-derivation-functions/#kbkdf
@@ -57,6 +56,7 @@ LG Encrypted EPK | .epk | https://www.lg.com/us/support/product/lg-OLED83B6GUA.A
 - lib/crypto.py:decrypt XSalsa20
 - lib/crypto.py:crc_hash XSalsa20-Poly1305
 - lib/crypto.py:crc_hash non xpg4 Tru64 cksum
+- lib/crypto.py:crc_hash SipHash-4-8
 
 ### CD-i RTF dev interview:
 > Q: what is a .rtr file?

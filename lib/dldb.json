@@ -442,7 +442,7 @@
     "unarc":{
         "p":"unarc.exe",
         "fs":[{
-            "u":"https://altushost-swe.dl.sourceforge.net/project/freearc/FreeArc/FreeArc%200.51/FreeArc-portable-0.51-win32.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/freearc/FreeArc/FreeArc%200.51/FreeArc-portable-0.51-win32.zip",
             "x":{
                 "bin/unarc.exe":"unarc.exe"
             }
@@ -1445,7 +1445,7 @@
     "balz":{
         "p":"balz.exe",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/balz/BALZ/1.50/balz150_win32.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/balz/BALZ/1.50/balz150_win32.zip",
             "x":{
                 "balz.exe":"balz.exe"
             }
@@ -1504,7 +1504,7 @@
     "crush":{
         "p":"crush.exe",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/crush/CRUSH/1.00/crush100.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/crush/CRUSH/1.00/crush100.zip",
             "x":{
                 "crush.exe":"crush.exe"
             }
@@ -1524,7 +1524,7 @@
     "lzpx":{
         "p":"lzpx.exe",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/lzpx/LZPX/1.5b/lzpx-1.5b.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/lzpx/LZPX/1.5b/lzpx-1.5b.zip",
             "x":{
                 "lzpx-1.5b/lzpx.exe":"lzpx.exe"
             }
@@ -1534,7 +1534,7 @@
     "lzpxj":{
         "p":"lzpxj.exe",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/lzpx/LZPXJ/1.2h/lzpxj-1.2h.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/lzpx/LZPXJ/1.2h/lzpxj-1.2h.zip",
             "x":{
                 "lzpxj-1.2h/lzpxj.exe":"lzpxj.exe"
             }
@@ -1643,7 +1643,7 @@
     "quad":{
         "p":"quad.exe",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/quad/QUAD/1.12/quad112.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/quad/QUAD/1.12/quad112.zip",
             "x":{
                 "quad.exe":"quad.exe"
             }
@@ -2031,7 +2031,7 @@
     "dar":{
         "p":"DAR/dar.exe",
         "fs":[{
-            "u":"https://cyfuture.dl.sourceforge.net/project/dar/dar/2.8.1/dar64-2.8.1-win64.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/dar/dar/2.8.1/dar64-2.8.1-win64.zip",
             "x":{
                 "dar64-2.8.1-win64/bin/dar.exe":"DAR/dar.exe",
                 "dar64-2.8.1-win64/bin/cygbz2-1.dll":"DAR/cygbz2-1.dll",
@@ -2141,16 +2141,6 @@
             "x":{
                 "mfs_manager.exe":"MFSManager/mfs_manager.exe",
                 "mfs_library.dll":"MFSManager/mfs_library.dll"
-            }
-        }],
-        "ts":0
-    },
-    "nsnsotool":{
-        "p":"nsnsotool.exe",
-        "fs":[{
-            "u":"https://github.com/0CBH0/nsnsotool/releases/download/v1.0a/nsnsotool_v1.0a.zip",
-            "x":{
-                "nsnsotool.exe":"nsnsotool.exe"
             }
         }],
         "ts":0
@@ -5310,7 +5300,7 @@
     "bfs2pack":{
         "p":"bfs2pack/bfs2pack_con.exe",
         "fs":[{
-            "u":"https://twds.dl.sourceforge.net/project/bfs2pack/bfs2pack/bfs2pack1.2/bfs2pack1.2-bin.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/bfs2pack/bfs2pack/bfs2pack1.2/bfs2pack1.2-bin.zip",
             "x":{
                 "bfspack1.2-bin/bfs2pack_con.exe":"bfs2pack/bfs2pack_con.exe",
                 "bfspack1.2-bin/zlib1.dll":"bfs2pack/zlib1.dll"
@@ -5634,7 +5624,7 @@
     "tapclean":{
         "p":"TAPClean.exe",
         "fs":[{
-            "u":"https://master.dl.sourceforge.net/project/tapclean/tapclean/TAPClean%200.38/tapclean-0.38-win.zip?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/tapclean/tapclean/TAPClean%200.38/tapclean-0.38-win.zip",
             "x":{
                 "TAPClean.exe":"TAPClean.exe"
             }
@@ -5742,6 +5732,23 @@
             }
         }],
         "ts":0
+    },
+    "siphash24":{
+        "pip":"siphash24",
+        "ts":1788895210
+    },
+    "zbic":{
+        "pip":"git+https://github.com/kinnay/zbic.git",
+        "ts":1786631367
+    },
+    "peunlck":{
+        "p":"peunlck.exe",
+        "fs":[{
+            "u":"http://www.gbppr.net/cracking/protools/files/unpackers/ucfpeunk.zip",
+            "x":{
+                "peunlck.EXE":"peunlck.exe"
+            }
+        }]
     },
     "sandboxie":{
         "p":"sandboxie/Start.exe",
@@ -6030,7 +6037,7 @@
     "unluac":{
         "p":"unluac.jar",
         "fs":[[
-            "https://netix.dl.sourceforge.net/project/unluac/Unstable/unluac_2025_12_23.jar?viasf=1",
+            "https://downloads.sourceforge.net/project/unluac/Unstable/unluac_2025_12_23.jar",
             "unluac.jar"
         ]],
         "ts":1766521780
@@ -6194,7 +6201,7 @@
     "innounp":{
         "p":"innounp.exe",
         "fs":[{
-            "u":"https://netcologne.dl.sourceforge.net/project/innounp/innounp/innounp%200.50/innounp050.rar?viasf=1",
+            "u":"https://downloads.sourceforge.net/project/innounp/innounp/innounp%200.50/innounp050.rar",
             "x":{
                 "innounp.exe":"innounp.exe"
             }
@@ -6208,9 +6215,9 @@
             "x":{
                 "innounp.exe":"innounp-2.exe"
             },
-            "ts":1776844849
+            "ts":1787989263
         }],
-        "ts":1776844849
+        "ts":1787989263
     },
     "innoextract":{
         "p":"innoextract/innoextract.exe",

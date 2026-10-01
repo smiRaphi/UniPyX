@@ -11,7 +11,7 @@ def asrt(c:bool,*r,err:Exception=ValueError):
 
 def swap32(i:bytes):
     c = len(i) // 4
-    return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i))
+    return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i[:c * 4])) + i[c * 4:]
 def swap32i(i:int): return int.from_bytes(i.to_bytes(4,'big'),'little')
 def reflecti(v:int,w:int):
     r = 0
@@ -999,6 +999,19 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             r = uxx().hash_cyrb64(i,kwargs.get('seed',0))
             if algo == 'cyrb53': return r & 0x1FFFFFFFFFFFFF
             return r
+        case 'lookup2': fnc = uxx().hash_lookup2
+        case 'lookup3'|'lookup3_32':
+            return uxx().hash_lookup3(i,kwargs.get('init',0) & 0xFFFFFFFF) & 0xFFFFFFFF
+        case 'lookup3_64': fnc = uxx().hash_lookup3
+        case 'siphash13'|'siphash24':
+            import siphash24
+            by = kwargs.pop('bytes',False)
+            o = getattr(siphash24,algo)(**kwargs)
+            if i is None: return o
+            o.update(i)
+            r = o.digest()
+            if not by: r = int.from_bytes(r,'little')
+            return r
         case 'bsdsum'|'bsd': fnc = uxx().hash_bsdsum
         case 'sysvsum'|'sysv': fnc = uxx().hash_sysvsum
         case 'pesum'|'pe': fnc = uxx().hash_pesum
@@ -1036,6 +1049,11 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             if i is None: return hashlib.new(algo,**kwargs)
             r = hashlib.new(algo,i,**kwargs).digest(**kw)
             if oby: return r
+            return int.from_bytes(r,'big')
+        case 'sha256nso':
+            # regular sha256 but the total size in the last block is in LE
+            r = uxx().hash_sha256nso(i)
+            if kwargs.get('bytes',False): return r
             return int.from_bytes(r,'big')
         case 'md5r':
             import hashlib
@@ -1531,6 +1549,8 @@ HASHTS = {
     'xxh32':4,'xxh64':8,'xxh3_64':8,'xxh128':16,'xxh3_128':16,
     'spooky2_32':4,'spooky2_64':8,'spooky2_128':16,
     'cyrb53':7,'cyrb64':8,
+    'lookup2':4,'lookup3':4,'lookup3_32':4,'lookup3_64':8,
+    'siphash13':8,'siphash24':8,
     'bsdsum':2,'bsd':2,'sysvsum':2,'sysv':2,'pesum':4,'pe':4,
     'rabin_fingerprint':1,'ipv4':2,'lrc_iso_1155':1,
     'sum8':1,'sum16':2,'sum24':3,'sum32':4,'sum40':5,'sum48':6,'sum56':7,'sum64':8,
@@ -1540,7 +1560,7 @@ HASHTS = {
     'md5':16,'md5r':16,'sha1':20,'md5_sha1':36,'md2':16,'md4':16,
     'ed2k':16,'emule':16,'edonkey':16,
     'md5x':4,'md5_lh5':4,
-    'sha224':28,'sha256':32,'sha384':48,'sha512':64,
+    'sha224':28,'sha256':32,'sha384':48,'sha512':64,'sha256nso':32,
     'sha3_224':28,'sha3_256':32,'sha3_384':48,'sha3_512':64,
     'sha512_224':28,'sha512_256':32,
     'blake224':28,'blake256':32,'blake384':48,'blake512':64,

@@ -295,11 +295,11 @@ EXPORT void decrypt_tea(const uint8_t *restrict src, const size_t size, uint8_t 
         uint32_t v0 = TEA_SWAP32(inp[p]);
         uint32_t v1 = TEA_SWAP32(inp[p + 1]);
 
-        uint32_t sv = (TEA_DELTA * 32) & 0xFFFFFFFF;
+        uint32_t sv = (GOLDEN_RATIO32 * 32) & 0xFFFFFFFF;
         for (int i = 0; i < 32; i++) {
             v1 -= ((v0 << 4) + k[2]) ^ (v0 + sv) ^ ((v0 >> 5) + k[3]);
             v0 -= ((v1 << 4) + k[0]) ^ (v1 + sv) ^ ((v1 >> 5) + k[1]);
-            sv -= TEA_DELTA;
+            sv -= GOLDEN_RATIO32;
         }
 
         out[p] = TEA_SWAP32(v0);
@@ -1588,6 +1588,94 @@ EXPORT uint32_t hash_tinysimple(const uint8_t *restrict src, const size_t size, 
     for (size_t p=0;p < size;p++) h = (h ^ src[p]) * TSH_MUL;
     return h ^ (h >> 9);
 }
+EXPORT uint32_t hash_lookup2(const uint8_t *restrict src, const size_t size, const uint32_t init) {
+    uint32_t a = GOLDEN_RATIO32, b = GOLDEN_RATIO32;
+    uint32_t c = init;
+
+    #define mix(a,b,c) {\
+    a -= b;a -= c;a ^= (c>>13);\
+    b -= c;b -= a;b ^= (a<<8 );\
+    c -= a;c -= b;c ^= (b>>13);\
+    a -= b;a -= c;a ^= (c>>12);\
+    b -= c;b -= a;b ^= (a<<16);\
+    c -= a;c -= b;c ^= (b>>5 );\
+    a -= b;a -= c;a ^= (c>>3 );\
+    b -= c;b -= a;b ^= (a<<10);\
+    c -= a;c -= b;c ^= (b>>15);\
+    }
+
+    size_t p = 0;
+    for (;p + 12 <= size;p += 12) {
+        a += read32le(src + p + 0);
+        b += read32le(src + p + 4);
+        c += read32le(src + p + 8);
+        mix(a,b,c);
+    }
+
+    c += size;
+    switch (size - p) {
+        case 11: c += src[p +10] << 24;
+        case 10: c += src[p + 9] << 16;
+        case 9:  c += src[p + 8] << 8;
+        case 8:  b += src[p + 7] << 24;
+        case 7:  b += src[p + 6] << 16;
+        case 6:  b += src[p + 5] << 8;
+        case 5:  b += src[p + 4];
+        case 4:  a += src[p + 3] << 24;
+        case 3:  a += src[p + 2] << 16;
+        case 2:  a += src[p + 1] << 8;
+        case 1:  a += src[p + 0];
+    }
+    mix(a,b,c);
+    #undef mix
+    return c;
+}
+EXPORT uint64_t hash_lookup3(const uint8_t *restrict src, const size_t size, const uint64_t init) {
+    uint32_t a,b,c;
+    a = b = c = DEADBEEF + size + (init & 0xFFFFFFFF);
+    c += init >> 32;
+
+    size_t p = 0;
+    for (;p + 12 < size;p += 12) {
+        a += read32le(src + p + 0);
+        b += read32le(src + p + 4);
+        c += read32le(src + p + 8);
+
+        a -= c;a ^= ROT32L(c, 4);c += b;
+        b -= a;b ^= ROT32L(a, 6);a += c;
+        c -= b;c ^= ROT32L(b, 8);b += a;
+        a -= c;a ^= ROT32L(c,16);c += b;
+        b -= a;b ^= ROT32L(a,19);a += c;
+        c -= b;c ^= ROT32L(b, 4);b += a;
+    }
+
+    switch (size - p) {
+        case 12: c += src[p +11] << 24;
+        case 11: c += src[p +10] << 16;
+        case 10: c += src[p + 9] << 8;
+        case 9:  c += src[p + 8];
+        case 8:  b += src[p + 7] << 24;
+        case 7:  b += src[p + 6] << 16;
+        case 6:  b += src[p + 5] << 8;
+        case 5:  b += src[p + 4];
+        case 4:  a += src[p + 3] << 24;
+        case 3:  a += src[p + 2] << 16;
+        case 2:  a += src[p + 1] << 8;
+        case 1:
+            a += src[p + 0];
+            break;
+        case 0: return c | ((uint64_t)b << 32);
+    }
+
+    c ^= b;c -= ROT32L(b,14);
+    a ^= c;a -= ROT32L(c,11);
+    b ^= a;b -= ROT32L(a,25);
+    c ^= b;c -= ROT32L(b,16);
+    a ^= c;a -= ROT32L(c, 4);
+    b ^= a;b -= ROT32L(a,14);
+    c ^= b;c -= ROT32L(b,24);
+    return c | ((uint64_t)b << 32);
+}
 
 static inline uint32_t dha256_sigma0(uint32_t x) { return ROT32L(x, 7 ) ^ ROT32L(x, 22) ^ x; }
 static inline uint32_t dha256_sigma1(uint32_t x) { return ROT32L(x, 13) ^ ROT32L(x, 27) ^ x; }
@@ -2540,6 +2628,56 @@ EXPORT hash256_t hash_panama(const uint8_t *restrict src, const size_t size) {
     hash256_t H;
     for (int8_t i=0;i < 8;i++) H.d[i] = SWAPLE32(S[9 + i]);
     return H;
+}
+
+static inline uint32_t sha256_E0(uint32_t x) { return ROT32L(x,30) ^ ROT32L(x,19) ^ ROT32L(x,10); }
+static inline uint32_t sha256_E1(uint32_t x) { return ROT32L(x,26) ^ ROT32L(x,21) ^ ROT32L(x, 7); }
+static inline uint32_t sha256_O0(uint32_t x) { return ROT32L(x,25) ^ ROT32L(x,14) ^ (x >> 3 ); }
+static inline uint32_t sha256_O1(uint32_t x) { return ROT32L(x,15) ^ ROT32L(x,13) ^ (x >> 10); }
+static inline void sha256_block(hash256_t *restrict S, const uint32_t *restrict buf) {
+    uint32_t W[0x40];
+    memcpy(W, buf, 0x10 * sizeof(uint32_t));
+    for (int i=0x10;i < 0x40;i++) W[i] = sha256_O1(W[i-2]) + W[i-7] + sha256_O0(W[i-15]) + W[i-16];
+    PHASH256_ABC(S);
+    for (int i=0;i < 0x40;i++) {
+        uint32_t t1 = h + sha256_E1(e) + ((e & f) ^ ((~e) & g)) + SHA256_K[i] + W[i];
+        uint32_t t2 = sha256_E0(a) + ((a & b) ^ (a & c) ^ (b & c));
+        h = g;g = f;f = e;e = d + t1;
+        d = c;c = b;b = a;a = t1 + t2;
+    }
+    S->d[0] += a;S->d[1] += b;
+    S->d[2] += c;S->d[3] += d;
+    S->d[4] += e;S->d[5] += f;
+    S->d[6] += g;S->d[7] += h;
+}
+EXPORT hash256_t hash_sha256nso(const uint8_t *restrict src, const size_t size) {
+    hash256_t S;
+    memcpy(S.d, SHA256_H0, sizeof(SHA256_H0));
+    size_t p = 0;
+    for (;p + 0x40 <= size;p += 0x40) {
+        uint32_t buf[0x10];
+        for (int8_t i=0;i < 0x10;i++) buf[i] = read32be(src + p + 4 * i);
+        sha256_block(&S, buf);
+    }
+
+    uint8_t d[0x40] = {0};
+    uint8_t dp = size - p;
+    memcpy(d, src + p, dp);
+    d[dp++] = 0x80;
+    if (dp > 0x38) dp = 0;
+    uint32_t buf[0x10];
+    if (dp == 0) {
+        for (int8_t i=0;i < 0x10;i++) buf[i] = read32be(d + 4 * i);
+        sha256_block(&S, buf);
+    }
+    for (;dp < 0x38;dp++) d[dp] = 0;
+    for (int8_t i=0;i < 14;i++) buf[i] = read32be(d + 4 * i);
+    const uint64_t bis = size * 8;
+    buf[14] = SWAPLE32(bis >> 32);
+    buf[15] = SWAPLE32(bis & MASK(32));
+    sha256_block(&S, buf);
+    swapbe32_arr(S.d, 8);
+    return S;
 }
 
 EXPORT void derive_protectit2(uint8_t *restrict buf) {

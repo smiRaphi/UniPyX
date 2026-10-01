@@ -1709,7 +1709,7 @@ def read_zip_extra(**l):
             case b'\x20\xA2': # Microsoft Open Packaging Growth Hint
                 pass # u64 growth hint, 0x10 padding
             case b'\x23\x11': # ?, seen in Forza Horizon 6
-                pass # u32 data offset
+                pass # u32 data offset in CDFH or padding to 0x1000 in LFH
             case b'\x29\x09': # ?, seen in libzip test file "testfile-plus-extra.zip"
                 if not 'libzip_cm' in fe: fe['libzip_cm'] = []
                 fe['libzip_cm'].append(f.read(s))

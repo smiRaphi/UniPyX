@@ -21,6 +21,9 @@ extern "C" {
 #else
     typedef long ssize_t;
 #endif
+#ifndef INTPTR_MAX
+    typedef ssize_t intptr_t;
+#endif
 
 typedef struct {
     uint64_t l;
@@ -48,9 +51,13 @@ static inline uint32_t uint128_32(uint128_t *restrict a, const uint8_t i) {
 #define XIMPORT(...)
 
 #if defined(__GNUC__) || defined(__clang__)
+    #define SWAP16(x) __builtin_bswap16(x)
     #define SWAP32(x) __builtin_bswap32(x)
     #define SWAP64(x) __builtin_bswap64(x)
 #elif defined(_MSC_VER)
+    unsigned short __cdecl _byteswap_ushort(unsigned short);
+    #pragma intrinsic(_byteswap_ushort)
+    #define SWAP16(x) _byteswap_ushort(x)
     unsigned long __cdecl _byteswap_ulong(unsigned long);
     #pragma intrinsic(_byteswap_ulong)
     #define SWAP32(x) _byteswap_ulong(x)
@@ -58,6 +65,9 @@ static inline uint32_t uint128_32(uint128_t *restrict a, const uint8_t i) {
     #pragma intrinsic(_byteswap_uint64)
     #define SWAP64(x) _byteswap_uint64(x)
 #else
+    static inline uint16_t SWAP16(uint16_t x) {
+        return ((x & 0xFF) << 8) | (x >> 8);
+    }
     static inline uint32_t SWAP32(uint32_t x) {
         return ((x & 0xFF) << 24 | (x & 0xFF00) << 8 | (x & 0xFF0000) >> 8 | (x & 0xFF000000) >> 24);
     }
@@ -66,14 +76,13 @@ static inline uint32_t uint128_32(uint128_t *restrict a, const uint8_t i) {
                 (x & 0xFF00000000) >> 8 | (x & 0xFF0000000000) >> 24 | (x & 0xFF000000000000) >> 40 | (x & 0xFF00000000000000) >> 56);
     }
 #endif
-static inline uint16_t SWAP16(uint16_t x) {
-    return ((uint16_t)x << 8) | (x >> 8);
-}
 static inline uint8_t SWAP8(uint8_t x) {
     return ((uint8_t)x << 4) | (x >> 4);
 }
+#define SWAPLE16(x) x
 #define SWAPLE32(x) x
 #define SWAPLE64(x) x
+#define SWAPBE16(x) SWAP16(x)
 #define SWAPBE32(x) SWAP32(x)
 #define SWAPBE64(x) SWAP64(x)
 
@@ -93,6 +102,7 @@ static inline uint16_t ROT16R(uint16_t x, const uint8_t r) { return ROTATER(x, 1
 static inline uint16_t ROT16L(uint16_t x, const uint8_t r) { return ROTATEL(x, 16, r); }
 static inline uint32_t ROT32R(uint32_t x, const uint8_t r) { return ROTATER(x, 32, r); }
 static inline uint32_t ROT32L(uint32_t x, const uint8_t r) { return ROTATEL(x, 32, r); }
+
 static inline uint32_t SIGNEXT32(uint32_t x) {
     if      (x & 0x00000080) x |= 0xFFFFFF00;
     else if (x & 0x00008000) x |= 0xFFFF0000;
@@ -138,9 +148,11 @@ static inline uint64_t SUMB(const uint8_t *restrict src, const size_t size) {
 }
 
 static inline uint16_t read16le(const uint8_t *restrict ptr) {
+    if ((intptr_t)ptr & 1 == 0) return SWAPLE16(*(const uint16_t *)ptr);
     return ptr[0] | (ptr[1] << 8);
 }
 static inline uint16_t read16be(const uint8_t *restrict ptr) {
+    if ((intptr_t)ptr & 1 == 0) return SWAPBE16(*(const uint16_t *)ptr);
     return ptr[1] | (ptr[0] << 8);
 }
 static inline uint32_t read24le(const uint8_t *restrict ptr) {
@@ -150,15 +162,19 @@ static inline uint32_t read24be(const uint8_t *restrict ptr) {
     return ptr[2] | (ptr[1] << 8) | (ptr[0] << 16);
 }
 static inline uint32_t read32le(const uint8_t *restrict ptr) {
+    if ((intptr_t)ptr & 3 == 0) return SWAPLE32(*(const uint32_t *)ptr);
     return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16) | ((uint32_t)ptr[3] << 24);
 }
 static inline uint32_t read32be(const uint8_t *restrict ptr) {
+    if ((intptr_t)ptr & 3 == 0) return SWAPBE32(*(const uint32_t *)ptr);
     return ptr[3] | (ptr[2] << 8) | (ptr[1] << 16) | ((uint32_t)ptr[0] << 24);
 }
 static inline uint64_t read64le(const uint8_t *restrict ptr) {
+    if ((intptr_t)ptr & 7 == 0) return SWAPLE64(*(const uint64_t *)ptr);
     return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16) | ((uint64_t)ptr[3] << 24) | ((uint64_t)ptr[4] << 32) | ((uint64_t)ptr[5] << 40) | ((uint64_t)ptr[6] << 48) | ((uint64_t)ptr[7] << 56);
 }
 static inline uint64_t read64be(const uint8_t *restrict ptr) {
+    if ((intptr_t)ptr & 7 == 0) return SWAPBE64(*(const uint64_t *)ptr);
     return ptr[7] | (ptr[6] << 8) | (ptr[5] << 16) | ((uint64_t)ptr[4] << 24) | ((uint64_t)ptr[3] << 32) | ((uint64_t)ptr[2] << 40) | ((uint64_t)ptr[1] << 48) | ((uint64_t)ptr[0] << 56);
 }
 
