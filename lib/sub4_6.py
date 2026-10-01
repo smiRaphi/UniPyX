@@ -1046,5 +1046,52 @@ Unknown 2: {f.reads(f.readu32())}""")
 
             f.close()
             if fs: return
+        case 'Datel PJH':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'PJH!')
+
+            c = f.readu32()
+            fs = []
+            for _ in range(c):
+                fs.append([f.readu32() for _ in range(8)])
+                f.skip(0x20)
+
+            for fe in fs:
+                asrt(fe[4] > 0x10 and fe[5] > 0x10)
+                n = sub_path(f.seekc(fe[0]).readutf16(fe[3] // 2).rstrip('\0'),slash=True)
+                f.seek(fe[1])
+                asrt(f.read(4) == b'PJH!' and f.readu32() == fe[6] and f.readu32() == fe[4] - 0x10 and f.readu32() == 0xDEADF00D)
+                extract_pjh_sub(File(f.decompress(fe[4] - 0x10,'zlib',usize=fe[6]),endian=f.endian),o + '/' + n)
+                f.seek(fe[2])
+                asrt(f.read(4) == b'PJH!' and f.readu32() == fe[7] and f.readu32() == fe[5] - 0x10 and f.readu32() == 0xDEADF00D)
+                writefile(f'{o}/{n}/$name.txt',f.decompress(fe[5] - 0x10,'zlib',usize=fe[7]).decode('utf-16le'))
+
+            f.close()
+            if fs: return
+        case 'Datel PJH Subfile':
+            db.try_custom()
+            from lib.file import File
+            return extract_pjh_sub(File(i,endian='<'),o)
 
     return 1
+
+def extract_pjh_sub(f:'File',o):
+    c = f.readu32()
+    f.skip(4) # data size
+    fs = []
+    for _ in range(c):
+        f.skip(0x18)
+        f.padc(8)
+        n = f.reads(0x20).rstrip('\0')
+        fs.append((n,f.reads32(),f.reads32(),f.readu32()))
+        f.padc(0x34)
+
+    for fe in fs:
+        if fe[1] == -1: continue
+        f.seek(fe[1])
+        writefile(o + '/' + fe[0],f.readc(fe[2]))
+
+    f.close()
+    if not fs: return 1

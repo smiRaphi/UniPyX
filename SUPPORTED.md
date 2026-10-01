@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1103
+# Supported Formats: 1105
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -384,7 +384,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (600)
+## Various (602)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -511,6 +511,8 @@ Dark Ages Map File | ??? | [gamearch](https://www.shikadi.net/camoto/desktop/) |
 Dark Reign 2 ZWP | .zwp | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Dark Reign FTG | .ftg | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Data MP4 | .mp4 | Custom | MP4 File with file appended to guid section, used to circumvent upload limits on discord
+Datel PJH | .str | Custom |
+Datel PJH Subfile | \* | Custom |
 Davilex Games IDX+IMG | .idx+.img | [davilex_games.bms](https://mirror.aluigi.org/bms/davilex_games.bms) |
 DBS Database | .dbs | Custom |
 DDLC+ Encrypted Unity Bundle | .cy | Custom -> Unity Bundle |

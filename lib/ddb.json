@@ -819,6 +819,14 @@
         "rs":"Who Wants to Be a Millionaire Sound DAT"
     },
     {
+        "d":[["isat","PJH!",0],["n0",4,4],["n0",4,8],["n0",4,12],["py","f.seek(4);return 8+f.readi(4,'<')*64==f.readi(4,'<')"]],
+        "rs":"Datel PJH","s":1
+    },
+    {
+        "d":[["isat","n0",4,0],["n0",4,4],["isatS","\\0",8,32],["isatS","\\0",52,84],["str0",40,32,3],["py","return 8+f.readi(4,'<')*128+f.readi(4,'<')==fsz"]],
+        "rs":"Datel PJH Subfile"
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",14,16]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },
