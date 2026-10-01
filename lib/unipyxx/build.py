@@ -37,6 +37,9 @@ DLDB = {
     # Base85 lzma ALONE ext.cpp:
 # T>t<C0RR90|NsC0{{Ru1NybMH6QTfjJ0s7*nYtjnX$_qXIzDZ>f$J1g-bzuoI*n8C|GC%DHQGr+=fN`RtFN<3OC!g}ron^0LFr~9U<WGP7Y*Ox8L<5g?DmOxdEYBi(JntwqtwEWZ?ej%r?TaJ6@x345QJT3$@W&tBQ$NFl|J*t$oWVKj@6tg+0IPYtO|Ae_KP9whh!eH$?6k@5<1U+`j_Tzm@PXwCnqYMC>~z9<CX&-sAO4`w^o49@k^`OG~rsF_Q`9cF*HpMIxJ`EQey&N19!%Mq&O`sWs(*SL_K=ixRRL!;jG+)E#*XkxB7ldoM;=!bPeYHAVFK@Sw&p@DTbs4_8}6hWdUL_D#Xj2dE<zH@^nj_kHJ8lED7#qvlo1^Pf~?|xq-Gtc4->jAp&r`s9za3{c8OeNa;!Jg=t~m$1%FwQ$m~%WplT%VTN7N+wp|VQsC=s(gcka^#<?X04h$0|Nf`)zC@?8F+W0aUU0t}0SF$gH4Wmn)rZFm>cUL8-s766N|KW1VY>{G{zoF6`TIUHiNe!dM8km0Xxg^5jY1fn+PHdjZ8AcoHhE6)&TS?C;*CDjSc2DMLu6GMS0l&#XzT<#Zhq>PLrja1Oc5ud$-3O{q?dfPf~2S>u0WMCI3y+64Gk(%Fj`+=_C5^ufmJk#$MF`R`8F63UJgV;)s~@Pf*OgkY1lE-KJA1}e~h8Hgs$rNll-<BCB7vJ#n?#A&aB%&xp%irAgdqX$x5s4-Nd8z(w<w1q6+1HX_zd(-2if)JwawsrMGag6M=k(=EGoOE1i?kvccr?qP#&hO4%&>!`Toer>z72v+pe
     'tersedecompress':('libtersedecompress.lib',0), # static https://github.com/openmainframeproject/tersedecompress/tree/master/cpp
+    # ./configure CFLAGS="-std=gnu89 -O2 -static"
+    # make -j <cores>
+    'libucl':('libucl.a',0), # static https://www.oberhumer.com/opensource/ucl/
     'unimplode6a':('unimplode6a.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/unimplode6a.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
     'ozunreduce':('ozunreduce.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/ozunreduce.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),
     'ozunshrink':('ozunshrink.h','https://raw.githubusercontent.com/jsummers/oldunzip/refs/heads/master/ozunshrink.h',(0,b'#include <stdint.h>\n#include <stdlib.h>\ntypedef intptr_t off_t;')),

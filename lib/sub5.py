@@ -269,7 +269,7 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'UCLPack':
             db.try_custom()
             from lib.file import decompress
-            d = decompress(readfile(i),'uclpack',db=db)
+            d = decompress(readfile(i),'uclpack')
             writefile(o + '/' + tbasename(i),d)
             return
         case 'Binary ][ Archive':

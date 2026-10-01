@@ -546,5 +546,56 @@ def extract3_1(inp:str,out:str,t:str) -> bool:
 
             of.close()
             return
+        case 'Datel Packed PS2 ELF':
+            CMPM = {
+                b'N2':'nrv2',
+                b'B':'b',b'D':'d',b'E':'e',
+                b'1':8,b'2':16,b'4':32,
+            }
+
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(0x10) == b'\x7FELF\1\1\1\0\0\0\0\0\0\0\0\0' and f.readu16() == 2 and f.readu16() == 8 and f.readu32() == 1)
+
+            oep = f.readu32()
+            pho = f.readu32()
+            asrt(f.readu32() == f.readu32() == 0)
+            f.skip(4)
+            asrt(f.readu16() == 1 and f.readu16() == f.readu16() == f.readu16() == 0)
+            f.seek(pho)
+            asrt(f.readu32() == 1)
+            sof = f.readu32()
+            ddp = f.pos
+            adr = f.readu32()
+            asrt(f.readu32() == adr)
+            f.skip(12)
+            alg = f.readu32()
+
+            ep = f.seek(oep - adr + sof - 8)
+            cmpa = f.read(4)
+            cmpa = CMPM[cmpa[:2]] + CMPM[cmpa[2:3]] + f'_{CMPM[cmpa[3:4]]}'
+            sp = f.readu32() - adr + sof
+
+            f.seek(sp)
+            nep = f.readu32()
+            us = f.readu32()
+            bss = f.readu32()
+            asrt(us <= bss)
+            nadr = f.readu32()
+            zs = ep - f.pos
+
+            of = File(o + '/' + basename(i) + '.elf','wb',endian=f.endian)
+            of.write(f.peek(sof,offset=[0]))
+            of.seek(0x18)
+            of.writeu32(nep)
+            of.seek(ddp)
+            of.writeu32(nadr)
+            of.writeu32(nadr)
+            of.writeu32(bss)
+            of.writeu32(bss + -bss % alg)
+            of.seek(sof)
+            of.write(bytes(bss - of.write(f.decompress(zs,cmpa,usize=us))))
+            return
 
     return 1

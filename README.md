@@ -36,7 +36,6 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 * self compiled [libblast](https://codeberg.org/implode-compression-impls/libblast)
 * self compiled [libmagic](https://github.com/weaverant/file-windows)
 * self made [GDeflate](https://github.com/microsoft/DirectStorage/tree/main/GDeflate) wrapper
-* self made [ucl](https://www.oberhumer.com/opensource/ucl/) wrapper
 * [ASD v2.0](http://fileformats.archiveteam.org/wiki/ASD_Archiver) because it's packed in a ASD SFX
 * [ChArc v1.2](http://fileformats.archiveteam.org/wiki/ChArc) because it's packed in a ChArc SFX
 * [DWC A5.10](http://fileformats.archiveteam.org/wiki/DWC) because it's packed in a DWC SFX

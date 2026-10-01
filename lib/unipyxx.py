@@ -54,6 +54,11 @@ ZSTDERR = {
     82:'No Forward Progress: Input empty',100:'Frame index too large',102:'SeekableIO',104:'Output buffer wrong',105:'Input buffer wrong',
     106:'Sequence producer failed',107:'External sequences invalid'
 }
+UCLERR = {
+    0:'OK',-1:'ERROR',-2:'INVALID_ARGUMENT',-3:'OUT_OF_MEMORY',
+    -101:'NOT_COMPRESSIBLE',
+    -201:'INPUT_OVERRUN',-202:'OUTPUT_OVERRUN',-203:'LOOKBEHIND_OVERRUN',-204:'EOF_NOT_FOUND',-205:'INPUT_NOT_CONSUMED',-206:'OVERLAP_OVERRUN',
+}
 
 def _1base_func(fnc,src,usize):
     i = (u8 * len(src)).from_buffer_copy(src)
@@ -230,6 +235,24 @@ class X:
             ('XMemDestroyDecompressionContext',(void,),void,0),
             ('XMemDecompress',(void,P(u8),P(szt),P(u8),szt),cint,0),
             ('XMemDecompressSegmentTD',(void,P(u8),P(szt),P(u8),szt,szt,szt),cint,0),
+            ('ucl_nrv2b_decompress_8',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2b_decompress_le16',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2b_decompress_le32',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2b_decompress_safe_8',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2b_decompress_safe_le16',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2b_decompress_safe_le32',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2d_decompress_8',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2d_decompress_le16',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2d_decompress_le32',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2d_decompress_safe_8',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2d_decompress_safe_le16',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2d_decompress_safe_le32',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2e_decompress_8',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2e_decompress_le16',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2e_decompress_le32',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2e_decompress_safe_8',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2e_decompress_safe_le16',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
+            ('ucl_nrv2e_decompress_safe_le32',(P(u8),u32,P(u8),P(u32),voidp),s32,0),
             ('decompress_zip_shrink',(P(u8),szt,P(u8),szt),cint,0),
             ('decompress_zip_reduce',(P(u8),szt,P(u8),szt,u8),cint,0),
             ('decompress_zip_implode',(P(u8),szt,P(u8),szt,u16),cint,0),
@@ -473,6 +496,13 @@ class X:
         r = self.dll.decompress_terse(i,len(src),o,usize,1 if text else 0)
         if r < 0: raise ValueError(f'Decompression failed ({r})')
         return bytes(o)[:r]
+    def decompress_nrv2(self,src:bytes,usize:int,mode:str,size:int,safe:bool=False) -> bytes:
+        i = (u8 * len(src)).from_buffer_copy(src)
+        o = (u8 * usize)()
+        u = u32(usize)
+        r = getattr(self.dll,f"ucl_nrv2{mode}_decompress{'_safe' if safe else ''}_{'' if size in ('8',8) else 'le'}{size}")(i,len(src),o,ctypes.byref(u),None)
+        if r != 0 and not (not safe and r == -205): raise ValueError(f'NRV2{mode.upper()}_{size} decompression failed: {UCLERR.get(r,"???")} ({r} {len(src)} -> {u.value} {usize})')
+        return bytes(o)[:u.value]
 
     def decrypt_inv(src:bytes) -> bytes: ...
     def decrypt_swp4(src:bytes) -> bytes: ...

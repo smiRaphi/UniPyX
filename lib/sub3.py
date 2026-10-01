@@ -1274,7 +1274,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
             f.seek(-8,1)
             d = f.read()
             f.close()
-            writefile(f'{o}/{basename(i)}.elf',decompress(d,'uclpack',db=db))
+            writefile(f'{o}/{basename(i)}.elf',decompress(d,'uclpack'))
             return
         case 'EDI Install Archive':
             dosbox(['ediextract','/U:.',i])

@@ -687,7 +687,7 @@ def uxx():
     if UPXX is None: UPXX = X()
     return UPXX
 
-OODLE = GDEFLATE = UCL = LIBBLAST = None
+OODLE = GDEFLATE = LIBBLAST = None
 NLZC = {f'lz{x:02X}':(x,f'decompress_lz{x:02X}_raw') for x in {0x10,0x11,0x40}} | {'lz60':(0x60,'decompress_lz40_raw')}
 LHZC = {f'lh{x}':f'-lh{x}-'.encode('latin1') for x in {0,5,6,7}}
 LZWM = {
@@ -701,7 +701,7 @@ LZWM = {
     'zb':    {        'ics':9, '1c':0x101,'cc':0x100, 'be':False,'vp':True},
 }
 def decompress(i:bytes,algo:str,**kwargs) -> bytes:
-    global OODLE,GDEFLATE,UCL,LIBBLAST
+    global OODLE,GDEFLATE,LIBBLAST
     match algo:
         case 'none': return i
         case 'guess':
@@ -933,44 +933,19 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
 
             import bin.lzo # type: ignore
             return bin.lzo.decompress(i,False,kwargs['usize'],algorithm=algo.upper())
-        case 'ucl_nrv2b'|'ucl_nrv2b_8'|'ucl_nrv2b_16'|'ucl_nrv2b_32'|\
-             'ucl_nrv2d'|'ucl_nrv2d_8'|'ucl_nrv2d_16'|'ucl_nrv2d_32'|\
-             'ucl_nrv2e'|'ucl_nrv2e_8'|'ucl_nrv2e_16'|'ucl_nrv2e_32':
-                asrt('usize' in kwargs and (UCL or kwargs.get('db')))
-                UCLERR = {-ix:x for ix,x in enumerate(('OK','ERROR','OUT_OF_MEMORY','NOT_COMPRESSIBLE','INPUT_OVERRUN','OUTPUT_OVERRUN','LOOKBEHIND_OVERRUN','EOF_NOT_FOUND','INPUT_NOT_CONSUMED'))}
-
-                if algo in {'ucl_nrv2b','ucl_nrv2d','ucl_nrv2e'}: algo += '_8'
-                import ctypes
-                if not UCL:
-                    UCL = ctypes.CDLL(kwargs['db'].get('ucl'))
-                    UCL.InitUCL.argtypes = []
-                    UCL.InitUCL.restype = ctypes.c_int
-
-                    for a in 'BDE':
-                        for f in {'','_Safe'}:
-                            for s in {'8','LE16','LE32'}:
-                                fn = getattr(UCL,f'DecompressNRV2{a}{f}_{s}')
-                                fn.argtypes = [ctypes.POINTER(ctypes.c_ubyte),ctypes.c_uint,ctypes.POINTER(ctypes.c_ubyte),ctypes.POINTER(ctypes.c_uint)]
-                                fn.restype = ctypes.c_int
-
-                    r = UCL.InitUCL()
-                    if r != 0: raise ValueError(UCLERR[r])
-                bs = int(algo.split('_')[-1])
-                fn = getattr(UCL,'DecompressNRV2' + algo[8].upper() + ('_Safe' if kwargs.get('safe') else '') + '_' + (f'LE{bs}' if bs > 8 else '8'))
-
-                src_len,dst_len = len(i),ctypes.c_uint(kwargs['usize'])
-                src = (ctypes.c_ubyte * src_len).from_buffer_copy(i)
-                dst = (ctypes.c_ubyte * kwargs['usize'])()
-                r = fn(ctypes.cast(src,ctypes.POINTER(ctypes.c_ubyte)),src_len,ctypes.cast(dst,ctypes.POINTER(ctypes.c_ubyte)),ctypes.byref(dst_len))
-                if r != 0: raise ValueError(UCLERR[r])
-                return bytes(dst[:dst_len.value])
+        case 'nrv2b'|'nrv2b_8'|'nrv2b_16'|'nrv2b_32'|\
+             'nrv2d'|'nrv2d_8'|'nrv2d_16'|'nrv2d_32'|\
+             'nrv2e'|'nrv2e_8'|'nrv2e_16'|'nrv2e_32':
+                asrt('usize' in kwargs)
+                if not '_' in algo: algo += '_8'
+                return uxx().decompress_nrv2(i,usize=kwargs['usize'],mode=algo[4],size=algo.split('_')[1],safe=kwargs.get('safe',False))
         case 'uclpack'|'uclpack_itc':
             from zlib import adler32
             itc = algo == 'uclpack_itc'
-            safe = bool(kwargs.get('safe',True))
+            safe = bool(kwargs.get('safe',False))
 
             if i[:8] != b'\x00\xE9UCL\xFF\x01\x1A': raise ValueError('invalid uclpack header')
-            dcrc = int.from_bytes(i[8:12],'big') & 1 and safe
+            dcrc = int.from_bytes(i[8:12],'big') & 1 and kwargs.get('crc',True)
             crc = 1
             mth = i[12]
             if not mth in {0x2B,0x2D,0x2E}: raise ValueError(f'invalid uclpack method (0x{mth:02X})')
@@ -996,7 +971,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 if len(cd) != zs: raise EOFError(f'unexpected EOF (by {zs - len(cd)})')
                 if zs == us: d = cd
                 else:
-                    d = decompress(cd,f'ucl_nrv{mth}_{32 if itc else 8}',usize=us,safe=safe,db=kwargs.get('db'))
+                    d = decompress(cd,f'nrv{mth}_{32 if itc else 8}',usize=us,safe=safe)
                     if len(d) != us: raise ValueError(f'actual decompressed block size ({len(d)}) is not equal to expected size ({us})')
                 o.extend(d)
                 if dcrc: crc = adler32(d,value=crc)

@@ -827,6 +827,11 @@
         "rs":"Datel PJH Subfile"
     },
     {
+        "rqr":"ELF 32-bit LSB executable",
+        "d":[["isat","\\2\\0\\x08\\0\\1\\0\\0\\0",16],["isat","\\x20\\0\\1\\0",42],["isatS","\\1",3,4],["isatS","\\0",9,7],["isatS","\\0",10,30],["isatS","\\0",6,46],["n0",4,24],["n0",4,28],["n0",2,40],["py","f.seek(24);e=f.readi(4,'<');f.seek(f.readi(4,'<')+4);o=f.readi(4,'<')+e;a=f.readi(4,'<');f.seek(o-a-8);return f.read(2)==b'N2' and f.read(1)in b'BDE' and f.read(1)in b'124' and f.readi(4,'<')==a"]],
+        "rs":"Datel Packed PS2 ELF","s":1
+    },
+    {
         "d":[["isat","\\xC0\\xDE\\0\\1",0],["isat","Open:",8],["contain","://",14,16]],
         "rs":"Nicktoons Gravjet Racing LIN","s":1
     },

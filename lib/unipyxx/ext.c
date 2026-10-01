@@ -195,6 +195,26 @@ EXPORT ssize_t decompress_terse(const uint8_t *restrict src, const size_t zsize,
     return tersedecompress_decompress(src, zsize, dst, usize, text);
 }
 
+XIMPORT(libucl)
+XEXPORT int32_t ucl_nrv2b_decompress_8(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2b_decompress_le16(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2b_decompress_le32(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2b_decompress_safe_8(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2b_decompress_safe_le16(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2b_decompress_safe_le32(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2d_decompress_8(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2d_decompress_le16(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2d_decompress_le32(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2d_decompress_safe_8(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2d_decompress_safe_le16(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2d_decompress_safe_le32(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2e_decompress_8(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2e_decompress_le16(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2e_decompress_le32(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2e_decompress_safe_8(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2e_decompress_safe_le16(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+XEXPORT int32_t ucl_nrv2e_decompress_safe_le32(const uint8_t *src, uint32_t src_len, uint8_t *dst, uint32_t *dst_len, void *wrkmem);
+
 EXPORT void free_exp(void *ptr) { free(ptr); }
 
 #ifdef __cplusplus

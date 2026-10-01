@@ -89,7 +89,7 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
             def decc(ix,us,d,algo):
                 ex = None
                 if algo != 'none':
-                    try: d = decompress(d,algo,db=db)
+                    try: d = decompress(d,algo)
                     except EOFError: ex = 'ucl'
                     else: asrt(len(d) == us)
 
