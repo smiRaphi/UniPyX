@@ -141,6 +141,9 @@ class X:
 
             ('decrypt_inv',   (P(u8),szt),          void,3),
             ('decrypt_swp4',  (P(u8),szt),          void,3),
+            ('decrypt_swp16', (P(u16),szt),         void,0),
+            ('decrypt_swp32', (P(u32),szt),         void,0),
+            ('decrypt_swp64', (P(u64),szt),         void,0),
             ('decrypt_roll',  (P(u8),szt,P(u8),szt),void,2),
             ('decrypt_rolr',  (P(u8),szt,P(u8),szt),void,2),
             ('decrypt_croll', (P(u8),szt,P(u8),szt),void,0),
@@ -230,6 +233,7 @@ class X:
             ('mac_cmac_tfit',(P(u8),szt,P(u8),P(u8),P(u8),P(u8)),void,0),
             ('hash_crc_init',(P(u8),u32,u64,s8),s8,0),
             ('hash_crc',(P(u8),u32,P(u8),u64,u64,u64,s8),u64,0),
+            ('hash_crc_minix',(P(u8),u32,P(u8),u64,u64,u64,s8),u64,0),
 
             ('XMemCreateDecompressionContext',(cint,P(XMemCodecParametersLZX),cint,voidp),cint,0),
             ('XMemDestroyDecompressionContext',(void,),void,0),
@@ -514,6 +518,21 @@ class X:
     def decrypt_airrc4(src:bytes,key:bytes) -> bytes: ...
     def decrypt_blackenergy_rc4(src:bytes,key:bytes) -> bytes: ...
 
+    def decrypt_swp16(self,src:bytes) -> bytes:
+        asrt(len(src) % 2 == 0)
+        b = (u16 * (len(src) // 2)).from_buffer_copy(src)
+        self.dll.decrypt_swp16(b,len(src))
+        return bytes(b)
+    def decrypt_swp32(self,src:bytes) -> bytes:
+        asrt(len(src) % 4 == 0)
+        b = (u32 * (len(src) // 4)).from_buffer_copy(src)
+        self.dll.decrypt_swp32(b,len(src))
+        return bytes(b)
+    def decrypt_swp64(self,src:bytes) -> bytes:
+        asrt(len(src) % 8 == 0)
+        b = (u64 * (len(src) // 8)).from_buffer_copy(src)
+        self.dll.decrypt_swp64(b,len(src))
+        return bytes(b)
     def decrypt_rxor(self,src:bytes,key:bytes|int) -> bytes:
         if isinstance(key,bytes): key = key[0]
         b = (u8 * len(src)).from_buffer_copy(src)
@@ -787,16 +806,19 @@ class X:
         self.dll.mac_cmac_tfit(s,len(src),d,k,t)
         return bytes(d)
 
-    def hash_crc(self,src:bytes,size:int,poly:int,xor:int,reflect:bool,init:int,value:int=None) -> int:
-        k = (size,poly,1 if reflect else 0)
+    def hash_crc(self,src:bytes,size:int,poly:int,xor:int,reflect:bool,init:int,value:int=None,minix:bool=False,reflecto:bool=None,first:int=None) -> int:
+        if reflecto is None: reflecto = reflect
+        k = (size,poly,1 if reflect else 0,1 if reflecto else 0)
         if not k in self.CRC:
             t = (u8 * 0x805)()
-            if self.dll.hash_crc_init(t,*k) != 0:
+            if self.dll.hash_crc_init(t,*k[:3]) != 0:
                 raise ValueError
+            t[0] = k[3]
+            if not first is None: t[5:5+8] = first.to_bytes(8,'little')
             self.CRC[k] = t
 
         i = (u8 * len(src)).from_buffer_copy(src)
-        r = self.dll.hash_crc(i,len(src),self.CRC[k],init,xor,value or 0,0 if value is None else 1)
+        r = (self.dll.hash_crc_minix if minix else self.dll.hash_crc)(i,len(src),self.CRC[k],init,xor,value or 0,0 if value is None else 1)
         return r
     def hash_fletcher(self,src:bytes,base:int,width:int,init:int=0,block_size:int=1) -> int:
         src += bytes(-len(src) % block_size)

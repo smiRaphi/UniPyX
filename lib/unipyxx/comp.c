@@ -904,7 +904,12 @@ EXPORT ssize_t decompress_szdd_raw(const uint8_t *restrict src, const size_t zsi
             fbl = 8;
         }
 
-        if (!(f & 1)) {
+        if (f & 1) {
+            CHKi(0)
+            dst[op] = src[ip++];
+            dict[wp++] = dst[op++];
+            wp &= 0xFFF;
+        } else {
             CHKi(1)
             uint8_t b1 = src[ip++];
             uint8_t b2 = src[ip++];
@@ -917,11 +922,6 @@ EXPORT ssize_t decompress_szdd_raw(const uint8_t *restrict src, const size_t zsi
                 dict[wp++] = dst[op];
                 wp &= 0xFFF;
             }
-        } else {
-            CHKi(0)
-            dst[op] = src[ip++];
-            dict[wp++] = dst[op++];
-            wp &= 0xFFF;
         }
 
         f >>= 1;

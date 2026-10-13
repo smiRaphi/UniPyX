@@ -19,7 +19,6 @@ Only made to work on x64 Windows for now. (Linux is completely untested but woul
 * self compiled [NLZM](https://github.com/nauful/NLZM)
 * self compiled [Lizard](https://github.com/inikep/lizard)
 * self compiled [blzpack](https://github.com/jibsen/brieflz)
-* self compiled [Chihiro decrypt & extract-fatx](https://github.com/JayFoxRox/Chihiro-Tools)
 * self compiled [MPQExtractor](https://github.com/Kanma/MPQExtractor)
 * self compiled [ZLI](https://github.com/facebook/openzl)
 * self compiled [lha](https://github.com/jca02266/lha)

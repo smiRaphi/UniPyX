@@ -1791,11 +1791,9 @@ def extract4_3(inp:str,out:str,t:str) -> bool:
                 isn = not a[9]-a[8]
                 for ix in range(a[8],a[9] + 1):
                     f.seek(blbs[ix][0])
-                    # seems to be some variation https://github.com/microsoft/DirectStorage/tree/main/GDeflate isn't able to decompress
-                    d = f.decompress(blbs[ix][2],('none','none'#'gdeflate'
-                                                  )[blbs[ix][1]],usize=a[2] | a[3] << 16,db=db)
+                    d = f.decompress(blbs[ix][2],('none','rtxio')[blbs[ix][1]],usize=a[2] | a[3] << 16,db=db)
                     asrt(crc_hash(d,'crc32') == blbs[ix][3])
-                    writefile(bfn + ('' if isn else f'_{ix}') + xfn + ('.gd' if blbs[ix][1] else ''),d)
+                    writefile(bfn + ('' if isn else f'_{ix}') + xfn,d)
 
             f.close()
             if asts: return

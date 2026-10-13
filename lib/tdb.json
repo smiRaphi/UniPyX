@@ -1822,5 +1822,8 @@
         "pe-pack",
         "pe-pack(1.0)",
         "pe-pack v 1.0 (c) 1998 by anakin"
+    ],
+    "FATX":[
+        "fatx filesystem data"
     ]
 }

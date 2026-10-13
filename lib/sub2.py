@@ -6,6 +6,7 @@ C64TM = {
     'C64 ROM-TAPE DATA':'dat',
     'OCEAN/IMAGINE F1':'f1.prg',
 }
+ENCGDR = {'840-0023C','840-0036C','840-0037C','840-0005C','841-0058C','840-0048C','840-0175C','GDL-0018','GDS-0014','GDL-0023','GDL-0023A','GDL-0009','GDL-0008','GDL-0007A','GDL-0007','841-0011C','GDL-0004','GDL-0025','GDL-0012','GDS-0029','GDS-0029A','GDS-0001','840-0044C','840-0043C','840-0068C','840-0002C','840-0028C','841-0003C','841-0016C','840-0016C','840-0083C','GDL-0005','GDS-0030','GDS-0030A','GDS-0030B','GDS-0037','GDS-0037A','GDS-0041','GDS-0041A','840-0019C','840-0001C','834-13842','834-13950','840-0042C','840-0039C','840-0007C','841-0014C','841-0013C','GDL-0011','GDL-0019A','GDL-0019','GDL-0041','GDL-0033A','GDL-0033','841-0012C','841-0002C','GDL-0010','841-0059C','GDS-0025A','GDS-0025','GDS-0020A','GDS-0020B','GDS-0020','GDS-0027','GDS-0026A','GDS-0026B','GDS-0026','GDS-0033','GDS-0032A','GDS-0032B','GDS-0032C','GDS-0032','GDS-0039A','GDS-0039B','GDS-0039','840-0073C','840-0013C','GDL-0037','GDL-0040','840-0025C','840-0140C','GDL-0034','GDS-0017','GDS-0018','GDS-0018A','GDS-0021','GDS-0021A','841-0007C','GDL-0028A','GDL-0028B','GDL-0028','GDL-0028C','GDL-0039','GDL-0039A','841-0061C','841-0017C','GDL-0001','GDL-0006','GDL-0013','GDS-0008','GDL-0014','GDL-0014A','840-0157C','840-0155C','840-0150C','840-0168C','840-0181C','840-0180C','GDS-0023A','GDS-0023C','GDS-0023E','GDS-0042','GDS-0042A','840-0038C','GDL-0042','840-0017C','840-0170C','841-0001C','841-0008C','841-0015C','GDL-0024','GDS-0034','841-0006C','GDS-0031','840-0030C','GDL-0017','GDL-0032A','GDL-0032','841-0062C','840-0177C','840-0004C','840-0020C','840-0047C','840-0035C','840-0018C','GDL-0030A','GDL-0030','GDL-0038','GDS-0002B','GDS-0016','GDS-0013','GDL-0021','841-0057C','840-0098C','840-0128C','840-0136C','840-0041C','GDS-0004','840-0117C','841-0005C','GDS-0005','GDS-0003','840-0112B','GDL-0002','GDL-0031A','GDL-0031','GDL-0020','GDS-0022','840-0045C','840-0008C','840-0022C','840-0166C','840-0011C','GDL-0036','GDL-0036A','GDL-0026','GDL-0035','GDL-0022','GDS-0019','GDS-0012','GDS-0012A','GDS-0012B','GDS-0012C','GDS-0024','GDS-0024A','GDS-0024B','GDS-0024C','GDS-0036','GDS-0036A','GDS-0036B','GDS-0036C','GDS-0036E','GDS-0036D','GDS-0036F','GDS-0009','GDS-0009A','840-0021C','840-0010C','GDS-0006','840-0015C','GDS-0011','840-0084C','GDS-0015','GDS-0015A','840-0064C','840-0012C','GDS-0010','840-0040C','841-0020C','840-0003C','611-0028','611-0028A','GDX-0024A','GDX-0002','GDX-0002P','GDX-0002A','GDX-0002B','GDX-0012','GDX-0012A','GDX-0013','CDV-10010','CDV-10010A','CDV-10024','CDV-10024A','CDV-10024B','CDV-10030','CDV-10030A','CDV-10031','CDV-10037','CDV-10037A','CDV-10037B','GDX-0007','GDX-0004','GDX-0004A','GDX-0004P','GDX-0014','GDX-0011A','GDX-0011','GDX-0014A','CDV-10005','CDV-10005A','CDV-10005B','CDV-10018','CDV-10005C','CDV-10005D','CDV-10028','CDP-10062','CDV-10026D','GDX-0018','GDX-0018A','GDX-0010C','GDX-0006','GDX-0006A','GDX-0006B','GDX-0006C','GDX-0006D','GDX-0006E','GDX-0006F','GDX-0006G','GDX-0017','GDX-0017A','GDX-0017B','GDX-0017C','GDX-0017D','GDX-0017E','GDX-0017F','GDX-0021','GDX-0021A','GDX-0021B','GDX-0023','GDX-0019','GDX-0001','GDX-0003','GDX-0003A','GDX-0003B','GDX-0009A','GDX-0009B','GDX-0009','GDX-0008A','GDX-0008B','GDX-0008','GDX-0016A','GDX-0016','GDX-0015A','GDX-0015','840-0129C','840-0137C','840-0062C','840-0139C','CDP-10002B','840-0080C','840-0106C','840-0061C','840-0046C','CDV-10013','CDV-10020','CDV-10015','CDV-10021','CDV-10015P','CDV-10025','CDV-10027','CDV-10025A','CDP-10003','CDP-10001C','CDV-10002','CDV-10008','GDT-0004','GDT-0004A','GDT-0004B','GDT-0004C','GDT-0004D','GDT-0004E','GDT-0008','GDT-0008A','GDT-0008B','GDT-0008C','842-13DN410J','GDT-0010B','GDT-0010','GDT-0009B','GDT-0009','GDT-0010A','GDT-0009A','GDT-0010C','GDT-0009C','GDT-0017A','GDT-0017B','GDT-0017','GDT-0016','GDT-0019A','GDT-0019B','GDT-0019','GDT-0018A','GDT-0018B','GDT-0018','GDT-0006A','GDT-0006B','GDT-0006C','GDT-0006D','GDT-0006E','GDT-0006F','GDT-0006G','GDT-0006','GDT-0005A','GDT-0005B','GDT-0005C','GDT-0005D','GDT-0005E','GDT-0005F','GDT-0005G','GDT-0005','GDT-0011','GDT-0022','GDT-0022A','GDT-0002','GDT-0001','GDT-0012','GDT-0014A','GDT-0014B','GDT-0014','GDT-0015A','GDT-0015','GDT-0013A','GDT-0013B','GDT-0013C','GDT-0013D','GDT-0013E','GDT-0013','GDT-0021','GDT-0020A','GDT-0020B','GDT-0020C','GDT-0020D','GDT-0020'}
 
 def clean_dol(id:str):
     if len(listdir(id)) == 2 and exists(id + '/UPDATE'):
@@ -410,8 +411,13 @@ def extract2(inp:str,out:str,t:str) -> bool:
         case 'GD-ROM CUE+BIN':
             run(['buildgdi','-extract','-cue',i,'-output',o + '\\','-ip',o + '\\IP.BIN'])
             if listdir(o):
-                from bin.sgkey import SGKeys
-                if exists(o + '/IP.BIN') and SGKeys().get(o): return extract(o + '\\IP.BIN',o,'Encrypted GD-ROM')
+                if exists(o + '/IP.BIN'):
+                    f = open(o + '/IP.BIN','rb')
+                    if f.read(0x20) == b'SEGA SEGAKATANA SEGA ENTERPRISES' and\
+                       f.read(0x20) and f.read(10).lstrip(b' ').split(b' ',1)[0].decode('latin-1') in ENCGDR:
+                        f.close()
+                        return extract(o + '\\IP.BIN',o,'Encrypted GD-ROM')
+                    f.close()
                 return
         case 'Nintendo TMD':
             db.try_custom()
@@ -573,12 +579,23 @@ def extract2(inp:str,out:str,t:str) -> bool:
                 if listdir(o): return
             td.destroy()
         case 'Encrypted GD-ROM':
-            from bin.sgkey import SGKeys
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('sgkeys',db)
+            from lib.crypto import decrypt
+
+            f = xopen(i,'rb')
+            asrt(f.read(0x20) == b'SEGA SEGAKATANA SEGA ENTERPRISES')
+            f.seek(0x40)
+            tid = f.read(10).lstrip(b' ').split(b' ',1)[0].decode('latin-1')
+            f.close()
+            keys.wait()
+            for ty in keys:
+                k = keys[ty].get(tid)
+                if k: break
+            else: return 1
 
             id = dirname(i)
-            t,key = SGKeys().get(i)
-            if not key: return 1
-
             drvs = []
             for f in listdir(id):
                 if len(f) != 7: continue
@@ -590,8 +607,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     lf.seek(0xC0)
                     drv = lf.read(0x20).strip(b'\0')
                     if drv:
-                        try:drv = id + '\\' + drv.decode('utf-8')
-                        except:pass
+                        try: drv = id + '\\' + drv.decode('utf-8')
+                        except UnicodeDecodeError: pass
                         else:
                             if exists(drv): drvs.append(drv)
                 lf.close()
@@ -600,19 +617,18 @@ def extract2(inp:str,out:str,t:str) -> bool:
 
             for f in drvs:
                 tf = o + '\\' + basename(f) + '.dec'
-                run(['chdecrypt',f,tf,key.hex().upper()])
-                asrt(exists(tf),err=FileNotFoundError)
-                od = tbasename(f) + '_ext'
-                if t == 'C':
+                writefile(tf,decrypt(readfile(f),'des_64le_ecb',k))
+                od = tf + '_ext'
+                if ty == 'C':
                     asrt(readfile(tf,size=4) == b'FATX',basename(tf))
                     mkdir(od)
                     extract(tf,od,'FATX')
-                elif t == 'T':
+                elif ty == 'T':
                     chk = readfile(tf,off=0x1C,size=4) == b'\xC2\x33\x9F\x3D'
                     asrt(chk,basename(tf))
                     mkdir(od)
                     extract2(tf,od,'GameCube ISO')
-                elif t == 'N':
+                elif ty == 'N':
                     tff = xopen(tf,'rb')
                     nt = None
 
@@ -629,7 +645,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                     if nt:
                         mkdir(od)
                         extract2(tf,od,nt)
-                elif t == '2':
+                elif ty == '2':
                     tff = xopen(tf,'rb')
                     nt = None
 
@@ -1255,9 +1271,8 @@ def extract2(inp:str,out:str,t:str) -> bool:
             return
         case 'Doctor V64 ROM':
             db.try_custom()
-            import struct
-            d = readfile(i)
-            writefile(f'{o}/{tbasename(i)}.z64',struct.pack(f'>{len(d)//2}H',*struct.unpack(f'<{len(d)//2}H',d)))
+            from lib.crypto import swap16
+            writefile(f'{o}/{tbasename(i)}.z64',swap16(readfile(i)))
             return
         case 'TR-DOS Disk':
             db.try_custom()

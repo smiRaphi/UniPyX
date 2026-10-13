@@ -324,6 +324,12 @@ def dos2unix(t:int=0,d:int=0,ms:float=0):
     if ms: dt.replace(microsecond=ms*1000000)
     return dt.timestamp()
 def dosr2unix(d:int=0,t:int=0,ms:float=0): return dos2unix(t,d,ms)
+def fatx2unix(t:int=0,d:int=0,ms:float=0):
+    asrt(d.bit_length() <= 16 and t.bit_length() <= 16)
+    if d == 0: d = 0x21
+    dt = datetime(2000 + ((d >> 9) & 0x7F),(d >> 5) & 0xF,d & 0x1F,(t >> 11) & 0x1F,(t >> 5) & 0x3F,(t & 0x1F) * 2)
+    if ms: dt.replace(microsecond=ms*1000000)
+    return dt.timestamp()
 def decode_bcd(i:int):
     r = 0
     ix = 0

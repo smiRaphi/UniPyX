@@ -506,7 +506,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     BFZK = {}
                 elif all(fe['ct'] in {0,8} for fe in fs) and i.lower().endswith('.pak'):
                     LEADS = keys['leadwerks']
-            if FRZK:
+            if not FRZK is None:
                 FRZK.wait()
                 FRMK = [x for x in FRZK['c'] if x['n'].startswith('fm') and x['t'] == 'file']
                 FRHK = [x for x in FRZK['c'] if x['n'].startswith('fh') and x['t'] == 'file']
@@ -556,7 +556,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.seek(ep)
 
                 d = f.readc(fe['zs'])
-                writefile_zip(**locals())
+                ret = writefile_zip(**locals())
+                if not ret is None: return ret
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):
@@ -679,7 +680,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 fs.append(fe)
 
                 d = f.read(fe['zs']) # not readc!
-                writefile_zip(**locals())
+                ret = writefile_zip(**locals())
+                if not ret is None: return ret
             f.close()
 
             if BUNDLE and not any(x is False for x in BUNDLE):

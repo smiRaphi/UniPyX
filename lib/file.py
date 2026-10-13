@@ -1142,7 +1142,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             r = OODLE.OodleLZ_Decompress(ib,len(i),o,kwargs['usize'],0 if algo in () else 1,0,0,None,0,None,None,None,0,0)
             if r == 0 and kwargs['usize'] != 0: raise ValueError('Failed to decompress')
             return bytes(o)[:r]
-        case 'gdeflate':
+        case 'gdeflate'|'rtxio':
             asrt(GDEFLATE or kwargs.get('db'))
             import ctypes
             if not GDEFLATE:
@@ -1150,21 +1150,46 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
                 GDEFLATE.DecompressData.argtypes = [ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint8),ctypes.c_size_t]
                 GDEFLATE.DecompressData.restype = ctypes.c_int
 
-            asrt(i[:2] == b'\x04\xFB')
-            isz = len(i)
-            bcc = int.from_bytes(i[2:4],'little')
-            if not bcc: raise ValueError('Empty block count')
+            from multiprocessing.pool import ThreadPool
 
-            flgs = int.from_bytes(i[4:7],'little')
-            if flgs & mask(2) != 1: raise ValueError(f'Invalid Tile Size Index ({flgs & mask(2)})')
-            us = bcc * 0x10000 + ((flgs >> 2) & mask(18))
+            def dec(of,i,os):
+                i = b'\x04\xFB\x00\x00' + i
+                ib = (ctypes.c_uint8 * len(i)).from_buffer_copy(i)
+                ob = (ctypes.c_uint8 * os)()
+                r = GDEFLATE.DecompressData(ib,len(i),ob,os)
+                if r == 0: raise ValueError('Failed to decompress')
+                return (of,bytes(ob))
 
-            ibuf = (ctypes.c_uint8 * isz).from_buffer_copy(i)
-            obuf = (ctypes.c_uint8 * us)()
+            ip = 0
+            p = ThreadPool()
+            pc = []
+            while ip < len(i):
+                ep = ip
+                asrt(i[ip:ip+2] == b'\x04\xFB');ip += 2
+                bto = int.from_bytes(i[ip:ip+2],'little');ip += 2
+                flgs = int.from_bytes(i[ip:ip+4],'little');ip += 4
+                ep += 0x100000 << (flgs & 3)
+                tus = 0x8000 << ((flgs >> 2) & 3)
+                bto *= tus
+                tls = (flgs >> 4) & 0x3FF
+                ltus = (flgs >> 14) or tus
 
-            r = GDEFLATE.DecompressData(ibuf,isz,obuf,us)
-            if r == 0: raise ValueError('Failed to decompress')
-            return bytes(obuf)
+                if tls == 0:
+                    ip = ep
+                    continue
+
+                pc.append(p.apply_async(dec,(bto,i[ip-4:ep],(tls - 1) * tus + ltus)))
+                ip = ep
+
+            p.close()
+            p.join()
+            ob = [pe.get() for pe in pc]
+
+            if len(ob) == 0: return ob[0][1]
+            o = bytearray(max(b[0]+len(b[1]) for b in ob))
+            for b in ob:
+                o[b[0]:b[0]+len(b[1])] = b[1]
+            return bytes(o)
         case 'xmem'|'xmem_lzx': return uxx().decompress_xmemlzx(i,kwargs['usize'])
         case 'xb'|'xbcompress': return uxx().decompress_xb(i)
         case 'capcom_yz2': return uxx().decompress_capcom_yz2(i,kwargs['usize'])

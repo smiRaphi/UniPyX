@@ -9,10 +9,12 @@ def asrt(c:bool,*r,err:Exception=ValueError):
         else: r = ''
         raise err(r)
 
-def swap32(i:bytes):
-    c = len(i) // 4
-    return struct.pack(f'>{c}I',*struct.unpack(f'<{c}I',i[:c * 4])) + i[c * 4:]
-def swap32i(i:int): return int.from_bytes(i.to_bytes(4,'big'),'little')
+def swap32i(i:int|bytes):
+    if isinstance(i,int): return int.from_bytes(i.to_bytes(4,'big'),'little')
+    return int.from_bytes(i,'big').to_bytes(4,'little')
+def swap64i(i:int|bytes):
+    if isinstance(i,int): return int.from_bytes(i.to_bytes(8,'big'),'little')
+    return int.from_bytes(i,'big').to_bytes(8,'little')
 def reflecti(v:int,w:int):
     r = 0
     for _ in range(w):
@@ -34,6 +36,15 @@ def uxx():
     global UPXX
     if UPXX is None: UPXX = X()
     return UPXX
+def swap16(i:bytes):
+    c = len(i) // 2
+    return uxx().decrypt_swp16(i[:c * 2]) + i[c * 2:]
+def swap32(i:bytes):
+    c = len(i) // 4
+    return uxx().decrypt_swp32(i[:c * 4]) + i[c * 4:]
+def swap64(i:bytes):
+    c = len(i) // 8
+    return uxx().decrypt_swp64(i[:c * 8]) + i[c * 8:]
 
 BASEXX_DEC = {
     'b10':'0123456789',
@@ -107,6 +118,9 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
         case 'inv'|'invert': return uxx().decrypt_inv(i)
         case 'inv_len': return uxx().decrypt_xor(i,(-1 - len(i)).to_bytes(1,signed=True))
         case 'swp4'|'swap4': return uxx().decrypt_swp4(i)
+        case 'swp16'|'swap16': return swap16(i)
+        case 'swp32'|'swap32': return swap32(i)
+        case 'swp64'|'swap64': return swap64(i)
         case 'roll':
             if type(key) == int: key = key.to_bytes(1)
             return uxx().decrypt_roll(i,key or b'\0')
@@ -186,6 +200,7 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             return c.decrypt(iv,i,kwargs.get('aad'))
         case 'blowfish_le'|'blowfish_le_ecb'|'blowfish_le_cbc'|'blowfish_le_cfb'|'blowfish_le_ofb'|'blowfish_le_ctr'|\
              'blowfish_le_openpgp'|'blowfish_le_eax': return swap32(decrypt(swap32(i),'blowfish' + algo[12:],key,iv,**kwargs))
+        case 'des_64le_ecb': return swap64(decrypt(swap64(i),'des_ecb',swap64i(key)))
         case 'salsa20':
             import ctypes
             from Cryptodome.Cipher import Salsa20
@@ -899,8 +914,22 @@ def crc_hash(i:bytes,algo:str,**kwargs) -> int:
             if isinstance(i,(list,tuple)): i = struct.pack(f'<{len(i)}I',*i)
             r = crc_hash(i,'crc16_kermit')
             return ((r >> 12) ^ (r >> 8) ^ (r >> 4) ^ r) & 0xF
+        case 'crc16_minix':
+            kwargs['size'] = 16
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC16['zmodem']
+            kwargs['minix'] = True
+            fnc = uxx().hash_crc
         case 'crc32_16': return crc_hash(i,'crc32',**kwargs) & 0xFFFF
-        case 'crc32_cksum': return crc_hash(i + len(i).to_bytes((len(i).bit_length() + 7) // 8,'little'),'crc32_posix')
+        case 'crc32_cksum'|'cksum': return crc_hash(i + len(i).to_bytes((len(i).bit_length() + 7) // 8,'little'),'crc32_posix')
+        case 'crc32_minix':
+            kwargs['size'] = 32
+            kwargs['poly'],kwargs['init'],kwargs['xor'],kwargs['reflect'] = CRC32['ludia']
+            kwargs['reflecto'] = False
+            kwargs['first'] = 0x7FFFFFFF
+            fnc = uxx().hash_crc
+        case 'crc32_cksum_minix'|'cksum_minix':
+            kwargs['minix'] = True
+            return crc_hash(i,'crc32_minix',**kwargs)
         case 'crc32_php': return swap32i(crc_hash(i,'crc32_bzip2',**kwargs))
         case 'bkdr'|'bkdr_ltr'|'bkdr32'|'bkdr32_ltr'|'aststrsum'|'ast_strsum'|'java'|'slf'|'nlg'|'solaris':
             kwargs['mult'],kwargs['add'],init = PRNG32[algo]
@@ -1526,7 +1555,8 @@ HASHTS = {
     x:FLETCH[x][0]//8 for x in FLETCH}|\
 {
     'crc8':1,'crc16':2,'crc24':3,'crc32':4,'crc40':5,'crc64':8,
-    'crc16_4_ar':1,'crc32_16':2,'crc32_php':4,'crc32_cksum':4,
+    'crc16_4_ar':1,'crc16_minix':2,'crc32_16':2,'crc32_php':4,'crc32_minix':4,
+    'crc32_cksum':4,'cksum':4,'crc32_cksum_minix':4,'cksum_minix':4,
     'adler8':1,'adler16':2,'adler32':4,'adler64':8,
     'fnv1_32':4,'fnv1a_32':4,'fnv0_32':4,
     'fnv1_64':8,'fnv1a_64':8,'fnv0_64':8,

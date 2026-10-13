@@ -267,6 +267,8 @@ Unknown 2: {f.reads(f.readu32())}""")
             if fs: return
         case 'ProtectIt/2 Encrypted':
             db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
             from lib.file import File
             from lib.crypto import decrypt
             f = File(i,endian='<')
@@ -274,7 +276,7 @@ Unknown 2: {f.reads(f.readu32())}""")
 
             # key = crc_hash(key, 'protectit2')
             # original program just uses this as verification for the processed key but it's just the actual key so yay
-            k = decrypt(f.readc(0x10),'xor',b'ProtectIt/2 OS/2')
+            k = decrypt(f.readc(0x10),'xor',keys.wait()['protectit2'])
             fn = f.reads(0x104,'ascii').rstrip('\0')
             d = f.read()
             f.close()
@@ -1074,6 +1076,62 @@ Unknown 2: {f.reads(f.readu32())}""")
             db.try_custom()
             from lib.file import File
             return extract_pjh_sub(File(i,endian='<'),o)
+        case 'Multimedia Viewer Book 2.0':
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'\x3F\x5F\4\1')
+            FMTM = {
+                'V':lambda:f.reads(f.readu8(),'ascii'),
+                'O':f.readleb128u,
+                '1':f.readu8,
+            }
+
+            f.seek(f.readu32())
+            asrt(f.read(4) == b'\x3B\x29\2\1')
+            pgs = f.readu16()
+            fmt = f.reads(0x10,'ascii').rstrip('\0')
+            asrt(fmt.startswith('VOO'))
+            fmt = [FMTM[x] for x in fmt]
+            asrt(f.readu32() == 0)
+            f.skip(4)
+            rix = f.readu32()
+            asrt(f.reads32() == -1)
+            f.skip(4)
+            lvls = f.readu16()
+            f.skip(4)
+            bp = f.pos
+
+            fs = []
+            def readd(lvl:int,p:str):
+                mkdir(p)
+                if lvl <= 1:
+                    f.skip(2) # pad len
+                    c = f.readu16()
+                    f.skip(8) # prev & next
+                    for _ in range(c):
+                        fs.append((p,*[x() for x in fmt]))
+                else:
+                    f.skip(2) # pad len
+                    c = f.readu16()
+                    ix1 = f.readu32()
+                    f.peek(readd,lvl - 1,p,offset=[bp + ix1 * pgs])
+                    for _ in range(c):
+                        n = f.reads(f.readu8(),'ascii')
+                        f.peek(readd,lvl - 1,p + '/' + n,offset=[bp + f.readu32() * pgs])
+
+            f.seek(bp + rix * pgs)
+            readd(lvls,o)
+
+            for fe in fs:
+                f.seek(fe[2])
+                # if fe[1].startswith('>'): d = f.decompress(fe[3],???,usize=fe[3] * 4 + 0x10000)
+                # else: d = f.readc(fe[3])
+                d = f.readc(fe[3])
+                writefile(fe[0] + '/' + sub_path(fe[1],slash=True),d)
+
+            f.close()
+            if fs: return
 
     return 1
 

@@ -1111,8 +1111,80 @@ def extract4(inp:str,out:str,t:str) -> bool:
             del amd
             return
         case 'FATX':
-            run(['chextract-fatx',tf,o])
-            if listdir(o): return
+            db.try_custom()
+            from lib.file import File
+            f = File(i,endian='<')
+            asrt(f.read(4) == b'FATX')
+
+            f.skip(4)
+            spc = f.readu32()
+            rc = f.readu32()
+            f.skip(0xFF0)
+
+            cs = spc * 0x200
+            cc = f.size // cs + 1
+            if cc < 0xFFF0: fat = f.readil(2,cc)
+            else: fat = f.readil(4,cc)
+            f.align(0x200)
+            while f:
+                if f.peek('u8'): break
+                f.skip(0x200)
+
+            bco = f.pos - cs
+            fs = []
+            dc = 0
+            def readd(p:str):
+                nonlocal dc
+                nl = f.readu8()
+                if nl == 0xFF: return True
+                a = f.readu8()
+                ty = (a >> 3) & 3
+                asrt(ty != 1,'volume label',err=NotImplementedError)
+                asrt(ty != 3,'long filename')
+
+                n = f.readc(0x2A)
+                if nl != 0x5E:
+                    assert nl <= 0x2A
+                    n = n[:nl]
+                n = n.split(b'\0')[0]
+                try: n = n.decode('utf-8')
+                except UnicodeDecodeError: n = n.decode('latin1')
+                if nl == 0x5E:
+                    n = sub_path(n,slash=True) + f'.{dc}.$deleted'
+                    dc += 1
+
+                cl = f.readu32()
+                sz = f.readu32()
+                ts = [fatx2unix(f.readu16(),f.readu16()) for _ in range(3)]
+
+                n = p + '/' + n
+                if ty == 2:
+                    mkdir(n)
+                    f.peek(lambda:[_ for _ in whilelc(lambda:f and not readd(n))],offset=[bco + cl * cs])
+                else: fs.append((n,cl,sz,ts,nl == 0x5E))
+            f.seek(bco + rc * cs)
+            while f and not readd(o):pass
+
+            mxcl = 0xFFF0 if cc < 0xFFF0 else 0x0FFFFFF0
+            for fe in fs:
+                of = xopen(fe[0],'wb')
+                cl = fe[1]
+                sz = fe[2]
+                while cl < mxcl and sz > 0:
+                    f.seek(bco + cl * cs)
+                    if sz < cs: l = sz
+                    else:
+                        l = cs
+                        cl = fat[cl]
+                    if of.write(f.read(l)) != l:
+                        if fe[4]: break
+                        raise EOFError(fe)
+                    sz -= l
+                of.close()
+                set_ftime(fe[0],ct=fe[3][1],mt=fe[3][0],at=fe[3][2])
+
+            f.close()
+            if fs: return
         case 'QOOB Flash IMG':
             db.try_custom()
             f = xopen(i,'rb')

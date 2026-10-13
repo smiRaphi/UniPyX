@@ -201,6 +201,15 @@ EXPORT void decrypt_inv(uint8_t *restrict buf, const size_t size) {
 EXPORT void decrypt_swp4(uint8_t *restrict buf, const size_t size) {
     for (size_t p=0;p < size;p++) buf[p] = SWAP8(buf[p]);
 }
+EXPORT void decrypt_swp16(uint16_t *restrict buf, const size_t size) {
+    for (size_t p=0;p < size / 2;p++) buf[p] = SWAP16(buf[p]);
+}
+EXPORT void decrypt_swp32(uint32_t *restrict buf, const size_t size) {
+    for (size_t p=0;p < size / 4;p++) buf[p] = SWAP32(buf[p]);
+}
+EXPORT void decrypt_swp64(uint64_t *restrict buf, const size_t size) {
+    for (size_t p=0;p < size / 8;p++) buf[p] = SWAP64(buf[p]);
+}
 EXPORT void decrypt_roll(uint8_t *restrict buf, const size_t size,
                    const uint8_t *restrict key, const size_t ksize) {
     size_t kc = 0;
@@ -1039,6 +1048,46 @@ EXPORT uint64_t hash_crc(const uint8_t *restrict src, const uint32_t size, const
         const size_t sh = (sizei < 8) ? 0 : (sizei - 8);
         for (size_t p=0;p < size;p++)
             h = ((h << 8) & mm) ^ *(uint64_t *)(t + 5 + ((src[p] ^ (h >> sh)) & 0xFF) * 8);
+    }
+    return h ^ xor;
+}
+EXPORT uint64_t hash_crc_minix(const uint8_t *restrict src, const uint32_t size, const uint8_t *restrict t,
+                               uint64_t init, uint64_t xor, const uint64_t value, const int8_t has_value) {
+    const int8_t ref = t[0];
+    const uint32_t sizei = *(uint32_t *)(t + 1);
+    const uint64_t mm = (sizei == 64) ? ~0ULL : (1ULL << sizei) - 1;
+    init &= mm;
+    xor &= mm;
+
+    uint64_t h;
+    if (has_value) h = (value & mm) ^ xor;
+    else h = init;
+
+    if (sizei == 32) {
+        uint8_t aux = 0;
+        if (ref)
+            for (size_t p=0;p < size;p++) {
+                uint8_t ix = h ^ src[p];
+                if (ix == 0) ix = aux++;
+                h = (h >> 8) ^ *(uint64_t *)(t + 5 + ix * 8);
+            }
+        else {
+            const size_t sh = (sizei < 8) ? 0 : (sizei - 8);
+            for (size_t p=0;p < size;p++) {
+                uint8_t ix = src[p] ^ (h >> sh);
+                if (ix == 0) ix = aux++;
+                h = ((h << 8) & mm) ^ *(uint64_t *)(t + 5 + ix * 8);
+            }
+        }
+    } else if (sizei == 16) {
+        if (ref)
+            for (size_t p=0;p < size;p++)
+                h = (h >> 8) ^ *(uint64_t *)(t + 5 + (h & 0xFF) * 8) ^ src[p];
+        else {
+            const size_t sh = (sizei < 8) ? 0 : (sizei - 8);
+            for (size_t p=0;p < size;p++)
+                h = ((h << 8) & mm) ^ *(uint64_t *)(t + 5 + ((h >> sh) & 0xFF) * 8) ^ src[p];
+        }
     }
     return h ^ xor;
 }

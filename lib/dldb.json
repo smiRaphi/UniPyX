@@ -1322,7 +1322,8 @@
             "x":{
                 "csc.exe":"csc.exe"
             }
-        }]
+        }],
+        "ts":1791304320
     },
     "csarc":{
         "p":"csarc.exe",
@@ -1709,24 +1710,6 @@
             "ts":1775080800
         }],
         "ts":1775080800
-    },
-    "chdecrypt":{
-        "p":"chdecrypt.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "chdecrypt.exe":"chdecrypt.exe"
-            }
-        }]
-    },
-    "chextract-fatx":{
-        "p":"chextract-fatx.exe",
-        "fs":[{
-            "u":".",
-            "x":{
-                "chextract-fatx.exe":"chextract-fatx.exe"
-            }
-        }]
     },
     "mpqextractor":{
         "p":"MPQExtractor.exe",
@@ -7118,7 +7101,14 @@
         "fs":[
         "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/keys.pyob"
         ],
-        "ts":1790416110
+        "ts":1790875147
+    },
+    "sgkeys":{
+        "p":"sgkeys.pyob",
+        "fs":[
+        "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/sgkeys.pyob"
+        ],
+        "ts":1791902479
     },
     "forza_keys":{
         "p":"forza_keys.pyob",

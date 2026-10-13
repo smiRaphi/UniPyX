@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1106
+# Supported Formats: 1107
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -170,7 +170,7 @@ CPC Plus IMG | ??? | Custom |
 Doctor V64 ROM | .v64 .n64 | Custom |
 Donkey Kong Banana Kingdom | ??? | Custom |
 Dr. Mario 64 N64 ROM | .z64 | [splat64](https://pypi.org/project/splat64/) + [Dr. Mario 64 decomp YAML](https://github.com/AngheloAlf/drmario64/tree/master/config) |
-Encrypted GD-ROM | .bin | Custom + [chdecrypt](https://github.com/JayFoxRox/Chihiro-Tools) |
+Encrypted GD-ROM | .bin | Custom |
 F-Zero X N64 ROM | .z64 | [Torch](https://github.com/HarbourMasters/Torch) + [F-Zero X Decompilation YAML](https://github.com/inspectredc/fzerox) |
 Famicom Disk Image | ??? | Custom |
 Final Fantasy X 2 ISO | .iso | Custom |
@@ -385,7 +385,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (602)
+## Various (603)
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -575,7 +575,7 @@ Eutechnyx CDFILES.DAT+AR | .dat+.ar | Custom |
 Exient XPK | .xpk | [nfshp2010wii.bms](https://mirror.aluigi.org/bms/nfshp2010wii.bms), [angry_birds_go.bms](https://aluigi.org/bms/angry_birds_go.bms), [xpk2.bms](https://aluigi.org/bms/xpk2.bms), [angry_birds_starwars.bms](https://aluigi.org/bms/angry_birds_starwars.bms) |
 F.E.A.R. LTAR | ??? | [Game Extractor Server](https://github.com/Sembiance/dexvert/blob/master/bin/GameExtractorServer.jar)([src](https://github.com/wattostudios/GameExtractor)) |
 Amusement Vision LZ | .lz | Custom |
-FATX | .fatx | [chextract-fatx](https://github.com/JayFoxRox/Chihiro-Tools) |
+FATX | .fatx .dec | Custom |
 Favorite Dear LKF | .lkf | [favorite_dear_lkf_script.bms](https://github.com/bartlomiejduda/Tools/blob/master/NEW%20Tools/Favourite%20Dear/Favorite_Dear_LKF_script.bms)
 Favorite Dear MSG 1 | ??? | Custom |
 Favorite Dear MSG 2 | ??? | Custom |
@@ -726,6 +726,7 @@ MotoGP ARK | .ark | Custom |
 MSKN 2 Archive | .mskn | Custom |
 mTropolis MDM | .q3 | Custom |
 mTropolis MPL | .mpl | Custom |
+Multimedia Viewer Book 2.0 | .m20 .mvb | Custom |
 Music Pen MDF+CMF | .mdf+.cmf | Custom |
 N-Space Zlib Compressed | \* | Custom |
 Natsume LZS | .paz \* | Custom |
