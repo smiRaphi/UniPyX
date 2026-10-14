@@ -108,11 +108,11 @@ def supdate(c:Cache,k:str,inf:dict):
         if u is None:
             nfs.append(f)
             continue
-        if u == '.': dom = None
+        if u == '.' or u.startswith('gdrive:'): dom = None
         else: dom = u.split('://')[1].split('/')[0]
 
         ts = ots
-        if u == '.': tts = -1
+        if dom is None: tts = -1
         elif u in {'https://mark0.net/download/trid_w32.zip','https://mark0.net/download/trid_win64.zip','https://mark0.net/download/trid.zip'}:
             try:ts = c.srch(r'>TrID(?:/(?:Linux|32|64))? v\d+\.\d+\w?(?: \(all platforms\))? - (\d\d/\d\d/\d{2,4})</','https://mark0.net/soft-trid-e.html')
             except httpx.ConnectTimeout:pass

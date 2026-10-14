@@ -2420,9 +2420,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 for fe in f.decompress(None,'zip',out={}):
                     fn = sanitize_relative(fe[0])
                     if fe[1] is None: mkdir(o + '/' + fn)
-                    else:
-                        writefile(o + '/' + fn,fe[1])
-                        set_ftime(o + '/' + fn,fe[2])
+                    else: writefile(o + '/' + fn,fe[1],ct=fe[2])
 
             f.close()
             if listdir(o) != ['$INSFILES']:
@@ -2499,8 +2497,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 asrt(ofs[ix] == -1)
                 asrt(szs[ix] == len(d) and crc_hash(d,'crc32') == crs[ix])
                 fn = o + '/$INSFILES/' + fn
-                writefile(fn,d)
-                set_ftime(fn,tss[ix])
+                writefile(fn,d,ct=tss[ix])
 
             eof = max(x + f.peek('u32',offset=x - f.pos) for x in ofs[len(res):])
             ds = {}
@@ -2530,8 +2527,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 if ix < len(oid): fn = o + '/' + ds[oid[ix]]
                 else: fn = o
                 fn += '/' + ns[ix - len(res)]
-                writefile(fn,d)
-                set_ftime(fn,tss[ix])
+                writefile(fn,d,ct=tss[ix])
 
             f.close()
             if c > 0: return
@@ -2762,8 +2758,7 @@ def extract3(inp:str,out:str,t:str) -> bool:
                 fn = sub_path(ppath(fe[0]))
                 if fe[1] != 'MAIN': fn = o + '/$GROUPS/' + sub_path(fe[1],slash=True) + '/' + fn
                 else: fn = o + '/' + fn
-                writefile(fn,d)
-                set_ftime(fn,fe[2])
+                writefile(fn,d,ct=fe[2])
 
             f.close()
             if fs: return
@@ -2888,9 +2883,8 @@ def extract3(inp:str,out:str,t:str) -> bool:
                     fn = o + '/' + m.read0s16()
                     if fe[2] == -1: mkdir(fn)
                     else:
-                        writefile(fn,d[p:p+fe[2]])
+                        writefile(fn,d[p:p+fe[2]],ct=fe[1])
                         p += fe[2]
-                        set_ftime(fn,fe[1])
 
             f.close()
             if pks: return

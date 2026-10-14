@@ -1250,8 +1250,7 @@ def extract4_1(inp:str,out:str,t:str) -> bool:
                     f.align(4)
             for fe in fs:
                 f.seek(fe[0])
-                writefile(o + '/' + fe[3],f.read(fe[1]))
-                set_ftime(o + '/' + fe[3],fe[2])
+                writefile(o + '/' + fe[3],f.read(fe[1]),ct=fe[2])
             f.close()
             if fs: return
         case 'Level5 Encrypted CRI CPK':
@@ -1763,8 +1762,7 @@ def extract4_1(inp:str,out:str,t:str) -> bool:
                 for ix in range(fe[6]):
                     s = ((fe[4] >> ix) * (fe[5] >> ix) * CTRPIXM[fe[3]][1]) // 8
                     xfn = f'{o}/{fn}_m{ix}_{fe[4] >> ix}x{fe[5] >> ix}.{CTRPIXM[fe[3]][0]}'
-                    writefile(xfn,f.readc(s))
-                    set_ftime(xfn,fe[7])
+                    writefile(xfn,f.readc(s),ct=fe[7])
 
             f.close()
             if fs: return

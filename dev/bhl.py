@@ -24,7 +24,12 @@ elif argv[1] == 'c':
 
 algo = argv[1]
 if algo in {'xxh32','xxh64','xxh128','xxh3_64','xxh3_128',
-            'murmur3','mmh3','murmur3_32','mmh3_32','murmur3_128','mmh3_128'}:
+            'murmur3','mmh3','murmur3_32','mmh3_32','murmur3_128','mmh3_128',
+            'spooky2_32','spooky2_64','spooky2_128',
+            'ascon_hash256','ascon256','ascon_hash','ascon_hasha','ascon_hash_be','ascon_hasha_be','ascon_hash_le','ascon_hasha_le',
+            'md2','md4','mdc2','ed2k','emule','edonkey',
+            'keccak224','keccak256','keccak384','keccak512',
+            'siphash13','siphash24',}:
     from lib.dldb import DLDB
     d = DLDB()
 

@@ -89,8 +89,7 @@ def extract4_6(inp:str,out:str,t:str) -> bool:
                 xo = f.readu32()
                 n = o + '/' + f.read0s('ascii')
                 ts = dos2unix(f.readu16(),f.readu16())
-                writefile(n,f.decompress(xo - f.pos,'zlib'))
-                set_ftime(n,ts)
+                writefile(n,f.decompress(xo - f.pos,'zlib'),ct=ts)
 
             f.close()
             if listdir(o): return
@@ -148,8 +147,7 @@ def extract4_6(inp:str,out:str,t:str) -> bool:
                     n = f.readc(0x100).split(b'\0')[0].decode('ascii')
                     ts = (f.readu32(),f.readu32())
                     f.padc(1)
-                    writefile(dn + '/' + n,f.decompress(zs,'bzip2' if us != zs else 'none',usize=us))
-                    set_ftime(dn + '/' + n,ct=ts[0],mt=ts[1])
+                    writefile(dn + '/' + n,f.decompress(zs,'bzip2' if us != zs else 'none',usize=us),ct=ts[0],mt=ts[1])
 
             f.close()
             if ps: return
@@ -533,11 +531,9 @@ Unknown 2: {f.reads(f.readu32())}""")
             ts = str2unix(h['timestamp'])
             ts = (ts - h['playTime'] / 1000,ts)
             console()
-            writefile(o + '/info.json',inf)
-            set_ftime(o + '/info.json',*ts)
+            writefile(o + '/info.json',inf,ct=ts[0],mt=ts[1])
             if d.startswith(b'\x1F\x8B'): d = decompress(d,'gzip')
-            writefile(o + '/data.json',d)
-            set_ftime(o + '/data.json',*ts)
+            writefile(o + '/data.json',d,ct=ts[0],mt=ts[1])
             return
         case 'Zip-Archive':
             db.try_custom()
@@ -1129,6 +1125,71 @@ Unknown 2: {f.reads(f.readu32())}""")
                 # else: d = f.readc(fe[3])
                 d = f.readc(fe[3])
                 writefile(fe[0] + '/' + sub_path(fe[1],slash=True),d)
+
+            f.close()
+            if fs: return
+        case 'Webfoot DS PAK':
+            db.try_custom()
+            from lib.crypto import HashLib
+            hl = HashLib.dl('webfoot_ds',db)
+            from lib.file import File
+            f = File(i,endian='<')
+
+            c = f.readu32()
+            fs = [(f.readu32(),f.readu32(),f.readu32(),f.readu32()) for _ in range(c)]
+            hl.wait()
+            for fe in fs:
+                f.seek(fe[1])
+                eps = f.readil(4,fe[3])
+                d = bytearray()
+                for ep in eps:
+                    cmp = f.readu32()
+                    us = f.readu32()
+                    td = f.decompress(ep - f.pos,('none','webfoot')[cmp],usize=us)
+                    if cmp == 0: td = td[:us]
+                    asrt(len(td) == us,us,len(td),cmp)
+                    d.extend(td)
+                asrt(len(d) == fe[2],fe[2],len(d))
+
+                if fe[0] in hl: n = hl[fe[0]]
+                else:
+                    n = f'$unk/{fe[0]:08X}.{guess_ext_nds(d)}'
+                writefile(o + '/' + n,d)
+
+            f.close()
+            if fs: return
+        case 'Milestone MIX':
+            db.try_custom()
+            from lib.pyob import PyOBinX
+            keys = PyOBinX.dl('keys',db)
+            from lib.crypto import decrypt
+            from lib.file import File,decompress
+            f = File(i,endian='<')
+
+            v = 1 + f.readu32()
+            c,of = f.readu32(),f.readu32()
+            v += f.readu32()
+            f.padc(0x10)
+
+            f.seek(of)
+            fs = []
+            for _ in range(c):
+                fs.append((f.readc(f.readu32()),f.readu32(),f.readu32(),f.readu32(),f.readbool(),f.readbool() if v >= 2 else False))
+                f.skip(8) # ?
+
+            ca = 'deflate' if v == 3 else 'lzw_mlst'
+            dn = '..\\'
+            if basename(i) == basename(dirname(i)).lower():
+                dn += '..\\'
+
+            keys.wait()
+            for fe in fs:
+                n = decrypt(fe[0],'xor' if v == 0 else 'cxorm',keys['milestone_mix']).decode('utf-8').rstrip('\0').replace('/','\\')
+                f.seek(fe[1])
+                if fe[5]: symlink(dn + '..\\' * n.count('\\') + n,o + '\\' + n)
+                else:
+                    d = f.readc(fe[2])
+                    writefile(o + '/' + n,decompress(d,ca if fe[4] else 'none',usize=fe[3],verify=True))
 
             f.close()
             if fs: return

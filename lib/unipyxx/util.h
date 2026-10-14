@@ -245,7 +245,7 @@ static inline int is_eof(BitReader *br) {
     return br->ptr >= br->end && !br->bits;
 }
 static inline int is_eofn(BitReader *br, size_t n) {
-    return (br->end - br->ptr) + br->bits < n;
+    return (br->end - br->ptr) * 8 + br->bits < n;
 }
 
 #ifdef __cplusplus

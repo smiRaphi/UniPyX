@@ -271,6 +271,14 @@ EXPORT void decrypt_cxori(uint8_t *restrict buf, const size_t size,
         if (kc >= ksize) kc = 0;
     }
 }
+EXPORT void decrypt_cxorm(uint8_t *restrict buf, const size_t size,
+                    const uint8_t *restrict key, const size_t ksize, const size_t iv) {
+    size_t kc = 0;
+    for (size_t p=0;p < size;p++) {
+        buf[p] ^= (p + iv) * key[kc++];
+        if (kc >= ksize) kc = 0;
+    }
+}
 EXPORT void decrypt_dxor(uint8_t *restrict buf,  const size_t size,
                    const uint8_t *restrict key1, const size_t ksize1,
                    const uint8_t *restrict key2, const size_t ksize2) {

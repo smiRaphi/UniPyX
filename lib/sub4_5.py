@@ -321,13 +321,11 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
         case 'Nintendo Amiibo NFC Raw':
             db.try_custom()
             from .sub2 import Nintendo
-            from lib.file import File,datetime
+            from lib.file import File
             f = File(Nintendo(db).amiibo_raw_decrypt(Nintendo.AmiiboRaw(i)),endian='>')
 
             f.seek(4)
-            cd,md = f.readu16(),f.readu16()
-            cd = datetime(2000 + ((cd >> 9) & 0x7F),(cd >> 5) & 0xF,cd & 0x1F).timestamp()
-            md = datetime(2000 + ((md >> 9) & 0x7F),(md >> 5) & 0xF,md & 0x1F).timestamp()
+            cd,md = fatx2unix(d=f.readu16()),fatx2unix(d=f.readu16())
             f.skip(4)
             n = f.readutf16(10).rstrip('\0') or tbasename(i)
             writefile(f'{o}/{n}_mii.bin',f.readc(0x60))
@@ -337,7 +335,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
             del f
 
             for f in ('mii','area','dec'):
-                set_ftime(f'{o}/{n}_{f}.bin',cd,mt=md)
+                set_ftime(f'{o}/{n}_{f}.bin',ct=cd,mt=md)
 
             return
         case 'Dynamix VOL':
@@ -1423,9 +1421,8 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                         tfn = o + '/' + sanitize_relative(tfn)
                         symlink(tfn,fn)
                     else:
-                        writefile(fn,f.readc(s))
+                        writefile(fn,f.readc(s),ct=ts[2],mt=ts[1],at=ts[0])
                         f.align(8)
-                        set_ftime(fn,ts[2],ts[1],ts[0])
                 elif byn and rst == 11:
                     if f.left < 0x44: break
                     f.skip(8)
@@ -1449,9 +1446,8 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                         tfn = o + '/' + sanitize_relative(tfn)
                         symlink(tfn,fn)
                     else:
-                        writefile(fn,f.readc(s))
+                        writefile(fn,f.readc(s),ct=ts[2],mt=ts[1],at=ts[0])
                         f.align(8)
-                        set_ftime(fn,ts[2],ts[0],ts[1])
                 elif byn and rst == 12:
                     if f.left < 0x4C: break
                     f.skip(8)
@@ -1474,9 +1470,8 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                         tfn = o + '/' + sanitize_relative(tfn)
                         symlink(tfn,fn)
                     else:
-                        writefile(fn,f.readc(s))
+                        writefile(fn,f.readc(s),ct=ts[2],mt=ts[1],at=ts[0])
                         f.align(8)
-                        set_ftime(fn,ts[2],ts[0],ts[1])
                 elif not byn and rt == 1 and rst == 3:
                     if f.left < 4: break
                     f.skip(4)
@@ -1554,8 +1549,7 @@ def extract4_5(inp:str,out:str,t:str) -> bool:
                         tfn = o + '/' + sanitize_relative(tfn)
                         symlink(tfn,fn)
                     else:
-                        writefile(fn,f.readc(fe['s']))
-                        set_ftime(fn,ct=fe['t'][2],at=fe['t'][1],mt=fe['t'][0])
+                        writefile(fn,f.readc(fe['s']),ct=fe['t'][2],at=fe['t'][1],mt=fe['t'][0])
 
             f.close()
             if xinf:

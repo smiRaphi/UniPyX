@@ -110,6 +110,10 @@ def decrypt(i:bytes,algo:str,key:bytes=None,iv:bytes=None,**kwargs) -> bytes:
             if isinstance(key,int): key = key.to_bytes(1)
             if isinstance(iv,bytes): iv = iv[0]
             return uxx().decrypt_cxori(i,key or b'\0',iv or 0)
+        case 'cxorm'|'cxor_mul':
+            if isinstance(key,int): key = key.to_bytes(1)
+            if isinstance(iv,bytes): iv = iv[0]
+            return uxx().decrypt_cxorm(i,key,iv or 0)
         case 'dxor':
             if type(key) == int: key = key.to_bytes(1)
             if type(iv) == int: iv = iv.to_bytes(1)

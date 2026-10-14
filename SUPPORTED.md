@@ -1,7 +1,7 @@
 [//]: <> (Empty extensions are written as ` `, NOTE: " "/U+2004 has to be used around it, otherwise it's gonna stick to the text.)
 [//]: <> (Checkboxes in tables can be created like this: `<ul><li>[x] </li></ul>`, has to have a | in front, even in the first column.)
 
-# Supported Formats: 1107
+# Supported Formats: 1109
 
 ## "Common" Archives/Compressors/Encodings (148)
 Name | Extension(s) | Extractor(s) | Comment
@@ -385,7 +385,7 @@ XPACK/LZCOM | .exe .com | [CUP386](https://github.com/Sembiance/dexvert/tree/mas
 Z-Code | ??? | [txd](https://mirror.ifarchive.org/if-archive/infocom/tools/ztools/) |
 [zexe](https://github.com/philtems/exepack) | .exe ` ` .elf | Custom |
 
-## Various (603)
+## Various (605)Milestone MIX
 Name | Extension(s) | Extractor(s) | Comment
 ---- | ------------ | ------------ | -------
 -8 SysFile | .bin | Custom |
@@ -707,6 +707,7 @@ Metropolis Software ZAP | .zap | Custom |
 Michigan: Report From Hell BIN | .bin | Custom |
 Michigan: Report From Hell LF | .lf | Custom |
 Microsoft .NET ResX | .resx | Custom |
+Milestone MIX | .mix | Custom |
 Minecraft Console ARC | .arc | Custom |
 Minecraft Console Game Rule File | .grf | Custom | only decompresses, does not parse
 Minecraft Console MCS | .mcs | Custom |
@@ -965,6 +966,7 @@ WarioWare Mega Party Game PAC | .pac | Custom |
 WarpIN Archive | .wip | Custom |
 WATCOM Archive | ??? | [WPACK](https://discmaster.textfiles.com/file/227/Gamers%20Arsenal%202%20(Arsenal%20Computer).ISO/faqs/gg2_aug.zip/WSQL.ZIP/WPACK.EXE) |
 WayForward PAK | .pak | Custom |
+Webfoot DS PAK | .pak | Custom |
 Westwood Encrypted MIX | .mix | Custom |
 Who Wants to Be a Millionaire DAT | .dat | Custom |
 Who Wants to Be a Millionaire Sound DAT | .dat | Custom |

@@ -4975,6 +4975,155 @@
         }],
         "ts":0
     },
+    "precomp_v0.3.0":{
+        "p":"precomp_v0.3.0/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphVU1IaUwyX0Z1bWM",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.0/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.0/zlib1.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.1":{
+        "p":"precomp_v0.3.1/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphR3RXSFVhSFdUMEk",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.1/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.1/zlib1.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.2":{
+        "p":"precomp_v0.3.2/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphSkpQZ3YtMU9USTQ",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.2/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.2/zlib1.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.3":{
+        "p":"precomp_v0.3.3/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphekUwSFBEdjVNOGM",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.3/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.3/zlib1.dll",
+                "pjg_dll.dll":"precomp_v0.3.3/pjg_dll.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.4":{
+        "p":"precomp_v0.3.4/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphRWdER0U5bWQ1VDA",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.4/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.4/zlib1.dll",
+                "packjpg22.dll":"precomp_v0.3.4/packjpg22.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.5":{
+        "p":"precomp_v0.3.5/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphamZEb2pfSERTZDQ",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.5/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.5/zlib1.dll",
+                "packJPG22.dll":"precomp_v0.3.5/packJPG22.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.6":{
+        "p":"precomp_v0.3.6/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObpheWhmU0JGeDlvVDA",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.6/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.6/zlib1.dll",
+                "packJPG22.dll":"precomp_v0.3.6/packJPG22.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.7":{
+        "p":"precomp_v0.3.7/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphN1kxUHRBTWpLSDg",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.7/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.7/zlib1.dll",
+                "packJPG.dll":"precomp_v0.3.7/packJPG.dll"
+            }
+        }]
+    },
+    "precomp_v0.3.8":{
+        "p":"precomp_v0.3.8/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphQTRhc1d6Y2tONWc",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.3.8/precomp.exe",
+                "zlib1.dll":"precomp_v0.3.8/zlib1.dll",
+                "packjpg_dll.dll":"precomp_v0.3.8/packjpg_dll.dll"
+            }
+        }]
+    },
+    "precomp_v0.4.0":{
+        "p":"precomp_v0.4.0/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphSW1RbXF1VEVUdEk",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.4.0/precomp.exe",
+                "packjpg_dll.dll":"precomp_v0.4.0/packjpg_dll.dll"
+            }
+        }]
+    },
+    "precomp_v0.4.1":{
+        "p":"precomp_v0.4.1/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphSHNHVWl0NDQtMzA",
+            "ex":".zip",
+            "x":{
+                "precomp.exe":"precomp_v0.4.1/precomp.exe",
+                "zlib1.dll":"precomp_v0.4.1/zlib1.dll",
+                "packjpg_dll.dll":"precomp_v0.4.1/packjpg_dll.dll"
+            }
+        }]
+    },
+    "precomp_v0.4.2":{
+        "p":"precomp_v0.4.2/precomp.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphbmpkYTFrODlMaXc",
+            "ex":".zip",
+            "x":{
+                "windows/precomp.exe":"precomp_v0.4.2/precomp.exe",
+                "windows/zlib1.dll":"precomp_v0.4.2/zlib1.dll",
+                "windows/packjpg_dll.dll":"precomp_v0.4.2/packjpg_dll.dll"
+            }
+        }]
+    },
+    "precomp_v0.4.3":{
+        "p":"precomp_v0.4.3.exe",
+        "fs":[{
+            "u":"gdrive:0B-yOP4irObphYzN4OTVEdXpVS1U",
+            "x":{
+                "windows/precomp.exe":"precomp_v0.4.3.exe"
+            }
+        }]
+    },
     "precomp_v0.4.4":{
         "p":"precomp_v0.4.4.exe",
         "fs":[{
@@ -7096,12 +7245,20 @@
         ]],
         "ts":1785262571
     },
+    "webfoot_ds_hashes":{
+        "p":"hashes/webfoot_ds.pyob",
+        "fs":[[
+            "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/webfoot_ds.pyob",
+            "hashes/webfoot_ds.pyob"
+        ]],
+        "ts":1791918385
+    },
     "keys":{
         "p":"keys.pyob",
         "fs":[
         "https://raw.githubusercontent.com/smiRaphi/UniPyX-Hashes/refs/heads/main/keys.pyob"
         ],
-        "ts":1790875147
+        "ts":1791995816
     },
     "sgkeys":{
         "p":"sgkeys.pyob",

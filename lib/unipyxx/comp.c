@@ -1287,6 +1287,99 @@ eof:
 }
 
 typedef struct {
+    const uint8_t *restrict b;
+    size_t s;
+    size_t p0,p1,p2;
+} WebfootBitReader;
+static inline uint8_t webfoot_get_bit(WebfootBitReader *br) {
+    const uint8_t r = (br->b[(br->p2 << 2) | (br->p1 ^ 3)] & (1 << (br->p0 ^ 7))) >> (br->p0 ^ 7);
+    if (++br->p0 == 8) {
+        br->p0 = 0;
+        if (++br->p1 == 4) {
+            br->p1 = 0;
+            br->p2++;
+        }
+    }
+    return r;
+}
+static inline uint64_t webfoot_get_bits(WebfootBitReader *br, const uint8_t n) {
+    uint64_t v = 0;
+    for (uint8_t i=0;i < n;i++) v = (v << 1) | webfoot_get_bit(br);
+    return v;
+}
+static inline uint64_t webfoot_get_gamma(WebfootBitReader *br) {
+    uint64_t v = 1;
+    do {
+        v += v + webfoot_get_bit(br);
+    } while (webfoot_get_bit(br));
+    return v;
+}
+EXPORT ssize_t decompress_webfoot(const uint8_t *restrict src, const size_t zsize,
+                                        uint8_t *restrict dst, const ssize_t usize) {
+    if (usize == 0) return 0;
+
+    WebfootBitReader br;
+    br.b = src;
+    br.s = zsize;
+    br.p0 = br.p1 = br.p2 = 0;
+    ssize_t op = 0;
+
+    uint8_t uns = 7;
+    uint8_t uad = 0;
+    uint8_t bds = 8;
+    uint64_t d = 1;
+    while (op < usize || usize == -1) {
+        if (webfoot_get_bit(&br))
+            dst[op++] = webfoot_get_bits(&br, uns) + uad;
+        else if (webfoot_get_bit(&br)) {
+            uint64_t l = webfoot_get_gamma(&br);
+            if (l <= 2) l = webfoot_get_gamma(&br);
+            else {
+                l -= 3;
+                d = (l << bds) | webfoot_get_bits(&br, bds);
+                l = webfoot_get_gamma(&br);
+                if (d >= 0x10000) l += 3;
+                else if (d >= 0x37FF) l += 2;
+                else if (d >= 0x27F) l += 1;
+                else if (d < 0x80) l += 4;
+            }
+            for (size_t i=0;i < l;i++,op++) dst[op] = dst[op - d];
+        } else if (webfoot_get_bit(&br)) {
+            int8_t x = webfoot_get_bits(&br, 4) - 1;
+            if (x < 0) {
+                if (webfoot_get_bit(&br)) {
+                    do {
+                        for (uint16_t i=0;i < 0x100;i++) dst[op++] = webfoot_get_bits(&br, 8);
+                    } while (webfoot_get_bit(&br));
+                } else {
+                    uns = 7 + webfoot_get_bit(&br);
+                    if (uns != 8) uad = webfoot_get_bits(&br, 8);
+                    else uad = 0;
+                }
+            }
+            else if (x == 0) dst[op++] = 0;
+            else {
+                dst[op] = dst[op - x];
+                op++;
+            }
+        } else {
+            uint8_t x = webfoot_get_bits(&br, 7);
+            if (x == 0) {
+                x = webfoot_get_bits(&br, 2);
+                if (x == 0) break;
+                bds = webfoot_get_bits(&br, x + 3);
+            } else {
+                d = x;
+                uint8_t l = webfoot_get_bits(&br, 2) + 2;
+                for (size_t i=0;i < l;i++,op++) dst[op] = dst[op - d];
+            }
+        }
+    }
+
+    return op;
+}
+
+typedef struct {
     const uint8_t *src;
     size_t s;
     size_t p;

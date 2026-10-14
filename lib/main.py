@@ -216,7 +216,7 @@ def readfile(f:str,m='rb',off=0,size=None,encoding='utf-8',newline=None,**kwargs
     r = o.read(size)
     o.close()
     return r
-def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,ct:int=None,mt:int=None,at:int=None,**kwargs):
+def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,ct:int=None,mt:int=None,at:int=None,unix=True,**kwargs):
     if m is None:
         if isinstance(d,(bytes,bytearray,memoryview)): m = 'b'
         elif isinstance(d,str): m = 't'
@@ -241,7 +241,7 @@ def writefile(f:str,d:bytes|str,m:str=None,encoding='utf-8',newline=None,ct:int=
         else: o = xopen(f,m,encoding=encoding,newline=newline,**kwargs)
         r = o.write(d)
         o.close()
-    set_ftime(f,ct=ct,mt=mt,at=at)
+    set_ftime(f,ct=ct,mt=mt,at=at,unix=unix)
 
     return r
 def rldir(i:str,files=True) -> list[str]:
@@ -404,6 +404,7 @@ TS_FMTS = [strp2re(x) for x in (
     "%m/%d/%Y",
     "%Y-%m-%d",
     "%Y-%m-%dT%H:%M:%S.%:mZ",
+    "%Y%m%d%H%M%S",
     "%:l:en_US:%m/%d/%Y %I:%M:%S %p",
     "%:l:en_US:%c",
     "%:l:en_US:%a, %d %b %Y %H:%M:%S %z",
@@ -1444,6 +1445,7 @@ def guess_ext_ps2(d:bytes):
 def guess_ext_nds(d:bytes):
     if not d: return 'null'
 
+    if isinstance(d,bytearray): d = bytes(d)
     if d[:4] in {b'RGCN',b'RLCN',b'RECN',b'RNAN',b'RCSN'}: ext = d[:4].decode('ascii').lower()[::-1]
     elif d[:4] in {b'BMD0',}: ext = d[:3].decode('ascii').lower()
     else: ext = guess_ext(d)

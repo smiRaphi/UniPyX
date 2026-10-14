@@ -801,8 +801,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
                     asrt(s == f.readu32())
                     f.skip(0x18)
                     d = f.read(s)
-                writefile(o + f'/{dn}{fe[1]}',d)
-                set_ftime(o + f'/{dn}{fe[1]}',tm)
+                writefile(o + f'/{dn}{fe[1]}',d,ct=tm)
             f.close()
             if fs: return
         case 'High Impact Games WAD':
@@ -981,9 +980,7 @@ def extract4_2(inp:str,out:str,t:str) -> bool:
 
                         f.seek(p)
                         if dr: [reade(pn + '/' + n) for _ in range(s-2)]
-                        else:
-                            writefile(pn + '/' + n,f.read(s))
-                            set_ftime(pn + '/' + n,tm)
+                        else: writefile(pn + '/' + n,f.read(s),ct=tm)
                     reade(o)
                 else: raise NotImplementedError(f'Platform: 0x{p:08X}')
 

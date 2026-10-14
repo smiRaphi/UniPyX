@@ -381,8 +381,8 @@ def extract5(inp:str,out:str,t:str) -> bool:
         case 'Precomp':
             f = xopen(i,'rb')
             f.seek(3)
-            v = list(f.read(3))
-            f.seek(7)
+            v = tuple(f.read(3))
+            f.seek(6 + (1 if v >= (0,4,0) else 0))
             t = []
             while True:
                 b = f.read(1)

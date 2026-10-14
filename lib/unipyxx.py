@@ -136,6 +136,7 @@ class X:
             ('decompress_lbalzss',  (P(u8),szt,P(u8),sszt,u8),sszt,0),
             ('decompress_cc3',      (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_aplib',    (P(u8),szt,P(u8),sszt),   sszt,1),
+            ('decompress_webfoot',  (P(u8),szt,P(u8),sszt),   sszt,1),
             ('decompress_capcom_yz2',(P(u8),szt,P(u8),sszt),  sszt,1),
             ('decompress_d0llz3',   (P(u8),szt,P(u8),sszt),   sszt,1),
 
@@ -152,6 +153,7 @@ class X:
             ('decrypt_rxor',  (P(u8),szt,u8),       void,0),
             ('decrypt_cxor',  (P(u8),szt,P(u8),szt),void,0),
             ('decrypt_cxori', (P(u8),szt,P(u8),szt,szt),void,0),
+            ('decrypt_cxorm', (P(u8),szt,P(u8),szt,szt),void,0),
             ('decrypt_dxor',  (P(u8),szt,P(u8),szt,P(u8),szt),void,0),
             ('decrypt_rlcg',  (P(u8),szt,u8,u8),    void,0),
             ('decrypt_tea',   (P(u8),szt,P(u8),P(u8),s8),void,0),
@@ -305,6 +307,7 @@ class X:
     def decompress_lzfse(src:bytes,usize:int) -> bytes: ...
     def decompress_cc3(src:bytes,usize:int) -> bytes: ...
     def decompress_aplib(src:bytes,usize:int) -> bytes: ...
+    def decompress_webfoot(src:bytes,usize:int) -> bytes: ...
 
     def decompress_blz_raw(self,src:bytes,usize:int) -> bytes:
         i = (u8 * len(src)).from_buffer_copy(src)
@@ -560,6 +563,11 @@ class X:
         b = (u8 * len(src)).from_buffer_copy(src)
         k = (u8 * len(key)).from_buffer_copy(key)
         self.dll.decrypt_cxori(b,len(src),k,len(key),iv)
+        return bytes(b)
+    def decrypt_cxorm(self,src:bytes,key:bytes,iv:int=0) -> bytes:
+        b = (u8 * len(src)).from_buffer_copy(src)
+        k = (u8 * len(key)).from_buffer_copy(key)
+        self.dll.decrypt_cxorm(b,len(src),k,len(key),iv)
         return bytes(b)
     def decrypt_dxor(self,src:bytes,key1:bytes,key2:bytes) -> bytes:
         b = (u8 * len(src)).from_buffer_copy(src)

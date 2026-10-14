@@ -829,7 +829,6 @@ def extract2(inp:str,out:str,t:str) -> bool:
             run(['discimagemanager','-c',tf],cwd=o)
             tf.destroy()
             if listdir(o):
-                from time import strptime,mktime
 
                 for f in rldir(o,False):
                     if not exists(f): continue
@@ -853,8 +852,7 @@ def extract2(inp:str,out:str,t:str) -> bool:
                                 f = nf
 
                         if 'DATETIME=' in finf:
-                            ft = mktime(strptime(finf.split('DATETIME=')[1].split()[0],'%Y%m%d%H%M%S'))
-                            set_ftime(f,ft)
+                            set_ftime(f,str2unix(finf.split('DATETIME=')[1].split()[0]))
                 return
         case 'C64 IMG':
             run(['c1541'],stdin=f'attach "{i}"\nextract\nquit\n',cwd=o)

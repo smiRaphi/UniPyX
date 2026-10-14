@@ -582,15 +582,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             for fe in refs:
                 fn = fe['ffn']
                 copyfile(drefs[fe['sha1']],fn)
-                ts = [0,0,0]
-                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
-                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
-                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
-                set_ftime(fn,*ts,unix=False)
-                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
-                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
-                if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
-                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+                dump_aux_zip(fn,fe,[fn])
             if fs: return
 
             if readfile(i,size=2) == b'MZ':
@@ -706,15 +698,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
             for fe in refs:
                 fn = fe['ffn']
                 copyfile(drefs[fe['sha1']],fn)
-                ts = [0,0,0]
-                if 'c' in fe['ts']: ts[0] = fe['ts']['c']
-                if 'a' in fe['ts']: ts[1] = fe['ts']['a']
-                if 'm' in fe['ts']: ts[2] = fe['ts']['m']
-                set_ftime(fn,*ts,unix=False)
-                if fe.get('cm'): writefile(fn + '.$comment.txt',fe['cm'])
-                if 'kv' in fe: writefile(fn + '.$kvpairs.json',json.dumps(fe['kv'],indent=2),'wt')
-                if 'avinf' in fe: writefile(fn + '.$avinfo.bin',fe['avinf'])
-                if 'os2x' in fe: writefile(fn + '.$os2.ea',fe['os2x'])
+                dump_aux_zip(fn,fe,[fn])
             if fs: return
 
             zip7(i,o,'ZIP',True)
@@ -1225,6 +1209,8 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 f.seek((fe[1]+1) * cs)
                 writefile(o + '/' + fe[0],f.read(fe[2]))
                 if fe[3]: set_ftime(o + '/' + fe[0],fe[3])
+
+            f.close()
             if fs: return
         case 'Base64':
             if db.print_try: print('Trying with custom extractor')
@@ -1438,8 +1424,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     cts = max(str2unix(x['startedDateTime']) for x in di['pages'])
                     mts = max(str2unix(x['startedDateTime']) + x['pageTimings'].get('onContentLoad',x['pageTimings']['onLoad']) for x in di['pages'])
                 else: cts = mts = None
-                writefile(o + '/$info.json',inf,'j',indent=4)
-                set_ftime(o + '/$info.json',ct=cts,mt=mts)
+                writefile(o + '/$info.json',inf,'j',indent=4,ct=cts,mt=mts)
 
             for ix,x in enumerate(di['entries']):
                 ct = str2unix(x['startedDateTime'])
@@ -1448,8 +1433,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                 for y in x:
                     if y not in {'request','response'}: inf[y] = x[y]
                 fn = f'{o}/{ix:02d}_$info.json'
-                writefile(fn,inf,'j',indent=4)
-                set_ftime(fn,ct=ct,mt=mt)
+                writefile(fn,inf,'j',indent=4,ct=ct,mt=mt)
 
                 qx = x['request']
                 rq = {}
@@ -1462,8 +1446,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                             else: rq[y][k] = v
                     else: rq[y] = qx[y]
                 fn = f'{o}/{ix:02d}_$request.json'
-                writefile(fn,rq,'j',indent=4)
-                set_ftime(fn,ct=ct)
+                writefile(fn,rq,'j',indent=4,ct=ct)
 
                 sx = x['response']
                 rs = {}
@@ -1478,8 +1461,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                         rs[y] = {zk:zv for zk,zv in sx[y].items() if zk in {'size','mimeType','compression'}}
                     else: rs[y] = sx[y]
                 fn = f'{o}/{ix:02d}_$response.json'
-                writefile(fn,rs,'j',indent=4)
-                set_ftime(fn,ct=ct,mt=mt)
+                writefile(fn,rs,'j',indent=4,ct=ct,mt=mt)
 
                 if 'content' in sx:
                     cx = sx['content']
@@ -1495,8 +1477,7 @@ def extract1(inp:str,out:str,t:str) -> bool:
                     else:
                         fn += '.null'
                         d = b''
-                    writefile(fn,d)
-                    set_ftime(fn,ct=ct,mt=mt)
+                    writefile(fn,d,ct=ct,mt=mt)
 
             if di['entries']: return
         case 'Base64 Data URL':
@@ -2078,8 +2059,8 @@ def writefile_zip(**l):
     else:
         asrt(not idir,d)
         writefile(fn,d)
-    tsns = [fn]
-
+    dump_aux_zip(fn,fe,[fn])
+def dump_aux_zip(fn:str,fe:dict,tsns:list[str]=[]):
     if fe.get('cm'):
         writefile(fn + '.$comment.txt',fe['cm'])
         tsns.append(fn + '.$comment.txt')

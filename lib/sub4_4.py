@@ -106,8 +106,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
                     else: d = f.readc(fe[6])
                 fn = f'{o}/{fe[0]}.{ex}'
                 writefile(fn,d)
-                if fe[2] > 0:
-                    set_ftime(fn,fe[2])
+                if fe[2] > 0: set_ftime(fn,fe[2])
 
             f.close()
             if fs: return
@@ -2246,8 +2245,7 @@ def extract4_4(inp:str,out:str,t:str) -> bool:
                     fn = fe[0].replace('.','/')
                     if fn.split('/')[-1] in {'ts','tome','wav','mp3','txt'}: fn = '.'.join(fn.rsplit('/',1))
                 fn = o + '/' + fn
-                writefile(fn,d)
-                set_ftime(fn,fe[3],unix=False)
+                writefile(fn,d,ct=fe[3],unix=False)
 
             f.close()
             if fs: return

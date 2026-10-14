@@ -170,15 +170,15 @@ class File:
     def readf64(self,end=None) -> float: return self.unpack('d',end)
     def readbool(self):
         b = self.readu8()
-        if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-1:08X}")
+        if b not in {0,1}: raise ValueError(f"Invalid bool value: 0x{b:02X} @ 0x{self.pos-1:08X}")
         return bool(b)
     def readbool16(self,end=None):
         b = self.readu16(end)
-        if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-2:08X}")
+        if b not in {0,1}: raise ValueError(f"Invalid bool value: 0x{b:04X} @ 0x{self.pos-2:08X}")
         return bool(b)
     def readbool32(self,end=None):
         b = self.readu32(end)
-        if b not in {0,1}: raise ValueError(f"Invalid bool value: {b} @ 0x{self.pos-4:08X}")
+        if b not in {0,1}: raise ValueError(f"Invalid bool value: 0x{b:08X} @ 0x{self.pos-4:08X}")
         return bool(b)
     def readleb128u(self):
         n = c = b = 0
@@ -696,6 +696,7 @@ LZWM = {
 
     'lzw':   {'mb':13,'ics':9, '1c':0x102,'cc':0x100, 'ec':0x101, 'be':False},
     'lzw_lg':{'mb':14,'ics':14,'1c':0x100,'cc':0x3FFE,'ec':0x3FFF,'be':True,'md':0x3FFE},
+  'lzw_mlst':{'mb':12,'ics':9, '1c':0x102,'cc':0x100, 'ec':0x101, 'be':False},
     'lzw_ys':{'mb':12,'ics':9, '1c':0x100,'rm':True,  'be':True, 'rc':True},
     'z':     {        'ics':9, '1c':0x100,            'be':False,'vp':True},
     'zb':    {        'ics':9, '1c':0x101,'cc':0x100, 'be':False,'vp':True},
@@ -1019,14 +1020,17 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             return uxx().decompress_lzss0_win_lsb(i,usize=kwargs['usize'],win=kwargs.get('win'),woff=kwargs.get('woff',0xFEE))
         case 'lzss1': return uxx().decompress_lzss1(i,usize=kwargs['usize'])
         case 'lzss16c': return lzss16c_decompress(i,usize=kwargs['usize'],big_endian=kwargs.get('big_endian',True))
-        case 'lzw'|'lzw_lg'|'lzw_ys':
+        case 'lzw'|'lzw_lg'|'lzw_ys'|'lzw_mlst':
             kw = kwargs.copy()
             asrt('usize' in kw)
+            ver = kw.pop('verify',False)
             for k,v in LZWM[algo].items():
                 rk = LZWM[k]
                 if not rk in kw: kw[rk] = v
 
-            return uxx().decompress_lzw(i,**kw)
+            r = uxx().decompress_lzw(i,**kw)
+            if ver: asrt(len(r) == kw['usize'],len(r),'!=',kw['usize'])
+            return r
         case 'rtl_lz':
             if 'usize' in kwargs: us = kwargs['usize']
             else: us,i = int.from_bytes(i[:8],'little'),i[8:]
@@ -1088,6 +1092,7 @@ def decompress(i:bytes,algo:str,**kwargs) -> bytes:
             elif t == 2: return decompress(i[4:],'lzw_ys',usize=kwargs['usize']) # LZW
             raise ValueError(f'Unknown stream compression type {t}')
         case 'aplib': return uxx().decompress_aplib(i,kwargs['usize'])
+        case 'webfoot': return uxx().decompress_webfoot(i,kwargs['usize'])
 
         case 'lz10_raw'|'lz11_raw'|'lz40_raw'|'lz60_raw'|'blz_raw':
             if algo == 'lz60_raw': algo = 'lz40_raw'

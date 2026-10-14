@@ -366,6 +366,15 @@ class DLDB:
             rmtree(td)
         else: raise NotImplementedError(p + f' [{ex}]')
     def dl(self,url:str,out:str,verify=True):
+        if url.startswith('gdrive:'):
+            r = self.c.get(f'https://docs.google.com/uc?export=download&confirm=1&id={url[7:]}',follow_redirects=True)
+            for k,v in r.cookies.items():
+                if k.startswith('download_warning'):
+                    r = self.c.get(f'https://docs.google.com/uc?export=download&confirm={v}&id={url[7:]}',follow_redirects=True)
+                    break
+            with open(out,'wb') as f: f.write(r.content)
+            return
+
         start = 0
         kwargs = {}
         if not verify:
